@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.apache.log4j.Logger;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -51,8 +52,8 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
-import org.objectweb.proactive.core.group.ProActiveGroupManager;
-import org.objectweb.proactive.core.group.ProActiveGroupManagerFactory;
+import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
+import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
@@ -96,7 +97,6 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-import java.util.Hashtable;
 
 
 public class ProActiveMetaObjectFactory implements MetaObjectFactory,
@@ -121,7 +121,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected MigrationManagerFactory migrationManagerFactoryInstance;
     protected RemoteBodyFactory remoteBodyFactoryInstance;
     protected ThreadStoreFactory threadStoreFactoryInstance;
-    protected ProActiveGroupManagerFactory proActiveGroupManagerFactoryInstance;
+    protected ProActiveSPMDGroupManagerFactory proActiveSPMDGroupManagerFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
     protected ProActiveSecurityManager proActiveSecurityManager;
 
@@ -136,7 +136,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
         remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
         threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-        proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
+        proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
     }
 
     /**
@@ -156,7 +156,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
             remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
             threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-            proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
+            proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
         }
     }
 
@@ -210,8 +210,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return threadStoreFactoryInstance;
     }
 
-    public ProActiveGroupManagerFactory newProActiveGroupManagerFactory() {
-        return proActiveGroupManagerFactoryInstance;
+    public ProActiveSPMDGroupManagerFactory newProActiveSPMDGroupManagerFactory() {
+        return proActiveSPMDGroupManagerFactoryInstance;
     }
 
     public ProActiveComponentFactory newComponentFactory() {
@@ -249,8 +249,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return new ThreadStoreFactoryImpl();
     }
 
-    protected ProActiveGroupManagerFactory newProActiveGroupManagerFactorySingleton() {
-        return new ProActiveGroupManagerFactoryImpl();
+    protected ProActiveSPMDGroupManagerFactory newProActiveSPMDGroupManagerFactorySingleton() {
+        return new ProActiveSPMDGroupManagerFactoryImpl();
     }
 
     protected ProActiveComponentFactory newComponentFactorySingleton(
@@ -338,11 +338,11 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
                     return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
                 } else if ("rmissh".equals(System.getProperty(
-                			"proactive.communication.protocol"))) {
-                	if (logger.isDebugEnabled()) {
-                		logger.debug("Factory is rmissh");
-                	}
-                	return new org.objectweb.proactive.core.body.rmi.SshRemoteBodyAdapter(body);
+                                "proactive.communication.protocol"))) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Factory is rmissh");
+                    }
+                    return new org.objectweb.proactive.core.body.rmi.SshRemoteBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmi");
@@ -365,10 +365,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // end inner class ThreadStoreFactoryImpl
-    protected static class ProActiveGroupManagerFactoryImpl
-        implements ProActiveGroupManagerFactory, java.io.Serializable {
-        public ProActiveGroupManager newProActiveGroupManager() {
-            return new ProActiveGroupManager();
+    protected static class ProActiveSPMDGroupManagerFactoryImpl
+        implements ProActiveSPMDGroupManagerFactory, java.io.Serializable {
+        public ProActiveSPMDGroupManager newProActiveSPMDGroupManager() {
+            return new ProActiveSPMDGroupManager();
         }
     }
 

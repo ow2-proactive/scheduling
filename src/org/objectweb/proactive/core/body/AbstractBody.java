@@ -30,18 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -54,10 +44,8 @@ import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.group.ProActiveGroupManager;
-import org.objectweb.proactive.core.group.ProxyForGroup;
+import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.ext.security.Communication;
@@ -75,6 +63,18 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 
 /**
@@ -125,8 +125,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected static Logger logger = Logger.getLogger(AbstractBody.class.getName());
     protected boolean isInterfaceSecureImplemented = false;
 
-    // GROUP
-    protected ProActiveGroupManager pgm;
+    // SPMD GROUP
+    protected ProActiveSPMDGroupManager spmdManager;
 
     // FAULT TOLERANCE
     protected FTManager ftmanager;
@@ -169,8 +169,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 
         // GROUP
-        this.pgm = factory.newProActiveGroupManagerFactory()
-                          .newProActiveGroupManager();
+        this.spmdManager = factory.newProActiveSPMDGroupManagerFactory()
+                                  .newProActiveSPMDGroupManager();
 
         Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
         Security.addProvider(myProvider);
@@ -453,6 +453,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         } finally {
             exitFromThreadStore();
         }
+    }
+
+    public ProActiveSPMDGroupManager getProActiveSPMDGroupManager() {
+        return this.spmdManager;
     }
 
     public Policy getPolicyFrom(X509Certificate certificate)
@@ -839,8 +843,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         throws java.io.IOException, RenegotiateSessionException {
         long sessionID = 0;
 
-        //	logger.debug("send Request Body" + destinationBody);
-        //logger.debug(" bla" + destinationBody.getRemoteAdapter());
+        // Tag the outgoing request with the barrier tags
+        if (!this.spmdManager.isTagsListEmpty()) {
+            methodCall.setBarrierTags(this.spmdManager.getBarrierTags());
+        }
+
+        // logger.debug("send Request Body" + destinationBody);
+        // logger.debug(" bla" + destinationBody.getRemoteAdapter());
         try {
             try {
                 if (!isSecurityOn) {
@@ -850,13 +859,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                         byte[] certE = destinationBody.getRemoteAdapter()
                                                       .getCertificateEncoded();
                         X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                        System.out.println("send Request AbstractBody, method " +
-                            methodCall.getName() + " cert " +
-                            cert.getSubjectDN().getName());
-                        if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
-                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+
+                        //                        System.out.println("send Request AbstractBody, method " +
+                        //                            methodCall.getName() + " cert " +
+                        //                            cert.getSubjectDN().getName());
+                        if ((sessionID = this.psm.getSessionIDTo(cert)) == 0) {
+                            this.psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
                                 destinationBody.getRemoteAdapter());
-                            sessionID = psm.getSessionIDTo(cert);
+                            sessionID = this.psm.getSessionIDTo(cert);
                         }
                     }
                 }
@@ -1004,7 +1014,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param o - the new SPMD group
      */
     public void setSPMDGroup(Object o) {
-        this.pgm.setSPMDGroup(o);
+        this.spmdManager.setSPMDGroup(o);
     }
 
     /**
@@ -1012,7 +1022,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @return the SPMD group of the active object
      */
     public Object getSPMDGroup() {
-        return this.pgm.getSPMDGroup();
+        return this.spmdManager.getSPMDGroup();
     }
 
     /**
@@ -1021,20 +1031,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      */
     public int getSPMDGroupSize() {
         return ProActiveGroup.size(this.getSPMDGroup());
-    }
-
-    /**
-     * Send a call to all member of the SPMD group
-     * @param gmc the control method call for group
-     */
-    public void sendSPMDGroupCall(MethodCallControlForGroup gmc) {
-        try {
-            ((ProxyForGroup) ProActiveGroup.getGroup(this.pgm.getSPMDGroup())).reify(gmc);
-        } catch (InvocationTargetException e) {
-            System.err.println(
-                "Unable to invoke a method call to control groups");
-            e.printStackTrace();
-        }
     }
 
     /**

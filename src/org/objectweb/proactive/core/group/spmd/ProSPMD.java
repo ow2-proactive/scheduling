@@ -216,8 +216,7 @@ public class ProSPMD {
      * @param barrierName the name of the barrier (used as unique identifier)
      */
     public static void barrier(String barrierName) {
-        ((AbstractBody) ProActive.getBodyOnThis()).sendSPMDGroupCall(new MethodCallBarrier(
-                barrierName));
+        ProSPMD.barrier(barrierName, ProSPMD.getSPMDGroup());
     }
 
     /**
@@ -228,8 +227,15 @@ public class ProSPMD {
      */
     public static void barrier(String barrierName, Object group) {
         try {
-            ((ProxyForGroup) ProActiveGroup.getGroup(group)).reify(new MethodCallBarrier(
-                    barrierName, ProActiveGroup.size(group)));
+            // add the barrier into the tag list
+            AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
+            body.getProActiveSPMDGroupManager().addToBarrierTags(barrierName);
+            // set the number of awaited message barriers
+            body.getProActiveSPMDGroupManager().setAwaitedBarrierCalls(barrierName,
+                ProActiveGroup.size(group));
+            // send the barrier messages
+            ProxyForGroup proxy = (ProxyForGroup) ProActiveGroup.getGroup(group);
+            proxy.reify(new MethodCallBarrier(barrierName));
         } catch (InvocationTargetException e) {
             System.err.println(
                 "Unable to invoke a method call to control groups");

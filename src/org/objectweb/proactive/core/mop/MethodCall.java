@@ -30,14 +30,19 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import java.io.ByteArrayInputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.ObjectToByteConverter;
 
 import sun.rmi.server.MarshalInputStream;
+
+import java.io.ByteArrayInputStream;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -106,6 +111,11 @@ public class MethodCall implements java.io.Serializable {
     private Object[] effectiveArguments;
 
     /**
+     * The list of tags for barrier
+     */
+    private LinkedList tagsForBarrier = null;
+
+    /**
      * The method corresponding to the call
      */
     private transient Method reifiedMethod;
@@ -131,16 +141,16 @@ public class MethodCall implements java.io.Serializable {
         if ((serializedEffectiveArguments == null) &&
                 (effectiveArguments != null)) {
             try {
-//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//
-//                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-//                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
-//                objectOutputStream.writeObject(effectiveArguments);
-//                objectOutputStream.flush();
-//                objectOutputStream.close();
-//                byteArrayOutputStream.close();
-//                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
-            	 serializedEffectiveArguments = ObjectToByteConverter.convert(effectiveArguments);
+                //                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                //
+                //                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+                //                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
+                //                objectOutputStream.writeObject(effectiveArguments);
+                //                objectOutputStream.flush();
+                //                objectOutputStream.close();
+                //                byteArrayOutputStream.close();
+                //                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+                serializedEffectiveArguments = ObjectToByteConverter.convert(effectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -255,6 +265,7 @@ public class MethodCall implements java.io.Serializable {
                 mc.tag = null;
                 mc.reifiedMethod = null;
                 mc.effectiveArguments = null;
+                mc.tagsForBarrier = null;
                 mc.key = null;
                 // Inserts the object in the pool
                 MethodCall.recyclePool[MethodCall.index] = mc;
@@ -379,11 +390,10 @@ public class MethodCall implements java.io.Serializable {
                 "Arguments for the method " + this.getName() +
                 " are invalids: " + e);
         } /*catch (InvocationTargetException e) {
-            throw new MethodCallExecutionFailedException(
-                "Target for invocation of " + this.getName() +
-                " is invalid: " + e);
-        }*/
-    }
+           throw new MethodCallExecutionFailedException(
+               "Target for invocation of " + this.getName() +
+               " is invalid: " + e);
+           }*/}
 
     protected void finalize() {
         MethodCall.setMethodCall(this);
@@ -604,6 +614,26 @@ public class MethodCall implements java.io.Serializable {
             }
             return result;
         }
+    }
+
+    /**
+     * Set the tags for barrier to the method call (by copy)
+     * @param barrierTags the list of tags
+     */
+    public void setBarrierTags(LinkedList barrierTags) {
+        this.tagsForBarrier = new LinkedList();
+        Iterator it = barrierTags.iterator();
+        while (it.hasNext()) {
+            this.tagsForBarrier.add(new String((String) it.next()));
+        }
+    }
+
+    /**
+     * Get the tags for barrier to the method call (by copy)
+     * @return the list of barrier tags
+     */
+    public LinkedList getBarrierTags() {
+        return this.tagsForBarrier;
     }
 
     //

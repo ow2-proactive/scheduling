@@ -30,13 +30,12 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+
+import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -44,21 +43,12 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
  * @author Laurent Baduel
  */
 public class MethodCallBarrier extends MethodCallControlForGroup {
-    private String IDName;
-    private int awaitedCalls;
 
-    private BlockingRequestQueue queueRef = null;
-    private BarrierState barrierState = null;
-    
-    /**
-     * Constructor
-     * @param idname - the id name of the barrier
-     * @param nbCalls - the number of call need to finish the barrier
-     */
-    public MethodCallBarrier(String idname, int nbCalls) {
-        this.IDName = idname;
-        this.awaitedCalls = nbCalls;
-    }
+    /** The unique ID of the barrier */
+    private String IDName;
+
+    /** the SPMDGroupManager in wich the barrier call have to operate (on the calle side) */
+    private ProActiveSPMDGroupManager spmdManager = null;
 
     /**
      * Constructor
@@ -66,7 +56,6 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      */
     public MethodCallBarrier(String idname) {
         this.IDName = idname;
-        this.awaitedCalls = ((AbstractBody) ProActive.getBodyOnThis()).getSPMDGroupSize();
     }
 
     /**
@@ -78,14 +67,6 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     }
 
     /**
-     * Returns the number of awaited call for this barrier
-     * @return the number of awaited call for this barrier
-     */
-    public int getAwaitedCalls() {
-        return this.awaitedCalls;
-    }
-
-    /**
      * Returns the ID name of the barrier
      * @return the ID name of the barrier
      */
@@ -94,37 +75,39 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     }
 
     /**
-     * Returns true if the barrier is immediate
-     * @return false - by default barrier are not immediate
+     * Execution of a barrier call is to block the service of request if the method is sent by the object itself.
+     * @param target this object is not used.
+     * @return null
      */
-    public boolean isImmediate() {
-    	return false;
-    }
-    
-    
-	/**
-	 * Execution of a barrier call is to block the service of request if the method is sent by the object itself
-	 */
-	public Object execute(Object target) throws InvocationTargetException, MethodCallExecutionFailedException {
-		if (this.queueRef != null) {
-			barrierState.setAwaitedCalls(this.getAwaitedCalls());
-			barrierState.tagLocalyCalled();
-			//check if this call is the last one for the barrier described in the barrierState  
-			int calls = barrierState.getAwaitedCalls() - (barrierState.getReceivedCalls()+1);
-			//if it is, do not block, the barrier is instantly released
-			if (calls != 0) {
-				queueRef.suspend();
-			}
-		}
-		return null;
-	}
-	
-	public void setQueue(BlockingRequestQueue b) {
-		this.queueRef = b;
-	}
-	
-	public void setBarrierState(BarrierState bs) {
-		this.barrierState = bs;
-	}
+    public Object execute(Object target)
+        throws InvocationTargetException, MethodCallExecutionFailedException {
+        this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
+        BarrierState bs = (BarrierState) this.spmdManager.getBarrierStateFor(this.getIDName());
 
+        // bs == null  =>  state not found  =>  first barrier encountered for ID name
+        if (bs == null) {
+            // System.out.println("First barrier \"" + this.getIDName() + "\" encountered !");
+            // build and add infos about new barrier
+            bs = new BarrierState();
+            this.spmdManager.addToCurrentBarriers(this.getIDName(), bs);
+        }
+
+        // if there is others waiting calls, decrement
+        if ((bs.getAwaitedCalls() - (bs.getReceivedCalls() + 1)) != 0) {
+            bs.incrementReceivedCalls();
+        }
+        // calls == 0  =>  this is the last awaited call to this barrier 
+        else {
+            this.spmdManager.remove(this.getIDName());
+        }
+        return null;
+    }
+
+    /**
+     *  Set the SPMDGroupManager in wich the barrier call have to operate
+     * @param spmdManager the ProActiveSPMDGroupManager in wich the barrier call have to operate
+     */
+    public void setSPMDManager(ProActiveSPMDGroupManager spmdManager) {
+        this.spmdManager = spmdManager;
+    }
 }

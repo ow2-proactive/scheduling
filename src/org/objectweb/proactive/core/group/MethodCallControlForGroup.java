@@ -38,6 +38,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.util.LinkedList;
+
 
 /**
  * @author Laurent Baduel
@@ -109,5 +111,20 @@ public abstract class MethodCallControlForGroup extends MethodCall {
      */
     public boolean isOneWayCall() {
         return true;
+    }
+
+    /**
+     * This method does nothing, because control messages are not subject to be bloqued by barriers
+     * @param barrierTags unsed parameter
+     */
+    public void setBarrierTags(LinkedList barrierTags) {
+    }
+
+    /**
+     * Control messages are never tagged
+     * @return null
+     */
+    public LinkedList getBarrierTags() {
+        return null;
     }
 }

@@ -28,32 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.group;
+package org.objectweb.proactive.core.group.spmd;
 
 
 /**
  * @author Laurent Baduel
  */
-public class ProActiveGroupManager implements java.io.Serializable {
-    private Object spmdGroup = null;
-
-    /**
-     * Set the SPMD group for the active object
-     * @param o - the new SPMD group
-     */
-    public void setSPMDGroup(Object o) {
-        this.spmdGroup = o;
-    }
-
-    /**
-     * Returns the SPMD group of the active object
-     * @return the SPMD group of the active object
-     */
-    public Object getSPMDGroup() {
-        return this.spmdGroup;
-    }
-
-    public void test() {
-        System.out.println("APPEL A TEST");
-    }
+public interface ProActiveSPMDGroupManagerFactory {
+    public ProActiveSPMDGroupManager newProActiveSPMDGroupManager();
 }
