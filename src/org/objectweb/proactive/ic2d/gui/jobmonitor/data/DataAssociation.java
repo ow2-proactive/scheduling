@@ -206,10 +206,7 @@ public class DataAssociation implements JobMonitorConstants {
 		
 		return res;
 	}
-	
-	/*
-	 * Exemple : getValues(VN, "myVN", AO) ==> {"Object1", "Object2"}
-	 */
+		
 	public MonitoredObjectSet getValues(BasicMonitoredObject from, int to, Set constraints) {
 		int key = from.getKey();
 		

@@ -19,4 +19,5 @@ public interface JobMonitorConstants
 	public static final String[] NAMES = new String[] {"Host", "JVM", "Node", "Active Object", "Job", "Virtual Node"};
 	public static final int NB_KEYS = NAMES.length;
 	public static final int[] KEY2INDEX = {0, 1, 2, 3, -1, 4, 5};
+	public static final int[] KEYS = {0, 1, 2, 3, 5, 6};
 }

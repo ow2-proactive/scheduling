@@ -40,7 +40,6 @@ public class Switcher extends JPanel implements JobMonitorConstants
 			final Branch b = treeModel.getBranch(i);
 			final JLabel l = new JLabel (b.getName(), b.getIcon(), SwingConstants.CENTER);
 			
-			l.setHorizontalAlignment (SwingConstants.CENTER);
 			l.setOpaque (true);
 			l.addMouseListener (new MouseAdapter()
 			{

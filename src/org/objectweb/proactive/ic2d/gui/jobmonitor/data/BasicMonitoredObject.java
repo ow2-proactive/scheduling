@@ -1,6 +1,7 @@
 
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
@@ -9,20 +10,20 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 	protected int key;
 	protected String prettyName;
 	protected String fullname;
-	private boolean deleted;
+	private GregorianCalendar deletedSince;
 	
 	protected BasicMonitoredObject(int key, String fullname) {
 		this.key = key;
 		this.fullname = fullname;
 		this.prettyName = fullname;
-		this.deleted = false;
+		this.deletedSince = null;
 	}
 	
 	public void copyInto(BasicMonitoredObject o) {
 		o.key = key;
 		o.prettyName = prettyName;
 		o.fullname = fullname;
-		o.deleted = deleted;
+		o.deletedSince = deletedSince;
 	}
 	
 	public static BasicMonitoredObject create(int key, String fullname) {
@@ -64,11 +65,19 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 	}
 	
 	public boolean isDeleted() {
-		return deleted;
+		return deletedSince != null;
 	}
 	
 	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
+		if (deleted) {
+			if (deletedSince == null)
+				deletedSince = new GregorianCalendar();
+		} else
+			deletedSince = null;
+	}
+	
+	public GregorianCalendar getDeletedSince() {
+		return deletedSince;
 	}
 	
 	public String getFullName() {

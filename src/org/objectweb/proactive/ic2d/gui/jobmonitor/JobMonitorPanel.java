@@ -101,7 +101,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         extractMenu.add(extract);
 
         for (int i = 0; i < views.length; i++)
-            tabs.addTab(views[i].getLabel(), views[i].getPanel());
+            tabs.addTab(views[i].getLabel(), views[i].getPane());
 
         tabs.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
@@ -186,7 +186,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 public void run() {
                     handleHosts();
                     for (int i = 0; i < views.length; i++)
-                        views[i].expandFirst();
+                        views[i].doneRefreshing();
                 }
             }).start();
     }
@@ -206,6 +206,13 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         hideOrShow(false);
     }
 
+    private void rebuildAll() {
+        for (int i = 0; i < views.length; i++) {
+            views[i].getModel().rebuild();
+            views[i].doneRefreshing();
+        }
+    }
+
     private void handleHosts() {
         synchronized (monitoredHosts) {
             asso.clear();
@@ -217,8 +224,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 handleHost(host);
             }
 
-            for (int i = 0; i < views.length; i++)
-                views[i].getModel().rebuild();
+            rebuildAll();
         }
     }
 
@@ -228,8 +234,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                     asso.deleteItem(hostNode.getObject());
                     handleHost(hostNode.getName());
 
-                    for (int i = 0; i < views.length; i++)
-                        views[i].getModel().rebuild();
+                    rebuildAll();
                 }
             }).start();
     }
@@ -277,16 +282,20 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     class TreeView {
         private String label;
         private JTree tree;
-        private JPanel panel;
+        private JSplitPane pane;
         private JPopupMenu popupmenu;
+        private JobMonitorStatus status;
 
         public TreeView(String label, int[] keys, boolean allowExchange) {
             this.label = label;
             DataModelTraversal traversal = new DataModelTraversal(keys);
             DataTreeModel model = new DataTreeModel(asso, traversal);
 
-            panel = new JPanel(new GridLayout(1, 1));
-            panel.add(createContent(model, allowExchange));
+            JPanel left = createContent(model, allowExchange);
+
+            pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left,
+                    new JScrollPane(status));
+            pane.setOneTouchExpandable(true);
         }
 
         private boolean constructPopupMenu(final DataTreeNode node) {
@@ -363,14 +372,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             buttons.add(collapse);
         }
 
-        private Container createContent(DataTreeModel model, boolean allowExpand) {
-            //JSplitPane sp = new JSplitPane ();
-            //sp.setOneTouchExpandable (true);
+        private JPanel createContent(DataTreeModel model, boolean allowExpand) {
             JPanel left = new JPanel(new BorderLayout());
 
-            //JPanel right = new JPanel ();
-            //sp.setLeftComponent (left);
-            //sp.setRightComponent (right);
             tree = new JTree(model);
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
             tree.setCellRenderer(new JobMonitorTreeCellRenderer());
@@ -416,6 +420,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             switcher.setBorder(BorderFactory.createEtchedBorder());
             left.add(switcher, BorderLayout.NORTH);
 
+            status = new JobMonitorStatus(tree);
             return left;
         }
 
@@ -423,16 +428,21 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             return label;
         }
 
-        public JPanel getPanel() {
-            return panel;
+        public JSplitPane getPane() {
+            return pane;
         }
 
         public DataTreeModel getModel() {
             return (DataTreeModel) tree.getModel();
         }
 
-        public void expandFirst() {
+        public void doneRefreshing() {
             tree.expandRow(0);
+            TreePath sel = tree.getSelectionPath();
+            if (sel != null) {
+                tree.setSelectionPath(null);
+                tree.setSelectionPath(sel);
+            }
         }
     }
 }
