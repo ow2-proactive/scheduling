@@ -70,8 +70,7 @@ public class Test extends FunctionalTest {
         A b = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "local" }, vnAgent.getNode());
 				Thread.sleep(3000);
-        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties("localhost","Agent"),
-                UrlBuilder.checkProtocol(System.getProperty("proactive.communication.protocol")));
+        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties("localhost","Agent"));
         a = (A) vnLookup.getUniqueAO();
         
     }
