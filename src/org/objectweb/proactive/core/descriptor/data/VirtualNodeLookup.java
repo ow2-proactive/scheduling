@@ -30,17 +30,12 @@
 */ 
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.net.UnknownHostException;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.event.DeploymentPropertiesEvent;
-import org.objectweb.proactive.core.event.DeploymentPropertiesEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 /**
