@@ -872,7 +872,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // caching class
                 ClassDataCache.instance().addClassData(className, classData);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Returning class " + className + " found in " +
+                    logger.debug(getURL() + " -- > Returning class " + className + " found in " +
                         parentRuntimeURL);
                 }
                 return classData;

@@ -4,11 +4,13 @@
  */
 package org.objectweb.proactive.core.util;
 
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+
 import java.util.Hashtable;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.Loggers;
 
 
 /**
@@ -23,6 +25,7 @@ public class ClassDataCache {
     private static Logger logger = Logger.getLogger(Loggers.CLASSLOADER);
     private static ClassDataCache classCache = null;
     private static Map classStorage;
+    private static String runtimeURL = null;
 
     private ClassDataCache() {
         classStorage = new Hashtable();
@@ -51,10 +54,7 @@ public class ClassDataCache {
      * @param classData bytecode of the class
      */
     public void addClassData(String fullname, byte[] classData) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("ClassDataCache caching class " +
-                    fullname);
-        }
+        debug("ClassDataCache caching class " + fullname);
         classStorage.put(fullname, classData);
     }
 
@@ -63,9 +63,18 @@ public class ClassDataCache {
      * @param fullname the name of the class
      */
     public byte[] getClassData(String fullname) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("ClassDataCache was asked for class " + fullname);
-        }
+        debug("ClassDataCache was asked for class " + fullname);
         return (byte[]) classStorage.get(fullname);
+    }
+
+    private void debug(String message) {
+        if (logger.isDebugEnabled()) {
+            try {
+                logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
+                    " --> " + message);
+            } catch (ProActiveException e) {
+                logger.debug("[unresolved runtime url] -- > " + message);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.classloader;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
@@ -45,30 +46,21 @@ public class ProActiveClassLoaderHelper {
         byte[] class_data = null;
 
         // 1. look in class cache
-        if (logger.isDebugEnabled()) {
-            logger.debug("looking for" + className + " in class data cache");
-        }
+        debug("looking for " + className + "  in class data cache");
         class_data = classCache.getClassData(className);
         if (class_data != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("found " + className + " in class data cache");
-            }
+            debug("found " + className + " in class data cache");
             return class_data;
         }
 
         // 2. look in runtime parents
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("looking for " + className +
-                    " in parent runtimes");
-            }
+            debug("looking for " + className + " in parent runtimes");
+
             class_data = ProActiveRuntimeImpl.getProActiveRuntime()
                                              .getClassDataFromParentRuntime(className);
             if (class_data != null) {
-                //classCache.addClassData(className, class_data);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("found " + className  + " in ancestor runtime");
-                }
+                debug("found " + className + " in ancestor runtime");
                 return class_data;
             }
         } catch (Exception e) {
@@ -123,5 +115,16 @@ public class ProActiveClassLoaderHelper {
         }
 
         throw new ClassNotFoundException(className);
+    }
+
+    private void debug(String message) {
+        if (logger.isDebugEnabled()) {
+            try {
+                logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
+                    " --> " + message);
+            } catch (ProActiveException e) {
+                logger.debug("[unresolved runtime url] -- > " + message);
+            }
+        }
     }
 }
