@@ -266,7 +266,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler pathHandler = new PathHandler();
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
                 this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
-                this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESSOR_PER_NODE_TAG, new SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
