@@ -1,0 +1,76 @@
+<html>
+<head>
+  <title>MigratableHello.java</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="0000ff"><strong>import org.objectweb.proactive.ActiveObjectCreationException;</strong></font>
+<font color="0000ff"><strong>import org.objectweb.proactive.ProActive;</strong></font>
+<font color="0000ff"><strong>import org.objectweb.proactive.core.body.migration.MigrationException;</strong></font>
+<font color="0000ff"><strong>import org.objectweb.proactive.core.node.NodeException;</strong></font>
+
+<font color="0000ff"><strong>import java.io.Serializable;</strong></font>
+
+
+<font color="#444444">// the object that will be migrated active has to be Serializable</font>
+<strong>public</strong> <strong>class</strong> <font color="#2040a0">MigratableHello</font> <strong>extends</strong> <font color="#2040a0">InitializedHello</font> <strong>implements</strong> <font color="#2040a0">Serializable</font> <font color="4444FF"><strong>{</strong></font>
+
+    <font color="#444444"><i>/**
+    * Creates a new MigratableHello object.
+    */</i></font>
+    <strong>public</strong> <font color="#2040a0">MigratableHello</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/**
+    * Creates a new MigratableHello object.
+    *
+    * @param name the name of the agent
+    */</i></font>
+
+    <font color="#444444">// ProActive requires the active object to explicitely define (or redefine)</font>
+    <font color="#444444">// the constructors, so that they can be reified</font>
+    <strong>public</strong> <font color="#2040a0">MigratableHello</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font> <font color="#2040a0">name</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <strong>super</strong><font color="4444FF"><strong>(</strong></font><font color="#2040a0">name</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/** factory for locally creating the active object
+    * @param name the name of the agent
+    * @return an instance of a ProActive active object of type MigratableHello
+    *
+    */</i></font>
+    <strong>public</strong> <strong>static</strong> <font color="#2040a0">MigratableHello</font> <font color="#2040a0">createMigratableHello</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font> <font color="#2040a0">name</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <strong>try</strong> <font color="4444FF"><strong>{</strong></font>
+            <strong>return</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">MigratableHello</font><font color="4444FF"><strong>)</strong></font> <font color="#2040a0">ProActive</font>.<font color="#2040a0">newActive</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">MigratableHello</font>.<strong>class</strong>.<font color="#2040a0">getName</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font>,
+                <strong>new</strong> <font color="#2040a0">Object</font><font color="4444FF"><strong>[</strong></font><font color="4444FF"><strong>]</strong></font> <font color="4444FF"><strong>{</strong></font> <font color="#2040a0">name</font> <font color="4444FF"><strong>}</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="4444FF"><strong>}</strong></font> <strong>catch</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">ActiveObjectCreationException</font> <font color="#2040a0">aoce</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+            <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;creation of the active object failed&quot;</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+            <font color="#2040a0">aoce</font>.<font color="#2040a0">printStackTrace</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+            <strong>return</strong> <strong>null</strong><font color="4444FF">;</font>
+        <font color="4444FF"><strong>}</strong></font> <strong>catch</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">NodeException</font> <font color="#2040a0">ne</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+            <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;creation of default node failed&quot;</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+            <font color="#2040a0">ne</font>.<font color="#2040a0">printStackTrace</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+            <strong>return</strong> <strong>null</strong><font color="4444FF">;</font>
+        <font color="4444FF"><strong>}</strong></font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/** method for migrating
+    * @param destination_node destination node
+    */</i></font>
+    <strong>public</strong> <strong>void</strong> <font color="#2040a0">moveTo</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font> <font color="#2040a0">destination_node</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;<font color="#77dd77">\n</font>-----------------------------&quot;</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;starting migration to node : &quot;</font> <font color="4444FF">+</font> <font color="#2040a0">destination_node</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;...&quot;</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <strong>try</strong> <font color="4444FF"><strong>{</strong></font>
+            <font color="#444444">// THIS MUST BE THE LAST CALL OF THE METHOD</font>
+            <font color="#2040a0">ProActive</font>.<font color="#2040a0">migrateTo</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">destination_node</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="4444FF"><strong>}</strong></font> <strong>catch</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">MigrationException</font> <font color="#2040a0">me</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+            <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;migration failed : &quot;</font> <font color="4444FF">+</font> <font color="#2040a0">me</font>.<font color="#2040a0">toString</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="4444FF"><strong>}</strong></font>
+    <font color="4444FF"><strong>}</strong></font>
+<font color="4444FF"><strong>}</strong></font>
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>
