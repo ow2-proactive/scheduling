@@ -203,8 +203,8 @@ public interface RemoteBody extends java.rmi.Remote, Handlerizable {
         throws SecurityNotAvailableException, IOException;
 
     /**
-     * For sending an event to the FTManager linked to this object
-     * @param ev the event
+     * For sending a message to the FTManager linked to this object
+     * @param fte the message
      * @return still not used
      */
     public int receiveFTMessage(FTMessage fte) throws IOException;

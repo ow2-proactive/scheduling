@@ -89,7 +89,7 @@ public interface Message {
 
     /**
      * Set fault-tolerance infos piggybacked on this message
-     * @param an array of chars that contains fault-tolerance infos
+     * @param mi an array of chars that contains fault-tolerance infos
      */
     public void setMessageInfo(char[] mi);
 

@@ -201,7 +201,7 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
 
     /**
      * For sending a non fonctionnal message to the FTManager linked to this object
-     * @param ev the event
+     * @param fte the recived message
      * @return still not used
      */
     public int receiveFTMessage(FTMessage fte) throws IOException;

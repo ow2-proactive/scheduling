@@ -201,7 +201,7 @@ public interface JiniBody extends java.rmi.Remote {
 
     /**
      * For sending an event to the FTManager linked to this object
-     * @param ev the event
+     * @param fte the received message
      * @return still not used
      */
     public int receiveFTMessage(FTMessage fte) throws IOException;
