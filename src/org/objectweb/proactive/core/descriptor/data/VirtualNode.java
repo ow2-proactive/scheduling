@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.descriptor.data;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -46,14 +47,19 @@ import org.objectweb.proactive.core.node.NodeException;
  */
 public interface VirtualNode extends java.io.Serializable
 {
-
+	
+	
+	static Logger logger = Logger.getLogger(VirtualNode.class.getName());
 	/**
 	 * Method setProperty.
 	 * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
 	 */
 	public void setProperty(String property);
 	
-
+	
+	public void setTimeout(String timeout);
+	
+	
 	/**
 	 * Returns the value of property attribute.
 	 * @return String
