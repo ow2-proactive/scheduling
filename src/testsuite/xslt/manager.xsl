@@ -7,7 +7,7 @@
 		<html>
 			<head>
   				<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
-  				<link id="stylesheet" rel="stylesheet" href="stylesheet.css" type="text/css" />
+  				<link  rel="stylesheet" href="stylesheet.css" type="text/css" />
   				<title><xsl:value-of select="Manager/Name" /></title>
   			</head>
 			<body>

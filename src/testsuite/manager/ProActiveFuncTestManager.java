@@ -37,9 +37,9 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     implements InterfaceProActiveManager {
     private ProActiveDescriptor pad = null;
     private VirtualNode[] virtualNodes = null;
-    private String xmlFileLocation = ProActiveBenchManager.class.getResource(
-            "/" + ProActiveFuncTestManager.class.getName().replace('.', '/') +
-            ".xml").getPath();
+    private String xmlFileLocation = ProActiveFuncTestManager.class.getResource(
+	        "/" + ProActiveFuncTestManager.class.getName().replace('.', '/') +
+	        ".xml").getPath();
     private Node sameVMNode = null;
     private Node localVMNode = null;
     private Node remoteVMNode = null;
@@ -93,7 +93,7 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
 
         ProActiveDescriptor pad = null;
         try {
-            pad = ProActive.getProactiveDescriptor(xmlFileLocation);
+            pad = ProActive.getProactiveDescriptor("file:" + xmlFileLocation);
         } catch (ProActiveException e) {
             logger.fatal("Problem with the ProActive descriptor", e);
             throw new RuntimeException(e);

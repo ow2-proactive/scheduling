@@ -4,12 +4,10 @@
  */
 package testsuite.test;
 
-import java.io.Serializable;
-
-import org.apache.log4j.Logger;
-
 import testsuite.result.BenchmarkResult;
 import testsuite.result.TestResult;
+
+import java.io.Serializable;
 
 
 /**
@@ -38,20 +36,12 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
     }
 
     /**
-     * Construct a new benchmark with a specified logger.
-     * @param logger a specified logger.
-     */
-    public Benchmark(Logger logger) {
-        super(logger, "Benchmark with no name", "Benchmark with no description.");
-    }
-
-    /**
      * Construct a new benchmark with name and a specified logger.
      * @param logger a specified logger.
      * @param name name of a benchmark.
      */
-    public Benchmark(Logger logger, String name) {
-        super(logger, name);
+    public Benchmark(String name) {
+        super(name);
         setDescription("Benchmark with no description.");
     }
 
@@ -62,16 +52,6 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
      */
     public Benchmark(String name, String description) {
         super(name, description);
-    }
-
-    /**
-     * Construct a new benchmark with name, description and a specified logger.
-     * @param logger a specified logger.
-     * @param name name of a benchmark.
-     * @param description description of a benchmark.
-     */
-    public Benchmark(Logger logger, String name, String description) {
-        super(logger, name, description);
     }
 
     /**
@@ -104,11 +84,15 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
         // preconditions
         try {
             if (!preConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Preconditions are not verified");
+                }
                 failed = true;
                 return new BenchmarkResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
         } catch (Exception e1) {
+            logger.error("Exception in preconditions", e1);
             failed = true;
             return new BenchmarkResult(this, TestResult.ERROR,
                 "In Preconditions", e1);
@@ -117,8 +101,12 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
         // benchmark
         try {
             resultTime = action();
+            if (logger.isInfoEnabled()) {
+                logger.info("Bench runs with success in " + resultTime + "ms");
+            }
             failed = false;
         } catch (Exception e) {
+            logger.fatal("Exception during the bench", e);
             failed = true;
             return new BenchmarkResult(this, TestResult.ERROR,
                 "In benchmark execution", e);
@@ -127,17 +115,25 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
         // postconditions
         try {
             if (!postConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Postconditions are not verified");
+                }
                 failed = true;
             }
         } catch (Exception e1) {
+            logger.error("Exception in postcondition", e1);
             failed = true;
             return new BenchmarkResult(this, TestResult.ERROR,
                 "In Postconditions", e1);
         }
         if (failed) {
+            logger.warn("The bench [FAILED]");
             return new BenchmarkResult(this, TestResult.GLOBAL_RESULT,
                 "Benchmark run with success but Postconditions not verified");
         } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("The bench [SUCCESS]");
+            }
             return new BenchmarkResult(this, BenchmarkResult.RESULT,
                 "Runned without problems");
         }

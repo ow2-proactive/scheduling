@@ -4,13 +4,12 @@
  */
 package testsuite.test;
 
+import testsuite.result.TestResult;
+
 import java.io.Serializable;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import org.apache.log4j.Logger;
-
-import testsuite.result.TestResult;
 
 
 /**
@@ -47,33 +46,13 @@ public abstract class FunctionalTest extends AbstractTest
     }
 
     /**
-     * Construct a new FunctionalTest with logger.
-     * @param logger a logger.
-     */
-    public FunctionalTest(Logger logger) {
-        super(logger);
-        setName("A test with no name");
-        setDescription("A test with no description.");
-    }
-
-    /**
      * Construct a new FunctionalTest with logger and name.
      * @param logger a logger.
      * @param name a name.
      */
-    public FunctionalTest(Logger logger, String name) {
-        super(logger, name);
+    public FunctionalTest(String name) {
+        super(name);
         setDescription("A test with no description.");
-    }
-
-    /**
-     * Construct a new FunctionalTest with logger, name and description.
-     * @param logger a logger.
-     * @param name a name.
-     * @param description a description.
-     */
-    public FunctionalTest(Logger logger, String name, String description) {
-        super(logger, name, description);
     }
 
     /**
@@ -82,7 +61,7 @@ public abstract class FunctionalTest extends AbstractTest
      * @param description a description.
      */
     public FunctionalTest(String name, String description) {
-        super(null, name, description);
+        super(name, description);
     }
 
     /**
@@ -116,11 +95,15 @@ public abstract class FunctionalTest extends AbstractTest
         // preconditions
         try {
             if (!preConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Preconditions are not verified");
+                }
                 failed = true;
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
         } catch (Exception e1) {
+            logger.error("Exception in preconditions", e1);
             failed = true;
             return new TestResult(this, TestResult.ERROR, "In Preconditions", e1);
         }
@@ -128,7 +111,11 @@ public abstract class FunctionalTest extends AbstractTest
         // test
         try {
             action();
+            if (logger.isInfoEnabled()) {
+                logger.info("Test runs with success");
+            }
         } catch (Exception e) {
+            logger.fatal("Exception during the test", e);
             failed = true;
             return new TestResult(this, TestResult.ERROR,
                 "During the test execution", e);
@@ -137,17 +124,25 @@ public abstract class FunctionalTest extends AbstractTest
         // postconditions
         try {
             if (!postConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Postconditions are not verified");
+                }
                 failed = true;
             }
         } catch (Exception e1) {
+            logger.error("Exception in postcondition", e1);
             failed = true;
             return new TestResult(this, TestResult.ERROR, "In Postconditions",
                 e1);
         }
         if (failed) {
+            logger.warn("The test [FAILED]");
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("The test [SUCCESS]");
+            }
             return new TestResult(this, TestResult.RESULT,
                 "Test run with success");
         }
@@ -157,11 +152,15 @@ public abstract class FunctionalTest extends AbstractTest
         // preconditions
         try {
             if (!preConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Preconditions are not verified");
+                }
                 failed = true;
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
             }
         } catch (Exception e1) {
+            logger.error("Exception in preconditions", e1);
             failed = true;
             return new TestResult(this, TestResult.ERROR, "In Preconditions", e1);
         }
@@ -188,13 +187,18 @@ public abstract class FunctionalTest extends AbstractTest
                     args[0] = null;
                 }
                 out = actionWithParams.invoke(this, args);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Test runs without error");
+                }
             } else {
+                logger.fatal("No action method was found with good signature");
                 throw new Exception("No action method with params was found");
             }
         } catch (Exception e) {
+            logger.fatal("Test failed", e);
             failed = true;
             out = null;
-            if (! (e instanceof InvocationTargetException)) {
+            if (!(e instanceof InvocationTargetException)) {
                 return new TestResult(this, TestResult.ERROR,
                     "During the test execution", e);
             } else {
@@ -207,18 +211,26 @@ public abstract class FunctionalTest extends AbstractTest
         // postconditions
         try {
             if (!postConditions()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Postconditions are not verified");
+                }
                 failed = true;
             }
         } catch (Exception e1) {
+            logger.error("Exception in postcondition", e1);
             failed = true;
             out = null;
             return new TestResult(this, TestResult.ERROR, "In Postconditions",
                 e1);
         }
         if (failed) {
+            logger.warn("The test [FAILED]");
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
+            if (logger.isInfoEnabled()) {
+                logger.info("The test [SUCCESS]");
+            }
             return new TestResult(this, TestResult.RESULT,
                 "Test run with success");
         }

@@ -31,7 +31,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.SimpleLayout;
+import org.apache.log4j.PatternLayout;
 import org.apache.log4j.WriterAppender;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -52,17 +52,19 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
     private String name = "AbstractManager with no name";
     private String description = "AbstractManager with no description.";
     private ArrayList groups = new ArrayList();
-    protected static Logger logger = Logger.getLogger("testsuite.Manager");
+    protected static Logger logger = null;
     private int nbRuns = 1;
     private ResultsCollections results = new ResultsCollections();
 
     public AbstractManager() {
+        logger = Logger.getLogger(getClass().getName());
         testAppender();
     }
 
     public AbstractManager(String name, String description) {
         this.name = name;
         this.description = description;
+        logger = Logger.getLogger(getClass().getName());
         testAppender();
     }
 
@@ -81,7 +83,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
                 logger.warn("Log file not found", e);
             }
             Logger.getRootLogger().addAppender(new WriterAppender(
-                    new SimpleLayout(), out));
+                    new PatternLayout("%d [%t] %-5p %c %x - %m%n"), out));
         }
     }
 

@@ -4,18 +4,22 @@
  */
 package testsuite.group;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 
 import testsuite.exception.BrowsePackageException;
+
 import testsuite.result.ResultsCollections;
+
 import testsuite.test.AbstractTest;
+
+import java.io.File;
+import java.io.FileFilter;
+
+import java.lang.reflect.Constructor;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /** It is a collection of tests.
@@ -33,7 +37,7 @@ public class Group {
 
     /** A logger for a group.
      */
-    protected static Logger logger = Logger.getLogger("testsuite.Manager.group.Group");
+    protected static Logger logger = null;
 
     /** All results of a group.
      */
@@ -47,12 +51,14 @@ public class Group {
     /** To construct a new group with default params.
      */
     public Group() {
+        logger = Logger.getLogger(getClass().getName());
     }
 
     /** To construct a new group from an another group.
      * @param group an ancestor group.
      */
     public Group(Group group) {
+        logger = Logger.getLogger(getClass().getName());
         this.results = new ResultsCollections(group.getResults());
         this.tests = new ArrayList(group.tests);
         this.name = group.name;
@@ -64,6 +70,7 @@ public class Group {
      * @param description a string description for a group.
      */
     public Group(String name, String description) {
+        logger = Logger.getLogger(getClass().getName());
         this.name = name;
         this.description = description;
     }
@@ -80,6 +87,7 @@ public class Group {
     public Group(String name, String description, File directory,
         String packageName, Object[] params, boolean useInitFile)
         throws BrowsePackageException {
+        logger = Logger.getLogger(getClass().getName());
         this.name = name;
         this.description = description;
 

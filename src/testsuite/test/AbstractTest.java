@@ -4,19 +4,22 @@
  */
 package testsuite.test;
 
+import org.apache.log4j.Logger;
+
+import testsuite.bean.Beanable;
+
+import testsuite.result.TestResult;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.Enumeration;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
-
-import testsuite.bean.Beanable;
-import testsuite.result.TestResult;
 
 
 /**
@@ -45,20 +48,13 @@ public abstract class AbstractTest implements Serializable, Beanable {
     private String description = "AbstractTest with no description.";
 
     /** Logger. */
-    private Logger logger = null;
+    protected static Logger logger = null;
 
     /**
      * Construct a new <code>AbstractTest</code> with defaults settings and a default logger.
      */
     public AbstractTest() {
-    }
-
-    /**
-     * Construct a new <code>AbstractTest</code> with defaults settings.
-     * @param logger the logger of this test
-     */
-    public AbstractTest(Logger logger) {
-        this.logger = logger;
+        logger = Logger.getLogger(getClass().getName());
     }
 
     /**
@@ -66,29 +62,19 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * @param logger the logger of this test
      * @param name name of this test
      */
-    public AbstractTest(Logger logger, String name) {
-        this.logger = logger;
+    public AbstractTest(String name) {
+        logger = Logger.getLogger(getClass().getName());
         this.name = name;
     }
 
     /**
      * Construct a new <code>AbstractTest</code>.
      * @param logger the logger of this test
-     * @param name name of this test
-     * @param description description of this test
-     */
-    public AbstractTest(Logger logger, String name, String description) {
-        this.logger = logger;
-        this.name = name;
-        this.description = description;
-    }
-
-    /**
-     * Construct a new <code>AbstractTest</code>.
      * @param name name of this test
      * @param description description of this test
      */
     public AbstractTest(String name, String description) {
+        logger = Logger.getLogger(getClass().getName());
         this.name = name;
         this.description = description;
     }
@@ -167,14 +153,6 @@ public abstract class AbstractTest implements Serializable, Beanable {
     }
 
     /**
-     * Sets the logger of a test.
-     * @param logger a Logger
-     */
-    public void setLogger(Logger logger) {
-        this.logger = logger;
-    }
-
-    /**
      * Return a String with the name and the description of a test.
      * @see java.lang.Object#toString()
      */
@@ -221,11 +199,17 @@ public abstract class AbstractTest implements Serializable, Beanable {
                 try {
                     setter.invoke(this, args);
                 } catch (IllegalArgumentException e1) {
-                    // TODO log4j debug
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Problem in loading attributes", e1);
+                    }
                 } catch (IllegalAccessException e1) {
-                    // TODO log4j debug
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Problem in loading attributes", e1);
+                    }
                 } catch (InvocationTargetException e1) {
-                    // TODO log4j debug
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Problem in loading attributes", e1);
+                    }
                 }
             } catch (SecurityException e) {
                 // do nothing
