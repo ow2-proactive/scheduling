@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.event.DeploymentPropertiesEventProducerImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 
@@ -67,6 +68,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
 
   /** map process id and process updater for later update of the process */
   private java.util.HashMap pendingProcessMapping;
+  
+
 
 
   //
@@ -81,6 +84,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
     virtualMachineMapping = new java.util.HashMap();
     processMapping = new java.util.HashMap();
     pendingProcessMapping = new java.util.HashMap();
+    
   }
 
 
@@ -116,16 +120,38 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   }
 
 
-  public VirtualNode createVirtualNode(String vnName) {
+  public VirtualNode createVirtualNode(String vnName, boolean lookup) {
     VirtualNode vn = getVirtualNode(vnName);
     if (vn == null) {
-      vn = new VirtualNodeImpl();
-      vn.setName(vnName);
+    		if(lookup){
+    			vn = new VirtualNodeLookup(vnName);
+    		}else{
+    			vn = new VirtualNodeImpl(vnName);
+    		}
+      
+      //vn = new VirtualNodeStrategy(new VirtualNodeImpl(vnName));
+      //vn.setName(vnName);
       virtualNodeMapping.put(vnName, vn);
       System.out.println("created VirtualNode name="+vnName);
     }
     return vn;
   }
+  
+//  public VirtualNode createLookupVirtualNode(String vnName){
+//  	VirtualNode vn = getVirtualNode(vnName);
+////  	VirtualNodeLookup vnLookup = new VirtualNodeLookup(vnName);
+////  	vnLookup.setLookupInformations(lookupUrl,protocol);
+//  	if (vn == null) {
+//  		vn = new VirtualNodeLookup(vnName);
+////  	}else{
+////  		vn.changeImplementation(vnLookup);
+////  	}
+//  		virtualNodeMapping.put(vnName, vn);
+//  	}
+//  	
+//  	return vn;
+//  }
+  
   
   
   public VirtualMachine createVirtualMachine(String vmName) {
