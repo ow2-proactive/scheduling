@@ -1,42 +1,43 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.test;
 
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import testsuite.exception.NotStandAloneException;
+
 import testsuite.result.TestResult;
 
+import java.io.Serializable;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 /**
@@ -51,14 +52,12 @@ public abstract class FunctionalTest extends AbstractTest
     implements Serializable {
 
     /** To know if the test run with success or not. If you don't run anytime a test
-            * this one is considered failed.
-            * */
+     * this one is considered failed.
+     * */
     private boolean failed = true;
 
     /** The result of the output of the test. Only if postconditions are verified. Null if method action return void. */
     private Object out = null;
-    
-	
 
     /** Precedents tests, their out will be use in method action as parameters. Must be in the same oder of the
      *  parameters.
@@ -122,6 +121,9 @@ public abstract class FunctionalTest extends AbstractTest
      */
     public TestResult runTest() {
         // preconditions
+		if (logger.isDebugEnabled()){
+			logger.debug("Test Preconditions of "+this.getName());
+		}
         try {
             if (!preConditions()) {
                 if (logger.isDebugEnabled()) {
@@ -130,6 +132,9 @@ public abstract class FunctionalTest extends AbstractTest
                 failed = true;
                 return new TestResult(this, TestResult.GLOBAL_RESULT,
                     "Preconditions not verified");
+            }
+            if (logger.isDebugEnabled()){
+            	logger.debug("Preconditions success in "+this.getName());
             }
         } catch (Exception e1) {
             logger.error("Exception in preconditions", e1);
@@ -140,9 +145,10 @@ public abstract class FunctionalTest extends AbstractTest
         // test
         try {
             action();
-//            if (logger.isInfoEnabled()) {
-//                logger.info("Test runs with success");
-//            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Action method of " + this.getName() +
+                    " runs with success");
+            }
         } catch (NotStandAloneException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Not executed Test : not a standalone test.");
@@ -161,11 +167,17 @@ public abstract class FunctionalTest extends AbstractTest
         }
         failed = false;
         // postconditions
+        if (logger.isDebugEnabled()){
+        	logger.debug("Test Postconditions of "+this.getName());
+        }
         try {
             if (!postConditions()) {
                 logger.warn("Postconditions are not verified");
                 failed = true;
             }
+			if (logger.isDebugEnabled()){
+				 logger.debug("Postconditions success in "+this.getName());
+			 }
         } catch (Exception e1) {
             logger.error("Exception in postcondition", e1);
             failed = true;
@@ -173,12 +185,14 @@ public abstract class FunctionalTest extends AbstractTest
                 e1);
         }
         if (failed) {
-            logger.warn("The test [FAILED]");
+            logger.warn(this.getName() + ": [FAILED]");
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
-            return new TestResult(this, TestResult.RESULT,
-                " runs with success");
+            if (logger.isInfoEnabled()) {
+                logger.info(this.getName() + ": [SUCCESS]");
+            }
+            return new TestResult(this, TestResult.RESULT, " runs with success");
         }
     }
 
@@ -221,8 +235,9 @@ public abstract class FunctionalTest extends AbstractTest
                     args[0] = null;
                 }
                 out = actionWithParams.invoke(this, args);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Test runs without error");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Action method of " + this.getName() +
+                        " runs without error");
                 }
             } else {
                 logger.fatal("No action method was found with good signature");
@@ -262,12 +277,14 @@ public abstract class FunctionalTest extends AbstractTest
                 e1);
         }
         if (failed) {
-            logger.warn("The test [FAILED]");
+            logger.warn(this.getName() + ": [FAILED]");
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
-            return new TestResult(this, TestResult.RESULT,
-                " runs with success");
+            if (logger.isInfoEnabled()) {
+                logger.info(this.getName() + ": [SUCESS]");
+            }
+            return new TestResult(this, TestResult.RESULT, " runs with success");
         }
     }
 

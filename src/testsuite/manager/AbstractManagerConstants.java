@@ -36,6 +36,7 @@ package testsuite.manager;
  *
  */
 public interface AbstractManagerConstants {
+	// Numeric codes to choose which output to show results
     public static final int HTML = 1;
     public static final int TEXT = 2;
     public static final int CONSOLE = 3;

@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.test;
 
 import testsuite.result.BenchmarkResult;
@@ -129,13 +129,14 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
         // benchmark
         try {
             resultTime = action();
-            if (logger.isInfoEnabled()) {
-                logger.info("Bench action method runs with success in " +
-                    resultTime + this.getTimer().getUnit());
+            if (logger.isDebugEnabled()) {
+                logger.debug(this.getName() +
+                    " action method runs with success in " + resultTime +
+                    this.getTimer().getUnit());
             }
             failed = false;
         } catch (Exception e) {
-            logger.fatal("Exception during the bench", e);
+            logger.fatal("Exception during the bench :" + this.getName(), e);
             failed = true;
             return new BenchmarkResult(this, TestResult.ERROR,
                 "In benchmark execution", e);
@@ -144,7 +145,9 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
         // postconditions
         try {
             if (!postConditions()) {
-                logger.warn("Postconditions are not verified");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Postconditions are not verified");
+                }
                 failed = true;
             }
         } catch (Exception e1) {
@@ -154,12 +157,16 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
                 "In Postconditions", e1);
         }
         if (failed) {
-            logger.warn("The bench [FAILED]");
+            if (logger.isDebugEnabled()) {
+                logger.debug("The bench [FAILED]");
+            }
             return new BenchmarkResult(this, TestResult.GLOBAL_RESULT,
                 "Benchmark run with success but Postconditions not verified");
         } else {
             if (logger.isInfoEnabled()) {
-                logger.info("The bench [SUCCESS]");
+                logger.info("The bench:" + this.getName() + " runs in " +
+                    this.getTimer().getCumulatedTime() +
+                    this.getTimer().getUnit());
             }
             return new BenchmarkResult(this, BenchmarkResult.RESULT,
                 "Runned without problems");

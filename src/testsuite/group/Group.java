@@ -257,8 +257,8 @@ public class Group {
     }
 
     public void initGroup(Timeable timer) throws Exception {
-        if (logger.isInfoEnabled()) {
-            logger.info("Beginning group " + name + "'s initialization");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Beginning groupTest " + name + "' initialization");
         }
         Iterator it = tests.iterator();
         while (it.hasNext()) {
@@ -268,8 +268,8 @@ public class Group {
                 ((Benchmark) test).setTimer(timer);
             }
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("Finnishing group " + name + "'s initialization");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Finnishing groupTest " + name + "' initialization");
         }
     }
 
@@ -284,16 +284,16 @@ public class Group {
      * @throws Exception if errors during ending a tests.
      */
     public void endGroup() throws Exception {
-        if (logger.isInfoEnabled()) {
-            logger.info("Beginning group " + name + "'s ending");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Beginning groupTest " + name + "' ending");
         }
         Iterator it = tests.iterator();
         while (it.hasNext()) {
             AbstractTest test = (AbstractTest) it.next();
             test.endTest();
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("Finnishing group " + name + "'s ending");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Finnishing groupTest " + name + "' ending");
         }
     }
 

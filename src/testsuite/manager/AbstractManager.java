@@ -30,6 +30,31 @@
  */
 package testsuite.manager;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.WriterAppender;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import org.xml.sax.SAXException;
+
+import testsuite.bean.Beanable;
+
+import testsuite.group.Group;
+
+import testsuite.result.ResultsCollections;
+import testsuite.result.ResultsExporter;
+
+import testsuite.test.AbstractTest;
+
+import testsuite.xml.ManagerDescriptorHandler;
+
+import testsuite.xslt.TransformerXSLT;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -38,8 +63,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -50,24 +77,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.WriterAppender;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
-import testsuite.bean.Beanable;
-import testsuite.group.Group;
-import testsuite.result.ResultsCollections;
-import testsuite.result.ResultsExporter;
-import testsuite.test.AbstractTest;
-import testsuite.xml.ManagerDescriptorHandler;
-import testsuite.xslt.TransformerXSLT;
 
 
 /**
@@ -80,7 +89,8 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String description = "AbstractManager with no description.";
     private ArrayList groups = new ArrayList();
     protected static Logger logger = Logger.getLogger(AbstractManager.class);
-	//protected static Logger logger = Logger.getRootLogger();
+
+    //protected static Logger logger = Logger.getRootLogger();
     private int nbRuns = 1;
     private ResultsCollections results = new ResultsCollections();
     private Properties properties = null;
@@ -106,9 +116,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     }
 
     private void testAppender() {
-       boolean hasAppender = false;
+        boolean hasAppender = false;
         Enumeration enum = Logger.getRootLogger().getAllAppenders();
-        if (enum.hasMoreElements()){
+        if (enum.hasMoreElements()) {
             hasAppender = true;
         }
         if (hasAppender) {
@@ -446,6 +456,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
      * @see testsuite.bean.Beanable#loadAttributes(java.util.Properties)
      */
     public void loadAttributes(Properties properties) {
+        if (logger.isInfoEnabled()) {
+            logger.info("Loading attributes");
+        }
         if (properties != null) {
             this.properties = properties;
             Class[] parameterTypes = { String.class };
@@ -460,26 +473,22 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
                     Object[] args = { value };
                     try {
                         setter.invoke(this, args);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("set " + name + " with " + value);
+                        if (logger.isInfoEnabled()) {
+                            logger.info("set " + name + " with " + value);
                         }
                     } catch (IllegalArgumentException e1) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(e1);
-                        }
+                        logger.warn(e1);
                     } catch (IllegalAccessException e1) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(e1);
-                        }
+                        logger.warn(e1);
                     } catch (InvocationTargetException e1) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(e1.getTargetException());
-                        }
+                        logger.warn(e1.getTargetException());
                     }
                 } catch (SecurityException e) {
                     // do nothing
+                    // 
                 } catch (NoSuchMethodException e) {
                     // do nothing
+                    //
                 }
             }
 
@@ -492,7 +501,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
                 }
             }
             if (logger.isInfoEnabled()) {
-                logger.info("Test Suite's attributes readed");
+                logger.info("Test Suite's attributes loaded");
             }
         }
     }

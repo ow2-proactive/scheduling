@@ -94,10 +94,4 @@ public class BenchNewActive extends ProActiveBenchmark {
     public boolean preConditions() throws Exception {
         return getNode() != null;
     }
-    
-	public boolean postConditions() throws Exception {
-		Object[] activeObjects = getNode().getActiveObjects();
-		return (object != null) && (activeObjects != null) &&
-		(activeObjects.length == 1) && activeObjects[0].equals(object);
-	}
 }

@@ -8,8 +8,7 @@
 	<result type="html" file="../benchmark.html" />
 	
 	<properties>
-		<!--<prop key="Timer" value="testsuite.timer.nano.NanoTimer" />
-		<prop key="Timer" value="testsuite.timer.micro.MicroTimer" />-->
+		<prop key="Timer" value="testsuite.timer.micro.MicroTimer" />
 	</properties>
 
 </Manager>

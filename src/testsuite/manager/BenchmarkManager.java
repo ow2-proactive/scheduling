@@ -1,41 +1,34 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.manager;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
@@ -44,18 +37,36 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.StandardXYItemRenderer;
+
 import org.jfree.data.DefaultCategoryDataset;
 import org.jfree.data.TableXYDataset;
 import org.jfree.data.XYSeries;
+
 import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
+
 import testsuite.result.AbstractResult;
 import testsuite.result.BenchmarkResult;
 import testsuite.result.ResultsCollections;
+
 import testsuite.test.Benchmark;
+
 import testsuite.timer.Timeable;
+
 import testsuite.timer.ms.MsTimer;
+
+import testsuite.xslt.TransformerXSLT;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Iterator;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 
 /**
@@ -66,17 +77,17 @@ public abstract class BenchmarkManager extends AbstractManager {
     protected Timeable timer = new MsTimer();
 
     /**
-    *
-    */
+     *
+     */
     public BenchmarkManager() {
         super("BenchmarkManager with no name",
             "BenchmarkManager with no description");
     }
 
     /**
-    * @param name
-    * @param description
-    */
+     * @param name
+     * @param description
+     */
     public BenchmarkManager(String name, String description) {
         super(name, description);
     }
@@ -88,9 +99,8 @@ public abstract class BenchmarkManager extends AbstractManager {
     }
 
     /**
-
-    * @see testsuite.manager.AbstractManager#execute()
-    */
+     * @see testsuite.manager.AbstractManager#execute()
+     */
     public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
@@ -99,9 +109,6 @@ public abstract class BenchmarkManager extends AbstractManager {
 
         if (useAttributesFile) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Load attributes");
-                }
                 loadAttributes();
             } catch (IOException e1) {
                 if (logger.isInfoEnabled()) {
@@ -131,9 +138,10 @@ public abstract class BenchmarkManager extends AbstractManager {
             try {
                 group.initGroup(this.timer);
             } catch (Exception e) {
-                logger.warn("Can't init group : " + group.getName(), e);
+                logger.warn("Can't init group of benchmarks: " +
+                    group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't init group : " + group.getName(), e);
+                    "Can't init group of benchmarks: " + group.getName(), e);
                 results.addAll(resultsGroup);
                 continue;
             }
@@ -143,26 +151,35 @@ public abstract class BenchmarkManager extends AbstractManager {
             long sum = 0;
             Iterator itTest = group.iterator();
             while (itTest.hasNext()) {
-                Benchmark test = (Benchmark) itTest.next();
+                Benchmark benchmark = (Benchmark) itTest.next();
                 long[] set = new long[getNbRuns()];
                 for (int i = 0; i < getNbRuns(); i++) {
-                    AbstractResult result = test.runTest();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("lauching benchmark: " +
+                            benchmark.getName());
+                    }
+                    AbstractResult result = benchmark.runTest();
 
-                    if (test.isFailed()) {
-                        logger.warn("Bench " + test.getName() + " [FAILED]");
+                    if (benchmark.isFailed()) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Result from benchmark " +
+                                benchmark.getName() + " is [FAILED]");
+                        }
+
                         errors++;
                     } else {
-                        set[i] = test.getResultTime();
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Bench " + test.getName() +
-                                " runs with success in " +
-                                test.getResultTime() + this.timer.getUnit());
+                        set[i] = benchmark.getResultTime();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Result from benchmark " +
+                                benchmark.getName() + " is run in " +
+                                benchmark.getResultTime() +
+                                this.timer.getUnit());
                         }
                         runs++;
-                        sum += test.getResultTime();
+                        sum += benchmark.getResultTime();
                     }
                 }
-                resultsGroup.add(new BenchmarkResult(test,
+                resultsGroup.add(new BenchmarkResult(benchmark,
                         AbstractResult.GLOBAL_RESULT, "no message", set));
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
@@ -174,9 +191,10 @@ public abstract class BenchmarkManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Can't ending group : " + group.getName(), e);
+                logger.warn("Can't ending group of benchmarks: " +
+                    group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't ending group : " + group.getName(), e);
+                    "Can't ending group of benchmarks: " + group.getName(), e);
                 results.addAll(resultsGroup);
                 continue;
             }
@@ -200,13 +218,42 @@ public abstract class BenchmarkManager extends AbstractManager {
     }
 
     /**
-    * @see testsuite.result.ResultsExporter#toHTML(java.io.File)
-    */
+     * @see testsuite.result.ResultsExporter#toHTML(java.io.File)
+     */
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
         createBenchGraph(location.getParentFile());
         createBarCharts(location.getParentFile());
-        super.toHTML(location);
+        if (logger.isInfoEnabled()) {
+            logger.info("Create HMTL file ...");
+        }
+        String xslPath = "/" +
+            AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
+                "/xslt/benchmark.xsl");
+        TransformerXSLT.transformerTo(toXML(), location, xslPath);
+
+        // copy css
+        String cssPath = "/" +
+            AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
+                "/css/stylesheet.css");
+        InputStream css = getClass().getResourceAsStream(cssPath);
+        File copy = new File(location.getParent() + File.separator +
+                "stylesheet.css");
+        FileOutputStream out = new FileOutputStream(copy);
+        byte[] buffer = new byte[1024];
+        int nbBytes = 0;
+
+        while (nbBytes != -1) {
+            nbBytes = css.read(buffer);
+            if (nbBytes > 0) {
+                out.write(buffer, 0, nbBytes);
+            }
+        }
+        css.close();
+        out.close();
+        if (logger.isInfoEnabled()) {
+            logger.info("... Finish creating HTML file");
+        }
     }
 
     private void createBarCharts(File location) throws IOException {

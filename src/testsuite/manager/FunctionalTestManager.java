@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.manager;
 
 import org.xml.sax.SAXException;
@@ -85,9 +85,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
 
         if (useAttributesFile) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Load attributes");
-                }
                 loadAttributes();
             } catch (IOException e1) {
                 if (logger.isInfoEnabled()) {
@@ -118,9 +115,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.initGroup();
             } catch (Exception e) {
-                logger.warn("Can't init group : " + group.getName(), e);
+                logger.warn("Can't init group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't init group : " + group.getName(), e);
+                    "Can't init group of tests: " + group.getName(), e);
                 continue;
             }
 
@@ -130,20 +127,26 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 Iterator itTest = group.iterator();
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Lauching test: " + test.getName());
+                    }
                     AbstractResult result = test.runTest();
                     if (result != null) {
                         resultsGroup.add(result);
-			if (test.isFailed()) {
-			    logger.warn("Test " + test.getName() + " [FAILED]");
-			    errors++;
-			} else {
-			    if (logger.isInfoEnabled()) {
-				logger.info("Test " + test.getName() +
-					    " runs with [SUCCESS]");
-			    }
-			    runs++;
-			}
-		    }
+                        if (test.isFailed()) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Result from test " +
+                                    test.getName() + " is [FAILED]");
+                            }
+                            errors++;
+                        } else {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Result from test " +
+                                    test.getName() + " is [SUCCESS]");
+                            }
+                            runs++;
+                        }
+                    }
                 }
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
@@ -153,70 +156,74 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Can't ending group : " + group.getName(), e);
+                logger.warn("Can't ending group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't ending group : " + group.getName(), e);
+                    "Can't ending group of tests: " + group.getName(), e);
                 continue;
             }
             results.addAll(resultsGroup);
         }
 
-	if (this.interLinkedGroups != null) {
-	    // runs interlinked test
-	    Iterator itInterGroup = this.interLinkedGroups.iterator();
-	    while (itInterGroup.hasNext()) {
-		Group group = (Group) itInterGroup.next();
+        if (this.interLinkedGroups != null) {
+            // runs interlinked test
+            Iterator itInterGroup = this.interLinkedGroups.iterator();
+            while (itInterGroup.hasNext()) {
+                Group group = (Group) itInterGroup.next();
 
-		ResultsCollections resultsGroup = group.getResults();
+                ResultsCollections resultsGroup = group.getResults();
 
-		try {
-		    group.initGroup();
-		} catch (Exception e) {
-		    logger.warn("Can't init group : " + group.getName(), e);
-		    resultsGroup.add(AbstractResult.ERROR,
-				     "Can't init group : " + group.getName(), e);
-		    continue;
-		}
-		
-		int runs = 0;
-		int errors = 0;
-		for (int i = 0; i < getNbRuns(); i++) {
-		    Iterator itTest = group.iterator();
-		    while (itTest.hasNext()) {
-			FunctionalTest test = (FunctionalTest) itTest.next();
-			AbstractResult result = test.runTestCascading();
-			resultsGroup.add(result);
-			if (test.isFailed()) {
-			    logger.warn("Test " + test.getName() + " [FAILED]");
-			    errors++;
-			} else {
-			    if (logger.isInfoEnabled()) {
-				logger.info("Test " + test.getName() +
-					    " runs with [SUCCESS]");
-			    }
-			    runs++;
-			}
-		    }
-		}
-		resultsGroup.add(AbstractResult.GLOBAL_RESULT,
-				 "Group : " + group.getName() + " Runs : " + runs +
-				 " Errors : " + errors);
-		
-		try {
-		    group.endGroup();
-		} catch (Exception e) {
-		    logger.warn("Can't ending group : " + group.getName(), e);
-		    resultsGroup.add(AbstractResult.ERROR,
-				     "Can't ending group : " + group.getName(), e);
-		    continue;
-		}
-		results.addAll(resultsGroup);
-		this.add(group);
-	    }
-	}
+                try {
+                    group.initGroup();
+                } catch (Exception e) {
+                    logger.warn("Can't init group of tests: " +
+                        group.getName(), e);
+                    resultsGroup.add(AbstractResult.ERROR,
+                        "Can't init group of tests: " + group.getName(), e);
+                    continue;
+                }
 
-	// end Manager
-	
+                int runs = 0;
+                int errors = 0;
+                for (int i = 0; i < getNbRuns(); i++) {
+                    Iterator itTest = group.iterator();
+                    while (itTest.hasNext()) {
+                        FunctionalTest test = (FunctionalTest) itTest.next();
+                        AbstractResult result = test.runTestCascading();
+                        resultsGroup.add(result);
+                        if (test.isFailed()) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Result from test " +
+                                    test.getName() + " is [FAILED]");
+                            }
+                            errors++;
+                        } else {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Result from test " +
+                                    test.getName() + " is [SUCCESS]");
+                            }
+                            runs++;
+                        }
+                    }
+                }
+                resultsGroup.add(AbstractResult.GLOBAL_RESULT,
+                    "Group : " + group.getName() + " Runs : " + runs +
+                    " Errors : " + errors);
+
+                try {
+                    group.endGroup();
+                } catch (Exception e) {
+                    logger.warn("Can't ending group of tests: " +
+                        group.getName(), e);
+                    resultsGroup.add(AbstractResult.ERROR,
+                        "Can't ending group of tests: " + group.getName(), e);
+                    continue;
+                }
+                results.addAll(resultsGroup);
+                this.add(group);
+            }
+        }
+
+        // end Manager
         try {
             endManager();
         } catch (Exception e) {
@@ -230,8 +237,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
             logger.info("... Finish");
         }
 
-	// Show Results
-	this.showResult();
+        // Show Results
+        this.showResult();
     }
 
     private int runs = 0;
@@ -245,15 +252,18 @@ public abstract class FunctionalTestManager extends AbstractManager {
             execCascadingTests(results, tests[i]);
         results.add(test.runTestCascading());
         if (test.isFailed()) {
-            logger.warn("Test " + test.getName() + " [FAILED]");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Result from test " + test.getName() +
+                    " is [FAILED]");
+            }
             errors++;
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("Test " + test.getName() + " runs with [SUCCESS]");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Result from test " + test.getName() +
+                    " is [SUCCESS]");
             }
             runs++;
         }
-	
     }
 
     public void execute(Group group, FunctionalTest lastestTest,
@@ -265,9 +275,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
 
         if (useAttributesFile) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Load attributes");
-                }
                 loadAttributes();
             } catch (IOException e1) {
                 if (logger.isInfoEnabled()) {
@@ -295,9 +302,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             group.initGroup();
         } catch (Exception e) {
-            logger.warn("Can't init group : " + group.getName(), e);
+            logger.warn("Can't init group of tests: " + group.getName(), e);
             resultsGroup.add(AbstractResult.ERROR,
-                "Can't init group : " + group.getName(), e);
+                "Can't init group of tests: " + group.getName(), e);
         }
 
         for (int i = 0; i < getNbRuns(); i++) {
@@ -310,9 +317,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
         try {
             group.endGroup();
         } catch (Exception e) {
-            logger.warn("Can't ending group : " + group.getName(), e);
+            logger.warn("Can't ending group of tests: " + group.getName(), e);
             resultsGroup.add(AbstractResult.ERROR,
-                "Can't ending group : " + group.getName(), e);
+                "Can't ending group of tests: " + group.getName(), e);
         }
 
         results.addAll(resultsGroup);
@@ -358,9 +365,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.initGroup();
             } catch (Exception e) {
-                logger.warn("Can't init group : " + group.getName(), e);
+                logger.warn("Can't init group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't init group : " + group.getName(), e);
+                    "Can't init group of tests: " + group.getName(), e);
                 continue;
             }
 
@@ -373,12 +380,15 @@ public abstract class FunctionalTestManager extends AbstractManager {
                     AbstractResult result = test.runTestCascading();
                     resultsGroup.add(result);
                     if (test.isFailed()) {
-                        logger.warn("Test " + test.getName() + " [FAILED]");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Result from test " + test.getName() +
+                                " is [FAILED]");
+                        }
                         errors++;
                     } else {
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Test " + test.getName() +
-                                " runs with [SUCCESS]");
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Result from test " + test.getName() +
+                                " is [SUCCESS]");
                         }
                         runs++;
                     }
@@ -391,9 +401,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Can't ending group : " + group.getName(), e);
+                logger.warn("Can't ending group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't ending group : " + group.getName(), e);
+                    "Can't ending group of tests: " + group.getName(), e);
                 continue;
             }
             results.addAll(resultsGroup);
