@@ -2,7 +2,7 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="penguinNode" property="multiple" timeout="200" waitForTimeout="true"/>
+			<virtualNode name="penguinNode" property="multiple"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
