@@ -42,7 +42,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     implements WorldObjectListener, javax.swing.Scrollable {
     private WorldObject worldObject;
     private ActiveObjectCommunicationRecorder communicationRecorder;
-    private String alignLayout="H"; //keep state of layout H or V
+    private String alignLayout = "H"; //keep state of layout H or V
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -87,6 +87,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 }
             });
         popup.addSeparator();
+        popup.addGenericMenu();
 
         /*** modifying automatic Hostlayout menu item rb automatic / Manual ebe 06-2004 ***/
 
@@ -99,7 +100,7 @@ public class WorldPanel extends AbstractDataObjectPanel
         //	}
         //      });
         //    popup.add(check);
-        javax.swing.JMenu LayoutJmenu = new javax.swing.JMenu("Layout");
+        javax.swing.JMenu LayoutJmenu = new javax.swing.JMenu("Host Layout");
         popup.add(LayoutJmenu);
 
         javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
@@ -134,7 +135,7 @@ public class WorldPanel extends AbstractDataObjectPanel
 
         /***********************************************************/
         /*** adding Horizontal/vertical Hostlayout radio button menu item ebe 06-2004 ***/
-        javax.swing.JMenu hostLayoutJmenu = new javax.swing.JMenu("HostsLayout");
+        javax.swing.JMenu hostLayoutJmenu = new javax.swing.JMenu("VM Layout");
         popup.add(hostLayoutJmenu);
 
         //menu rb Horiz
@@ -143,7 +144,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 "Horizontal");
         JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                   alignLayoutChild("H");
+                    alignLayoutChild("H");
                 }
             });
 
@@ -181,10 +182,14 @@ public class WorldPanel extends AbstractDataObjectPanel
 
     // Set child Alignement H  / V 
     public void alignLayoutChild(String align) {
-    	alignLayout=align;
+        alignLayout = align;
         java.util.Iterator iterator = childsIterator();
         while (iterator.hasNext()) {
-            ((HostPanel) iterator.next()).alignLayout(align);
+            HostPanel hostchild = (HostPanel) iterator.next();
+            if (hostchild.alignLayout != align) {
+                hostchild.alignLayout(align);
+                hostchild.switchAlignRb();
+            }
         }
     }
 
@@ -376,10 +381,11 @@ public class WorldPanel extends AbstractDataObjectPanel
             return preferredLayoutSize(target);
         }
     }
-	/**
-	 * @return Returns the alignLayout.
-	 */
-	public String getAlignLayout() {
-		return alignLayout;
-	}
+
+    /**
+     * @return Returns the alignLayout.
+     */
+    public String getAlignLayout() {
+        return alignLayout;
+    }
 }
