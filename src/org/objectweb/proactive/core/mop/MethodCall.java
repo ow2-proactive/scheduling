@@ -48,6 +48,13 @@ import java.lang.reflect.Method;
  * @author Julien Vayssi&egrave;re
  */
 public final class MethodCall implements java.io.Serializable {
+    // added a tag for identification of component requests
+    private String tag;
+
+    // added a field for the Fractal interface name 
+    // (the name of the interface containing the method called)
+    private String fcFunctionalInterfaceName;
+
     //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
     //
@@ -70,6 +77,9 @@ public final class MethodCall implements java.io.Serializable {
     /**        Indicates if the recycling of MethodCall object is on. */
     private static boolean recycleMethodCallObject;
     private static java.util.Hashtable reifiedMethodsTable = new java.util.Hashtable();
+
+    //tag for component calls
+    public static final String COMPONENT_TAG = "component-methodCall";
 
     /**
      * Initializes the recycling of MethodCall objects to be enabled by default.
@@ -199,6 +209,26 @@ public final class MethodCall implements java.io.Serializable {
     }
 
     /**
+     * Returns a MethodCall object with extra info for component calls (the
+     * possible name of the functional interface invoked).
+     * @param reifiedMethod
+     * @param effectiveArguments
+     * @param fcFunctionalInterfaceName fractal interface name, whose value is :
+     *  - null if the call is non-functional
+     *  - the name of the functional interface otherwise
+     * @return MethodCall
+     */
+    public synchronized static MethodCall getComponentMethodCall(
+        Method reifiedMethod, Object[] effectiveArguments,
+        String fcFunctionalInterfaceName) {
+        MethodCall mc = MethodCall.getMethodCall(reifiedMethod,
+                effectiveArguments);
+        mc.setTag(COMPONENT_TAG);
+        mc.setFcFunctionalInterfaceName(fcFunctionalInterfaceName);
+        return mc;
+    }
+
+    /**
      *        Tells the recyclying process that the MethodCall object passed as parameter
      *        is ready for recycling. It is the responsibility of the caller of this
      *        method to make sure that this object can safely be disposed of.
@@ -309,6 +339,37 @@ public final class MethodCall implements java.io.Serializable {
      */
     public void makeDeepCopyOfArguments() throws java.io.IOException {
         effectiveArguments = (Object[]) Utils.makeDeepCopy(effectiveArguments);
+    }
+
+    /**
+     * accessor for the functional name ot the invoked Fractal interface
+     * @return the functional name of the invoked Fractal interface
+     */
+    public String getFcFunctionalInterfaceName() {
+        return fcFunctionalInterfaceName;
+    }
+
+    /**
+     * setter for the functional name of the invoked Fractal interface
+     * @param the functional name of the invoked Fractal interface
+     */
+    public void setFcFunctionalInterfaceName(String string) {
+        fcFunctionalInterfaceName = string;
+    }
+
+    /**
+     * setter for the tag of the method call
+     */
+    public void setTag(String string) {
+        tag = string;
+    }
+
+    /**
+     * accessor for the tag of the method call
+     * @return the tag of the method call
+     */
+    public String getTag() {
+        return tag;
     }
 
     //
