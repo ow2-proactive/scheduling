@@ -33,28 +33,37 @@ class AssoKey implements Comparable {
 }
 
 /*
- * Job -*-> VN -*-> Host -*-> JVM -*-> Node -*-> AO
- * 
- * But the world is not a simple tree.
+ *                     VN
+ *                      |
+ *                      *
+ *                      |
+ *                      v
+ * Host -*-> JVM -*-> Node -*-> AO
+ *                      ^
+ *                      |
+ *                      *
+ *                      |
+ *                     Job
  */
 
 public class DataAssociation implements JobMonitorConstants {
 	private Map asso;
 	private Set[] sets;
-	private int[][] specialCases = {
-			{JOB, HOST},
-			{JOB, JVM},
-			{VN, JVM}
-	};
-	
+	private final int[] specialCases = {VN, JOB};
+
 	public DataAssociation() {
 		clear();
 	}
 	
+	private void addToSet(int key, String value) {
+		if (sets[key] == null)
+			sets[key] = new TreeSet();
+		
+		sets[key].add(value);
+	}
+	
 	private void addAsso(int fromKey, String fromValue, int toKey, String toValue) {
-		if (sets[toKey] == null)
-			sets[toKey] = new TreeSet();
-		sets[toKey].add(toValue);
+		addToSet(toKey, toValue);
 		
 		AssoKey key = new AssoKey(fromKey, toKey, fromValue);
 		Object res = asso.get(key);
@@ -66,26 +75,20 @@ public class DataAssociation implements JobMonitorConstants {
 		Set l = (Set) res;
 		l.add(toValue);
 	}
-	
+
 	public void addChild(int fromKey, String fromValue, int toKey, String toValue) {
 		addAsso(fromKey, fromValue, toKey, toValue);
 		addAsso(toKey, toValue, fromKey, fromValue);
 	}
-	
-	/* Exemple : addChild(VN, "myVN", "camel.inria.fr") */
+
+	/* Exemple : addChild(HOST, "camel.inria.fr", "PA_JVM_0123456798") */
 	public void addChild(int key, String lvalue, String rvalue) {
 		addChild(key, lvalue, key + 1, rvalue);
 	}
 
-	private boolean isSpecialCase(int fromKey, int toKey) {
-		if (toKey < fromKey) {
-			int tmp = toKey;
-			toKey = fromKey;
-			fromKey = tmp;
-		}
-		
+	private boolean isSpecialCase(int key) {
 		for (int i = 0; i < specialCases.length; i++)
-			if (fromKey == specialCases[i][0] && toKey == specialCases[i][1])
+			if (key == specialCases[i])
 				return true;
 
 		return false;
@@ -94,14 +97,28 @@ public class DataAssociation implements JobMonitorConstants {
 	private Set getAsso(int from, String name, int to) {
 		AssoKey key = new AssoKey(from, to, name);
 		Object res = asso.get(key);
-		if (res == null)
-			return new TreeSet();
+		if (res == null) {
+			res = new TreeSet();
+			asso.put(key, res);
+		}
 		
 		return (Set) res;
 	}
 	
+	private Set handleSpecialCase(int from, String name, int to) {
+		Set toNode = getAsso(from, name, NODE);
+		Set res = new TreeSet();
+		Iterator iter = toNode.iterator();
+		while (iter.hasNext()) {
+			String stepName = (String) iter.next();
+			Set temp = getValues(NODE, stepName, to);
+			res.addAll(temp);
+		}
+		return res;
+	}
+	
 	/*
-	 * Exemple : getValues(VN, "myVN", KEY_AO) ==> {"Object1", "Object2"}
+	 * Exemple : getValues(VN, "myVN", AO) ==> {"Object1", "Object2"}
 	 */
 	public Set getValues(int from, String name, int to) {
 		if (to == from) {
@@ -113,9 +130,12 @@ public class DataAssociation implements JobMonitorConstants {
 		if (from == NO_KEY)
 			return list(to);
 		
-		if (to == from + 1 || to == from - 1 || isSpecialCase(from, to))
+		if (to == from + 1 || to == from - 1)
 			return getAsso(from, name, to);
 
+		if (isSpecialCase(from) || isSpecialCase(to))
+			return handleSpecialCase(from, name, to);
+		
 		int inc = (to > from) ? 1 : -1;
 		Set step = getValues(from, name, to - inc);
 		if (step.isEmpty())
