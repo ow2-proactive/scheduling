@@ -10,7 +10,7 @@
 
 <!-- Header : end -->
 <table align="center" border="1" width="40%">
-	<tbody>
+	<t>
 		<tr>
 		<th align="center">ProActive ReferenceCard</th>	
 		</tr>
@@ -174,8 +174,8 @@ the AO behavior in the method named runActivity():</p>
 <FONT ID="SingleLineComment">   // Implements RunActive for programming a specific behavior</FONT>
 <FONT ID="SingleLineComment">   // runActivity() is automatically called when such an AO is created</FONT>
 <b class="java">public void </b> runActivity(Body body) {
-Service service = new Service(Body);
-while ( Terminate ) {
+Service service = new Service(body);
+while ( terminate ) {
 	<FONT ID="SingleLineComment">...    // Do some activity on its own</FONT>
 	...
 	<FONT ID="SingleLineComment">...    // Do some services, e.g. a FIFO service on method named foo</FONT>
