@@ -1,7 +1,8 @@
 package org.objectweb.proactive.core.group;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ListIterator;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.objectweb.proactive.Body;
@@ -23,10 +24,6 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  */
 public class ProxyForGroup extends AbstractProxy implements org.objectweb.proactive.core.mop.Proxy, Group, java.io.Serializable {
-
-		static long nbtour = 0;
-		static long total = 0;
-
 
 
 	/** The name of the Class : all members of the group are "className" assignable */
@@ -218,21 +215,25 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 
-	/* --------------- THE GROUP'S METHOD ------------------ */
+	/* ------------------- THE COLLECTION'S METHOD ------------------ */
 
-	/** If o is a reified object and if it is "assignableFrom" the class of the group, add it into the group 
-	if o is a group merge it into the group 
-	if o is not a reified object nor a group : do nothing */
-	public void add(Object o) {
+	/** 
+	 * If o is a reified object and if it is "assignableFrom" the class of the group, add it into the group
+	 *  - if o is a group merge it into the group
+	 *  - if o is not a reified object nor a group : do nothing
+	 * @param o - element whose presence in this group is to be ensured
+	 * @return <code>true</code> if this collection changed as a result of the call
+	 */
+	public boolean add(Object o) {
 		try {
 			if ((MOP.forName(this.className)).isAssignableFrom(o.getClass())) {
 				/* if o is an reified object and if it is "assignableFrom" the class of the group, ... add it into the group */
 				if (MOP.isReifiedObject(o)) {
-					this.memberList.add(o);
+					return this.memberList.add(o);
 				} /* if o is a Group */
 				else if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
 					/* like an addMerge call */
-					memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
+					return this.memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
 				} /* o is a standard Java object */
 				else {
 					Object tmp = null;
@@ -242,14 +243,168 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						System.err.println("Unable to create a stub+proxy for the new member of the group");
 					}
 					((org.objectweb.proactive.core.body.future.FutureProxy)((StubObject)tmp).getProxy()).setResult(o);
-					add(tmp);
+					return this.add(tmp);
 				}
-			} else
+			}
+			else {
 				System.err.println("uncompatible Object");
-		} catch (java.lang.ClassNotFoundException e) {
-			System.err.println("Unknown class : " + this.className);
+				return false;
+			}
 		}
+		catch (java.lang.ClassNotFoundException e) { System.err.println("Unknown class : " + this.className); }
+		return true;
 	}
+
+	/**
+	 * Adds all of the elements in the specified Collection to this Group.
+	 * @param <code>c</code> - the elements to be inserted into this Group.
+	 * @return <code>true</code> if this collection changed as a result of the call.
+	 */
+	public boolean addAll(Collection c) {
+		boolean modified = false;
+		Iterator iterator = c.iterator();
+		while (iterator.hasNext()) {
+			modified |= this.add(iterator.next());
+		}
+		return modified;
+	}
+
+
+	/**
+	 * Removes all of the elements from this group.
+	 * This group will be empty after this method returns.
+	 */
+	public void clear() {
+		this.memberList.clear();
+	}
+
+	/**
+	 * This method returns true if and only if this group contains at least one element e such that <code>o.equals(e)</code>
+	 * @return <code>true</code> if this collection contains the specified element. 
+	 */
+	public boolean contains(Object o) {
+		return this.memberList.contains(o);
+	}
+
+	/**
+	 * Checks if this Group contains all of the elements in the specified collection.
+	 * @param <code>c</code> - the collection to be checked for containment in this Group.
+	 * @return <code>true</code> if this Group contains all of the elements in the specified collection
+	 */
+	public boolean containsAll(Collection c) {
+		boolean contained;
+		Iterator iterator = c.iterator();
+		while (iterator.hasNext()) {
+			contained = this.contains(iterator.next());
+			if (!contained) return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Compares the specified object with this group for equality.
+	 */
+	public boolean equals(Object o) {
+		if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup)
+			return this.proxyForGroupID.equals(((org.objectweb.proactive.core.group.ProxyForGroup)o).proxyForGroupID);
+		else
+			return false;
+	}
+
+	/**
+	 * Returns the hash code value for this group
+	 */
+	public int hashCode() {
+		return this.memberList.hashCode();
+	}
+
+	/**
+	 * Check if the group is empty.
+	 * @return <code>true</code> if this collection contains no elements.
+	 */
+ 	public boolean isEmpty() {
+ 		return this.memberList.isEmpty();
+ 	}
+
+	/**
+	 * Returns a ListIterator of the member in the group
+	 */
+	public Iterator iterator() {
+		return this.memberList.listIterator();
+	}
+
+	/**
+	 * Removes a single instance of the specified element from this Group, if it is present.
+	 * It removes the first occurence e where <code>o.equals(e)</code> returns <code>true</code>. 
+	 * @param <code>o</code> the element to be removed from this Group (if present).
+	 * @return <code>true> if the Group contained the specified element. 
+	 */
+	public boolean remove(Object o) {
+		return this.memberList.remove(o);
+	}
+
+	/**
+	 * Removes all this Group's elements that are also contained in the specified collection.
+	 * After this call returns, this collection will contain no elements in common with the specified collection.
+	 * @param <code>c</code> - elements to be removed from this Group.
+	 * @return <code>true</code> if this Group changed as a result of the call 
+	 */
+	public boolean removeAll(Collection c) {
+		boolean modified = false;
+		Iterator iterator = c.iterator();
+		while (iterator.hasNext()) {
+			modified |= this.remove(iterator.next());
+		}
+		return modified;		
+	}
+
+	/**
+	 * Retains only the elements in this Group that are contained in the specified collection.
+	 * It removes from this Group all of its elements that are not contained in the specified collection.
+	 * @param <code>c</code> - elements to be retained in this Group.
+	 * @return <code>true</code> if this Group changed as a result of the call.
+	 */
+	public boolean retainAll(Collection c) {
+		boolean modified = false;
+		Iterator iterator = c.iterator();
+		while (iterator.hasNext()) {
+			Object tmp = iterator.next();
+			if (this.contains(tmp))
+				modified |= this.remove(tmp);
+		}
+		return modified;		
+
+	}
+ 
+	/**
+	 * Returns the number of member in this Group.
+	 */
+	public int size() {
+		return this.memberList.size();
+	}
+	
+	/**
+	 * Returns an array containing all of the elements in this Group in the correct order.
+	 */
+	public Object[] toArray() {
+		return this.memberList.toArray();
+	}
+
+	/**
+	 * Returns an array containing all of the elements in this collection;
+	 * the runtime type of the returned array is that of the specified array. 
+	 * @param <code>a</code> - the array into which the elements of this collection are to be stored, if it is big enough;
+	 * otherwise, a new array of the same runtime type is allocated for this purpose.
+	 * @return an array containing the elements of this collection
+	 */		
+	public Object[] toArray(Object[] a) {
+		return this.memberList.toArray(a);
+	}
+
+
+
+	/* ---------------------- THE GROUP'S METHOD ------------------- */
+
 
 	/** Add all member of the group oGroup into the Group */
 	public void addMerge(Object oGroup) {
@@ -271,9 +426,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 	}
 
+
 	/**
 	 * Returns the index of the first occurence of the specified Object <code>obj</code>
-	 * Returns -1 if the list does not contain this object.
+	 * @return -1 if the list does not contain this object.
 	 */
 	public int indexOf(Object obj) {
 		return this.memberList.indexOf(obj);
@@ -294,19 +450,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return this.memberList.get(i);
 	}
 
-	/**
-	 * Returns the number of member in the group
-	 */
-	public int size() {
-		return this.memberList.size();
-	}
-
-	/**
-	 * Returns a ListIterator of the member in the group
-	 */
-	public ListIterator iterator() {
-		return this.memberList.listIterator();
-	}
 
 	/** Return the ("higher") Class of group's member */
 	public Class getType() throws java.lang.ClassNotFoundException {
@@ -333,7 +476,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		((ProxyForGroup) ((StubObject) result).getProxy()).waited = this.waited;
 		return result;
 	}
-
 	//  This is the best thing to do, but createStubObject has a private acces !!!! :
 	//    // Instanciates the stub object
 	//    StubObject stub = MOP.createStubObject(this.className, MOP.forName(this.className));
@@ -350,6 +492,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			System.out.println(i + " : " + memberList.get(i).getClass().getName());
 		}
 	}
+
+	/* ------------------- SYNCHRONIZATION -------------------- */
 
 	protected void waitAll() {
 		ProActive.waitForAll(this.memberList);
@@ -402,6 +546,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 
 	/* ------------------------ PRIVATE METHODS FOR SERIALIZATION --------------------- */
+
 	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
 		this.waitForAllCallsDone();
 		// Now that all the results are available, we can copy the group (of future)

@@ -30,21 +30,35 @@
 */ 
 package org.objectweb.proactive.core.group;
 
-import java.util.ListIterator;;
 
 
 /**
- * This interface presents the group abilities.
+ * This interface presents the group abilities extending java.util.Collection.
+ *
+ * @see java.util.Collection
  *
  * @author Laurent Baduel - INRIA
  *
  */
-public interface Group { 
-    
-    /**
-     * Add an element into the group.
-     */
-    public void add(Object o);
+public interface Group extends java.util.Collection { 
+
+
+	/**
+	 * Returns the (upper) class of member.
+	 */
+	public Class getType() throws java.lang.ClassNotFoundException;
+
+	/**
+	 * Returns the name of the (upper) class of member.
+	 */    
+	public String getTypeName();
+
+	/**
+	 * Returns an object representing the group, and assignable from the (upper) class of member.
+	 */
+	public Object getGroupByType();
+
+
     
     /**
      * Merge a group into the group.
@@ -55,31 +69,6 @@ public interface Group {
      * Remove the object at the specified index.
      */
     public void remove(int index);
-
-    /**
-     * Returns the number of member.
-     */
-    public int size();
-
-    /**
-     * Returns the (upper) class of member.
-     */
-    public Class getType() throws java.lang.ClassNotFoundException;
-
-    /**
-     * Returns the name of the (upper) class of member.
-     */    
-    public String getTypeName();
-
-    /**
-     * Returns a ListIterator of the member in the group
-     */
-    public ListIterator iterator();
-
-    /**
-     * Returns an object representing the group, and assignable from the (upper) class of member.
-     */
-    public Object getGroupByType();
 
     /**
      * Returns the index in the group of the first occurence of the specified element, -1 if the list does not contain this element.
