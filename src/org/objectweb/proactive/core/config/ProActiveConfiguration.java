@@ -222,9 +222,10 @@ public class ProActiveConfiguration {
         if (System.getProperty("log4j.configuration") == null) {
             loadLogger();
         }
-        if (System.getProperty("proactive.communication.protocol").equals("rmi")) {
-            setProperty("proactive.rmi.port", "1099");
-        }
+        
+        setProperty("proactive.rmi.port", "1099");
+        setProperty("proactive.http.port", "2010");
+        
         setProperty("proactive.ft", "disable");
         setProperty("proactive.ft.ttc", "30");
     }
