@@ -4,14 +4,15 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
+
 /**
  * @author Matthieu Morel
  *
  */
 public class B {
-    
-    public B() {}
-    
+    public B() {
+    }
+
     public B(String param) {
         try {
             createActiveObjectC();
@@ -22,10 +23,13 @@ public class B {
     }
 
     public void createActiveObjectC() throws Exception {
-        ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(System.getProperty("user.home") + "/ProActive/src/nonregressiontest/runtime/classloader/deployment.xml");
+        ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(getClass()
+                                                                              .getResource("/deployment.xml")
+                                                                              .getPath());
         descriptor.activateMappings();
-        Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.C", new Object[]{"sdfasdf"}, descriptor.getVirtualNode("VN1").getNode());
+        Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.C",
+                new Object[] { "sdfasdf" },
+                descriptor.getVirtualNode("VN1").getNode());
         descriptor.killall(false);
     }
-    
 }

@@ -39,6 +39,13 @@ import testsuite.test.FunctionalTest;
 /**
  * 2 steps hierarchical deployment with dynamic classloading through runtimes.
  *
+ * 1. A is created on VN1 where A.class is not available
+ *  => the class A is asked to the initial deployment runtime
+ * 2. B is created from A, and creates a remote object C on a place where C is not available.
+ * => class C is asked to the runtime of A and B, which asks to the initial deployment runtime
+ * 
+ * 
+ * 
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
