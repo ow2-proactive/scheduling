@@ -3,12 +3,6 @@ package org.objectweb.proactive.test;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
-/**
- * @author fhuet
- *
- * 
- *
- */
 public class ProActiveTestSuite extends junit.framework.TestSuite {
 	
 	public ProActiveTestSuite(String s) {
@@ -17,9 +11,8 @@ public class ProActiveTestSuite extends junit.framework.TestSuite {
 	
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
-		suite.addTestSuite(org.objectweb.proactive.core.util.test.TestCircularArrayList.class);
+		suite.addTestSuite(org.objectweb.proactive.core.util.test.CircularArrayListTest.class);
+		suite.addTestSuite(org.objectweb.proactive.core.node.rmi.test.NodeFactoryTest.class);
 		return suite;	
 	}
-	
-
 }

@@ -6,7 +6,7 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueueImpl;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
-public class TestCircularArrayList extends TestCase {
+public class CircularArrayListTest extends TestCase {
 
 	private Object o, o2, o3;
 	private CircularArrayList list;
@@ -62,7 +62,7 @@ public class TestCircularArrayList extends TestCase {
 		}
 	}
 
-	public TestCircularArrayList(String str) {
+	public CircularArrayListTest(String str) {
 		super(str);
 	}
 }
