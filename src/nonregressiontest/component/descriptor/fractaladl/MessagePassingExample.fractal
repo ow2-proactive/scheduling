@@ -4,27 +4,31 @@
 <definition name="nonregressiontest.component.descriptor.fractaladl.MessagePassingExample" extends="nonregressiontest.component.descriptor.fractaladl.MessagePassingExampleType">
 	
    <exportedVirtualNodes>
-    	<exportedVirtualNode name="VN3">
-    		<composedFrom>
-    			<!--these were defined as "multiple" -->
-		   		<composingVirtualNode component="a2-3" name="VNA"/>
-		   		<composingVirtualNode component="a2-2" name="VNA"/>
-		   		<composingVirtualNode component="a2-1" name="VNA"/>
-		   		<!-- these were defined as single (see their definition)
-		   		 : there will be only 1 instance of each component -->
-		   		<composingVirtualNode component="b2" name="VNB"/>
-		   		<composingVirtualNode component="b1" name="VNB"/>
-    		</composedFrom>
-    	</exportedVirtualNode>
+        <exportedVirtualNode name="VN3">
+          <composedFrom>
+              <!-- VNA is a "multiple" virtual node, therefore
+              VN3, which inherits this property, will have to 
+              be mapped onto several nodes in the deployment 
+              descriptor -->
+            <composingVirtualNode component="a2-3" name="VNA"/>
+            <composingVirtualNode component="a2-2" name="VNA"/>
+            <composingVirtualNode component="a2-1" name="VNA"/>
+            <composingVirtualNode component="a1" name="VNA"/>
+         </composedFrom>
+        </exportedVirtualNode>
+        <exportedVirtualNode name="VN2">
+          <composedFrom>
+            <composingVirtualNode component="b2" name="VNB"/>
+            <composingVirtualNode component="b1" name="VNB"/>
+          </composedFrom>
+        </exportedVirtualNode>
     </exportedVirtualNodes>
 
   <component name="b2" definition="nonregressiontest.component.descriptor.fractaladl.b"/>
   <component name="parallel">
     <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
     <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-    <component name="a1" definition="nonregressiontest.component.descriptor.fractaladl.a">
-    	<virtual-node name="VN3" cardinality="single"/> <!-- this one is not exported -->
-    </component>
+    <component name="a1" definition="nonregressiontest.component.descriptor.fractaladl.a"/>
     <component name="parallel-2">
       <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
       <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
