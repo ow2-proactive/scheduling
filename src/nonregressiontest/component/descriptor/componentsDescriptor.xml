@@ -27,19 +27,19 @@
     </types>
     <components>
         <primitive-component implementation="nonregressiontest.component.PrimitiveComponentB"
-            name="p2" type="B-Type" virtualNode="null"/>
-        <composite-component name="c" type="A-Type" virtualNode="null">
+            name="p2" type="B-Type" virtualNode="VN1"/>
+        <composite-component name="c" type="A-Type" virtualNode="VN2">
             <components>
                 <primitive-component
                     implementation="nonregressiontest.component.PrimitiveComponentA" name="p1"
-                    type="A-Type" virtualNode="null"/>
+                    type="A-Type" virtualNode="VN1"/>
             </components>
             <bindings>
                 <binding client="c.i1" server="p1.i1"/>
                 <binding client="p1.i2" server="c.i2"/>
             </bindings>
         </composite-component>
-        <parallel-composite-component name="parallel" type="C-Type" virtualNode="null">
+        <parallel-composite-component name="parallel" type="C-Type" virtualNode="VN1">
             <components>
                 <primitive-component  implementation="nonregressiontest.component.PrimitiveComponentC" name="parallelized"
                     type="C-Type" virtualNode="VN3"/>
