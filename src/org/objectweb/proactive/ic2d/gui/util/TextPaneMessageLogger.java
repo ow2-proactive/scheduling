@@ -92,19 +92,29 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
     logInternal(message, regularStyle);
   }
 
-  public void log(String message, Throwable e) {
+  public void log(String message, Throwable e, boolean dialog) {
     logInternal(message, errorStyle);
     java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
     java.io.PrintWriter pw = new java.io.PrintWriter(baos, false);
     e.printStackTrace(pw);
     pw.flush();
     logInternal(baos.toString(), stackTraceStyle);
-    invokeDialog(message);
+    if (dialog)
+    	invokeDialog(message);
+  }
+
+  public void log(Throwable e, boolean dialog) {
+    log(e.getMessage(), e, dialog);
+  }
+  
+  public void log(String message, Throwable e) {
+    log(message, e, true);
   }
 
   public void log(Throwable e) {
-    log(e.getMessage(), e);
+    log(e, true);
   }
+  
 
 
 

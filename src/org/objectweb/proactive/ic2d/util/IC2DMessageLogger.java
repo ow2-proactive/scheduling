@@ -36,7 +36,7 @@ public interface IC2DMessageLogger extends MessageLogger {
 
   public void warn(String message);
 
+  public void log(String message, Throwable e, boolean dialog);
+
+  public void log(Throwable e, boolean dialog);
 }
-
-
-

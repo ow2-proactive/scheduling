@@ -213,6 +213,13 @@ public class IC2DObject extends AbstractDataObject {
       if (logger != null) logger.log(e);
     }
 
+    public void log(String message, Throwable e, boolean dialog) {
+    	if (logger != null) logger.log(message, e, dialog);
+    }
+
+    public void log(Throwable e, boolean dialog) {
+    	if (logger != null) logger.log(e, dialog);
+    }
   }
 
 }

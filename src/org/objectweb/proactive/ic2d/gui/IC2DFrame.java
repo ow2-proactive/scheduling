@@ -589,6 +589,13 @@ public void activeObjectAdded(ActiveObject activeObject) {
       logger.log(e);
     }
 
+    public void log(String message, Throwable e, boolean dialog) {
+    	logger.log(message, e, dialog);
+    }
+
+    public void log(Throwable e, boolean dialog) {
+    	logger.log(e, dialog);
+    }
   }
 
 }
