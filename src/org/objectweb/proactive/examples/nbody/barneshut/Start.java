@@ -41,16 +41,19 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 
-
+/**
+* <P>
+ * This starts the Barnes-Hut example. Domains are synchronized through an OO-spmd scheme,
+ * and their relations are defined through a tree representing spacial extent. This relation
+ * is built on the distance from one Planet to a Domain.
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
+ */
 public class Start { 
     
-    /**
-     * Options should be "java Start xmlFile [-display] totalNbBodies maxIter"
-     * @param -display, which is not compulsory, specifies whether a graphic display is to be created.
-     * @param xmlFile is the xml deployment file..
-     * @param totalNbBodies  The number of Planets in the System
-     * @param maxIter The number of iterations before the program stops. 
-     */
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args) ; 
     }

@@ -40,7 +40,15 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 /**
- * Starts the simulation running the groupoospmd example.
+ * <P>
+ * This starts the nbody example, where communication uses Groups, and synchronization
+ * is done using an SPMD scheme. ProActive offers barriers, which stop all Active Objects
+ * within the same Group. This way, synchronization is written in a very readable fashion. 
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
  */
 public class Start{
     

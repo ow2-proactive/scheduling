@@ -41,17 +41,34 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
-
+/**
+* <P>
+ * This launches the different versions of the nbody example
+ * <ul>
+ * <li> simple : simplest version, one-to-one communication and master</li>
+ * <li> groupcom : group communication and master</li>
+ * <li> groupdistrib : odd-even-synchronization</li>
+ * <li> groupoospmd : oospmd synchronization</li>
+ * <li> barneshut : an implementation of the Barnes-Hutalgorithm</li>
+ * </ul>
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
+ */
 public class Start implements Serializable{
     
     private static ProActiveDescriptor descriptorPad; 
     /**
      * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"
-     * @param -nodisplay, which is not compulsory, specifies whether a graphic display is to be created.
-     * @param -displayft, which is not compulsory, specifies whether a fault-generating panel should be created.
-     * @param xmlFile is the xml deployment file..
-     * @param totalNbBodies  The number of Planets in the System.
-     * @param maxIter The number of iterations before the program stops.
+     * Parameters can be <ul>
+     * <li> -nodisplay, which is not compulsory, specifies whether a graphic display is to be created.</li>
+     * <li> -displayft, which is not compulsory, specifies whether a fault-generating panel should be created.</li>
+     * <li> xmlFile is the xml deployment file..</li>
+     * <li> totalNbBodies  The number of Planets in the System.</li>
+     * <li> maxIter The number of iterations before the program stops.</li>
+     * </ul>
      */
     public static void main(String[] args) {
         new Start().run(args);

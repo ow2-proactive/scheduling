@@ -42,7 +42,15 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 
 /**
- * Starts the simulation running the groupcom example.
+ * <P>
+ * Starts the simulation running the groupcom example. Domains are synchronized by a Maestro,
+ * but communicate with Group communication, which is an improvement compared to several 
+ * sequential communications.
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
  */
 public class Start {
     

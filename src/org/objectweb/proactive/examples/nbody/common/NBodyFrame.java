@@ -287,7 +287,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
     
     private int getZoomedCoord(int x){
         //return x/zoomValue + (SIZE/2-xCenter) + SIZE/2/this.zoomValue;
-        return x/zoomValue;
+        return 2*x/zoomValue;
     }
     
     

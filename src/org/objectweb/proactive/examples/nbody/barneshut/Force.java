@@ -87,7 +87,7 @@ public class Force implements Serializable{
     
     /**
      * Adds up the force of the parameter force to this. 
-     * @param f, the force to be added to this
+     * @param f the force to be added to this
      */
     public void add(Force f) {
         this.x += f.x;

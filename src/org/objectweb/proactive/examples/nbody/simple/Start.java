@@ -38,6 +38,18 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
+/**
+ * <P>
+ * This starts the nbody example, on the most simple example. Every Active Object (Domains) is 
+ * associated to one single Planet. Synchronization is achieved by using another type of Active 
+ * Object, a Maestro, which waits for all Domains to finish the current iteration before asking
+ * them to start the following one.  
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
+ */
 
 public class Start {
     
@@ -49,12 +61,19 @@ public class Start {
             org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING simplest VERSION");
         
-        Rectangle universe = new Rectangle(-100 , -100 , 100 , 100);
+        //Rectangle universe = new Rectangle(-100 , -100 , 100 , 100);
+        Planet [] planet = new Planet[]{
+                new Planet(new Rectangle(-100 , -100, 1 ,1)),
+                new Planet(new Rectangle(100 , 100, 1 ,1)),
+                new Planet(new Rectangle(-100 , 100, 1 ,1)),
+                new Planet(new Rectangle(100 , -100, 1 ,1))
+                };
         Domain [] domainArray = new Domain [totalNbBodies];
         for (int  i = 0 ; i < totalNbBodies ; i++) {
             Object [] constructorParams = new Object [] {
                     new Integer(i), 
-                    new Planet (universe)
+//                  new Planet (universe)
+                    planet[i]
             	};
             try {
                 // Create all the Domains used in the simulation 

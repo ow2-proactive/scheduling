@@ -71,7 +71,7 @@ public class Domain implements Serializable{
     /**
      * Constructor
      * @param i the unique identifier
-     * @param r the boundaries containing the Planet at the begining of the simulation
+     * @param planet the Planet controlled by this Domain
      */
     public Domain (Integer i, Planet planet) {
         this.identification = i.intValue();
@@ -82,7 +82,6 @@ public class Domain implements Serializable{
     
     /**
      * Initialize all necessary variables, namely the variables concerning neighborhood, the display, and forces. 
-     * @param domainGroup the Group of all Domains within universe 
      * @param dp The Displayer used to show on screen the movement of the objects.
      * @param maxIter The number of iterations to compute before stoppping
      */
@@ -108,10 +107,10 @@ public class Domain implements Serializable{
     /**
      * Called by a distant Domain, this method adds the inf contribution to the force applied on the local Planet
      * @param inf the distant Planet which adds its contribution.
-     * @param receivedIter the distant iteration, to make sure we're synchronized 
+     * @param id the distant Domain's identification
      */
     public void setValue(Planet inf, int id) {
-        if (id != this.identification)  
+        if (id != this.identification)
             this.currentForce.add (info, inf);		// add this contribution to the force on Planet
     }
     

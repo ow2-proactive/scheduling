@@ -74,7 +74,7 @@ public class Domain implements Serializable{
     /**
      * Constructor
      * @param i the unique identifier
-     * @param r the boundaries containing the Planet at the begining of the simulation
+     * @param planet the Planet controlled by this Domain
      */
     public Domain (Integer i, Planet planet, 
             org.objectweb.proactive.examples.nbody.common.Start killsupport) {

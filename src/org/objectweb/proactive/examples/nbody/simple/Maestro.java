@@ -48,7 +48,7 @@ public class Maestro implements Serializable {
     
     /**
      * Create a new master for the simulation, which pilots all the domains given in parameter.
-     * @param domainG the group of Domains which are to be controled by this Maestro.
+     * @param domainArray the group of Domains which are to be controled by this Maestro.
      * @param max the total number of iterations that should be simulated
      */
     public Maestro (Domain [] domainArray, Integer max, org.objectweb.proactive.examples.nbody.common.Start killsupport) {

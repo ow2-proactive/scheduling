@@ -66,7 +66,7 @@ public class Force implements Serializable{
     // FIXME : the code below is not used, and should be in order to make things more efficient.
     /**
      * Adds up the force of the parameter force to this. 
-     * @param f, the force to be added to this
+     * @param f the force to be added to this
      */
     public void add(Force f) {
         this.x += f.x;

@@ -93,7 +93,6 @@ public class Info implements Serializable{
     
     /**
      * Sets the center of the current Info as the center of mass of the Planets contained.
-     * @param planets The set of infos which are to be summed up
      */
     public void recomputeCenterOfMass() {
         this.x = 0;

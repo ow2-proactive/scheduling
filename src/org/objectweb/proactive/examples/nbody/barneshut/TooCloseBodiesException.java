@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
 /**
- * An Exception which is thrown when the force between a Planet and a Set of Planet is tryed to be computed,
- * but the Planet is too close to the Set, and the formula used would create a way too big approximation.
+ * An Exception which is thrown when the force between a Planet and a set of Planet is tried to be computed,
+ * but the Planet is too close to the set, and the formula used would create a way too big approximation.
  */
 public class TooCloseBodiesException extends Exception{}

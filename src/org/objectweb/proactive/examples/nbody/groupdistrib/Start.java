@@ -39,7 +39,18 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
-
+/**
+ * <P>
+ * This starts the nbody example, where communication uses Groups, and synchronization
+ * is done through an odd-even scheme : if a value arrives with the wrong iteration number,
+ * it gets postponed until the next iteration. This allows for a soft synchronization, where 
+ * Domains do not have to wait for all the others before starting the following iteration. 
+ * </P>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2005/04
+ * @since   ProActive 2.2
+ */
 public class Start {
     
     public static void main(String[] args) {

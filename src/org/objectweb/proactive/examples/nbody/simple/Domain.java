@@ -60,7 +60,7 @@ public class Domain implements Serializable{
     /**
      * Creates a container for a Planet, within a region of space.
      * @param i The unique identifier of this Domain
-     * @param r The Planet will be created inside the region r 
+     * @param planet The Planet controlled by this Domain 
      */
     public Domain (Integer i, Planet planet) {	 
         this.identification = i.intValue();
