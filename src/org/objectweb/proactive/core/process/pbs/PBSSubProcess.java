@@ -85,11 +85,13 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
         this.hostname = null;
+        this.command_path = DEFAULT_QSUBPATH;
     }
 
     public PBSSubProcess(ExternalProcess targetProcess) {
         super(targetProcess);
         this.hostname = null;
+        this.command_path = DEFAULT_QSUBPATH;
     }
 
     public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
@@ -193,7 +195,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
 
     protected String buildCommand() {
         StringBuffer qsubCommand = new StringBuffer();
-        qsubCommand.append(DEFAULT_QSUBPATH).append(" ");
+        qsubCommand.append(command_path).append(" ");
         if (interactive.equals("true")) {
             qsubCommand.append(" -I");
         }

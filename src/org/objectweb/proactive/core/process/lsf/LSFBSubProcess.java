@@ -99,6 +99,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     super();
     setCompositionType(GIVE_COMMAND_AS_PARAMETER);
     this.hostname = null;
+    this.command_path = DEFAULT_BSUBPATH;
   }
   
   
@@ -110,6 +111,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   public LSFBSubProcess(ExternalProcess targetProcess) {
     super(targetProcess);
     this.hostname = null;
+    this.command_path = DEFAULT_BSUBPATH;
   }
 
     
@@ -272,7 +274,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   protected String buildBSubCommand() {
   	StringBuffer bSubCommand = new StringBuffer();
-  	bSubCommand.append(DEFAULT_BSUBPATH);
+  	bSubCommand.append(command_path);
   	if(interactive.equals("true")) bSubCommand.append(" -I");
   	bSubCommand.append(" -n "+processor+" -q "+queueName+" ");
   	if(hostList != null){

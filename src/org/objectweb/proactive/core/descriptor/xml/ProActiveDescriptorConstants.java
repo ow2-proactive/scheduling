@@ -74,6 +74,7 @@ public interface ProActiveDescriptorConstants {
     public static final String SERVICES_TAG = "services";
     public static final String PROCESS_REFERENCE_TAG = "processReference";
     public static final String SERVICE_REFERENCE_TAG = "serviceReference";
+    public static final String COMMAND_PATH_TAG = "commandPath";
     public static final String ENVIRONMENT_TAG = "environment";
     public static final String HOST_LIST_TAG = "hostlist";
     public static final String BSUB_OPTIONS_TAG = "bsubOption";

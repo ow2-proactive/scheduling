@@ -147,6 +147,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         throws java.io.IOException {
         try {
             //if (inputMessageLogger != null) inputMessageLogger.log("Command is "+commandToExecute);
+	    //System.out.println(commandToExecute);
             externalProcess = Runtime.getRuntime().exec(commandToExecute);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
                         externalProcess.getInputStream()));

@@ -114,6 +114,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             this.proActiveDescriptor = proActiveDescriptor;
             addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
             addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
+            addHandler(COMMAND_PATH_TAG, new CommandPathHanlder());
         }
 
         public void startContextElement(String name, Attributes attributes)
@@ -161,6 +162,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
                 Object result = activeHandler.getResultObject();
                 proActiveDescriptor.registerProcess(cep, (String) result);
+            } else if (name.equals(COMMAND_PATH_TAG)) {
+                targetProcess.setCommandPath((String) activeHandler.getResultObject());
             }
         }
 
@@ -213,6 +216,22 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
 
         // end inner class EnvironmentHandler
+        protected class CommandPathHanlder extends BasicUnmarshaller {
+            public CommandPathHanlder() {
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                String path = attributes.getValue("value");
+
+                if (checkNonEmpty(path)) {
+                    setResultObject(path);
+                } else {
+                    throw new org.xml.sax.SAXException(
+                        "The Id of the referenced definition cannot be set to an empty string");
+                }
+            }
+        }
     }
 
     //end of inner class ProcessHandler
