@@ -85,8 +85,8 @@ public class AverageMicroTimer implements Timer, Serializable {
      * @return the average time in microseconds
      *                   -1 if  NaN
      */
-    public long getAverage() {
-        return ((nbrValues > 0) ? (total / nbrValues) : (-1));
+    public double getAverage() {
+        return ((nbrValues > 0) ? ((double) total / nbrValues) : (-1));
     }
 
     public void dump() {

@@ -18,7 +18,7 @@ public interface Timer {
 	
 	public int getNumberOfValues();
 	
-	public long getAverage(); 
+	public double getAverage(); 
 	
 	public String getName();
 	

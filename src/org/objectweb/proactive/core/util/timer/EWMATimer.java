@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public class EWMATimer extends AverageMicroTimer {
     protected double alpha;
-    protected long average;
+    protected double average;
 
     public EWMATimer(String s, double alpha) {
         super(s);
@@ -24,14 +24,14 @@ public class EWMATimer extends AverageMicroTimer {
             currentElapsed += timer.getCumulatedTime();
             this.total += currentElapsed;
             this.nbrValues++;
-            this.average = (long) ((this.average * this.alpha) +
+            this.average = ((this.average * this.alpha) +
                 ((1 - this.alpha) * currentElapsed));
             currentElapsed = 0;
             running = false;
         }
     }
 
-    public long getAverage() {
+    public double getAverage() {
         return this.average;
     }
     
@@ -39,9 +39,9 @@ public class EWMATimer extends AverageMicroTimer {
     	int max = 100;
     	Random r = new Random();
     	long rValue; 
-    	long[] ewmaMemory = new long[max];
-    	long[] ewmaMemory2 = new long[max];
-    	long[] tMemory = new long[max];
+    	double[] ewmaMemory = new double[max];
+    	double[] ewmaMemory2 = new double[max];
+    	double[] tMemory = new double[max];
 		//we use multilple  timers to show the difference between a classical average one and a EWMA one
     	EWMATimer ewmat = new EWMATimer("EWMA", 0.9);
     	EWMATimer ewmat2 = new EWMATimer("EWMA", 0.5);

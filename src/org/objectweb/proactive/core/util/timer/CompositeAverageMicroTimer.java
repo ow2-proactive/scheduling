@@ -73,7 +73,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     /**
      * return the average time of all the timers
      */
-    public long getAverage() {
+    public double getAverage() {
         int values = 0;
         long time = 0;
         Iterator it = timerMap.values().iterator();
@@ -82,7 +82,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
             values += t.getNumberOfValues();
             time += t.getCumulatedTime();
         }
-        return ((values > 0) ? (time / values) : (-1));
+        return ((values > 0) ? ((double) time / values) : (-1));
     }
 
     public String toString() {
