@@ -26,9 +26,14 @@ IF EXIST %PROACTIVE%\lib\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib
 IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini-ext.jar
 IF EXIST %PROACTIVE%\lib\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\reggie.jar
 
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog.jar
-IF EXIST %PROACTIVE%\lib\iaik_jce_full.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_jce_full.jar
-IF EXIST %PROACTIVE%\lib\iaik_ssl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_ssl.jar
+rem Globus jar files
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-jglobus.jar
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-ogce.jar
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix.jar
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix32.jar
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix-asn1.jar
+IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\puretls.jar
+
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar
 IF EXIST %PROACTIVE%\lib\javaxCrypto.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javaxCrypto.jar
 IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis.jar
