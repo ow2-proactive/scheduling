@@ -3,7 +3,6 @@
 	<!-- General book file  -->
 	<!-- A subbook should include the master book at this point
     <IncludeBook> masterbook.xml </Book> -->
-	
 	<Options>
 		<!-- BOOK OPTIONS -->
 		<BookFilename>api.book</BookFilename>
@@ -19,8 +18,8 @@
 		<BookTitle>"ProActive PDC"</BookTitle>
 		<BookSubTitle>"The ProActive Java Library for Parallel, Distributed, and Concurrent Computing"</BookSubTitle>
 		<BookAuthor>"ProActive Team"</BookAuthor>
-		<BookVersion>"Version 0.9.3"</BookVersion>
-		<BookCopyright>"Copyright \xa9 June 2002 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
+		<BookVersion>"Version 1.0.1"</BookVersion>
+		<BookCopyright>"Copyright \xa9 January 2003 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
 		<BookPublisher>"INRIA Sophia Antipolis"</BookPublisher>
 		<!-- CHAPTER OPTIONS -->
 		<Author enabled="false"/>
@@ -121,7 +120,7 @@
 		</Chapter>
 	</Chapters>
 	<BackMatter>
-	<!--
+		<!--
 		<SectionFile> ./test/sample-src/doc-files/appendix.html </SectionFile>
 		<SectionFile> ./test/sample-src/doc-files/colophon.html </SectionFile>
 		-->
