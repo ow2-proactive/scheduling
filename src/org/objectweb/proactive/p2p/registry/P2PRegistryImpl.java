@@ -97,6 +97,12 @@ public int getNumberOfAvailables() throws RemoteException {
 	return underloaded.size();
 	}
 
+public Object[] getFullyAvailables(int n) throws RemoteException {
+        if (n > underloaded.size()) n = underloaded.size();
+        List l = new LinkedList(underloaded.values());
+        return l.subList(0,n-1).toArray();
+        }
+
 public Object[] getAvailables(int n) throws RemoteException {
 	if (n > register.size()) n = register.size();
 	List l = new LinkedList(register.values());

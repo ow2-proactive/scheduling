@@ -29,4 +29,6 @@ public Object getUnderloaded(String key) throws RemoteException;
 
 public int getNumberOfAvailables() throws RemoteException;
 public Object[] getAvailables(int n) throws RemoteException;
+
+public Object[] getFullyAvailables(int n) throws RemoteException
 }
