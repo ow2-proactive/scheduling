@@ -30,25 +30,23 @@ public class Test extends FunctionalTest {
     }
 
     public void action() throws Exception {
+		Object[][] params = {
+			{ "Agent0" },
+			{ "Agent1" },
+			{ "Agent2" }
+		};
+		Node[] nodes = {
+			TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
+			TestNodes.getRemoteVMNode()
+		};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+				params, nodes);
+
         this.resultTypedGroup = this.typedGroup.asynchronousCall();
     }
 
     public void endTest() throws Exception {
         // nothing to do
-    }
-
-    public void initTest() throws Exception {
-        Object[][] params = {
-            { "Agent0" },
-            { "Agent1" },
-            { "Agent2" }
-        };
-        Node[] nodes = {
-            TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-            TestNodes.getRemoteVMNode()
-        };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
-                params, nodes);
     }
 
     public boolean postConditions() throws Exception {
@@ -74,4 +72,7 @@ public class Test extends FunctionalTest {
         // is the result of the n-th group member at the n-th position in the result group ?
         return rightRankingOfResults;
     }
+
+	public void initTest() throws Exception {
+	}
 }
