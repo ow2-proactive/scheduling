@@ -115,4 +115,12 @@ public abstract class ProActiveFunctionalTest extends FunctionalTest
     public Node getRemoteVMNode() {
         return ((ProActiveFuncTestManager) manager).getRemoteVMNode();
     }
+    
+    /**
+     * @return a node with automatic continuations enabled
+     */
+	public Node getRemoteACVMNode() {
+		return ((ProActiveFuncTestManager) manager).getRemoteACVMNode();
+	}
+
 }
