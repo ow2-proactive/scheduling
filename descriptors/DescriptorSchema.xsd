@@ -64,7 +64,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
 			<xs:element name="componentDefinition" type="ComponentDefinitionType">
-				<xs:unique name="idName">		
+				<xs:unique name="idName">
 					<xs:selector xpath=".//*"/>
 					<xs:field xpath="@name"/>
 					<!-- uniqueness of every name attribute in the component definition part -->
@@ -316,6 +316,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 	</xs:complexType>
@@ -352,6 +353,11 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="type" type="xs:string" use="required" fixed="absolute"/>
 		<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:complexType>
+	
+	<xs:simpleType name="JvmParameterType">
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
 		<xs:sequence>
