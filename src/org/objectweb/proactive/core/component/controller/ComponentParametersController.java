@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.controller;
 
+import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.proactive.core.component.ComponentParameters;
 
 
@@ -35,13 +36,21 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 */
 /**
  * This interface defines a new type of Fractal controllers, 
- * that allow a sophisticated configuration of the components 
+ * that allow configuration of the components with this implementation 
  * @author Matthieu Morel
  */
-public interface ComponentParametersController {
+public interface ComponentParametersController extends AttributeController {
 
+	/**
+	 * getter
+	 * @return the component parameters
+	 */
 	public ComponentParameters getComponentParameters();
 
+	/**
+	 * setter
+	 * @param componentParameters the component parameters
+	 */
 	public void setComponentParameters(ComponentParameters componentParameters);
     
 }
