@@ -140,7 +140,25 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             String url = UrlBuilder.buildUrl(host, vnLookup, protocol);
             VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,
                     true);
-            vn.setLookupInformations(url, protocol);
+
+            //		vn.setLookupInformations(url,protocol);
+            String port = attributes.getValue("port");
+
+            //System.out.println(port);
+            if (checkNonEmpty(port)) {
+                if (protocol.equals("jini:")) {
+                    throw new org.xml.sax.SAXException(
+                        "For a jini lookup, no port number should be specified");
+                }
+                url = UrlBuilder.buildUrl(host, vnLookup, protocol,
+                        new Integer(port).intValue());
+                vn.setLookupInformations(url, protocol,
+                    new Integer(port).intValue());
+                //if no port is specified we use 1099 since it is the default port. Even if it is jini
+                // the UrlBuilder will not use the port when building the url
+            } else {
+                vn.setLookupInformations(url, protocol, 1099);
+            }
         }
     }
 
@@ -294,16 +312,17 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
                 String acquisitionMethod = attributes.getValue("method");
-                String portNumber = attributes.getValue("port");                
+                String portNumber = attributes.getValue("port");
                 if (acquisitionMethod != null) {
                     currentVM.setAcquisitionMethod(acquisitionMethod);
                 }
                 if (portNumber != null) {
-                	currentVM.setPortNumber(portNumber);
+                    currentVM.setPortNumber(portNumber);
                 }
             }
         }
-         // end inner class AcquisitionHandler
+
+        // end inner class AcquisitionHandler
 
         /**
          * This class receives acquisition events
@@ -327,7 +346,9 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 }
             }
         }
-         // end inner class CreationHandler
+
+        // end inner class CreationHandler
     }
-     // end inner class JVMHandler
+
+    // end inner class JVMHandler
 }
