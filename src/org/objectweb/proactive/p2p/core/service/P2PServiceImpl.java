@@ -30,17 +30,8 @@
  */
 package org.objectweb.proactive.p2p.core.service;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -52,8 +43,21 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.core.info.Info;
 import org.objectweb.proactive.p2p.core.service.KnownTable.KnownTableElement;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Vector;
 
 
 /**
@@ -70,8 +74,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     private KnownTable knownProActiveJVM = null;
     private String runtimeName = null;
     private int load = 0;
-    private String url = null;
-    private String completeUrl = "";
+    private String peerHostname;
+    private String peerUrl = null;
     private Info serviceInfo;
     private FakeProActiveRuntime fakeProActiveRuntime;
 
@@ -85,7 +89,6 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public P2PServiceImpl() {
         // Empty Cronstructor
-  
     }
 
     /**
@@ -99,33 +102,32 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      *            like 2410
      * @param createNode
      */
-    public P2PServiceImpl(String acquisitionMethod, String portNumber,
-        ProActiveRuntime paRuntime) {
+    public P2PServiceImpl(String acquisitionMethod, String portNumber) {
         try {
             this.acquisitionMethod = acquisitionMethod;
             this.portNumber = portNumber;
 
             // URL
             String url = InetAddress.getLocalHost().getCanonicalHostName();
-
+            this.peerHostname = url;
+            
             if (url.endsWith("/")) {
                 url.replace('/', ' ');
                 url.trim();
             }
 
             url += (":" + this.portNumber);
-            this.url = "//" + url;
-            this.completeUrl = this.acquisitionMethod + this.url + "/";
-            this.runtime = paRuntime;
-            this.runtimeName = this.url + "/" +
-                this.runtime.getVMInformation().getName();
+            this.peerUrl = "//" + url;
+            
+            this.runtime = RuntimeFactory.getProtocolSpecificRuntime(this.acquisitionMethod);
+            this.runtimeName = this.runtime.getURL();
+            this.serviceInfo = new Info(0, 0, this.getServiceName());
 
-            this.serviceInfo = new Info(0, 0, this.completeUrl);
-            
             this.fakeProActiveRuntime = new FakeProActiveRuntime();
-            
         } catch (UnknownHostException e) {
-            logger.error("Could't return the URL of this P2P Service");
+            logger.error("Could't return the URL of this P2P Service ");
+        } catch (ProActiveException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -136,9 +138,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
     /**
      * Add the default name of the P2P Node to a specified <code>url</code>.
-     *
-     * @param url
-     *            the url.
+     * @param url  the url.
      * @return the <code>url</code> with the name of the P2P Node.
      */
     private static String urlAdderP2PNodeName(String url) {
@@ -162,12 +162,63 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     protected static P2PService getRemoteP2PService(String url)
         throws NodeException, ActiveObjectCreationException {
-        
         url = urlAdderP2PNodeName(url);
+
         Node node = NodeFactory.getNode(url);
+
+        try {
+            String runtimeUrl = node.getProActiveRuntime().getURL();
+        } catch (ProActiveException e) {
+            logger.error("Can't get remote ProActiveRuntime URL of " + url);
+        }
+
         P2PService p2p = (P2PService) node.getActiveObjects(P2PServiceImpl.class.getName())[0];
-        
+
         return p2p;
+    }
+
+    /**
+     *
+     * @param remoteUrl URL of a remote node.
+     * @return The node pointed by the remoteUrl.
+     * @throws NodeException
+     * @throws ActiveObjectCreationException
+     */
+    protected static Node getRemoteNode(String remoteUrl)
+        throws NodeException, ActiveObjectCreationException {
+        return NodeFactory.getNode(urlAdderP2PNodeName(remoteUrl));
+    }
+
+    /**
+     *
+     * @param distNode Node upon we can find a remote p2pService
+     * @return The runtime url where the node is located.
+     * @throws NodeException
+     * @throws ActiveObjectCreationException
+     */
+    protected static String getRemoteProActiveRuntimeURL(Node distNode)
+        throws NodeException, ActiveObjectCreationException {
+        String runtimeUrl = "";
+
+        try {
+            runtimeUrl = distNode.getProActiveRuntime().getURL();
+        } catch (ProActiveException e) {
+            logger.error("Can't get remote ProActiveRuntime URL");
+        }
+
+        return runtimeUrl;
+    }
+
+    /**
+     *
+     * @param distNode Node upon we can find a remote p2pService
+     * @return The remote P2PService.
+     * @throws NodeException If node is unavailable
+     * @throws ActiveObjectCreationException
+     */
+    protected static P2PService getRemoteP2PService(Node distNode)
+        throws NodeException, ActiveObjectCreationException {
+        return (P2PService) distNode.getActiveObjects(P2PServiceImpl.class.getName())[0];
     }
 
     private ProActiveRuntime getRemoteProActiveRuntime()
@@ -175,104 +226,104 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         return RuntimeFactory.getDefaultRuntime();
     }
 
-    // -------------------------------------------------------------------------
-    // Implements P2P Service
-    // -------------------------------------------------------------------------
-
-
-    /**
-     * @see org.objectweb.proactive.p2p.core.service.P2PService#registerP2PService(java.lang.String)
-     */
-    public void registerP2PService(String url) 
-    {
-        if (this.completeUrl.compareTo(url) != 0)
-        {
-            try
-            {
-            P2PService dist;
-            
-            	if ((dist = P2PServiceImpl.getRemoteP2PService(url)) != null) 
-            	{
-
-            	    this.registerP2PService(url, dist.getInfo(), true);
-            	    if (logger.isInfoEnabled())
-            	        logger.info(this.completeUrl + " has register " + url);
-            	}
-            }
-            catch (NodeException e) 
-            {
-                logger.error("Could't register the P2P Service in: " + url, e);
-            }	 
-            catch (ActiveObjectCreationException e) 
-            {
-                logger.error("No P2P Service was found in: " + url, e);
-            }
-            
-       }
-    }
-    
-    public void registerP2PService(String name, Info distInfo,  boolean remoteRecord) 
-    {
-        KnownTableElement exist = (KnownTableElement) knownProActiveJVM.get(name);
-
-        if (exist != null) {
-            exist.setLastUpdate(System.currentTimeMillis());
-
-            if (logger.isInfoEnabled())
-                logger.info("Update ProActive JVM: " + name);
-        } else {
-
-                KnownTableElement element = this.knownProActiveJVM.new KnownTableElement(name,
-                        distInfo);
-                
-                knownProActiveJVM.put(name, element);
-                
-                if (logger.isInfoEnabled())
-                    logger.info("Add ProActive JVM: " + name);
-        }
-
-        if (remoteRecord) 
-        {
-            P2PService distService;
-            try
-            {
-                // we get remote service directly to avoid deadlock instead of get it from the distInfo  
-                if ((distService = P2PServiceImpl.getRemoteP2PService(name)) != null) 
-                {            
-                    distService.registerP2PService(this.completeUrl, this.serviceInfo, false);
-                    
-                    if (logger.isInfoEnabled())
-                        logger.info(this.completeUrl + " remote record" + name);
-                }
-            } catch (NodeException e)
-            {
-                logger.error("Could't register the P2P Service in: " + url);
-            } catch (ActiveObjectCreationException e)
-            {
-                logger.error("No P2P Service was found in: " + url);
-            }
-        }
-    }
-    
-    /**
-     * returninformation available for this peer such as name, load, stub 
-     */
-    public Info getInfo() {
-        return this.serviceInfo;
-    }
-
     /**
      * @see org.objectweb.proactive.p2p.core.service.P2PService#registerP2PServices(java.util.Collection)
      */
-    public void registerP2PServices(Collection servers) 
-    {
+    public void registerP2PServices(Collection servers) {
         Iterator it = servers.iterator();
 
         while (it.hasNext()) {
             String currentServer = (String) it.next();
+
             //  Record the current server in this PAR
             this.registerP2PService(currentServer);
         }
+    }
+
+    /**
+     *
+     * @param myHostname Current hostname.
+     * @param remoteUrl A remote url.
+     */
+    public void registerP2PService(String remoteUrl) {
+        // 	we should find an hostname matching this kind of pattern : hostname.inria.fr:PORT
+  
+        if (this.peerHostname.compareTo(UrlBuilder.getNameFromUrlWithoutPort(remoteUrl)) != 0) {
+            try {
+                P2PService dist;
+                Node remoteP2PNode = P2PServiceImpl.getRemoteNode(remoteUrl);
+
+                if ((dist = P2PServiceImpl.getRemoteP2PService(remoteP2PNode)) != null) {
+                    this.registerP2PService(P2PServiceImpl.getRemoteProActiveRuntimeURL(
+                            remoteP2PNode), dist.getInfo(), true);
+
+                    if (logger.isInfoEnabled()) {
+                        logger.info(this.getServiceName() + " has register " +
+                            remoteUrl);
+                    }
+                }
+            } catch (NodeException e) {
+                logger.error("Could't register the P2P Service in: " +
+                    remoteUrl);
+            } catch (ActiveObjectCreationException e) {
+                logger.error("No P2P Service was found in: " + remoteUrl);
+            }
+        }
+    }
+
+    public void registerP2PService(String remoteProActiveRuntimeURL,
+        Info distInfo, boolean remoteRecord) {
+        KnownTableElement exist = (KnownTableElement) knownProActiveJVM.get(remoteProActiveRuntimeURL);
+
+        if (exist != null) {
+            exist.setLastUpdate(System.currentTimeMillis());
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Update ProActive JVM: " +
+                    remoteProActiveRuntimeURL);
+            }
+        } else {
+            KnownTableElement element = this.knownProActiveJVM.new KnownTableElement(remoteProActiveRuntimeURL,
+                    distInfo);
+
+            knownProActiveJVM.put(remoteProActiveRuntimeURL, element);
+
+            if (logger.isInfoEnabled()) {
+                logger.info("Add ProActive JVM: " + remoteProActiveRuntimeURL);
+            }
+        }
+
+        if (remoteRecord) {
+            P2PService distService;
+
+            try {
+                // we get remote service directly to avoid deadlock instead of
+                // get it from the distInfo
+                if ((distService = P2PServiceImpl.getRemoteP2PService(this.acquisitionMethod +
+                                "//" +
+                                UrlBuilder.getNameFromPARUrl(
+                                    remoteProActiveRuntimeURL))) != null) {
+                    distService.registerP2PService(this.getServiceName(),
+                        this.serviceInfo, false);
+
+                    if (logger.isInfoEnabled()) {
+                        logger.info(this.getServiceName() + " remote record" +
+                            remoteProActiveRuntimeURL);
+                    }
+                }
+            } catch (NodeException e) {
+                logger.error("Could't register the P2P Service in: " + peerUrl);
+            } catch (ActiveObjectCreationException e) {
+                logger.error("No P2P Service was found in: " + peerUrl);
+            }
+        }
+    }
+
+    /**
+              * returninformation available for this peer such as name, load, stub
+              */
+    public Info getInfo() {
+        return this.serviceInfo;
     }
 
     /**
@@ -313,111 +364,116 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getProActiveJVMs(int,
      *      int, java.lang.String)
      */
-    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, LinkedList parentList)
-        throws ProActiveException {
+    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL,
+        LinkedList parentList) throws ProActiveException {
         return this.getProActiveJVMs(n, TTL, parentList, false);
     }
 
-    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, LinkedList parentList,
-        boolean internalUSe) throws ProActiveException {
+    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL,
+        LinkedList parentList, boolean internalUSe) throws ProActiveException {
         Hashtable res = new Hashtable();
-        
-        KnownTableElement [] tmp = this.knownProActiveJVM.toArray();
-        
+
+        KnownTableElement[] tmp = this.knownProActiveJVM.toArray();
+
         LinkedList peerToContact = new LinkedList();
-        
-        // adding "this" reference in the parent search path 
-        parentList.add(this.completeUrl);
-        
+
+        // adding "this" reference in the parent search path
+        parentList.add(this.getServiceName());
+
         int i = 0;
-        
-        while(i < tmp.length)
-        {
-            if (!parentList.contains(tmp[i].getKey()))
+
+        while (i < tmp.length) {
+            if (!parentList.contains(tmp[i].getKey())) {
                 peerToContact.add(tmp[i]);
+            }
+
             i++;
         }
 
-        if (logger.isInfoEnabled())
-            logger.info(this.completeUrl + " knows " + tmp.length + " P2PNode, where " + peerToContact.size() + " are not parents, TTL is " + TTL);
-        
-        KnownTableElement peerElement;  
+        if (logger.isInfoEnabled()) {
+            logger.info(this.getServiceName() + " knows " + tmp.length +
+                " P2PNode, where " + peerToContact.size() +
+                " are not parents, TTL is " + TTL);
+        }
+
+        KnownTableElement peerElement;
         Iterator it = peerToContact.iterator();
 
-        while(it.hasNext())
-        {
+        while (it.hasNext()) {
             peerElement = (KnownTableElement) it.next();
-    
-           
-                if (peerElement.getLoad() > 0) 
-                {
-                    if (logger.isInfoEnabled())
-                        logger.info(this.completeUrl + " has selected " + peerElement.getKey() + " has a possible giveable JVM ");
-                        
-                        Object tmpPar = peerElement.getP2PService().getProActiveRuntime();
-                        Object par = ProActive.getFutureValue(tmpPar);
 
-                        if (par instanceof ProActiveRuntime)
-                        {
-                            VMInformation vmi = ((ProActiveRuntime) par).getVMInformation();
-                            res.put(vmi.getName(), par);
-                            if (logger.isInfoEnabled())
-                                logger.info(this.completeUrl + " has added " + peerElement.getKey() + " JVM to result list");
-	
-                        }
+            if (peerElement.getLoad() > 0) {
+                if (logger.isInfoEnabled()) {
+                    logger.info(this.getServiceName() + " has selected " +
+                        peerElement.getKey() + " has a possible giveable JVM ");
                 }
+
+                Object tmpPar = peerElement.getP2PService().getProActiveRuntime();
+                Object par = ProActive.getFutureValue(tmpPar);
+
+                if (par instanceof ProActiveRuntime) {
+                    VMInformation vmi = ((ProActiveRuntime) par).getVMInformation();
+                    res.put(vmi.getName(), par);
+
+                    if (logger.isInfoEnabled()) {
+                        logger.info(this.getServiceName() + " has added " +
+                            peerElement.getKey() + " JVM to result list");
+                    }
+                }
+            }
         }
-                 
+
         if ((res.size() >= n) || (TTL == 0)) {
             Vector resFinal = new Vector(res.values());
-            
+
             if (resFinal.size() >= n) {
-                
-                if (logger.isInfoEnabled())
-                    logger.info(this.completeUrl + " has send back " + n + " JVM");
-                
+                if (logger.isInfoEnabled()) {
+                    logger.info(this.getServiceName() + " has send back " + n +
+                        " JVM");
+                }
+
                 return (ProActiveRuntime[]) resFinal.subList(0, n).toArray(new ProActiveRuntime[n]);
-            } 
-            else if (TTL == 0) {
-                
-                if (logger.isInfoEnabled())
-                    logger.info(this.completeUrl + " has send back " + resFinal.size() + " JVM");
+            } else if (TTL == 0) {
+                if (logger.isInfoEnabled()) {
+                    logger.info(this.getServiceName() + " has send back " +
+                        resFinal.size() + " JVM");
+                }
 
                 return (ProActiveRuntime[]) resFinal.toArray(new ProActiveRuntime[resFinal.size()]);
             }
         }
-        
+
         it = peerToContact.iterator();
-        
-        // asking to contact list peers for new JVM .... 
+
+        // asking to contact list peers for new JVM ....
         while ((res.size() < n) && (it.hasNext())) {
             P2PService current = ((KnownTableElement) it.next()).getP2PService();
 
             ProActiveRuntime[] currentRes;
 
             try {
-                
                 String peerName = null;
-                
-                if (logger.isInfoEnabled())
-                {
-                    peerName = current.getServiceName();
-                    logger.info(this.completeUrl + " asking " + peerName + " for " + (n - res.size()) + " new source .... ");
-                }
-                
-                currentRes = current.getProActiveJVMs(n - res.size(), TTL - 1,  parentList);
 
-                if (logger.isInfoEnabled())
-                {
-                    if(currentRes != null)
-                        logger.info("Finnally " + peerName + " has return " + currentRes.length + " JVM");
-                    else
-                        logger.info("Finnally " + peerName + " has return 0 JVM");
+                if (logger.isInfoEnabled()) {
+                    peerName = current.getServiceName();
+
+                    logger.info(this.getServiceName() + " asking " + peerName +
+                        " for " + (n - res.size()) + " new source .... ");
                 }
-                
+
+                currentRes = current.getProActiveJVMs(n - res.size(), TTL - 1,
+                        parentList);
+
+                if (logger.isInfoEnabled()) {
+                    if (currentRes != null) {
+                        logger.info("Finnally " + peerName + " has return " +
+                            currentRes.length + " JVM");
+                    } else {
+                        logger.info("Finnally " + peerName +
+                            " has return 0 JVM");
+                    }
+                }
             } catch (Exception e) {
-                System.out.println("Could't get JVMS");
-                e.printStackTrace();
                 if (logger.isDebugEnabled()) {
                     logger.debug("Could't get JVMS", e);
                 }
@@ -432,9 +488,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                 }
             }
         }
-        
-        // res.remove(this.runtimeName);
 
+        // res.remove(this.runtimeName);
         Vector resFinal = new Vector(res.values());
 
         if (resFinal.size() > n) {
@@ -448,18 +503,18 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getProActiveJVMs()
      */
     public ProActiveRuntime[] getProActiveJVMs() throws ProActiveException {
-
         Vector res = new Vector(this.knownProActiveJVM.size());
         Object[] table = this.knownProActiveJVM.toArray();
 
         for (int i = 0; i < table.length; i++) {
-
             KnownTableElement elem = (KnownTableElement) table[i];
 
             try {
                 Object par = elem.getP2PService().getProActiveRuntime();
-                if (par instanceof ProActiveRuntime)             
+
+                if (par instanceof ProActiveRuntime) {
                     res.add(par);
+                }
             } catch (Exception e) {
                 // The remote is dead => remove from known table
                 this.unregisterP2PService((String) elem.getKey());
@@ -473,21 +528,23 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getProActiveRuntime()
      */
     public Object getProActiveRuntime() {
-
-        if (this.serviceInfo.getFreeLoad() > 0)
-        {
+        if (this.serviceInfo.getFreeLoad() > 0) {
             this.setLoad(this.serviceInfo.getFreeLoad() - 1);
-            
-            if (logger.isInfoEnabled()) 
-                logger.info(this.completeUrl + " give is ProActiveRuntime");
-            
+
+            if (logger.isInfoEnabled()) {
+                logger.info(this.getServiceName() +
+                    " give is ProActiveRuntime");
+            }
+
             return this.runtime;
-        }
-        else 
-        {
-            // As it's not possible to return null when using Future we return a NullProActiveRuntime object
-            if (logger.isInfoEnabled())
-                logger.info(this.completeUrl + " doesn't give is ProActiveRuntime because load is full");
+        } else {
+            // As it's not possible to return null when using Future we return a
+            // FakeProActiveRuntime object
+            if (logger.isInfoEnabled()) {
+                logger.info(this.getServiceName() +
+                    " doesn't give is ProActiveRuntime because load is full");
+            }
+
             return this.fakeProActiveRuntime;
         }
     }
@@ -496,7 +553,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @return Returns the name of theis P2P Service.
      */
     public String getServiceName() {
-        return this.completeUrl;
+        return this.runtimeName;
     }
 
     /**
@@ -509,9 +566,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     /**
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getURL()
      */
-    public String getURL() 
-    {
-        return this.url;
+    public String getURL() {
+        return this.peerUrl;
     }
 
     // -------------------------------------------------------------------------
@@ -528,10 +584,10 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
         for (int i = 0; i < values.length; i++) {
             P2PService service = ((KnownTableElement) values[i]).getP2PService();
-            service.registerP2PService(this.completeUrl, this.serviceInfo, false);
+            service.registerP2PService(this.getServiceName(), this.serviceInfo,
+                false);
         }
     }
-
 
     /**
      * @see org.objectweb.proactive.p2p.core.load.Load#getLoad()
@@ -541,13 +597,10 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         return this.serviceInfo.getFreeLoad();
     }
 
-    
-    public void printKnownPeer()
-    {
+    public void printKnownPeer() {
         this.knownProActiveJVM.printKnownPeer();
     }
-    
-    
+
     // -------------------------------------------------------------------------
     // Init Activity
     // -------------------------------------------------------------------------
@@ -557,29 +610,27 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public void initActivity(Body body) {
         try {
-            
             this.serviceInfo.setService((P2PService) ProActive.getStubOnThis());
-            
+
             // Create the known table
             this.knownProActiveJVM = (KnownTable) ProActive.newActive(KnownTable.class.getName(),
-                    null, P2PServiceImpl.urlAdderP2PNodeName(this.url));
-            
+                    null, P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
+
             ProActive.enableAC(this.knownProActiveJVM);
-            
+
             // Launch a thread to update the known table.
             Object[] params = {
-                    this.knownProActiveJVM, 
-                    ProActive.getStubOnThis(),
-                    this.completeUrl};
-            
+                    this.knownProActiveJVM, ProActive.getStubOnThis(),
+                    this.getServiceName()
+                };
+
             ProActive.newActive(Updater.class.getName(), params,
-                    P2PServiceImpl.urlAdderP2PNodeName(this.url));
-            
+                P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
         } catch (ActiveObjectCreationException e) {
-            logger.error("Could't create the Updater", e);
+            logger.error("Could't create the Updater");
         } catch (NodeException e) {
             logger.error(e);
-       } catch (IOException e) {
+        } catch (IOException e) {
             logger.error(e);
         }
     }
@@ -592,27 +643,24 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see java.lang.Object#equals(java.lang.Object)
      */
     public boolean equals(Object obj) {
-        return (this.completeUrl.compareTo(((P2PService) obj).getServiceName()) == 0)
+        return (this.getServiceName().compareTo(((P2PService) obj).getServiceName()) == 0)
         ? true : false;
     }
-    
+
     /**
-     * This class is use as a possible return value for the method getProActiveRuntime() 
-     * We need it because the call to the method lead to the creation of a future, 
-     * so we can't return null if the p2pservice doesn't want to give is runtime.
-     * We can use this class to store some information about future availability 
-     * of the peer ... 
+     * This class is use as a possible return value for the method
+     * getProActiveRuntime() We need it because the call to the method lead to
+     * the creation of a future, so we can't return null if the p2pservice
+     * doesn't want to give is runtime. We can use this class to store some
+     * information about future availability of the peer ...
+     *
      * @author vcave
      *
-     * TODO To change the template for this generated type comment go to
-     * Window - Preferences - Java - Code Style - Code Templates
+     * TODO To change the template for this generated type comment go to Window -
+     * Preferences - Java - Code Style - Code Templates
      */
-    public class FakeProActiveRuntime implements Serializable
-    {
-
-        public FakeProActiveRuntime()
-        {
-            
+    public class FakeProActiveRuntime implements Serializable {
+        public FakeProActiveRuntime() {
         }
     }
 }
