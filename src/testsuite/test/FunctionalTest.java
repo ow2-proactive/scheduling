@@ -114,6 +114,11 @@ public abstract class FunctionalTest extends AbstractTest
             if (logger.isInfoEnabled()) {
                 logger.info("Test runs with success");
             }
+        } catch (RuntimeException e) {
+            logger.fatal("Exception during the test", e);
+            failed = true;
+            return new TestResult(this, TestResult.ERROR,
+                "During the test execution", e);
         } catch (Exception e) {
             logger.fatal("Exception during the test", e);
             failed = true;
@@ -192,6 +197,12 @@ public abstract class FunctionalTest extends AbstractTest
                 logger.fatal("No action method was found with good signature");
                 throw new Exception("No action method with params was found");
             }
+        } catch (RuntimeException e) {
+            logger.fatal("Test failed", e);
+            failed = true;
+            out = null;
+            return new TestResult(this, TestResult.ERROR,
+                "During the test execution", e);
         } catch (Exception e) {
             logger.fatal("Test failed", e);
             failed = true;
