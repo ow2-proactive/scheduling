@@ -47,26 +47,9 @@ PROACTIVE=../.
 # ----
 # Set up the classpath using classes dir or jar files
 # 
-CLASSPATH=.
-if [ -d $PROACTIVE/classes ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes
-else
-   mkdir $PROACTIVE/classes
-fi
+workingDir=`dirname $0`
+. $workingDir/env.sh
 
-if [ -f $PROACTIVE/ProActive.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive.jar
-fi
-
-if [ -f $PROACTIVE/ProActive_examples.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
-fi
-
-export CLASSPATH
-echo CLASSPATH=$CLASSPATH
 echo "compiling java files in org/objectweb/proactive/examples/$1/"
 javac -d ../classes org/objectweb/proactive/examples/$1/*.java
 

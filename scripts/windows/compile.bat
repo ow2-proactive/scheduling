@@ -42,12 +42,9 @@ rem javac.exe -d ..\classes org\objectweb\proactive\examples\%1\%%f
 pushd .
 cd ..\..\src
 
-set CLASSPATH=.
+
 set PROACTIVE=..\.
-IF NOT EXIST %PROACTIVE%\classes mkdir %PROACTIVE%\classes
-IF EXIST %PROACTIVE%\classes set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
-IF EXIST %PROACTIVE%\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
-IF EXIST %PROACTIVE%\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
+call init.bat
 
 echo CLASSPATH=%CLASSPATH%
 
