@@ -72,7 +72,8 @@ public class Hello {
   }
 
   public String sayHello() {
-    return hi + " at " + dateFormat.format(new java.util.Date());
+    return hi + " at " + dateFormat.format(new java.util.Date())+
+        " from node : " + ProActive.getBodyOnThis().getNodeURL();
   }
 
   public static void main(String[] args) {
