@@ -143,14 +143,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             if ((file != null) && new File(file).exists()) {
                 // loading security from a file
-                logger.info("Runtime : loading policy file" + file);
+                logger.info("ProActive Securiy Policy (proactive.runtime.security) using " + file);
                 Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
                 Security.addProvider(myProvider);
                 // policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
                 psm = new ProActiveSecurityManager(file);
             } else {
                 // creating a generic certificate
-                logger.info("Runtime : loading policy file is null");
+                logger.info("ProActive Securiy Policy (proactive.runtime.security) not set. Security disabled ");
                 //Object[] tmp = ProActiveSecurity.generateGenericCertificate();
                 //certificate = (X509Certificate) tmp[0];
                 //privateKey = (PrivateKey) tmp[1];
