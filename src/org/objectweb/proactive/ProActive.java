@@ -1245,19 +1245,19 @@ public class ProActive {
             }
 
             //	target is a proxy (i.e. a ref. to a body) ?			
-
-            /*if (target instanceof AbstractProxy) {
-                    try {
-                            HashMap map= ((AbstractProxy) target).getHandlersLevel();
-                                    if ((handler = searchExceptionHandler(ex.getClass(), map, Handler.ID_Proxy)) != null) {
-                                            return handler;
-                                    }
-                    } catch (ProActiveException e) {
-                            if (logger.isDebugEnabled()) {
-                                    logger.debug("*** ERROR : " + e.getMessage());
-                            }
+            if (target instanceof AbstractProxy) {
+                try {
+                    HashMap map = ((AbstractProxy) target).getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Proxy)) != null) {
+                        return handler;
                     }
-            }*/
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
         }
 
         // Try to get an handler from VM level
