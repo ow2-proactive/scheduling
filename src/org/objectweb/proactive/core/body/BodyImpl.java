@@ -273,8 +273,8 @@ public abstract class BodyImpl extends AbstractBody
                     return;
                 }
                 UniqueID destinationBodyId = request.getSourceBodyID();
-                System.out.println("destinationBodyID " + destinationBodyId);
-                if (destinationBodyId != null) {
+                if ((destinationBodyId != null) &&
+                        (messageEventProducer != null)) {
                     messageEventProducer.notifyListeners(reply,
                         MessageEvent.REPLY_SENT, destinationBodyId,
                         getRequestQueue().size());
@@ -319,8 +319,8 @@ public abstract class BodyImpl extends AbstractBody
             return ++absoluteSequenceID;
         }
     }
-     // end inner class LocalBodyImpl
 
+    // end inner class LocalBodyImpl
     private class InactiveLocalBodyStrategy implements LocalBodyStrategy,
         java.io.Serializable {
         //
@@ -365,5 +365,6 @@ public abstract class BodyImpl extends AbstractBody
             throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
         }
     }
-     // end inner class LocalInactiveBody
+
+    // end inner class LocalInactiveBody
 }
