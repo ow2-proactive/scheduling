@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.BasicUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
@@ -219,8 +220,12 @@ public class ProcessHandler extends AbstractUnmarshallerDecorator implements Pro
   	public BsubOptionHandler(){
   		
   		//this.bSubProcess = (LSFBSubProcess)targetProcess;
+  		UnmarshallerHandler pathHandler = new PathHandler();
   		this.addHandler(HOST_LIST_TAG,new SingleValueUnmarshaller());
   		this.addHandler(PROCESSOR_TAG,new SingleValueUnmarshaller());
+  		BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+    	bch.addHandler(PATH_TAG, pathHandler);
+    	this.addHandler(SCRIPT_PATH_TAG, bch);
   	}
   	
   	
@@ -235,6 +240,8 @@ public class ProcessHandler extends AbstractUnmarshallerDecorator implements Pro
   			bSubProcess.setHostList((String)activeHandler.getResultObject());
   		}else if (name.equals(PROCESSOR_TAG)){
   			bSubProcess.setProcessorNumber((String)activeHandler.getResultObject());
+  		}else if (name.equals(SCRIPT_PATH_TAG)){
+  			bSubProcess.setScriptLocation((String)activeHandler.getResultObject());
   		}
   	}	
   }// end inner class OptionHandler
