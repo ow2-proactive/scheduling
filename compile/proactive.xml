@@ -327,7 +327,7 @@
 			create zip version of ProActive with source
 		-->
 		<zip zipfile="${dist.dir}/ProActive-src_1_0_3.zip">
-			<zipfileset dir="${PAdist.dir}" prefix="ProActive"/>
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive"/>
 		</zip>
 		<!-- 
 			create zip version of ProActive doc 
