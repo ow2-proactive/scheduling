@@ -24,16 +24,16 @@ import java.util.Vector;
 /**
  * Generates Interface implementations for the functional interfaces of the
  * component representative.
- *
- * This class :
+ *<br>
+ * This class :<br>
  * - implements the java interface corresponding to the functional
- * interface of the component.
- * - implements StubObject, like the standard ProActive stub
+ * interface of the component.<br>
+ * - implements StubObject, like the standard ProActive stub<br>
  * - is linked to the ProActive proxy (corresponding to the actual active object)
- *
- * Method calls are reified as MethodCall objects, that contain :
- * - a tag signaling component requests
- * - the name given to the component functional interface.
+ *<br>
+ * Method calls are reified as MethodCall objects, that contain :<br>
+ * - a tag signaling component requests<br>
+ * - the name given to the component functional interface.<br>
  *
  * @author Matthieu Morel
  */
@@ -109,11 +109,6 @@ public class RepresentativeInterfaceClassGenerator
             // add StubObject, so we can set the proxy
             interfacesToImplement.addElement(StubObject.class);
 
-            //  	String generated_class_name = getGeneratedClassName(fcInterfaceName, interfaceType.getFcItfSignature());
-            //        if (!isPrimitive) {
-            //            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectCompositeComponentRepresentativeClassName(
-            //                                             fcInterfaceName, interfaceType.getFcItfSignature());
-            //        } else {
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());
             //}
@@ -136,22 +131,22 @@ public class RepresentativeInterfaceClassGenerator
                         generatedClassesCache.toString());
                 }
 
-                // Next few lines for debugging only
-                //                            try {
-                //                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
-                //                                                                     stubClassFullName + ".class");
-                //                
-                //                                if (logger.isDebugEnabled()) {
-                //                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-                //                                }
-                //                
-                //                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-                //                                fos.write(bytes);
-                //                                fos.close();
-                //                			} catch (Exception e) {
-                //                				// e.printStackTrace();
-                //                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-                //                			}
+//                // Next few lines for debugging only
+//                                            try {
+//                                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
+//                                                                                     stubClassFullName + ".class");
+//                                
+//                                                if (logger.isDebugEnabled()) {
+//                                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
+//                                                }
+//                                
+//                                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+//                                                fos.write(bytes);
+//                                                fos.close();
+//                                			} catch (Exception e) {
+//                                				// e.printStackTrace();
+//                                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+//                                			}
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
             }
@@ -295,25 +290,25 @@ public class RepresentativeInterfaceClassGenerator
     protected void createFields() {
         // Creates the field that points to the active object
         this.classGenerator.visitField(ACC_PROTECTED, PROXY_FIELD_NAME,
-            PROXY_TYPE, null);
+            PROXY_TYPE, null, null);
     }
 
     protected void createStaticVariables() {
         // Creates fields that contains the array of Method objects
         // that represent the reified methods of this class
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods",
-            METHOD_ARRAY_TYPE, null);
+            METHOD_ARRAY_TYPE, null, null);
 
         // creates and set the field that points to the functional interface name
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
             FUNCTIONAL_INTERFACE_NAME_FIELD_NAME,
-            FUNCTIONAL_INTERFACE_NAME_TYPE, fcInterfaceName);
+            FUNCTIONAL_INTERFACE_NAME_TYPE, fcInterfaceName, null);
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {
         // Creates the class initializer method itself
         CodeVisitor cv = this.classGenerator.visitMethod(ACC_STATIC,
-                "<clinit>", "()V", null);
+                "<clinit>", "()V", null, null);
 
         // Creates an array of Method objects that we will store into the static
         // variable 'methods' of type 'Method[]'
@@ -450,7 +445,7 @@ public class RepresentativeInterfaceClassGenerator
     protected void createGetAndSetProxyMethods() {
         // Do the getProxy method first
         CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC,
-                "getProxy", "()" + PROXY_TYPE, null);
+                "getProxy", "()" + PROXY_TYPE, null, null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);
@@ -464,7 +459,7 @@ public class RepresentativeInterfaceClassGenerator
 
         // Now, do the setProxy method
         cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setProxy",
-                "(" + PROXY_TYPE + ")V", null);
+                "(" + PROXY_TYPE + ")V", null, null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);

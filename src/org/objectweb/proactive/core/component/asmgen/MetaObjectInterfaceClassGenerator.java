@@ -22,15 +22,15 @@ import java.util.Vector;
 /**
  * Creates Interface implementations for the functional interfaces of the
  * component metaobject.
- *
+ *<br>
  * The functional calls are delegated to the "impl" field, whose value is set during
  * binding operations.
- *
+ *<br>
  * - In case of a primitive component, the impl field will be the reified object to
- * which the body is attached.
+ * which the body is attached.<br>
  * - In case of a composite component, the impl field will be a component
- * representative.
- * - For a parallel component, the impl field will be a group of component representatives.
+ * representative.<br>
+ * - For a parallel component, the impl field will be a group of component representatives.<br>
  *
  *  @author Matthieu Morel
  *
@@ -106,9 +106,6 @@ public class MetaObjectInterfaceClassGenerator
             // add Serializable interface
             interfacesToImplement.addElement(Serializable.class);
 
-            //// add GeneratedRepresentative, so we can set the proxy
-            //interfacesToImplement.addElement(StubObject.class.getName());
-            //  	String generated_class_name = getGeneratedClassName(fcInterfaceName, interfaceType.getFcItfSignature());
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());
 
@@ -128,27 +125,20 @@ public class MetaObjectInterfaceClassGenerator
                         getGeneratedClassesCache().toString());
                 }
 
-                // Next few lines for debugging only
-                //			try {
-                //				//java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + stubClassFullName + ".class");
-                //				java.io.File file = new java.io.File("generated/" + stubClassFullName + ".class");
-                //
-                //				if (logger.isDebugEnabled()) {
-                //					//logger.debug("writing down the generated class : " + file.getAbsolutePath());
-                //				}
-                //
-                //				java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-                //				fos.write(bytes);
-                //				fos.close();
-                //			} catch (FileNotFoundException fnfe) {
-                //				// e.printStackTrace();
-                //				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-                //			}
+                //                // Next few lines for debugging only
+                //                			try {
+                //                				//java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + stubClassFullName + ".class");
+                //                				java.io.File file = new java.io.File("generated/" + stubClassFullName + ".class");
+                //                
+                //                				java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+                //                				fos.write(bytes);
+                //                				fos.close();
+                //                			} catch (Exception e) {
+                //                				// e.printStackTrace();
+                //                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                			}
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
-
-                // link the class to the class loader
-                //linkClass(generated_class);
             }
 
             ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
@@ -167,38 +157,13 @@ public class MetaObjectInterfaceClassGenerator
         } catch (InstantiationException e) {
             throw new InterfaceGenerationFailedException("constructor belongs to an abstract class?",
                 e);
-            // TODO : check this
-        }
-    }
-
-    // TODO : remove this method
-    private void linkClass(Class generated_class) {
-        try {
-            //	invoke the resolve method of the current thread class loader by reflection
-            Class clc = Class.forName("java.lang.ClassLoader");
-            Class[] argumentTypes = new Class[1];
-            argumentTypes[0] = Class.class;
-
-            Method method = clc.getDeclaredMethod("resolveClass", argumentTypes);
-            method.setAccessible(true);
-
-            Object[] effectiveArguments = new Object[1];
-            effectiveArguments[0] = generated_class;
-
-            method.invoke(ClassLoader.getSystemClassLoader(), effectiveArguments);
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("linked class : " + className);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
     protected void createGetAndSetFcItfImplMethods() {
         // Do the getFcItfImpl method first
         CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC,
-                "getFcItfImpl", "()" + OBJECT_TYPE, null);
+                "getFcItfImpl", "()" + OBJECT_TYPE, null, null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);
@@ -212,7 +177,7 @@ public class MetaObjectInterfaceClassGenerator
 
         // Now, do the setProxy method
         cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setFcItfImpl",
-                "(" + OBJECT_TYPE + ")V", null);
+                "(" + OBJECT_TYPE + ")V", null, null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);
@@ -269,7 +234,7 @@ public class MetaObjectInterfaceClassGenerator
     protected void createFields() {
         // Creates the field that points to the delegatee
         this.classGenerator.visitField(ACC_PROTECTED, IMPL_FIELD_NAME,
-            OBJECT_TYPE, null);
+            OBJECT_TYPE, null, null);
     }
 
     protected void createStaticVariables() {

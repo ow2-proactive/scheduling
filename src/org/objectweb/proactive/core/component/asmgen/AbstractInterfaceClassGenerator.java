@@ -190,19 +190,14 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
      * @return
      */
     protected ClassWriter createClassGenerator() {
-        //String superclassName = ;
-        //String[] interfaces = new String[interfacesToImplement.size()];
-        //String[] interfaces = (String[]) interfacesToImplement.toArray(new String[interfacesToImplement.size()]);
         String[] interfaces = new String[interfacesToImplement.size()];
         for (int i = 0; i < interfacesToImplement.size(); i++) {
-            //interfaces[i] = interfaces[i].replace('.', '/');
             interfaces[i] = ((Class) interfacesToImplement.get(i)).getName().replace('.', '/');
         }
 
         ClassWriter cw = new ClassWriter(true);
         cw.visit(Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
                  
-        //this.stubClassFullName.replace('.', '/'), // Fully-qualified class generatedClassName
         this.stubClassFullName, SUPER_CLASS_NAME, // Superclass
                  interfaces, // declared interfaces
                  "<generated>");
@@ -211,7 +206,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
     protected void createConstructor() {
         // Actually creates the method generator (ASM : uses the visitor)
-        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>", "()V", null);
+        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 
         //Calls the constructor of the super class
         cv.visitVarInsn(ALOAD, 0);
@@ -245,7 +240,8 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         CodeVisitor cv = this.classGenerator.visitMethod(flags, // access flags
                                                          m.getName(), // Method generatedClassName
                                                          mDesc, // return and argument types
-                                                         null); // exceptions
+                                                         null, // exceptions
+                                                         null); // Attributes
         return cv;
     }
 
@@ -412,6 +408,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
         // If the target type is an interface, the only thing we have to do is to
         // get the list of all its public methods.
+        
         for (int j = 0; j < interfacesToImplement.size(); j++) {
             //Class interface_class = Class.forName((String) interfacesToImplement.get(j));
             Class interface_class = (Class) interfacesToImplement.get(j);
@@ -420,7 +417,6 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
                 tempVector.addElement(allPublicMethods[i]);
             }
         }
-
 
         // Turns the vector into an array of type Method[]
         this.methods = new Method[tempVector.size()];
@@ -446,8 +442,6 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         this.methods = validMethods;
 
 
-        //this.packageName = Utils.getPackageName(this.className);
-        //this.stubClassFullName = Utils.convertClassNameToStubClassName(this.className);
         this.packageName = null;
         this.stubClassSimpleName = org.objectweb.proactive.core.mop.Utils.getSimpleName(this.stubClassFullName);
 
