@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="ProActive" default="usage" basedir=".">
+        <property environment="env"/> 
 	<property name="base" value=".."/>
 	<property name="src.dir" value="${base}/src"/>
 	<property name="proactive.dir" value="org/objectweb/proactive"/>
@@ -392,20 +393,41 @@
       ==
       ================================================================
 	-->	
-	<target name="stub">
-	<echo message="${classes.dir}"/>
-	<path id="test">
-	    	<fileset dir="${classes.dir}" >
-                  <include name="**/TimedMigrationManager.class"/>
+        <target name="stub_dir" unless="stub.classdir">
+            <property name="stub.classdir" value="${basedir}${file.separator}..${file.separator}classes"/>
+        </target>
+
+	<target name="stub" depends="stub_dir">
+	<echo message="${stub.classdir}"/>
+        <path id="classDir">
+              <pathelement path="${stub.classdir}"/>
+        </path>
+        <!-- 
+            The path to the class dir
+        --> 
+        <pathconvert pathsep=" " property="classesDir" refid="classDir"/>
+        <!--
+           Select files to rewrite
+        -->
+	<path id="classFiles">
+	    	<fileset dir="${stub.classdir}" >
+                  <include name="**/*.class"/>
+                  <exclude name="**/*$*"/>
                </fileset>
-	    </path>  
-	     <pathconvert pathsep=" " property="test-files" refid="test">
-	    <!-- <map from="/home1/fabrice/workProActive/ProActive/classes/" to=""/>-->
-	      <map from="${classes.dir}${file.separator}" to=""/>
-	     </pathconvert>
-	<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" dir="${classes.dir}">
-	      <classpath refid="project.classpath"/>
-	       <arg line="${test-files}"/>
+	</path>  
+         <!--
+            Remove the trailing path from all files
+          -->
+	  <pathconvert pathsep=" " property="test-files" refid="classFiles">
+	       <map from="${classesDir}" to=""/>
+	  </pathconvert>
+	<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" dir="${stub.classdir}">
+	      <classpath> 
+               <pathelement path="${stub.classdir}"/>
+               <path refid="project.classpath"/>
+               <pathelement path="${env.CLASSPATH}"/>
+             </classpath>
+	       <arg line="-d ${stub.classdir} ${test-files}"/>
 	 </java> 
 	</target>
 	<!--
