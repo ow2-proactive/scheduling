@@ -176,6 +176,7 @@ public abstract class RuntimeFactory {
     //do we have any association for this node?
     //String protocol = getProtocol(proActiveRuntimeURL);
     RuntimeFactory factory = getFactory(protocol);
+    proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL,protocol);
     //		System.out.println("NodeFactory: getNode " + s + " got factory " + tmp);
     return factory.getRemoteRuntimeImpl(proActiveRuntimeURL);
   }

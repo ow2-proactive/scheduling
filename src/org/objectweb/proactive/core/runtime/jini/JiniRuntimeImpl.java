@@ -34,6 +34,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
@@ -46,8 +48,10 @@ import net.jini.lease.LeaseRenewalEvent;
 import net.jini.lookup.entry.Name;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -67,7 +71,7 @@ public class JiniRuntimeImpl
   implements JiniRuntime, java.io.Serializable, net.jini.discovery.DiscoveryListener, net.jini.lease.LeaseListener {
 
 
-	protected ProActiveRuntimeImpl proActiveRuntime;
+	protected transient ProActiveRuntimeImpl proActiveRuntime;
 	protected String proActiveRuntimeURL;
 	//ServiceRegistar table used afterwards to register node service
 	//Vector is used because the size is unknown and this class is synchronized
@@ -75,6 +79,10 @@ public class JiniRuntimeImpl
 	
 	//table used to handle node's registration when discovery event is received after the node's creation
 	protected java.util.Hashtable jiniNodeMap;
+	
+	//table used to handle virtualnode's registration when discovery event is received after the virtualnode's registration
+	//this table contains a mapping virtualNode's name and an arrayList that contains all associated ServiceRegistrations
+	protected java.util.Hashtable jiniVirtualNodeMap;
 	
 	private boolean isRuntimeRegistered = false;
   // this object is not serializable
@@ -88,6 +96,7 @@ public class JiniRuntimeImpl
   	this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
   	this.proActiveRuntimeURL = buildRuntimeURL();
   	this.jiniNodeMap = new java.util.Hashtable();
+  	this.jiniVirtualNodeMap = new java.util.Hashtable();
   	this.registrarsTable = new java.util.Vector();
   	net.jini.discovery.LookupDiscovery discover = null;
     try {
@@ -110,18 +119,18 @@ public class JiniRuntimeImpl
   // -- Implements JiniRuntime -----------------------------------------------
   //
   
-  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException 
+  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException, NodeException
 	{
 		//counter used to check that the node has been registered at 
 		//least once as jini service
-		int counter = 0;
+		//int counter = 0;
 		//wait until the discovered method is called
 		//otherwise registars could be null, because it is 
 		//another thread that fulfill this table
 		while(!isRuntimeRegistered){}
 		String nodeURL = null;
 		//first we build a well-formed url
-		//System.out.println("table size "+registrarsTable.size());
+		
 		try{
 		nodeURL = buildNodeURL(nodeName);
 		//then take the name of the node
@@ -134,34 +143,9 @@ public class JiniRuntimeImpl
 		}catch (java.net.UnknownHostException e){
 			throw new java.rmi.RemoteException("Host unknown in "+nodeURL,e);
 		}
-		ServiceID serviceID = newServiceID();
-		//register it as a jini service with the url
-		for (int n = 0; n < registrarsTable.size(); n++) {
-    ServiceRegistrar registrar = (ServiceRegistrar)registrarsTable.get(n);
-    ServiceRegistration reg = null;
-    try {
-      // construction du service
-      //ServiceID serviceID = new ServiceID((new Long(nodeURL)).longValue(),(new Long("jini")).longValue());
-      //ServiceID serviceID = new ServiceID(new DataInputStream(new InputStream()));
-      //ServiceItem item = new ServiceItem(null, this, new Entry[] { new Name(nodeURL)});
-			ServiceItem item = new ServiceItem(serviceID, this, new Entry[] { new Name(nodeURL)});
-      reg = registrar.register(item, Lease.FOREVER);
-      counter++;
-    } catch (Exception e) {
-      System.out.println("register exception " + e.toString());
-      continue;
-    }
-    // if counter=0 no node are registered as jini Service
-    if(counter == 0) throw new java.rmi.RemoteException("register exception ");
-    System.out.println(" service JiniNode Registered " + nodeURL);
-    //System.out.println("Registrar "+registrar.getLocator().getHost());
-      // on lance le lease manager pour que l'objet puisse se reenregistrer
-    leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
-		}
-		//register the node in the hashtable, hence if another lookup service is
-		//discoverer after the node creation, the runtime will be able to register this node in the new 
-		//lookup service
-		jiniNodeMap.put(nodeURL,serviceID);
+		
+		jiniNodeMap.put(nodeURL,registerService(nodeURL));
+		
 		return nodeURL;
 		
 	}
@@ -178,12 +162,6 @@ public class JiniRuntimeImpl
 		proActiveRuntime.killNode(nodeName);
 	}
 
-	
-//	public void createLocalVM(JVMProcess jvmProcess)
-//		throws IOException
-//	{
-//	proActiveRuntime.createLocalVM(jvmProcess);
-//	}
 
 	
 	public void createVM(UniversalProcess remoteProcess)
@@ -193,33 +171,10 @@ public class JiniRuntimeImpl
 	}
 
 	
-//	public Node[] getLocalNodes()
-//	{
-//		return proActiveRuntime.getLocalNodes(); 
-//	}
-
-	
 	public String[] getLocalNodeNames()
 	{
 		return proActiveRuntime.getLocalNodeNames();
 	}
-
-	
-//	public String getLocalNode(String nodeName)
-//	{
-//		return proActiveRuntime.getLocalNode(nodeName);
-//	}
-//
-//	
-//	public String getNode(String nodeName)
-//	{
-//		return proActiveRuntime.getNode(nodeName);
-//	}
-	
-	
-//	public String getDefaultNodeName(){
-//		return proActiveRuntime.getDefaultNodeName();
-//	}
 
 	
 	public VMInformation getVMInformation()
@@ -260,11 +215,62 @@ public class JiniRuntimeImpl
 	}
 	
 	
-	public ArrayList getActiveObject(String nodeName, String objectName){
-		return proActiveRuntime.getActiveObject(nodeName,objectName);
+	public ArrayList getActiveObjects(String nodeName, String objectName){
+		return proActiveRuntime.getActiveObjects(nodeName,objectName);
 	}
 	
 	
+	public VirtualNode getVirtualNode(String virtualNodeName){
+		return proActiveRuntime.getVirtualNode(virtualNodeName);
+	} 
+	
+	
+	public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding)throws java.rmi.RemoteException {
+		String virtualNodeURL = null;
+		//first we build a well-formed url
+		
+		try{
+		virtualNodeURL = buildNodeURL(virtualNodeName);
+		}catch (java.net.UnknownHostException e){
+			throw new java.rmi.RemoteException("Host unknown in "+virtualNodeURL,e);
+		}
+		
+		if(replacePreviousBinding){
+			if(jiniVirtualNodeMap.get(virtualNodeURL) != null) jiniVirtualNodeMap.remove(virtualNodeURL);
+		}
+		if(!replacePreviousBinding && jiniVirtualNodeMap.get(virtualNodeURL) != null) throw new java.rmi.RemoteException("VirtualNode "+virtualNodeURL+" already registered as Jini service");
+		
+		jiniVirtualNodeMap.put(virtualNodeURL,registerService(virtualNodeURL));
+		
+		
+	}
+	
+	
+	public void unregisterVirtualNode(String virtualNodeName) throws java.rmi.RemoteException{
+		proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(virtualNodeName));
+		String virtualNodeURL = null;
+		//first we build a well-formed url
+		
+		try{
+			virtualNodeURL = buildNodeURL(virtualNodeName);
+			Vector serviceRegistrationTable = (Vector)jiniVirtualNodeMap.get(virtualNodeURL);
+			if(!serviceRegistrationTable.isEmpty()){
+				for (int i = 0;i<serviceRegistrationTable.size();i++){
+					ServiceRegistration reg = (ServiceRegistration)serviceRegistrationTable.get(i);
+					reg.getLease().cancel();
+//					System.out.println("Lease cancelled for "+virtualNodeName);
+				}
+			}
+		}catch (java.net.UnknownHostException e){
+			throw new java.rmi.RemoteException("Host unknown in "+virtualNodeURL,e);
+		}catch(net.jini.core.lease.UnknownLeaseException e){
+			throw new java.rmi.RemoteException("Unable to get the Lease for virtualNode "+virtualNodeURL,e);
+		}
+		finally{
+		jiniVirtualNodeMap.remove(virtualNodeURL);
+		}
+		
+	}
 	
 	public UniversalBody createBody(String nodeName,ConstructorCall bodyConstructorCall,boolean isNodeLocal)
 		throws
@@ -292,7 +298,7 @@ public class JiniRuntimeImpl
     // on cherche un registrar pour pouvoir s'enregistrer
     for (int n = 0; n < registrars.length; n++) {
       ServiceRegistrar registrar = registrars[n];
-      //System.out.println("Name registrar :"+registrars[n].getServiceID().toString());
+      
       ServiceRegistration reg = null;
       try {
         // construction du service
@@ -305,10 +311,12 @@ public class JiniRuntimeImpl
         System.out.println("register exception " + e.toString());
         continue;
       }
-      //System.out.println(" service JiniRuntime Registered");
+      
       //add the registrar in the table for future use(node registration)
        registrarsTable.add(registrar);
-       registerJiniNodes(registrar);
+       
+       registerServiceAfterDiscovery(jiniNodeMap,registrar);
+       registerServiceAfterDiscovery(jiniVirtualNodeMap,registrar);
       // on lance le lease manager pour que l'objet puisse se reenregistrer
       leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
       isRuntimeRegistered = true;
@@ -368,47 +376,51 @@ public class JiniRuntimeImpl
   // ---PRIVATE METHODS--------------------------------------
   //
   
-  /**
- * Method registerJiniNodes.
- * @param registrar
- */
-  
-  //This method is very useful when the JiniRuntime receives event about a new Lookup service
-  //that was discovered.In such case, the runtime registers all nodes previously created
-  //as Jini service with the registrar given as parameter
-	private void registerJiniNodes(ServiceRegistrar registrar)
-	{
+  	
+	//This method is very useful when the JiniRuntime receives event about a new Lookup service
+  //that was discovered.In such case, the runtime registers all nodes and virtualnodes previously registered
+  //as Jini service with the registrar given as parameter and the corresponding hashtable
+	private void registerServiceAfterDiscovery(Hashtable jiniObjectTable, ServiceRegistrar registrar){
 		ServiceRegistration reg = null;
-		if(!jiniNodeMap.isEmpty()){
-			synchronized(jiniNodeMap){
-				for(java.util.Enumeration e = jiniNodeMap.keys();e.hasMoreElements();){
-					String nodeURL = (String)e.nextElement();
-					ServiceItem item = new ServiceItem((ServiceID)(jiniNodeMap.get(nodeURL)),this, new Entry[] { new Name(nodeURL)});
+		ServiceID serviceID = null;
+		if(!jiniObjectTable.isEmpty()){
+			synchronized(jiniObjectTable){
+				for(java.util.Enumeration e = jiniObjectTable.keys();e.hasMoreElements();){
+					String objectURL = (String)e.nextElement();
+					Vector serviceRegistrationTable = (Vector)jiniObjectTable.get(objectURL);
+					if(!serviceRegistrationTable.isEmpty()){
+					  serviceID = ((ServiceRegistration)serviceRegistrationTable.get(0)).getServiceID();
+					}else{
+					
+						serviceID=newServiceID();
+					}
+					ServiceItem item = new ServiceItem(serviceID,this, new Entry[] { new Name(objectURL)});
 					try{
-					reg = registrar.register(item, Lease.FOREVER);
+						reg = registrar.register(item, Lease.FOREVER);
 					}catch (Exception ex) {
       			System.out.println("register exception " + ex.toString());
       			continue;
     			}
-    			System.out.println(" service JiniNode Registered " + nodeURL);
-//    			try{
-//    			System.out.println("Registrar "+registrar.getLocator().getHost());
-//    			}catch(Exception et){
-//    				et.printStackTrace();
-//    			}
+    				System.out.println(" Service Registered " + objectURL);
+
       		// on lance le lease manager pour que l'objet puisse se reenregistrer
-    			leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
+    				leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
+    				((Vector)jiniObjectTable.get(objectURL)).add(reg);
+					
 				}
 			}
 		}
+		
 	}
-  
+	
+	
+	
   private String buildRuntimeURL() {
   	String host = getVMInformation().getInetAddress().getHostName();
   	String name = getVMInformation().getName();
   	return UrlBuilder.buildUrl(host,name);
   }
-  
+   
   
   private String buildNodeURL(String url) throws java.net.UnknownHostException{
   	int i = url.indexOf('/');
@@ -418,7 +430,38 @@ public class JiniRuntimeImpl
   		return UrlBuilder.buildUrl(host,url);
   	}else{
   		return UrlBuilder.checkUrl(url);
-  	}
+  	} 
+  }
+  
+  private Vector registerService(String objectUrl)throws java.rmi.RemoteException{
+  	//counter used to check that the object has been registered at 
+		//least once as jini service
+		int counter = 0;
+		ServiceID serviceID = newServiceID();
+		Vector serviceRegistrationTable = new Vector();
+		//register it as a jini service with the url
+		for (int n = 0; n < registrarsTable.size(); n++) {
+    	ServiceRegistrar registrar = (ServiceRegistrar)registrarsTable.get(n);
+    	ServiceRegistration reg = null;
+    	try {
+      
+				ServiceItem item = new ServiceItem(serviceID, this, new Entry[] { new Name(objectUrl)});
+      	reg = registrar.register(item, Lease.FOREVER);
+      	counter++;
+    	} catch (Exception e) {
+      	System.out.println("register exception " + e.toString());
+      	continue;
+    	}
+    	// if counter=0 no node or vn are registered as jini Service
+    	if(counter == 0) throw new java.rmi.RemoteException("register exception ");
+    	System.out.println("Service registered " + objectUrl);
+    	//System.out.println("Registrar "+registrar.getLocator().getHost());
+      // on lance le lease manager pour que l'objet puisse se reenregistrer
+    	leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
+    	serviceRegistrationTable.add(reg);
+    
+		}
+		return serviceRegistrationTable;
   }
   
 }

@@ -7,8 +7,10 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -28,7 +30,7 @@ public class RemoteProActiveRuntimeImpl
 {
 
 
-	protected ProActiveRuntimeImpl proActiveRuntime;
+	protected transient ProActiveRuntimeImpl proActiveRuntime;
 	protected String proActiveRuntimeURL;
 	
 	
@@ -58,7 +60,7 @@ public class RemoteProActiveRuntimeImpl
   //
 	
 
-	public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException 
+	public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException, NodeException 
 	{
 		String nodeURL = null;
 		//Node node;
@@ -70,11 +72,12 @@ public class RemoteProActiveRuntimeImpl
 			String name = UrlBuilder.getNameFromUrl(nodeURL);
 			//System.out.println("name is : "+ name);
 			//System.out.println("url is : "+ nodeURL);
-			//create the node with the name 
-			proActiveRuntime.createLocalNode(name,replacePreviousBinding);
 			//register it with the url
 			if (replacePreviousBinding) java.rmi.Naming.rebind(nodeURL,this);
 			else java.rmi.Naming.bind(nodeURL,this);
+			//create the node with the name 
+			proActiveRuntime.createLocalNode(name,replacePreviousBinding);
+			
 			System.out.println ("Node "+ nodeURL+" successfully bound in registry at "+nodeURL);
 		}catch (java.rmi.AlreadyBoundException e){
 			throw new java.rmi.RemoteException("Node "+nodeURL+" already bound in registry",e);
@@ -182,10 +185,54 @@ public class RemoteProActiveRuntimeImpl
 	}
 	
 	
-	public ArrayList getActiveObject(String nodeName, String objectName){
-		return proActiveRuntime.getActiveObject(nodeName,objectName);
+	public ArrayList getActiveObjects(String nodeName, String objectName){
+		return proActiveRuntime.getActiveObjects(nodeName,objectName);
 	}
 	
+	public VirtualNode getVirtualNode(String virtualNodeName){
+		return proActiveRuntime.getVirtualNode(virtualNodeName); 
+	}
+	
+	
+	public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding)throws java.rmi.RemoteException {
+		String virtualNodeURL = null;
+		
+		try
+		{ 
+			//first we build a well-formed url
+			virtualNodeURL = buildNodeURL(virtualNodeName);
+			//then take the name of the virtualnode
+			//String name = UrlBuilder.getNameFromUrl(virtualNodeURL);
+			//register it with the url
+			if (replacePreviousBinding) java.rmi.Naming.rebind(virtualNodeURL,this);
+			else java.rmi.Naming.bind(virtualNodeURL,this);
+			System.out.println ("VirtualNode "+ virtualNodeURL+" successfully bound in registry at "+virtualNodeURL);
+		}catch (java.rmi.AlreadyBoundException e){
+			throw new java.rmi.RemoteException("VirtualNode "+virtualNodeURL+" already bound in registry",e);
+		}catch (java.net.MalformedURLException e){
+			throw new java.rmi.RemoteException("cannot bind in registry at "+virtualNodeURL,e);
+		}catch (java.net.UnknownHostException e){
+			throw new java.rmi.RemoteException("Host unknown in "+virtualNodeURL,e);
+		}
+		
+		
+	}
+	
+	public void unregisterVirtualNode(String virtualnodeName)throws java.rmi.RemoteException{
+		String virtualNodeURL = null;
+		proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(virtualnodeName));
+		try{
+			//first we build a well-formed url
+			virtualNodeURL = buildNodeURL(virtualnodeName);
+			java.rmi.Naming.unbind(virtualNodeURL);
+		}catch(java.net.MalformedURLException e){
+			throw new java.rmi.RemoteException("cannot unbind in registry at "+virtualNodeURL,e);
+		}catch(java.rmi.NotBoundException e){
+			throw new java.rmi.RemoteException(virtualNodeURL+ "is not bound in the registry",e);
+		}catch (java.net.UnknownHostException e){
+			throw new java.rmi.RemoteException("Host unknown in "+virtualNodeURL,e);
+		}
+	}
 	
 	
 	public UniversalBody createBody(String nodeName,ConstructorCall bodyConstructorCall,boolean isNodeLocal)
@@ -229,7 +276,8 @@ public class RemoteProActiveRuntimeImpl
   		return UrlBuilder.checkUrl(url);
   	}
   }
-
+	
+	
    
   
 }

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -280,14 +281,41 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 	
 	
-	public ArrayList getActiveObject(String nodeName, String objectName) throws ProActiveException{
+	public ArrayList getActiveObjects(String nodeName, String objectName) throws ProActiveException{
 		try{
-			return jiniRuntime.getActiveObject(nodeName,objectName);
+			return jiniRuntime.getActiveObjects(nodeName,objectName);
 		}catch (java.rmi.RemoteException re){
 			throw new ProActiveException(re);
 		}
 	}
 
+
+	public VirtualNode getVirtualNode(String virtualNodeName)throws ProActiveException{
+		try{
+		return jiniRuntime.getVirtualNode(virtualNodeName);
+		}catch (java.rmi.RemoteException re){
+			throw new ProActiveException(re);
+		}
+	}
+	
+	
+	public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding)throws ProActiveException {
+		try{
+		jiniRuntime.registerVirtualNode(virtualNodeName,replacePreviousBinding);
+		}catch(java.rmi.RemoteException re){
+			throw new ProActiveException(re);
+		}
+	}
+	
+	
+	public void unregisterVirtualNode(String virtualNodeName) throws ProActiveException{
+		try{
+		jiniRuntime.unregisterVirtualNode(virtualNodeName);
+		}catch(java.rmi.RemoteException re){
+			throw new ProActiveException(re);
+		}
+	}
+	
 	
 	public UniversalBody createBody(String nodeName,ConstructorCall bodyConstructorCall,boolean isNodeLocal)
 		throws

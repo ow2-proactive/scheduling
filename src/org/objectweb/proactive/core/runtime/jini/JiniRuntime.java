@@ -34,8 +34,10 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
@@ -51,7 +53,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 public interface JiniRuntime extends java.rmi.Remote
 {
   
-  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException;
+  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException, NodeException;
   
   
   
@@ -113,8 +115,17 @@ public interface JiniRuntime extends java.rmi.Remote
  	public ArrayList getActiveObjects(String nodeName) throws java.rmi.RemoteException;
  	
  	
- 	public ArrayList getActiveObject(String nodeName, String objectName) throws java.rmi.RemoteException;
+ 	public ArrayList getActiveObjects(String nodeName, String objectName) throws java.rmi.RemoteException;
  	
+  
+  public VirtualNode getVirtualNode(String virtualNodeName)throws java.rmi.RemoteException;
+  
+  
+  public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding)throws java.rmi.RemoteException ;
+  
+  
+  public void unregisterVirtualNode(String virtualNodeName)throws java.rmi.RemoteException;
+  
   
   public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall,boolean isNodeLocal) throws java.rmi.RemoteException,
               ConstructorCallExecutionFailedException, java.lang.reflect.InvocationTargetException;

@@ -37,14 +37,17 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.event.AbstractEventProducer;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.runtime.event.AbstractProActiveRuntimeEventProducer;
 
 
 /**
@@ -57,12 +60,12 @@ import org.objectweb.proactive.core.runtime.event.AbstractProActiveRuntimeEventP
  * @since   ProActive 0.91
  *
  */
-public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer implements ProActiveRuntime {
+public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime {
 
   //
   // -- STATIC MEMBERS -----------------------------------------------------------
   //
-
+ 
   //the Unique instance of ProActiveRuntime
   private static ProActiveRuntime proActiveRuntime = new ProActiveRuntimeImpl();
   // name of the default Node created when creating the ProActiveRuntime
@@ -76,6 +79,9 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
   
   // map nodes and their names
   private java.util.Hashtable nodeMap;
+  
+  //map VirtualNodes and their names
+  private java.util.Hashtable virtualNodesMap;
   
   // map proActiveRuntime registered on this VM and their names
   private java.util.Hashtable proActiveRuntimeMap;
@@ -94,10 +100,8 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
       this.nodeMap = new java.util.Hashtable();
       this.vmInformation = new VMInformationImpl();
       this.proActiveRuntimeMap = new java.util.Hashtable();
-      // create the default node name. Note that the node with this name is not yet created
-      //this.defaultNodeName = BuildDefaultNodeName();
-      // create the default Node attached to this runtime
-     // createLocalNode(DEFAULT_NODE_NAME);
+      this.virtualNodesMap = new java.util.Hashtable();
+      
      //System.out.println(vmInformation.getVMID().toString());
     } catch (java.net.UnknownHostException e) {
       System.out.println();
@@ -117,6 +121,15 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
     return proActiveRuntime;
   }
   
+  /**
+	 * Register the given VirtualNode on this ProActiveRuntime. This method cannot be called remotely.
+	 * @param vn the virtualnode to register
+	 * @param vnname the name of the VirtualNode to register
+	 */
+  public void registerLocalVirtualNode(VirtualNode vn, String vnName){
+  	//System.out.println("vn "+vnName+" registered");
+  	virtualNodesMap.put(vnName,vn);
+  }
 
   //
   // -- Implements ProActiveRuntime  -----------------------------------------------
@@ -124,9 +137,14 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
 	/**
 	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean)
 	 */
-  public String createLocalNode(String nodeName,boolean replacePreviousBinding)  {
+  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws NodeException {
     //Node node = new NodeImpl(this,nodeName);
     //System.out.println("node created with name "+nodeName+"on proActiveruntime "+this);
+    if(replacePreviousBinding){
+			if(nodeMap.get(nodeName) != null) nodeMap.remove(nodeName);
+		}
+		if(!replacePreviousBinding && nodeMap.get(nodeName) != null) throw new NodeException("Node "+nodeName+" already created on this ProActiveRuntime. To overwrite this node, use true for replacePreviousBinding");
+		
     nodeMap.put(nodeName,new java.util.ArrayList());
     return nodeName;
   }
@@ -299,7 +317,25 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
   }
   
   
-  public ArrayList getActiveObject(String nodeName, String objectName){
+  public VirtualNode getVirtualNode(String virtualNodeName){
+//  	System.out.println("i am in get vn ");
+  	return (VirtualNode)virtualNodesMap.get(virtualNodeName);
+  }
+  
+  
+	
+  
+  
+  public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding) {
+  	//This method has no effect here since the virtualNode has been registered in some registry
+  	//like RMI or JINI
+  }
+  
+  public void unregisterVirtualNode(String virtualNodeName){
+  	virtualNodesMap.remove(virtualNodeName);
+  }
+  
+  public ArrayList getActiveObjects(String nodeName, String objectName){
   	// we have to clone the array otherwise modifications done on nodeMap
   	// would be reflected on the temp variable bodyArray
   	ArrayList bodyArray = (ArrayList)((ArrayList)nodeMap.get(nodeName)).clone();
@@ -360,28 +396,34 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
     return boa;
   }
 
+//	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+//		System.out.println("I am in runtime serialization ");
+//		out.defaultWriteObject();
+//	}
 
-  //
-  // --------------------Implements AbstractProActiveRuntimeEventProducer---------------------
-  //
-  
-  protected void notifyOneListener(ProActiveListener proActiveListener, ProActiveEvent event){
-  	RuntimeRegistrationEvent runtimeRegistrationEvent = (RuntimeRegistrationEvent) event;
-  	RuntimeRegistrationEventListener runtimeRegistrationEventListener = (RuntimeRegistrationEventListener)proActiveListener;
-  	//notify the listener that a registration occurs
-  	runtimeRegistrationEventListener.runtimeRegistered(runtimeRegistrationEvent);
-  }
-  
-  protected void notifyListeners(ProActiveRuntime proActiveRuntime,int type,String registeredRuntimeName, String creatorID, String protocol){
-  	if (hasListeners()){
-      notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntimeName, creatorID, protocol));
-  	}
-  	else System.out.println("no listener");
-  }
-  
-  //
-  // -- PRIVATE METHODS  -----------------------------------------------
-  //
+//  //
+//  // --------------------Implements AbstractDeploymentEventProducer---------------------
+//  //
+//  
+//  protected void notifyOneListener(ProActiveListener proActiveListener, ProActiveEvent event){
+//  	RuntimeRegistrationEvent runtimeRegistrationEvent = (RuntimeRegistrationEvent) event;
+//  	RuntimeRegistrationEventListener runtimeRegistrationEventListener = (RuntimeRegistrationEventListener)proActiveListener;
+//  	//notify the listener that a registration occurs
+//  	runtimeRegistrationEventListener.runtimeRegistered(runtimeRegistrationEvent);
+//  }
+//  
+//  
+//  
+//  //
+//  // -- PRIVATE METHODS  -----------------------------------------------
+//  //
+//  
+//  private void notifyListeners(ProActiveRuntime proActiveRuntime,int type,String registeredRuntimeName, String creatorID, String protocol){
+//  	if (hasListeners()){
+//      notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntimeName, creatorID, protocol));
+//  	}
+//  	else System.out.println("no listener");
+//  }
   
 	/**
 	 * Registers the specified body at the nodeName key in the <code>nodeMap</code>.

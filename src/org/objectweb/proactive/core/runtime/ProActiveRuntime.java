@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -64,7 +65,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 0.91
  *
  */
-public interface ProActiveRuntime{
+public interface ProActiveRuntime {
 
   /**
    * Creates a new Node in the same VM as this ProActiveRuntime
@@ -209,10 +210,35 @@ public interface ProActiveRuntime{
 	 * Returns all Active Objects with the specified class name, deployed on the node with the given name on 
 	 * this ProActiveRuntime
 	 * @param nodeName the name of the node
-	 * @param objectname class of the Active Objects to look for
+	 * @param classname class of the Active Objects to look for
 	 * @return Object[] Active Objects of the specified class name deployed on this ProactiveRuntime
 	 */
-  public ArrayList getActiveObject(String nodeName, String objectName) throws ProActiveException;
+  public ArrayList getActiveObjects(String nodeName, String className) throws ProActiveException;
+  
+  
+	/**
+	 * Returns the VirtualNode with the given name
+	 * @param VirtualNodeName the name of the VirtualNode to be acquired
+	 * @return VirtualNode the virtualnode of the given name or null if such virtualNode
+	 * does not exist. 
+	 */
+  public VirtualNode getVirtualNode(String virtualNodeName)throws ProActiveException;
+  
+  
+	/**
+	 * Registers the virtualNode of the given name in a registry such RMIRegistry or Jini Service Lookup
+	 * @param virtualNodeName
+	 */
+  public void registerVirtualNode(String virtualNodeName,boolean replacePreviousBinding)throws ProActiveException ;
+  
+  
+	/**
+	 * Unregisters the VirtualNode of the given name from the local runtime.
+	 * @param virtualNodeName the virtualNode to unregister.
+	 * @throws ProActiveException if a problem occurs when trying to unregister the virtualNode
+	 */
+  public void unregisterVirtualNode(String virtualNodeName) throws ProActiveException;
+  
   
   
   /**
