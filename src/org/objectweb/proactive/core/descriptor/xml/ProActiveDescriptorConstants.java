@@ -62,6 +62,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String PROCESS_DEFINITION_TAG = "processDefinition";
   public static final String JVM_PROCESS_TAG = "jvmProcess";
   public static final String RSH_PROCESS_TAG = "rshProcess";
+  public static final String MAPRSH_PROCESS_TAG = "maprshProcess";
   public static final String SSH_PROCESS_TAG = "sshProcess";
   public static final String RLOGIN_PROCESS_TAG = "rloginProcess";
   public static final String BSUB_PROCESS_TAG = "bsubProcess";
@@ -83,6 +84,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String CLASSPATH_TAG = "classpath"; 
   public static final String JAVA_PATH_TAG = "javaPath"; 
   public static final String POLICY_FILE_TAG = "policyFile"; 
+  public static final String LOG4J_FILE_TAG = "log4jpropertiesFile";
   public static final String CLASSNAME_TAG = "classname"; 
   public static final String PARAMETERS_TAG = "parameters"; 
   
