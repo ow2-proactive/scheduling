@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>
  * UniqueID is a unique object identifier across all jvm. It is made of a unique VMID combined
@@ -49,7 +51,7 @@ public class UniqueID implements java.io.Serializable {
 
   //the Unique ID of the JVM
   private static java.rmi.dgc.VMID uniqueVMID = new java.rmi.dgc.VMID();
-  
+  protected static Logger logger = Logger.getLogger(UniqueID.class.getName());
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -136,7 +138,7 @@ public class UniqueID implements java.io.Serializable {
    * for debug purpose
    */
   public void echo() {
-    System.out.println("UniqueID The Id is " + id + " and the address is " + vmID);
+    logger.info("UniqueID The Id is " + id + " and the address is " + vmID);
   }
 
 
