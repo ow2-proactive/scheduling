@@ -79,29 +79,32 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @param newurl
      */
     public HttpRuntimeAdapter(String newurl) {
-        this.url = newurl;
-        createURL();
+        try {
+            this.url = UrlBuilder.checkUrl(newurl);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this, newurl);
         this.vmInformation = runtimestrategyadapter.getVMInformation();
     }
 
-    public void createURL() {
-
-        /* !!! */
-        if (!url.startsWith("http:")) {
-            url = "http:" + url;
-        }
-
-        if (port == 0) {
-            port = UrlBuilder.getPortFromUrl(url);
-        }
-
-        try {
-            url = "http://" + UrlBuilder.getHostNameAndPortFromUrl(url);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void createURL() {
+//
+//        /* !!! */
+//        if (!url.startsWith("http:")) {
+//            url = "http:" + url;
+//        }
+//
+//        if (port == 0) {
+//            port = UrlBuilder.getPortFromUrl(url);
+//        }
+//
+//        try {
+//            url = "http://" + UrlBuilder.getHostNameAndPortFromUrl(url);
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
