@@ -41,7 +41,7 @@ public class Log4jConfigurationHandler extends AbstractUnmarshallerDecorator
 	//	try {
 	//		u = new URL(s);
 	//	} catch (MalformedURLException e) {
-	//		// TODO Auto-generated catch block
+	//		// TO DO : Auto-generated catch block
 	//		e.printStackTrace();
 	//	}
 	//	PropertyConfigurator.configure(u);

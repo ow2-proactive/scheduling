@@ -32,7 +32,6 @@ package nonregressiontest.activeobject.loopmixedlocation;
 
 import nonregressiontest.activeobject.locationserver.A;
 import nonregressiontest.activeobject.locationserver.MigratableA;
-
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import org.objectweb.proactive.ProActive;
@@ -42,8 +41,6 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
-
-import testsuite.manager.ProActiveFuncTestManager;
 
 import testsuite.test.FunctionalTest;
 
