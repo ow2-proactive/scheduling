@@ -81,11 +81,15 @@ public interface ProActiveDescriptor extends java.io.Serializable{
 
 	
 	/**
-   * Creates a VirtualNode of the given name
+   * Creates a VirtualNode with the given name
+   * If the VirtualNode with the given name has previously been created, this method returns it.
    * @param vnName
+   * @param lookup if true, at creation time the VirtualNode will be a VirtualNodeLookup.
+   * If false the created VirtualNode is a VirtualNodeImpl. Once the VirtualNode created this field 
+   * has no more influence when calling this method
    * @return VirtualNode
    */
-  public VirtualNode createVirtualNode(String vnName);
+  public VirtualNode createVirtualNode(String vnName, boolean lookup);
   
   
   /**
