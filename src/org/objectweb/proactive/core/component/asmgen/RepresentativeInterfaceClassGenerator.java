@@ -75,7 +75,7 @@ public class RepresentativeInterfaceClassGenerator
     protected static final String PROXY_TYPE = "Lorg/objectweb/proactive/core/mop/Proxy;";
     protected static final String STUB_INTERFACE_NAME = "org/objectweb/proactive/core/mop/StubObject";
     protected static final String PROXY_FIELD_NAME = "myProxy";
-    private static final Logger logger = logger;
+    private static final Logger logger = ProActiveLogger.getLogger("components.bytecodegeneration");
 
     // generatedClassesCache that contains all the generated classes according to their name
     private static Hashtable generatedClassesCache = new Hashtable();

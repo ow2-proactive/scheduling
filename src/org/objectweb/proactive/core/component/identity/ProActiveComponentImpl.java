@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -73,6 +74,8 @@ import java.util.ArrayList;
  */
 public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     Serializable {
+    
+    protected static final Logger logger = ProActiveLogger.getLogger("components");
 
     //private ComponentParameters componentParameters;
     private Interface[] interfaceReferences;
