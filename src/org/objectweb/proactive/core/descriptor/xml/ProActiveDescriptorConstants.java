@@ -77,10 +77,11 @@ public interface ProActiveDescriptorConstants  {
   public static final String BSUB_OPTIONS_TAG = "bsubOption";
   public static final String SCRIPT_PATH_TAG = "scriptPath";
   public static final String GLOBUS_OPTIONS_TAG = "globusOption";
-  public static final String GLOBUS_HOST_TAG = "globusHost";
-  public static final String GLOBUS_HOST_LIST_TAG = "globusHostList";
-  public static final String GRAM_PORT_TAG = "GramPort";
-  public static final String GIS_PORT_TAG = "GISPort";
+  public static final String GLOBUS_COUNT_TAG = "count";
+//  public static final String GLOBUS_HOST_TAG = "globusHost";
+//  public static final String GLOBUS_HOST_LIST_TAG = "globusHostList";
+//  public static final String GRAM_PORT_TAG = "GramPort";
+//  public static final String GIS_PORT_TAG = "GISPort";
   public static final String PRUN_OPTIONS_TAG = "prunOption";
   public static final String PROCESSOR_TAG = "processor";
   public static final String HOSTS_NUMBER_TAG = "hostsNumber";
