@@ -43,8 +43,11 @@ import org.objectweb.proactive.core.node.jini.JiniNode;
 
 public class ServiceLocatorHelper implements DiscoveryListener {
 
-  protected static int MAX_RETRY = 3;
+  protected static int MAX_RETRY = 8;
   protected static long MAX_WAIT = 10000L;
+  
+  private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+  private static String DEFAULT_RMID_LOCATION = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"rmid";
 
   protected static LookupLocator lookup = null;
   protected static ServiceRegistrar registrar = null;
@@ -73,6 +76,10 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   private static String grpName = "public";
 
   private static final String tmpDir = createTempDirectory(host);
+  
+  private static java.io.File jiniLockFile = null;
+  
+  private static final String jiniLockFileLocation = System.getProperty("user.dir")+System.getProperty("file.separator")+host+"jiniLockFile";
 
   //
   // -- Constructors -----------------------------------------------
@@ -110,6 +117,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     if (locatorChecked) return; // already done for this VM
     try {
     	getOrCreateServiceLocator();
+    	//delete the lock file
+      if(jiniLockFile.exists()) jiniLockFile.delete();
     } catch(java.io.IOException e) {
       e.printStackTrace();
       System.exit(1);
@@ -255,15 +264,20 @@ public class ServiceLocatorHelper implements DiscoveryListener {
       } catch (java.io.IOException e) {
         System.err.println("Registrar search failed: " + e.getMessage());
         if (MAX_RETRY-- > 0) {
+        	//-----------wont work everywhere---------------------------
+        	Runtime.getRuntime().exec(DEFAULT_RMID_LOCATION);
           createServiceLocator();
           getOrCreateServiceLocator();
         } else {
+        	//delete the lock file
+      		if(jiniLockFile.exists()) jiniLockFile.delete();
           throw new java.io.IOException("\nCannot run a ServiceLocator : Have you launched the rmid deamon on " + host);
         }
       } catch (java.lang.ClassNotFoundException e) {
         throw new java.io.IOException("Registrar search failed: " + e.toString());
       }
       System.out.println("Registrar found on " + host);
+      
       // Just for test
       //displayServices();
     }
@@ -273,6 +287,19 @@ public class ServiceLocatorHelper implements DiscoveryListener {
    * Create a new Service Locator on the local host
    */
   private static void createServiceLocator() {
+  	//this block is usefull to avoid many ServiceLocator to be created by different
+  	//threads at the same time.If the file cannot be created, it is because another thread
+  	//put a lock on it, in other word it is trying to create the serviceLocator
+  	//so wait a bit for the service to be created 
+  	if(!createLockFile()) {
+  		try{
+  			Thread.sleep(2000);
+  		}catch(Exception e){
+  				e.printStackTrace();
+  			}
+  		return;
+  	}
+  	System.out.println("creating lock file");
     System.out.println("No ServiceLocator founded ...  we launch a ServiceLocator on " + host);
     String reggieTmpDir = tmpDir + System.getProperty("file.separator") + "reggie_log";
     delDirectory(new java.io.File(tmpDir));
@@ -286,6 +313,24 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     String[] args = { "", policy, reggieTmpDir, };
     com.sun.jini.start.ServiceStarter.create(args, "com.sun.jini.reggie.CreateLookup", "com.sun.jini.reggie.RegistrarImpl", "lookup");
   }
+
+	/**
+	 * Method createLockFile.
+	 * @param host
+	 * @return String
+	 */
+	private static boolean createLockFile()
+	{
+	 jiniLockFile = new java.io.File(jiniLockFileLocation);
+		//jiniLockFile.deleteOnExit();
+		try{
+		return jiniLockFile.createNewFile();
+		}catch(java.io.IOException e){
+			//an exception occured try anyway to create the service locator
+			return true;
+		}
+	}
+
 
 
 }
