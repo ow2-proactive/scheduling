@@ -36,6 +36,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 
 /**
@@ -75,12 +76,12 @@ public class Loader {
                     deploymentDescriptor).getResultObject();
         } catch (org.xml.sax.SAXException e) {
             e.printStackTrace();
-            ProActive.componentLogger.fatal(
+            ProActiveLogger.getLogger("components").fatal(
                 "a problem occured when getting the ProActive descriptor or the ComponentsDescriptor");
             throw new ProActiveException(e);
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            ProActive.componentLogger.fatal(
+            ProActiveLogger.getLogger("components").fatal(
                 "a problem occured during the ProActiveDescriptor object creation");
             throw new ProActiveException(e);
         }
