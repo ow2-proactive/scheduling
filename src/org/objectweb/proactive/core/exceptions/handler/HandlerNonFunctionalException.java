@@ -95,13 +95,13 @@ public class HandlerNonFunctionalException implements Handler {
      * @param e The exception to be handled
      */ 
     public void handle(NonFunctionalException e) {
-        System.out.println("EXCEPTION [" + e.getDescription() +
+        logger.debug("EXCEPTION [" + e.getDescription() +
             "] HANDLED WITH [" + this.getClass().getName() + "]");
-        System.out.println(suggestion);
-        System.out.println(
+        logger.debug(suggestion);
+        logger.debug(
             "=> (solution 2) SET HANDLER FOR EXCEPTION [" +
             e.getClass().getName() + "]");
-            e.printStackTrace();
+            logger.error("NFE",e);
     }
 
     /**
@@ -110,10 +110,10 @@ public class HandlerNonFunctionalException implements Handler {
      */
     public void handle(NonFunctionalException nfe, Exception e)
         throws Exception {
-        logger.info("EXCEPTION [" + nfe.getDescription() +
+        logger.debug("EXCEPTION [" + nfe.getDescription() +
             "] HANDLED WITH [" + this.getClass().getName() + "]");
-        logger.info(suggestion);
-        logger.info(
+        logger.debug(suggestion);
+        logger.debug(
             "=> (solution 2) SET HANDLER FOR EXCEPTION [" +
             nfe.getClass().getName() + "]");
         throw e;
