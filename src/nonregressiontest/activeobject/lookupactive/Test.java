@@ -70,7 +70,7 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-    	String url = UrlBuilder.buildUrlFromProperties("localhost","A", "rmi:");
+    	String url = UrlBuilder.buildUrlFromProperties("localhost","A");
         A a = (A) ProActive.lookupActive(A.class.getName(), url);
         return ((a != null) && (a.getName().equals("toto")));
     }

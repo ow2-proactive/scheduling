@@ -63,7 +63,7 @@ public class A implements RunActive {
 
     public void runActivity(Body body) {
         try {
-            ProActive.register((A) ProActive.getStubOnThis(), UrlBuilder.buildUrlFromProperties("localhost","A", "rmi:"));
+            ProActive.register((A) ProActive.getStubOnThis(), UrlBuilder.buildUrlFromProperties("localhost","A"));
         } catch (IOException e) {
             e.printStackTrace();
         }
