@@ -82,10 +82,10 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     static {
         try {
             host = java.net.InetAddress.getLocalHost().getHostName();
-            String policyLocation = System.getProperty("proactive.java.policy");
+            String policyLocation = System.getProperty("java.security.policy");
             if(policyLocation != null) policy = policyLocation;
             else policy = DEFAULT_POLICY;
-            DEFAULT_RMID_PARAMS.concat(policy);
+            DEFAULT_RMID_PARAMS = DEFAULT_RMID_PARAMS.concat(policy);
         } catch (java.net.UnknownHostException e) {
             logger.fatal("Lookup failed: " + e.getMessage());
             e.printStackTrace();
