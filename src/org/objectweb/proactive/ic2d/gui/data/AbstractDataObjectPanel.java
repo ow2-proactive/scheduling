@@ -437,19 +437,19 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
 
             public FontSizeMenu() {
                 super("Change font size");
-                HashMenuFontSize.put(SMALL_FONT, new String("Small font size"));
-                add(createItem(SMALL_FONT, false));
                 HashMenuFontSize.put(VERY_SMALL_FONT,
                     new String("Very small font size"));
                 add(createItem(VERY_SMALL_FONT, false));
+                HashMenuFontSize.put(SMALL_FONT, new String("Small font size"));
+                add(createItem(SMALL_FONT, false));
                 HashMenuFontSize.put(REGULAR_FONT,
                     new String("Regular font size"));
                 add(createItem(REGULAR_FONT, false));
+                HashMenuFontSize.put(BIG_FONT, new String("Large font size"));
+                add(createItem(BIG_FONT, false));
                 HashMenuFontSize.put(VERY_BIG_FONT,
                     new String("Very large font size"));
                 add(createItem(VERY_BIG_FONT, false));
-                HashMenuFontSize.put(BIG_FONT, new String("Large font size"));
-                add(createItem(BIG_FONT, false));
             }
 
             private javax.swing.JMenuItem createItem(final java.awt.Font font,
