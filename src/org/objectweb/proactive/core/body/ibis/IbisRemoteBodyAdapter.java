@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -161,7 +162,7 @@ public class IbisRemoteBodyAdapter implements BodyAdapter, java.io.Serializable 
 
         // Try if URL is the address of a IbisRemoteBody
         try {
-            o = ibis.rmi.Naming.lookup(url);
+            o = ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(url,"ibis:"));
         } catch (ibis.rmi.NotBoundException e) {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
