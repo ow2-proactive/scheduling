@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.component.type.ProActiveComponentType;
  * - a ref on the stub on the base object
  */
 public class ComponentParameters implements Serializable {
-    protected static Logger logger = Logger.getLogger(ComponentParameters.class.getName());
+    protected static Logger logger = Logger.getLogger("components");
 
     private Object stubOnReifiedObject;
     private ComponentType componentType;
