@@ -497,10 +497,12 @@ other remote components. A component can be composite, made of other
 components, and as such itself distributed over several machines.
 Component systems are defined in XML files (ADL: Architecture Description 
 Language); these files describe the definition, the assembly, and the 
-bindings of components.
+bindings of components.</br>
 Components follow the Fractal hierarchical component model specification and 
-API, see http://fractal.objectweb.org
+API, see http://fractal.objectweb.org</br>
+The following methods are specific to ProActive.
 </p>
+<p>In the class org.objectweb.proactive.ProActive :
 			<pre>
 Component newActiveComponent("A", params, VirtualNode, ComponentParameters);
 <FONT ID="FormalComment">   // Creates a new ProActive component from the specified class A.
@@ -508,7 +510,17 @@ Component newActiveComponent("A", params, VirtualNode, ComponentParameters);
    // The ComponentParameters defines the configuration of a component: 
    // name of component, interfaces (server and client), etc.
    // Returns a reference to a component, as defined in the Fractal API </FONT>
+</pre>
+</p>
+<p>In the class org.objectweb.proactive.core.component.Fractive :
+<pre>
+ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature);
+<FONT ID="FormalComment">   // This method is used in primitive components.
+   // It generates a client collective interface named itfName, and typed as itfSignature.
+   // This collective interface is a typed ProActive group.
 
+</pre>
+</p>
 			</td>
 	</tbody>
 </table><br></br><br></br>
