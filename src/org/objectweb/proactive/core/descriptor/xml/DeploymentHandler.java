@@ -279,7 +279,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         private VirtualMachine currentVM;
 
         private JVMHandler() {
-            this.addHandler(ACQUISITION_TAG, new AcquisitionHandler());
+            //this.addHandler(ACQUISITION_TAG, new AcquisitionHandler());
             this.addHandler(CREATION_PROCESS_TAG, new CreationHandler());
         }
 
@@ -305,22 +305,22 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         /**
          * This class receives acquisition events
          */
-        private class AcquisitionHandler extends BasicUnmarshaller {
-            private AcquisitionHandler() {
-            }
-
-            public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
-                String acquisitionMethod = attributes.getValue("method");
-                //String portNumber = attributes.getValue("port");
-                if (acquisitionMethod != null) {
-                    currentVM.setAcquisitionMethod(acquisitionMethod);
-                }
-//                if (portNumber != null) {
-//                    currentVM.setPortNumber(portNumber);
+//        private class AcquisitionHandler extends BasicUnmarshaller {
+//            private AcquisitionHandler() {
+//            }
+//
+//            public void startContextElement(String name, Attributes attributes)
+//                throws org.xml.sax.SAXException {
+//                String acquisitionMethod = attributes.getValue("method");
+//                //String portNumber = attributes.getValue("port");
+//                if (acquisitionMethod != null) {
+//                    currentVM.setAcquisitionMethod(acquisitionMethod);
 //                }
-            }
-        }
+////                if (portNumber != null) {
+////                    currentVM.setPortNumber(portNumber);
+////                }
+//            }
+//        }
 
         // end inner class AcquisitionHandler
 

@@ -55,9 +55,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  public ProActiveDescriptorHandler() {
+  public ProActiveDescriptorHandler(String xmlDescriptorUrl) {
     super(false);
-    proActiveDescriptor = new ProActiveDescriptorImpl();
+    proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
     addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
     addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
 	addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
@@ -81,8 +81,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
 
   public static void main(String[] args) throws java.io.IOException {
-    InitialHandler h = new InitialHandler();
+    
     String uri = "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
+	InitialHandler h = new InitialHandler(uri);
     //String uri = "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
     
     org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
@@ -96,7 +97,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
   public static ProActiveDescriptorHandler createProActiveDescriptor(String xmlDescriptorUrl) throws java.io.IOException,org.xml.sax.SAXException {
       //static method added to replace main method
       try {
-        InitialHandler h = new InitialHandler();
+        InitialHandler h = new InitialHandler(xmlDescriptorUrl);
         String uri = xmlDescriptorUrl;
         org.objectweb.proactive.core.xml.io.StreamReader sr =
           new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
@@ -148,9 +149,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
   private static class InitialHandler extends AbstractUnmarshallerDecorator {
     // line added to return a ProactiveDescriptorHandler object
     private ProActiveDescriptorHandler proActiveDescriptorHandler;
-    private InitialHandler() {
+    private InitialHandler(String xmlDescriptorUrl) {
       super();
-      proActiveDescriptorHandler = new ProActiveDescriptorHandler();
+      proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl);
       this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);
     }
     public Object getResultObject() throws org.xml.sax.SAXException {
@@ -179,8 +180,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
        vn.setProperty(property);
       }
       String timeout = attributes.getValue("timeout");
+	  String waitForTimeoutAsString = attributes.getValue("waitForTimeout");
+	  boolean waitForTimeout = false;
+	  if (checkNonEmpty(waitForTimeoutAsString)){
+		waitForTimeout = new Boolean(waitForTimeoutAsString).booleanValue();
+	  }
       if (checkNonEmpty(timeout)) {
-       vn.setTimeout(timeout);
+       vn.setTimeout(timeout, waitForTimeout);
       }
 
     }

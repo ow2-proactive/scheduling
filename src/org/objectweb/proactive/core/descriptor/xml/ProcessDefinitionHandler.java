@@ -294,6 +294,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             this.addHandler(JAVA_PATH_TAG, bch);
             this.addHandler(POLICY_FILE_TAG, bch);
             this.addHandler(LOG4J_FILE_TAG, bch);
+            this.addHandler(PROACTIVE_PROPS_FILE_TAG, bch);
             this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
             this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
             // this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
@@ -354,7 +355,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
             } else if (name.equals(LOG4J_FILE_TAG)) {
                 jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
-            } else if (name.equals(CLASSNAME_TAG)) {
+            } else if(name.equals(PROACTIVE_PROPS_FILE_TAG)) {
+            	jvmProcess.setJvmOptions("-Dproactive.configuration="+(String) activeHandler.getResultObject());
+            }else if (name.equals(CLASSNAME_TAG)) {
                 jvmProcess.setClassname((String) activeHandler.getResultObject());
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
