@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+   <!--
+ Header : start
+~~~ -->
+<table width="100%">
+  <tr>
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back
+to guided tour index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="parallel_processing.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="migration.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a>
+    </td>
+  </tr>
+</table>
+<hr> <!-- Link to index : end -->
+<h2>OO SPMD on a Jacobi example</h2>
+
+<p class="textNormal">&nbsp;</p>
+
+
+<h3 class="textNormal">1.  Execution and first glance at the Jacobi code</h3>
+<h3 class="textNormal">1.1 Source files: ProActive/src/org/objectweb/proactive/examples/jacobi</h3>
+<p class="textNormal">The Jacobi example is made of two Java classes:</p>
+<p class="textNormal">- Jacobi.java: the main class</p>
+<p class="textNormal">- SubMatrix.java: the class implementing the SPMD code</p>
+<p class="textNormal">Have a first quick look at the code, especially the Jacobi class, looking for the strings "ProActive", "Nodes", "newSPMDGroup".</p>
+<br>
+<p class="textNormal">The last instruction of the class:</p>
+<p class="textNormal">	<code>matrix.compute();</code></p>
+<p class="textNormal">is an asynchronous group call. It sends a request to all active objects in the SPMD group, triggering computations in all the SubMatrix.
+<p class="textNormal">We will get to the class SubMatrix.java later on.</p>
+
+<h3 class="textNormal">1.2 Execution</h3>
+<p class="textNormal">	ProActive examples come with scripts to easily launch the execution under both Unix and Windows.</p>
+<p class="textNormal">	For Jacobi, launch:</p>
+<p class="textNormal"><code>ProActive/scripts/unix/jacobi.sh</code></p>
+<p class="textNormal">or</p>
+<p class="textNormal"><code>ProActive/scripts/windows/jacobi.bat</code></p>
+<p class="textNormal">	The computation stops after minimal difference is reached between two iterations (constant MINDIFF in class Jacobi.java), or after a fixed number of iteration (constant ITERATIONS in class Jacobi.java).</p>
+<br>
+<p class="textNormal">	The provided script, using an XML descriptor, creates 4 JVMs on the current machine. The Jacobi class creates an SPMD group of 9 Active Objects; 2 or 3 AOs per JVM.<br>
+<br>
+<p class="textNormal">	Look at the traces on the console upon starting the script; in the current case, remember that all JVMs and AOs send output to the same console. More specifically, understand the following:<br>
+<p class="textNormal">	  <code> - "Created a new registry on port 1099"</code></p>
+<p class="textNormal">	  <code>- "Reading deployment descriptor ... Matrix.xml "</code></p>
+<p class="textNormal">	  <code>- "created VirtualNode"</code></p>
+<p class="textNormal">	  <code>- "**** Starting jvm on"</code></p>
+<p class="textNormal">	  <code>- "ClassFileServer is reading resources from classpath"</code></p>
+<p class="textNormal">	  <code> - "Detected an existing RMI Registry on port 1099""</code></p>
+<p class="textNormal">	  <code> - "Generating class : ... jacobi.Stub_SubMatrix "</code></p>
+<p class="textNormal">	  <code> - "ClassServer sent class ... jacobi.Stub_SubMatrix successfully"</code></p>
+<br>
+<p class="textNormal">	You can start IC2D (script ic2d.sh or ic2d.bat) in order to visualize the JVMs and the Active Objects. Just activate the "Monitoring a new host" in the "Monitoring" menu at the top left.<br>
+<br>
+<p class="textNormal">	To stop the Jacobi computation and all the associated AOs, and JVMs, just ^C in the window where you started the Jacobi script.<br>
+</p>
+
+<h3 class="textNormal">2. Modification and compilation</h3>
+<h3 class="textNormal">2.1 Source modification</h3>
+<p class="textNormal">Do a simple source modification, for instance changing the values of the constants MINDIFF (0.00000001 for ex) and ITERATIONS in class Jacobi.java.</p>
+<p class="textNormal">Caveat: Be careful, due to a shortcoming of the Java make system (ant), make sure to also touch the class SubMatrix.java that uses the constants.</p>
+
+<h3 class="textNormal">2.2 Compilation</h3>
+<p class="textNormal">ProActive distribution comes with scripts to easily recompile the provided examples:</p>
+<p class="textNormal"><code>linux>ProActive/compile/build</code></p>
+<p class="textNormal">or</p>
+<p class="textNormal"><code>windows>ProActive/compile/build.bat</code>
+<p class="textNormal">Several targets are provided (start build without arguments to obtain them). In order to recompile the Jacobi, just start the target that recompile all the examples:
+<p class="textNormal"><code>build examples</code></p>
+<p class="textNormal">2 source files must appear as being recompiled.</p>
+
+<p class="textNormal">	Following the recompilation, rerun the examples as explained in section 1.2 above, and observe the differences.</p>
+
+
+<h3 class="textNormal">3. Detailed understanding of the OO SPMD Jacobi</h3>
+<h3 class="textNormal">3.1 Structure of the code</h3>
+<p class="textNormal">	Within the class SubMatrix.java the following methods correspond to a standard Jacobi implementation, and are not specific to ProActive:</p>
+		<p class="textNormal"><code>- internalCompute ()</code></p>
+		<p class="textNormal"><code>- borderCompute ()</code></p>
+		<p class="textNormal"><code>- exchange ()</code></p>
+		<p class="textNormal"><code>- buildFakeBorder (int size)</code></p>
+		<p class="textNormal"><code>- buildNorthBorder ()</code></p>
+		<p class="textNormal"><code>- buildSouthBorder ()</code></p>
+		<p class="textNormal"><code>- buildWestBorder ()</code></p>
+		<p class="textNormal"><code>- buildEastBorder ()</code></p>
+		<p class="textNormal"><code>- stop ()</code></p>
+
+<p class="textNormal">	The methods on which asynchronous remote method invocations take place</p>
+<p class="textNormal">	are:</p>
+		<p class="textNormal"><code>- sendBordersToNeighbors ()</code></p>
+		<p class="textNormal"><code>- setNorthBorder (double[] border)</code></p>
+		<p class="textNormal"><code>- setSouthBorder (double[] border)</code></p>
+		<p class="textNormal"><code>- setWestBorder (double[] border)</code></p>
+		<p class="textNormal"><code>- setEastBorder (double[] border)</code></p>
+
+<p class="textNormal">	The first one sends to the appropriate neighbors the appropriate values,  calling set*Border() methods asynchronously. Upon execution by the AO,  the methods set*Border() memorize locally the values being received.</p>
+<p class="textNormal">	Notice that all those communication methods are made of purely functional Java code, without any code to the ProActive API.</p>
+
+<p class="textNormal">	On the contrary, the followings are ProActive related aspects:</p>
+		<p class="textNormal"><code>- buildNeighborhood ()</code></p>
+		<p class="textNormal"><code>- compute ()</code></p>
+		<p class="textNormal"><code>- loop ()</code></p>
+<p class="textNormal">	We will detail them in the next section.</p>
+
+<p class="textNormal">Note: the classes managing topologies are still under development. In the next release, the repetitive and tedious topology related instructions (e.g. methods buildNeighborhood) won't have to be written explicitly by the user, whatever the topology (2D, 3D).</p>
+
+<h3 class="textNormal">3.2 OO SPMD behavior </h3>
+
+<p class="textNormal">	Let us detail the OO SPMD techniques and ProActive related methods.
+
+<p class="textNormal">	First of all, look for the definition and use of the attribute "asyncRefToMe". Using the primitive "getStubOnThis()", it provides a reference to the current active object **on which method calls are asynchronous**. It permits the AO to send requests to itself.</p>
+<p class="textNormal">	For instance in</p>
+		<p class="textNormal"><code>this.asyncRefToMe.loop();</code></p>
+<p class="textNormal">	Notice the absence of classical loop. The method "loop()" is indeed asynchronously called from itself; it is not really recursivity since it does not have the drawback of the stack growing.
+	It features an important advantage: the AO will remain reactive to other calls 	being sent to him. Moreover, it eases reuse since it is not necessary
+	to explicitly encode within the main SPMD loop all the messages that
+	have to be taken into account. It also facilitates composition
+	since services can be called by activities outside the SPMD group,
+	they will be automatically executed by the FIFO service of the Active
+	Object.</p>
+
+<p class="textNormal">	The method "buildNeighborhood ()" is called only once for
+	initialization. Using a 2D topology (Plan), it constructs references
+	to north, south, west, east neighbors -- attributes with respective
+	names. It also construct dynamically the group of neighbors. Starting
+	from an empty group of type SubMatrix</p>
+<p class="textNormal"><code>		this.neighbors = (SubMatrix) ProActiveGroup.newGroup</code></p>
+<p class="textNormal"><code>						(SubMatrix.class.getName());</code></p>
+<p class="textNormal">	such typed view of the group is used to get the group view:
+		Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors);
+	Then, the appropriate neighbors are added dynamically in the group,
+	e.g.:</p>
+<p class="textNormal">		<code>neighborsGroup.add(this.north);</code></p>
+<p class="textNormal">	Again, the classes managing topologies will permit to simplify this
+	code.</p>
+
+<p class="textNormal">	The group of neighbors built above is important wrt synchronization.
+	Below in method "loop()", an efficient barrier is achieved only using
+	the direct neighbors:</p>
+<p class="textNormal"><code>		ProSPMD.barrier("SynchronizationWithNeighbors"+
+				this.iterationsToStop,
+				this.neighbors);</code></p>
+<p class="textNormal">	This barrier takes as a parameter the group to synchronize with: it
+	will be passed only when the 4 neighbors in the current 2D example
+	have reached the same point. Adding the rank of the current iteration
+	allows to have a unique identifier for each instance of the barrier.</p>
+<p class="textNormal">	Try to change the barrier instruction to a total barrier:</p>
+<p class="textNormal">		<code>ProSPMD.barrier("SynchronizationWithNeighbors"+ this.iterationsToStop);</code></p>
+<p class="textNormal">	Then recompile and execute again. Using IC2D observe that many more
+	communications are necessary.
+</p>
+<p class="textNormal">	In order to get details and documentation on Groups and OO SPMD, have a
+	look at:</p>
+<p class="textNormal"><code>	ProActive/src/org/objectweb/proactive/doc-files/</code></p>
+<p class="textNormal">	<code>				TypedGroupCommunication.html</code></p>
+<p class="textNormal">	<code>				OOSPMD.html</code></p>
+
+
+<h3 class="textNormal">3.3 Adding a Method barrier for a step by step execution</h3>
+<p class="textNormal">	Let say we would like to control step by step the execution of the
+	SPMD code. We will add a barrier in the SubMatrix.java, and control
+	the barrier from input in the Jacobi.java class.</p>
+
+<p class="textNormal">	In class SubMatrix.java, add a Method <code>barrier()</code> of the form:</p>
+<p class="textNormal">	<code>		String[] st= new String[1];</code></p>
+<p class="textNormal">	<code>		st[0]="keepOnGoing";</code></p>
+<p class="textNormal">	<code>		ProSPMD.barrier(st);</code></p>
+<p class="textNormal">	Do not forget to define the <code>keepOnGoing()</code> method that indeed can
+	return void, and just be empty. Find the appropriate place to call
+	the <code>barrier()</code> Method in the <code>loop()</code> Method.</p>
+
+<p class="textNormal">	In class Jacobi.java, just after the <code>compute()</code> Method, add an
+	infinite loop that, upon a user's return key pressed, calls the method <code>keepOnGoing()</code>
+	on the SPMD group "matrix". Here are samples of the code:</p>
+<p class="textNormal">	<code>		while (true) {</code></p>
+<p class="textNormal">	<code>		    printMessageAndWait();</code></p>
+<p class="textNormal">		<code>	    matrix.keepOnGoing();</code></p>
+<p class="textNormal">		<code>	}</code></p>
+<p class="textNormal"><code>		...</code></p>
+<p class="textNormal"> <code>	  	private static void printMessageAndWait() {</code></p>
+<p class="textNormal">	<code>		java.io.BufferedReader d = new java.io.BufferedReader(</code></p>
+<p class="textNormal">	<code>				new java.io.InputStreamReader(System.in));</code></p>
+<p class="textNormal">	<code>		System.out.println("   --> Press return key to continue");</code></p>
+<p class="textNormal">	<code>		System.out.println("         or Ctrl c to stop.");</code></p>
+<p class="textNormal">	<code>		try { </code></p>
+<p class="textNormal">	<code>		    d.readLine(); </code></p>
+<p class="textNormal">		<code>	} catch (Exception e) {</code></p>
+<p class="textNormal">	<code>		}</code></p>
+<p class="textNormal"><code>		} </code></p>
+<p class="textNormal">	Recompile, and execute the code. Each iteration needs to be activated
+	by hitting the return key in the shell window where Jacobi was launched.
+	Start IC2D (./ic2d.sh or ic2d.bat), and visualize the communications as you control them. Use
+	the "Reset Topology" button to clear communication arcs. The green and
+	red dots indicate the pending requests.</p>
+
+<p class="textNormal">	You can imagine and test other modifications to the Jacobi code.</p>
+<p class="textNormal"><center><img src="pics/screenshots/jacobiic2d.png"></center></p>
+
+<h3 class="textNormal">4. Virtual Nodes and Deployment descriptors</h3>
+
+
+<h3 class="textNormal">4.1 Virtual Nodes</h3>
+<p class="textNormal">	Get back to the source code of Jacobi.java, and understand where and
+	how the Virtual Nodes and Nodes are being used.
+<h3 class="textNormal">4.2 XML Descriptors</h3>
+<p class="textNormal">The XML descriptor being used is:
+<p class="textNormal"><code>		ProActive/descriptors/Matrix.xml</code>
+<p class="textNormal">	Look for and understand the following definitions:
+<p class="textNormal"><code>		- Virtual Node Definition</code>
+<p class="textNormal"><code>		- Mapping of Virtual Nodes to JVM</code>
+<p class="textNormal"><code>		- JVM Definition</code>
+<p class="textNormal"><code>		- Process Definition</code>
+<p class="textNormal">	A detailed presentation of XML descriptors is available at:
+<p class="textNormal"><code>		ProActive/docs/api/index.html</code>
+<p class="textNormal">	entry     9.   	XML Deployment Descriptors
+
+<h3 class="textNormal">4.3 Changing the descriptor</h3>
+<p class="textNormal">Edit the file Matrix.xml in order to change the number of JVMs being
+	used. For instance, if your machine is powerful enough, start 9
+	JVMs, in order to have a single SubMatrix per JVM.</p>
+<p class="textNormal"><center><img src="pics/screenshots/jacobiic2d9vm.png"></center></p>
+
+<p class="textNormal">	You do not need to recompile, just restart the execution. Use IC2D
+	to visualize the differences in the configuration.</p>
+
+<h3 class="textNormal">5. Execution on several machines and Clusters</h3>
+
+<h3 class="textNormal">5.1 Execution on several machines in the room</h3>
+<p class="textNormal">	Associate with several persons or use several machines, and modify the
+	file</p>
+<p class="textNormal">		<code>		ProActive/examples/descriptors/Matrix.xml</code></p>
+<p class="textNormal">	in order to launch the Jacobi computation on several machines.
+	You can use IC2D to visualize the machines and the JVMs being launched
+	on them.</p>
+<h3 class="textNormal">5.2 Execution on Clusters</h3>
+<p class="textNormal">If you have access to your own clusters, configure the XML descriptor
+	 to launch the Jacobi on them, using the appropriate protocol:</p>
+<p class="textNormal">		ssh, LSF, PBS, Globus, etc.</p>
+<p class="textNormal">	Have a look at</p>
+<p class="textNormal"><code>ProActive/docs/api/org/objectweb/proactive/doc-files/Descriptor.html</code></p>
+<p class="textNormal">	to get the format of the XML descriptor for each of the supported
+	protocols.</p>
+
+<p align="right" class="textNormal">&nbsp;</p>
+</body>
+</html>
