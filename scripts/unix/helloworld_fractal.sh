@@ -20,6 +20,7 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
+JAVACMD=$JAVACMD" -Dfractal.provider=org.objectweb.proactive.core.component.Fractive"
 
 $JAVACMD org.objectweb.proactive.examples.components.helloworld.HelloWorld $1 $2 $3
 
