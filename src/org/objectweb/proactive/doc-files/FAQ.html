@@ -54,6 +54,7 @@ about asm?</a></li>
 about bcel ?</a></li>
  <li class="textNormal"><a href="#javaSecurity">Why do I get an exception
 java.security.AccessControlException access denied ?</a></li>
+<li class="textNormal"><a href="#win">Why examples and compilation do not work under Windows?</a></li>
  <li class="textNormal"><a href="#nodeCreation">How does the node creation
 happen ?</a></li>
  <li class="textNormal"><a href="#rmiregistryCreation">How does the RMI Registry
@@ -225,7 +226,20 @@ the property <code>-Djava.security.policy</code>. For instance : </p>
 
  Question
 
---> <li class="textNormal"><a
+--> 
+<li class="textNormal"><a name="win">
+    <h3>Why examples and compilation do not work under Windows?</h3>
+    </a> 
+<p class="textNormal">
+It happens quite often, that the default installation directory under Windows is under Program Files which contains space. Then setting the JAVA_HOME
+environment variable to the install directory, might be a problem for bat files(all windows examples, and compilation are ran with bat files). 
+To get rid of those problems, the best thing is to install jdk in a directory whose name does not contain  spaces such as C:\java\j2sdk.... or D:\java\j2sdk... and then to set the JAVA_HOME environment variable accordingly: set JAVA_HOME=C:\java\j2sdk... Another solution  is to do a copy paste of the command defined in the bat file in the DOS window. 
+</p>
+<!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+    </li>
+<li class="textNormal"><a
  name="nodeCreation">
     <h3>How does the node creation happen ?</h3>
     </a> 
