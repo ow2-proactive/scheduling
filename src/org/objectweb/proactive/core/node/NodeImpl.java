@@ -44,10 +44,30 @@ import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
+/**
+ * <p>
+ * A <code>Node</code> offers a set of services needed by ProActive to work with
+ * remote JVM. Each JVM that is aimed to hold active objects should contains at least
+ * one instance of the node class. That instance, when created, will be registered
+ * to some registry where it is possible to perform a lookup (such as the RMI registry).
+ * </p><p>
+ * When ProActive needs to interact with a remote JVM, it will lookup for one node associated
+ * with that JVM (using typically the RMI Registry) and use this node to perform the interaction.
+ * </p><p>
+ * We expect several concrete implementations of the Node to be wrtten such as a RMI node, a JINI node ...
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.1,  2002/08/28
+ * @since   ProActive 0.9
+ *
+ */
 
 public class NodeImpl implements Node, Serializable
-{
 
+{
+	
+	
 	protected NodeInformation nodeInformation;
 	protected ProActiveRuntime proActiveRuntime;
 	//
