@@ -19,6 +19,7 @@
 		<pathelement location="${base}/classes"/>
 		<fileset dir="${base}/lib">
 			<include name="*.jar"/>
+			<include name="components/*.jar"/>
 		</fileset>
 	</path>
 	<path id="test.classpath">
