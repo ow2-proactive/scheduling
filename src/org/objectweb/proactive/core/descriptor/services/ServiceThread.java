@@ -32,15 +32,23 @@ package org.objectweb.proactive.core.descriptor.services;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.util.Vector;
 
 
 /**
@@ -49,6 +57,9 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since   ProActive 2.0.1
  */
 public class ServiceThread extends Thread {
+    private static final long LOOK_UP_FREQ = new Long(System.getProperty(
+                P2PConstants.PROPERTY_LOOKUP_FREQ)).longValue();
+    private static final int MAX_NODE = P2PConstants.MAX_NODE;
     private VirtualNode vn;
     private UniversalService service;
     private VirtualMachine vm;
@@ -71,23 +82,39 @@ public class ServiceThread extends Thread {
 
         try {
             part = service.startService();
-            nodeCount = nodeCount + part.length;
-            notifyVirtualNode(part);
-            if (service.getServiceName().equals("P2PLookup")) {
-                this.P2Ptimeout = ((P2PLookupService) service).getTimeout();
-                this.nodeRequested = ((P2PLookupService) service).getNodeNumber();
+            nodeCount = nodeCount + ((part != null) ? part.length : 0);
+            if (part != null) {
+                notifyVirtualNode(part);
+            }
+            if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
+                // Start asking nodes
+                P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
+                P2PNodesLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
+                        this.vn.getName(), this.vn.getJobID());
+                this.P2Ptimeout = Long.parseLong(System.getProperty(
+                            P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+                this.nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
                 // if the timeout of the service is longer than the vn's one
                 // then adjust the vn's timeout.
                 long vnTimeout = vn.getTimeout();
-
                 if (vnTimeout < P2Ptimeout) {
                     ((VirtualNodeImpl) vn).setTimeout(P2Ptimeout, false);
                 }
                 while (!timeoutExpired() && askForNodes()) {
-                    Thread.sleep(((P2PLookupService) service).getLookupFrequence());
-                    part = service.startService();
-                    nodeCount = nodeCount + part.length;
-                    notifyVirtualNode(part);
+                    Vector future = p2pNodesLookup.getAndRemoveNodes();
+                    Vector nodes = (Vector) ProActive.getFutureValue(future);
+                    for (int i = 0; i < nodes.size(); i++) {
+                        Node node = (Node) nodes.get(i);
+                        nodeCount++;
+                        ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
+                                vn, NodeCreationEvent.NODE_CREATED, node,
+                                nodeCount));
+                    }
+                    if (askForNodes() && (nodeCount != 0)) {
+                        Thread.sleep(LOOK_UP_FREQ);
+                    } else if (askForNodes()) {
+                        Thread.sleep(100);
+                    }
                 }
             }
         } catch (ProActiveException e) {
@@ -123,8 +150,7 @@ public class ServiceThread extends Thread {
             return false;
         } else {
             if (timeout == 0) {
-                this.timeout = System.currentTimeMillis() +
-                    ((P2PLookupService) service).getTimeout();
+                this.timeout = System.currentTimeMillis() + this.P2Ptimeout;
             }
             long currentDate = System.currentTimeMillis();
             return currentDate > timeout;
@@ -136,7 +162,7 @@ public class ServiceThread extends Thread {
      * @return true if there are still nodes expected
      */
     private boolean askForNodes() {
-        if (nodeRequested == ((P2PLookupService) service).getMAX()) {
+        if (nodeRequested == ((P2PDescriptorService) service).getMAX()) {
             // nodeRequested = -1 means try to get the max number of nodes
             return true;
         } else {

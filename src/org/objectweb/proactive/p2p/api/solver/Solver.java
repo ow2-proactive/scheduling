@@ -28,15 +28,15 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.solver;
+package org.objectweb.proactive.p2p.api.solver;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.p2p.core.problem.Problem;
-import org.objectweb.proactive.p2p.core.problem.Result;
-import org.objectweb.proactive.p2p.core.worker.Worker;
+import org.objectweb.proactive.p2p.api.problem.Problem;
+import org.objectweb.proactive.p2p.api.problem.Result;
+import org.objectweb.proactive.p2p.api.worker.Worker;
 
 
 /**

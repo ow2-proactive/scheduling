@@ -28,15 +28,42 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.load;
+package org.objectweb.proactive.p2p.service.exception;
 
 
 /**
  * @author Alexandre di Costanzo
  *
+ * Created on Jan 11, 2005
  */
-public interface Load {
-    public void setLoad(int load);
+public class P2POldMessageException extends Exception {
 
-    public int getLoad();
+    /**
+     *
+     */
+    public P2POldMessageException() {
+        super();
+    }
+
+    /**
+     * @param message
+     */
+    public P2POldMessageException(String message) {
+        super(message);
+    }
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public P2POldMessageException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param cause
+     */
+    public P2POldMessageException(Throwable cause) {
+        super(cause);
+    }
 }

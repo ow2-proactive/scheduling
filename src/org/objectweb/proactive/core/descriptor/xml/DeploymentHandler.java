@@ -286,7 +286,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                     "VirtualMachine defined without name");
             }
             currentVM = proActiveDescriptor.createVirtualMachine(vmName);
-            String nodeNumber = attributes.getValue("nodeNumber");
+            String nodeNumber = attributes.getValue("askedNodes");
             try {
                 if (checkNonEmpty(nodeNumber)) {
                     currentVM.setHostsNumber(nodeNumber);

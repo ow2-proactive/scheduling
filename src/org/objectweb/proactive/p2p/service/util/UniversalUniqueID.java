@@ -28,51 +28,61 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.problem;
+package org.objectweb.proactive.p2p.service.util;
 
 import java.io.Serializable;
+import java.util.Random;
 
 
 /**
  * @author Alexandre di Costanzo
  *
+ * Created on Feb 7, 2005
  */
-public abstract class Result implements Serializable {
-    private Object result = null;
-
-    public Result() {
-        // empty constructor
-    }
-
-    public Result(Object result) {
-        this.result = result;
-    }
-
-    public abstract boolean isBetterThanMe(Result other);
+public class UniversalUniqueID implements Serializable {
+    private static Random _RandomForSpace = new Random();
+    private static Random _RandomForTime = new Random();
+    private String uniqueId = null;
 
     /**
-     * @return Returns the result.
+     * @param uniqueId
      */
-    public Object getResult() {
-        try {
-            return this.result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+    protected UniversalUniqueID(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    /**
+     * @return an universal unique ID.
+     */
+    public static UniversalUniqueID randomUUID() {
+        String uniqueId = Long.toHexString(System.currentTimeMillis()) + "-" +
+            Long.toHexString(_RandomForSpace.nextLong()) + "-" +
+            Long.toHexString(_RandomForTime.nextLong());
+        return new UniversalUniqueID(uniqueId);
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object obj) {
+        if (obj instanceof UniversalUniqueID) {
+            return this.uniqueId.equals(((UniversalUniqueID) obj).uniqueId);
+        } else {
+            return false;
         }
     }
 
     /**
-     * @param result The result to set.
+     * @see java.lang.Object#hashCode()
      */
-    public void setResult(Object result) {
-        this.result = result;
+    public int hashCode() {
+        return this.uniqueId.hashCode();
     }
-    
+
     /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
-        return this.result.toString();
+        return this.uniqueId;
     }
 }

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.services.P2PLookupService;
+import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -52,7 +52,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         super(false);
         this.pad = pad;
         this.addHandler(RMI_LOOKUP_TAG, new RMILookupHandler());
-        this.addHandler(P2P_LOOKUP_TAG, new P2PLookupHandler());
+        this.addHandler(P2P_SERVICE_TAG, new P2PServiceHandler());
     }
 
     /* (non-Javadoc)
@@ -84,10 +84,10 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         }
     } // end of inner class RMILookupHandler
 
-    protected class P2PLookupHandler extends PassiveCompositeUnmarshaller {
-        protected P2PLookupService p2pService;
+    protected class P2PServiceHandler extends PassiveCompositeUnmarshaller {
+        protected P2PDescriptorService p2pDescriptorService;
 
-        public P2PLookupHandler() {
+        public P2PServiceHandler() {
             super(false);
             CollectionUnmarshaller ch = new CollectionUnmarshaller(String.class);
             ch.addHandler(PEER_TAG, new SingleValueUnmarshaller());
@@ -96,47 +96,50 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
 
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
-            p2pService = new P2PLookupService();
-            String nodeNumberMax = attributes.getValue("nodeNumber");
-            if (checkNonEmpty(nodeNumberMax)) {
-                if (nodeNumberMax.equals("MAX")) {
-                    p2pService.setNodeNumberToMAX();
+            p2pDescriptorService = new P2PDescriptorService();
+            String askedNodes = attributes.getValue("nodesAsked");
+            if (checkNonEmpty(askedNodes)) {
+                if (askedNodes.equals("MAX")) {
+                    p2pDescriptorService.setNodeNumberToMAX();
                 } else {
-                    p2pService.setNodeNumber(new Integer(nodeNumberMax).intValue());
+                    p2pDescriptorService.setNodeNumber(Integer.parseInt(askedNodes));
                 }
             }
 
-            //            String minNodeNumber = attributes.getValue("minNodeNumber");
-            //            if(checkNonEmpty(minNodeNumber)){
-            //                p2pService.setMinNodeNumber(new Integer(minNodeNumber).intValue());
-            //            }
-            String timeout = attributes.getValue("timeout");
-            if (checkNonEmpty(timeout)) {
-                if (timeout.equals("MAX")) {
-                    // -1 means infinite timeout
-                    p2pService.setTimeout(new Integer(-1).longValue());
-                } else {
-                    p2pService.setTimeout(new Integer(timeout).longValue());
-                }
+            String acq = attributes.getValue("acq");
+            if (checkNonEmpty(acq)) {
+                p2pDescriptorService.setAcq(acq);
             }
-            String lookupFrequence = attributes.getValue("lookupFrequence");
-            if (checkNonEmpty(lookupFrequence)) {
-                p2pService.setLookupFrequence(new Integer(lookupFrequence).intValue());
+
+            String port = attributes.getValue("port");
+            if (checkNonEmpty(port)) {
+                p2pDescriptorService.setPort(port);
             }
-            String TTL = attributes.getValue("TTL");
-            if (checkNonEmpty(TTL)) {
-                p2pService.setTTL(new Integer(TTL).intValue());
+
+            String noa = attributes.getValue("NOA");
+            if (checkNonEmpty(noa)) {
+                p2pDescriptorService.setNoa(noa);
+            }
+
+            String ttu = attributes.getValue("TTU");
+            if (checkNonEmpty(ttu)) {
+                p2pDescriptorService.setTtu(ttu);
+            }
+
+            String ttl = attributes.getValue("TTL");
+            if (checkNonEmpty(ttl)) {
+                p2pDescriptorService.setTtl(ttl);
             }
         }
 
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             String[] peerList = (String[]) activeHandler.getResultObject();
-            p2pService.setPeerList(peerList);
+            p2pDescriptorService.setPeerList(peerList);
         }
 
         public Object getResultObject() throws org.xml.sax.SAXException {
-            return p2pService;
+            return p2pDescriptorService;
         }
 
         private class SingleValueUnmarshaller extends BasicUnmarshaller {
@@ -145,5 +148,5 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 setResultObject(value);
             }
         }
-    } // end of inner class P2PLookupHandler
+    } // end of inner class P2PServiceHandler
 }

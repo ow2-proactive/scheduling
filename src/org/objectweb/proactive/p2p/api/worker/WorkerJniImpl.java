@@ -28,13 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.worker;
+package org.objectweb.proactive.p2p.api.worker;
+
 
 /**
- * Add communications features for Workers.
- * 
  * @author Alexandre di Costanzo
  *
  */
-public interface Communication {
+public class WorkerJniImpl {
 }

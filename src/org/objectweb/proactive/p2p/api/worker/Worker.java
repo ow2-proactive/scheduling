@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.worker;
+package org.objectweb.proactive.p2p.api.worker;
 
 import org.apache.log4j.Logger;
 
@@ -44,11 +44,10 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.p2p.core.problem.Problem;
-import org.objectweb.proactive.p2p.core.problem.Result;
-import org.objectweb.proactive.p2p.core.service.P2PService;
-import org.objectweb.proactive.p2p.core.service.P2PServiceImpl;
+import org.objectweb.proactive.p2p.api.problem.Problem;
+import org.objectweb.proactive.p2p.api.problem.Result;
+import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
 
 import java.io.Serializable;
 
@@ -82,13 +81,15 @@ public class Worker implements Serializable, InitActive {
         return result;
     }
 
-    private ProActiveRuntime[] booking;
+    private P2PNodesLookup booking;
 
     public int getPeers(int n) throws ProActiveException {
         System.out.println("On cherche les peers");
-        this.booking = this.service.getProActiveJVMs(n, 1);
+        // this.booking = this.service.getNodes(n, null, null);
         System.out.println("C'est bon j'a la reservation");
-        return this.booking.length;
+        this.booking.allArrived();
+        //return this.booking.size();
+        return 0;
     }
 
     public void relaxPeers() {
@@ -101,20 +102,8 @@ public class Worker implements Serializable, InitActive {
      */
     public void createDaughter(Object[][] params) throws ProActiveException {
         // Nodes Creation
-        Node[] nodes = new Node[this.booking.length];
-        for (int i = 0; i < nodes.length; i++) {
-            try {
-                nodes[i] = NodeFactory.getNode(this.booking[i].createLocalNode(
-                            "Node" + i, false, null,
-                            this.booking[i].getVMInformation().getName(),
-                            this.booking[i].getJobID()));
-            } catch (NodeException e) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("Couldn't create on node on remote JVM", e);
-                }
-            }
-        }
-
+        //Node[] nodes = (Node[]) this.booking.toArray(new Node[this.booking.size()]);
+        Node[] nodes = null;
         try {
             // Group Creation
             Object[][] paramsGroup = new Object[params.length][1];
@@ -153,7 +142,7 @@ public class Worker implements Serializable, InitActive {
             System.out.println("J'attends...");
             Body body = ProActive.getBodyOnThis();
             Service service = new Service(body);
-            System.out.println(">>>>Service"+service.getOldest());
+            System.out.println(">>>>Service" + service.getOldest());
             service.blockingServeOldest();
         }
         return this.problem.gather((Result[]) ProActiveGroup.getGroup(results)
@@ -246,7 +235,7 @@ public class Worker implements Serializable, InitActive {
         try {
             Node p2pNode = NodeFactory.getNode("rmi://localhost:2410/" +
                     P2PService.P2P_NODE_NAME);
-            Object[] ao = p2pNode.getActiveObjects(P2PServiceImpl.class.getName());
+            Object[] ao = p2pNode.getActiveObjects(P2PService.class.getName());
             this.service = (P2PService) ao[0];
         } catch (NodeException e) {
             logger.fatal("Couldn't found a P2P Node on this host", e);

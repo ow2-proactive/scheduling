@@ -30,13 +30,16 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.services.P2PLookupService;
+import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
+import org.objectweb.proactive.core.event.NodeCreationEventListener;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
@@ -56,14 +59,19 @@ import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.Loggers;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.io.Serializable;
 
 import java.security.cert.X509Certificate;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -78,7 +86,7 @@ import java.util.Hashtable;
  */
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
-        ServiceUser {
+        NodeCreationEventListener, ServiceUser {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -145,6 +153,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private PolicyServer policyServer;
     private String policyServerFile;
     private String jobID = ProActive.getJobId();
+    private Vector p2pNodes = new Vector();
+
+    /** Logger */
+    private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -317,7 +329,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public int getNumberOfCurrentlyCreatedNodes() {
         return nbCreatedNodes;
     }
-    
+
     /*
      *  (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCreatedNodesAfterDeployment()
@@ -330,7 +342,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
         return nbCreatedNodes;
     }
-
 
     /**
      * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor
@@ -453,7 +464,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 //we have to be carefull. Indeed if the node is local, we do not
                 // want to kill the runtime, otherwise the application is over
                 // so if the node is local, we just unregister this node from any registry
-                if (!NodeFactory.isNodeLocal(node)) {
+                if (!NodeFactory.isNodeLocal(node) && !this.isP2pNode(node)) {
                     try {
                         part.killRT(softly);
                     } catch (ProActiveException e1) {
@@ -465,13 +476,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                 part.getVMInformation().getInetAddress()) +
                             " terminated!!!");
                     }
-                } else {
+                } else if (!this.isP2pNode(node)) {
                     try {
                         //					the node is local, unregister it.
                         part.killNode(node.getNodeInformation().getURL());
                     } catch (ProActiveException e) {
                         e.printStackTrace();
                     }
+                } else {
+                    // it's a p2p node
+                    this.killP2PNode(node);
                 }
             }
             isActivated = false;
@@ -492,6 +506,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             proActiveRuntimeImpl.unregisterVirtualNode(this.name);
         }
+    }
+
+    /**
+     * @param node the node to test.
+     * @return true if the node was get from a P2P networks.
+     */
+    private boolean isP2pNode(Node node) {
+        return this.p2pNodes.contains(node);
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
@@ -633,7 +655,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.warn("port unknown: " + port);
             }
 
-            // it is the only way to get accurate value of nodeNumber
+            // it is the only way to get accurate value of askedNodes
             VirtualMachine vm = (VirtualMachine) awaitedVirtualNodes.get(event.getCreatorID());
             int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
             for (int i = 1; i <= nodeNumber; i++) {
@@ -686,7 +708,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
      */
     public void setService(UniversalService service) {
-        
     }
 
     /**
@@ -903,7 +924,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             vm.setProcess(copyProcess);
             return copyProcess;
         } else {
-            //increment the node count by nodeNumber
+            //increment the node count by askedNodes
             increaseNumberOfNodes(new Integer(vm.getNodeNumber()).intValue());
             return process;
         }
@@ -926,7 +947,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
-            logger.debug("nodeNumber " + nodeNumber);
+            logger.debug("askedNodes " + nodeNumber);
         }
 
         while (ExternalProcessDecorator.class.isInstance(processImpl)) {
@@ -949,7 +970,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNumberOfNodes((new Integer(prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                increaseNumberOfNodes((new Integer(
+                        prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         prun.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof PBSSubProcess) {
@@ -963,7 +985,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNumberOfNodes((new Integer(pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                increaseNumberOfNodes((new Integer(
+                        pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         pbs.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof OARSubProcess) {
@@ -1135,12 +1158,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // the same service this might lead to unexpected behaviour
         UniversalService copyService = (UniversalService) makeDeepCopy(service);
         vm.setService(copyService);
-        if (service.getServiceName().equals("P2PLookup")) {
-            int nodeRequested = ((P2PLookupService) service).getNodeNumber();
+        if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
+            int nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
 
             // if it is a P2Pservice we must increase the node count with the number
             // of nodes requested
-            if (nodeRequested != ((P2PLookupService) service).getMAX()) {
+            if (nodeRequested != ((P2PDescriptorService) service).getMAX()) {
                 increaseNumberOfNodes(nodeRequested);
                 //nodeRequested = MAX means that the service will try to get every nodes 
                 // it can. So we can't predict how many nodes will return.
@@ -1170,5 +1193,50 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
+    }
+
+    /**
+     * Use for p2p infrastructure to get nodes.
+     * @see org.objectweb.proactive.core.event.NodeCreationEventListener#nodeCreated(org.objectweb.proactive.core.event.NodeCreationEvent)
+     */
+    public void nodeCreated(NodeCreationEvent event) {
+        Node newNode = event.getNode();
+        this.createdNodes.add(newNode);
+        this.p2pNodes.add(newNode);
+        nbCreatedNodes++;
+        nodeCreated = true;
+        //notify all listeners that a node has been created
+        notifyListeners(this, NodeCreationEvent.NODE_CREATED, newNode,
+            nbCreatedNodes);
+    }
+
+    /**
+     * Kill the given p2p node.
+     * @param node the node to kill.
+     */
+    private void killP2PNode(Node node) {
+        String nodeUrl = node.getNodeInformation().getURL();
+
+        // Get remote reference to the node manager
+        ProActiveRuntime remoteRuntime = node.getProActiveRuntime();
+        ArrayList remoteAO = null;
+        try {
+            remoteAO = remoteRuntime.getActiveObjects(P2PConstants.P2P_NODE_NAME,
+                    P2PNodeManager.class.getName());
+        } catch (ProActiveException e) {
+            P2P_LOGGER.warn("Couldn't get reference to remote node manager at " +
+                nodeUrl, e);
+        }
+        if (remoteAO.size() == 1) {
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
+            remoteNodeManager.leaveNode(node);
+            if (P2P_LOGGER.isInfoEnabled()) {
+                P2P_LOGGER.info("Node at " + nodeUrl + " succefuly killed");
+            }
+        } else {
+            P2P_LOGGER.warn(
+                "Couldn't kill remote node: no remote node manager found at " +
+                nodeUrl);
+        }
     }
 }

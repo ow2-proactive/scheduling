@@ -1,15 +1,16 @@
-package org.objectweb.proactive.p2p.core.daemon;
+package org.objectweb.proactive.p2p.daemon;
 
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.ProActiveLogger;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.StreamReader;
-import org.objectweb.proactive.p2p.core.service.StartP2PService;
+import org.objectweb.proactive.p2p.service.StartP2PService;
 
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -641,7 +642,7 @@ public class Daemon {
 
         RollingFileAppender rfa;
         try {
-           new File(LOG_DIR).mkdir();
+            new File(LOG_DIR).mkdir();
             rfa = new RollingFileAppender(layout, filename, true);
         } catch (IOException ioe) {
             ioe.printStackTrace();
@@ -856,7 +857,11 @@ public class Daemon {
     private void startWorking() {
         log("Start to work", false);
         StartP2PService service = new StartP2PService(url);
-        service.start();
+        try {
+            service.start();
+        } catch (ProActiveException e) {
+            logger.warn("Couldn't start the P2P Service", e);
+        }
     }
 
     public static void main(String[] args) {

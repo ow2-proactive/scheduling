@@ -28,4 +28,4 @@ exec nice -19 java -cp $CLASSPATH                               \
                    -Djava.security.manager                      \
                    -Djava.security.policy=proactive.java.policy \
                    -Dlog4j.configuration=proactive-log4j        \
-                   org.objectweb.proactive.p2p.core.daemon.Daemon "$@"
+                   org.objectweb.proactive.p2p.daemon.Daemon "$@"

@@ -28,12 +28,51 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.worker;
+package org.objectweb.proactive.p2p.api.problem;
+
+import java.io.Serializable;
 
 
 /**
  * @author Alexandre di Costanzo
  *
  */
-public class WorkerJniImpl {
+public abstract class Result implements Serializable {
+    private Object result = null;
+
+    public Result() {
+        // empty constructor
+    }
+
+    public Result(Object result) {
+        this.result = result;
+    }
+
+    public abstract boolean isBetterThanMe(Result other);
+
+    /**
+     * @return Returns the result.
+     */
+    public Object getResult() {
+        try {
+            return this.result;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * @param result The result to set.
+     */
+    public void setResult(Object result) {
+        this.result = result;
+    }
+    
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return this.result.toString();
+    }
 }

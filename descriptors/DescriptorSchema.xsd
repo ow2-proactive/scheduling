@@ -351,7 +351,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="ServiceDefinitionType">
 		<xs:choice>
 			<xs:element name="RMIRegistryLookup" type="RMIRegistryLookupType"/>
-			<xs:element name="P2PLookup" type="P2PLookupType"/>
+			<xs:element name="P2PService" type="P2PServiceType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -359,23 +359,29 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="RMIRegistryLookupType">
 		<xs:attribute name="url" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!-- P2PLookup has one child peerSet that represents a set of peer's url. It has also 4 attributes: nodeNumber that represents the number of nodes requested, timeout: the timeout of the P2P service, lookupFrequence, TTL.-->
-	<xs:complexType name="P2PLookupType">
+	<!-- P2PService has one child peerSet that represents a set of peer's url.
+	It has also 6 attributes: 
+		nodesAsked: that represents the number of nodes requested, 
+		acq: the acquisition method (rmi, http, ibis, etc.), 
+		port: the listeming port number,
+		NOA: the number of acquaintances,
+		TTU: time to update,
+		TTL: time to live.
+	-->
+	<xs:complexType name="P2PServiceType">
 		<xs:sequence>
 			<xs:element name="peerSet" type="peerSetType"/>
 		</xs:sequence>
-		<xs:attribute name="nodeNumber" use="required">
+		<xs:attribute name="nodesAsked" use="required">
 			<xs:simpleType>
 				<xs:union memberTypes="xs:positiveInteger MaxType"/>
 			</xs:simpleType>
 		</xs:attribute>
-		<xs:attribute name="timeout" use="optional">
-			<xs:simpleType>
-				<xs:union memberTypes="xs:positiveInteger MaxType"/>
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="lookupFrequence" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="NOA" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="TTU" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="TTL" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="acq" type="xs:string" use="optional"/>
+		<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">

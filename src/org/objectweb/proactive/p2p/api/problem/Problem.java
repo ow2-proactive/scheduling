@@ -28,11 +28,11 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.core.problem;
+package org.objectweb.proactive.p2p.api.problem;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.p2p.core.worker.Worker;
+import org.objectweb.proactive.p2p.api.worker.Worker;
 
 
 /**

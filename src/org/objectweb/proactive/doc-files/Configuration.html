@@ -1,164 +1,302 @@
-<!-- saved from url=(0022)http://internet.e-mail -->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>ProActive Basic Configuration</title>
-<link rel="stylesheet" href="ProActive.css">
+<!-- saved from url=(0022)http://internet.e-mail -->
+  <title>ProActive Basic Configuration</title>
+  <link rel="stylesheet" href="ProActive.css">
 </head>
-<body bgcolor="white">
-
+<body style="background-color: white;">
 <!--
  Header : start 
 ~~~ -->
 <table width="100%">
-<tr>
-<td align="left" valign="middle">
-    <table cellpadding="2" cellspacing="0" border="1">
+  <tbody>
     <tr>
-    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
-    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="OOSPMD.html">prev</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Descriptor.html">next</a>&nbsp;&nbsp;</td>
+      <td align="left" valign="middle">
+      <table border="1" cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../../../../overview-summary.html">back
+to API</a>&nbsp;&nbsp;</td>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="index.html">back to
+index</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="OOSPMD.html">prev</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="Descriptor.html">next</a>&nbsp;&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="right" valign="top"> <img
+ src="ProActiveLogo200x34.gif"></td>
     </tr>
-    </table>
-</td>
-<td  align="right" valign="top">
-<img src="ProActiveLogo200x34.gif"/>
-</td>
-</tr>
+  </tbody>
 </table>
 <hr>
 <!-- Link to index : end -->
-
 <h1>ProActive Basic Configuration</h1>
-
-
 <h2>Overview</h2>
-<p class="textNormal">
- In order to get easier and more flexible configuration in ProActive, we introduced an xml file where all ProActive related configuration is located. It represents properties that will be added to the System when an application using ProActive is launched. Some well-known properties(explained after) will determine the behaviour of ProActive services inside a global application. That file can also contain <b>user-defined</b> properties to be used in their application.
-</p><br>
+<p class="textNormal"> In
+order to get easier and more flexible configuration in ProActive, we
+introduced an xml file where all ProActive related configuration is
+located. It represents properties that will be added to the System when
+an application using ProActive is launched. Some well-known
+properties(explained after) will determine the behaviour of ProActive
+services inside a global application. That file can also contain <b>user-defined</b>
+properties to be used in their application.
+</p>
+<br>
 <h2>How does it work ?</h2>
 <p class="textNormal">
- Using this file is very straightforward, since all lines must follow the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt;<br></br>
- Those properties will be set in the System using System.setProperty(key,value) <b>if and only if</b> this property is not already set in the System.<br>
- If an application is using  ProActive, that file is loaded once when a method is called through  a ProActive "entry point". By "entry point" we mean ProActive class, NodeFactory class, RuntimeFactory class (static block in all that classes).<br>
-For instance calling  <b>ProActive.newActive or NodeFactory.getNode </b> .... loads that file. This only occurs once inside a jvm. <br></br>
-As said before this file can contain <b>user-defined</b> properties. It means that people used to run their application with:<br>
-java .... -Dprop1=value1 -Dprop2=value2 .... -Dpropn=valuen can define all their properties in the ProActive configuration file with:<br></br>
-&lt;prop <b>key</b>="prop1" <b>value</b>="value1"/&gt;<br>
-&lt;prop <b>key</b>="prop2" <b>value</b>="value2"/&gt;<br>
+Using this file is very straightforward, since all lines must follow
+the model: &lt;prop <b>key</b>="somekey"
+<b>value</b>="somevalue"/&gt;<br>
+<br>
+Those properties will be set in the System using
+System.setProperty(key,value) <b>if
+and only if</b> this property is not
+already set in the System.<br>
+If an application is using ProActive, that file is loaded once when a
+method is called through a ProActive "entry point". By "entry point" we
+mean ProActive class, NodeFactory class, RuntimeFactory class (static
+block in all that classes).<br>
+For instance calling <b>ProActive.newActive
+or NodeFactory.getNode </b> ....
+loads that file. This only occurs once inside a jvm. <br>
+<br>
+As said before this file can contain <b>user-defined</b>
+properties. It means that people used to run their application with:<br>
+java .... -Dprop1=value1 -Dprop2=value2 .... -Dpropn=valuen can define
+all their properties in the ProActive configuration file with:<br>
+<br>
+&lt;prop <b>key</b>="prop1"
+<b>value</b>="value1"/&gt;<br>
+&lt;prop <b>key</b>="prop2"
+<b>value</b>="value2"/&gt;<br>
 ...<br>
-&lt;prop <b>key</b>="propn" <b>value</b>="valuen"/&gt;<br>
+&lt;prop <b>key</b>="propn"
+<b>value</b>="valuen"/&gt;<br>
 </p>
 <h2>Where to access this file ?</h2>
 <p class="textNormal">
-There is a default file with default ProActive options located under ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml. This file is automatically copied with the same package structure under the classes directory when compiling source files with the ProActive/compile/build facility. Hence it is included in the jar file of the distribution under org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below for default options).<br></br>
-People can specify their own configuration file by running their application with proactive.configuration option, i.e <br>
-java ... <b>-Dproactive.configuration=pathToTheConfigFile</b>. In that case, the given xml file is loaded. Some ProActive properties(defined below) are required for applications using ProActive to work, so even if not defined in user config file, they will be loaded programatically with default values. So people can just ignore the config file if they are happy with the default configuration or create their own file if they want to change ProActive properties values or add their own properties <br></br>
-A specific tag: <b>&lt;ProActiveUserPropertiesFile&gt;</b> is provided in <a href="Descriptor.html">Deployment Descriptor</a> to notify remote jvms which configuration file to load once created:
-<pre>
-&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;
-...
- &lt;ProActiveUserPropertiesFile&gt;
-     &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
- &lt;/ProActiveUserPropertiesFile&gt;
-...
-&lt;/jvmProcess&gt;
- </pre>
+There is a default file with default ProActive options located under
+ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml.
+This file is automatically copied with the same package structure under
+the classes directory when compiling source files with the
+ProActive/compile/build facility. Hence it is included in the jar file
+of the distribution under
+org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See
+below for default options).<br>
+<br>
+People can specify their own configuration file by running their
+application with proactive.configuration option, i.e <br>
+java ... <b>-Dproactive.configuration=pathToTheConfigFile</b>.
+In that case, the given xml file is loaded. Some ProActive
+properties(defined below) are required for applications using ProActive
+to work, so even if not defined in user config file, they will be
+loaded programatically with default values. So people can just ignore
+the config file if they are happy with the default configuration or
+create their own file if they want to change ProActive properties
+values or add their own properties <br>
+<br>
+A specific tag: <b>&lt;ProActiveUserPropertiesFile&gt;</b>
+is provided in <a href="Descriptor.html">Deployment
+Descriptor</a> to notify remote jvms
+which configuration file to load once created:
 </p>
+<pre>&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>...<br> &lt;ProActiveUserPropertiesFile&gt;<br>     &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;<br> &lt;/ProActiveUserPropertiesFile&gt;<br>...<br>&lt;/jvmProcess&gt;<br> </pre>
 <h2>ProActive properties</h2>
 <p>
+</p>
 <ul class="listWithSpace">
-	<li class="textNormal"><b>Required</b><br></br>
-		<ul class="listWithSpace">
-			<li class="textNormal"><b>proactive.communication.protocol</b> represents the communication protocol i.e the protocol, objects on remote JVMS are exported with.  At this stage several protocols are supported: <b>RMI(rmi), HTTP(http), IBIS/RMI(ibis), SSH tunneling for RMI/HTTP(rmissh), JINI(jini)</b>. It means that once the JVM starts, Nodes, Active Objects that will be created on this JVM, will export themselves using the protocol specified in <b>proactive.communication.protocol</b> property. They will be reachable transparently through the given protocol.</li>
-			<li class="textNormal"><b>schema.validation</b>. Two values are possible:<b>enable, disable</b>. If enable, all xml files will be validated against provided schema. Default is <b>disable</b></li>
-			<li class="textNormal"><b>proactive.future.ac</b>. Two values are possible:<b>enable, disable</b> If enable, <a href="AC.html">automatic continuations</a> are activated. Default is <b>enable</b></li>
-		</ul><br></br>
-		Note that if not specified those properties are set programmatically with the default value.
-	</li><br></br>
-	<li class="textNormal"><b>Other properties</b><br></br>
-		<ul class="listWithSpace">
-			<li class="textNormal"><b>proactive.rmi.port</b> represents the port number on which to start the RMIRegistry. Default is 1099. If  an RMIRegistry is already running  on the given port, jms  use the existing registry</li>
-			<li class="textNormal"><b>proactive.http.port</b> represents the port number on which to start the HTTP server. Default is 2010. If this port is occupied by another application, the http server starts on the first free port(given port is incremented transparently)</li>
-			<li class="textNormal"><b>proactive.useIPaddress</b> if set to <b>true</b>, IP adresses will be used instead of machines names. This property is particularly usefull to deal with sites that do not host a DNS</li>
-			<li class="textNormal"><b>proactive.hostname</b> when this property is set, the host name on which the jvm is started is given by the value of the property.  This property is particularly usefull to deal with machines with two network interfaces</li>
-			<li class="textNormal"><b>proactive.locationserver</b> represents the location server class to instantiate when using Active Objects with Location Server</li>
-			<li class="textNormal"><b>proactive.locationserver.rmi</b> represents the url under which the Location Server is registered in the RMIRegistry</li>
-			<li class="textNormal"><b>fractal.provider</b> This property defines the bootstrap component for the Fractal component model</li>
-		
-		<p class="textNormal">Following properties are specific to the protocol <b><a href="SSHTunneling.html">rmissh</a> </b></p>
-		<li class="textNormal"><b>proactive.ssh.port</b>: the port number on which all the ssh daemons to
-    which this JVM must connect to are expected to listen. If this property 
-    is not set, the default is 22.</li>
-     <li class="textNormal"><b>proactive.ssh.username</b>: the username which will be used during
-    authentication with all the ssh daemons to which this JVM will need to
-    connect to. If this property is not set, the default is the user.name 
-    java property.</li>
-     <li class="textNormal"><b>proactive.ssh.known_hosts</b>: a filename which identifies the file
-    which contains the traditional ssh known_hosts list. This list of hosts
-    is used during authentication with each ssh daemon to which this JVM
-    will need to connect to. If the host key does not match the one stored
-    in this file, the authentication will fail. If this property is not
-    set, the default is System.getProperty ("user.home") + "/.ssh/known_hosts"</li>
-     <li class="textNormal"><b>proactive.ssh.key_directory</b>: a directory which is expected to contain
-    the pairs of public/private keys used during authentication. the private
-    keys must not be encrypted. The public keys filenames must match "*.pub".
-    Private keys are ignored if their associated public key is not present.
-    If this property is not set, the default is 
-    System.getProperty ("user.home") + "/.ssh/"</li>
-     <li class="textNormal"><b>proactive.tunneling.try_normal_first</b>: if this property is set to "yes",
-    the tunneling code always attempts to make a direct rmi connection to
-    the remote object before tunneling. If this property is not set, the 
-    default is not to make these direct-connection attempts.
-    This property is especially useful if you want to deploy a number of 
-    objects on a LAN where only one of the hosts needs to run with the rmissh
-    protocol to allow hosts outside the LAN to connect to this frontend host.
-    The other hosts located on the LAN can use the try_normal_first property
-    to avoid using tunneling to make requests to the LAN frontend.</li>
-     <li class="textNormal"><b>proactive.tunneling.connect_timeout</b>: this property specifies how long
-    the tunneling code will wait while trying to establish a connection to a
-    remote host before declaring that the connection failed. If this property
-    is not set, the default value is 2000ms.</li>
-     <li class="textNormal"><b>proactive.tunneling.use_gc</b>: if this property is set to "yes", the client
-    JVM does not destroy the ssh tunnels are soon as they are not used anymore.
-    They are queued into a list of unused tunnels which can be reused. If this
-    property is not set or is set to another value, the tunnels are destroyed
-    as soon as they are not needed anymore by the JVM.</li>
-     <li class="textNormal"><b>proactive.tunneling.gc_period</b>: this property specifies how long the
-    tunnel garbage collector will wait before destroying a unused tunnel. If
-    a tunnel is older than this value, it is automatically destroyed. If this
-    property is not set, the default value is 10000ms.</li>    
-		
-		<br></br>
-		Note that as mentionned above, user-defined properties can be added.
-	</li>
+  <li class="textNormal"><b>Required</b><br>
+    <br>
+    <ul class="listWithSpace">
+      <li class="textNormal"><b>proactive.communication.protocol</b>
+represents the communication protocol i.e the protocol, objects on
+remote JVMS are exported with. At this stage several protocols are
+supported: <b>RMI(rmi),
+HTTP(http), IBIS/RMI(ibis), SSH tunneling for RMI/HTTP(rmissh),
+JINI(jini)</b>. It means that once
+the JVM starts, Nodes, Active Objects that will be created on this JVM,
+will export themselves using the protocol specified in <b>proactive.communication.protocol</b>
+property. They will be reachable transparently through the given
+protocol.</li>
+      <li class="textNormal"><b>schema.validation</b>.
+Two values are possible:<b>enable,
+disable</b>. If enable, all xml
+files will be validated against provided schema. Default is <b>disable</b></li>
+      <li class="textNormal"><b>proactive.future.ac</b>.
+Two values are possible:<b>enable,
+disable</b> If enable, <a href="AC.html">automatic continuations</a>
+are activated. Default is <b>enable</b></li>
+    </ul>
+    <br>
+    <br>
+Note that if not specified those properties are set programmatically
+with the default value. </li>
+  <br>
+  <br>
+  <li class="textNormal"><b>Peer-to-Peer
+properties<a name="p2p_properties"></a></b><br>
+    <br>
+    <ul class="listWithSpace">
+      <li class="textNormal"><b>proactive.p2p.acq</b>
+is the communication protocol that's used to communicate with this P2P
+Service. All ProActive communication protocols are supported: rmi,
+http, etc. Default is rmi.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.port</b>
+represents the port number on which to start the P2P Service. Default
+is 2410. The port is used by the communication protocol.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.noa:
+Number Of Acquaintances (NOA)</b>
+is the minimal number of peers one peer needs to know to keep up the
+infrastructure. By default, its value is 10 peers.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.ttu:
+Time To Update (TTU)</b> each peer
+sends an heart beat to its
+acquaintances.
+By default, its value is 1 minutes.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.ttl:
+Time To Live (TTL)</b>
+represents messages live time in hops of JVMs (node). By default, its
+value is 5 hops. </li>
+      <li class="textNormal"><b>proactive.p2p.msg_capacity</b>
+is the maximum memory size to stock message UUID. Default value is 1000
+messages UUID.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.expl_msg</b>
+is the percentage of agree response when peer is looking for
+acquaintances. By default, its value is 66%.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.booking_max</b>
+uses during booking a shared node. It's the maximum time in millisecond
+to create at less an active object in the shared node. After this time
+and if no active objects are created the shared node will leave and the
+peer which gets this shared node will be not enable to use it more.
+Default is 3 minutes.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.nodes_acq_to</b>
+uses with descriptor file. It is the timeout in milliseconds for nodes
+acquisition. The default value is 3 minutes.<br>
+      </li>
+      <li class="textNormal"><b>proactive.p2p.lookup_freq</b>
+also uses with descriptor file. It is the lookup frequency in
+milliseconds for re-asking nodes. By default, it's value is 30 seconds.<br>
+        <br>
+      </li>
+    </ul>
+  </li>
+  <li class="textNormal"><b>Other
+properties</b><br>
+    <br>
+    <ul class="listWithSpace">
+      <li class="textNormal"><b>proactive.rmi.port</b>
+represents the port number on which to start the RMIRegistry. Default
+is 1099. If an RMIRegistry is already running on the given port, jms
+use the existing registry</li>
+      <li class="textNormal"><b>proactive.http.port</b>
+represents the port number on which to start the HTTP server. Default
+is 2010. If this port is occupied by another application, the http
+server starts on the first free port(given port is incremented
+transparently)</li>
+      <li class="textNormal"><b>proactive.useIPaddress</b>
+if set to <b>true</b>,
+IP adresses will be used instead of machines names. This property is
+particularly usefull to deal with sites that do not host a DNS</li>
+      <li class="textNormal"><b>proactive.hostname</b>
+when this property is set, the host name on which the jvm is started is
+given by the value of the property. This property is particularly
+usefull to deal with machines with two network interfaces</li>
+      <li class="textNormal"><b>proactive.locationserver</b>
+represents the location server class to instantiate when using Active
+Objects with Location Server</li>
+      <li class="textNormal"><b>proactive.locationserver.rmi</b>
+represents the url under which the Location Server is registered in the
+RMIRegistry</li>
+      <li class="textNormal"><b>fractal.provider</b>
+This property defines the bootstrap component for the Fractal component
+model</li>
+      <p class="textNormal">Following
+properties are specific to the protocol <b><a href="SSHTunneling.html">rmissh</a>
+      </b></p>
+      <li class="textNormal"><b>proactive.ssh.port</b>:
+the port number on which all the ssh daemons to which this JVM must
+connect to are expected to listen. If this property is not set, the
+default is 22.</li>
+      <li class="textNormal"><b>proactive.ssh.username</b>:
+the username which will be used during authentication with all the ssh
+daemons to which this JVM will need to connect to. If this property is
+not set, the default is the user.name java property.</li>
+      <li class="textNormal"><b>proactive.ssh.known_hosts</b>:
+a filename which identifies the file which contains the traditional ssh
+known_hosts list. This list of hosts is used during authentication with
+each ssh daemon to which this JVM will need to connect to. If the host
+key does not match the one stored in this file, the authentication will
+fail. If this property is not set, the default is System.getProperty
+("user.home") + "/.ssh/known_hosts"</li>
+      <li class="textNormal"><b>proactive.ssh.key_directory</b>:
+a directory which is expected to contain the pairs of public/private
+keys used during authentication. the private keys must not be
+encrypted. The public keys filenames must match "*.pub". Private keys
+are ignored if their associated public key is not present. If this
+property is not set, the default is System.getProperty ("user.home") +
+"/.ssh/"</li>
+      <li class="textNormal"><b>proactive.tunneling.try_normal_first</b>:
+if this property is set to "yes", the tunneling code always attempts to
+make a direct rmi connection to the remote object before tunneling. If
+this property is not set, the default is not to make these
+direct-connection attempts. This property is especially useful if you
+want to deploy a number of objects on a LAN where only one of the hosts
+needs to run with the rmissh protocol to allow hosts outside the LAN to
+connect to this frontend host. The other hosts located on the LAN can
+use the try_normal_first property to avoid using tunneling to make
+requests to the LAN frontend.</li>
+      <li class="textNormal"><b>proactive.tunneling.connect_timeout</b>:
+this property specifies how long the tunneling code will wait while
+trying to establish a connection to a remote host before declaring that
+the connection failed. If this property is not set, the default value
+is 2000ms.</li>
+      <li class="textNormal"><b>proactive.tunneling.use_gc</b>:
+if this property is set to "yes", the client JVM does not destroy the
+ssh tunnels are soon as they are not used anymore. They are queued into
+a list of unused tunnels which can be reused. If this property is not
+set or is set to another value, the tunnels are destroyed as soon as
+they are not needed anymore by the JVM.</li>
+      <li class="textNormal"><b>proactive.tunneling.gc_period</b>:
+this property specifies how long the tunnel garbage collector will wait
+before destroying a unused tunnel. If a tunnel is older than this
+value, it is automatically destroyed. If this property is not set, the
+default value is 10000ms.</li>
+      <br>
+      <br>
+Note that as mentionned above, user-defined properties can be added.
+    </ul>
+  </li>
 </ul>
-</ul>
-</p>
-
 <h2>Example</h2>
-<p class="textNormal">
-Configuration file must have following structure:
-<pre>
-&lt;ProActiveUserProperties&gt;
- &lt;properties&gt;
-  &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;
-  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;
-  &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;
-  &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
-  ....
-  &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;
-  ....
- &lt;/properties&gt;
-&lt;/ProActiveUserProperties&gt;
-</pre></p>
-<p class="textNormal">
-Note that tag <b>ProActiveUserProperties</b>,  tag <b>properties</b> and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
-</p>
+<p class="textNormal">Configuration
+file must have following structure: </p>
+<pre>&lt;ProActiveUserProperties&gt;<br> &lt;properties&gt;<br>  &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;<br>  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;<br>  &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;<br>  &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;<br>  ....<br>  &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;<br>  ....<br> &lt;/properties&gt;<br>&lt;/ProActiveUserProperties&gt;<br></pre>
+<p class="textNormal">Note
+that tag <b>ProActiveUserProperties</b>,
+tag <b>properties</b>
+and the model: &lt;prop <b>key</b>="somekey"
+<b>value</b>="somevalue"/&gt;
+are mandatory for ProActive to parse correctly the document </p>
 <!--
  Footer : start 
-~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; October 2004 INRIA All Rights Reserved.</p>
-<!-- Footer : end -->
+~~~ --> <br>
+<hr>
+<div class="textSmall" align="right">Copyright
+&copy; October 2004 INRIA All Rights Reserved.
+<!-- Footer : end --> </div>
 </body>
 </html>
