@@ -1,0 +1,91 @@
+/*
+ * Created on Aug 8, 2003
+ *
+ * To change the template for this generated file go to
+ * Window - Preferences - Java - Code Generation - Code and Comments
+ */
+package testsuite.test;
+
+import java.io.Serializable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.node.Node;
+
+
+/**
+ * @author adicosta
+ *
+ * To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Generation - Code and Comments
+ */
+public abstract class ProActiveFunctionalTest extends FunctionalTest
+    implements Serializable, InterfaceProActiveTest {
+    private Node node = null;
+
+	public ProActiveFunctionalTest() {
+ }
+
+ /**
+  *
+  */
+ public ProActiveFunctionalTest(Node node) {
+	 super("Remote Functional AbstractTest", "This test is executed in remote host.");
+	 this.node = node;
+ }
+
+ /**
+  * @param logger
+  */
+ public ProActiveFunctionalTest(Node node, Logger logger) {
+	 super(logger, "Remote  Functional AbstractTest",
+		 "This test is executed in remote host.");
+	 this.node = node;
+ }
+
+ /**
+  * @param logger
+  * @param name
+  */
+ public ProActiveFunctionalTest(Node node, Logger logger, String name) {
+	 super(logger, name, "This test is executed in remote host.");
+	 this.node = node;
+ }
+
+ /**
+  * @param name
+  * @param description
+  */
+ public ProActiveFunctionalTest(Node node, String name, String description) {
+	 super(name, description);
+	 this.node = node;
+ }
+
+ /**
+  * @param logger
+  * @param name
+  * @param description
+  */
+ public ProActiveFunctionalTest(Node node, Logger logger, String name,
+	 String description) {
+	 super(logger, name, description);
+	 this.node = node;
+ }
+
+    public void killVM() {
+        System.exit(0);
+    }
+
+    /**
+     * @return
+     */
+    public Node getNode() {
+        return node;
+    }
+
+    /**
+     * @param node
+     */
+    public void setNode(Node node) {
+        this.node = node;
+    }
+}

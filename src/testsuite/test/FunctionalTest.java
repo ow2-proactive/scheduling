@@ -1,0 +1,265 @@
+/*
+ * Created on Jul 17, 2003
+ *
+ */
+package testsuite.test;
+
+import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.log4j.Logger;
+
+import testsuite.result.TestResult;
+
+
+/**
+ * <p>Define a generic functional AbstractTest.</p>
+ * <p>If you want to use a test with the results of other tests. You must do create an action method with params.
+ * This method can return a result, it will be accessible by <code>getOut()</code>.</p>
+ * <p><b>Warning : </b> The array of tests must be in the same order of args of action method.</p>
+ * @author Alexandre di Costanzo
+ *
+ */
+public abstract class FunctionalTest extends AbstractTest
+    implements Serializable {
+
+    /** To know if the test run with success or not. If you don't run anytime a test
+            * this one is considered failed.
+            * */
+    private boolean failed = true;
+
+    /** The result of the output of the test. Only if postconditions are verified. Null if method action return void. */
+    private Object out = null;
+
+    /** Precedents tests, their out will be use in method action as parameters. Must be in the same oder of the
+     *  parameters.
+     */
+    private FunctionalTest[] tests = null;
+
+    /**
+     * Construct a new FunctionalTest.
+     */
+    public FunctionalTest() {
+        super();
+        setName("A test with no name");
+        setDescription("A test with no description.");
+    }
+
+    /**
+     * Construct a new FunctionalTest with logger.
+     * @param logger a logger.
+     */
+    public FunctionalTest(Logger logger) {
+        super(logger);
+        setName("A test with no name");
+        setDescription("A test with no description.");
+    }
+
+    /**
+     * Construct a new FunctionalTest with logger and name.
+     * @param logger a logger.
+     * @param name a name.
+     */
+    public FunctionalTest(Logger logger, String name) {
+        super(logger, name);
+        setDescription("A test with no description.");
+    }
+
+    /**
+     * Construct a new FunctionalTest with logger, name and description.
+     * @param logger a logger.
+     * @param name a name.
+     * @param description a description.
+     */
+    public FunctionalTest(Logger logger, String name, String description) {
+        super(logger, name, description);
+    }
+
+    /**
+     * Construct a new FunctionalTest with name and description.
+     * @param name a name.
+     * @param description a description.
+     */
+    public FunctionalTest(String name, String description) {
+        super(null, name, description);
+    }
+
+    /**
+     *  <p>Preconditions are not essential for a test.</p>
+     * <p>But you can override this method, it call before running a test.
+     * If preconditions are not verified the tes don't run and is failed.</p>
+     * @see testsuite.test.AbstractTest#preConditions()
+     */
+    public boolean preConditions() throws Exception {
+        return true;
+    }
+
+    /**
+     *  <p>Postconditions are not essential for a test.</p>
+     * <p>But you can override this method, it call after running a test.
+     * If postconditions are not verified the test is failed.</p>
+     * @see testsuite.test.AbstractTest#postConditions()
+     */
+    public boolean postConditions() throws Exception {
+        return true;
+    }
+
+    /**
+     *  <p>AbstractTest preconditions, run action or action with params if you write it and set the before tests
+     *  put the output in out variable and test postconditions.</p>
+     * <p>You can get the output with method <code>getOut()</code>.</p>
+     * <p>To know if a test run successfully call the method <code>isFailled()</code></p>
+     * @see testsuite.test.AbstractTest#runTest()
+     */
+    public TestResult runTest() {
+        // preconditions
+        try {
+            if (!preConditions()) {
+                failed = true;
+                return new TestResult(this, TestResult.GLOBAL_RESULT,
+                    "Preconditions not verified");
+            }
+        } catch (Exception e1) {
+            failed = true;
+            return new TestResult(this, TestResult.ERROR, "In Preconditions", e1);
+        }
+
+        // test
+        try {
+            action();
+        } catch (Exception e) {
+            failed = true;
+            return new TestResult(this, TestResult.ERROR,
+                "During the test execution", e);
+        }
+        failed = false;
+        // postconditions
+        try {
+            if (!postConditions()) {
+                failed = true;
+            }
+        } catch (Exception e1) {
+            failed = true;
+            return new TestResult(this, TestResult.ERROR, "In Postconditions",
+                e1);
+        }
+        if (failed) {
+            return new TestResult(this, TestResult.GLOBAL_RESULT,
+                "Test run with success but Postconditions not verified");
+        } else {
+            return new TestResult(this, TestResult.RESULT,
+                "Test run with success");
+        }
+    }
+
+    public TestResult runTestCascading() {
+        // preconditions
+        try {
+            if (!preConditions()) {
+                failed = true;
+                return new TestResult(this, TestResult.GLOBAL_RESULT,
+                    "Preconditions not verified");
+            }
+        } catch (Exception e1) {
+            failed = true;
+            return new TestResult(this, TestResult.ERROR, "In Preconditions", e1);
+        }
+
+        // test
+        try {
+            Method[] methods = getClass().getMethods();
+            Method actionWithParams = null;
+            for (int i = 0; i < methods.length; i++) {
+                if ((methods[i].getName().compareTo("action") == 0) &&
+                        (methods[i].getReturnType().getName().compareTo("void") != 0)) {
+                    actionWithParams = methods[i];
+                    break;
+                }
+            }
+            if (actionWithParams != null) {
+                Object[] args = null;
+                if (tests != null) {
+                    args = new Object[tests.length];
+                    for (int i = 0; i < tests.length; i++)
+                        args[i] = tests[i].getOut();
+                } else {
+                    args = new Object[1];
+                    args[0] = null;
+                }
+                out = actionWithParams.invoke(this, args);
+            } else {
+                throw new Exception("No action method with params was found");
+            }
+        } catch (Exception e) {
+            failed = true;
+            out = null;
+            if (! (e instanceof InvocationTargetException)) {
+                return new TestResult(this, TestResult.ERROR,
+                    "During the test execution", e);
+            } else {
+                return new TestResult(this, TestResult.ERROR,
+                    "During the test execution",
+                    ((InvocationTargetException) e).getTargetException());
+            }
+        }
+        failed = false;
+        // postconditions
+        try {
+            if (!postConditions()) {
+                failed = true;
+            }
+        } catch (Exception e1) {
+            failed = true;
+            out = null;
+            return new TestResult(this, TestResult.ERROR, "In Postconditions",
+                e1);
+        }
+        if (failed) {
+            return new TestResult(this, TestResult.GLOBAL_RESULT,
+                "Test run with success but Postconditions not verified");
+        } else {
+            return new TestResult(this, TestResult.RESULT,
+                "Test run with success");
+        }
+    }
+
+    /**
+     *  <p>Your test code.</p>
+     * @throws Exception if one error is up during the execution.
+     */
+    public abstract void action() throws Exception;
+
+    /**
+     * <p>To know if a test run successfully.</p>
+     * <p><b>Warning : </b>if you don't have already run the test, this method return <b>false</b>.</p>
+     * @return <b>true</b> if a test run successfully, <b>false</b> else.
+     */
+    public boolean isFailed() {
+        return failed;
+    }
+
+    /**
+     * To get the output result of action method if you use an action method with args.
+     * @return the output of your test or null.
+     */
+    public Object getOut() {
+        return out;
+    }
+
+    /**
+     * Get the precedent tests of  a test.
+     * @return the before tests.
+     */
+    public FunctionalTest[] getTests() {
+        return tests;
+    }
+
+    /**
+     * The output result of this tests will be use to run this test with action method with params.
+     * @param tests the before tests.
+     */
+    public void setTests(FunctionalTest[] tests) {
+        this.tests = tests;
+    }
+}
