@@ -109,26 +109,29 @@ public class Test extends FunctionalTest {
         String remoteURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remoteVM)
                             .getProxy()).getBody().getNodeURL();
 
-        //System.out.println("*** URL " + TestNodes.getRemoteVMNode().getNodeInformation().getURL());
-        //System.out.println("*** OA " + TestNodes.getRemoteVMNode().getActiveObjects(A.class.getName()));
-        // Add exception handler to the active object on the same VM
         //System.out.println("*** SET HANDLER IN SAME VM : " + sameURL);
-        ProActive.setExceptionHandler(HandlerCommunicationException.class,
-            ProActiveCommunicationException.class, Handler.ID_Body, sameVM);
+		ProActive.setExceptionHandler(HandlerCommunicationException.class,
+					ProActiveCommunicationException.class, Handler.ID_Code, sameVM);
+        // ProActive.setExceptionHandler(HandlerCommunicationException.class,
+         // ProActiveCommunicationException.class, Handler.ID_Body, sameVM);
         ProActive.setExceptionHandler(HandlerMigrationException.class,
             ProActiveMigrationException.class, Handler.ID_Body, sameVM);
 
         // Add exception handler to the active object on a local VM
         //System.out.println("*** SET HANDLER IN LOCAL VM : " + localURL);
-        ProActive.setExceptionHandler(HandlerCommunicationException.class,
-            ProActiveCommunicationException.class, Handler.ID_Body, localVM);
+		ProActive.setExceptionHandler(HandlerCommunicationException.class,
+					ProActiveCommunicationException.class, Handler.ID_Code, localVM);
+        // ProActive.setExceptionHandler(HandlerCommunicationException.class,
+          // ProActiveCommunicationException.class, Handler.ID_Body, localVM);
         ProActive.setExceptionHandler(HandlerMigrationException.class,
             ProActiveMigrationException.class, Handler.ID_Body, localVM);
 
         // Add exception handler to the active object on a remote VM
         //System.out.println("*** SET HANDLER IN REMOTE VM : " + remoteURL);
-        ProActive.setExceptionHandler(HandlerCommunicationException.class,
-            ProActiveCommunicationException.class, Handler.ID_Body, remoteVM);
+		ProActive.setExceptionHandler(HandlerCommunicationException.class,
+					ProActiveCommunicationException.class, Handler.ID_Code, remoteVM);
+        // ProActive.setExceptionHandler(HandlerCommunicationException.class,
+           // ProActiveCommunicationException.class, Handler.ID_Body, remoteVM);
         ProActive.setExceptionHandler(HandlerMigrationException.class,
             ProActiveMigrationException.class, Handler.ID_Body, remoteVM);
     }
@@ -137,17 +140,16 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#postConditions()
      */
     public boolean postConditions() throws Exception {
+      
         // We create on the fly two non functional exception
         ProActiveMigrationException nfeMig = new ProActiveMigrationException(null);
         ProActiveCommunicationException nfeCom = new ProActiveCommunicationException(null);
 
-        // We check if handlers table contains handlers for both migration and communication exception at active object level 
-
-        /*return (sameVM.protectedFrom(nfeCom) && sameVM.protectedFrom(nfeMig) &&
-                                 localVM.protectedFrom(nfeCom) && localVM.protectedFrom(nfeMig) &&
-                                 remoteVM.protectedFrom(nfeCom) && remoteVM.protectedFrom(nfeMig)
-                                 );
-        */
+		// Test one handler
+		//Handler handler = ProActive.searchExceptionHandler(nfeCom, remoteVM);
+		//handler.handle(nfeCom, remoteVM.getNodeUrl());
+		 
+        // We check if handlers table contains handlers for both migration and communication exceptions at any level 
         return ((ProActive.searchExceptionHandler(nfeCom, sameVM) != null) &&
         (ProActive.searchExceptionHandler(nfeMig, sameVM) != null) &&
         (ProActive.searchExceptionHandler(nfeCom, localVM) != null) &&
