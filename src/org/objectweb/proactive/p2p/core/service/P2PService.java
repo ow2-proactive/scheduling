@@ -30,11 +30,13 @@
  */
 package org.objectweb.proactive.p2p.core.service;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.p2p.core.info.Info;
 import org.objectweb.proactive.p2p.core.load.Load;
-
-import java.util.Collection;
 
 
 /**
@@ -114,8 +116,10 @@ public interface P2PService extends Load {
      *            <code>false</code> for don't register the local Service in
      *            the remote Service.
      */
+    /*
     public abstract void registerP2PService(String serviceName,
         P2PService service, int serviceLoad, boolean remoteRecord);
+        */
 
     /**
      * Unregister a remote P2P Service form this local Service.
@@ -163,7 +167,7 @@ public interface P2PService extends Load {
      * @return @throws
      *         ProActiveException
      */
-    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, String parent)
+    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, LinkedList parent)
         throws ProActiveException;
 
     /**
@@ -204,7 +208,7 @@ public interface P2PService extends Load {
      *
      * @return
      */
-    public abstract ProActiveRuntime getProActiveRuntime();
+    public abstract Object getProActiveRuntime();
 
     /**
      * @return the acquisition method of its ProActive Runtime.
@@ -215,4 +219,14 @@ public interface P2PService extends Load {
      * @return the URL of this service
      */
     public abstract String getURL();
+    
+    
+    // MODIFICATION ...............................
+    public abstract Info getInfo();
+    
+    public abstract void registerP2PService(String name, Info distInfo, boolean remoteRecord);
+    
+    public void printKnownPeer();
+       
+    
 }
