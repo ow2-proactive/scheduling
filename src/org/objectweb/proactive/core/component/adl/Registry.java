@@ -1,6 +1,32 @@
 /*
- * Created on Apr 22, 2004
- * author : Matthieu Morel
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package org.objectweb.proactive.core.component.adl;
 
@@ -13,16 +39,19 @@ import org.objectweb.fractal.util.Fractal;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.util.Hashtable;
 import java.util.Iterator;
 
 
 /**
+ * This class is a static registry used for storing component instances according to their name.
+ *
  * @author Matthieu Morel
  */
 public class Registry {
-    private static Logger logger = Logger.getLogger(Registry.class.getName());
+    private static Logger logger = ProActiveLogger.getLogger("components.adl");
     static private Registry instance = null;
     private Hashtable table;
 
@@ -30,6 +59,10 @@ public class Registry {
         table = new Hashtable();
     }
 
+    /**
+     * Returns a single instance
+     * @return the unique instance in the vm
+     */
     static public Registry instance() {
         if (instance == null) {
             instance = new Registry();
@@ -37,8 +70,8 @@ public class Registry {
         return instance;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.fractal.adl.RegistryManager#addComponent(org.objectweb.fractal.api.Component)
+    /**
+     * see {@link org.objectweb.fractal.adl.RegistryManager#addComponent(org.objectweb.fractal.api.Component)}
      */
     public void addComponent(Component component) throws ADLException {
         if (ProActiveGroup.isGroup(component)) {
@@ -56,8 +89,8 @@ public class Registry {
                 }
                 table.put(name, component);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("ADDED COMPONENT " + name +
-                        " TO THE REGISTRY");
+                    logger.debug("added component " + name +
+                        " to the local registry");
                 }
             } catch (NoSuchInterfaceException e) {
                 throw new ADLException("It is not possible to register a component without a NameController controller",
@@ -66,10 +99,18 @@ public class Registry {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.fractal.adl.RegistryManager#getComponent(java.lang.String)
+    /**
+     * see {@link org.objectweb.fractal.adl.RegistryManager#getComponent(java.lang.String)}
      */
     public Component getComponent(String name) {
         return (Component) table.get(name);
+    }
+
+    /**
+     * empties the registry
+     *
+     */
+    public void clear() {
+        table.clear();
     }
 }
