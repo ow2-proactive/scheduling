@@ -57,6 +57,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
   private transient UniversalBody body = null;
   private boolean firstBarrierCallEncountered = false;
   private boolean suspended = false;
+  private boolean specialExecution = false;
+  private String specialMethod = "";
   private int awaitedBarrierCall = 0;
   private HashMap currentBarriers = new HashMap();
   private LinkedList methodBarriers = new LinkedList();
@@ -105,6 +107,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  					this.suspended = false;
 	  				}
 	  			}
+	  			this.specialMethod = r.getMethodName();
+	  			this.specialExecution = true;
 	  		}
   		}
       }
@@ -299,13 +303,17 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
    * @return the request found in the queue.
    */
   protected Request barrierBlockingRemove() {
-	  while ((this.isEmpty() && this.shouldWait) || this.suspended) {
+	  while (((this.isEmpty() && this.shouldWait) || this.suspended) && !this.specialExecution) {
 		  if (this.hasListeners()) {
 			  this.notifyAllListeners(new RequestQueueEvent(this.ownerID, RequestQueueEvent.WAIT_FOR_REQUEST));
 		  }
 		  try {
 			  this.wait(); }
 		  catch (InterruptedException e) { }
+	  }
+	  if (this.specialExecution) {
+	  	this.specialExecution = false;
+	  	return this.blockingRemoveOldest(this.specialMethod);
 	  }
 	  return this.barrierRemoveOldest();
   }
