@@ -1204,15 +1204,14 @@ public class ProActive {
 
         // Try to get a handler from object level (active object = body or proxy)
         if (target != null) {
-            //	Get the body of the target object
-            UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
-
+            
             // target is local body (i.e. active object level) ?			
             if (target instanceof ActiveBody) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("*** SEARCH HANDLER IN LOCAL BODY");
                 }
                 try {
+					UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Body)) != null) {
@@ -1223,14 +1222,14 @@ public class ProActive {
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-            }
-
-            // target is remote body (i.e. active object level) ?
-            if (target instanceof RemoteBodyAdapter) {
+                
+			// target is remote body (i.e. active object level) ?
+            } else if (target instanceof RemoteBodyAdapter) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("*** SEARCH HANDLER IN REMOTE BODY");
                 }
                 try {
+					UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getRemoteAdapter()
                                    .getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
@@ -1242,12 +1241,15 @@ public class ProActive {
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-            }
-
-            //	target is a proxy (i.e. a ref. to a body) ?			
-            if (target instanceof AbstractProxy) {
+                
+			// target is a proxy (i.e. a ref. to a body) ?
+            } else if (target instanceof AbstractProxy) {
+				if (logger.isDebugEnabled()) {
+					logger.debug("*** SEARCH HANDLER IN PROXY");
+				}
                 try {
-                    HashMap map = ((AbstractProxy) target).getHandlersLevel();
+					AbstractProxy proxy = (AbstractProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy();
+                    HashMap map = ((AbstractProxy) proxy).getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Proxy)) != null) {
                         return handler;
