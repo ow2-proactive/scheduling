@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.Serializable;
-import java.security.cert.X509Certificate;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -62,6 +58,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.security.cert.X509Certificate;
+
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -150,9 +153,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /** Logger */
     private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
-
-	private Vector p2pNodeslookupList = new Vector();
-
+    private Vector p2pNodeslookupList = new Vector();
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -327,13 +328,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return nbMappedNodes;
     }
 
-    /*
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createdNodeCount()
+    /**
+     * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead
      */
     public int createdNodeCount() {
-        throw new RuntimeException("This method is deprecated, use getNumberOfCurrentlyCreatedNodes() or getNumberOfCreatedNodesAfterDeployment()");
+        throw new RuntimeException(
+            "This method is deprecated, use getNumberOfCurrentlyCreatedNodes() or getNumberOfCreatedNodesAfterDeployment()");
     }
-    
+
     /*
      *  (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
@@ -469,20 +471,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         Node node;
         ProActiveRuntime part = null;
         if (isActivated) {
-        	// Killing p2p nodes
-        	if (this.p2pNodeslookupList.size() > 0) {
-        		for (int index = 0 ; index < this.p2pNodeslookupList.size() ; index ++) {
-        			P2PNodeLookup currentNodesLookup = (P2PNodeLookup) this.p2pNodeslookupList.get(index);
-        			currentNodesLookup.killAllNodes();
-        		}
-        	}
-        	// Killing other nodes
+            // Killing p2p nodes
+            if (this.p2pNodeslookupList.size() > 0) {
+                for (int index = 0; index < this.p2pNodeslookupList.size();
+                        index++) {
+                    P2PNodeLookup currentNodesLookup = (P2PNodeLookup) this.p2pNodeslookupList.get(index);
+                    currentNodesLookup.killAllNodes();
+                }
+            }
+
+            // Killing other nodes
             for (int i = 0; i < createdNodes.size(); i++) {
                 node = (Node) createdNodes.get(i);
                 part = node.getProActiveRuntime();
-                
+
                 if (this.p2pNodes.contains(node)) {
-                	continue;
+                    continue;
                 }
 
                 //we have to be carefull. Indeed if the node is local, we do not
@@ -1219,7 +1223,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
-    
+
     // -------------------------------------------------------------------------
     // For P2P nodes acquisition
     // -------------------------------------------------------------------------
@@ -1240,11 +1244,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             nbCreatedNodes);
     }
 
-	/**
-	 * @param nodesLookup
-	 */
-	public void addP2PNodesLookup(P2PNodeLookup nodesLookup) {
-		this.p2pNodeslookupList.add(nodesLookup);
-		P2P_LOGGER.debug("A P2P nodes lookup added to the vn: "+this.name);
-	}
+    /**
+     * @param nodesLookup
+     */
+    public void addP2PNodesLookup(P2PNodeLookup nodesLookup) {
+        this.p2pNodeslookupList.add(nodesLookup);
+        P2P_LOGGER.debug("A P2P nodes lookup added to the vn: " + this.name);
+    }
 }
