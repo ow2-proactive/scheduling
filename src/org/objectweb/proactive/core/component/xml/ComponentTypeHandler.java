@@ -6,6 +6,7 @@ package org.objectweb.proactive.core.component.xml;
 
 import java.util.Vector;
 
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
@@ -48,10 +49,14 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
 	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
 	 */
 	public Object getResultObject() throws SAXException {
+		try {
 		// return a (typeName / ComponentType instance) couple.
 		interfaceTypes.trimToSize();
 		InterfaceType[] itf_types = (InterfaceType[])interfaceTypes.toArray(new InterfaceType[interfaceTypes.size()]);
 		return new Object[] {typeName, ProActiveTypeFactory.instance().createFcType(itf_types)};	
+		} catch (InstantiationException e) {
+			throw new SAXException ("cannot create component type");
+		}
 	}
 
 	/* (non-Javadoc)
@@ -147,32 +152,40 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
 						+ ComponentsDescriptorConstants.INTERFACE_CONTINGENCY_MANDATORY_TAG
 						+ ", "
 						+ ComponentsDescriptorConstants.INTERFACE_CONTINGENCY_OPTIONAL_TAG
-						+ ", or nothing (default is "
+						+ ", or nothing (if schema validation is enabled) (default is "
 						+ ComponentsDescriptorConstants.INTERFACE_CONTINGENCY_OPTIONAL_TAG
 						+ ")");
 			}
 
 			value = attributes.getValue(ComponentsDescriptorConstants.INTERFACE_CARDINALITY_TAG);
-			if (!checkNonEmpty(value)
-				|| value.equals(ComponentsDescriptorConstants.INTERFACE_CARDINALITY_SINGLE_TAG)) {
-				cardinality = TypeFactory.SINGLE;
-			} else if (value.equals(ComponentsDescriptorConstants.INTERFACE_CARDINALITY_COLLECTIVE_TAG)) {
+			if (checkNonEmpty(value)) {
+				if (value.equals(ComponentsDescriptorConstants.INTERFACE_CARDINALITY_SINGLE_TAG)) {
+					cardinality = TypeFactory.SINGLE;
+				} else if (value.equals(ComponentsDescriptorConstants.INTERFACE_CARDINALITY_COLLECTIVE_TAG)) {
 				cardinality = TypeFactory.COLLECTION;
+				}
 			} else {
 				throw new SAXException(
 					"cardinality values are : "
 						+ ComponentsDescriptorConstants.INTERFACE_CARDINALITY_COLLECTIVE_TAG
 						+ ", "
 						+ ComponentsDescriptorConstants.INTERFACE_CARDINALITY_SINGLE_TAG
-						+ ", or nothing (default is "
+						+ ", or nothing (if schema validation is enabled) (default is "
 						+ ComponentsDescriptorConstants.INTERFACE_CARDINALITY_SINGLE_TAG
 						+ ") ");
 			}
 
-			InterfaceType itf_type =
-				ProActiveTypeFactory.instance().createFcItfType(itf_name, itf_signature, isClient, contingency, cardinality);
+			InterfaceType itf_type = null;
+			try {
+				itf_type = ProActiveTypeFactory.instance().createFcItfType(itf_name, itf_signature, isClient, contingency, cardinality);
+			} catch (InstantiationException e) {
+				throw new SAXException(e);
+			}
 			//componentParameters.addInterfaceTypes((InterfaceType[]) activeHandler.getResultObject());
-			ComponentHandler.logger.debug("new interface type added: " + itf_type.getFcItfName());
+			if (logger.isDebugEnabled()) {
+				ComponentHandler.logger.debug("new interface type added: " + itf_type.getFcItfName());
+			}
+			
 			interfaceTypes.add(itf_type);
 			//componentParameters.addInterfaceType(itf_type);
 			//setResultObject(itf_type);
