@@ -33,10 +33,13 @@ package org.objectweb.proactive.core.runtime.ibis;
 import ibis.rmi.Remote;
 import ibis.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -48,10 +51,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -126,6 +125,10 @@ public interface RemoteProActiveRuntime extends Remote {
     public UniversalBody receiveBody(String nodeName, Body body)
         throws RemoteException;
 
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
+    	throws RemoteException;
+        
+    
     /**
      * @return creator certificate
      */

@@ -33,8 +33,11 @@ package org.objectweb.proactive.core.runtime;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -588,6 +591,42 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return boa;
     }
 
+    
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(String, Checkpoint, int)
+     */
+	public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
+	    logger.debug("Receive a checkpoint for recovery");
+	    
+	    // the recovered body
+	    Body ret = ckpt.recover();
+	    
+	    //update the nodeURL in the registred body 
+	    String newURL = UrlBuilder.buildUrlFromProperties
+	    	(vmInformation.getInetAddress().getHostName(),nodeName);
+		ret.updateNodeURL(newURL);
+		
+	    // set ftm.owner and call beforeRecoery()
+	    ((AbstractBody)ret).getFTManager().owner = ((AbstractBody)ret);
+	    ((AbstractBody)ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(),inc);
+			
+	    // register the body
+	    this.registerBody(nodeName, ret);
+	    
+	    // restart actvity
+	    if (logger.isDebugEnabled()){
+	        logger.debug(ret.getID() + " is restarting activity...");
+	    }
+	    ((ActiveBody)ret).startBody();
+	    
+	    // no more need to return the recovered body
+		return null;
+	}
+    
+    
+    
+    
+    
     /**
      * Registers the specified body at the nodeName key in the <code>nodeMap</code>.
      * In fact it is the <code>UniqueID</code> of the body that is attached to the nodeName

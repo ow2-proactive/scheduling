@@ -37,6 +37,7 @@ import ibis.rmi.UnmarshalException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -367,6 +368,15 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.receiveCheckpoint(nodeName,ckpt,inc);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+    
     // SECURITY
 
 
@@ -559,4 +569,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         throws RemoteException, AlreadyBoundException {
         return new RemoteProActiveRuntimeImpl();
     }
+
+
 }

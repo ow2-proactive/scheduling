@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -634,5 +635,14 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(java.lang.String, org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
+     */
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) throws ProActiveException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

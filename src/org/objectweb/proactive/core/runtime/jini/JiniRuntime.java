@@ -30,10 +30,14 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
-import org.apache.log4j.Logger;
+import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -45,12 +49,6 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.rmi.RemoteException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -126,7 +124,10 @@ public interface JiniRuntime extends java.rmi.Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws java.rmi.RemoteException;
-
+    
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
+    	throws java.rmi.RemoteException;
+        
     /**
      * @return creator certificate
      */
