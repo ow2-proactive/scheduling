@@ -61,7 +61,18 @@ public class NonFunctionalException extends ProActiveException {
 		super();
 		description = "NFE" + separator;
     }
+
 	  
+	/**
+	  * Constructs a <code>NonFunctionalException</code> with the specified
+	  * detail message and nested exception.
+	  * @param s the detail message
+	  */
+	public NonFunctionalException(String s) {
+		super(s);
+		description = "NFE" + separator;
+	  }
+
 	  
 	/**
 	  * Constructs a <code>NonFunctionalException</code> with the specified
