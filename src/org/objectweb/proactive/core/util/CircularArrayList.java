@@ -375,19 +375,19 @@ public class CircularArrayList extends java.util.AbstractList
 
         public CircularArrayListIterator(CircularArrayList clist) {
             this.clist = clist;
-            this.pos = 0;
+            this.pos = -1;
         }
 
         public boolean hasNext() {
-            return (this.clist.convert(this.pos) < this.clist.size);
+            return (this.clist.convert(this.pos+1) < this.clist.size);
         }
 
         public Object next() {
-            return this.clist.get(this.pos++);
+            return this.clist.get(++this.pos);
         }
 
         public void remove() {
-            this.clist.remove(this.pos - 1);
+            this.clist.remove(this.pos);
         }
     }
 }
