@@ -174,7 +174,7 @@ public class ThreadPool {
         for (int i = 0; i < threads.length; i++) {
             this.threads[i].interrupt();
             this.controler.jobStart();
-            this.threads[i].destroy();
+            // this.threads[i].destroy();   // deprecated
         }
         this.controler.waitDone();
     }
