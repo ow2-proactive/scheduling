@@ -32,8 +32,6 @@ package org.objectweb.proactive.core.component.representative;
 
 import org.apache.log4j.Logger;
 
-import org.objectweb.fractal.api.Component;
-
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.mop.Proxy;
 
@@ -52,9 +50,9 @@ public class ProActiveComponentRepresentativeFactory {
 		}
 	}
 
-	public Component createComponentRepresentative(
+	public ProActiveComponentRepresentative createComponentRepresentative(
 		ComponentParameters componentParameters,
 		Proxy proxy) {
-		return (Component) new ProActiveComponentRepresentativeImpl(componentParameters, proxy);
+		return new ProActiveComponentRepresentativeImpl(componentParameters, proxy);
 	}
 }
