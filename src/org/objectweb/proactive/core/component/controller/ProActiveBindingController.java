@@ -90,7 +90,7 @@ public class ProActiveBindingController extends ProActiveController
             //				}
             if (!((ProActiveInterfaceType) ((Interface) getFcItfOwner()
                                                                 .getFcInterface(clientItfName)).getFcItfType()).isFcCollectionItf()) {
-                System.out.println(((ComponentParametersController) getFcItfOwner()
+                logger.info(((ComponentParametersController) getFcItfOwner()
                                     .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
                                     .getName() + "." + clientItfName +
                     " IS ALREADY BOUND");
