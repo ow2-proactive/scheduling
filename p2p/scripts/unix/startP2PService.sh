@@ -1,7 +1,10 @@
 #!/bin/sh
 
 workingDir=`dirname $0`
-. $workingDir/env.sh
+
+cd $PWD/../../../scripts/unix
+. env.sh
+cd $workingDir
 
 while true
 do 
