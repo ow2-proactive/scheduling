@@ -40,7 +40,7 @@ package org.objectweb.proactive.core.runtime;
  * @since   ProActive 0.9
  *
  */
-public interface VMInformation {
+public interface VMInformation extends java.io.Serializable{
 
   /**
    * Returns the VMID of the VM the node belongs to
