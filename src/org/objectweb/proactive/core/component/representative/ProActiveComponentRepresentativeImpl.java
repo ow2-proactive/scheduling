@@ -91,6 +91,8 @@ public class ProActiveComponentRepresentativeImpl
     private StubObject stubOnBaseObject = null;
     private String hierarchicalType = null;
     private Boolean hasBindingController = null;
+    private String currentControllerInterface=null;
+    
 
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
         String hierarchicalType) {
@@ -229,17 +231,14 @@ public class ProActiveComponentRepresentativeImpl
      */
     public Component getFcItfOwner() {
         return this;
-        //        return (Component) reifyCall(Interface.class.getName(),
-        //            "getFcItfOwner", new Class[] {  }, new Object[] {  });
     }
 
-    /*
-     *implements  org.objectweb.fractal.api.Interface#getFcItfName()}
+    /**
+     * implements  {@link org.objectweb.fractal.api.Interface#getFcItfName()}
+     * @return the name of the last retreived controller interface 
      */
     public String getFcItfName() {
-        // PB is that the current object implements several functional interfaces.
-        // Thus it has several names...
-        return null;
+        return currentControllerInterface;
     }
 
     /*
@@ -285,6 +284,7 @@ public class ProActiveComponentRepresentativeImpl
                 throw new NoSuchInterfaceException(
                     "there is no content controller in this component");
             }
+            currentControllerInterface = interfaceName;
             return this;
         }
         for (int i = 0; i < interfaceReferences.length; i++) {
@@ -328,8 +328,7 @@ public class ProActiveComponentRepresentativeImpl
      *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        return (Object[]) reifyCall(Component.class.getName(),
-            "getFcInterfaces", new Class[] {  }, new Object[] {  });
+        return interfaceReferences;
     }
 
     /*
@@ -366,12 +365,6 @@ public class ProActiveComponentRepresentativeImpl
         Object result = reifyCall(Object.class.getName(), "equals",
                 new Class[] { Object.class }, new Object[] { component });
         return ((Boolean) result).booleanValue();
-        //        if (!(component instanceof ProActiveComponent)) {
-        //            logger.error(
-        //                "can only compare proactive components to proactive components ");
-        //            return false;
-        //        }
-        //        return getProxy().equals(((ProActiveComponentRepresentative) component).getProxy());
     }
 
     public int hashCode() {
@@ -395,7 +388,7 @@ public class ProActiveComponentRepresentativeImpl
      *implements  ComponentParametersController#setComponentParameters(ComponentParameters)}
      */
     public void setComponentParameters(ComponentParameters componentParameters) {
-        logger.error("only available in the meta-objects");
+        logger.error("setComponentParameters method is not available in component representatives");
     }
 
     /*
@@ -440,25 +433,26 @@ public class ProActiveComponentRepresentativeImpl
      * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
      */
     public Object getReferenceOnBaseObject() {
+        logger.error("getReferenceOnBaseObject() method is not available in component representatives");
         return null;
     }
 
-    /** (non-Javadoc)
+    /** 
      * only available in the meta-objects
      */
     public ComponentRequestQueue getRequestQueue() {
-        logger.error("only available in the meta-objects");
+        logger.error("getRequestQueue() is not available in component representatives");
         return null;
     }
 
-    /* (non-Javadoc)
+    /* 
      * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
     public Component getRepresentativeOnThis() {
         return this;
     }
 
-    /* (non-Javadoc)
+    /* 
      * @see org.objectweb.fractal.api.control.SuperController#getFcSuperComponents()
      */
     public Component[] getFcSuperComponents() {
@@ -466,7 +460,7 @@ public class ProActiveComponentRepresentativeImpl
             "getFcSuperComponents", new Class[] {  }, new Object[] {  });
     }
 
-    /* (non-Javadoc)
+    /* 
      * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#addParent(org.objectweb.fractal.api.Component)
      */
     public void addParent(Component parent) {
@@ -474,7 +468,7 @@ public class ProActiveComponentRepresentativeImpl
             new Class[] { Component.class }, new Object[] { parent });
     }
 
-    /* (non-Javadoc)
+    /* 
      * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#removed(org.objectweb.fractal.api.Component)
      */
     public void removeParent(Component parent) {
@@ -482,21 +476,21 @@ public class ProActiveComponentRepresentativeImpl
             new Class[] { Component.class }, new Object[] { parent });
     }
 
-    /* (non-Javadoc)
+    /*
      * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#getStubOnReifiedObject()
      */
     public StubObject getStubOnBaseObject() {
         return stubOnBaseObject;
     }
 
-    /* (non-Javadoc)
+    /* 
      * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
      */
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;
     }
 
-    /* (non-Javadoc)
+    /* 
      * @see org.objectweb.proactive.core.component.controller.ProActiveBindingController#hasBindingsOnClientInterfaces()
      */
     public Boolean isBound() {
