@@ -15,14 +15,15 @@
 		<th align="center">ProActive ReferenceCard</th>	
 		</tr>
 	</tbody>
-</table><br></br>
+</table>
+<p align="center"><b><a href="http://ProActive.ObjectWeb.org">ProActive.ObjectWeb.org</a></b></p><br></br>
 <p class="textNormal">
 <b>ProActive</b> is a Java library for <b>parallel</b>, <b>distributed</b>,
 and
 <b>concurrent</b> computing, also featuring <b>mobility</b> and <b>security</b>
 in a uniform framework.
 <b>ProActive</b> provides a
-comprehensive API and a graphical interface.</b>.
+comprehensive API and a graphical interface.</b>
 The library is based on an Active Object pattern that is a uniform way
 to encapsulate:
 </p>
@@ -99,12 +100,12 @@ Internet GRIDs.</p>
                        specified. </li>
 <li><b>Node:</b> the result of mapping a VN to a set of JVMs. After activation, a VN 
       contains a set of nodes, living in a set of JVMs.</li>
-<li><b>IC2D:</b> Interactive Control and Debugging of Distribution
-      A Graphical environment for monitoring and steering Grid applications</li></ul>
+<li><b>IC2D:</b> Interactive Control and Debugging of Distribution:
+      a Graphical environment for monitoring and steering Grid applications</li></ul><br></br>
 </td>
 		</tr>
 	</tbody>
-</table><br></br>
+</table><br></br><br></br>
 <table width="100%" border="1">
 	<tbody>
 		<tr>
@@ -153,31 +154,6 @@ v.gee (param);
 	</tbody>
 </table><br></br>
 
-<table width="100%" border="1">
-	<tbody>
-		<tr>
-			<th>Main principles: asynchronous method calls and implicit futures</th>
-		</tr>
-		<tr>
-			<td><pre>
-A a = (A) ProActive.newActive("A", params, node);
-<FONT ID="SingleLineComment">   // Create an active Object of type A in the JVM specified by Node</FONT>
-a.foo (param); 
-<FONT ID="SingleLineComment">   // A one way typed asynchronous communication towards the (remote) AO a</FONT>
-<FONT ID="SingleLineComment">   // A request is sent to a,</FONT>
-v = a.bar (param);
-<FONT ID="SingleLineComment">   // A typed asynchronous communication with result.</FONT>
-<FONT ID="SingleLineComment">   // v is first an awaited Future, to be transparently filled up after</FONT>
-<FONT ID="SingleLineComment">   // service of the request, and reply</FONT>
-...
-v.gee (param);
-<FONT ID="SingleLineComment">   // Use of the result of an asynchronous call.</FONT>
-<FONT ID="SingleLineComment">   // If v is still an awaited future, it triggers an automatic </FONT>
-<FONT ID="SingleLineComment">   // wait: Wait-by-necessity</FONT>
-</pre>
-			</td>
-	</tbody>
-</table><br></br>
 <table width="100%" border="1">
 	<tbody>
 		<tr>
@@ -395,7 +371,7 @@ ag.remove(index)
 <FONT ID="SingleLineComment">   // Removes the object at the specified index</FONT>
 
 A ga2 = (A) ag.getGroupByType();
-<FONT ID="SingleLineComment">   // Returns to the typed view of a group (ga2==ga)</FONT>
+<FONT ID="SingleLineComment">   // Returns to the typed view of a group </FONT>
 
 <b class="java">void </b>  setScatterGroup(g);
 <FONT ID="FormalComment">   // By default, a group used as a parameter of a group communication
@@ -567,7 +543,7 @@ code: machines, creation, lookup and registry protocols.
 <pre>
 ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File);
 <FONT ID="FormalComment">   // Returns a ProActiveDescriptor object from the xml
-descriptor file name </FONT>
+   // descriptor file name </FONT>
 
 pad.activateMapping(String VN);
 <FONT ID="FormalComment">   // Activates the given Virtual Node: launches or acquires 
