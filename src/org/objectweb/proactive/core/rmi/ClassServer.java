@@ -161,7 +161,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            return UrlBuilder.buildUrl(java.net.InetAddress.getLocalHost().getHostName(), "", "http:", port);
+            return UrlBuilder.buildUrl(java.net.InetAddress.getLocalHost().getCanonicalHostName(), "", "http:", port);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
