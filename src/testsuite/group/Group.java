@@ -39,6 +39,9 @@ import testsuite.manager.AbstractManager;
 import testsuite.result.ResultsCollections;
 
 import testsuite.test.AbstractTest;
+import testsuite.test.Benchmark;
+
+import testsuite.timer.Timeable;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -122,15 +125,15 @@ public class Group {
             manager);
     }
 
-	public Group(File directory,
-		String packageName, Object[] params, boolean useInitFile,
-		AbstractManager manager) throws BrowsePackageException {
-		logger = Logger.getLogger(getClass().getName());
+    public Group(File directory, String packageName, Object[] params,
+        boolean useInitFile, AbstractManager manager)
+        throws BrowsePackageException {
+        logger = Logger.getLogger(getClass().getName());
 
-		addTests(directory, packageName, packageName, params, useInitFile,
-			manager);
-	}
-	
+        addTests(directory, packageName, packageName, params, useInitFile,
+            manager);
+    }
+
     private static FileFilter dirFilter = new FileFilter() {
             public boolean accept(File pathname) {
                 if (pathname.isDirectory()) {
@@ -253,10 +256,7 @@ public class Group {
         }
     }
 
-    /** Run the init method of all tests and set the tests loggers with the group logger.
-     * @throws Exception if error during the initialization of tests.
-     */
-    public void initGroup() throws Exception {
+    public void initGroup(Timeable timer) throws Exception {
         if (logger.isInfoEnabled()) {
             logger.info("Beginning group " + name + "'s initialization");
         }
@@ -264,10 +264,20 @@ public class Group {
         while (it.hasNext()) {
             AbstractTest test = (AbstractTest) it.next();
             test.initTest();
+            if (timer != null) {
+                ((Benchmark) test).setTimer(timer);
+            }
         }
         if (logger.isInfoEnabled()) {
             logger.info("Finnishing group " + name + "'s initialization");
         }
+    }
+
+    /** Run the init method of all tests and set the tests loggers with the group logger.
+     * @throws Exception if error during the initialization of tests.
+     */
+    public void initGroup() throws Exception {
+        this.initGroup(null);
     }
 
     /** run the end method of all tests.
