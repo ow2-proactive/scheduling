@@ -1860,7 +1860,7 @@ public class ProActive {
      * Undeploy component interfaces on a web server
      * @param componentName The name of the component
      * @param url The url of the web server
-     * @param c The component owning the services interfaces
+     * @param component  The component owning the services interfaces
      */
     public static void unExposeComponentAsWebService(String componentName,
         String url, Component component) {

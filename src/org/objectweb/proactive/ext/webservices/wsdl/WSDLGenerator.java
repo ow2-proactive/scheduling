@@ -52,7 +52,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class WSDLGenerator extends WSConstants {
     /**
      * Generate the WSDL document associate with an  active object exposed as a web service
-     * @param o The object that we want to obtain WSDL
+     * @param c The class object that we want to obtain WSDL
      * @param serviceName The name of the service (urn)
      * @param urlRouter   The url where the service can be accessed
      * @param documentation The Documentation of the service
