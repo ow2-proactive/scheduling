@@ -3,7 +3,7 @@
     	<log4jFile file="../../../../../../scripts/unix/proactive-log4j"/>
 <properties>
 		<prop key="RemoteHostname" value="owenii" />
-		<prop key="ibis.property.file" value="/home1/fabrice/workIbis/Ibis/src/ibis/properties"/>
+		<prop key="ibis.property.file" value="/net/home/fhuet/Ibis/src/ibis/properties"/>
 		<prop key="proactive.locationserver" value="org.objectweb.proactive.ext.locationserver.LocationServer"/>
 		<prop key="proactive.locationserver.rmi" value="//localhost/LocationServer"/>
 		<prop key="proactive.future.ac" value="disable"/>
