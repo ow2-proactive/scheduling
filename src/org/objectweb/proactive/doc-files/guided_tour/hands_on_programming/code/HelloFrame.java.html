@@ -1,40 +1,54 @@
 <html>
 <head>
-  <title>HelloClient.java</title>
+  <title>HelloFrame.java</title>
 </head>
 <body bgcolor="#ffffff" text="#000000">
 <pre>
-<strong>public</strong> <strong>class</strong> <font color="#2040a0">HelloClient</font> <font color="4444FF"><strong>{</strong></font>
-    <strong>public</strong> <strong>static</strong> <strong>void</strong> <font color="#2040a0">main</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font><font color="4444FF"><strong>[</strong></font><font color="4444FF"><strong>]</strong></font> <font color="#2040a0">args</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
-        <font color="#2040a0">Hello</font> <font color="#2040a0">myServer</font><font color="4444FF">;</font>
-        <font color="#2040a0">String</font> <font color="#2040a0">message</font><font color="4444FF">;</font>
-        <strong>try</strong> <font color="4444FF"><strong>{</strong></font>
-            <font color="#444444">// checks for the server's URL</font>
-            <strong>if</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">args</font>.<font color="#2040a0">length</font> <font color="4444FF">=</font><font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
-                <font color="#444444">// There is no url to the server, so create an active server within this VM</font>
-                <font color="#2040a0">myServer</font> <font color="4444FF">=</font> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">Hello</font><font color="4444FF"><strong>)</strong></font> <font color="#2040a0">org</font>.<font color="#2040a0">objectweb</font>.<font color="#2040a0">proactive</font>.<font color="#2040a0">ProActive</font>.<font color="#2040a0">newActive</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">Hello</font>.<strong>class</strong>.<font color="#2040a0">getName</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font>,
-                        <strong>new</strong> <font color="#2040a0">Object</font><font color="4444FF"><strong>[</strong></font><font color="4444FF"><strong>]</strong></font> <font color="4444FF"><strong>{</strong></font> <font color="#008000">&quot;local&quot;</font> <font color="4444FF"><strong>}</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-            <font color="4444FF"><strong>}</strong></font> <strong>else</strong> <font color="4444FF"><strong>{</strong></font>
-                <font color="#444444">// Lookups the server object</font>
-                <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;Using server located on &quot;</font> <font color="4444FF">+</font> <font color="#2040a0">args</font><font color="4444FF"><strong>[</strong></font><font color="#FF0000">0</font><font color="4444FF"><strong>]</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-                <font color="#2040a0">myServer</font> <font color="4444FF">=</font> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">Hello</font><font color="4444FF"><strong>)</strong></font> <font color="#2040a0">org</font>.<font color="#2040a0">objectweb</font>.<font color="#2040a0">proactive</font>.<font color="#2040a0">ProActive</font>.<font color="#2040a0">lookupActive</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">Hello</font>.<strong>class</strong>.<font color="#2040a0">getName</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font>,
-                        <font color="#2040a0">args</font><font color="4444FF"><strong>[</strong></font><font color="#FF0000">0</font><font color="4444FF"><strong>]</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-            <font color="4444FF"><strong>}</strong></font>
+<font color="#444444"><i>/**
+ * This class allows the creation of a graphical window
+ * with a text field
+ *
+ */</i></font>
+<strong>public</strong> <strong>class</strong> <font color="#2040a0">HelloFrame</font> <strong>extends</strong> <font color="#2040a0">javax</font>.<font color="#2040a0">swing</font>.<font color="#2040a0">JFrame</font> <font color="4444FF"><strong>{</strong></font>
+    <strong>private</strong> <font color="#2040a0">javax</font>.<font color="#2040a0">swing</font>.<font color="#2040a0">JLabel</font> <font color="#2040a0">jLabel1</font><font color="4444FF">;</font>
 
-            <font color="#444444">// Invokes a remote method on this object to get the message</font>
-            <font color="#2040a0">message</font> <font color="4444FF">=</font> <font color="#2040a0">myServer</font>.<font color="#2040a0">sayHello</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-            <font color="#444444">// Prints out the message</font>
-            <font color="#2040a0">System</font>.<font color="#2040a0">out</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;The message is : &quot;</font> <font color="4444FF">+</font> <font color="#2040a0">message</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-        <font color="4444FF"><strong>}</strong></font> <strong>catch</strong> <font color="4444FF"><strong>(</strong></font><font color="#2040a0">Exception</font> <font color="#2040a0">e</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
-            <font color="#2040a0">System</font>.<font color="#2040a0">err</font>.<font color="#2040a0">println</font><font color="4444FF"><strong>(</strong></font><font color="#008000">&quot;Could not reach/create server object&quot;</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-            <font color="#2040a0">e</font>.<font color="#2040a0">printStackTrace</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-            <font color="#2040a0">System</font>.<font color="#2040a0">exit</font><font color="4444FF"><strong>(</strong></font><font color="#FF0000">1</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
-        <font color="4444FF"><strong>}</strong></font>
+    <font color="#444444"><i>/** Creates new form HelloFrame */</i></font>
+    <strong>public</strong> <font color="#2040a0">HelloFrame</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font> <font color="#2040a0">text</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">initComponents</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="#2040a0">setText</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">text</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/** This method is called from within the constructor to
+     * initialize the form.
+     *        It will perform the initialization of the frame
+     */</i></font>
+    <strong>private</strong> <strong>void</strong> <font color="#2040a0">initComponents</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">jLabel1</font> <font color="4444FF">=</font> <strong>new</strong> <font color="#2040a0">javax</font>.<font color="#2040a0">swing</font>.<font color="#2040a0">JLabel</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="#2040a0">addWindowListener</font><font color="4444FF"><strong>(</strong></font><strong>new</strong> <font color="#2040a0">java</font>.<font color="#2040a0">awt</font>.<font color="#2040a0">event</font>.<font color="#2040a0">WindowAdapter</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+                <strong>public</strong> <strong>void</strong> <font color="#2040a0">windowClosing</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">java</font>.<font color="#2040a0">awt</font>.<font color="#2040a0">event</font>.<font color="#2040a0">WindowEvent</font> <font color="#2040a0">evt</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+                    <font color="#2040a0">exitForm</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">evt</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+                <font color="4444FF"><strong>}</strong></font>
+            <font color="4444FF"><strong>}</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+
+        <font color="#2040a0">jLabel1</font>.<font color="#2040a0">setHorizontalAlignment</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">javax</font>.<font color="#2040a0">swing</font>.<font color="#2040a0">SwingConstants</font>.<font color="#2040a0">CENTER</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+        <font color="#2040a0">getContentPane</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font>.<font color="#2040a0">add</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">jLabel1</font>, <font color="#2040a0">java</font>.<font color="#2040a0">awt</font>.<font color="#2040a0">BorderLayout</font>.<font color="#2040a0">CENTER</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/** Kill the frame */</i></font>
+    <strong>private</strong> <strong>void</strong> <font color="#2040a0">exitForm</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">java</font>.<font color="#2040a0">awt</font>.<font color="#2040a0">event</font>.<font color="#2040a0">WindowEvent</font> <font color="#2040a0">evt</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <font color="#444444">//        System.exit(0); would kill the VM !</font>
+        <font color="#2040a0">dispose</font><font color="4444FF"><strong>(</strong></font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font> <font color="#444444">// this way, the active object agentFrameController stays alive</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+    <font color="#444444"><i>/**
+     * sets the text of the label inside the frame
+     */</i></font>
+    <strong>private</strong> <strong>void</strong> <font color="#2040a0">setText</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">String</font> <font color="#2040a0">text</font><font color="4444FF"><strong>)</strong></font> <font color="4444FF"><strong>{</strong></font>
+        <font color="#2040a0">jLabel1</font>.<font color="#2040a0">setText</font><font color="4444FF"><strong>(</strong></font><font color="#2040a0">text</font><font color="4444FF"><strong>)</strong></font><font color="4444FF">;</font>
     <font color="4444FF"><strong>}</strong></font>
 <font color="4444FF"><strong>}</strong></font>
 
 </pre>
 <hr>
-syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
 </body>
 </html>
