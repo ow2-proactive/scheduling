@@ -75,7 +75,7 @@ public abstract class AbstractListProcessDecorator
         this.domain = domain;
         this.padding = padding;
         this.list = list.replaceAll("\\s", "");
-        setAllIndex(list);
+        setAllIndex(this.list);  
         for (int i = Integer.parseInt(beginIndex);
                 i <= Integer.parseInt(endIndex); i = i + step) {
             tmp = "" + i; //we change as String to check the array
