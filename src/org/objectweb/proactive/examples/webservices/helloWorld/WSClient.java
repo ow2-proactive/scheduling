@@ -46,7 +46,16 @@ import javax.xml.rpc.ServiceFactory;
 public class WSClient {
 
     public static void main(String[] args) {
-        String address = "http://localhost:8080/soap/servlet/rpcrouter";
+        
+        String address;
+        if (args.length == 0)
+            address = "http://localhost:8080";
+        else 
+            address = args[0];
+        if (!address.startsWith("http://"))
+            address = "http://" + address;
+        
+        address += "/soap/servlet/rpcrouter";
         String namespaceURI = "helloWorld";
         String serviceName = "helloWorld";
         String portName = "helloWorld";

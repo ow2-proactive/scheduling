@@ -48,11 +48,18 @@ public class HelloWorld {
     }
     
     public static void main(String[] args) {
-        String url = "http://localhost:8080";
         
-        try {
+        String url;
+        if (args.length == 0)
+            url = "http://localhost:8080";
+        else
+            url = args[0];
+        if (!url.startsWith("http://"))
+            url = "http://" + url;
+        System.out.println("Deploy an hello world service on : " + url);
+            try {
             HelloWorld hw = (HelloWorld)ProActive.newActive("org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld", new Object [] {});
-            ProActive.exposeAsWebService(hw,"http://localhost:8080/", "helloWorld", new String[] {"helloWorld"});
+            ProActive.exposeAsWebService(hw, url,  "helloWorld", new String[] {"helloWorld"});
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
