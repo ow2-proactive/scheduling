@@ -151,6 +151,8 @@ public class HostPanel extends AbstractDataObjectPanel
         this.alignLayoutChild(align); // 
         revalidate();
         repaint();
+        HostPanel.this.parentDataObjectPanel.revalidate();
+        HostPanel.this.parentDataObjectPanel.repaint();
     }
 
     // Set child (vm) Alignement H  / V 
