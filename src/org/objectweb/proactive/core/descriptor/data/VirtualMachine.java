@@ -30,8 +30,11 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+
+import java.io.IOException;
 
 
 /**
@@ -71,29 +74,28 @@ public interface VirtualMachine {
      */
     public String getName();
 
-//    /**
-//     * Sets the acquisitionMethod field to the given value
-//     * @param s
-//     */
-//    public void setAcquisitionMethod(String s);
-//
-//    /**
-//     * Returns the AcquisitionMethod value
-//     * @return String
-//     */
-//    public String getAcquisitionMethod();
-
-//    /**
-//     * Sets the port number of the acquisition process
-//     * @param s
-//     */
-//    public void setPortNumber(String s);
-//
-//    /**
-//     * Return the Acquisition port number
-//     * @param s
-//     */
-//    public String getPortNumber();
+    //    /**
+    //     * Sets the acquisitionMethod field to the given value
+    //     * @param s
+    //     */
+    //    public void setAcquisitionMethod(String s);
+    //
+    //    /**
+    //     * Returns the AcquisitionMethod value
+    //     * @return String
+    //     */
+    //    public String getAcquisitionMethod();
+    //    /**
+    //     * Sets the port number of the acquisition process
+    //     * @param s
+    //     */
+    //    public void setPortNumber(String s);
+    //
+    //    /**
+    //     * Return the Acquisition port number
+    //     * @param s
+    //     */
+    //    public String getPortNumber();
 
     /**
      * Sets the process mapped to this VirtualMachine to the given process
@@ -106,6 +108,18 @@ public interface VirtualMachine {
      * @return ExternalProcess
      */
     public ExternalProcess getProcess();
+
+    /**
+     * Sets the service mapped to this VirtualMachine to the given service
+     * @param service
+     */
+    public void setService(UniversalService service);
+
+    /**
+     * Returns the service mapped to this VirtualMachine
+     * @return the service mapped to this VirtualMachine
+     */
+    public UniversalService getService();
 
     /**
      * Returns the name of the machine where the process mapped to this virtual machine
@@ -126,25 +140,25 @@ public interface VirtualMachine {
      */
     public String getCreatorId();
 
-	/**
-	 * Returns true if this machine has been acquired false otherwise 
-	 * @return boolean if the machine result of a lookup 
-	 */
-	public boolean isAcquired();
-	
-	/**
-     * @param isAcquired The isAcquired to set.
+    /**
+     * Returns true if this machine his mapped onto a process false if mapped 
+     * onto a service
+     * @return boolean if the machine result of a lookup
      */
-    public void setAcquired(boolean isAcquired); 
-    
-	/**
-	 * @return Returns the remoteRuntime.
-	 */
-	public ProActiveRuntime getRemoteRuntime() ;
-	
-	/**
-	 * @param remoteRuntime The remoteRuntime to set.
-	 */
-	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) ;
+    public boolean hasProcess();
 
+//    /**
+//     * @param isAcquired The isAcquired to set.
+//     */
+//    public void setAcquired(boolean isAcquired);
+
+    /**
+     * @return Returns the remoteRuntime.
+     */
+    public ProActiveRuntime getRemoteRuntime();
+
+    /**
+     * @param remoteRuntime The remoteRuntime to set.
+     */
+    public void setRemoteRuntime(ProActiveRuntime remoteRuntime);
 }

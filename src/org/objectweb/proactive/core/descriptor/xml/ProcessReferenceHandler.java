@@ -55,7 +55,7 @@ public class ProcessReferenceHandler extends BasicUnmarshaller {
             setResultObject(refid);
         } else {
             throw new org.xml.sax.SAXException(
-                "The Id of the referenced process cannot be set to an empty string");
+                "The Id of the referenced definition cannot be set to an empty string");
         }
     }
 }

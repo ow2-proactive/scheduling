@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
@@ -58,19 +59,20 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     private String acquisitionMethod;
 
     /** the port number used during the acquisition */
-        private String portNumber;
+    private String portNumber;
 
-     /** the port number used during the acquisition */
-     private String protocol;
+    /** the port number used during the acquisition */
+    private String protocol;
 
-        
     /** indiquates if this machine results from a lookup or not  */
-    private boolean isAcquired = false;
-    
+    private boolean hasProcess = true;
     private ProActiveRuntime remoteRuntime;
 
     /** the process to start in order to create the JVM */
     private transient ExternalProcess process;
+
+    /** the service to start in order to acquire the JVM */
+    private transient UniversalService service;
 
     /** The name of the VirtualNode that created this VirtualMachine */
     private String creatorId = null;
@@ -108,20 +110,6 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         return name;
     }
 
-    //    public void setAcquisitionMethod(String s) {
-    //        acquisitionMethod = s;
-    //    }
-    //
-    //    public String getAcquisitionMethod() {
-    //        return acquisitionMethod;
-    //    }
-    //    public void setPortNumber(String s) {
-    //    	portNumber = s;
-    //    }
-    //    
-    //    public String getPortNumber() {
-    //    	return portNumber;
-    //    }
     public void setProcess(ExternalProcess p) {
         process = p;
     }
@@ -154,26 +142,44 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#isAcquired()
      */
-    public boolean isAcquired() {
-        return isAcquired;
+    public boolean hasProcess() {
+        return hasProcess;
     }
 
     /**
      * @param isAcquired The isAcquired to set.
      */
-    public void setAcquired(boolean isAcquired) {
-        this.isAcquired = isAcquired;
+
+    //    public void setAcquired(boolean isAcquired) {
+    //        this.isAcquired = isAcquired;
+    //    }
+
+    /**
+     * @return Returns the remoteRuntime.
+     */
+    public ProActiveRuntime getRemoteRuntime() {
+        return remoteRuntime;
     }
-	/**
-	 * @return Returns the remoteRuntime.
-	 */
-	public ProActiveRuntime getRemoteRuntime() {
-		return remoteRuntime;
-	}
-	/**
-	 * @param remoteRuntime The remoteRuntime to set.
-	 */
-	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
-		this.remoteRuntime = remoteRuntime;
-	}
+
+    /**
+     * @param remoteRuntime The remoteRuntime to set.
+     */
+    public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
+        this.remoteRuntime = remoteRuntime;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
+     */
+    public void setService(UniversalService service) {
+        hasProcess = false;
+        this.service = service;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#getService()
+     */
+    public UniversalService getService() {
+        return service;
+    }
 }

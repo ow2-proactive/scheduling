@@ -30,14 +30,11 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
@@ -217,13 +214,6 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         //
         // -- INNER CLASSES ------------------------------------------------------
         //
-        private class SingleValueUnmarshaller extends BasicUnmarshaller {
-            public void readValue(String value) throws org.xml.sax.SAXException {
-                setResultObject(value);
-            }
-        }
-         //end of inner class SingleValueUnmarshaller
-
         private class JvmSetHandler extends CollectionUnmarshaller {
             protected JvmSetHandler() {
                 super(String.class);
@@ -236,44 +226,43 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
-                    vn.createNodeOnCurrentJvm(protocol);               
+                    vn.createNodeOnCurrentJvm(protocol);
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
             }
-        }
-         //end of inner class JvmSetHandler
 
-        private class VmNameHandler extends BasicUnmarshaller {
-            private VmNameHandler() {
-            }
-
-            public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
-                String vmName = attributes.getValue("value");
-                if (checkNonEmpty(vmName)) {
-                    setResultObject(vmName);
-                } else {
-                    throw new org.xml.sax.SAXException(
-                        "The name of the Jvm cannot be set to an empty string");
+            //end of inner class JvmSetHandler
+            private class VmNameHandler extends BasicUnmarshaller {
+                private VmNameHandler() {
                 }
-            }
-        }
-         //end of inner class VmNameHandler
 
-        private class CurrentJvmHandler extends BasicUnmarshaller {
-            private CurrentJvmHandler() {
-            }
+                public void startContextElement(String name,
+                    Attributes attributes) throws org.xml.sax.SAXException {
+                    String vmName = attributes.getValue("value");
+                    if (checkNonEmpty(vmName)) {
+                        setResultObject(vmName);
+                    } else {
+                        throw new org.xml.sax.SAXException(
+                            "The name of the Jvm cannot be set to an empty string");
+                    }
+                }
+            } //end of inner class VmNameHandler
 
-            public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
-                String protocol = attributes.getValue("protocol");
-                setResultObject(protocol);
-            }
-        }
-         // end of inner class CurrentJvmHandler
+            private class CurrentJvmHandler extends BasicUnmarshaller {
+                private CurrentJvmHandler() {
+                }
+
+                public void startContextElement(String name,
+                    Attributes attributes) throws org.xml.sax.SAXException {
+                    String protocol = attributes.getValue("protocol");
+                    setResultObject(protocol);
+                }
+            } // end of inner class CurrentJvmHandler
+        } // end of inner class JvmSetHandler
     }
-     // end inner class MapHandler
+
+    // end inner class MapHandler
 
     /**
      * This class receives jvm events
@@ -308,33 +297,48 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         /**
          * This class receives acquisition events
          */
-        private class AcquisitionHandler extends BasicUnmarshaller {
+        private class AcquisitionHandler extends PassiveCompositeUnmarshaller {
             private AcquisitionHandler() {
+                this.addHandler(SERVICE_REFERENCE_TAG,
+                        new ProcessReferenceHandler());
             }
-
-            public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
-                String runtimeURL = attributes.getValue("url");
-                //String portNumber = attributes.getValue("port");
-                if (runtimeURL != null) {
-                	
-                	String protocol = UrlBuilder.getProtocol(runtimeURL);
-                	String url = UrlBuilder.removeProtocol(runtimeURL,protocol);
-                	proActiveDescriptor.registerProcess(currentVM, (String) runtimeURL);
-                	ProActiveRuntime proActiveRuntimeRegistered = null;
-					try {
-						proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,protocol);
-					} catch (ProActiveException e) {
-						e.printStackTrace();
-					}
-					currentVM.setAcquired(true);
-                	currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
-                	//currentVM.setAcquisitionMethod(acquisitionMethod);
+            
+            protected void notifyEndActiveHandler(String name,
+                    UnmarshallerHandler activeHandler)
+                    throws org.xml.sax.SAXException {
+                    Object o = activeHandler.getResultObject();
+                    if (o == null) {
+                        return;
+                    }
+                    proActiveDescriptor.registerService(currentVM, (String)o);
                 }
-////               if (portNumber != null) {
-/////                    currentVM.setPortNumber(portNumber);
-////                }
-            }
+
+//            public void startContextElement(String name, Attributes attributes)
+//                throws org.xml.sax.SAXException {
+//                String runtimeURL = attributes.getValue("url");
+//
+//                //String portNumber = attributes.getValue("port");
+//                if (runtimeURL != null) {
+//                    String protocol = UrlBuilder.getProtocol(runtimeURL);
+//                    String url = UrlBuilder.removeProtocol(runtimeURL, protocol);
+//                    proActiveDescriptor.registerProcess(currentVM,
+//                        (String) runtimeURL);
+//                    ProActiveRuntime proActiveRuntimeRegistered = null;
+//                    try {
+//                        proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,
+//                                protocol);
+//                    } catch (ProActiveException e) {
+//                        e.printStackTrace();
+//                    }
+//                    currentVM.setAcquired(true);
+//                    currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
+//                    //currentVM.setAcquisitionMethod(acquisitionMethod);
+//                }
+
+                ////               if (portNumber != null) {
+                /////                    currentVM.setPortNumber(portNumber);
+                ////                }
+         //   }
         }
 
         // end inner class AcquisitionHandler

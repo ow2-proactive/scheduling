@@ -30,14 +30,15 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ext.security.PolicyServer;
+
+import java.security.cert.X509Certificate;
 
 
 /**
@@ -51,32 +52,13 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @see VirtualMachine
  */
 public interface VirtualNode extends java.io.Serializable, Job {
-    static Logger logger = Logger.getLogger(VirtualNode.class.getName());
-
-    /**
-     * Sets the property attribute to the given value
-     * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
-     */
-    public void setProperty(String property);
-
-    /**
-     * Sets the timeout variable to the given value.
-     * Calling this method will force this VirtualNode to wait until the timeout expires
-     * before giving access to its nodes.
-     */
-    public void setTimeout(String timeout, boolean waitForTimeout);
+    static Logger vnlogger = Logger.getLogger(VirtualNode.class.getName());
 
     /**
      * Returns the value of property attribute.
      * @return String
      */
     public String getProperty();
-
-    /**
-     * Sets the name of this VirtualNode
-     * @param s
-     */
-    public void setName(String s);
 
     /**
      * Returns the name of this VirtualNode
@@ -96,6 +78,12 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return VirtualMachine
      */
     public VirtualMachine getVirtualMachine();
+
+    /**
+     * Returns the timeout of this VirtualNode
+     * @return the timeout of this VirtualNode
+     */
+    public long getTimeout();
 
     /**
      * Activates all the Nodes mapped to this VirtualNode in the XML Descriptor
@@ -164,9 +152,9 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * It is in fact the runtime(so the jvm) on which the node is running that is killed.
      * Nodes are previously unregistered from any registry.
      * @param softly if false, all jvms created when activating this VirtualNode are killed abruptely
-	 * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
-	 * dying. To be more precise a thraed is created to ask periodically the registry if objects are still
-	 * registered.
+     * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
+     * dying. To be more precise a thraed is created to ask periodically the registry if objects are still
+     * registered.
      */
     public void killAll(boolean softly);
 
@@ -183,6 +171,11 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * Returns true is this VirtualNode is already activated, false otherwise
      */
     public boolean isActivated();
+
+    /**
+     * @return true if this VirtualNode is a VirtualNodeLookup, false if it is a VirtualNodeImpl
+     */
+    public boolean isLookup();
 
     /**
      * Allows to set runtime informations for this VirtualNode activation.
@@ -204,18 +197,24 @@ public interface VirtualNode extends java.io.Serializable, Job {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
-        
+
+    /**
+     * Returns the minimum number of nodes needed for this VirtualNode.
+     * This number represents the minimum number of nodes,  this VirtualNode needs in order to be
+     * suitable for the application. Default value is the total number of nodes requested in the
+     * XML file
+     */
+    public int getMinNumberOfNodes();
+
     // SECURITY
-	/**
-//	   * @return creator certificate
-	   */
-	  public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	  /**
-	   * @return policy server
-	   */
-	  public PolicyServer getPolicyServer();
+    /**
+       //           * @return creator certificate
+     */
+    public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	  public void setPolicyServer(PolicyServer server);
-	  public void setPolicyFile(String file);
+    /**
+     * @return policy server
+     */
+    public PolicyServer getPolicyServer();
 }

@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.security.cert.X509Certificate;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -40,6 +38,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
+
+import java.security.cert.X509Certificate;
 
 
 /**
@@ -78,28 +78,10 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setProperty(String)
-     */
-    public void setProperty(String property) {
-        logger.warn(message);
-    }
-
-    /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getProperty()
      */
     public String getProperty() {
         return virtualNode.getProperty();
-    }
-
-    public void setTimeout(String timeout, boolean waitForTimeout) {
-        logger.warn(message);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setName(String)
-     */
-    public void setName(String s) {
-        logger.warn(message);
     }
 
     /**
@@ -110,10 +92,17 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getTimeout()
+     */
+    public long getTimeout() {
+        return virtualNode.getTimeout();
+    }
+
+    /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#addVirtualMachine(VirtualMachine)
      */
     public void addVirtualMachine(VirtualMachine virtualMachine) {
-        logger.warn(message);
+        vnlogger.warn(message);
     }
 
     /**
@@ -141,7 +130,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 e.printStackTrace();
             }
         } else {
-            logger.info("VirtualNode " + this.name + " already activated !!!");
+            vnlogger.info("VirtualNode " + this.name +
+                " already activated !!!");
         }
     }
 
@@ -220,14 +210,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     public void killAll(boolean softly) {
-        logger.warn(message);
+        vnlogger.warn(message);
     }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createNodeOnCurrentJvm(String)
      */
     public void createNodeOnCurrentJvm(String protocol) {
-        logger.warn(message);
+        vnlogger.warn(message);
     }
 
     public Object getUniqueAO() throws ProActiveException {
@@ -238,13 +228,17 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     public boolean isActivated() {
         return isActivated;
     }
-    
-//
-	//-------------------IMPLEMENTS Job-----------------------------------
-	//
-	public String getJobID(){
-		return virtualNode.getJobID();
-	}
+
+    public boolean isLookup() {
+        return true;
+    }
+
+    //
+    //-------------------IMPLEMENTS Job-----------------------------------
+    //
+    public String getJobID() {
+        return virtualNode.getJobID();
+    }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
@@ -279,6 +273,32 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         this.portForLookup = port;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
+     */
+    public int getMinNumberOfNodes() {
+        return virtualNode.getMinNumberOfNodes();
+    }
+
+    //  SECURITY
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
+     */
+    public X509Certificate getCreatorCertificate() throws ProActiveException {
+        return virtualNode.getCreatorCertificate();
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
+     */
+    public PolicyServer getPolicyServer() {
+        return virtualNode.getPolicyServer();
+    }
+
+    //
+    //-------------------PRIVATE METHODS---------------------------------
+    //
     private boolean isWaitingForProperties() {
         return (runtimeProperties.size() >= 1);
     }
@@ -302,36 +322,4 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new ProActiveException(exceptionMessage);
         }
     }
-    
-    // SECURITY
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
-	 */
-	public X509Certificate getCreatorCertificate() throws ProActiveException {
-		return virtualNode.getCreatorCertificate();
-	}
-
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
-	 */
-	public PolicyServer getPolicyServer() {
-		return virtualNode.getPolicyServer();
-	}
-
-	/* (non-Javadoc)
-			 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyServer()
-			 */
-	public void setPolicyServer(PolicyServer ps) {
-		System.out.println(message);
-	//	virtualNode.setPolicyServer(ps);
-	}
-
-
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
-	 */
-	public void setPolicyFile(String file) {
-		
-	}
-    
 }

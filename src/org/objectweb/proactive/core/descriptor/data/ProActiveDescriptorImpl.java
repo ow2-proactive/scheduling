@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -82,6 +83,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     /** map process id and process updater for later update of the process */
     private java.util.HashMap pendingProcessMapping;
 
+    /** map process id and service */
+    private java.util.HashMap serviceMapping;
+
+    /** map process id and service updater for later update of the service */
+    private java.util.HashMap pendingServiceMapping;
+
     /** Location of the xml file */
     private String url;
 
@@ -102,6 +109,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         virtualMachineMapping = new java.util.HashMap();
         processMapping = new java.util.HashMap();
         pendingProcessMapping = new java.util.HashMap();
+        serviceMapping = new java.util.HashMap();
+        pendingServiceMapping = new java.util.HashMap();
         this.url = url;
     }
 
@@ -129,6 +138,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     public ExternalProcess getProcess(String name) {
         return (ExternalProcess) processMapping.get(name);
+    }
+
+    public UniversalService getService(String serviceID) {
+        return (UniversalService) serviceMapping.get(serviceID);
     }
 
     public VirtualNode createVirtualNode(String vnName, boolean lookup) {
@@ -204,6 +217,26 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             compositeProcess.setTargetProcess(process);
         }
     }
+    
+    public void addService(String serviceID, UniversalService service) {
+        ServiceUpdater serviceUpdater = (ServiceUpdater) pendingServiceMapping.remove(serviceID);
+        if (serviceUpdater != null) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating Service name=" + serviceID);
+            }
+            serviceUpdater.updateService(service);
+        }
+        processMapping.put(serviceID, service);
+    }
+
+    public void registerService(VirtualMachine virtualMachine, String serviceID) {
+        UniversalService service = getService(serviceID);
+        if (service == null) {
+            addPendingService(serviceID, virtualMachine);
+        } else {
+            virtualMachine.setService(service);
+        }
+    }
 
     public void activateMappings() {
         VirtualNode[] virtualNodeArray = getVirtualNodes();
@@ -252,29 +285,23 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             //       prR.setProActiveSecurityManager(psm);
             //   } catch (ProActiveException e) {
             //       e.printStackTrace();
-            
             // set the security policyserver to the default proactive meta object
             PolicyServer clonedPolicyServer = null;
             try {
-            	 clonedPolicyServer = (PolicyServer) policyServer.clone();
-            	 
-            	 clonedPolicyServer.generateEntityCertificate("HalfBody for " + policyServer.getApplicationName());
-            	 
-            	 ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
-            	 ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
-            	 
-            	 
-			} catch (CloneNotSupportedException e1) {
-				e1.printStackTrace();
-			}
-            
-            
-            
+                clonedPolicyServer = (PolicyServer) policyServer.clone();
+
+                clonedPolicyServer.generateEntityCertificate("HalfBody for " +
+                    policyServer.getApplicationName());
+
+                ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
+                ProActiveMetaObjectFactory.newInstance()
+                                          .setProActiveSecurityManager(psm);
+            } catch (CloneNotSupportedException e1) {
+                e1.printStackTrace();
+            }
         } catch (IOException e) {
-         
             e.printStackTrace();
         } catch (SAXException e) {
-       
             e.printStackTrace();
         }
     }
@@ -309,10 +336,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     private void addPendingProcess(String processID,
         VirtualMachine virtualMachine) {
-        ProcessUpdater updater = new VirtualMachineProcessUpdater(virtualMachine);
+        ProcessUpdater updater = new VirtualMachineUpdater(virtualMachine);
 
         //pendingProcessMapping.put(processID, updater);
-        addUpdater(processID, updater);
+        addProcessUpdater(processID, updater);
     }
 
     private void addPendingProcess(String processID,
@@ -320,10 +347,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         ProcessUpdater updater = new CompositeExternalProcessUpdater(compositeProcess);
 
         //pendingProcessMapping.put(processID, updater);
-        addUpdater(processID, updater);
+        addProcessUpdater(processID, updater);
     }
 
-    private void addUpdater(String processID, ProcessUpdater processUpdater) {
+    private void addProcessUpdater(String processID,
+        ProcessUpdater processUpdater) {
         CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
         if (compositeProcessUpdater == null) {
             compositeProcessUpdater = new CompositeProcessUpdater();
@@ -333,9 +361,53 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         compositeProcessUpdater.addProcessUpdater(processUpdater);
     }
 
+    
+
+    private void addPendingService(String serviceID,
+        VirtualMachine virtualMachine) {
+        ServiceUpdater updater = new VirtualMachineUpdater(virtualMachine);
+        addServiceUpdater(serviceID, updater);
+    }
+
+    private void addServiceUpdater(String serviceID,
+        ServiceUpdater serviceUpdater) {
+        CompositeServiceUpdater compositeServiceUpdater = (CompositeServiceUpdater) pendingServiceMapping.get(serviceID);
+        if (compositeServiceUpdater == null) {
+            compositeServiceUpdater = new CompositeServiceUpdater();
+            //pendingProcessMapping.put(processID, processUpdater);
+            pendingServiceMapping.put(serviceID, compositeServiceUpdater);
+        }
+        compositeServiceUpdater.addServiceUpdater(serviceUpdater);
+    }
+
     //
     //  ----- INNER CLASSES -----------------------------------------------------------------------------------
     //
+    private interface ServiceUpdater {
+        public void updateService(UniversalService service);
+    }
+
+    private class CompositeServiceUpdater implements ServiceUpdater {
+        private java.util.ArrayList updaterList;
+
+        public CompositeServiceUpdater() {
+            updaterList = new java.util.ArrayList();
+        }
+
+        public void addServiceUpdater(ServiceUpdater s) {
+            updaterList.add(s);
+        }
+
+        public void updateService(UniversalService s) {
+            java.util.Iterator it = updaterList.iterator();
+            while (it.hasNext()) {
+                ServiceUpdater serviceUpdater = (ServiceUpdater) it.next();
+                serviceUpdater.updateService(s);
+            }
+            updaterList.clear();
+        }
+    }
+
     private interface ProcessUpdater {
         public void updateProcess(ExternalProcess p);
     }
@@ -377,10 +449,11 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         }
     }
 
-    private class VirtualMachineProcessUpdater implements ProcessUpdater {
+    private class VirtualMachineUpdater implements ProcessUpdater,
+        ServiceUpdater {
         private VirtualMachine virtualMachine;
 
-        public VirtualMachineProcessUpdater(VirtualMachine virtualMachine) {
+        public VirtualMachineUpdater(VirtualMachine virtualMachine) {
             this.virtualMachine = virtualMachine;
         }
 
@@ -389,6 +462,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 logger.debug("Updating VirtualMachine Process");
             }
             virtualMachine.setProcess(p);
+        }
+
+        public void updateService(UniversalService s) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating VirtualMachine Service");
+            }
+            virtualMachine.setService(s);
         }
     }
 }

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
@@ -173,7 +174,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       // create and register a VirtualNode
       String vnName = attributes.getValue("name");
       if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
-      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName,false);
+      // underneath, we know that it is a VirtualNodeImpl, since the bollean in the method is false 
+      VirtualNodeImpl vn = (VirtualNodeImpl)proActiveDescriptor.createVirtualNode(vnName,false);
       // property
       String property = attributes.getValue("property");
       if (checkNonEmpty(property)) {
@@ -186,7 +188,11 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 		waitForTimeout = new Boolean(waitForTimeoutAsString).booleanValue();
 	  }
       if (checkNonEmpty(timeout)) {
-       vn.setTimeout(timeout, waitForTimeout);
+       vn.setTimeout(new Integer(timeout).longValue(), waitForTimeout);
+      }
+      String minNodeNumber = attributes.getValue("minNodeNumber");
+      if (checkNonEmpty(minNodeNumber)){
+          vn.setMinNumberOfNodes((new Integer(minNodeNumber).intValue()));
       }
 
     }

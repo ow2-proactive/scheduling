@@ -32,6 +32,11 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.services.P2PLookupService;
+import org.objectweb.proactive.core.descriptor.services.ServiceThread;
+import org.objectweb.proactive.core.descriptor.services.UniversalService;
+import org.objectweb.proactive.core.event.NodeCreationEvent;
+import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.Node;
@@ -67,7 +72,7 @@ import java.util.Hashtable;
  * @see ProActiveDescriptor
  * @see VirtualMachine
  */
-public class VirtualNodeImpl extends RuntimeDeploymentProperties
+public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNode, Serializable, RuntimeRegistrationEventListener {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -100,6 +105,11 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     /** Number of Nodes mapped to this VirtualNode in the XML Descriptor */
     private int nodeCount;
 
+    /** Minimum number of nodes needed for this virtualnode while waiting on the nodes
+     * creation.
+     */
+    private int minNodeNumber = 0;
+
     /** Number of Nodes mapped to this VitualNode in the XML Descriptor that are actually created */
     private int nodeCountCreated;
 
@@ -113,7 +123,14 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     private String registrationProtocol;
     private boolean registration = false;
     private boolean waitForTimeout = false;
-    protected int MAX_RETRY = 70;
+
+    //protected int MAX_RETRY = 70;
+
+    /** represents the timeout in ms*/
+    protected long timeout = 70000;
+
+    /** represents the sum of the timeout + current time in ms*/
+    protected long globalTimeOut;
     private Object uniqueActiveObject = null;
     private X509Certificate creatorCertificate;
     private PolicyServer policyServer;
@@ -155,6 +172,11 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
+
+    /**
+     * Sets the property attribute to the given value
+     * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
+     */
     public void setProperty(String value) {
         this.property = value;
     }
@@ -163,11 +185,25 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return property;
     }
 
-    public void setTimeout(String timeout, boolean waitForTimeout) {
-        MAX_RETRY = new Integer(timeout).intValue();
+    public long getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Sets the timeout variable to the given value.
+     * Calling this method will force this VirtualNode to wait until the timeout expires
+     * before giving access to its nodes.
+     */
+    public void setTimeout(long timeout, boolean waitForTimeout) {
+        System.out.println("timeour set " + timeout);
+        this.timeout = timeout;
         this.waitForTimeout = waitForTimeout;
     }
 
+    /**
+     * Sets the name of this VirtualNode
+     * @param s
+     */
     public void setName(String s) {
         this.name = s;
     }
@@ -206,79 +242,17 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         if (!isActivated) {
             for (int i = 0; i < virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
-                boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
-                ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
 
-                // Test if that is this virtual Node that originates the creation of the vm
-                // else the vm was already created by another virtualNode, in that case, nothing is
-                // done at this point, nodes creation will occur when the runtime associated with the jvm
-                // will register.
-                if (!vmAlreadyAssigned ) {
-                    if (vm.isAcquired()) {
-                    	
-                    	String nodeName;
-                        String[] nodeNames = null;
-                        ProActiveRuntime proActiveRuntimeRegistered;
-                        String nodeHost;
-                        String protocol = null;
-                        String url = null;
-                        int port = 0;
-                       
-                    	
-//                    	gets the registered runtime
-                        proActiveRuntimeRegistered = vm.getRemoteRuntime();
-                  
-                        try {
-                            protocol = UrlBuilder.getProtocol(proActiveRuntimeRegistered.getURL());
-							url = UrlBuilder.removeProtocol(proActiveRuntimeRegistered.getURL(),protocol);
-						} catch (ProActiveException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-                       
-                        // get the host of nodes
-                        nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                             .getInetAddress()
-                                                             .getCanonicalHostName();
+                // first check if it is a process that is attached to the vm
+                if (vm.hasProcess()) {
+                    boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
+                    ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
 
-                        try {
-                            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
-                        } catch (ProActiveException e) {
-                            logger.warn("port unknown: " + port);
-                        }
-                        try {
-                            //get the node on the registered runtime
-                            // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
-                            int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
-                            for (int j = 1; j <= nodeNumber; j++) {
-                                nodeName = this.name +
-                                    Integer.toString(new java.util.Random(
-                                            System.currentTimeMillis()).nextInt());
-                                url = buildURL(nodeHost, nodeName, protocol, port);
-
-                                // nodes are created from the registered runtime, since this virtualNode is
-                                // waiting for runtime registration to perform co-allocation in the jvm.
-                                PolicyServer nodePolicyServer = null;
-                                if (policyServer != null) {
-                                    nodePolicyServer = (PolicyServer) policyServer.clone();
-
-                                    nodePolicyServer.generateEntityCertificate(name);
-                                }
-
-                                proActiveRuntimeRegistered.createLocalNode(url, false,
-                                    nodePolicyServer, this.getName(), this.jobID);
-                                performOperations(proActiveRuntimeRegistered, url, protocol);
-                            }
-                        } catch (ProActiveException e) {
-                            e.printStackTrace();
-                        } catch (CloneNotSupportedException e) {
-                            e.printStackTrace();
-                        }
-                    
-                    	
-                    	
-                    	
-                    } else {
+                    // Test if that is this virtual Node that originates the creation of the vm
+                    // else the vm was already created by another virtualNode, in that case, nothing is
+                    // done at this point, nodes creation will occur when the runtime associated with the jvm
+                    // will register.
+                    if (!vmAlreadyAssigned) {
                         setParameters(process, vm);
                         process.setSecurityFile(policyServerFile);
                         // It is this virtual Node that originates the creation of the vm
@@ -291,12 +265,11 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                                 process.getCommand());
                         }
                     }
+                } else {
+                    // It is a service that is mapped to the vm.
+                    startService(vm);
                 }
 
-                //			}else{
-                //				// add in the hashtable the vm's creator id, and the number of nodes that should be created
-                //				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
-                //			}
                 increaseIndex();
             }
 
@@ -306,6 +279,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 internalCreateNodeOnCurrentJvm(protocol);
             }
 
+            //initialization of the global timeout
+            globalTimeOut = System.currentTimeMillis() + timeout;
             isActivated = true;
             if (registration) {
                 register();
@@ -396,7 +371,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             }
         } else {
             throw new NodeException(
-                "Cannot return nodes, no nodes hava been created");
+                "Cannot return nodes, no nodes have been created");
         }
         return nodeTab;
     }
@@ -480,38 +455,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         localVirtualMachines.add(protocol);
     }
 
-    private void internalCreateNodeOnCurrentJvm(String protocol) {
-        try {
-            // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
-            // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
-            // we must increase the node count
-            String url;
-            increaseNodeCount(1);
-            String nodeName = this.name +
-                Integer.toString(new java.util.Random(
-                        System.currentTimeMillis()).nextInt());
-
-            // get the Runtime for the given protocol
-            ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
-                        protocol));
-
-            //create the node
-            PolicyServer nodePolicyServer = null;
-            if (policyServer != null) {
-                nodePolicyServer = (PolicyServer) policyServer.clone();
-
-                nodePolicyServer.generateEntityCertificate(name);
-            }
-
-            url = defaultRuntime.createLocalNode(nodeName, false,
-                    nodePolicyServer, this.getName(), ProActive.getJobId());
-            //add this node to this virtualNode
-            performOperations(defaultRuntime, url, protocol);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public Object getUniqueAO() throws ProActiveException {
         if (!property.equals("unique_singleAO")) {
             logger.warn(
@@ -542,6 +485,10 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
     public boolean isActivated() {
         return isActivated;
+    }
+
+    public boolean isLookup() {
+        return false;
     }
 
     //
@@ -579,7 +526,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             }
             protocol = event.getProtocol();
             //gets the registered runtime
-            proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+            proActiveRuntimeRegistered = event.getRegisteredRuntime();
 
             // get the host of nodes
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
@@ -606,7 +553,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     PolicyServer nodePolicyServer = null;
                     if (policyServer != null) {
                         nodePolicyServer = (PolicyServer) policyServer.clone();
-
                         nodePolicyServer.generateEntityCertificate(name);
                     }
 
@@ -624,7 +570,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //Check if the virtualNode that originates the process is among awaited VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
             //gets the registered runtime
-            proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+            proActiveRuntimeRegistered = event.getRegisteredRuntime();
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getInetAddress()
@@ -673,12 +619,16 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException {
-        try {
-            checkProperty(information);
-        } catch (ProActiveException e) {
-            throw new ProActiveException("No property can be set at runtime on this VirtualNode",
-                e);
-        }
+        //        try {
+        //            checkProperty(information);
+        //        } catch (ProActiveException e) {
+        //            throw new ProActiveException("No property can be set at runtime on this VirtualNode",
+        //                e);
+        //        }
+        //No need to check if the property exist since no property can be set 
+        // at runtime on a VNImpl. This might change in the future.
+        throw new ProActiveException(
+            "No property can be set at runtime on this VirtualNode");
     }
 
     public void setRegistrationProtocol(String protocol) {
@@ -690,22 +640,106 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return this.registrationProtocol;
     }
 
+    /**
+     * Sets the minimal number of nodes this VirtualNode needs to be suitable for the application.
+     * It means that if in the Deployment file, this VirtualNode is mapped onto n nodes, and the
+     * minimum number of nodes is set to m, with of course m<n, calling method getNodes will return
+     * when at least m nodes are created
+     * @param min the minimum number of nodes
+     */
+    public void setMinNumberOfNodes(int min) {
+        this.minNodeNumber = min;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
+     */
+    public int getMinNumberOfNodes() {
+        return minNodeNumber;
+    }
+
+    //  SECURITY
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
+     */
+    public X509Certificate getCreatorCertificate() {
+        return creatorCertificate;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
+     */
+    public PolicyServer getPolicyServer() {
+        return policyServer;
+    }
+
+    /**
+     * @param server
+     */
+    public void setPolicyServer(PolicyServer server) {
+        // logger.debug("Setting PolicyServer " + server + " to VN " +name);
+        policyServer = server;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
+     */
+    public void setPolicyFile(String file) {
+        policyServerFile = file;
+    }
+
     //
     //-------------------PRIVATE METHODS--------------------------------------
     //
+    private void internalCreateNodeOnCurrentJvm(String protocol) {
+        try {
+            // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
+            // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
+            // we must increase the node count
+            String url;
+            increaseNodeCount(1);
+            String nodeName = this.name +
+                Integer.toString(new java.util.Random(
+                        System.currentTimeMillis()).nextInt());
+
+            // get the Runtime for the given protocol
+            ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
+                        protocol));
+
+            //create the node
+            PolicyServer nodePolicyServer = null;
+            if (policyServer != null) {
+                nodePolicyServer = (PolicyServer) policyServer.clone();
+
+                nodePolicyServer.generateEntityCertificate(name);
+            }
+
+            url = defaultRuntime.createLocalNode(nodeName, false,
+                    nodePolicyServer, this.getName(), ProActive.getJobId());
+            //add this node to this virtualNode
+            performOperations(defaultRuntime, url, protocol);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Waits until at least one Node mapped to this VirtualNode in the XML Descriptor is created
      */
-    private void waitForNodeCreation() throws NodeException {
-        int count = 0;
+    private synchronized void waitForNodeCreation() throws NodeException {
         while (!nodeCreated) {
-            if (count < MAX_RETRY) {
-                count++;
+            if (!timeoutExpired()) {
                 try {
-                    Thread.sleep(1000);
+                    wait(getTimeToSleep());
                 } catch (InterruptedException e2) {
                     e2.printStackTrace();
+                } catch (IllegalStateException e) {
+                    // it may happen that we entered in the loop and just after
+                    // the timeToSleep is < 0. It means that the timeout expired
+                    // that is why we catch the runtime exception
+                    throw new NodeException(
+                        "After many retries, not even one node can be found");
                 }
             } else {
                 throw new NodeException(
@@ -718,35 +752,58 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     /**
      * Waits until all Nodes mapped to this VirtualNode in the XML Descriptor are created
      */
-    private void waitForAllNodesCreation() throws NodeException {
-        int count = 0;
-
+    private synchronized void waitForAllNodesCreation()
+        throws NodeException {
+        int tempNodeCount = nodeCount;
         if (waitForTimeout) {
-            while (count < MAX_RETRY) {
-                count++;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e2) {
-                    e2.printStackTrace();
-                }
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e2) {
+                e2.printStackTrace();
             }
         } else {
-            while (nodeCountCreated != nodeCount) {
-                if (count < MAX_RETRY) {
-                    count++;
+            // check if we can release the vn before all nodes expected, are created
+            // i.e the minNumber of nodes is set
+            if (minNodeNumber != 0) {
+                tempNodeCount = minNodeNumber;
+            }
+            while (nodeCountCreated != tempNodeCount) {
+                if (!timeoutExpired()) {
                     try {
-                        Thread.sleep(1000);
+                        wait(getTimeToSleep());
                     } catch (InterruptedException e2) {
                         e2.printStackTrace();
+                    } catch (IllegalStateException e) {
+                        // it may happen that we entered in the loop and just after
+                        // the timeToSleep is < 0. It means that the timeout expired
+                        // that is why we catch the runtime exception
+                        throw new NodeException("After many retries, only " +
+                            nodeCountCreated + " nodes are created on " +
+                            tempNodeCount + " expected ");
                     }
                 } else {
                     throw new NodeException("After many retries, only " +
                         nodeCountCreated + " nodes are created on " +
-                        nodeCount + " expected");
+                        tempNodeCount + " expected");
                 }
             }
         }
         return;
+    }
+
+    private boolean timeoutExpired() {
+        long currentTime = System.currentTimeMillis();
+        return (globalTimeOut < currentTime);
+    }
+
+    private long getTimeToSleep() {
+        // if timeToSleep is < 0 we throw an exception
+        long timeToSleep = globalTimeOut - System.currentTimeMillis();
+        if (timeToSleep > 0) {
+            return timeToSleep;
+        } else {
+            throw new IllegalStateException("Timeout expired");
+        }
     }
 
     /**
@@ -765,7 +822,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //modifications will be applied on one object that might 
         // be referenced by other virtualNodes .i.e check started
         if (!vmAlreadyAssigned) {
-            copyProcess = makeDeepCopy(process);
+            copyProcess = (ExternalProcess) makeDeepCopy(process);
             vm.setProcess(copyProcess);
             return copyProcess;
         } else {
@@ -873,9 +930,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
      * @param process the process to copy
      * @return ExternalProcess, the copy version of the process
      */
-    private ExternalProcess makeDeepCopy(ExternalProcess process) {
+    private Object makeDeepCopy(Object process) {
         //deepCopyTag = true;
-        ExternalProcess result = null;
+        Object result = null;
         try {
             java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
             java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
@@ -884,7 +941,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             oos.close();
             java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
             java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
-            result = (ExternalProcess) ois.readObject();
+            result = ois.readObject();
             ois.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -928,14 +985,19 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return protocol;
     }
 
-    private void performOperations(ProActiveRuntime part, String url,
-        String protocol) {
-        createdNodes.add(new NodeImpl(part, url, checkProtocol(protocol),
-                this.jobID));
+    private synchronized void performOperations(ProActiveRuntime part,
+        String url, String protocol) {
+        Node node = new NodeImpl(part, url, checkProtocol(protocol), this.jobID);
+        createdNodes.add(node);
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
         nodeCountCreated++;
+        // wakes up Thread that are waiting for the node creation 
+        notifyAll();
+        //notify all listeners that a node has been created
+        notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
+            nodeCountCreated);
     }
 
     private void register() {
@@ -955,10 +1017,36 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         this.registration = value;
     }
 
+    private void startService(VirtualMachine vm) {
+        UniversalService service = vm.getService();
+
+        //we need to perform a deep copy. Indeed if several vm reference
+        // the same service this might lead to unexpected behaviour
+        UniversalService copyService = (UniversalService) makeDeepCopy(service);
+        vm.setService(copyService);
+        if (service.getServiceName().equals("P2PLookup")) {
+            int nodeRequested = ((P2PLookupService) service).getNodeNumber();
+
+            // if it is a P2Pservice we must increase the node count with the number
+            // of nodes requested
+            if (nodeRequested != ((P2PLookupService) service).getMAX()) {
+                increaseNodeCount(nodeRequested);
+                //nodeRequested = MAX means that the service will try to get every nodes 
+                // it can. So we can't predict how many nodes will return.
+            }
+        } else {
+            //increase with 1 node
+            increaseNodeCount(1);
+        }
+        new ServiceThread(this, vm).start();
+    }
+
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         try {
-            waitForAllNodesCreation();
+            if (isActivated) {
+                waitForAllNodesCreation();
+            }
         } catch (NodeException e) {
             e.printStackTrace();
         }
@@ -969,36 +1057,5 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-    }
-
-    // SECURITY
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
-     */
-    public X509Certificate getCreatorCertificate() {
-        return creatorCertificate;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
-     */
-    public PolicyServer getPolicyServer() {
-        return policyServer;
-    }
-
-    /**
-     * @param server
-     */
-    public void setPolicyServer(PolicyServer server) {
-        // logger.debug("Setting PolicyServer " + server + " to VN " +name);
-        policyServer = server;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
-     */
-    public void setPolicyFile(String file) {
-        policyServerFile = file;
     }
 }
