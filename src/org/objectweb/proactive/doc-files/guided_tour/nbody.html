@@ -51,11 +51,22 @@ Rationale<br>
 goes through the different steps that
 could take you to writing an application with ProActive, from a simple
 design, to a more complicated structure. This is meant to help you get
-familiar with the Group facilities offered by ProActive.</p>
+familiar with the Group facilities offered by ProActive. Please take
+note that this page tries to take you through the progression, step by
+step. You may find some <a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">more
+information</a>, mainly on the
+design, on
+the
+web, on the <a href="http://www-sop.inria.fr/oasis/proactive/apps/">
+applications/example page </a><a>
+of proactive. <br>
+</a></p>
 <p>
-n-body is a classic problem. It consists in working out the position of
+<a>n-body is a classic problem. It
+consists in working out the position of
 bodies in space, which depend only on the gravitational forces that
-apply to them. A good introduction to the problem is given <a
+apply to them. A good introduction to the problem is given </a><a
  href="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">here</a>.
 You may find a detailled explanation of the underlying mathematics <a
  href="http://members.fortunecity.com/kokhuitan/nbody.html">here</a>.
@@ -104,7 +115,8 @@ should be read as : the total force on the body <span
 is the sum of all the forces between <span style="font-style: italic;">b</span>
 and all the other bodies in the system.<br>
 This
-is the force one has to compute for every body in the system. With this
+is the force that has to be computed for every body in the system. With
+this
 force, using the the usual physics formulae, <br>
       </p>
       <div style="text-align: center;"><img
@@ -129,11 +141,9 @@ the time):<br>
     </tr>
   </tbody>
 </table>
-<br>
 </div>
 <h3 class="textNormal">2
 Source files: ProActive/src/org/objectweb/proactive/examples/nbody</h3>
-<br>
 <p>
 This guided tour is based on the files you may find in the directory
 ProActive/src/org/objectweb/proactive/examples/nbody. You'll find the
@@ -149,13 +159,13 @@ are two enhancement based on different synchronization schemes.
 'barneshut' is a bit special, in that it contains a different algorithm
 to solve the nbody problem. <br>
 </p>
-<br>
 <h3 class="textNormal">3
 common</h3>
-<p>The files contained in 'common'
+<p>The
+files contained in 'common'
 are those that are reused throughout
-the different versions.&nbsp; Let's see what they do:</p>
-<br>
+the different versions.&nbsp; Let's see what they do:<br>
+</p>
 <ul>
   <li>First of all there are the
 two files
@@ -163,7 +173,8 @@ called Displayer.java and NBodyFrame.java. These handle the graphical
 output of the bodies, as they move about in space. They are not
 specially of interest, as GUI is not the point of this tutorial.
 Nonetheless, please note that the important method here is
-    <p class="textNormal"> <code>public
+    <p class="textNormal"> <code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
 void drawBody(int x, int y, int vx, int vy, int weight, int d,
 int id) ;</code></p>
 Taking position, velocity, diameter and unique identifier of a body, it
@@ -179,7 +190,7 @@ examples. A Planet is no more than a point in
 space, with velocity and mass - the diameter expresses the size to use
 for the display:
     <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-public
+    </code><code>public
 class Planet <span style="color: rgb(0, 121, 0);">implements
 Serializable</span>{<br>
 &nbsp;&nbsp;&nbsp;
@@ -255,8 +266,16 @@ catch
     </code></p>
 the <code>Node [] nodes</code>
 are the different JVMs that were created on possibly different
-machines. They are used for Active Object creation. For example, in the
-simple example, the Maestro is created on the first of theses JVMs, and
+machines. They are used for Active Object creation. They were specified
+in the descriptor used to deploy the application. You may find more
+information on these <a
+ href="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/Descriptor.html">
+descriptors here</a>, while Active
+Object creation is explained in <a
+ href="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/ActiveObjectCreation.html">
+this page</a>.
+Just as an example, in the
+simple package, the Maestro is created on the first of theses JVMs, and
 takes three parameters, a <code>Domain
 []</code>, an <code>Integer</code>,
 and a <code>Start</code>
@@ -265,14 +284,14 @@ and a <code>Start</code>
     <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Object [] constructorParams ; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-constructorParams = {domainArray, new Integer(maxIter), killsupport} ; <br>
+constructorParams = {domainArray, new Integer(maxIter),
+killsupport} ; <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 maestro
 = (Maestro) ProActive.newActive ( Maestro.class.getName(),
 constructorParams , nodes[0] ) ;</code></p>
   </li>
 </ul>
-<br>
 <p>The files contained in the
 other directories, 'simple', 'groupcom',
 'groupdistrib' , 'groupoospmd' , detail steps of increasing complexity,
@@ -282,16 +301,17 @@ go too fast. Let's have a look at the insides of the simplest
 implementation of the n-body problem. <br>
 </p>
 <h3 class="textNormal">4
-simple</h3>
-<br>
+simple<br>
+</h3>
 <p>This is the implementation of
 the simplest example of nbody. We defined
 the <code>Planet</code>
 to be a passive object, and it does nothing. It
 is a container for position, velocity and mass, as we've seen in the
-description given higher up. The real actors are the Domains, who do
+description given higher up. The real actors are the <code>Domains</code>,
+who do
 all the work. To every
-<code>Planet</code>,
+<code>Planet</code>
 in the universe, is associated a
 <code>Domain</code>,
 which is an
@@ -302,8 +322,9 @@ contains the code to manage the communication of the possitions of the <code>Pla
 during the simulation. They are created in the Start.java file : <br>
 <code></code></p>
 <br>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Domain
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rectangle
+universe = new Rectangle (-100,-100,100,100);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Domain
 [] domainArray = new
 Domain
 [totalNbBodies];<br>
@@ -315,10 +336,7 @@ Object [] <span style="color: rgb(0, 121, 0);">constructorParams</span>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 new Integer(i), <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X,
-STEP_Y),<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-killsupport<br>
+new Planet (universe)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; };<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -358,28 +376,35 @@ and since it's an <code>Object []</code>
 , the parameters may only be <code>Objects</code>
 (don't try to build constructors using ints in their
 constructor - this explains the use of the class <code>Integer</code>).
-The Domains, once created, are initialized, and then they are
+The <code>Domains</code>, once created, are initialized, and then they
+are
 synchronized by all pinging the maestro, with the notifyFinished
 call.&nbsp; are started
 by issuing the sendValueToNeighbours request. <br>
 <code></code></p>
 <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-// init workers<br>
+</code><code>//
+init workers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 for (int i=0 ; i &lt; totalNbBodies ; i ++)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 domainArray[i].init(domainArray, displayer, maestro);</code></p>
 <p><code><br>
 </code></p>
-<p><code>&nbsp;public
-void init(Domain [] domainArray, Displayer dp, Maestro master) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-maestro.notifyFinished(); &nbsp;&nbsp;&nbsp;
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>public
+void init(Domain [] domainArray, Displayer dp, Maestro
+master) {<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>.....<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>maestro.notifyFinished();
+&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; // say we're ready to start .<br>
-&nbsp;&nbsp;&nbsp; }<br>
-</code> </p>
-<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp; }</code><br>
+</p>
 <p>While in their execution, the <code>Domains</code>
 gather information concerning the position of all
 the other bodies, which need to be known to move the local <code>Planet</code>,
@@ -435,21 +460,21 @@ moveBody();<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 }<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-}&nbsp;&nbsp; </code> </p>
-<br>
+}&nbsp;&nbsp; </code>
+</p>
 <p>This means that each <code>Domain</code>
 sends its
 information to all the other <code>Domains</code>,
 and then waits until it has received all the positions it is waiting
 for. The other <code>Domains</code>
 are stored as an array, and a Maestro is built
-to coordinate all the computation : to avoid having Domains computing
-iterations ahead of the others, explicit synchronization is achieved by
+to coordinate all the computation : to avoid having <code>Domains</code>
+computing
+iterations
+ahead of the others, explicit synchronization is achieved by
 the <code>Maestro</code>.
 It waits for all to notify it, before asking them to go on with the
-next iteration. <br>
-<code></code></p>
-<br>
+next iteration. </p>
 <p class="textNormal"><code>&nbsp;
 &nbsp; &nbsp;&nbsp; public
 void notifyFinished() {<br>
@@ -487,69 +512,23 @@ this.domainArray[i].<span style="color: rgb(0, 121, 0);">sendValueToNeighbours()
 }<br>
 </code>
 </p>
-<h3 class="textNormal">5
-groupcom</h3>
-<br>
-<p>This is a simple improvement,
+<p>You may find another view of
+this example on this <a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web
+page</a><a>.</a></p>
+<h3 class="textNormal"><a>5
+groupcom</a></h3>
+<p><a>This
+is a simple improvement,
 which allows to have faster
 communication. You may have noticed the Group capabilities of
 ProActive. They give us the ability to call on operation on an object
 which is&nbsp; a Group, and have it sent to all the members of the
-Group. In the previous example, the neighbours where stocked in an
-array, and each was accessed in turn:<br>
-<code></code></p>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-for
-(int i = 0 ; i &lt; this.neighbours.length ; i ++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;
-if (i != this.identification) // don't notify self!<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp; &nbsp;
-this.neighbours[i].<span style="color: rgb(0, 121, 0);">setValue</span>(this.info,
-this.identification);<br>
-</code></p>
-<br>
-<p>Well, that's BAAAAD! Replace
-this by the following code, because it works faster :</p>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.neighbours.setValue<span style="color: rgb(0, 121, 0);"></span>(this.info,
-this.identification);<br>
-</code></p>
-<p>It's a bit strange at first,
-because <code>neighbours</code>
-is of type <code>Domain</code>.
-You may think we're accessing only one Active Object at once, but
-that's not true. We're accesssing all the objects in the group, and to
-be able to continue using the methods of the Domain class, the group is
-type as one Domain. You have to create the <code>neighbours</code>
-group
-at the beginning of the code of the <code>Domain</code>,
-for example in the <code>init()</code>
-method, but you can then use it everywhere, in replacement of the
-array! <br>
-<code></code></p>
-<br>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-public
-void init(Domain domainGroup,
-Displayer dp, Maestro master) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.neighbours = domainGroup;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Group g = ProActiveGroup.getGroup(neighbours);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-g.remove(ProActive.getStubOnThis()); &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; // no need to send information to self<br>
-&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; &nbsp; .....<br>
-</code></p>
-<p>Such a group must be created
-as a Group, either empty, then filled in, or can be created as the
-Active Objects are created. That's more elegant, and here's how it's
-done :</p>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Group. We can use them in this framework : first, create a Group,
+instead of having independant <code>Active
+Objects</code> : <br>
+</a></p>
+<p><code><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Object
 [][] params = ... <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -567,32 +546,113 @@ Domain.class.getName(), params, nodes);<br>
 } <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
 &nbsp;&nbsp;
-catch ....</code></p>
-<p>The double array params stores
+catch ....</a></code></p>
+<p><a>The
+double array params stores
 the parameters passed to the
-constructors of the Domains we're creating. Domain 0 will have
-params[0][] passed as arguments, Domain 1 params[1][], and so on. The
+constructors of the <code>Domains</code> we're creating. <code>Domain
+0</code> will have
+<code>params[0][]</code> passed as arguments, <code>Domain 1
+params[1][]</code>, and so on. The
 nodes are the Nodes on which to display these Active Objects. Do notice
-the try... catch construction, which is needed, like around any
-creation of Active Objects, which may raise exceptions.&nbsp;
+the <code>try... catch</code> construction, which is needed, like
+around any
+creation of <code>Active Objects</code>, which may raise exceptions.
+In this
+previous bit of&nbsp; code, a <code>Group</code> containing new <code>Active
+Objects</code>
+has been created, and all these Objects belong to the group .&nbsp;
+You may have noticed that the type of the <code>Group</code> is
+Domain. It's a bit
+strange at first, and you may think this reference points to only one
+Active Object at once, but
+that's not true. We're accesssing all the objects in the group, and to
+be able to continue using the methods of the Domain class, the group is
+typed as <code>Domain</code>, and that's the reason why it's called a
+typed Group. <br>
+<code></code></a></p>
+<p><a>Now,
+this group is passed as
+parameter to all the members of the Group, in just one call:</a></p>
+<p><code><a>&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
+domainGroup.init(domainGroup, displayer, maestro);
+</a></code></p>
+<p><a>SThis
+method sets the local
+field as a copy of the passed parameter, and as such is unique, we can
+play around with it without affecting the others, so let's remove the
+local <code>Domain<code> from the Group, to avoid having calls on self:<br>
+</code></code></a></p>
+<p>
 </p>
-<br>
-<h3 class="textNormal">6
-groupdistrib</h3>
-<br>
-<p>Now, do like the idea that the
+<p><code><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+void init(Domain domainGroup,
+Displayer dp, Maestro master) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.neighbours = domainGroup;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Group g = ProActiveGroup.getGroup(neighbours);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+g.remove(ProActive.getStubOnThis()); &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; // no need to send information to self<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; .....</a></code><a><br>
+</a></p>
+<p><a>Remember
+that in the previous
+example, the neighbours where stocked in an
+array, and each was accessed in turn:<br>
+<code></code></a></p>
+<p><code><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for
+(int i = 0 ; i &lt; this.neighbours.length ; i ++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+if (i != this.identification) // don't notify self!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;
+this.neighbours[i].<span style="color: rgb(0, 121, 0);">setValue</span>(this.info,
+this.identification);</a></code><a><br>
+</a></p>
+<p><a>Well,
+that's BAAAAD! Replace
+this by the following code, because it works faster :</a></p>
+<p><code><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.neighbours.setValue<span style="color: rgb(0, 121, 0);"></span>(this.info,
+this.identification);<br>
+</a></code></p>
+<p><a>This
+has the following meaning
+: call the method setValue, with the given parameters, to all the
+members of the Group neighbours.&nbsp;
+</a></p>
+<p><a>You
+may find another view of this example on this </a><a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">web
+page</a><a>.</a></p>
+<h3 class="textNormal"><a>6
+groupdistrib</a></h3>
+<p><a>Now,
+do like the idea that the
 synchronization is centralized on one
 entity? I don't and it's the bottleneck of the application anyway :
-once a Domain has finished, it sends the notifyFinshed, and then sits
+once a <code>Domain</code> has finished, it sends the notifyFinshed,
+and then sits
 idle. Well, a way of making this better is to remove it completly! You
-may have noticed that because a Domain needs to have all the
-information of all the Domains of the same iteration before going on
+may have noticed that because a <code>Domain</code> needs to have all
+the
+information of all the <code>Domains</code> of the same iteration
+before going on
 with the next iteration, if you change the behaviour of the setValue
 method to treat early calls, it would work nice and smoothly. That's
 what we've done : <br>
-<code></code></p>
-<br>
-<p><code>&nbsp;&nbsp;&nbsp;
+<code></code></a></p>
+<a><br>
+</a>
+<p><code><a>&nbsp;&nbsp;&nbsp;
 public
 void setValue(Planet inf, int
 receivedIter) {<br>
@@ -624,9 +684,11 @@ late!"));<br>
 <span style="color: rgb(0, 121, 0);">this.prematureValues.add</span>(new
 Carrier (inf, receivedIter));<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; }</code></p>
-<br>
-<p>Also notice how the computation
+&nbsp;&nbsp;&nbsp; }</a></code></p>
+<a><br>
+</a>
+<p><a>Also
+notice how the computation
 is done when the result is received (<code>this.currentForce.add(info,
 inf);</code>),
 not
@@ -642,8 +704,9 @@ It's better to have this sum ready when needed.<span
 The <code>prematureValues </code>Vector
 is the place where we put the values that arrive out of sync. When
 a value is early, it is queued there, and dequeued as soon as this
-Domain changes iteration.</p>
-<br>
+<code>Domain</code> changes iteration.</a></p>
+<a><br>
+</a>
 <table style="width: 100%; text-align: left;" border="0" cellpadding="2"
  cellspacing="2">
   <tbody>
@@ -683,15 +746,18 @@ setValue(c.planet , c.iter); // works even if c.iter &gt; iter<br>
     </tr>
   </tbody>
 </table>
-<p>That treatPremature() method
+<p><a>That
+treatPremature() method
 simply treats the values that were early
-as if they had just arrived. </p>
-<br>
-<br>
-<h3 class="textNormal">7
-groupoospmd</h3>
-<br>
-<p>This is another way to improve
+as if they had just arrived. </a></p>
+<p><a>You
+may find another view of this example on this </a><a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">web
+page</a><a>.</a></p>
+<h3 class="textNormal"><a>7
+groupoospmd</a></h3>
+<p><a>This
+is another way to improve
 the groupcom example. It also removes
 the master, but this time by inserting oospmd barriers, that can be
 thought as behaving like the maestro
@@ -699,8 +765,9 @@ class, but faster. What happens is that each Active Objects hits the
 barrier call, and then waits for all the others to have reached it,
 before reading its
 request queue again. <br>
-</p>
-<br>
+</a></p>
+<a><br>
+</a>
 <table style="width: 100%; text-align: left;" border="1" cellpadding="2"
  cellspacing="2">
   <tbody>
@@ -736,8 +803,10 @@ clearValues();<br>
     </tr>
   </tbody>
 </table>
-<br>
-<p>Beware, the&nbsp;
+<a><br>
+</a>
+<p><a>Beware,
+the&nbsp;
 stop-and-wait&nbsp; is
 not just after the barrier call, but instead blocks the request queue.
 So if there is code after that barrier, it <span
@@ -751,8 +820,8 @@ would be executed <span style="font-weight: bold;">before</span>
 the barrier execution, which is exactly what we don't want! <br>
 To create functional OOspm Groups, there is a special instruction,
 which has the same parameters as a newGroup instruction : <br>
-</p>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</a></p>
+<a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 <code>Object [][] params = <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -769,22 +838,25 @@ try {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 catch ...<br>
 </code>
-<br>
-<h3 class="textNormal">8
-Barnes-Hut</h3>
-<br>
-<p class="textNormal">
-This way to construct the nbody simulation is based on a very different
+</a>
+<p><a>You
+may find another view of this example on this </a><a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">web
+page</a><a>.</a></p>
+<h3 class="textNormal"><a>8
+Barnes-Hut</a></h3>
+<p class="textNormal"><a>This
+way to construct the nbody simulation is based on a very different
 algorithm. This is inserted to show how one can express this algorithm
 in ProActive, but breaks off from the previous track, having such a
 different approach to solving the problem. Here's how it works: <br>
-</p>
-<p class="textNormal">To
+</a></p>
+<p class="textNormal"><a>To
 avoid broadcasting to every active object the new position of every
 particle, a tree implementation can simplify the problem by
 agglomerating sets of particles as a single particle, with a mass equal
 to the sum of masses of the all the particles:. This is the core of the
-Barnes-Hut algorithm. References on this can be found for example <a
+Barnes-Hut algorithm. References on this can be found for example </a><a
  href="http://physics.gmu.edu/%7Elarge/lr_forces/desc/bh/bhdesc.html">here</a>,
 and <a
  href="http://www.cita.utoronto.ca/%7Edubinski/treecode/node2.html">here</a>.
@@ -800,7 +872,8 @@ It is either subdivided into smaller <code>Domains</code>,
 or is a leaf of the total tree, and then only contains <code>Planets</code>.
 A Planet is still an Object with mass, velocity and position, but is no
 longer on a one-to-one connection with a <code>Domain</code>.
-We have cut down communications to the biggest Domains possible : when
+We have cut down communications to the biggest <code>Domains</code>
+possible : when
 a <code>Planet</code>
 is distant enough, its interactions are not computed, but it is grouped
 with its local neighbours to a bigger particle. Here is an example of
@@ -833,30 +906,37 @@ needs not be known by the Domain in red : it assumes all the particles
 in the blue Domain are only one big one, centered at the center of mass
 of all the particles within the blue.</p>
 <p>In this version, the
-Domains
-communicate with a reduced set of other Domains, spanning on volumes of
+<code>Domains</code>
+communicate with a reduced set of other <code>Domains</code>, spanning
+on volumes of
 different sizes. Synchronization is achieved by sending explicitely
 iteration numbers, and returning when needed older positions. You may
-notice that some Domains seem dsynchronized with other ones, having
+notice that some <code>Domains</code> seem desynchronized with other
+ones, having
 several iterations inbetween. That is no problem because if they then
 need to be synchronized and send each other information, a mechanism
 saving the older positions permits to
-send them when needed.&nbsp;&nbsp; <a href="../nbody-barnes-hut.html">Barnes-Hut
-example</a>.
-</p>
-<br>
-<h3 class="textNormal">9
-Conclusion</h3>
-<br>
-<p>In this guided tour, we tried
+send them when needed.</p>
+<p>You may find another view of
+this example on this <a
+ href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web
+page</a><a>.</a></p>
+<h3 class="textNormal"><a>9
+Conclusion</a></h3>
+<p><a>In
+this guided tour, we tried
 to show different facilities provided by
 ProActive, based on a real problem (nbody). We first saw how to deploy
 the application, then tuned it by adding Group communication, then
-removed a bottleneck ( due to the hard synchronization) . Finally,
+removed a bottleneck ( due to the hard synchronization ) . Finally,
 given is the code associated to a different algorithm, which
 cumbersomely shows how to get Active Objects deployed along a tree
-structure to communicate. <br>
-Recall the difffernt tricks used. </p>
+structure to communicate. Remember that there is
+</a><a href="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">another
+explaination</a> of all this on the
+web <br>
+<br>
+</p>
 <br>
 <br>
 </body>
