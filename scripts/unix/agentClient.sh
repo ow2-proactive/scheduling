@@ -4,10 +4,10 @@ echo --- upperClient -------------------------------------------
 
 if [ $# -lt 1 ]; then
     echo "
-       Start upperClient
-         upperClient.sh <the url of the node where Active Object Upper is going to be migrated to>
+       Start AgentClient
+         AgentClient.sh <the url of the node where Active Object Upper is going to be migrated to>
   
-         ex : upperClient.sh  //$HOSTNAME/node1
+         ex : agentClient.sh  //$HOSTNAME/node1
          The node has to be previously launched with the command ./startNode.sh //$HOSTNAME/node1
  
     "
