@@ -1,13 +1,16 @@
 @echo off
 echo. 
-echo --- Chat with ProActive ---------------------------------
-if "%1" == "" goto usage
+echo --- N-body with ProActive ---------------------------------
 
 SETLOCAL
+
 call init.bat
-%JAVA_CMD%  org.objectweb.proactive.examples.nbody.Start %1 %2 %3 %4
+set XMLDESCRIPTOR=..\..\descriptors\Workers.xml
+
+%JAVA_CMD% org.objectweb.proactive.examples.nbody.Start %XMLDESCRIPTOR% %1 %2 %3
+
+
 ENDLOCAL
 
-:end
 echo. 
 echo ---------------------------------------------------------
