@@ -67,31 +67,8 @@ public class NodeControler {
     }
 
     protected String getHostNameFromNodeName(String nodeName) {
-        //  StringTokenizer t = new StringTokenizer(nodeName, "/");
-        //..	  System.out.println("XXXXXXXXXXXXnodeName is ");
-        //System.out.println("XXXXXXXXXXXXnodeName is " + nodeName);
         Pattern p = Pattern.compile("(.*:)?(//)?(.*)/(.*)");
-
-        //	Matcher m = p.matcher(nodeName);
         Matcher m = p.matcher(nodeName);
-      //  boolean matchFound = m.find();
-
-        //	  if (matchFound) {
-        //		  // Get all groups for this match
-        //		  for (int i=1; i<=m.groupCount(); i++) {
-        //			  String groupStr = m.group(i);
-        //			  System.out.println("XXXX" +groupStr);
-        //		  }
-        //	  }
-        //if (nodeName.indexOf('/') != 0) {
-        //	//oups, we have 
-        //}
-        //        //since the nodeName looks like //name:port/node1
-        //we are only interested in the first token
-        // String tmp = t.nextToken();
-        // System.out.println("tmp = " + tmp);
-        //t = new StringTokenizer(tmp, ":");
-        //return t.nextToken();
         return m.group(3);
     }
 
@@ -100,14 +77,6 @@ public class NodeControler {
         RSHNodeProcessImpl p = null;
 
         String hostName = getHostNameFromNodeName(name);
-
-        //      String hostName = null;
-        //	try {
-        //		hostName = new URL(name).getHost();
-        //	} catch (MalformedURLException e1) {
-        //		
-        //		e1.printStackTrace();
-        //	}
         System.out.println("Hostname is " + hostName);
         p = new RSHNodeProcessImpl();
         p.setJavaPath(JAVA);

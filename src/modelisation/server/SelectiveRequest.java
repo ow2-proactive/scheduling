@@ -10,7 +10,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
-import util.timer.MicroTimer;
+import org.objectweb.proactive.core.util.timer.MicroTimer;
 
 public class SelectiveRequest extends RequestImpl implements java.io.Serializable {
 

@@ -5,8 +5,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.timer.MicroTimer;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
-import util.timer.MicroTimer;
 
 public class TimedLocationServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
