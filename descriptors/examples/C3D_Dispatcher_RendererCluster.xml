@@ -73,9 +73,6 @@
 					<log4jpropertiesFile>
 						<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive-log4j"/>
 					</log4jpropertiesFile>
-					<proActivePropertiesFile>
-						<absolutePath value="/net/home/rquilici/config.xml"/>
-					</proActivePropertiesFile>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="bsubInriaCluster">
