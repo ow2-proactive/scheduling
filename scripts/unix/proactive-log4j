@@ -16,18 +16,4 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
 ########### Change here default logging level on a 
 ########### per-logger basis
 ########### usage is log4j.logger.className=Level, Appender
-log4j.logger.org.objectweb.proactive.core.runtime.RuntimeFactory=INFO,A1
-log4j.logger.org.objectweb.proactive.core.descriptor.data.VirtualNode=INFO,A1
-log4j.logger.org.objectweb.proactive.core.runtime.RuntimeFactory=INFO,A1
-log4j.logger.org.objectweb.proactive.core.process.UniversalProcess=INFO,A1
-log4j.logger.org.objectweb.proactive.core.process.AbstractUniversalProcess=INFO,A1
-log4j.logger.org.objectweb.proactive.core.runtime.StartRuntime=INFO,A1
-log4j.logger.org.objectweb.proactive.core.descriptor.data.VirtualNode=INFO,A1
-log4j.logger.org.objectweb.proactive.core.node.NodeFactory=INFO,A1
-log4j.logger.org.objectweb.proactive.core.runtime.ibis.RemoteRuntimeFactory=INFO,A1
-log4j.logger.org.objectweb.proactive.core.body.HalfBody=INFO,A1
-log4j.logger.org.objectweb.proactive.core.body.request.RequestImpl=INFO,A1
-log4j.logger.org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl=INFO,A1
-log4j.logger.org.objectweb.proactive.core.body.request.RequestReceiverImpl=INFO,A1
-log4j.logger.org.objectweb.proactive.core.group.ProxyForGroup=INFO,A1
-log4j.logger.org.objectweb.proactive.core.mop.MethodCall=INFO,A1
+
