@@ -605,11 +605,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             String hostName = hostInetAddress.getCanonicalHostName();
             this.processCreatorId = "jvm";
 
-            //            this.name = "PA_RT" +
+            //            this.name = "PA_JVM" +
             //                Integer.toString(new java.security.SecureRandom().nextInt()) +
             //                "_" + hostName;
             String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
-            this.name = "PA_RT" + random + "_" + hostName;
+            this.name = "PA_JVM" + random + "_" + hostName;
             if (System.getProperty("proactive.jobid") != null) {
                 this.jobId = System.getProperty("proactive.jobid");
             } else {

@@ -118,7 +118,7 @@ static {
     for (int i = 0; i < list.length; i++) {
       Object obj;
       //-----------------added lines-------------------------------
-      if(list[i].indexOf("PA_RT")== -1 && list[i].indexOf("SpyListenerNode") == -1 && list[i].indexOf("_VN")== -1){
+      if(list[i].indexOf("PA_JVM")== -1 && list[i].indexOf("SpyListenerNode") == -1 && list[i].indexOf("_VN")== -1){
       //-----------------added lines---------------------------- 	
       try {
         obj = registry.lookup(list[i]);

@@ -359,7 +359,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 java.rmi.Naming.bind(UrlBuilder.removeProtocol(url, "rmi:"),
                     this);
             }
-            if (url.indexOf("PA_RT") < 0) {
+            if (url.indexOf("PA_JVM") < 0) {
                 logger.info(url + " successfully bound in registry at " + url);
             }
         } catch (java.rmi.AlreadyBoundException e) {
@@ -374,7 +374,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     private void unregister(String url) throws java.rmi.RemoteException {
         try {
             java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, "rmi:"));
-            if (url.indexOf("PA_RT") < 0) {
+            if (url.indexOf("PA_JVM") < 0) {
                 logger.info(url + " unbound in registry");
             }
         } catch (ConnectException e) {
@@ -382,7 +382,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             //an exception otherwise the killRT method cannot reach the end!
             if ((e.getCause().getClass().getName().equals("java.net.ConnectException") &&
                     e.getCause().getMessage().equals("Connection refused"))) {
-                if (url.indexOf("PA_RT") < 0) {
+                if (url.indexOf("PA_JVM") < 0) {
                     logger.info("RMIRegistry unreachable on host " +
                         getVMInformation().getInetAddress().getCanonicalHostName() +
                         " to unregister " + url + ". Killed anyway !!!");

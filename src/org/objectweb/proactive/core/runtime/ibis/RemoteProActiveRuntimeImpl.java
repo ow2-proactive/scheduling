@@ -338,7 +338,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             } else {
                 Naming.bind(UrlBuilder.removeProtocol(url, "ibis:"), this);
             }
-			if(url.indexOf("PA_RT")<0){
+			if(url.indexOf("PA_JVM")<0){
             	logger.info(url + " successfully bound in registry at " + url);
 			}
         } catch (AlreadyBoundException e) {
@@ -351,7 +351,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     private void unregister(String url) throws RemoteException {
         try {
             Naming.unbind(UrlBuilder.removeProtocol(url, "ibis:"));
-			if(url.indexOf("PA_RT")<0){
+			if(url.indexOf("PA_JVM")<0){
 				logger.info(url + " unbound in registry");
 			} 
         } catch (java.net.MalformedURLException e) {

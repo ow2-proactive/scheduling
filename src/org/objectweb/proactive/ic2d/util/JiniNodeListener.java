@@ -92,7 +92,7 @@ public class JiniNodeListener implements DiscoveryListener {
                         String jiniName = matches.items[i].attributeSets[0].toString();
 
                         //System.out.println("name of the node "+jiniName);
-                        if ((jiniName.indexOf("PA_RT") == -1) &&
+                        if ((jiniName.indexOf("PA_JVM") == -1) &&
                                 (jiniName.indexOf("_VN") == -1)) {
                             // it is a node
                             int k = jiniName.indexOf("=");
@@ -187,7 +187,7 @@ public class JiniNodeListener implements DiscoveryListener {
                         String jiniName = matches.items[i].attributeSets[0].toString();
 
                         //System.out.println("name of the node "+jiniName);
-                        if ((jiniName.indexOf("PA_RT") == -1) &&
+                        if ((jiniName.indexOf("PA_JVM") == -1) &&
                                 (jiniName.indexOf("_VN") == -1)) {
                             // it is a node
                             int k = jiniName.indexOf("=");

@@ -572,7 +572,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
                             ServiceRegistration reg = (ServiceRegistration) serviceRegistrationTable.get(i);
                             reg.getLease().cancel();
                         }
-                        if (objectUrl.indexOf("PA_RT") < 0) {
+                        if (objectUrl.indexOf("PA_JVM") < 0) {
                             logger.info("Lease cancelled for " + objectUrl);
                         }
                     }
