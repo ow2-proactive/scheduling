@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -150,20 +152,30 @@ public abstract class BodyImpl extends AbstractBody
         }
 
         // FAULT TOLERANCE
+        
+        
+        
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
-            try {
-                // should use a factory ...
-                this.ftmanager = new FTManagerCIC();
-                this.ftmanager.init(this);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Init FTManager on " + this.getNodeURL());
+            // if the targetBody is not serilizable, FT is disabled
+            if (this.localBodyStrategy.getReifiedObject() instanceof Serializable){            
+                try {
+                    // should use a factory ...
+                    this.ftmanager = new FTManagerCIC();
+                    this.ftmanager.init(this);
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Init FTManager on " + this.getNodeURL());
+                    }
+                    logger.info("** Fault-Tolerance is enable **");
+                } catch (ProActiveException e) {
+                    logger.error(
+                            "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                            e);
+                    this.ftmanager = null;
                 }
-                logger.info("** Fault-Tolerance is enable **");
-            } catch (ProActiveException e) {
-                logger.error(
-                    "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-                    e);
+            }else{
+                // target body is not serilizable
+                logger.error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                 this.ftmanager = null;
             }
         } else {
