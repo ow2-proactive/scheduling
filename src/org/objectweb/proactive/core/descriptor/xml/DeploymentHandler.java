@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
 
   private ProActiveDescriptor proActiveDescriptor;
-
+	
   //
   //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
   //
@@ -276,7 +276,6 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
 
       public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         String acquisitionMethod = attributes.getValue("method");
-        //System.out.println("found acquisitionMethod="+acquisitionMethod+" for currentVM="+currentVM.getName());
         if (acquisitionMethod != null) {
           currentVM.setAcquisitionMethod(acquisitionMethod);
         }
