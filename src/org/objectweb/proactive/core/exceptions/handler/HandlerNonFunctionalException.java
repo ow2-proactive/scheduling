@@ -111,9 +111,10 @@ public class HandlerNonFunctionalException implements Handler {
             loggerNFE.info(
                 "******************************************************************************************************************************************");
             loggerNFE.info("");
-            loggerNFE.error("NFE", nfe);
+            //loggerNFE.error("NFE", nfe);
+            nfe.printStackTrace();
         }
-    }
+    } 
 
     /**
      * Provide a treatment for the handled exception(s)
