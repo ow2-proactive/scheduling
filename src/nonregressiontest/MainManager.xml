@@ -55,6 +55,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.binding.remote.collective.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.binding.local.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.descriptor.arguments.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.nfe.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.nfe.servicecrash.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.Test"/>
