@@ -218,39 +218,39 @@ if (args.length == 0) {
 </pre>
 
 <p class="textNormal">
-To launch the Client and the Server, just type:
+To launch the Client and the Server, just type:<br>
 </p>
 <code>
-linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient
+linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient<br><br>
 windows> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.HelloClient &
 </code>
 
 <h3>Hello World from another VM on the same host</h3>
 <h4>Starting the server</h4>
-Just start the <code>main</code> method in the <code>Hello</code> class.
+Just start the <code>main</code> method in the <code>Hello</code> class.<br>
 <code>
-linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.Hello
+linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.Hello<br><br>
 windows> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.Hello &
 </code>
 
 <h4>Launching the client</h4>
 <code>
-linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello
+linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello<br><br>
 windows> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello
 </code>
 
 <h3>Hello World from abroad: another VM on a different host</h3>
 <h4>Starting the server</h4>
-Log on to the server's host, and launch the <code>Hello</code> class.
+Log on to the server's host, and launch the <code>Hello</code> class.<br>
 <code>
-linux remoteHost>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.Hello
+linux remoteHost>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.Hello<br><br>
 windows remoteHost> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.Hello &
 </code>
 
 <h4>Launching the client</h4>
-Log on to the client Host, and launch the client
+Log on to the client Host, and launch the client<br>
 <code>
-linux clientHost>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello
+linux clientHost>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello<br><br>
 windows clientHost> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello
 </code>
 
