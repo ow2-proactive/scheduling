@@ -190,7 +190,9 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             addChild(NODE, nodeName, AO, aoName);
-            addChild(JOB, rba.getJobID(), AO, aoName);
+            
+            // The Body/Job modifications are not yet committed
+            // addChild(JOB, rba.getJobID(), AO, aoName);
         }
     }
 
