@@ -30,13 +30,13 @@
 */ 
 package org.objectweb.proactive.ext.security;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNodeAdapter;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNodeAdapter;
 import org.objectweb.proactive.core.node.NodeException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.rmi.RemoteNode;
-import org.objectweb.proactive.core.node.rmi.RemoteNodeAdapter;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNode;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNodeAdapter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 

@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.ext.jini;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNode;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNode;
 
 public interface RemoteNodeJiniInterface extends RemoteNode//java.rmi.Remote
 {

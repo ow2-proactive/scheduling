@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.ext.security;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNode;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNode;
 
 /**
  *  Description of the Interface

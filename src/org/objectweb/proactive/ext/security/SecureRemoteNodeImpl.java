@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.ext.security;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNodeImpl;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNodeImpl;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.node.Node;

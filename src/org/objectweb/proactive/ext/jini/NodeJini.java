@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.ext.jini;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNodeImpl;
+import org.objectweb.proactive.core.node.oldies.rmi.RemoteNodeImpl;
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
