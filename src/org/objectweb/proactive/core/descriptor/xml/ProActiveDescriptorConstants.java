@@ -113,4 +113,11 @@ public interface ProActiveDescriptorConstants {
     public static final String P2P_SERVICE_TAG = "P2PService";
     public static final String PEERS_SET_TAG = "peerSet";
     public static final String PEER_TAG = "peer";
+    public static final String FT_CONFIG_TAG = "faultTolerance";
+    public static final String FT_CKPTSERVER_TAG = "checkpointServer";
+    public static final String FT_RECPROCESS_TAG = "recoveryProcess";
+    public static final String FT_LOCSERVER_TAG = "locationServer";
+    public static final String FT_RESSERVER_TAG = "ressourceServer";
+    public static final String FT_GLOBALSERVER_TAG = "globalServer";
+    public static final String FT_TTCVALUE_TAG = "ttc";
 }

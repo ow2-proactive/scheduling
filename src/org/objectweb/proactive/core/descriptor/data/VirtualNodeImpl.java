@@ -39,6 +39,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
@@ -150,10 +151,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private PolicyServer policyServer;
     private String policyServerFile;
     private String jobID = ProActive.getJobId();
+
+    // FAULT TOLERANCE
+    private FaultToleranceService ftService;
+
     private Vector p2pNodes = new Vector();
 
     /** Logger */
     private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
+
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -306,6 +312,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (registration) {
                 register();
             }
+            
+            // FAULT TOLERANCE
+            try{
+                if (this.ftService!=null){
+                    // register nodes only if ressource is not null
+                    this.ftService.registerRessources(this.getNodes());}
+            } catch (NodeException e) {
+                logger.error(e.getMessage());
+            }
+            
         } else {
             logger.info("VirtualNode " + this.name + " already activated !!!");
         }
@@ -701,7 +717,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
      */
-    public void setService(UniversalService service) {
+    public void setService(UniversalService service) throws ProActiveException {
+        if (FaultToleranceService.FT_SERVICE_NAME.equals(service.getServiceName())){
+            this.ftService = (FaultToleranceService)service;
+        } else {
+            throw new ProActiveException(" Unable to bind the given service to a virtual node");
+        }
     }
 
     /**
@@ -1040,6 +1061,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
+        
+            // FAULT TOLERANCE settings
+            if (this.ftService!=null){
+                jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
+            }
+ 
         }
     }
 
@@ -1222,9 +1249,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeUrl, e);
         }
         if (remoteAO.size() == 1) {
-            // FIXME CLASS CAST EXCEPTION
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
-            remoteNodeManager.leaveNode(node);
+           P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
+           remoteNodeManager.leaveNode(node);
             if (P2P_LOGGER.isInfoEnabled()) {
                 P2P_LOGGER.info("Node at " + nodeUrl + " succefuly killed");
             }

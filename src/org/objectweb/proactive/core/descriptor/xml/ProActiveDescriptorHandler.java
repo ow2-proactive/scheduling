@@ -196,7 +196,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       if (checkNonEmpty(minNodeNumber)){
           vn.setMinNumberOfNodes((new Integer(minNodeNumber).intValue()));
       }
-      String serviceId = attributes.getValue("ftserviceId");
+      String serviceId = attributes.getValue("ftServiceId");
       if (checkNonEmpty(serviceId)) {
        pad.registerService(vn, serviceId);
       }

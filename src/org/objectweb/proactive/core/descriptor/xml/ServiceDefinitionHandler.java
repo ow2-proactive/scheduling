@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.RMIRegistryLookupService;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
@@ -52,6 +53,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         super(false);
         this.pad = pad;
         this.addHandler(RMI_LOOKUP_TAG, new RMILookupHandler());
+        this.addHandler(FT_CONFIG_TAG, new FaultToleranceHandler());
         this.addHandler(P2P_SERVICE_TAG, new P2PServiceHandler());
     }
 
@@ -148,5 +150,53 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 setResultObject(value);
             }
         }
-    } // end of inner class P2PServiceHandler
+    } // end of inner class P2PLookupHandler
+    
+    protected class FaultToleranceHandler extends PassiveCompositeUnmarshaller {
+        
+        protected FaultToleranceService ftService;
+        
+        public FaultToleranceHandler(){
+            FTConfigHandler ftch = new FTConfigHandler();
+            this.addHandler(FT_CKPTSERVER_TAG, ftch);
+            this.addHandler(FT_RECPROCESS_TAG, ftch);
+            this.addHandler(FT_LOCSERVER_TAG, ftch);
+            this.addHandler(FT_RESSERVER_TAG, ftch);
+            this.addHandler(FT_GLOBALSERVER_TAG, ftch);
+            this.addHandler(FT_TTCVALUE_TAG, ftch);
+        }
+        
+        public void startContextElement(String name, Attributes attributes)
+        throws org.xml.sax.SAXException {
+            this.ftService = new FaultToleranceService();
+        }
+        
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return this.ftService;
+        } 
+        
+        protected class FTConfigHandler extends BasicUnmarshaller {
+            
+            public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+                if (FT_RECPROCESS_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setRecoveryProcessURL(attributes.getValue("url"));
+                } else if (FT_LOCSERVER_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setLocationServerURL(attributes.getValue("url"));
+                } else if (FT_CKPTSERVER_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue("url"));
+                }  else if (FT_RESSERVER_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setAttachedRessourceServer(attributes.getValue("url"));
+                }  else if (FT_TTCVALUE_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue("value"));
+                }  else if (FT_GLOBALSERVER_TAG.equals(name)){
+                    FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue("url"));
+                } 
+            }
+        }
+    
+    }
+    
+
+
 }
