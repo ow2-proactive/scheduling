@@ -4,14 +4,23 @@
 # This variable should be set to the directory where is installed ProActive
 #
 
+
+
+
 if [ ! $PROACTIVE ]
 then
 workingDir=`dirname $0`
+
+
 PROACTIVE=$workingDir/../../../.
 export PROACTIVE
 fi
 
-CLASSPATH=.
+if [ ! $ENV_WS]
+then
+export ENV_WS=env_ws
+
+
 # ----------------------------------------------------------------------------
 
 JAVA_HOME=${JAVA_HOME-NULL};
@@ -28,8 +37,6 @@ fi
 # ----
 # Set up the classpath using classes dir or jar files
 #
-
-
 
 if [ -f $PROACTIVE/lib/ws/soap.jar ] 
 then
@@ -70,9 +77,6 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/mail.jar
 fi
 
-
-
-echo CLASSPATH=$CLASSPATH
-
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.library.path=$PROACTIVE/lib -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
-export JAVACMD
+#echo CLASSPATH=$CLASSPATH
+fi
+. $workingDir/../env.sh
