@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.body.proxy;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -198,6 +199,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
 
 
-    protected abstract void sendRequest(MethodCall methodCall, Future future)
-                                 throws java.io.IOException;
+    protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException;
+	
+	protected abstract void sendRequest(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException;
+
 }

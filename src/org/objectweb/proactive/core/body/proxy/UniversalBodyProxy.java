@@ -201,25 +201,28 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     // address space because being a local representative for something remote
     // is what the proxy is all about. This is why we know that the table that
     // can be accessed by using a static methode has this information.
-    Body sourceBody = LocalBodyStore.getInstance().getCurrentThreadBody();
-    // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
-    // Maybe we could use some optimisation here
-    UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
-    if (newBody != null) {
-      universalBody = newBody;
-      isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
-    }
-    sourceBody.getFuturePool().registerDestination(universalBody);
-    if (isLocal) {
-      // Replaces the effective arguments with a deep copy
-      // Only do this if the body is local
-      // For remote bodies, this is automatically handled by the RMI stub
-      methodCall.makeDeepCopyOfArguments();
-    }
-    
-    sendRequestInternal(methodCall, future, sourceBody);
-   sourceBody.getFuturePool().removeDestination();
+    sendRequest(methodCall, future, LocalBodyStore.getInstance().getCurrentThreadBody());
   }
+
+  protected void sendRequest(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {
+	// Now we check whether the reference to the remoteBody has changed i.e the body has migrated
+	// Maybe we could use some optimisation here
+	UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
+	if (newBody != null) {
+	  universalBody = newBody;
+	  isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
+	}
+	sourceBody.getFuturePool().registerDestination(universalBody);
+	if (isLocal) {
+	  // Replaces the effective arguments with a deep copy
+	  // Only do this if the body is local
+	  // For remote bodies, this is automatically handled by the RMI stub
+	  methodCall.makeDeepCopyOfArguments();
+	}
+	sendRequestInternal(methodCall, future, sourceBody);
+	sourceBody.getFuturePool().removeDestination();
+  }
+
 
   protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {
     sourceBody.sendRequest(methodCall, future, universalBody);
