@@ -122,7 +122,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
 
     /**
      * Sets the number of nodes to be acquired with this P2P service
-     * @param askedNodes The askedNodes to set.
+     * @param nodeNumer The askedNodes to set.
      */
     public void setNodeNumber(int nodeNumber) {
         this.askedNodes = nodeNumber;
