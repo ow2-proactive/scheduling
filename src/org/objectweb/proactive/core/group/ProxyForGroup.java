@@ -1086,7 +1086,7 @@ public class ProxyForGroup extends AbstractProxy
  	 * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
 	 */
 	public synchronized Object getNamedElement(String key) {
-		return this.elementNames.get(key);
+		return get(((Integer)this.elementNames.get(key)).intValue());
 	}
 
 	/**
@@ -1106,7 +1106,7 @@ public class ProxyForGroup extends AbstractProxy
 		if (elementNames.containsKey(key)) {
 			removeNamedElement(key);
 		}
-		this.elementNames.put(key,new Integer(this.size()-1));
+		this.elementNames.put(key,new Integer(this.size()));
 		this.add(value);
 	}
 
