@@ -422,7 +422,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 logger.info(url + " successfully bound in registry at " + url);
             }
         } catch (java.rmi.AlreadyBoundException e) {
-            throw new java.rmi.RemoteException(url +
+            logger.warn("WARNING "+url +
                 " already bound in registry", e);
         } catch (java.net.MalformedURLException e) {
             throw new java.rmi.RemoteException("cannot bind in registry at " +

@@ -389,7 +389,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 logger.info(url + " successfully bound in registry at " + url);
             }
         } catch (AlreadyBoundException e) {
-            throw new RemoteException(url + " already bound in registry", e);
+            logger.warn("WARNING "+url + " already bound in registry", e);
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("cannot bind in registry at " + url, e);
         }
