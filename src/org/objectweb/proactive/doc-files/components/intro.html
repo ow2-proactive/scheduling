@@ -187,11 +187,11 @@ As you can see, the document is validated against an xml schema (first line of t
 
  <h2>Examples</h2>
 
- <p>2 examples are presented : code snippets for visualizing the transition between active objects and components, and the "hello world", from the Fractal tutorial. The programming model is Fractal, and one should refer to the Fractal documentation for detailed examples. the helloworld example explains the use of deployment descriptors for automatic deployment of the components. It shows
+ <p>2 examples are presented : code snippets for visualizing the transition between active objects and components, and the "hello world", from the Fractal tutorial. The programming model is Fractal, and one should refer to the Fractal documentation for detailed examples.
 </p>
 
 <h3>From objects to active objects to distributed components</h3>
-<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes. We will also see that components are created from component definitions. Let us first consider the "Toto" interface :</p>
+<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes, while components are created from component definitions. Let us first consider the "Toto" interface :</p>
 <pre class="snippet">public interface Toto {
         public String foo(); // dummy method
 }
@@ -217,7 +217,7 @@ As you can see, the document is validated against an xml schema (first line of t
         aNode, // location, could also be a virtual node
         );
 </pre>
-<p>As components are also active objects in this implementation, they benefit from the same features, and are configurable in a similar way. Constructor parameters, nodes, activity, or factories, that can be specified for active objects, are also specifiable for components. The definition of a component involves 3 steps : the type, the description of the content, and the description of the controller.</p>
+<p>As components are also active objects in this implementation, they benefit from the same features, and are configurable in a similar way. Constructor parameters, nodes, activity, or factories, that can be specified for active objects, are also specifiable for components. The definition of a component requires 3 sub-definitions : the type, the description of the content, and the description of the controller.</p>
 
 <h4>Type</h4>
 <p>The type of the component (i.e. the functional interfaces provided and required) is specified in a standard way : (as taken from the Fractal tutorial) </p>
@@ -256,7 +256,7 @@ ComponentType totoType = tf.createFcType(new InterfaceType[] {
                                  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
              );
 </pre>
-<p>Eventually, the component definition is instantiated using the standard Fractal API.  This component can then be manipulated as any other Fractal component. </p>
+<p>Eventually, the component definition is instantiated using the standard Fractal API.  This component can then be manipulated as any other Fractal component.</p>
 <pre class="snippet">Component component = componentFactory.newFcInstance(
               componentType, // type of the component (defining the client and server interfaces)
               controllerDesc, // implementation-specific description for the controller
@@ -330,7 +330,7 @@ public class TotoImpl implements Toto, BindingController {
  <h3>The HelloWorld example</h3>
 
  <p class="textNormal">
- The mandatory helloworld example shows the different ways of creating a component system, and it can easily be implemented using ProActive.
+ The mandatory helloworld example (from the Fractal tutorial) shows the different ways of creating a component system (programmatically and using the ADL), and it can easily be implemented using ProActive.
 </p>
 <p class="textNormal">
 <h4>Set-up</h4>
@@ -343,6 +343,7 @@ You can find the code for this example in the package org.objectweb.proactive.ex
 <li class="textNormal">The reference example is provided for level 3.3. implementation, whereas this current implementation is at level 3.2 : templates are not provided. Thus you will have to skip the specific code for templates. </LI>
 <li class="textNormal">The <code>newFcInstance</code> method of the <code>GenericFactory</code> interface, used for directly creating components, takes 2 implementation-specific parameters. So you should use the <code>org.objectweb.proactive.component.ControllerDescription</code> and <code>org.objectweb.proactive.component.ContentDescription</code> classes to define ProActive components. (It is possible to use the same parameters than in Julia, but that hinders you from using some functionalities specific to ProActive, such as distributed deployment or definition of the activity).</li>
 <li class="textNormal">Collective interfaces could be implemented the same way than suggested, but using the <code>Fractive.createCollectiveClientInterface</code> method will prove useful with this implementation : you are then able to use the functionalities provided by the typed groups API.</li>
+<li class="textNormal">Components can be distributed</li>
 </ul>
 
 
@@ -432,6 +433,7 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <h3>Tools</h3>
 <p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems. Notably, we are thinking of reusing the new version of the Fractal ADL, which is highly customizable. This sharing of a common base for configuration with other Fractal implementations would allow the sharing of common tools, such as the Fractal GUI, and as a result, a synergy on the tools.
 </p>
+<h3>Other</h3>
 <p class="textNormal">Other areas of research that we are opening around this work include :
 <UL>
 <LI class="textNormal">wrapping legacy codes (MPI) for interoperability with other protocols</LI>
