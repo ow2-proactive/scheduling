@@ -14,7 +14,5 @@ sleep 6
 
 $JAVACMD org.objectweb.proactive.examples.matrix.Main c3d.hosts 300
 
-killall java
-
 echo
 echo ---------------------------------------------------------
