@@ -82,7 +82,9 @@ public class FutureMap extends Object implements java.io.Serializable {
 	 * @param creatorID UniqueID of the creator body of the future
 	 * @param futureObject future to register
 	 */
-	public synchronized void receiveFuture(long id, UniqueID creatorID, Future futureObject) {
+	public synchronized void receiveFuture(Future futureObject) {
+		long id = futureObject.getID();
+		UniqueID creatorID = futureObject.getCreatorID();
 		java.util.HashMap indexedByID = (java.util.HashMap) (indexedByBodyID.get(creatorID));
 
 		// entry does not exist
@@ -176,6 +178,8 @@ public class FutureMap extends Object implements java.io.Serializable {
 		}
 	}
 
+
+
 	/*
 	 * Unset the migration tag in all futures of the map.
 	 * @see FutureProxy
@@ -221,54 +225,6 @@ public class FutureMap extends Object implements java.io.Serializable {
 			}
 		}
 	}
-
-	/**
-	 * Set the continuation tag in all futures of the map.
-	 * @see FutureProxy
-	 */
-	public synchronized void setContinuationTag() {
-			java.util.Collection c1 = indexedByBodyID.values();
-			java.util.Iterator it1 = c1.iterator();
-
-			while (it1.hasNext()) {
-				java.util.Collection c2 = ((java.util.HashMap) (it1.next())).values();
-				java.util.Iterator it2 = c2.iterator();
-				while (it2.hasNext()) {
-					java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());
-					java.util.ArrayList futures = listes[0];
-					java.util.Iterator itFutures = futures.iterator();
-					while (itFutures.hasNext()) {
-						FutureProxy p = (FutureProxy) itFutures.next();
-						p.setContinuationFlag();
-					}
-				}
-			}
-		}
-	
-
-
-	/**
-	 * Unset the continuation tag in all futures of the map.
-	 * @see FutureProxy
-	 */
-	public synchronized void unsetContinuationTag() {
-			java.util.Collection c1 = indexedByBodyID.values();
-			java.util.Iterator it1 = c1.iterator();
-
-			while (it1.hasNext()) {
-				java.util.Collection c2 = ((java.util.HashMap) (it1.next())).values();
-				java.util.Iterator it2 = c2.iterator();
-				while (it2.hasNext()) {
-					java.util.ArrayList[] listes = (java.util.ArrayList[]) (it2.next());
-					java.util.ArrayList futures = listes[0];
-					java.util.Iterator itFutures = futures.iterator();
-					while (itFutures.hasNext()) {
-						FutureProxy p = (FutureProxy) itFutures.next();
-						p.unsetContinuationFlag();
-					}
-				}
-			}
-		}
 	
 
 }

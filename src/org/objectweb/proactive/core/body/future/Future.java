@@ -81,21 +81,4 @@ public interface Future extends LocalFuture {
 	 */ 
   public void setSenderID(UniqueID i);
 
-	/**
-	 * To get the senderID.
-	 */ 
-  public UniqueID getSenderID();
-
-	/**
-	 * To set the receiverID, ie the UniqueID of the body that will receive this future,
-	 * in case of automatic continuation.
-	 */ 	
-  public void setReceiverID(UniqueID i);
-
-
-	/**
-	 * To get the receiverID.
-	 */ 
-  public UniqueID getReceiverID();
- 
 }

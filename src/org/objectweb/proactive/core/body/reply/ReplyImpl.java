@@ -58,7 +58,10 @@ public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializabl
   public void send(UniversalBody destinationBody) throws java.io.IOException {
   	// if destination body is on the same VM that the sender, we must perform 
   	// a deep copy of result in order to preserve ProActive model.
-  	boolean isLocal = LocalBodyStore.getInstance().getLocalBody(destinationBody.getID()) != null;
+  	UniqueID destinationID = destinationBody.getID();
+  	boolean isLocal = ((LocalBodyStore.getInstance().getLocalBody(destinationID) != null)
+  						|| (LocalBodyStore.getInstance().getLocalHalfBody(destinationID) != null));
+  	
   	if (isLocal) {
   		result = Utils.makeDeepCopy(result);
   	}

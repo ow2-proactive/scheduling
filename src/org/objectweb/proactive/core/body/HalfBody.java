@@ -167,7 +167,7 @@ public class HalfBody extends AbstractBody {
 			Request request = internalRequestFactory.newRequest(methodCall, HalfBody.this, future == null, sequenceID);
 			if (future != null) {
 				future.setID(sequenceID);
-				futures.receiveFuture(sequenceID, future.getCreatorID(), future);
+				futures.receiveFuture(future);
 			}
 			request.send(destinationBody);
 		}

@@ -110,11 +110,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	protected UniqueID senderID;
 
 	/**
-	 * Unique ID of the receiver  (in case of automatic continuation).
-	 */
-	protected UniqueID receiverID;
-
-	/**
 	 * This flag indicates the status of the future object
 	 */
 	protected boolean isAvailable;
@@ -242,7 +237,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	}
 
 
-        public synchronized void setResult(Object o) {
+    public synchronized void setResult(Object o) {
 	    target = o;
 	    isAvailable = true;
 	}
@@ -259,6 +254,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	 * Blocks the calling thread until the future object is available.
 	 */
 	public synchronized void waitFor() {
+	
 		while (!isAvailable) {
 			try {
 				this.wait();
@@ -266,7 +262,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 			}
 		}
 	}
-
+	
+	
+	
 	public long getID() {
 		return ID;
 	}
@@ -287,17 +285,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		senderID = i;
 	}
 
-	public UniqueID getSenderID() {
-		return senderID;
-	}
-
-	public void setReceiverID(UniqueID i) {
-		receiverID = i;
-	}
-
-	public UniqueID getReceiverID() {
-		return receiverID;
-	}
 
 
 	//
@@ -350,6 +337,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 				target = ((FutureProxy)p).target;
 			}
 		}
+		
 		return result;
 	}
 
@@ -368,22 +356,31 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	protected void unsetMigrationTag() {
 		migration = false;
 	}
-
 	
-	protected void setContinuationFlag() {
+	public synchronized void setContinuationTag(){
 		continuation = true;
 	}
-
-	protected void unsetContinuationFlag() {
+	
+	public synchronized void unsetContinuationTag(){
 		continuation = false;
 	}
+	
+	
 
-
+	
 	//
 	// -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
 	//
 
-	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+	private synchronized  void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+		
+		
+		//if continuation is already set, we are in a forwarder
+		//else if a destination is available in destTable, set the continuation tag
+		if (!continuation) {
+			continuation = (FuturePool.getBodyDestination()!=null);
+		}
+		
 		// We wait until the result is available
 		if ((!migration) && (!continuation)) {
 			waitFor();
@@ -398,10 +395,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 				sender = LocalBodyStore.getInstance().getLocalHalfBody(senderID);
 			}
 			if (sender != null) {
-				UniversalBody dest = FuturePool.getBodyDest();
+				UniversalBody dest = FuturePool.getBodyDestination();
 				if (dest != null) {
 					sender.getFuturePool().addAutomaticContinuation(ID, creatorID, dest);
-					receiverID = dest.getID();
 				}
 			}// if sender is still null, it's a forwarder !!
 		}
@@ -414,42 +410,30 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		out.writeLong(ID);
 		//Pass the creatorID
 		out.writeObject(creatorID);
-		// Pass the receiverID
-		out.writeObject(receiverID);
 
 		// It is impossible that a future object can be passed
 		// as a parameter if it has raised a checked exception
 		// For the other exceptions...
 		out.writeBoolean(isException);
 		out.writeBoolean(isAvailable);
+		
+		//unset the current continuation tag
+		this.continuation = false;
 	}
 
 
-	private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-
+	private synchronized void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
 		target = (Object) in.readObject();
 		continuation = (boolean) in.readBoolean();
 		ID = (long) in.readLong();
 		creatorID = (UniqueID) in.readObject();
-		receiverID = (UniqueID) in.readObject();
 		isException = (boolean) in.readBoolean();
 		isAvailable = (boolean) in.readBoolean();
 
 		if (continuation && isAwaited()) {
-
-			Body receiver = LocalBodyStore.getInstance().getLocalBody(receiverID);
-			if (receiver == null) {
-				receiver = LocalBodyStore.getInstance().getLocalHalfBody(receiverID);
-			}
-			if (receiver != null) {
-				receiver.getFuturePool().receiveFuture(ID, creatorID, this);
-				continuation = false;
-				receiverID = null;
-			}
-			// if receiver is still null, it is a forwarder
-			else
-				// let the continuation flag
-				continuation = true;
+			continuation = false;
+			FuturePool.registerIncomingFuture(this);
+				
 		}
 
 		//now we restore migration to its normal value
@@ -514,4 +498,30 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		}
 	}
 
+
+
+
+	//////////////////////////
+	//////////////////////////
+	////FOR DEBUG PURPOSE/////
+	//////////////////////////
+	//////////////////////////
+	public synchronized static int futureLength(Object future) {
+		int res = 0;
+		if ((MOP.isReifiedObject(future))
+			&& ((((StubObject) future).getProxy()) instanceof Future)) {
+			res++;
+			Future f = (Future) (((StubObject) future).getProxy());
+			Object gna = f.getResult();
+			while ((MOP.isReifiedObject(gna))
+				&& ((((StubObject) gna).getProxy()) instanceof Future)) {			
+				f = (Future) (((StubObject) gna).getProxy());
+				gna = f.getResult();
+				res++;
+			}
+		}
+		return res;
+	}
+	
+	
 }

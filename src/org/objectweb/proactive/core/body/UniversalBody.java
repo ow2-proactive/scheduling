@@ -46,68 +46,61 @@ import org.objectweb.proactive.core.body.request.Request;
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter
  */
-public interface UniversalBody  {
+public interface UniversalBody {
 
-  /**
-   * Receives a request for later processing. The call to this method is non blocking
-   * unless the body cannot temporary receive the request.
-   * @param request the request to process
-   * @exception java.io.IOException if the request cannot be accepted
-   */
-  public void receiveRequest(Request request) throws java.io.IOException;
+	/**
+	 * Receives a request for later processing. The call to this method is non blocking
+	 * unless the body cannot temporary receive the request.
+	 * @param request the request to process
+	 * @exception java.io.IOException if the request cannot be accepted
+	 */
+	public void receiveRequest(Request request) throws java.io.IOException;
 
+	/**
+	 * Receives a reply in response to a former request.
+	 * @param reply the reply received
+	 * @exception java.io.IOException if the reply cannot be accepted
+	 */
+	public void receiveReply(Reply r) throws java.io.IOException;
 
-  /**
-   * Receives a reply in response to a former request.
-   * @param reply the reply received
-   * @exception java.io.IOException if the reply cannot be accepted
-   */
-  public void receiveReply(Reply r) throws java.io.IOException;
+	/**
+	 * Returns the url of the node this body is associated to
+	 * The url of the node can change if the active object migrates
+	 * @return the url of the node this body is associated to
+	 */
+	public String getNodeURL();
 
+	/**
+	 * Returns the UniqueID of this body
+	 * This identifier is unique accross all JVMs
+	 * @return the UniqueID of this body
+	 */
+	public UniqueID getID();
 
-  /**
-   * Returns the url of the node this body is associated to
-   * The url of the node can change if the active object migrates
-   * @return the url of the node this body is associated to
-   */
-  public String getNodeURL();
+	/**
+	 * Signals to this body that the body identified by id is now to a new
+	 * remote location. The body given in parameter is a new stub pointing
+	 * to this new location. This call is a way for a body to signal to his
+	 * peer that it has migrated to a new location
+	 * @param id the id of the body
+	 * @param body the stub to the new location
+	 */
+	public void updateLocation(UniqueID id, UniversalBody body) throws java.io.IOException;
 
-
-  /**
-   * Returns the UniqueID of this body
-   * This identifier is unique accross all JVMs
-   * @return the UniqueID of this body
-   */
-  public UniqueID getID();
-
-
-  /**
-   * Signals to this body that the body identified by id is now to a new
-   * remote location. The body given in parameter is a new stub pointing
-   * to this new location. This call is a way for a body to signal to his
-   * peer that it has migrated to a new location
-   * @param id the id of the body
-   * @param body the stub to the new location
-   */
-  public void updateLocation(UniqueID id, UniversalBody body) throws java.io.IOException;
-
-
-  /**
-   * Returns the remote friendly version of this body
-   * @return the remote friendly version of this body
-   */
-  public UniversalBody getRemoteAdapter();
-
+	/**
+	 * Returns the remote friendly version of this body
+	 * @return the remote friendly version of this body
+	 */
+	public UniversalBody getRemoteAdapter();
 
 	/**
 	 * Enables automatic continuation mechanism for this body
 	 */
 	public void enableAC() throws java.io.IOException;
 
-	
 	/**
 	 * Disables automatic continuation mechanism for this body
 	 */
-	public void disableAC() throws java.io.IOException;	
+	public void disableAC() throws java.io.IOException;
 
 }

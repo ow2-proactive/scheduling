@@ -34,6 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.RequestQueue;
@@ -142,16 +143,53 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //System.out.println("  --> receiveRequest m="+request.getMethodName());
     if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
+   	this.registerIncomingFutures();
     internalReceiveRequest(request);
     this.threadStore.exit();
   }
+
+
 
   public void receiveReply(Reply reply) throws java.io.IOException {
     //System.out.println("  --> receiveReply m="+reply.getMethodName());
     if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
-    internalReceiveReply(reply);
+	this.registerIncomingFutures();
+	internalReceiveReply(reply);
     this.threadStore.exit();
+  }
+  
+  /**
+   * This method effectively register futures (ie in the futurePool) that arrive in this active
+   * object (by parameter or by result). Incoming futures have been registered in the static table
+   * FuturePool.incomingFutures during their deserialization. This effective registration must be perform
+   * AFTER entering in the ThreadStore.
+   */
+  private void registerIncomingFutures (){
+  	// get list of futures that should be deserialized and registred "behind the ThreadStore"
+  	java.util.ArrayList incomingFutures = FuturePool.getIncomingFutures();
+  	
+  	if (incomingFutures!=null) {
+  		// if futurePool is not null, we are in an Active Body
+  		 if (getFuturePool()!=null) {
+    		// some futures have to be registred in the local futurePool
+    		java.util.Iterator it = incomingFutures.iterator();
+    		while (it.hasNext()){
+    			Future current = (Future)(it.next());
+    			getFuturePool().receiveFuture(current);
+    		}
+    		FuturePool.removeIncomingFutures();
+  		 } else {
+  		 	// we are in a forwarder
+  		 	// some futures have to set their continuation tag
+    		java.util.Iterator it = incomingFutures.iterator();
+    		while (it.hasNext()){
+    			FutureProxy current = (FutureProxy)(it.next());
+    			current.setContinuationTag();
+    		}
+    		FuturePool.removeIncomingFutures();
+  		 }
+  	}
   }
   
   

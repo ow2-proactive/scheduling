@@ -183,7 +183,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       universalBody = newBody;
       isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
     }
-    sourceBody.getFuturePool().setContinuationTag(universalBody);
+    sourceBody.getFuturePool().registerDestination(universalBody);
     if (isLocal) {
       // Replaces the effective arguments with a deep copy
       // Only do this if the body is local
@@ -192,7 +192,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     }
     
     sendRequestInternal(methodCall, future, sourceBody);
-    sourceBody.getFuturePool().unsetContinuationTag();
+   sourceBody.getFuturePool().removeDestination();
   }
 
   protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {

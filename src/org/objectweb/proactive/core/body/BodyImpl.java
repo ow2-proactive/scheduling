@@ -247,9 +247,9 @@ public abstract class BodyImpl extends AbstractBody
 				UniqueID destinationBodyId = request.getSourceBodyID();
 				if (destinationBodyId != null)
 					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId);
-				this.getFuturePool().setContinuationTag(request.getSender());
+				this.getFuturePool().registerDestination(request.getSender());
 				reply.send(request.getSender());
-				this.getFuturePool().unsetContinuationTag();
+				this.getFuturePool().removeDestination();
 			} catch (ServeException e) {
 				// handle error here
 				throw new ProActiveRuntimeException("Exception in serve (Still not handled) : throws killer RuntimeException", e);
@@ -268,7 +268,7 @@ public abstract class BodyImpl extends AbstractBody
 			Request request = internalRequestFactory.newRequest(methodCall, BodyImpl.this, future == null, sequenceID);
 			if (future != null) {
 				future.setID(sequenceID);
-				futures.receiveFuture(sequenceID, future.getCreatorID(), future);
+				futures.receiveFuture(future);
 			}
 			messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_SENT, destinationBody.getID());
 			request.send(destinationBody);

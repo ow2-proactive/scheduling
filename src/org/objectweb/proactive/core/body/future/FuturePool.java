@@ -35,27 +35,33 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 
-
 public class FuturePool extends Object implements java.io.Serializable {
 
 	protected boolean newState;
+
+	// table of future and ACs
 	private FutureMap futures;
-	
+
 	// ID of the body corresponding to this futurePool
 	private UniqueID ownerBody;
-	
+
 	// Active queue of AC services
 	private transient ActiveACQueue queueAC;
-	
+
 	// toggle for enabling or disabling automatic continuation 
 	private boolean acEnabled;
 
+	// table used for storing values which arrive in the futurePool BEFORE the registration
+	// of its corresponding future.
+	private java.util.HashMap valuesForFutures;
 
 	//
 	// -- CONSTRUCTORS -----------------------------------------------
@@ -63,6 +69,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
 	public FuturePool() {
 		futures = new FutureMap();
+		valuesForFutures = new java.util.HashMap();
 		this.newState = false;
 		if (ProActiveProperties.getACState().equals("enable"))
 			this.acEnabled = true;
@@ -81,26 +88,55 @@ public class FuturePool extends Object implements java.io.Serializable {
 	// this table is used to register destination before sending.
 	// So, a future could retreive its destination during serialization
 	// this table indexed by the thread which perform the registration.
-	static private java.util.HashMap bodyDest;
+	static private java.util.Hashtable bodyDestination;
 
 	// to register in the table
-	static private synchronized void registerBodyDest(UniversalBody dest) {
-		bodyDest.put(Thread.currentThread(), dest);
+	static public void registerBodyDestination(UniversalBody dest) {
+		bodyDestination.put(Thread.currentThread(), dest);
 	}
 
 	// to clear an entry in the table
-	static private synchronized void resetBodyDest() {
-		bodyDest.remove(Thread.currentThread());
+	static public void removeBodyDestination() {
+		bodyDestination.remove(Thread.currentThread());
 	}
 
 	// to get a destination
-	static public synchronized UniversalBody getBodyDest() {
-		return (UniversalBody) (bodyDest.get(Thread.currentThread()));
+	static public UniversalBody getBodyDestination() {
+		return (UniversalBody) (bodyDestination.get(Thread.currentThread()));
+	}
+
+
+
+	// this table is used to register deserialized futures after receive
+	// So, futures to add in the local futurePool could be retreived
+	static private java.util.Hashtable incomingFutures;
+
+	// to register an incoming future in the table  	
+	public static void registerIncomingFuture(Future f) {
+		java.util.ArrayList listOfFutures = (java.util.ArrayList) incomingFutures.get(Thread.currentThread());
+		if (listOfFutures != null) {
+			listOfFutures.add(f);
+		} else {
+			java.util.ArrayList newListOfFutures = new java.util.ArrayList();
+			newListOfFutures.add(f);
+			incomingFutures.put(Thread.currentThread(), newListOfFutures);
+		}
+	}
+
+	// to remove an entry from the table
+	static public void removeIncomingFutures() {
+		incomingFutures.remove(Thread.currentThread());
+	}
+
+	// to get a list of incomingFutures
+	static public java.util.ArrayList getIncomingFutures() {
+		return (java.util.ArrayList) (incomingFutures.get(Thread.currentThread()));
 	}
 
 	// static init block
 	static {
-		bodyDest = new java.util.HashMap();
+		bodyDestination = new java.util.Hashtable();
+		incomingFutures = new java.util.Hashtable();
 	}
 
 	//
@@ -147,17 +183,16 @@ public class FuturePool extends Object implements java.io.Serializable {
 	 * This method perform local futures update, and put an ACService in the activeACqueue.
 	 * @param id sequence id of the future to update
 	 * @param creatorID ID of the body creator of the future to update
-	 * @param result value to "give" to the futures 
+	 * @param result value to update with the futures 
 	 */
-	public void receiveFutureValue(long id, UniqueID creatorID, Object result) throws java.io.IOException {
-
-		// 1) Update futures
-		java.util.ArrayList futuresToUpdate = getFuturesToUpdate(id, creatorID);
+	public synchronized void receiveFutureValue(long id, UniqueID creatorID, Object result) throws java.io.IOException {
+		
+		// get all aiwated futures
+		java.util.ArrayList futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
 
 		if (futuresToUpdate != null) {
 			Future future = (Future) (futuresToUpdate.get(0));
 			if (future != null) {
-				// Sets the result into the future
 				future.receiveReply(result);
 			}
 			// if there are more than one future to update, we "give" deep copy
@@ -170,33 +205,22 @@ public class FuturePool extends Object implements java.io.Serializable {
 				otherFuture.receiveReply(Utils.makeDeepCopy(result));
 			}
 			unsetMigrationTag();
-			synchronizedStateChange();
+			stateChange();
+
+			// 2) create and put ACservices
+			if (acEnabled) {
+				java.util.ArrayList bodiesToContinue = futures.getAutomaticContinuation(id, creatorID);
+				if ((bodiesToContinue != null) && (bodiesToContinue.size() != 0)) {
+					queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null, result)));
+				}
+			}
+
+			// 3) Remove futures from the futureMap
+			futures.removeFutures(id, creatorID);
+		} else {
+			// we have to store the result until future arrive
+			this.valuesForFutures.put(""+id+creatorID, result);
 		}
-
-		// 2) create and put ACservices
-		if (acEnabled) {
-			java.util.ArrayList bodiesToContinue = getAutomaticContinuation(id, creatorID);
-			if (bodiesToContinue != null)
-				queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null, result)));
-		}
-		
-		// 3) Remove futures from the futureMap
-		futures.removeFutures(id,creatorID);
-	}
-
-	// stateChange must be called in a synchronized method !
-	private synchronized void synchronizedStateChange() {
-		stateChange();
-	}
-
-	// to get list of futures to update in the futurMap		
-	private java.util.ArrayList getFuturesToUpdate(long id, UniqueID bodyID) {
-		return futures.getFuturesToUpdate(id, bodyID);
-	}
-
-	// to get list of Acs to perform 
-	private java.util.ArrayList getAutomaticContinuation(long id, UniqueID bodyID) {
-		return futures.getAutomaticContinuation(id, bodyID);
 	}
 
 
@@ -206,10 +230,17 @@ public class FuturePool extends Object implements java.io.Serializable {
 	 * @param creatorID UniqueID of the body which creates futureObject
 	 * @param futureObject future to register
 	 */
-	public void receiveFuture(long id, UniqueID creatorID, Future futureObject) {
+	public synchronized void receiveFuture(Future futureObject) {
 		futureObject.setSenderID(ownerBody);
-		futures.receiveFuture(id, creatorID, futureObject);
-		synchronizedStateChange();
+		futures.receiveFuture(futureObject);
+		long id = futureObject.getID();
+		UniqueID creatorID = futureObject.getCreatorID();
+		if (valuesForFutures.get(""+id+creatorID) != null) {
+			try {
+				this.receiveFutureValue(id, creatorID, valuesForFutures.remove(""+id+creatorID));
+			} catch (java.io.IOException e) {
+			}
+		}
 	}
 
 	/**
@@ -220,7 +251,6 @@ public class FuturePool extends Object implements java.io.Serializable {
 	 */
 	public void addAutomaticContinuation(long id, UniqueID creatorID, UniversalBody bodyDest) {
 		futures.addAutomaticContinuation(id, creatorID, bodyDest);
-		synchronizedStateChange();
 	}
 
 
@@ -236,33 +266,32 @@ public class FuturePool extends Object implements java.io.Serializable {
 
 	}
 
+	/**
+	 * To register a destination before sending a reques or a reply
+	 * Registration key is the calling thread.
+	 */
+	public void registerDestination(UniversalBody dest){
+		if (acEnabled)
+			FuturePool.registerBodyDestination(dest);
+	}
+
+	/**
+	 * To clear registred destination for the calling thread.
+	 */
+	public void removeDestination(){
+		if (acEnabled)
+			FuturePool.removeBodyDestination();
+	}
+
+
+	public void setMigrationTag() {
+		futures.setMigrationTag();
+	}
+
 	public void unsetMigrationTag() {
 		futures.unsetMigrationTag();
 	}
 
-
-	/**
-	 * Set the continuation tag for all futures in the futureMap.
-	 * Register body destination in bodyDest static table 
-	 */
-	public void setContinuationTag(UniversalBody bodyDestination) {
-		if (acEnabled) {
-			this.registerBodyDest(bodyDestination);
-			futures.setContinuationTag();
-		}
-	}
-
-	/**
-	 * Unset the continuation tag for all futures in the futureMap.
-	 * Remove body destination in bodyDest static table.
-	 */
-	public void unsetContinuationTag() {
-		if (acEnabled) {
-			this.resetBodyDest();
-			futures.unsetContinuationTag();
-		}
-	}
-	
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//
@@ -270,10 +299,6 @@ public class FuturePool extends Object implements java.io.Serializable {
 	private void stateChange() {
 		this.newState = true;
 		notifyAll();
-	}
-
-	private void setMigrationTag() {
-		futures.setMigrationTag();
 	}
 
 	//
@@ -300,8 +325,10 @@ public class FuturePool extends Object implements java.io.Serializable {
 			queueAC = new ActiveACQueue(queue);
 			queueAC.start();
 		}
+		
 	}
 
+	
 	//--------------------------------INNER CLASS------------------------------------//
 
 	/**
@@ -356,13 +383,20 @@ public class FuturePool extends Object implements java.io.Serializable {
 		}
 
 		/**
+		 * Return the oldest request in queue and remove it from the queue
+		 */
+		public synchronized ACService removeACRequest() {
+			counter--;
+			return (ACService) (queue.remove(0));
+		}
+
+		/**
 		 * To stop the thread.
 		 */
 		public synchronized void killMe() {
 			kill = true;
 			notifyAll();
 		}
-
 
 		public void run() {
 			// get a reference on the owner body
@@ -378,14 +412,13 @@ public class FuturePool extends Object implements java.io.Serializable {
 
 			while (true) {
 				// if there is no AC to do, wait...
-				while ((counter == 0) && !kill) {
-					waitForAC();
-				}
+				waitForAC();
+				
 				if (kill)
 					break;
+				
 				// there are ACs to do !
 				try {
-					// now we have it
 					// enter in the threadStore 
 					owner.enterInThreadStore();
 
@@ -393,18 +426,13 @@ public class FuturePool extends Object implements java.io.Serializable {
 					if (kill)
 						break;
 
-					ACService toDo = (ACService) (queue.get(0));
-					if (toDo != null)
+					ACService toDo = this.removeACRequest();
+					if (toDo != null) {
 						toDo.doAutomaticContinuation();
-
-					// request is done, we can remove it
-					queue.remove(0);
-					counter--;
+					}
 
 					// exit from the threadStore
 					owner.exitFromThreadStore();
-					// allows other actions to be done
-					// Thread.yield();
 
 				} catch (Exception e2) {
 					// to unblock active object
@@ -414,17 +442,17 @@ public class FuturePool extends Object implements java.io.Serializable {
 			}
 		}
 
-		// synchronized wait
+		// synchronized wait on ACRequest queue
 		private synchronized void waitForAC() {
 			try {
-				wait();
+				while ((counter == 0) && !kill) {
+					wait();
+				}
 			} catch (InterruptedException e) {
 			}
 		}
 
-	} 
-
-
+	}
 
 	/**
 	 * A simple object for a request for an automatic continuation
@@ -452,14 +480,12 @@ public class FuturePool extends Object implements java.io.Serializable {
 
 		public void doAutomaticContinuation() throws java.io.IOException {
 			if (dests != null) {
-				setContinuationTag(null);
 				for (int i = 0; i < dests.size(); i++) {
 					UniversalBody dest = (UniversalBody) (dests.get(i));
-					FuturePool.registerBodyDest(dest);
-					dest.receiveReply(reply);
+					registerDestination(dest);
+					reply.send(dest);
+					removeDestination();
 				}
-				FuturePool.resetBodyDest();
-				unsetContinuationTag();
 			}
 		}
 	} //ACService

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.event.*;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
@@ -211,7 +212,6 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         ((RequestQueueEventListener) listener).requestQueueModified((RequestQueueEvent) event);
     }
 
-
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
@@ -266,6 +266,15 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         return null;
     }
 
+
+	
+
+	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+		// we must set migration tag because requests could contain awaited future (parameters)
+		org.objectweb.proactive.Body owner = LocalBodyStore.getInstance().getLocalBody(ownerID);
+		owner.getFuturePool().setMigrationTag();
+		out.defaultWriteObject();
+	}
 
 
     //

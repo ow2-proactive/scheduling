@@ -131,7 +131,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
     }
     // try to migrate
     UniversalBody migratedBody = null;
-    try {
+    try { 
       migratedBody = migrationManager.migrateTo(node, this);
     } catch (MigrationException e) {
       nodeURL = saveNodeURL;
