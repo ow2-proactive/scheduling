@@ -15,7 +15,7 @@
 					<path type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
 				</javaPath>
 				<policyFile>
-					<path type="relative" origin="userHome" value="/ProActive/classes/proactive.java.policy"/>
+					<path type="relative" origin="userHome" value="/ProActive/scripts/unix/proactive.java.policy"/>
 				</policyFile>
 			</jvmProcess>
 			<process id="globusProcess" class="org.objectweb.proactive.core.process.globus.GlobusProcess">
