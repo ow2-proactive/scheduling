@@ -47,7 +47,8 @@ import testsuite.test.ProActiveFunctionalTest;
  */
 public class Test extends ProActiveFunctionalTest {
     private static String FS = System.getProperty("file.separator");
-    private static String XML_LOCATION ="Penguin.xml";
+    private static String XML_LOCATION = Test.class.getResource(
+            "/nonregressiontest/descriptor/Penguin.xml").getPath();
     VirtualNode vn;
 
     public Test() {
