@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
 import testsuite.test.FunctionalTest;
-import example.TestRmiLookup;
 
 
 /**
@@ -45,10 +44,10 @@ import example.TestRmiLookup;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String ONEVM_XML_LOCATION_UNIX = TestRmiLookup.class.getResource(
+    private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/rmilookup/OneVM.xml")
                                                                        .getPath();
-    private static String LOOK_XML_LOCATION_UNIX = TestRmiLookup.class.getResource(
+    private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/rmilookup/LookupRMI.xml")
                                                                       .getPath();
     Node node;

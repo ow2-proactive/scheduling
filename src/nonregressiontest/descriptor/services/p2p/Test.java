@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 
 import testsuite.test.FunctionalTest;
-import example.TestRmiLookup;
+
 
 
 /**
@@ -47,7 +47,7 @@ import example.TestRmiLookup;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static String P2P_XML_LOCATION_UNIX = TestRmiLookup.class.getResource(
+    private static String P2P_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/services/p2p/TestP2P.xml").getPath();
     JVMProcessImpl process1;
     JVMProcessImpl process;
