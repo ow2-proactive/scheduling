@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import testsuite.exception.BrowsePackageException;
 
 import testsuite.manager.AbstractManager;
+
 import testsuite.result.ResultsCollections;
 
 import testsuite.test.AbstractTest;
@@ -85,13 +86,14 @@ public class Group {
      * @throws BrowsePackageException if some errors.
      */
     public Group(String name, String description, File directory,
-        String packageName, Object[] params, boolean useInitFile, AbstractManager manager)
-        throws BrowsePackageException {
+        String packageName, Object[] params, boolean useInitFile,
+        AbstractManager manager) throws BrowsePackageException {
         logger = Logger.getLogger(getClass().getName());
         this.name = name;
         this.description = description;
 
-        addTests(directory, packageName, packageName, params, useInitFile, manager);
+        addTests(directory, packageName, packageName, params, useInitFile,
+            manager);
     }
 
     private static FileFilter dirFilter = new FileFilter() {
@@ -122,8 +124,8 @@ public class Group {
      * @throws BrowsePackageException if an error.
      */
     private void addTests(File directory, String packageName,
-        String parentPackage, Object[] params, boolean useInitFile, AbstractManager manager)
-        throws BrowsePackageException {
+        String parentPackage, Object[] params, boolean useInitFile,
+        AbstractManager manager) throws BrowsePackageException {
         if (!directory.isDirectory()) {
             throw new BrowsePackageException(
                 "Directory is not a valid directory");
@@ -145,7 +147,8 @@ public class Group {
                 if (file.getName().compareTo(nextRep) == 0) {
                     String nextPackageName = "";
                     if (packageName.indexOf('.') != -1) {
-						nextPackageName =packageName.substring(packageName.indexOf('.') + 1);
+                        nextPackageName = packageName.substring(packageName.indexOf(
+                                    '.') + 1);
                     } else {
                         nextPackageName = null;
                     }
@@ -154,7 +157,6 @@ public class Group {
                 } else {
                     continue;
                 }
-
             }
         } else {
             // Files package founded
@@ -167,42 +169,49 @@ public class Group {
                     parameterTypes[j] = params[j].getClass();
             }
 
-
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
                 if (file.isDirectory()) {
                     addTests(file, null, parentPackage + "." + file.getName(),
                         params, useInitFile, manager);
-                } else if (file.getName().matches("Test.*") ||
-                        file.getName().matches("Bench.*")) {
+                } else {
+                    String fileTest = parentPackage + "." +
+                        file.getName().replaceAll("\\.class", "");
                     try {
-                        String fileTest = parentPackage + "." +
-                            file.getName().replaceAll("\\.class", "");
                         Class c = getClass().getClassLoader().loadClass(fileTest);
-                        AbstractTest test = null;
 
-                        if (parameterTypes != null) {
-                            Constructor constructor = c.getConstructor(parameterTypes);
-                            test = (AbstractTest) constructor.newInstance(params);
+                        //                        if (file.getName().matches("Test.*") ||
+                        //                                file.getName().matches("Bench.*")) {
+                        Class superClass = c;
+                        while (superClass.getSuperclass() != Object.class)
+                            superClass = superClass.getSuperclass();
+
+                        if (superClass.getName().compareTo(AbstractTest.class.getName()) == 0) {
+                            AbstractTest test = null;
+
+                            if (parameterTypes != null) {
+                                Constructor constructor = c.getConstructor(parameterTypes);
+                                test = (AbstractTest) constructor.newInstance(params);
+                            } else {
+                                test = (AbstractTest) c.newInstance();
+                            }
+                            test.setManager(manager);
+
+                            if (logger.isDebugEnabled()) {
+                                logger.debug(test.getName() +
+                                    " added in group " + name);
+                            }
+
+                            if (useInitFile) {
+                                test.loadAttributes();
+                            }
+                            tests.add(test);
                         } else {
-                            test = (AbstractTest) c.newInstance();
+                            continue;
                         }
-						test.setManager(manager);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(test.getName() + " added in group " +
-                                name);
-                        }
-
-                        if (useInitFile) {
-                            test.loadAttributes();
-                        }
-                        tests.add(test);
                     } catch (Exception e) {
                         throw new BrowsePackageException(e);
                     }
-                } else {
-                    continue;
                 }
             }
         }
