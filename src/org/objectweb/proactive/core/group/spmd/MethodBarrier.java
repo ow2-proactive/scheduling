@@ -83,16 +83,16 @@ public class MethodBarrier implements Serializable {
 	}
 	
 	/**
-	 * Returns the index of the specified method
+	 * Returns the index of the specified method not yet recieved
 	 * @param methodName - the name of the method
 	 * @return the index of the method, <code>-1</code> if the method is not
-	 * member of this barrier 
+	 * member of this barrier or already received 
 	 */
 	private int indexOf(String methodName) {
 		boolean find = false;
 		int i;
 		for (i = 0; ((i<this.methodNames.length) && (!find)); i++) {
-			find = this.methodNames[i].equals(methodName);
+			find = this.methodNames[i].equals(methodName) && !this.arrivedMethods[i];
 		}
 		if (find) {
 			return i-1;

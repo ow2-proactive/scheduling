@@ -350,15 +350,7 @@ public class ProxyForGroup extends AbstractProxy
 
                 /* if o is an reified object and if it is "assignableFrom" the class of the group, ... add it into the group */
                 if (MOP.isReifiedObject(o)) {
-                    boolean result = this.memberList.add(o);
-
-                    /* in the particular case that o extends GroupMember, there are few more operations */
-                    if (o instanceof org.objectweb.proactive.core.group.GroupMember) {
-                        ((org.objectweb.proactive.core.group.GroupMember) o).setMyGroup(stub);
-                        ((org.objectweb.proactive.core.group.GroupMember) o).setMyRank(this.memberList.indexOf(
-                                o));
-                    }
-                    return result;
+                    return this.memberList.add(o);
                 }
                 // COMPONENTS
 
