@@ -39,13 +39,11 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 
 
 /**
- * <P>
  * An object implementing this interface is an implementation of one part
  * of the local view of the body of an active object. This interface define
  * only one part of the local view and is used to be able to change easily the
  * strategy of a body. Typically, after a body migrates, it is necessary to change
  * the its local implementation.
- * </P>
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
