@@ -34,11 +34,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 
 import testsuite.test.FunctionalTest;
-
 
 
 /**
@@ -53,6 +52,7 @@ public class Test extends FunctionalTest {
     JVMProcessImpl process;
     Node[] nodeTab;
     ProActiveDescriptor pad;
+    private String defaultPort;
 
     public Test() {
         super("P2P JVM acquisition in deployment descriptor",
@@ -77,8 +77,8 @@ public class Test extends FunctionalTest {
         Thread.sleep(5000);
         process.startProcess();
         Thread.sleep(7000);
-         pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);	
-         pad.activateMappings();
+        pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
+        pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("p2pvn");
         nodeTab = vn.getNodes();
     }
@@ -87,6 +87,7 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
+        this.defaultPort = System.getProperty("proactive.rmi.port");
     }
 
     /* (non-Javadoc)
@@ -94,6 +95,7 @@ public class Test extends FunctionalTest {
      */
     public void endTest() throws Exception {
         pad.killall(false);
+        System.setProperty("proactive.rmi.port", this.defaultPort);
     }
 
     public boolean postConditions() throws Exception {

@@ -4,8 +4,7 @@
   <meta name="Keywords"
  content="infrastructure, p2p, peer-to-peer,
 proactive, daemon, xml">
-  <title>ProActive P2P
-Infrastructure</title>
+  <title>ProActive P2P Infrastructure</title>
   <link rel="stylesheet" href="ProActive.css">
   <meta name="Author" content="Alexandre di Costanzo">
 </head>
@@ -33,8 +32,8 @@ index</a>&nbsp;&nbsp;</td>
         </tbody>
       </table>
       </td>
-      <td align="right" valign="top">
-      <img src="ProActiveLogo200x34.gif"></td>
+      <td align="right" valign="top"> <img
+ src="ProActiveLogo200x34.gif"></td>
     </tr>
   </tbody>
 </table>
@@ -127,14 +126,14 @@ file.</li>
 <p>Before launching this script,
 you have to specify some arguments to this command:</p>
 <p><b>startP2PService</b>
-<code>[acquisitionMethod
-[portNumber]] [-s Peer ...] [-f PeersListFile]</code></p>
+<code>[-acq acquisitionMethod]
+[-port portNumber] [-s Peer ...] [-f PeersListFile]</code></p>
 <ul>
-  <li> <b>acquisitionMethod</b>
+  <li> <b>-acq acquisitionMethod</b>
 the ProActive Runtime communication protocol used. Examples: rmi, http,
 ibis,
 ... By default it is <i>rmi</i>.</li>
-  <li> <b>portNumber</b>
+  <li> <b>-port portNumber</b>
 is the port number where the P2P Service will listen. By default it is <i>2410</i></li>
   <li> <b>-s
 Peer ...</b> specify addresses of
@@ -313,8 +312,7 @@ the JVM</b>: This command will stop
 the JVM and will restart it at the next scheduled time, which is the
 day after:<br>
     <code>$
-ProActive/p2p/build/p2pctl stop</code>
-  </li>
+ProActive/p2p/build/p2pctl stop</code> </li>
   <li><b>Kill
 the daemon</b>:<br>
     <code>$
@@ -332,8 +330,7 @@ Deployment Descriptors</h3>
 settings such as:</p>
 <ul>
   <li>The number of node you want
-from the P2P infrastructure. Setting
-    <b>MAX</b>
+from the P2P infrastructure. Setting <b>MAX</b>
 as value is equivalent to an
 infinite number of node. (attribute <b>nodesAsked</b>)</li>
   <li><b>acq</b>
