@@ -1,6 +1,3 @@
-/*
- * Created on Jan 7, 2005
- */
 package org.objectweb.proactive.examples.nbody.common;
 
 
@@ -10,15 +7,12 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 
 /**
- * @author irosenbe
+ * @author cdelbe
  */
 public class Displayer implements Serializable, InitActive{
-    
+
     private transient NBodyFrame nbf;
-    private int w,h;
-    private int centralX,centralY;
-    private int reference;
-    private int radiusReference;
+    // private int w,h;
     private int nbBodies;
     
     public Displayer(){}
@@ -27,34 +21,15 @@ public class Displayer implements Serializable, InitActive{
         this.nbBodies=nbBodies.intValue();
     }
     
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id){
-        if (reference==-1){
-            this.reference=id;
-            this.radiusReference = weight/2000+1;
-        }
-        
-        if (id==reference){
-            // reference
-            this.centralX=x+radiusReference;
-            this.centralY=y+radiusReference;
-        }
-        int dx = x+(w/2)-centralX;
-        int dy = y+(h/2)-centralY;
-        
-        this.nbf.drawBody(dx,dy,vx,vy, weight,d,id);
-        
+    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id, String name){
+        this.nbf.drawBody(x,y,vx,vy, weight,d,id, name);        
     }
-    
-    
+
     public void initActivity(Body body) {
         nbf = new NBodyFrame("ProActive N-Body", nbBodies);
-        nbf.setVisible(true);
-        //this.nbf = nbf;
-        this.w=nbf.getWidth();
-        this.h=nbf.getHeight();
-        this.centralX=w/2;
-        this.centralY=h/2;
-        this.reference =-1;
+		nbf.setVisible(true);
+       // this.w=nbf.getWidth();
+       // this.h=nbf.getHeight();
     }
     
 }
