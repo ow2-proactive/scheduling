@@ -55,8 +55,8 @@ public class RequestQueueEvent extends ProActiveEvent implements java.io.Seriali
 
   /**
    * Creates a new <code>RequestQueueEvent</code> based on the given owner id and type
-   * @param <code>ownerID</code> the id of the owner of the <code>RequestQueue</code> in which the event occured
-   * @param <code>type</code> the type of the event that occured
+   * @param ownerID the id of the owner of the <code>RequestQueue</code> in which the event occured
+   * @param type the type of the event that occured
    */
   public RequestQueueEvent(UniqueID ownerID, int type) {
     super(ownerID, type);

@@ -46,7 +46,7 @@ public interface RequestQueueEventListener extends ProActiveListener {
 
   /**
    * Signals that the observed RequestQueue has been modified
-   * @param <code>event</code> the event that details the modification,
+   * @param event the event that details the modification,
    * either removal or addition of a request.
    */
   public void requestQueueModified(RequestQueueEvent event);

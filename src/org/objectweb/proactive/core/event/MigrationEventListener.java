@@ -46,25 +46,25 @@ public interface MigrationEventListener extends ProActiveListener {
 
   /**
    * Signals that a migration is about to start 
-   * @param <code>event</code> the event that details the migration
+   * @param event the event that details the migration
    */
   public void migrationAboutToStart(MigrationEvent event);
   
   /**
    * Signals that the migration is finished on the originating host side
-   * @param <code>event</code> the event that details the migration
+   * @param event the event that details the migration
    */
   public void migrationFinished(MigrationEvent event);
   
   /**
    * Signals that the migration failed with a exception detailed in the event.
-   * @param <code>event</code> the event that details the exception occured in the migration
+   * @param event the event that details the exception occured in the migration
    */
   public void migrationExceptionThrown(MigrationEvent event);
   
   /**
    * Signals that the migrated body has restarted of the destination host side
-   * @param <code>event</code> the event that details the migration
+   * @param event the event that details the migration
    */
   public void migratedBodyRestarted(MigrationEvent event);
    

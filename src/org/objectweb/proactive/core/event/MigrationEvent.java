@@ -54,8 +54,8 @@ public class MigrationEvent extends ProActiveEvent implements java.io.Serializab
   /**
    * Creates a new <code>MigrationEvent</code> occuring during the migration of the 
    * active object linked to the given body. 
-   * @param <code>body</code> the body associated to the migrating active object
-   * @param <code>type</code> a number specifying when in the process of migration the event occured.
+   * @param body the body associated to the migrating active object
+   * @param type a number specifying when in the process of migration the event occured.
    */
   public MigrationEvent(Body body, int type) {
     super(body, type);
@@ -63,7 +63,7 @@ public class MigrationEvent extends ProActiveEvent implements java.io.Serializab
   
   /**
    * Creates a new <code>MigrationEvent</code> based on an exception occuring during the process of migration.
-   * @param <code>exception</code> the exception that occured
+   * @param exception the exception that occured
    */
   public MigrationEvent(MigrationException exception) {
     super(exception, MIGRATION_EXCEPTION);

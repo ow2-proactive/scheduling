@@ -44,12 +44,12 @@ package org.objectweb.proactive.core.event;
 public interface FutureEventListener extends ProActiveListener {
 
   /** Signals that a Thread was forced to wait for a future result.
-   *  @param <code>futureEvent</code> the event caused by the waiting
+   *  @param futureEvent the event caused by the waiting
    */
   public void waitingForFuture(FutureEvent futureEvent);
 
   /** Signals that a Thread finished waiting for a future result.
-   *  @param <code>futureEvent</code> the event caused by the waiting
+   *  @param futureEvent the event caused by the waiting
    */
   public void receivedFutureResult(FutureEvent futureEvent);
 

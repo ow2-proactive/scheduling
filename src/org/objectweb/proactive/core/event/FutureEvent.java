@@ -55,10 +55,10 @@ public class FutureEvent extends ProActiveEvent implements java.io.Serializable 
 
   /**
    * Creates a new <code>FutureEvent</code> based on the given FutureProxy
-   * @param <code>bodyID</code> the <code>UniqueID</code> of the body that is waiting for the future result
-   * @param <code>creatorID</code> the <code>UniqueID</code> of the body that created
+   * @param bodyID the <code>UniqueID</code> of the body that is waiting for the future result
+   * @param creatorID the <code>UniqueID</code> of the body that created
    * the corresponding <code>Future</code> 
-   * @param <code>type</code> the type of the event that occured
+   * @param type the type of the event that occured
    */
   public FutureEvent(UniqueID bodyID, UniqueID creatorID, int type) {
     super(bodyID, type);

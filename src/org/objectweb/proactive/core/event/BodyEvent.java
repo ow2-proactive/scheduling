@@ -57,8 +57,8 @@ public class BodyEvent extends ProActiveEvent implements java.io.Serializable {
 
   /**
    * Creates a new <code>BodyEvent</code>
-   * @param <code>body</code> the body created or deleted
-   * @param <code>messageType</code> the type of the event either BODY_CREATED or BODY_DESTROYED
+   * @param body the body created or deleted
+   * @param messageType the type of the event either BODY_CREATED or BODY_DESTROYED
    */
   public BodyEvent(UniversalBody body, int messageType) {
     super(body, messageType);

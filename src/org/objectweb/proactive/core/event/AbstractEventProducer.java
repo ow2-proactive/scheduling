@@ -117,7 +117,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
 
     /**
      * Adds the given listener
-     * @param <code>listener</code> the listener to register
+     * @param listener the listener to register
      */
     protected void addListener(ProActiveListener listener) {
         synchronized (eventListeners) {
@@ -129,7 +129,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
 
     /**
      * Removes the given listener
-     * @param <code>listener</code> the listener to remove
+     * @param listener the listener to remove
      */
     protected void removeListener(ProActiveListener listener) {
         synchronized (eventListeners) {
@@ -140,7 +140,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     /**
      * Notifies all registered listener with the event. This method call
      * <code>notifyOneListener</code> on each registered listener.
-     * @param <code>event</code> the event to fire to all listeners.
+     * @param event the event to fire to all listeners.
      */
     protected void notifyAllListeners(ProActiveEvent event) {
         synchronized (eventListeners) {
@@ -153,8 +153,8 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
 
     /**
      * Notifies one listener with the event.
-     * @param <code>listener</code> the listener to notify.
-     * @param <code>event</code> the event to fire to the listener.
+     * @param listener the listener to notify.
+     * @param event the event to fire to the listener.
      */
     protected abstract void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event);
@@ -226,14 +226,14 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
 
         /**
          * Adds the given listener
-         * @param <code>listener</code> the listener to add in the list
+         * @param listener the listener to add in the list
          * @return true if the listener has been added.
          */
         public boolean add(ProActiveListener listener);
 
         /**
          * Removes the given listener
-         * @param <code>listener</code> the listener to remove from the list
+         * @param listener the listener to remove from the list
          * @return true if the listener has been removed.
          */
         public boolean remove(ProActiveListener listener);

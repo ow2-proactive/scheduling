@@ -69,11 +69,11 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   /**
    * Creates a new <code>MessageEvent</code> based on the message 
    * <code>message</code> and on the given action
-   * @param <code>message</code> the message on which this event is based.
-   * @param <code>messageActionType</code> the type of the action occuring with
+   * @param message the message on which this event is based.
+   * @param messageActionType the type of the action occuring with
    * this message either REQUEST_SENT/RECEIVED, REPLY_SENT/RECEIVED,
    * VOID_REQUEST_SERVED or SERVING_STARTED.
-   * @param <code>requestQueueLength</code> the length of the request queue of the
+   * @param requestQueueLength the length of the request queue of the
    * body that sends this event or -1 if this event did not affect the queue length.
    */
   public MessageEvent(Message message, int messageActionType, UniqueID destinationID,
