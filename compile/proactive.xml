@@ -3,6 +3,7 @@
         <property environment="env"/> 
 	<property name="base" value=".."/>
 	<property name="src.dir" value="${base}/src"/>
+	<property name="daemon.dir" value="${base}/p2p"/>
 	<property name="proactive.dir" value="org/objectweb/proactive"/>
 	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
@@ -178,6 +179,17 @@
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
+	</target>
+	<target name="daemon" depends="p2p">
+	    <exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS" >
+			<arg line="-Wall -g -o proactivep2p -x c proactivep2p.cpp proactivep2p.h"/>
+		</exec>
+		<exec dir="${daemon.dir}/src/common" executable="cc" os="Linux, Darwin, SunOS" >
+			<arg line="-Wall -g -o p2pctl -x c p2pctl.c proactivep2p.h"/>
+		</exec>
+		<mkdir dir="${daemon.dir}/build"/>
+		<move file="${daemon.dir}/src/common/proactivep2p" todir="${daemon.dir}/build"/>
+		<move file="${daemon.dir}/src/common/p2pctl" todir="${daemon.dir}/build"/>
 	</target>
 	<!--
 	   ================================================================

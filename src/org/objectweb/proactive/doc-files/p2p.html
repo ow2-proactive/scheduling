@@ -26,7 +26,7 @@
 </table> 
 <hr> 
 <!-- Link to index : end --> 
-<h1>ProActive Peer-to-PeerInfrastructure</h1> 
+<h1>ProActive Peer-to-Peer Infrastructure</h1> 
 <p>Computational Peer-To-Peer (P2P) is becoming a key execution environment. The potential of 100,000 of nodes interconnected to execute a single application is rather appealing, especially for Grid computing. Mimicking data P2P, one could start a computation that that no failure would ever be able to stop (and maybe nobody).</p> 
 <p>The ProActive P2P aims to use sparse CPU cycles from organizations or institutions desktop workstations.</p> 
 <p>This short document explains to create a simple computational P2P networks. This network is a dynamic JVMs network which use like computation nodes.</p> 
@@ -96,11 +96,28 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <h3>The P2P Daemon</h3> 
 <p>The daemon aim to use computers in Peer-to-Peer computations, there will be a Java virtual machine sleeping on your computers and waking up at scheduled times to get some work done.</p> 
 <p>The JVM is scheduled by default to wake up the weekend and during the night. Next, we will explain how to change the schedule. The JVM is running with the lowest priority.</p> 
-<h4>Installation</h4> 
-<p>First, to install the daemon with Windows, you to run this script:</p> 
+<h4>Installation</h4>
+ 
+<h5>UNIX</h5>
+
+<p>Go to the directory: <code>ProActive/compile</code> and run this
+      command:</p>
+<code>$ ./build damon</code>
+
+<h5>Micorsoft Windows</h5>
+
+    <p>To compile daemon source (in c++), we don't porvide any
+      automatic script, you have to do it by yourself. All sources for
+      Windows are in the directory:
+      <code>ProActive/p2p/src/windows</code>. If you use Visual Studio
+      or else in the same directory you found Microsoft projects files.</p>
+
+<p>After that you are ready to install the daemon with Windows, you
+      have jsut to run this script:</p> 
 <code>C:&gt; ProActive\p2p\scripts\windows\Service\install.bat</code> 
 <p>To remove the daemon:</p> 
 <code>C:&gt; ProActive\p2p\scripts\windows\Service\remove.bat</code>
+
 <p><b>Comment</b>: By default the port number of the daemon is <b>9301</b>.</p> 
 <h4>Configuration</h4> 
 <p>The daemon is configured with XML files in the <code>ProActive/p2p/config/</code> directory. To find the correct configuration file, the daemon will first try with a host dependant file: <code>config/proactivep2p.${HOST}.xml</code> for example: <code>config/proactivep2p.camel.inria.fr.xml</code> if the daemon is running on the host named <code>camel.inria.fr.</code></p> 
@@ -131,9 +148,9 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <h4>Control</h4> 
 <ul> 
   <li><b>Stop the JVM</b>: This command will stop the JVM and make it restart for the next scheduled time, which is the day after:<br> 
-    <code>$ ProActive/p2p/build/{unix}{windows}/p2pctl stop</code> </li> 
+    <code>$ ProActive/p2p/build/p2pctl stop</code> </li> 
   <li><b>Kill the daemon</b>:<br> 
-    <code>$ ProActive/p2p/build/{unix}{windows}/p2pctl killdaemon</code></li> 
+    <code>$ ProActive/p2p/build/p2pctl killdaemon</code></li> 
 </ul> 
 <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--> 
 <h2><a name=appli></a>Launch your Application</h2> 
