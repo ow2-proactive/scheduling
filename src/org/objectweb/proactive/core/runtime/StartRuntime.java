@@ -134,33 +134,18 @@ public class StartRuntime {
                         //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
                 "proactive.communication.protocol") + ":");
 
-            String comProtocol = System.getProperty(
-                    "proactive.communication.protocol");
-            if (comProtocol == "http") {
-                ;
-            }
-            comProtocol = "";
 
             //            logger.info("Runtime started at " + comProtocol+ ":" +
             //                proActiveRuntime.getURL());
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
-            /*
-               for (int i = 1; i <= nodenumber; i++) {
-                   proActiveRuntime.createLocalNode(nodeURL +
-                       Integer.toString(
-                           new java.util.Random(System.currentTimeMillis()).nextInt()),
-                       false);
-                   //Thread.sleep(2000); for windows
-               }
-               //System.out.println("creation OK");
-               //System.out.println(DefaultRuntimeURL);
-             */
-            if (DefaultRuntimeURL != null) {
-                register(DefaultRuntimeURL);
-            }
+            
         } catch (ProActiveException e) {
             e.printStackTrace();
+            //we can still try to register if for instance an Alreadybound exception occurs
+        }
+        if (DefaultRuntimeURL != null) {
+            register(DefaultRuntimeURL);
         }
     }
 
@@ -180,6 +165,8 @@ public class StartRuntime {
             proActiveRuntime.setParent(DefaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
+            // if we cannot register, this jvm is useless
+            System.exit(0);
         }
     }
 }
