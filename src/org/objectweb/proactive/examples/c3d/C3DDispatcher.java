@@ -420,11 +420,13 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		//  public void setPixels(int[] newpix, Interval interval, C3DRenderingEngine currentEngine) {
 
 		long elapsed;
-
+		
 		/* Delivers the new pixels to all user frames */
 		for (Enumeration e = h_users.elements(); e.hasMoreElements();)
 		{
-			((User) e.nextElement()).getObject().setPixels(newpix, interval);
+			User user = (User) e.nextElement();
+			
+			user.getObject().setPixels(newpix, interval);
 		}
 
 		/* Stores the newly rendered interval in <code>pixels</code>; this
@@ -665,28 +667,38 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		/* Loops over lifetime */
 		while (body.isActive())
 		{
-			/* Waits on any method call */
-			Request r = requestQueue.blockingRemoveOldest();
-			String methodName = r.getMethodName();
-			if (methodName.startsWith("rotate")
-				|| methodName.startsWith("spin"))
-				processRotate(body, methodName, r);
-			if (!Election.isRunning())
-			{
-				// No election and the method != up,down,left,right
-				body.serve(r);
+			//if a user is migrating the dispatcher must first register it before rendering the scene
+//			Request migrationRequest = requestQueue.removeOldest("registerMigratedUser");
+//			if(migrationRequest != null){
+//				body.serve(migrationRequest);
+//			}else{
+				/* Waits on any method call */
+				Request r = requestQueue.blockingRemoveOldest();
+				String methodName = r.getMethodName();
+				if (methodName.startsWith("rotate")|| methodName.startsWith("spin")){
+					processRotate(body, methodName, r);
+				}
+				else{
+					if (!Election.isRunning())
+					{
+						// No election and the method != up,down,left,right
+						body.serve(r);
+					}
+					else if (methodName.equals("addSphere"))
+					{
+					// There is an election and addsphere comes..
+					// nothing happens...
+					showMessageAll("Cannot add spheres while an election is running");
+					}
+					else 
+					{
+					// THERE IS a running election and the method name is not left or right..
+					
+					body.serve(r);
+					}
+				}
 			}
-			else if (methodName.equals("addSphere"))
-			{
-				// There is an election and addsphere comes..
-				// nothing happens...
-				showMessageAll("Cannot add spheres while an election is running");
-			}
-			else
-			{
-				// IF THERE IS a running election and the method name is not left or right...
-			}
-		}
+		//}
 	}
 
 	private void registerDispatcher(String nodeURL)
@@ -744,6 +756,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 		}
 		if (methodName.equals("rotateLeft"))
 		{
@@ -1106,7 +1119,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		//System.out.println(jvmNodeProcess.getParameters());
 		//dispatcher.activate();
 		node = dispatcher.getNode();
-		System.out.println(node.getNodeInformation().getURL());
+		//System.out.println(node.getNodeInformation().getURL());
 		//System.out.println(System.getProperty("java.class.path"));
 		//String nodeURL = node.getNodeInformation().getURL();
 		try
@@ -1295,12 +1308,25 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	public void unregisterConsumer(int number)
 	{
 		showMessageExcept(number, "User " + nameOfUser(number) + " left");
-
-		for (Enumeration e = h_users.elements(); e.hasMoreElements();)
+		
+		for (Enumeration e = h_users.keys(); e.hasMoreElements();)
 		{
-			((User) e.nextElement()).getObject().informUserLeft(
-				nameOfUser(number));
+			int i = ((Integer) e.nextElement()).intValue();
+			
+			if (i != number)
+			{
+				User user = ((User) h_users.get(new Integer(i)));
+				// Inform all user except the user that left
+				user.getObject().informUserLeft(nameOfUser(number));
+			}
 		}
+//		for (Enumeration e = h_users.elements(); e.hasMoreElements();)
+//		{
+//			User user = (User) e.nextElement();
+//			if(
+//			user.getObject().informUserLeft(
+//				nameOfUser(number));
+//		}
 
 		try
 		{
@@ -1308,6 +1334,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		}
 		catch (Exception ex)
 		{
+			ex.printStackTrace();
 		}
 		h_users.remove(new Integer(number));
 		if (h_users.isEmpty())
@@ -1678,6 +1705,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 						}
 						catch (Exception l_ex)
 						{
+							l_ex.printStackTrace();
 						}
 					}
 				}
@@ -1696,6 +1724,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 						}
 						catch (Exception l_ex)
 						{
+							l_ex.printStackTrace();
 						}
 					}
 				}
@@ -1772,6 +1801,7 @@ class Election extends Thread
 		}
 		catch (InterruptedException e)
 		{
+			e.printStackTrace();
 		}
 
 		int score[] = { 0, 0, 0, 0, 0, 0 };
