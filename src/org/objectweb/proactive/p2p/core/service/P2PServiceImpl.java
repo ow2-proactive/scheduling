@@ -53,7 +53,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.p2p.core.info.Info;
-import org.objectweb.proactive.p2p.core.info.NullProActiveRuntime;
 import org.objectweb.proactive.p2p.core.service.KnownTable.KnownTableElement;
 
 
@@ -74,7 +73,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     private String url = null;
     private String completeUrl = "";
     private Info serviceInfo;
-    private NullProActiveRuntime nullProActiveRuntime;
+    private FakeProActiveRuntime fakeProActiveRuntime;
 
     /**
      * <p>
@@ -86,26 +85,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public P2PServiceImpl() {
         // Empty Cronstructor
-        /*
-        String url;
-
-        try {
-            url = InetAddress.getLocalHost().getCanonicalHostName();
-
-            if (url.endsWith("/")) {
-                url.replace('/', ' ');
-                url.trim();
-            }
-
-            url += (":" + this.portNumber);
-            this.url = "//" + url;
-            this.completeUrl = this.acquisitionMethod + this.url + "/";
-            
-            //this.serviceInfo = new Info(this, 0, 0, this.url);
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }*/
+  
     }
 
     /**
@@ -142,7 +122,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
             this.serviceInfo = new Info(0, 0, this.completeUrl);
             
-            this.nullProActiveRuntime = new NullProActiveRuntime();
+            this.fakeProActiveRuntime = new FakeProActiveRuntime();
             
         } catch (UnknownHostException e) {
             logger.error("Could't return the URL of this P2P Service");
@@ -241,8 +221,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             if (logger.isInfoEnabled())
                 logger.info("Update ProActive JVM: " + name);
         } else {
-            
-               
+
                 KnownTableElement element = this.knownProActiveJVM.new KnownTableElement(name,
                         distInfo);
                 
@@ -275,7 +254,9 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         }
     }
     
-    
+    /**
+     * returninformation available for this peer such as name, load, stub 
+     */
     public Info getInfo() {
         return this.serviceInfo;
     }
@@ -406,8 +387,6 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             }
         }
         
-
-        
         it = peerToContact.iterator();
         
         // asking to contact list peers for new JVM .... 
@@ -509,7 +488,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             // As it's not possible to return null when using Future we return a NullProActiveRuntime object
             if (logger.isInfoEnabled())
                 logger.info(this.completeUrl + " doesn't give is ProActiveRuntime because load is full");
-            return this.nullProActiveRuntime;
+            return this.fakeProActiveRuntime;
         }
     }
 
@@ -615,5 +594,25 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     public boolean equals(Object obj) {
         return (this.completeUrl.compareTo(((P2PService) obj).getServiceName()) == 0)
         ? true : false;
+    }
+    
+    /**
+     * This class is use as a possible return value for the method getProActiveRuntime() 
+     * We need it because the call to the method lead to the creation of a future, 
+     * so we can't return null if the p2pservice doesn't want to give is runtime.
+     * We can use this class to store some information about future availability 
+     * of the peer ... 
+     * @author vcave
+     *
+     * TODO To change the template for this generated type comment go to
+     * Window - Preferences - Java - Code Style - Code Templates
+     */
+    public class FakeProActiveRuntime implements Serializable
+    {
+
+        public FakeProActiveRuntime()
+        {
+            
+        }
     }
 }
