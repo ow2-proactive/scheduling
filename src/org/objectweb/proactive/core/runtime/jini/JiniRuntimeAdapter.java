@@ -233,7 +233,26 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
             // behavior to be defined
         }
     }
+    
+    public void addParent(String proActiveRuntimeName) {
+    	try {
+    		jiniRuntime.addParent(proActiveRuntimeName);
+        } catch (RemoteException re) {
+        	// hum ...
+        	re.printStackTrace();
+        }
+    }
 
+    public String[] getParents() {
+    	try {
+    		return jiniRuntime.getParents();
+    	} catch (RemoteException re) {
+        	// hum ...
+        	re.printStackTrace();
+        	return new String[0];
+        }	
+    }
+    
     public void killRT(boolean softly) throws Exception {
         try {
             jiniRuntime.killRT(softly);

@@ -52,6 +52,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+
 //
 import java.io.File;
 import java.io.IOException;
@@ -126,6 +127,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     // map proActiveRuntime registered on this VM and their names
     private java.util.Hashtable proActiveRuntimeMap;
 
+    // synchronized set of URL to runtimes in which we are registered
+    private java.util.Set parentsURL;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------------------
     //
@@ -136,6 +140,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable();
+            this.parentsURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
             this.virtualNodesMap = new java.util.Hashtable();
             this.descriptorMap = new java.util.Hashtable();
             this.policyServerMap = new java.util.Hashtable();
@@ -322,6 +327,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
             proActiveRuntimeName, creatorID, creationProtocol, vmName);
+        proActiveRuntimeDist.addParent(getURL());
     }
 
     /**
@@ -346,6 +352,29 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
         return (ProActiveRuntime) proActiveRuntimeMap.get(proActiveRuntimeName);
+    }
+
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(String)
+     */
+    public void addParent(String proActiveRuntimeName) {
+        parentsURL.add(proActiveRuntimeName);
+    }
+
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
+     */
+    public String[] getParents() {
+        String[] urls;
+
+        synchronized (parentsURL) {
+            urls = new String[parentsURL.size()];
+            java.util.Iterator iter = parentsURL.iterator();
+            for (int i = 0; i < urls.length; i++)
+                urls[i] = (String) iter.next();
+        }
+
+        return urls;
     }
 
     /**

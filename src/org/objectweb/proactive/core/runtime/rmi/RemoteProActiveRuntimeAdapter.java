@@ -252,6 +252,25 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    public void addParent(String proActiveRuntimeName) {
+    	try {
+    		remoteProActiveRuntime.addParent(proActiveRuntimeName);
+        } catch (java.rmi.RemoteException re) {
+        	// hum ...
+        	re.printStackTrace();
+        }
+    }
+
+    public String[] getParents() {
+    	try {
+    		return remoteProActiveRuntime.getParents();
+    	} catch (java.rmi.RemoteException re) {
+        	// hum ...
+        	re.printStackTrace();
+        	return new String[0];
+        }	
+    }
+    
     public void killRT(boolean softly) throws Exception {
         try {
             if (!alreadykilled) {

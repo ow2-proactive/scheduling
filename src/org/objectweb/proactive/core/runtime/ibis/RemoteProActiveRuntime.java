@@ -91,6 +91,10 @@ public interface RemoteProActiveRuntime extends Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws RemoteException;
 
+    public void addParent(String proActiveRuntimeName) throws RemoteException;
+
+    public String[] getParents() throws RemoteException;
+    
     public void killRT(boolean softly) throws RemoteException;
 
     public String getURL() throws RemoteException;

@@ -165,6 +165,14 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
+    public void addParent(String proActiveRuntimeName) {
+    	proActiveRuntime.addParent(proActiveRuntimeName);
+    }
+
+    public String[] getParents() {
+    	return proActiveRuntime.getParents();
+    }
+    
     public void killRT(boolean softly) throws java.rmi.RemoteException {
         killAllNodes();
         unregisterAllVirtualNodes();

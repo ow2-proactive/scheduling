@@ -91,6 +91,10 @@ public interface JiniRuntime extends java.rmi.Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
+    public void addParent(String proActiveRuntimeName) throws java.rmi.RemoteException;
+
+    public String[] getParents() throws java.rmi.RemoteException;
+    
     public void killRT(boolean softly) throws java.rmi.RemoteException;
 
     public String getURL() throws java.rmi.RemoteException;

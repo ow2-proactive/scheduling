@@ -154,6 +154,19 @@ public interface ProActiveRuntime extends Job {
         throws ProActiveException;
 
     /**
+     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
+     * Tells this runtime that it's registered in another one 
+     * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
+     */
+    public void addParent(String proActiveRuntimeName);
+    
+    /**
+     * Returns all the ProActiveRuntime URL in which this runtime is registered
+     * @return all the ProActiveRuntime URL in which this runtime is registered
+     */
+    public String[] getParents();
+    
+    /**
      * Kills this ProActiveRuntime and this VM
      * @param softly if false, this Runtime is killed abruptely
      * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
