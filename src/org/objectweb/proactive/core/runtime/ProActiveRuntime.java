@@ -188,8 +188,12 @@ public interface ProActiveRuntime {
 
     /**
      * Kills this ProActiveRuntime and this VM
+     * @param softly if false, this Runtime is killed abruptely
+	 * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
+	 * dying. To be more precise a thread is created to ask periodically the registry if objects are still
+	 * registered.
      */
-    public void killRT() throws Exception;
+    public void killRT(boolean softly) throws Exception;
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM

@@ -86,7 +86,7 @@ public class Test extends FunctionalTest {
     * @see testsuite.test.AbstractTest#endTest()
     */
     public void endTest() throws Exception {
-    	proActiveDescriptorAgent.killall();
+    	proActiveDescriptorAgent.killall(false);
     }
 
     public boolean postConditions() throws Exception {

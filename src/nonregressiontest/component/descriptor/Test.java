@@ -80,7 +80,7 @@ public class Test extends FunctionalTest {
 			} catch (Exception e) {
 				e.printStackTrace();
 				try {
-					deploymentDescriptor.killall();
+					deploymentDescriptor.killall(false);
 				} catch (ProActiveException pae) {
 					pae.printStackTrace();
 				}
@@ -98,7 +98,7 @@ public class Test extends FunctionalTest {
 	 * @see testsuite.test.AbstractTest#endTest()
 	 */
 	public void endTest() throws Exception {
-		deploymentDescriptor.killall();
+		deploymentDescriptor.killall(false);
 	}
 
 	public boolean postConditions() throws Exception {

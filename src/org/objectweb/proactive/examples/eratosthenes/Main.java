@@ -188,7 +188,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
       			  	
       			  	// this method will catch and print out an exception,
       			  	// there is nothing we can do about it
-      			  	node.getProActiveRuntime().killRT();
+      			  	node.getProActiveRuntime().killRT(false);
       			  }
     	 		} catch (Throwable ex) {
     			}

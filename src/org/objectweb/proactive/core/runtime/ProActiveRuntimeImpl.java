@@ -43,12 +43,8 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 
-
 import java.util.ArrayList;
-
-
 import java.util.Random;
-
 
 
 /**
@@ -71,12 +67,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private static Random prng = null; // new Random();
 
     private static synchronized int getNextInt() {
-    	 if (prng == null) {
-    	 	 prng = new Random();
-    	 }
-    	return prng.nextInt();
+        if (prng == null) {
+            prng = new Random();
+        }
+        return prng.nextInt();
     }
-    
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------------------
     //
@@ -156,7 +152,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#DeleteAllNodes()
      */
     public void killAllNodes() {
@@ -236,13 +231,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String)
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) {
         //System.out.println("register in Impl");
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
-            proActiveRuntimeName, creatorID, creationProtocol,vmName);
+            proActiveRuntimeName, creatorID, creationProtocol, vmName);
     }
 
     /**
@@ -272,7 +268,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT()
      */
-    public void killRT() {
+    public void killRT(boolean softly) {
         System.exit(0);
     }
 
@@ -297,10 +293,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     public String getURL(int port) {
-    	return "//" + vmInformation.getInetAddress().getHostName() + ":" + port + "/" +
-    	vmInformation.getName();
+        return "//" + vmInformation.getInetAddress().getHostName() + ":" +
+        port + "/" + vmInformation.getName();
     }
-    
+
     public ArrayList getActiveObjects(String nodeName) {
         // we have to clone the array otherwise modifications done on nodeMap
         // would be reflected on the temp variable bodyArray
@@ -523,13 +519,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             hostInetAddress = java.net.InetAddress.getLocalHost();
             String hostName = hostInetAddress.getHostName();
             this.processCreatorId = "jvm";
-            //this.name = "PA_RT"+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt())+"_"+hostName;
-//                        this.name = "PA_RT" +
-//                            Integer.toString(new java.security.SecureRandom().nextInt()) +
-//                            "_" + hostName;
-//            			this.name = "PA_RT" +
-//            							Integer.toString(new java.util.Random().nextInt()) +
-//            							"_" + hostName;
+
+            //            this.name = "PA_RT" +
+            //                Integer.toString(new java.security.SecureRandom().nextInt()) +
+            //                "_" + hostName;
             this.name = "PA_RT" +
                 Integer.toString(ProActiveRuntimeImpl.getNextInt()) + "_" +
                 hostName;

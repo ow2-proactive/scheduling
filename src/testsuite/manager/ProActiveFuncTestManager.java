@@ -218,7 +218,7 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
      */
     public void endManager() throws Exception {
         if (pad != null) {
-            pad.killall();
+            pad.killall(false);
         }
 
         //rshJVM.stopProcess();
