@@ -391,6 +391,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void setParent(String parentRuntimeName) {
         if (parentRuntimeURL == null) {
             parentRuntimeURL = parentRuntimeName;
+            runtimeAcquaintancesURL.add(parentRuntimeURL);
+
+		
         } else {
             logger.error("Parent runtime already set!");
         }
