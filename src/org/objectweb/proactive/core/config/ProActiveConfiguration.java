@@ -168,7 +168,30 @@ public class ProActiveConfiguration {
     public static String getSchemaValidationState() {
         return System.getProperty("schema.validation");
     }
-
+    
+    // FAULT TOLERANCE
+    public static String getFTState() {
+        return System.getProperty("proactive.ft");
+    }
+    public static String getCheckpointServer() {
+        return System.getProperty("proactive.ft.server.checkpoint");
+    }
+    public static String getLocationServer() {
+        return System.getProperty("proactive.ft.server.location");
+    }
+    public static String getRecoveryServer() {
+        return System.getProperty("proactive.ft.server.recovery");
+    }
+    public static String getGlobalFTServer() {
+        return System.getProperty("proactive.ft.server.global");
+    }
+    public static String getTTCValue() {
+        return System.getProperty("proactive.ft.ttc");
+    }
+    public static String getAttachedRessourceServer(){
+        return System.getProperty("proactive.ft.server.ressource");
+    }
+    
     //To be used for the launcher 
     //    /**
     //     * Sets the value of proactive.home if not already set
@@ -202,6 +225,8 @@ public class ProActiveConfiguration {
         if (System.getProperty("proactive.communication.protocol").equals("rmi")) {
             setProperty("proactive.rmi.port", "1099");
         }
+        setProperty("proactive.ft", "disable");
+        setProperty("proactive.ft.ttc", "30");
     }
 
     /**
