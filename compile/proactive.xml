@@ -73,6 +73,7 @@
 		<echo message="  ibis     : everything related to proactive ibis"/>
 		<echo message="  rewrite  : rewrite classes to enhance performance with ibis"/>
 		<echo message="  runTests	: Run all non regression tests"/>
+		<echo message="  runTestsLocal	: Run all non regression tests on the current host only"/>
 		<echo message="  runBench	: Run benchmarks"/>
 		<echo message=""/>
 		<echo message="=========================================="/>
@@ -536,7 +537,7 @@
       ==
       ================================================================
 	-->
-	<target name="nonregressiontest" depends="testsuite, proActiveJar">
+	<target name="nonregressiontest" depends="testsuite, proActiveJar, all">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
