@@ -31,13 +31,16 @@
 package org.objectweb.proactive.p2p.core.service;
 
 import java.io.Serializable;
-
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.p2p.core.info.Info;
 
 
 /**
@@ -45,6 +48,9 @@ import java.util.Vector;
  *
  */
 public class KnownTable implements Serializable {
+    
+    protected static Logger logger = Logger.getLogger(KnownTable.class.getName());
+    
     private Hashtable table = null;
 
     public KnownTable() {
@@ -117,7 +123,11 @@ public class KnownTable implements Serializable {
     /**
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
-    public KnownTableElement put(String key, KnownTableElement value) {
+    public KnownTableElement put(String key, KnownTableElement value) 
+    {
+        if(logger.isInfoEnabled())
+            logger.info(" KnownTable putting " +value.getKey());
+        
         if (this.table == null) {
             this.table = new Hashtable();
         }
@@ -195,7 +205,8 @@ public class KnownTable implements Serializable {
         private int load = 0;
         private long lastUpdate = 0;
         private String key = null;
-
+        private Info info;
+        
         public KnownTableElement() {
             // empty
         }
@@ -207,40 +218,50 @@ public class KnownTable implements Serializable {
             this.lastUpdate = lastUpdate;
             this.key = key;
         }
+        
+        public KnownTableElement(String key, Info distInfo) {
+            	this.info = distInfo;    
+                this.key = key;
+            }
 
         /**
          * @return Returns the lastUpdate.
          */
         public long getLastUpdate() {
-            return this.lastUpdate;
+//            return this.lastUpdate;
+            return this.info.getLastUpdate();
         }
 
         /**
          * @param lastUpdate The lastUpdate to set.
          */
         public void setLastUpdate(long lastUpdate) {
-            this.lastUpdate = lastUpdate;
+//            this.lastUpdate = lastUpdate;
+            this.info.setLastUpdate(lastUpdate);
         }
 
         /**
          * @return Returns the load.
          */
         public int getLoad() {
-            return this.load;
+            //return this.load;
+            return this.info.getFreeLoad();
         }
 
         /**
          * @param load The load to set.
          */
         public void setLoad(int load) {
-            this.load = load;
+            //this.load = load;
+            this.info.setLoad(load);
         }
 
         /**
          * @return Returns the runtime.
          */
         public P2PService getP2PService() {
-            return this.service;
+            return this.info.getService();
+            //return this.service;
         }
 
         /**
@@ -248,6 +269,20 @@ public class KnownTable implements Serializable {
          */
         public String getKey() {
             return key;
+        }
+    }
+
+    /**
+     * 
+     */
+    public void printKnownPeer()
+    {
+        Set entrySet = this.table.keySet();
+        
+        Iterator it = entrySet.iterator();
+        while(it.hasNext())
+        {
+          System.out.println(" knows " + it.next());
         }
     }
 }
