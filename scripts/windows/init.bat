@@ -31,12 +31,11 @@ IF EXIST %PROACTIVE%\lib\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\c
 IF EXIST %PROACTIVE%\lib\iaik_jce_full.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_jce_full.jar
 IF EXIST %PROACTIVE%\lib\iaik_ssl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_ssl.jar
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar
-IF EXIST %PROACTIVE%\lib\jaxp.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jaxp.jar
-IF EXIST %PROACTIVE%\lib\crimson.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\crimson.jar
 IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis.jar
+IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xerceImpl.jar
 echo CLASSPATH=%CLASSPATH%
 
-set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy 
+set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=proactive-log4j
 set PATH=%JAVA_HOME%\bin;%PATH%
 goto end
 
