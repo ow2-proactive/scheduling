@@ -40,9 +40,11 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.ServeException;
+import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -298,6 +300,12 @@ public abstract class BodyImpl extends AbstractBody
             long sequenceID = getNextSequenceID();
             Request request = internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);
+            // COMPONENTS : generate ComponentRequest for component messages
+            if (methodCall.getTag() != null) {
+                if (methodCall.getTag().equals(MethodCall.COMPONENT_TAG)) {
+                    request = new ComponentRequestImpl((RequestImpl) request);
+                }
+            }
             if (future != null) {
                 future.setID(sequenceID);
                 futures.receiveFuture(future);
