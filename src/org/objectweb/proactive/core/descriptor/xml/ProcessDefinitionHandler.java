@@ -132,7 +132,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
             String username = attributes.getValue("username");
             if (checkNonEmpty(username)) {
-                targetProcess.setUsername(username);
+                targetProcess.setUsername("username");
             }
         }
 
@@ -234,7 +234,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
-                this.addHandler(QUEUE_NAME_TAG, new SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -266,8 +265,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
                 } else if (name.equals(PRUN_OUTPUT_FILE)) {
                     prunSubProcess.setOutputFile((String) activeHandler.getResultObject());
-                } else if (name.equals(QUEUE_NAME_TAG)) {
-                	prunSubProcess.setQueueName((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
@@ -292,7 +289,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
             bch.addHandler(ABS_PATH_TAG, pathHandler);
             bch.addHandler(REL_PATH_TAG, pathHandler);
-             bch.addHandler(JVMPARAMETER_TAG, new BasicUnmarshaller());
+            bch.addHandler(JVMPARAMETER_TAG, new BasicUnmarshaller());
             //  this.addHandler(JVMPARAMETERS_TAG, bch);
             this.addHandler(JAVA_PATH_TAG, bch);
             this.addHandler(POLICY_FILE_TAG, bch);
@@ -361,10 +358,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 jvmProcess.setClassname((String) activeHandler.getResultObject());
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
-            }// else if (name.equals(JVMPARAMETERS_TAG)) {
-               // jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
-            //}
-             else {
+            } // else if (name.equals(JVMPARAMETERS_TAG)) {
+
+            else {
                 super.notifyEndActiveHandler(name, activeHandler);
             }
         }
@@ -486,7 +482,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
         }
 
-        // end inner class OptionHandler
+        // end inner class OptionHandler 
     }
 
     // end of inner class BSubProcessHandler
@@ -498,11 +494,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
         protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller {
             public GlobusOptionHandler() {
-                this.addHandler(GRAM_PORT_TAG, new SingleValueUnmarshaller());
-                this.addHandler(GIS_PORT_TAG, new SingleValueUnmarshaller());
-                CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-                cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
-                this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
+                this.addHandler(GLOBUS_COUNT_TAG, new SingleValueUnmarshaller());
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -515,15 +507,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 // we know that it is a globus process since we are
                 // in globus option!!!
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
-                if (name.equals(GRAM_PORT_TAG)) {
-                    globusProcess.setGramPort((String) activeHandler.getResultObject());
-                } else if (name.equals(GIS_PORT_TAG)) {
-                    globusProcess.setGISPort((String) activeHandler.getResultObject());
-                } else if (name.equals(GLOBUS_HOST_LIST_TAG)) {
-                    String[] globusHostList = (String[]) activeHandler.getResultObject();
-                    for (int i = 0; i < globusHostList.length; i++) {
-                        globusProcess.addGlobusHost(globusHostList[i]);
-                    }
+                if (name.equals(GLOBUS_COUNT_TAG)) {
+                    globusProcess.setCount((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
@@ -542,14 +527,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     }
 
     private class JVMParameterHandler extends BasicUnmarshaller {
-		public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
-	  // read from XML
-	  
-	  String value = attributes.getValue("value");
-	
-		setResultObject(value);
-	  
-    }
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            // read from XML
+            String value = attributes.getValue("value");
+
+            setResultObject(value);
+        }
     }
 
     //end of inner class SingleValueUnmarshaller
