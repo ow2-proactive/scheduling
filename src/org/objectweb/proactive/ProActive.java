@@ -56,6 +56,18 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
+// For exceptions handling
+import java.util.HashMap;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.exceptions.communication.*;
+import org.objectweb.proactive.core.exceptions.creation.*;
+import org.objectweb.proactive.core.exceptions.group.*;
+import org.objectweb.proactive.core.exceptions.migration.*;
+import org.objectweb.proactive.core.exceptions.security.*;
+import org.objectweb.proactive.core.exceptions.service.*;
+import org.objectweb.proactive.core.exceptions.handler.*;
+
 /**
  * <p>
  * The ProActive class provides a set of static services through static method calls.
@@ -153,16 +165,33 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  */
 public class ProActive {
 
+    
+    //
+    // -- STATIC MEMBERS -----------------------------------------------
+    //
 
-  //
-  // -- STATIC MEMBERS -----------------------------------------------
-  //
+    static public HashMap defaultLevel = null;
+    static public HashMap VMLevel = null;
 
-  static {
-    Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
-  }
+    static {  
+	Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
+	
+	// Creation of lower levels of exception handling
+	defaultLevel = new HashMap();
+	VMLevel = new HashMap();
+	
+	// We create default handler and add them to default level
+	// System.out.println("*** Initialization of default level handlers");
+	setExceptionHandler(defaultLevel, HandlerProActiveException.class.getName(), ProActiveException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerCommunicationException.class.getName(), ProActiveCommunicationException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerCreationException.class.getName(), ProActiveCreationException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerGroupException.class.getName(), ProActiveGroupException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerMigrationException.class.getName(), ProActiveMigrationException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerSecurityException.class.getName(), ProActiveSecurityException.class.getName());
+	setExceptionHandler(defaultLevel, HandlerServiceException.class.getName(), ProActiveServiceException.class.getName());
+    }
 
-  //
+    //
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
@@ -887,7 +916,88 @@ public class ProActive {
 		body.setImmediateService(methodName);
 	}
 
-//
+    /**
+     * Search an appropriate handler in a given level. We first search a handler for the real 
+     * class of exception and continue with mother classes until we find a handler.
+     * @param level Level containing a collection of handlers where we search a reliable handler.
+     * @param ex Exception for which we search a handler.
+     * @return A reliable handler or null
+     */
+    public static HandlerInterface searchExceptionHandler(HashMap level, ProActiveException ex) {
+
+	// First we look for the class of the raised exception
+	Class exClass = ex.getClass();
+	HandlerInterface handler = null;
+
+	// Then we search if a handler exists in the given level
+	// We stop when we find either right handler or none
+	while (handler ==  null && exClass.getName().compareTo(ProActiveException.class.getName()) != 0) {
+	    // System.out.println("*** search " + exClass.getName());
+
+	    if (level.containsKey(exClass.getName()))
+		try {
+		    handler = (HandlerInterface) Class.forName((String) level.get(exClass.getName())).newInstance();
+		} catch (Exception e) {
+		    if (e instanceof ClassNotFoundException) {
+			System.out.println("*** Handler for " + exClass.getName() + " is invalid");
+			break;
+		    } else 
+			e.printStackTrace();
+		}
+	    else
+		exClass = exClass.getSuperclass();
+	}
+	
+	// We return handler
+	return handler;
+    }
+    
+
+    /**
+     * Add a new handler to a specific level.
+     * If a handler already exists, it's overwrited.
+     * @param level Level containing exception handlers.
+     * @param hName The handler associated to one specific exception.
+     * @param exName The class of exception to handle. It should be a subclass of ProActiveException.
+     */
+    public static void setExceptionHandler(HashMap level, String hName, String exName) {
+
+	// System.out.println("*** Set exception handler for " + exName);
+	
+	// We don't want to modify the default level except if no handler exists
+	if (level == defaultLevel) {
+	    if (level.get(exName) == null)
+		level.put(exName, hName);
+	} else {
+	    level.put(exName, hName);
+	}
+    }
+    
+
+    /**
+     * Remove the handler for a specific class of exception.
+     * @param level Level from which the handler is deleted.
+     * @param exName The class of exception handled by the mechanism. It should be a subclass of ProActiveException.
+     */
+    public static HandlerInterface unsetExceptionHandler(HashMap level, String exName) {
+
+	// We keep a trace of the deleted handler
+	HandlerInterface handler = null;
+
+	// We don't want to modify default level
+	if (level != defaultLevel)
+	    try {
+		handler = (HandlerInterface) Class.forName((String) level.remove(exName)).newInstance(); 
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+
+	// We return the deleted handler
+	return handler;
+    }
+
+
+  //
   // -- PRIVATE METHODS -----------------------------------------------
   //
 
