@@ -109,6 +109,22 @@ public class ProActiveGroup {
 	
 	return result;
     }
+
+   /** Create an object representing a group and create members with params cycling on nodeList. */
+    public static Object newActiveGroupTHREAD(String className, Object[][] params, String[] nodeList)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+
+	Object result = newActiveGroup(className);
+	Group g = ProActiveGroup.getGroup(result);
+
+
+	for (int i = 0 ; i < params.length ; i++)
+	    ((org.objectweb.proactive.core.group.ProxyForGroup)g).createThreadCreation(className, params[i], nodeList[i % nodeList.length]);
+
+	((org.objectweb.proactive.core.group.ProxyForGroup)g).waitForTheWaitedCreation();
+
+	return result;
+    }
     
     
     /**
@@ -323,6 +339,8 @@ public class ProActiveGroup {
 	}
 	
     }
+
+
 
 
 }
