@@ -131,7 +131,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
                     AbstractResult result = test.runTest();
-                    resultsGroup.add(result);
+                    if (result != null) {
+                        resultsGroup.add(result);
+                    }
                     if (test.isFailed()) {
                         logger.warn("Test " + test.getName() + " [FAILED]");
                         errors++;

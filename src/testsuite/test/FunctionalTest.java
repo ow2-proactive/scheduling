@@ -30,6 +30,8 @@
 */
 package testsuite.test;
 
+import testsuite.exception.NotStandAloneException;
+
 import testsuite.result.TestResult;
 
 import java.io.Serializable;
@@ -140,6 +142,11 @@ public abstract class FunctionalTest extends AbstractTest
             if (logger.isInfoEnabled()) {
                 logger.info("Test runs with success");
             }
+        } catch (NotStandAloneException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Not executed Test : not a standalone test.");
+            }
+            return null;
         } catch (RuntimeException e) {
             logger.fatal("Exception during the test", e);
             failed = true;
