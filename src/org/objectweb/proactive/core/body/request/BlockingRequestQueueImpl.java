@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.body.request;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
@@ -38,7 +40,9 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
 import org.objectweb.proactive.core.group.spmd.BarrierState;
+import org.objectweb.proactive.core.group.spmd.MethodBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;
+import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.io.Serializable,BlockingRequestQueue {
 
@@ -55,6 +59,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
   private boolean suspended = false;
   private int awaitedBarrierCall = 0;
   private HashMap currentBarriers = new HashMap();
+  private LinkedList methodBarriers = new LinkedList();
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -84,6 +89,25 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  super.add(r);
 	  logger.debug("Adding request " + r.getMethodName());
 
+	  // if there is a "method based barrier"
+	  if (this.methodBarriers.size() != 0) {
+  		Iterator it = this.methodBarriers.iterator();
+  		boolean methodFound = false;
+  		MethodBarrier mb;
+  		int i = 1;
+  		while (it.hasNext() && !methodFound) {
+  			mb = (MethodBarrier)it.next();
+  			methodFound = mb.checkMethod(r.getMethodName());
+	  		if (methodFound) {
+	  			if (mb.barrierOver()) {
+	  				it.remove();
+	  				if (this.methodBarriers.size() == 0) {
+	  					this.suspended = false;
+	  				}
+	  			}
+	  		}
+  		}
+      }
 	  // if barrier call => special treatement
 	  if (r.getMethodCall() instanceof MethodCallBarrier) {
 		  //System.out.println("    BARRIER CALL\n          Source: " + r.getSourceBodyID() + "\n          Body:   " + this.body.getID());
@@ -118,6 +142,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 			  // System.out.println("Barrier \"" + mcb.getIDName() + "\" released !");
 			  this.suspended = false;
 		  }
+	  }
+	  // a "method based barrier" => stop the activity of this AO
+	  else if (r.getMethodCall() instanceof MethodCallBarrierWithMethodName) {
+	  		MethodCallBarrierWithMethodName mcbwmn = (MethodCallBarrierWithMethodName)r.getMethodCall();
+	  		this.methodBarriers.add(new MethodBarrier(mcbwmn.getMethodNames()));
+			this.suspended = true;
 	  }
 	  this.notifyAll();
 	}

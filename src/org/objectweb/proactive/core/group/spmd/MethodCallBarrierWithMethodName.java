@@ -30,61 +30,36 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 
-
 /**
- * This class represents a call of strong synchronization between the member of a SPMD Group.
  * @author Laurent Baduel
  */
-public class MethodCallBarrier extends MethodCallControlForGroup {
+public class MethodCallBarrierWithMethodName extends MethodCallControlForGroup {
 
-	private String IDName;
-	private int awaitedCalls;
+	private String[] methodNames;
 
 	/**
 	 * Constructor
-	 * @param idname - the id name of the barrier 
-	 * @param nbCalls - the number of call need to finish the barrier 
+	 * @param methodNames - the id name of the barrier
 	 */
-	public MethodCallBarrier(String idname, int nbCalls) {
-		this.IDName = idname;
-		this.awaitedCalls = nbCalls;
+	public MethodCallBarrierWithMethodName(String[] methodNames) {
+		this.methodNames = methodNames;
 	}
 
 	/**
-	 * Constructor
-	 * @param idname - the id name of the barrier 
-	 */
-    public MethodCallBarrier(String idname) {
-    	this.IDName = idname;
-    	this.awaitedCalls = ((AbstractBody) ProActive.getBodyOnThis()).getSPMDGroupSize();
-    }
-
-	/**
-	 * Returns the name of the call
-	 * @return the String "MethodCallBarrier"
+	 * Returns the name of the method call
+	 * @return "MethodCallBarrierWithMethodName"
 	 */
 	public String getName() {
-		return "MethodCallBarrier";
+		return "MethodCallBarrierWithMethodName";
 	}
 
 	/**
-	 * Returns the number of awaited call for this barrier
-	 * @return the number of awaited call for this barrier
+	 * Returns the names of the awaited methods
+	 * @return the names of the awaited methods;
 	 */
-	public int getAwaitedCalls() {
-		return this.awaitedCalls;
+	public String[] getMethodNames() {
+		return this.methodNames;
 	}
-    
-    /**
-     * Returns the ID name of the barrier
-     * @return the ID name of the barrier
-     */
-    public String getIDName() {
-    	return this.IDName;
-    }
-
 }

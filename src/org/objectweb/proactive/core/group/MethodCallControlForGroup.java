@@ -50,11 +50,13 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 
 
 	/**
-	 * Returns the number of parmeters
+	 * Returns the number of parmeters (0 for most of method call for group)
 	 * @return 0 
 	 * @see org.objectweb.proactive.core.mop.MethodCall#getNumberOfParameter()
 	 */
-	public abstract int getNumberOfParameter();
+	public int getNumberOfParameter() {
+		return 0;
+	}
 
 	//
 	// --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------

@@ -61,7 +61,7 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
 	}
 
 	/**
-	 * This call have one parameter.
+	 * This call has one parameter : the group to set as SPMD group.
 	 * @return 1
 	 * @see org.objectweb.proactive.core.mop.MethodCall#getNumberOfParameter()
 	 */

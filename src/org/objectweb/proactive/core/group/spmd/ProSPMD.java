@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -220,6 +221,23 @@ public class ProSPMD {
 		try {
 			((ProxyForGroup) ProActiveGroup.getGroup(group)).reify(new MethodCallBarrier(barrierName,ProActiveGroup.size(group))); }
 		catch (InvocationTargetException e) {
+			System.err.println("Unable to invoke a method call to control groups");
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Stops the activity and wait for the methods to resume.
+	 * @param methodNames the name of the methods used to synchronize
+	 */
+	public static void barrier (String[] methodNames) {
+		try {
+			((StubObject) ProActive.getStubOnThis()).getProxy().reify(
+					new MethodCallBarrierWithMethodName(methodNames)); }
+		catch (InvocationTargetException e) {
+			System.err.println("Unable to invoke a method call to control groups");
+			e.printStackTrace(); }
+		catch (Throwable e) {
 			System.err.println("Unable to invoke a method call to control groups");
 			e.printStackTrace();
 		}
