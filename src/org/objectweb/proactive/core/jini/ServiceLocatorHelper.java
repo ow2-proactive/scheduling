@@ -30,8 +30,6 @@
 */
 package org.objectweb.proactive.core.jini;
 
-import java.io.IOException;
-
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
 import net.jini.core.lookup.ServiceRegistrar;
@@ -39,7 +37,7 @@ import net.jini.core.lookup.ServiceTemplate;
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
-import org.objectweb.proactive.core.node.jini.JiniNode;
+import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
 
 public class ServiceLocatorHelper implements DiscoveryListener {
 
@@ -200,7 +198,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
       }
       System.out.println(">> >> >> Locator : " + this.registrar.getLocator());
   
-      ServiceTemplate template = new ServiceTemplate(null, new Class[] { JiniNode.class }, null);
+      ServiceTemplate template = new ServiceTemplate(null, new Class[] { JiniRuntime.class }, null);
       ServiceMatches matches = this.registrar.lookup(template, Integer.MAX_VALUE);
       System.out.println(">> >> >> " + matches.items.length + " required ");
       System.out.println(">> >> >> " + matches.totalMatches + " founded ");
