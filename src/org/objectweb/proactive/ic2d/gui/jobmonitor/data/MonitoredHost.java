@@ -7,7 +7,8 @@ import java.util.Map;
 public class MonitoredHost extends BasicMonitoredObject {
     static protected int lastID = 0;
     static protected Map prettyNames = new HashMap();
-
+    private int port;
+    
     protected int incLastID() {
         return ++lastID;
     }
@@ -16,7 +17,18 @@ public class MonitoredHost extends BasicMonitoredObject {
         return prettyNames;
     }
 
-    public MonitoredHost(String fullname) {
-        super(HOST, null, fullname);
+    public void copyInto(BasicMonitoredObject o) {
+        super.copyInto(o);
+        MonitoredHost hostObject = (MonitoredHost) o;
+        hostObject.port = port;
     }
-}
+    
+    public MonitoredHost(String hostname, int port) {
+        super(HOST, hostname, hostname + ":" + port);
+        this.port = port;
+    }
+    
+    public int getPort() {
+    	return port;
+    }
+ }

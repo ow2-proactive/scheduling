@@ -6,6 +6,8 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
+import java.rmi.registry.Registry;
+
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -57,8 +59,15 @@ public class JobMonitorFrame extends JFrame {
                         return;
                     }
                     String host = (String) result;
-
-                    panel.addMonitoredHost(host);
+                    int port;
+                    int portIndex = host.indexOf(':');
+                    if (portIndex < 0) {
+                        port = Registry.REGISTRY_PORT;
+                    } else {
+                        port = Integer.parseInt(host.substring(portIndex + 1));
+                        host = host.substring(0, portIndex);
+                    }
+                    panel.addMonitoredHost(host, port);
                     panel.updateHosts();
                 }
             });

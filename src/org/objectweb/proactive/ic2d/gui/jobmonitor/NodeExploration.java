@@ -145,7 +145,7 @@ public class NodeExploration implements JobMonitorConstants {
     public void exploreHost(String hostname, int port) {
         Registry registry;
         String[] list;
-        MonitoredHost hostObject = new MonitoredHost(hostname);
+        MonitoredHost hostObject = new MonitoredHost(hostname, port);
 
         if (skippedObjects.contains(hostObject)) {
             return;
@@ -167,7 +167,7 @@ public class NodeExploration implements JobMonitorConstants {
                 try {
                     RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
                     part = new RemoteProActiveRuntimeAdapter(r);
-                    handleProActiveRuntime(part, 1);
+                    handleProActiveRuntime(part, port, 1);
                 } catch (Exception e) {
                     log(e);
                     continue;
@@ -176,7 +176,7 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
-    private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
+    private void handleProActiveRuntime(ProActiveRuntime pr, int port, int depth) {
         if (pr instanceof RemoteProActiveRuntime &&
                 !(pr instanceof RemoteProActiveRuntimeAdapter)) {
             try {
@@ -197,7 +197,7 @@ public class NodeExploration implements JobMonitorConstants {
             log(e);
             return;
         }
-        MonitoredJVM jvmObject = new MonitoredJVM(url, depth);
+        MonitoredJVM jvmObject = new MonitoredJVM(url, port, depth);
 
         if (visitedVM.contains(vmName) || skippedObjects.contains(jvmObject)) {
             return;
@@ -210,7 +210,9 @@ public class NodeExploration implements JobMonitorConstants {
         }
 
         String hostname = infos.getInetAddress().getCanonicalHostName();
-        MonitoredHost hostObject = new MonitoredHost(hostname);
+
+        /* TODO: add the port in VMInformation */
+        MonitoredHost hostObject = new MonitoredHost(hostname, port);
         if (skippedObjects.contains(hostObject)) {
             return;
         }
@@ -235,7 +237,7 @@ public class NodeExploration implements JobMonitorConstants {
             List known = getKnownRuntimes(pr);
             Iterator iter = known.iterator();
             while (iter.hasNext())
-                handleProActiveRuntime((ProActiveRuntime) iter.next(), depth +
+                handleProActiveRuntime((ProActiveRuntime) iter.next(), port, depth +
                     1);
         }
     }
@@ -318,7 +320,7 @@ public class NodeExploration implements JobMonitorConstants {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
             ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());
             if (pr != null) {
-                handleProActiveRuntime(pr, jvmObject.getDepth());
+                handleProActiveRuntime(pr, jvmObject.getPort(), jvmObject.getDepth());
             }
         }
     }
