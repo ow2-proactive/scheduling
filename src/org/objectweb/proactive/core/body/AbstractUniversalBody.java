@@ -111,6 +111,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   }
 
   public UniversalBody getRemoteAdapter() {
+  	System.out.println("getRemoteAdapter " + this.remoteBody);
     return remoteBody;
   }
 
@@ -119,7 +120,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   }
 
   public void updateLocation(UniqueID bodyID, UniversalBody body) {
-    location.putBody(bodyID, body);
+    location.updateBody(bodyID, body);
   }
 
 

@@ -244,7 +244,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
     if (body != null) {
       // we update our table to say that this body is local
-      location.putBody(bodyID, body);
+      location.updateBody(bodyID, body);
       return body;
     } else {
       //it was not found in this vm let's try the location table
@@ -317,6 +317,10 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //We are no longer an active body
     LocalBodyStore.getInstance().unregisterBody(this);
   }
+
+//protected void activityStopped2(){
+//	LocalBodyStore.getInstance().unregisterBody(this);
+//}
 
   /**
    * Signals that the activity of this body, managed by the active thread has just started.

@@ -65,7 +65,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive, 
    */
   public void updateLocation(UniqueID i, UniversalBody s) {
       // System.out.println("Server: updateLocation() " + i + " object = " + s);
-    table.putBody(i, s);
+    table.updateBody(i, s);
   }
 
 
