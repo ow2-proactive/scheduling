@@ -41,13 +41,16 @@ public interface Constants {
 	public final static String LIFECYCLE_CONTROLLER = "lifecycle-controller";
 	public final static String BINDING_CONTROLLER = "binding-controller";
 	public final static String COMPONENT_PARAMETERS_CONTROLLER = "component-parameters-controller";
+	public final static String NAME_CONTROLLER = "name-controller";
 	public final static String ATTRIBUTE_CONTROLLER = "attribute-controller";
+	public final static String SUPER_CONTROLLER = "super-controller";
 	public final static String COMPONENT = "component";
 	public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
 	// hierarchical types of component
 	public final static String COMPOSITE = "composite";
 	public final static String PRIMITIVE = "primitive";
 	public final static String PARALLEL = "parallel-composite";
+	
 
 
 }
