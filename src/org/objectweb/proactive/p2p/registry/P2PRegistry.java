@@ -6,8 +6,8 @@
  */
 package org.objectweb.proactive.p2p.registry;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import org.objectweb.proactive.core.ProActiveException;
+
 
 /**
  * @author jbustos
@@ -15,20 +15,28 @@ import java.rmi.RemoteException;
  * To change the template for this generated type comment go to
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
-public interface P2PRegistry extends Remote {
-public void register(String key, Object o) throws RemoteException;
-public void unregister(String key, Object o) throws RemoteException;
+public interface P2PRegistry {
+    public void register(String key, Object o) throws ProActiveException;
 
-public void registerOverloaded(String key, Object o) throws RemoteException;
-public void unregisterOverloaded(String key, Object o) throws RemoteException;
+    public void unregister(String key) throws ProActiveException;
 
-public void registerUnderloaded(String key, Object o) throws RemoteException;
-public void unregisterUnderloaded(String key, Object o) throws RemoteException;
+    public void registerOverloaded(String key, Object o)
+        throws ProActiveException;
 
-public Object getUnderloaded(String key) throws RemoteException;
+    public void unregisterOverloaded(String key, Object o)
+        throws ProActiveException;
 
-public int getNumberOfAvailables() throws RemoteException;
-public Object[] getAvailables(int n) throws RemoteException;
+    public void registerUnderloaded(String key, Object o)
+        throws ProActiveException;
 
-public Object[] getFullyAvailables(int n) throws RemoteException;
+    public void unregisterUnderloaded(String key, Object o)
+        throws ProActiveException;
+
+    public Object getUnderloaded(String key) throws ProActiveException;
+
+    public int getNumberOfAvailables() throws ProActiveException;
+
+    public Object[] getAvailables(int n) throws ProActiveException;
+
+    public Object[] getFullyAvailables(int n) throws ProActiveException;
 }
