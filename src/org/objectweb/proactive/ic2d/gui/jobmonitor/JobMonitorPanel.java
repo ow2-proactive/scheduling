@@ -421,6 +421,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			asso.addChild(JOB, jobId, vnName);
 			asso.addChild(VN, vnName, hostname);
 			asso.addChild(JVM, vmName, nodeName);
+			asso.addChild(JOB, jobId, HOST, hostname);
+			asso.addChild(JOB, jobId, JVM, vmName);
+			asso.addChild(VN, vnName, JVM, vmName);
 			handleActiveObjects(nodeName, activeObjects);
 		}
 	}

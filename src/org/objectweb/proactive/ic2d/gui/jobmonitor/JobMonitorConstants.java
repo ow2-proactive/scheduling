@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
 public interface JobMonitorConstants
 {
+	/* The values are meaningless, but the order is important */
 	public static final int NO_KEY = -1;
 	public static final int JOB    = 0;
 	public static final int VN     = 1;

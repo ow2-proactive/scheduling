@@ -34,11 +34,18 @@ class AssoKey implements Comparable {
 
 /*
  * Job -*-> VN -*-> Host -*-> JVM -*-> Node -*-> AO
+ * 
+ * But the world is not a simple tree.
  */
 
 public class DataAssociation implements JobMonitorConstants {
 	private Map asso;
 	private Set[] sets;
+	private int[][] specialCases = {
+			{JOB, HOST},
+			{JOB, JVM},
+			{VN, JVM}
+	};
 	
 	public DataAssociation() {
 		clear();
@@ -60,12 +67,39 @@ public class DataAssociation implements JobMonitorConstants {
 		l.add(toValue);
 	}
 	
+	public void addChild(int fromKey, String fromValue, int toKey, String toValue) {
+		addAsso(fromKey, fromValue, toKey, toValue);
+		addAsso(toKey, toValue, fromKey, fromValue);
+	}
+	
 	/* Exemple : addChild(VN, "myVN", "camel.inria.fr") */
 	public void addChild(int key, String lvalue, String rvalue) {
-		addAsso(key, lvalue, key + 1, rvalue);
-		addAsso(key + 1, rvalue, key, lvalue);
-	} 
+		addChild(key, lvalue, key + 1, rvalue);
+	}
 
+	private boolean isSpecialCase(int fromKey, int toKey) {
+		if (toKey < fromKey) {
+			int tmp = toKey;
+			toKey = fromKey;
+			fromKey = tmp;
+		}
+		
+		for (int i = 0; i < specialCases.length; i++)
+			if (fromKey == specialCases[i][0] && toKey == specialCases[i][1])
+				return true;
+
+		return false;
+	} 
+	
+	private Set getAsso(int from, String name, int to) {
+		AssoKey key = new AssoKey(from, to, name);
+		Object res = asso.get(key);
+		if (res == null)
+			return new TreeSet();
+		
+		return (Set) res;
+	}
+	
 	/*
 	 * Exemple : getValues(VN, "myVN", KEY_AO) ==> {"Object1", "Object2"}
 	 */
@@ -79,15 +113,9 @@ public class DataAssociation implements JobMonitorConstants {
 		if (from == NO_KEY)
 			return list(to);
 		
-		if (to == from + 1 || to == from - 1) {
-			AssoKey key = new AssoKey(from, to, name);
-			Object res = asso.get(key);
-			if (res == null)
-				return new TreeSet();
-			
-			return (Set) res;
-		}
-		
+		if (to == from + 1 || to == from - 1 || isSpecialCase(from, to))
+			return getAsso(from, name, to);
+
 		int inc = (to > from) ? 1 : -1;
 		Set step = getValues(from, name, to - inc);
 		if (step.isEmpty())
@@ -117,8 +145,7 @@ public class DataAssociation implements JobMonitorConstants {
 	}
 	
 	private void removeChild(int parentKey, String parentName, String childName) {
-		AssoKey key = new AssoKey(parentKey, parentKey + 1, parentName);
-		Set res = (Set) asso.get(key);
+		Set res = getValues(parentKey, parentName, parentKey + 1);
 		res.remove(childName);
 		if (res.isEmpty())
 			removeItem(parentKey, parentName);
