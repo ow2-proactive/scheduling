@@ -1842,6 +1842,30 @@ public class ProActive {
     	ProActiveDeployer.undeploy(urn,url);
     }
     
+    
+    /**
+     *  Deploy a component as a webservice. Each interface of the component will be accessible by
+     * the urn <componentName>_<interfaceName> in order to identify the component an interface belongs to.
+     * All the interfaces public  methods will be exposed.
+     * @param componentName The name of the component
+     * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
+     * @param component The component owning the interfaces that will be deployed as web services.
+     */
+    public static void exposeComponentAsWebService(Component component,
+        String url, String componentName) {
+        ProActiveDeployer.deployComponent(componentName, url, component);
+    }
+    
+    /**
+     * Undeploy component interfaces on a web server
+     * @param componentName The name of the component
+     * @param url The url of the web server
+     * @param c The component owning the services interfaces
+     */
+    public static void unExposeComponentAsWebService(String componentName,
+        String url, Component component) {
+        ProActiveDeployer.undeployComponent(componentName, url, component);
+    }
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
