@@ -559,6 +559,6 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         }
         */
     public UniversalBody getRemoteAdapter() {
-        return getRemoteAdapter();
+        return this;
     }
 }
