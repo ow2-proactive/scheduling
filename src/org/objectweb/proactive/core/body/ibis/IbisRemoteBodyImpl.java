@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 
 
@@ -82,7 +83,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     public void receiveRequest(Request r) throws java.io.IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("body  = " + body);
-		     logger.debug("request =  " + r.getMethodName());
+            logger.debug("request =  " + r.getMethodName());
         }
         body.receiveRequest(r);
     }
@@ -122,6 +123,15 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         body.setImmediateService(methodName);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.jini.JiniBody#getProActiveComponent()
+     */
+    public ProActiveComponent getProActiveComponent()
+        throws java.io.IOException {
+        // COMPONENTS
+        return body.getProActiveComponent();
     }
 
     //
