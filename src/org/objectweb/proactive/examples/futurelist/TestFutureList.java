@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.futurelist;
 
-
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 public class TestFutureList {
 

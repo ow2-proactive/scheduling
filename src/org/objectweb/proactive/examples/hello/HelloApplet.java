@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.hello;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame {
 

@@ -13,13 +13,13 @@ public class Main {
 	static Logger logger = Logger.getLogger(Main.class.getName());
 	
     public static void main (String args[]) {
-
 	if (args.length != 2) {
 	   logger.error("missing argument : <MatrixSize>");
 	    System.exit(0);
 	}
+
 	ProActiveConfiguration.load();
-	
+
 //	
 //	String[] nodesList = readNodesList(args[0]);	
 //	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";

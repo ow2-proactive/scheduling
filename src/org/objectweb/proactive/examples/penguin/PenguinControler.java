@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.CircularArrayList;
@@ -108,6 +109,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
 
 //<<<<<<< PenguinControler.java
   public static void main(String args[]) {
+	ProActiveConfiguration.load();
   	// Version without descriptor
 //    try {
 //      // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);

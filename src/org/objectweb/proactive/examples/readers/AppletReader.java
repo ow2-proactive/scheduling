@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.readers;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 public class AppletReader extends org.objectweb.proactive.examples.StandardFrame {
 
   public ReadCanvas readerPanel;
@@ -43,6 +45,7 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
 
 
   public static void main(String arg[]) {
+  	ProActiveConfiguration.load();
     new AppletReader("Reader/Writer", 350, 300);
   }
 

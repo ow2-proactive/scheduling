@@ -70,6 +70,7 @@ public class TestNFE {
 
 	// Main program
 	public static void main(String[] args) {
+		ProActiveConfiguration.load();
 	
 		ProActiveConfiguration.load();
 		// We need one arg : the name of a class of non functional exception

@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.hello;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 public class SimpleAgent implements java.io.Serializable {
 	
@@ -65,6 +66,7 @@ public class SimpleAgent implements java.io.Serializable {
       System.exit(-1);
     }
  
+	ProActiveConfiguration.load();
     SimpleAgent t = null;
     try {
       // create the SimpleAgent in this JVM
