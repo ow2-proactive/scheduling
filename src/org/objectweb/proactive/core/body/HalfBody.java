@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueue;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -140,15 +139,7 @@ public class HalfBody extends AbstractBody {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveComponentIdentity()
-     */
-    public ProActiveComponent getProActiveComponent() {
-        // COMPONENTS
-        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
-    }
-
-    /**
+     /**
      *  @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
