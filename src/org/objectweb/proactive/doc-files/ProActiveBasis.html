@@ -37,7 +37,7 @@ distribution used for building concurrent applications using
 ProActive. An active object owns its own thread. This thread
 only executes the methods invoked on this active object by other
 active objects and those of the passive objects of the subsystem
-that belongs to this active object. With ProActive PDC, the
+that belongs to this active object. With ProActive, the
 programmer does not have to explicitly manipulate Thread
 objects, unlike in standard Java.
 </p>
@@ -102,7 +102,7 @@ Then, the thread of an active object alternatively chooses a
 method in the queue of pending requests and executes it. It is
 important to note that no parallelism is provided inside an active
 object. This is an important decision in the design of ProActive
-PDC which enables the use of pre-post conditions and class
+ which enables the use of pre-post conditions and class
 invariants.
 </p><p class="textNormal">
 On the side of the subsystem which send a call to an active

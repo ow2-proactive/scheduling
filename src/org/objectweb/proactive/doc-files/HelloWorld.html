@@ -187,7 +187,7 @@ variable that holds the reference (<code>Hello</code> here). If no object is fou
 <h4>Invoking a method on a remote object</h4>
 <p class="textNormal">
 This is exactly like invoking a method on a local object of the same type. The user does not have to deal with catching
-distribution-related exceptions like, for example, when using RMI or CORBA. Future versions of ProActive PDC will provide an
+distribution-related exceptions like, for example, when using RMI or CORBA. Future versions of ProActive will provide an
 exception handler mechanism in order to process these exceptions in a separate place than the functional code. As class <code>String</code> is 
 <code>final</code>, there cannot be any asynchronism here since the object returned from the call cannot be replaced by a
 future object (this restriction on <code>final</code> classes is imposed by ProActive's implementation).
@@ -196,7 +196,7 @@ future object (this restriction on <code>final</code> classes is imposed by ProA
 <h4>Printing out the message</h4>
 <p class="textNormal">
 As already stated, the only modification brought to the code by
-ProActive PDC is located at the place where active objects are
+ProActive is located at the place where active objects are
 created. All the rest of the code remains the same, which fosters
 software reuse.
 </p>
