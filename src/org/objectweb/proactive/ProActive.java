@@ -93,8 +93,6 @@ public class ProActive {
     public final static Logger loggerSecurity = Logger.getLogger("SECURITY");
     public final static Logger loggerGroup = Logger.getLogger("GROUP");
     public final static Logger loggerNFE = Logger.getLogger("NFE");
-    /** Logger for ProActive P2P **/
-    public final static Logger loggerP2P = Logger.getLogger("P2P");
 
     //
     // -- STATIC MEMBERS -----------------------------------------------
