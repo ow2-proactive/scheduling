@@ -21,28 +21,28 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	}
 
 	/**
-	 * @see org.objectweb.fractal.api.Interface#getFcItfOwner()
+	 * see {@link Interface#getFcItfOwner()}
 	 */
 	public Component getFcItfOwner() {
 		return owner;
 	}
 
 	/**
-	 * @see org.objectweb.fractal.api.Interface#getFcItfName()
+	 * see {@link Interface#getFcItfName()}
 	 */
 	public String getFcItfName() {
 		return name;
 	}
 
 	/**
-	 * @see org.objectweb.fractal.api.Interface#getFcItfType()
+	 * see {@link Interface#getFcItfType()}
 	 */
 	public Type getFcItfType() {
 		return type;
 	}
 
 	/**
-	 * @see org.objectweb.fractal.api.Interface#isFcInternalItf()
+	 * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
 	 */
 	public boolean isFcInternalItf() {
 		return isInternal;
@@ -113,18 +113,10 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	}
 
 	/**
-	 * @return
+	 * getter
+	 * @return the delegatee
 	 */
 	public abstract Object getFcItfImpl();
-
-//	public boolean isControlInterface() {
-//		return (
-//			getFcItfName().equals(ContentController.CONTENT_CONTROLLER)
-//				|| getFcItfName().equals(BindingController.BINDING_CONTROLLER)
-//				|| getFcItfName().equals(LifeCycleController.LIFECYCLE_CONTROLLER)
-//				|| getFcItfName().equals(UserBindingController.USER_BINDING_CONTROLLER)
-//				|| getFcItfName().equals(ComponentParametersController.COMPONENT_PARAMETERS_CONTROLLER));
-//	}
 
 	/**
 	 * Sets the object to which this interface reference object should delegate
@@ -136,6 +128,7 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	 */
 	public abstract void setFcItfImpl(final Object impl);
 
+	
 	public String toString() {
 		String string =
 			"name : "
