@@ -73,7 +73,6 @@ import java.util.ArrayList;
  */
 public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveComponentImpl.class.getName());
 
     //private ComponentParameters componentParameters;
     private Interface[] interfaceReferences;
@@ -395,9 +394,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     public Component getRepresentativeOnThis() {
         try {
-            
             return ProActiveComponentRepresentativeFactory.instance()
-                                                          .createComponentRepresentative((ComponentType)getFcType(),
+                                                          .createComponentRepresentative((ComponentType) getFcType(),
                 ((StubObject) MOP.turnReified(body.getReifiedObject().getClass()
                                                   .getName(),
                     org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
