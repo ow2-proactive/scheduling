@@ -210,7 +210,7 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/xml-apis.jar
 fi
  
-echo "CLASSPATH"=$CLASSPATH 
+#echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH
 
 
