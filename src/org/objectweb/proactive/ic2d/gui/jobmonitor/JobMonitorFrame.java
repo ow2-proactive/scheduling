@@ -4,7 +4,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
@@ -29,13 +29,13 @@ public class JobMonitorFrame extends JFrame
 		 setJMenuBar (createMenuBar());
 	}
 
-	private javax.swing.JMenuBar createMenuBar()
+	private JMenuBar createMenuBar()
 	{
-	    javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
+	    JMenuBar menuBar = new JMenuBar();
 	    	    
-	    javax.swing.JMenu monitoringMenu = new javax.swing.JMenu("Monitoring");
+	    JMenu monitoringMenu = new JMenu("Monitoring");
 
-	    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new RMI host");
+	    JMenuItem b = new JMenuItem("Monitor a new RMI host");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
@@ -45,10 +45,10 @@ public class JobMonitorFrame extends JFrame
 			      initialHostValue = java.net.InetAddress.getLocalHost().getCanonicalHostName();
 			    } catch (java.net.UnknownHostException exc) {
 			    }
-			    Object result = javax.swing.JOptionPane.showInputDialog(panel, // Component parentComponent,
+			    Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,
 			        "Please enter the name or the IP of the host to monitor :", // Object message,
 			        "Adding a host to monitor", // String title,
-			        javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+			        JOptionPane.PLAIN_MESSAGE, // int messageType,
 			        null, // Icon icon,
 			        null, // Object[] selectionValues,
 			        initialHostValue // Object initialSelectionValue)
@@ -66,18 +66,18 @@ public class JobMonitorFrame extends JFrame
 	    menuBar.add (monitoringMenu);
 
 	    // control menu
-	    javax.swing.JMenu controlMenu = new javax.swing.JMenu ("Control");
+	    JMenu controlMenu = new JMenu ("Control");
 
-	    b = new javax.swing.JMenuItem ("Set Time-To-Refresh");
+	    b = new JMenuItem ("Set Time-To-Refresh");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed (java.awt.event.ActionEvent e)
 	        {
 	        	String initialValue = "" + panel.getTtr();
-			    Object result = javax.swing.JOptionPane.showInputDialog(panel, // Component parentComponent,
+			    Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,
 			        "Please enter the time to refresh, in seconds :", // Object message,
 			        "Setting the time to refresh", // String title,
-			        javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+			        JOptionPane.PLAIN_MESSAGE, // int messageType,
 			        null, // Icon icon,
 			        null, // Object[] selectionValues,
 			        initialValue // Object initialSelectionValue)
@@ -99,7 +99,7 @@ public class JobMonitorFrame extends JFrame
 	    });
 	    controlMenu.add(b);
 	    
-	    b = new javax.swing.JMenuItem ("Set Depth Control");
+	    b = new JMenuItem ("Set Depth Control");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
