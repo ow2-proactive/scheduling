@@ -47,6 +47,8 @@ and we'll update the FAQ.</p>
 <ol class="listWithSpace">
  <li class="textNormal"><a href="#build">How do I build ProActive from the
 distribution ?</a></li>
+ <li class="textNormal"><a href="#asm">Why do I get an exception java.lang.NoClassDefFoundError
+about asm?</a></li>
  <li class="textNormal"><a href="#bcel">Why do I get an exception java.lang.NoClassDefFoundError
 about bcel ?</a></li>
  <li class="textNormal"><a href="#javaSecurity">Why do I get an exception
@@ -78,7 +80,9 @@ of an active object ?</a></li>
 custom activity of an active object ?</a></li>
  <li class="textNormal"><a href="#liveAndActive">What did happen to the former
     <b>live()</b> method and <b>Active</b> interface ?</a></li>
- 
+ <li class="textNormal"><a href="#JiniUse">How can I use <b>Jini </b> in ProActive ?</a></li>
+<li class="textNormal"><a href="#JiniPb">Why do I get an exception when using <b>Jini </b>?</a></li>
+
 </ol>
        
 <h2> <a name="answers"></a>Answers </h2>
@@ -132,7 +136,7 @@ script : </p>
 
  Question
 
---> <li class="textNormal"><a name="bcel">
+--> <li class="textNormal"><a name="asm">
     <h3>Why do I get an exception java.lang.NoClassDefFoundError about asm?</h3>
     </a> 
     <p class="textNormal"> ProActive uses <a
@@ -703,7 +707,34 @@ to : </p>
     </ul>
  
     <p></p>
+<!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
+<li class="textNormal"><a
+ name="JiniUse">
+<h3>How can I use <b>Jini </b> in ProActive ?</h3>
+</a>
+<p class="textNormal"> In order to use <b>Jini </b>in ProActive you have to configure properly the deployment descriptor. All informations on how 
+to configure XML deployment descriptor are provided <a href="Descriptor.html">here</a></p>
  </li>
+<p></p>
+<!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
+<li class="textNormal"><a
+ name="JiniPb">
+<h3>Why do I get an exception when using <b>Jini </b>?</h3>
+</a>
+<p class="textNormal"></p>In order to get <b>Jini </b> working properly in ProActive, you have to put in your HOME directory a copy
+of proactive.java.policy located in ProActive/scripts/unix or windows. Indeed the rmid deamon need this file to start. If you try to use Jini without this policy file, it will not work.
+Moreover, if you did it once, make sure that there is no file called machine_namejiniLockFile in your working directory. This file is usefull to avoid many Service Lookup to be created
+ by concurrent threads. This file is removed automatically when a Lookup Service is created. If the application failed(for instance because of the policy file) it is possible that this file
+remains in the directory, in that case if you restart the application it will not work.  So checkout if this file is present in your working directory, if so remove it and restart the application</p>
+ </li>
+<p></p>
+
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
 [<a href="#answers">Answers</a>]</tt></p>
