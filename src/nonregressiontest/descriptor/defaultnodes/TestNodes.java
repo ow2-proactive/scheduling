@@ -125,12 +125,13 @@ public class TestNodes extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        // nothing to do
+        killNodes();
     }
 
     public static void killNodes() throws ProActiveException {
         if (proActiveDescriptor != null) {
             proActiveDescriptor.killall();
+            proActiveDescriptor = null;
         }
     }
 
@@ -168,6 +169,7 @@ public class TestNodes extends FunctionalTest {
     public static Node getRemoteACVMNode() {
         return remoteACVMNode;
     }
+
 
     public static VirtualNode getVirtualNode(String name) {
         for (int i = 0; i < virtualNodes.length; i++) {
