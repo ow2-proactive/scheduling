@@ -542,7 +542,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     /**
-     * @param string
+     * @param privateKeyFile
      */
     public void setPrivateKey(String privateKeyFile) {
         logger.debug("Loading private key ...");
@@ -587,7 +587,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     /**
-     * @param string
+     * @param certificateFile
      */
     public void setCertificate(String certificateFile) {
         try {
@@ -630,7 +630,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     /**
-     * @param certificate
+     * @param pathToApplicationcertificate
      */
     public void setApplicationCertificate(String pathToApplicationcertificate) {
         try {
@@ -652,7 +652,7 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     /**
-     * @param key
+     * @param pathToApplicationPrivateKey
      */
     public void setApplicationPrivateKey(String pathToApplicationPrivateKey) {
         if (applicationPrivateKey == null) {
@@ -748,7 +748,8 @@ public class PolicyServer implements Serializable, Cloneable {
     }
 
     /**
-     * @param set application name 
+     * Set application name
+     * @param applicationName 
      */
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;

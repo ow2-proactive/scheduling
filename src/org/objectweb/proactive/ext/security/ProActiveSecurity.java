@@ -386,7 +386,7 @@ public class ProActiveSecurity {
     }
 
     /**
-     * @param string
+     * 
      */
     public static void migrateTo(PolicyServer ps, String bodyURL, Node nodeTo)
         throws SecurityMigrationException {

@@ -221,13 +221,12 @@ public class CertTools {
         return ret;
     }
 
+//    * Convenience method for getting an email address from a DN. Uses {@link
+//    * getPartFromDN(String,String)} internally, and searches for {@link EMAIL}, {@link EMAIL1},
+//    * {@link EMAIL2}, {@link EMAIL3} and returns the first one found.
     /**
-     * Convenience method for getting an email address from a DN. Uses {@link
-     * getPartFromDN(String,String)} internally, and searches for {@link EMAIL}, {@link EMAIL1},
-     * {@link EMAIL2}, {@link EMAIL3} and returns the first one found.
-     *
+     * Convenience method for getting an email address from a DN.
      * @param dn the DN
-     *
      * @return the found email address, or <code>null</code> if none is found
      */
     public static String getEmailFromDN(String dn) {
@@ -403,7 +402,7 @@ public class CertTools {
      * Reads a certificate in PEM-format from an InputStream. The stream may contain other things,
      * the first certificate in the stream is read.
      *
-     * @param certFile the input stream containing the certificate in PEM-format
+     * @param certstream the input stream containing the certificate in PEM-format
      * @return Ordered Collection of X509Certificate, first certificate first, or empty Collection
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.
@@ -447,7 +446,7 @@ public class CertTools {
     /**
      * Returns a certificate in PEM-format.
      *
-     * @param cert the certificate to convert to PEM
+     * @param certs the certificate to convert to PEM
      * @return byte array containing PEM certificate
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.

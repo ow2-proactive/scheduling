@@ -174,7 +174,6 @@ public interface RemoteProActiveRuntime extends Remote {
 
     /**
      * @param sc
-     * @return
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws RemoteException, SecurityNotAvailableException;

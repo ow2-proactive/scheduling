@@ -111,7 +111,7 @@ public class Policy implements Serializable {
     }
 
     /**
-     * @param ArrayLists
+     * @param arrayLists
      */
     public void setCommunicationRules(Communication[] arrayLists) {
         setCommunicationRulesReply(arrayLists[0]);

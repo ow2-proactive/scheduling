@@ -132,7 +132,6 @@ public class ProActiveSecurityManager implements Serializable {
 
     /**
      * Method ProActiveSecurityManager.
-     * @param file the file containing the policy
      * @throws IOException if the file doesn't exist
      */
     public ProActiveSecurityManager(X509Certificate certificate, PrivateKey pk,
@@ -215,7 +214,7 @@ public class ProActiveSecurityManager implements Serializable {
 
     /**
      * Method getPolicyTo.
-     * @param certificate the object certificate we want to get the policy from
+     * @param securityContext the object certificate we want to get the policy from
      * @return Policy policy attributes
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
@@ -248,7 +247,6 @@ public class ProActiveSecurityManager implements Serializable {
 
     /**
      * Method getPolicyTo.
-     * @param certificate the object certificate we want to get the policy from
      * @return Policy policy attributes
      */
     public Communication getPolicyTo(String type, String from, String to)
@@ -1714,7 +1712,8 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-     * @param set object policy server
+     * Set object policy server
+     * @param policyServer
      */
     public void setPolicyServer(PolicyServer policyServer) {
         this.policyServer = policyServer;

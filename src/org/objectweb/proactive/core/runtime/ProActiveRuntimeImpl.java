@@ -852,7 +852,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /**
      * @param sc
-     * @return
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws SecurityNotAvailableException {

@@ -74,8 +74,7 @@ public class Communication implements Serializable {
     }
 
     /**
-     * Method Communication.
-     * @param communication specifies if communication is allowed
+     * This method specifies if communication is allowed
      * @param authentication specifies if authentication is required, optional, or denied
      * @param confidentiality specifies if confidentiality is required, optional, or denied
      * @param integrity specifies if integrity is required, optional, or denied
@@ -198,7 +197,7 @@ public class Communication implements Serializable {
     }
 
     /**
-     * @param aocreation
+     * 
      */
     public int getAOCreation() {
         return this.aoCreation;

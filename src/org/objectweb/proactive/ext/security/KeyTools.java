@@ -94,9 +94,7 @@ public class KeyTools {
      * @param alias the alias used for the key entry
      * @param privKey RSA private key
      * @param cert user certificate
-     * @param cacert Collection of X509Certificate, or null if only one cert in chain, in that case use 'cert'.
-     * @param username user's username
-     * @param password user's password
+     * @param cacerts Collection of X509Certificate, or null if only one cert in chain, in that case use 'cert'.
      * @return KeyStore containing PKCS12-keystore
      * @exception Exception if input parameters are not OK or certificate generation fails
      */

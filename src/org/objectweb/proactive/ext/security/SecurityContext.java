@@ -90,7 +90,8 @@ public class SecurityContext implements Serializable {
     }
 
     /**
-     * @param set the type of the interaction (migration, request, reply)
+     * set the type of the interaction (migration, request, reply)
+     * @param i
      */
     public void setType(int i) {
         type = i;
@@ -160,42 +161,42 @@ public class SecurityContext implements Serializable {
     }
 
     /**
-     * @param true if object on 'from' can create object
+     * @param b true if object on 'from' can create object
      */
     public void setCreationActiveObjectFrom(boolean b) {
         creationActiveObjectFrom = b;
     }
 
     /**
-     * @param true if object is authorized to create onject on 'to'
+     * @param b true if object is authorized to create onject on 'to'
      */
     public void setCreationActiveObjectTo(boolean b) {
         creationActiveObjectTo = b;
     }
 
     /**
-     * @param lists all entities from 'from'
+     * @param list all entities from 'from'
      */
     public void setEntitiesFrom(ArrayList list) {
         entitiesFrom = list;
     }
 
     /**
-     * @param lists all entities from 'to'
+     * @param list all entities from 'to'
      */
     public void setEntitiesTo(ArrayList list) {
         entitiesTo = list;
     }
 
     /**
-     * @param true if migration is granted
+     * @param b true if migration is granted
      */
     public void setMigration(boolean b) {
         migration = b;
     }
 
     /**
-     * @param true if migration is granted to
+     * @param b true if migration is granted to
      */
     public void setMigrationTo(boolean b) {
         migrationTo = b;

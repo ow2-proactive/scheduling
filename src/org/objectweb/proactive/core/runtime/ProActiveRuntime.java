@@ -320,7 +320,6 @@ public interface ProActiveRuntime extends Job {
 
     /**
      * @param sc
-     * @return
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException;

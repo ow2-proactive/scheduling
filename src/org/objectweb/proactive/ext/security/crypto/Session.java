@@ -362,7 +362,7 @@ public class Session implements Serializable {
     }
 
 	/**
-	 * @return
+	 * 
 	 */
 	public SecurityContext getSecurityContext() {
 		
