@@ -245,16 +245,12 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         this.bodies[id][2]=weight;
         this.bodies[id][3]=d;
         this.bodies[id][4]=vx;
-        this.bodies[id][5]=vy;
-        
-        counter ++;  
-        if (counter < nbBodies * 2  ) { // Only do this operation at the begining
-            bodyname[id]=name;
-            if (!names.contains(name)){
-                this.names.remove(id);
-                this.names.add(id,name);
-                this.listVMs.addItem(name);
-            }
+        this.bodies[id][5]=vy;        
+        bodyname[id]=name;
+        if (!names.contains(name)){
+            this.names.remove(id);
+            this.names.add(id,name);
+            this.listVMs.addItem(name);           
         }
         repaint();
     }
