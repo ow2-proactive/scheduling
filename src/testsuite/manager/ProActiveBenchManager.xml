@@ -1,39 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
-    <componentDefinition>
-        <virtualNodesDefinition>
-            <virtualNode name="Dispatcher"/>
-            <virtualNode name="Dispatcher1"/>
-        </virtualNodesDefinition>
-    </componentDefinition>
-    <deployment>
-        <mapping>
-            <map virtualNode="Dispatcher">
-                <jvmSet>
-                    <currentJVM protocol="rmi"/>
-                </jvmSet>
-            </map>
-            <map virtualNode="Dispatcher1">
-                <jvmSet>
-                    <vmName value="Jvm1"/>
-                </jvmSet>
-            </map>
-        </mapping>
-        <jvms>
-            <jvm name="Jvm1">
-                <acquisition method="rmi"/>
-                <creation>
-                    <processReference refid="linuxJVM"/>
-                </creation>
-            </jvm>
-        </jvms>
-    </deployment>
-    <infrastructure>
-        <processes>
-            <processDefinition id="linuxJVM">
-                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess" />
-            </processDefinition>
-        </processes>
-    </infrastructure>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Dispatcher"/>
+			<virtualNode name="Dispatcher1"/>
+			<virtualNode name="Dispatcher2"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="Dispatcher">
+				<jvmSet>
+					<currentJVM protocol="rmi"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Dispatcher1">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Dispatcher2">
+				<jvmSet>
+					<vmName value="Jvm2"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<acquisition method="rmi"/>
+				<creation>
+					<processReference refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<acquisition method="rmi"/>
+				<creation>
+					<processReference refid="rshProcess"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="rshProcess">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+					<processReference refid="linuxJVM"/>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
 </ProActiveDescriptor>
