@@ -71,7 +71,7 @@ public class HelloWorld {
 
 		if (useParser) {
 			//      // -------------------------------------------------------------------
-			//      // OPTION 1 : USE THE FRACTAL ADL
+			//      // OPTION 1 : USE THE (custom) FRACTAL ADL
 			//      // -------------------------------------------------------------------
 			Loader loader = new Loader();
 
@@ -134,7 +134,7 @@ public class HelloWorld {
 					cf.newFcInstance(
 						cType,
 						new ControllerDescription("client", Constants.PRIMITIVE),
-						new ContentDescription(ClientImpl.class.getName()));
+						new ContentDescription(ClientImpl.class.getName()));  // other properties could be added (activity for example)
 
 				// create server component
 				Component sComp =
