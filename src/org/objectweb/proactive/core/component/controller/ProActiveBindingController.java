@@ -158,7 +158,7 @@ public class ProActiveBindingController extends ProActiveController
 
     /**
      *
-     * @param the name of the client interface
+     * @param clientItfName the name of the client interface
      * @return a Binding object if single binding, Vector of Binding objects otherwise
      */
     public Object removeBinding(String clientItfName) {
@@ -167,7 +167,7 @@ public class ProActiveBindingController extends ProActiveController
 
     /**
      *
-     * @param the name of the client interface
+     * @param clientItfName the name of the client interface
      * @return a Binding object if single binding, Vector of Binding objects otherwise
      */
     public Object getBinding(String clientItfName) {

@@ -180,7 +180,7 @@ public class ComponentParameters implements Serializable {
 
     /**
      * keeps a reference on the standard ProActive stub
-     * @param ref on an instance of a standard ProActive stub on the reified object
+     * @param object an instance of a standard ProActive stub on the reified object
      */
     public void setStubOnReifiedObject(Object object) {
         stubOnReifiedObject = object;

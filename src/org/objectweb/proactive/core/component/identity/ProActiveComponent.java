@@ -62,7 +62,7 @@ public interface ProActiveComponent extends Component {
 	
 	/**
 	 * comparison between components
-	 * @param componentIdentity another component to compare to
+	 * @param object another component to compare to
 	 * @return true if both components are equals
 	 */
 	public boolean equals(Object object);
