@@ -71,6 +71,9 @@ public class ProActive {
   // -- STATIC MEMBERS -----------------------------------------------
   //
   
+  static {
+    Class c = org.objectweb.proactive.core.node.NodeFactory.class;
+  }
 
   //
   // -- CONSTRUCTORS -----------------------------------------------

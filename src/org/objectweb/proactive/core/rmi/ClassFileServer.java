@@ -283,7 +283,7 @@ public class ClassFileServer extends ClassServer {
 
 
     private void printMessage() {
-      System.out.println("To use this ClassFileServer set the property java.rmi.server.codebase to http://"+hostname+":"+port+"/");
+      //System.out.println("To use this ClassFileServer set the property java.rmi.server.codebase to http://"+hostname+":"+port+"/");
       if (codebases == null) {
         System.out.println(" --> This ClassFileServer is reading resources from classpath");
       } else {

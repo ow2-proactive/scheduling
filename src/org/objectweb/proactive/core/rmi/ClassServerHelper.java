@@ -45,6 +45,9 @@ public class ClassServerHelper {
   //
   
   public ClassServerHelper() {
+    if (System.getSecurityManager() == null) {
+      System.setSecurityManager(new java.rmi.RMISecurityManager());
+    }
   }
   
   

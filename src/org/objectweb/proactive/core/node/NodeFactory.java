@@ -64,8 +64,6 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
  */
 public abstract class NodeFactory {
 
-  protected static ClassServerHelper classServerHelper = new ClassServerHelper();
-  
   private static final String DEFAULT_NODE_NAME = "//localhost/Node";
 
   // test with class loader
@@ -81,9 +79,9 @@ public abstract class NodeFactory {
   public static boolean JINI_ENABLED;
  
   static {
+    createClassServer();
     JINI_ENABLED = isJiniEnabled();
     registerProtocolFactories();
-    createClassServer();
   }
   
 
@@ -237,7 +235,7 @@ public abstract class NodeFactory {
 
   private static void createClassServer() {
     try {
-      classServerHelper.initializeClassServer();
+      new ClassServerHelper().initializeClassServer();
     } catch (Exception e) {
       System.out.println("Error with the ClassServer : "+e.getMessage());
     }
