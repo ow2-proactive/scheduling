@@ -73,7 +73,12 @@ public class IC2D {
       System.out.println("Globus not installed !");
     }
     */
-    
+    try {
+      Class.forName("org.objectweb.proactive.core.node.NodeFactory");
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      System.exit(1);
+    }
     IC2DObject ic2dObject = new IC2DObject();
     IC2DFrame ic2dFrame = new IC2DFrame(ic2dObject, options);
     if (hosts != null) {
