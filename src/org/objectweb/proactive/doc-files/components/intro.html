@@ -39,7 +39,7 @@ for ProActive of an extensible, dynamical and hierarchical component model, <a h
 
 This document is an overview of the implementation of Fractal with ProActive. First, it explains the goals and the reasons
 for a new implementation of the Fractal model. Second, it shows the extensions to the model and the conformance to the Fractal specification.
-The third section is a word on the current Architecture Description Language. The fourth section goes through some examples to illustrate the use of the API and the distribution of components. The final section is about our forthcoming research work. The architecture of the implementation is described here.
+The third section is a word on the current Architecture Description Language. The fourth section goes through some examples to illustrate the use of the API and the distribution of components. The final section is about our forthcoming research work. You can also get an overview of the architecture of this implementation <a href="architecture.html">here</a>.
 </p>
 <p class="textNormal"><i>For a general overview of our work , you can also refer to a paper presented at the International Symposium on Distributed Objects and Applications (DOA), in November 2003. (<a href="http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf">.pdf</a>)
 </i>
@@ -148,7 +148,7 @@ The <code>Fractive</code> class acts as :
             ProActiveGroup.getGroup(i2).add(serverItf);
         }
 }</pre>
-<p class="textNormal">You will be able to see the collective interface as an object of type I, and therefore invoke methods defined by I. But you will also be able to see the collective interface as a collection, as a group is also a collection : <br>
+<p class="textNormal">You will be able to see the collective interface as an object of type I, and therefore invoke methods defined by I. But you will also be able to see the collective interface as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.html"/>collection</a>, as a group can also be manipulated as a collection : <br>
 <pre class="snippet">Collection c = ProActiveGroup.getGroup(i);</pre>
 </p>
 
@@ -191,8 +191,50 @@ As you can see, the document is validated against an xml schema (first line of t
 
  <h2>Examples</h2>
 
- <p>So far, only one example is presented (hello world). Indeed, the programming model is this  of Fractal, and one should refer to the Fractal documentation for detailed examples. However, the helloworld example explains the use of deployment descriptors for automatic deployment of the components. It shows
+ <p>So far, one basic example is presented : the "hello world", from the Fractal tutorial. Indeed, the programming model used here is Fractal, and one should refer to the Fractal documentation for detailed examples. However, the helloworld example explains the use of deployment descriptors for automatic deployment of the components. It shows
 </p>
+
+<h3>From objects to active objects to distributed components</h3>
+<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes. </p>
+<pre class="snippet">Toto object = new Toto(constructorParameters);</pre>
+
+<p>The <a href="../HelloWorld.html">ProActive Hello World example </a>explains this. It is possible to specify the activity of the active object, the location (node or virtual node), or a factory for meta-objects, using the appropriate factory method :
+</p>
+<pre class="snippet">
+Toto active_object = (Toto)ProActive.newActive(
+        classname, // signature of the base class
+        constructorParameters, // Object[]
+        node, // location, could also be a virtual node
+        activity, // implements the Active interface
+        factory // allows internal configuration of the library
+        );
+</pre>
+<p>As components are also active objects in this implementation, they benefit from the same features, and are configurable the same way. The configurable properties shown above are now specified in the ContentDescription parameter :
+</p>
+<pre class="snippet">ContentDescription contentDesc = new ContentDescription(
+            className, // signature of the base class
+            constructorParameters, // Object[]
+            node, // location, could also be a virtual node
+            activity, // implements the Active interface
+            factory // allows internal customization of the library
+            );
+</pre>
+<p>Properties relative to the controller can be specified in the ControllerDescription :</p>
+<pre class="snippet">ControllerDescription controllerDesc = new ControllerDescription(
+            "myName", // name of the component
+             Constants.PRIMITIVE // the hierarchical type of the component
+                                 // it could be PRIMITIVE, COMPOSITE, or PARALLEL
+             );
+</pre>
+<p>Then, the component is instantiated using the standard Fractal API :</p>
+<pre class="snippet">Component component = componentFactory.newFcInstance(
+              componentType, // type of the component
+              controllerDesc, // implementation-specific description for the controller
+              contentDesc // implementation-specific description for the content
+              );
+</pre>
+
+
 
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
  <h3>The HelloWorld example</h3>
@@ -248,6 +290,36 @@ Another configuration is also possible, where client and server are wrapped arou
 <p class="textNormal">Currently, bindings are not optimized. For example, in the configuration with wrappers, there is an indirection that can be costly, between the client and the server. We are currently working on optimizations that would allow to shortcut communications. It is the same idea than in Julia, but we are dealing here with distributed components. It will probably imply compromises between dynamicity and performance issues.
 </p>
 
+<h4>execution</h4>
+<p>You should get something like :</p>
+<pre class="snippet">
+01 Server: print method called
+02 Server: begin printing...
+03 Server: print done.
+04	at org.objectweb.proactive.examples.components.helloworld.ServerImpl.print(ServerImpl.java:36)
+05	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+06	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+07	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+08	at java.lang.reflect.Method.invoke(Method.java:324)
+09	at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:358)
+10	at org.objectweb.proactive.core.component.request.ComponentRequestImpl.serveInternal(ComponentRequestImpl.java:122)
+11	at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:105)
+12	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:274)
+13	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:753)
+14	at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivity(ActiveBody.java:230)
+15	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
+16	at java.lang.Thread.run(Thread.java:536)
+</pre>
+<p>What can be seen is very different from the output you would get with the Julia implementation. Here is what happens (from bottom to top of the
+stack):
+<ul>
+<LI>line 16 : The active object runs its activity in its own Thread</LI>
+<LI>line 14 : The default activity is to serve incoming request in a FIFO order</LI>
+<li>line 10 : Requests (reified method calls) are encapsulated in ComponentRequestImpl objects</li>
+<li>line 08 : A request is served using reflection</li>
+<li>line 04 : The method invoked by is the print method of an instance of ServerImpl</li>
+</ul>
+</P>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <h3>The Comanche example</h3>
  <p class="textNormal"><a href="http://fractal.objectweb.org/tutorial/index.html">
@@ -265,7 +337,7 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <p class="textNormal">We are currently working on strategies for optimizations that would allow us to reduce the interceptions and the network latency times (when the components are distributed).
 </p>
 <h3>Packaging</h3>
-<p>Components should be accessible through predefined / preconfigured packages. A bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that should be addressed</p>
+<p>Reusability and Components should be accessible through predefined / preconfigured packages. A bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that should be addressed</p>
 
 <h3>Tools</h3>
 <p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems. Notably, we are thinking of reusing the new version of the Fractal ADL, which is highly customizable. This sharing of a common base for configuration with other Fractal implementations would allow the sharing of common tools, such as the Fractal GUI, and as a result, a synergy on the tools.
