@@ -74,17 +74,9 @@ public class ProActiveConfiguration {
             if (System.getProperty("proactive.configuration") != null) {
                 filename = System.getProperty("proactive.configuration");
             } else {
-                //                if (logger.isDebugEnabled()) {
-                //                    logger.debug("******** No proactive.configuration");
-                //                }
                 filename = ProActiveConfiguration.class.getResource(
                         "ProActiveConfiguration.xml").toString();
             }
-
-            //            if (logger.isDebugEnabled()) {
-            //                            System.out.println("****** Reading configuration from " +
-            //                               filename);
-            //            }
             ProActiveConfiguration.load(filename);
             isLoaded = true;
         }
@@ -135,32 +127,32 @@ public class ProActiveConfiguration {
         loadDefaultProperties();
     }
 
-    /**
-     * Dump loaded properties, i.e properties found in the configuration file
-     */
-    public void dumpLoadedProperties() {
-        Iterator it = loadedProperties.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
-
-            //            System.out.println("Name = " + name);
-            //            System.out.println("Value = " + this.loadedProperties.get(name));
-        }
-    }
-
-    /**
-     * Dump properties added to the system, i.e loaded properties
-     * which were not already in the system
-     */
-    public void dumpAddedProperties() {
-        Iterator it = addedProperties.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
-
-            //            System.out.println("Name = " + name);
-            //            System.out.println("Value = " + this.addedProperties.get(name));
-        }
-    }
+//    /**
+//     * Dump loaded properties, i.e properties found in the configuration file
+//     */
+//    public void dumpLoadedProperties() {
+//        Iterator it = loadedProperties.keySet().iterator();
+//        while (it.hasNext()) {
+//            String name = (String) it.next();
+//
+//            //            System.out.println("Name = " + name);
+//            //            System.out.println("Value = " + this.loadedProperties.get(name));
+//        }
+//    }
+//
+//    /**
+//     * Dump properties added to the system, i.e loaded properties
+//     * which were not already in the system
+//     */
+//    public void dumpAddedProperties() {
+//        Iterator it = addedProperties.keySet().iterator();
+//        while (it.hasNext()) {
+//            String name = (String) it.next();
+//
+//            //            System.out.println("Name = " + name);
+//            //            System.out.println("Value = " + this.addedProperties.get(name));
+//        }
+//    }
 
     public static String getLocationServerClass() {
         return System.getProperty("proactive.locationserver");
