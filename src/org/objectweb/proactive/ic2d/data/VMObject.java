@@ -60,6 +60,7 @@ public class VMObject extends AbstractDataObject {
     } catch (java.net.UnknownHostException e) {
       currentHost = "localhost";
     }
+    System.out.println("current host: "+currentHost);
     try {
       SPY_LISTENER_NODE = NodeFactory.createNode("//"+currentHost+"/"+SPY_LISTENER_NODE_NAME, true);
     } catch (NodeException e) {
@@ -81,6 +82,7 @@ public class VMObject extends AbstractDataObject {
 
   public VMObject(HostObject host, VMID vmid, Node node) throws ActiveObjectCreationException, NodeException {
     super(host);
+    System.out.println("nodeURL : "+node.getNodeInformation().getURL());
     this.vmid = vmid;
     this.objectNodeMap = new java.util.HashMap();
     SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());

@@ -99,7 +99,9 @@ public class DialogUtils {
     if (result == null || (!(result instanceof String)))
       return;
     String host = (String) result;
+    System.out.println("host "+host);
     worldObject.addHosts(host);
+    
   }
 
   public static void openNewNodeDialog(

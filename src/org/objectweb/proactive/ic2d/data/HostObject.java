@@ -242,6 +242,7 @@ public class HostObject extends AbstractDataObject {
       }
       for (int i = 0; i < nodes.length; i++) {
         Node node = nodes[i];
+        System.out.println("nodeURL "+node.getNodeInformation().getURL());
         String nodeName = node.getNodeInformation().getName();
         if ((targetNodeName == null) || targetNodeName.equals(nodeName)) {
           VMObject vmObject = findVMObjectHavingExistingNode(nodeName);

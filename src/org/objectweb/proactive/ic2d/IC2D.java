@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d;
 import org.objectweb.proactive.ic2d.gui.IC2DFrame;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
 /**
  * <p>
@@ -74,7 +74,7 @@ public class IC2D {
     }
     */
     try {
-      Class.forName("org.objectweb.proactive.core.node.NodeFactory");
+      Class.forName("org.objectweb.proactive.core.runtime.RuntimeFactory");
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
       System.exit(1);
