@@ -73,7 +73,6 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     private String portNumber = System.getProperty("proactive.rmi.port");
     private KnownTable knownProActiveJVM = null;
     private String runtimeName = null;
-    private int load = 0;
     private String peerHostname;
     private String peerUrl = null;
     private Info serviceInfo;
@@ -167,11 +166,11 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
         Node node = NodeFactory.getNode(url);
 
-        try {
-            String runtimeUrl = node.getProActiveRuntime().getURL();
-        } catch (ProActiveException e) {
-            logger.error("Can't get remote ProActiveRuntime URL of " + url);
-        }
+//        try {
+//            String runtimeUrl = node.getProActiveRuntime().getURL();
+//        } catch (ProActiveException e) {
+//            logger.error("Can't get remote ProActiveRuntime URL of " + url);
+//        }
 
         P2PService p2p = (P2PService) node.getActiveObjects(P2PServiceImpl.class.getName())[0];
 
@@ -186,7 +185,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @throws ActiveObjectCreationException
      */
     protected static Node getRemoteNode(String remoteUrl)
-        throws NodeException, ActiveObjectCreationException {
+        throws NodeException {
         return NodeFactory.getNode(urlAdderP2PNodeName(remoteUrl));
     }
 
@@ -194,11 +193,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      *
      * @param distNode Node upon we can find a remote p2pService
      * @return The runtime url where the node is located.
-     * @throws NodeException
-     * @throws ActiveObjectCreationException
      */
-    protected static String getRemoteProActiveRuntimeURL(Node distNode)
-        throws NodeException, ActiveObjectCreationException {
+    protected static String getRemoteProActiveRuntimeURL(Node distNode) {
         String runtimeUrl = "";
 
         try {
@@ -220,11 +216,6 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     protected static P2PService getRemoteP2PService(Node distNode)
         throws NodeException, ActiveObjectCreationException {
         return (P2PService) distNode.getActiveObjects(P2PServiceImpl.class.getName())[0];
-    }
-
-    private ProActiveRuntime getRemoteProActiveRuntime()
-        throws ProActiveException {
-        return RuntimeFactory.getDefaultRuntime();
     }
 
     /**
@@ -279,7 +270,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
     public void registerP2PService(String remoteProActiveRuntimeURL,
         Info distInfo, boolean remoteRecord) {
-        KnownTableElement exist = (KnownTableElement) knownProActiveJVM.get(remoteProActiveRuntimeURL);
+        KnownTableElement exist = knownProActiveJVM.get(remoteProActiveRuntimeURL);
 
         if (exist != null) {
             exist.setLastUpdate(System.currentTimeMillis());
@@ -376,11 +367,6 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public ProActiveRuntime[] getProActiveJVMs(int n, int TTL,
         LinkedList parentList) throws ProActiveException {
-        return this.getProActiveJVMs(n, TTL, parentList, false);
-    }
-
-    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL,
-        LinkedList parentList, boolean internalUSe) throws ProActiveException {
         Hashtable res = new Hashtable();
 
         KnownTableElement[] tmp = this.knownProActiveJVM.toArray();
@@ -527,7 +513,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                 }
             } catch (Exception e) {
                 // The remote is dead => remove from known table
-                this.unregisterP2PService((String) elem.getKey());
+                this.unregisterP2PService( elem.getKey());
             }
         }
 
@@ -578,6 +564,50 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public String getURL() {
         return this.acquisitionMethod +  this.peerUrl;
+    }
+    
+    // -------------------------------------------------------------------------
+    // Asynchronous version
+    // -------------------------------------------------------------------------
+    
+    /**
+     * @see org.objectweb.proactive.p2p.core.service.P2PService#getComputationalNode(java.lang.String)
+     */
+    public Node getComputationalNode(String name, String vnName, String jobId) {
+        if (this.serviceInfo.getFreeLoad() > 0) {
+            // Create the node
+            this.setLoad(this.serviceInfo.getFreeLoad() - 1);
+            try {
+                String urlNode = this.runtime.createLocalNode(name, false, null, vnName, jobId);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Node created with url: "+urlNode);
+                }
+                return NodeFactory.getNode(urlNode);
+            } catch (NodeException e) {
+                this.setLoad(this.serviceInfo.getFreeLoad() + 1);
+                logger.error("Couldn't create or return node", e);
+                return null;
+            }
+        } else  {
+            if (logger.isDebugEnabled()) {
+                logger.debug("No free node");
+            }
+           return null;
+        }
+    }
+    
+    /**
+     * @see org.objectweb.proactive.p2p.core.service.P2PService#killComputationalNode(java.lang.String)
+     */
+    public void killComputationalNode(String name) {
+        try {
+            this.runtime.killNode(name);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Node "+ name +" killed");
+            }
+        } catch (ProActiveException e) {
+            logger.error("Node "+ name + " not killed", e);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -673,4 +703,5 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         public FakeProActiveRuntime() {
         }
     }
+
 }

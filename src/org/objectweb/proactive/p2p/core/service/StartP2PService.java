@@ -239,7 +239,7 @@ public class StartP2PService {
             // Record the ProActiveRuntime in other from Servers List File
             if (!serverList.isEmpty()) {
                 addDefaults();
-                ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
+                this.p2pService.registerP2PServices(this.serverList);
             }
         } catch (NodeException e) {
             logger.error(e);

@@ -34,6 +34,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.p2p.core.info.Info;
 import org.objectweb.proactive.p2p.core.load.Load;
@@ -195,6 +196,21 @@ public interface P2PService extends Load {
      */
     public abstract ProActiveRuntime[] getProActiveJVMs()
         throws ProActiveException;
+    
+    /**
+     * Ask to this peer to create a node. It's no garantee to create a node
+     * @param name the name of the node.
+     * @param vnName name of the Virtual Node.
+     * @param jobId your jobId.
+     * @return a new node or whatever.
+     */
+    public abstract Node getComputationalNode(String name, String vnName, String jobId);
+    
+    /**
+     * Ask to kill the specified node in this peer.
+     * @param name the name of the node.
+     */
+    public abstract void killComputationalNode(String name);
 
     /**
      * Get the name of this P2P Service.
