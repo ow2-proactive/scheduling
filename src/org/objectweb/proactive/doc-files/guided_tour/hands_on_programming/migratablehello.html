@@ -125,8 +125,8 @@ windows>build.bat examples
 linux>build examples
 cd ..</pre>
 
-<pre>linux>java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</pre>
-<pre>windows>java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</pre>
+<code>linux>java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</code><br><br>
+<code>windows>java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.MigratableHelloClient //localhost/n1 //localhost/n2</code>
 <p>- observe the instance of MigratableHello migrating :</p>
 <p>&nbsp;</p>
 <p><img src="../pics/hello/agent_execution.gif"></p>
