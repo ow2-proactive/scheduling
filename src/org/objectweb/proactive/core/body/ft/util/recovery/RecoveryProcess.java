@@ -55,13 +55,13 @@ public interface RecoveryProcess extends Remote {
     /**
      * Register the calling OA. Each OA is registred on creation by newActive.
      * Default state is RUNNING.
-     * @param body the registered body
+     * @param id the registered body id
      */
     public void register(UniqueID id) throws RemoteException;
 
     /**
      * Notify the recovery process that the body passed in paramater is suspected to be failed.
-     * @param failed the suspected OA
+     * @param id the id of the suspected OA
      */
     public void failureDetected(UniqueID id) throws RemoteException;
 

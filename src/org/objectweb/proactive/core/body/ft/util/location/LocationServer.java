@@ -59,8 +59,8 @@ public interface LocationServer extends Remote {
     /**
      * Set the new location of the active object identified by id.
      * Call register in the recovery process.
-     * @param id
-     * @param location
+     * @param id id of the caller
+     * @param newLocation new location of the caller
      */
     public void updateLocation(UniqueID id, UniversalBody newLocation)
         throws RemoteException;
