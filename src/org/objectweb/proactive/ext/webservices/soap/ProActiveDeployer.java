@@ -30,15 +30,34 @@
  */
 package org.objectweb.proactive.ext.webservices.soap;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Hashtable;
-
 import org.apache.soap.SOAPException;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.ServiceManagerClient;
+import org.apache.soap.server.TypeMapping;
+import org.apache.soap.util.xml.QName;
+
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.fractal.api.control.LifeCycleController;
+
+import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.ext.webservices.WSConstants;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
+
+import java.lang.reflect.Method;
+
+import java.math.BigDecimal;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
 
 /**
@@ -46,35 +65,116 @@ import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
  * This class is responsible to deploy an active object as a web service.
  * It serialize the stub/proxy into a string and send it to the rcprouter Servlet in order to register it on the tomcat server.
  * */
-
-public class ProActiveDeployer {
-    private static final String PROACTIVE_PROVIDER = "org.objectweb.proactive.ext.webservices.soap.ProActiveProvider";
-    private static final String PROACTIVE_STUB = "Stub";
-    private static final String WSDL_FILE = "Wsdl";
-    private static final String ROUTER="/soap/servlet/rpcrouter";
-    private static final String DOCUMENTATION = "ProActive Active Object";
-    
-    private static Hashtable deployedObjects = new Hashtable();
-
+public class ProActiveDeployer extends WSConstants {
     /**
      *  Deploy an active object as a web service
      * @param urn The name of the web service
-     * @param url The runtime URL where to contact the active object
-     * @param o The active Object
-     * @param methods The methods of the active object you  want to be accessible
+     * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
+     * @param o The active Object to be deployed as a web service
+     * @param methods The methods of the active object you  want to be accessible. If null, all public methods will be exposed.
      */
-    
-    public static void deploy(String urn, String url, Object o,  String [] methods) {
+    public static void deploy(String urn, String url, Object o, String[] methods) {
+        deploy(urn, url, o, null, methods, false);
+    }
 
-    	/* first we need to generate a WSDL description of the object we want to deploy */
-    	String wsdl = WSDLGenerator.getWSDL(o, urn, url + ROUTER, DOCUMENTATION,methods );
-    	
-    	
+    /**
+     *  Deploy a component as a webservice. Each interface of the component will be accessible by
+     * the urn <componentName>_<interfaceName> in order to identify the component an interface belongs to.
+     * All the interfaces public  methods will be exposed.
+     * @param componentName The name of the component
+     * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
+     * @param component The component owning the interfaces that will be deployed as web services.
+     */
+    public static void deployComponent(String componentName, String url,
+        Component component) {
+        Object[] interfaces = component.getFcInterfaces();
+
+        for (int i = 0; i < interfaces.length; i++) {
+            Interface interface_ = ((Interface) interfaces[i]);
+
+            /* only expose server interfaces and not the lifecycle controller */
+            if (!(interface_ instanceof LifeCycleController)) {
+                if (!((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                    String name = interface_.getFcItfName();
+
+                    /* get all the public methods */
+                    Method[] methods = interface_.getClass().getMethods();
+                    Vector meths = new Vector();
+
+                    for (int j = 0; j < methods.length; j++) {
+                        String methodName = methods[j].getName();
+
+                        if (isAllowedMethod(methodName)) {
+                            meths.addElement(methodName);
+                        }
+                    }
+
+                    String[] methsArray = new String[meths.size()];
+                    meths.toArray(methsArray);
+                    deploy(componentName + "_" + name, url, interface_,
+                        component, methsArray, true);
+                }
+            }
+        }
+    }
+
+    /**
+     *  Undeploy a service on a web server
+     * @param urn The name (urn) of the service
+     * @param url The web server url
+     */
+    public static void undeploy(String urn, String url) {
+        ServiceManagerClient serviceManagerClient = null;
+
+        try {
+            serviceManagerClient = new ServiceManagerClient(new URL(url +
+                        ROUTER));
+            serviceManagerClient.undeploy(urn);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (SOAPException e1) {
+            e1.printStackTrace();
+        }
+    }
+
+    /**
+     * Undeploy component interfaces on a web server
+     * @param componentName The name of the component
+     * @param url The url of the web server
+     * @param c The component owning the services interfaces
+     */
+    public static void undeployComponent(String componentName, String url,
+        Component component) {
+        Object[] interfaces = component.getFcInterfaces();
+
+        for (int i = 0; i < interfaces.length; i++) {
+            Interface inter = (Interface) interfaces[i];
+
+            if (!(inter instanceof LifeCycleController)) {
+                if (!((ProActiveInterfaceType) inter.getFcItfType()).isFcClientItf()) {
+                    String serviceName = componentName + "_" +
+                        inter.getFcItfName();
+                    undeploy(serviceName, url);
+                }
+            }
+        }
+    }
+
+    /*
+     * deploy services.
+     */
+    private static void deploy(String urn, String url, Object o, Component c,
+        String[] methods, boolean componentInterface) {
+        /* first we need to generate a WSDL description of the object we want to deploy */
+        String wsdl = WSDLGenerator.getWSDL(o, urn, url + ROUTER,
+                DOCUMENTATION, methods);
+
         /*For deploying an active object we need a ServiceManagerClient that will contact the Serlvet */
         ServiceManagerClient serviceManagerClient = null;
 
         try {
-            serviceManagerClient = new ServiceManagerClient(new URL(url + ROUTER));
+            serviceManagerClient = new ServiceManagerClient(new URL(url +
+                        ROUTER));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -83,18 +183,34 @@ public class ProActiveDeployer {
         DeploymentDescriptor dd = new DeploymentDescriptor();
         dd.setID(urn);
         dd.setProviderType(DeploymentDescriptor.PROVIDER_USER_DEFINED);
-    
+
         dd.setServiceClass(PROACTIVE_PROVIDER);
-        
+
         dd.setIsStatic(false);
-        dd.setMethods(methods);
+
+        /* Get the type mapping for customized returned types */
+        TypeMapping[] tms = getMappings(o.getClass(), methods);
+        dd.setMappings(tms);
+
+        if (methods != null) {
+            dd.setMethods(methods);
+        }
+
         dd.setProviderClass(o.getClass().getName());
 
         /* Here we put the serialized stub into a dd property */
         Hashtable props = new Hashtable();
-        props.put(PROACTIVE_STUB,
-            ProActiveXMLUtils.serializeObject(o));
-		props.put(WSDL_FILE, wsdl);
+
+        props.put(WSDL_FILE, wsdl);
+
+        if (componentInterface) {
+            props.put(COMPONENT_INTERFACE, "true");
+            props.put(PROACTIVE_STUB, ProActiveXMLUtils.serializeObject(c));
+        } else {
+            props.put(COMPONENT_INTERFACE, "false");
+            props.put(PROACTIVE_STUB, ProActiveXMLUtils.serializeObject(o));
+        }
+
         dd.setProps(props);
 
         try {
@@ -102,26 +218,95 @@ public class ProActiveDeployer {
         } catch (SOAPException e1) {
             e1.printStackTrace();
         }
-   
     }
-    
- /**
-  *  Undeploy a service on a web server
-  * @param urn The name (urn) of the service	
-  * @param url The web server url
-  */
-    public static void undeploy (String urn , String url) {
-    	 ServiceManagerClient serviceManagerClient = null;
 
-         try {
-             serviceManagerClient = new ServiceManagerClient(new URL(url + ROUTER));
-             serviceManagerClient.undeploy(urn);
-         } catch (MalformedURLException e) {
-             e.printStackTrace();
-         }catch (SOAPException e1) {
-            e1.printStackTrace();
-        }
+    /*
+     * check if a method can be exposed as WS
+     */
+    private static boolean isAllowedMethod(String method) {
+        return !disallowedMethods.contains(method);
     }
-    
-  
+
+    /*
+     *  Gets the types mapping for custonize returned types
+     * Only Java Beans are supported
+     */
+    private static TypeMapping[] getMappings(Class c, String[] methods) {
+        Vector tms = new Vector();
+        Vector sMethods = new Vector();
+
+        for (int i = 0; i < methods.length; i++) {
+            sMethods.addElement(methods[i]);
+        }
+
+        Vector mMethods = new Vector();
+        Method[] ms = c.getDeclaredMethods();
+
+        for (int i = 0; i < ms.length; i++) {
+            mMethods.addElement(ms[i]);
+        }
+
+        Enumeration e = mMethods.elements();
+
+        while (e.hasMoreElements()) {
+            Method m = (Method) e.nextElement();
+            System.out.println("Method =  " + m);
+
+            if (sMethods.contains(m.getName())) {
+                Class[] parameters = m.getParameterTypes();
+
+                for (int j = 0; j < parameters.length; j++) {
+                    if (!supportedTypes.contains(parameters[j])) {
+                        String pname = extractName(parameters[j]);
+
+                        TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
+                                new QName("http://" + pname,
+                                    parameters[j].getSimpleName()),
+                                parameters[j].getCanonicalName(),
+                                "org.apache.soap.encoding.soapenc.BeanSerializer",
+                                "org.apache.soap.encoding.soapenc.BeanSerializer");
+                        tms.addElement(tm);
+                    }
+                }
+            }
+        }
+
+        TypeMapping[] tmsArray = new TypeMapping[tms.size()];
+        e = tms.elements();
+
+        int i = 0;
+
+        while (e.hasMoreElements()) {
+            tmsArray[i++] = (TypeMapping) e.nextElement();
+        }
+
+        return tmsArray;
+    }
+
+    /*
+     * Utility to construct the namespace of the type mapping
+     */
+    private static String extractName(Class c) {
+        String result = new String();
+
+        Package p = c.getPackage();
+
+        if (p != null) {
+            String packageName = p.getName();
+            StringTokenizer st = new StringTokenizer(packageName, ".");
+            int nbTokens = st.countTokens();
+            String[] tmp = new String[nbTokens];
+            int n = 0;
+
+            while (st.hasMoreTokens())
+                tmp[n++] = st.nextToken();
+
+            for (int i = nbTokens - 1; i > -1; i--)
+                result += (tmp[i] + ".");
+
+            return result.substring(0, result.length() - 1);
+        }
+
+        return "DefaultNamespace";
+    }
 }

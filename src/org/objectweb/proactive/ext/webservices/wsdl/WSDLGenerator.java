@@ -32,12 +32,13 @@ package org.objectweb.proactive.ext.webservices.wsdl;
 
 import org.apache.axis.wsdl.fromJava.Emitter;
 
+import org.objectweb.proactive.ext.webservices.WSConstants;
+
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.wsdl.WSDLException;
@@ -48,8 +49,7 @@ import javax.xml.parsers.ParserConfigurationException;
 /**
  * @author vlegrand
  */
-public class WSDLGenerator {
-
+public class WSDLGenerator extends WSConstants {
     /**
      * Generate the WSDL document associate with an  active object exposed as a web service
      * @param o The object that we want to obtain WSDL
@@ -63,70 +63,33 @@ public class WSDLGenerator {
         String urlRouter, String documentation, String[] methods) {
         StringWriter sw = new StringWriter();
         String namespace = serviceName;
+
         try {
             Emitter emitter = new Emitter();
 
-            Vector disallowedMethods = new Vector();
-
-            disallowedMethods.add("equals");
-            disallowedMethods.add("toString");
-            disallowedMethods.add("runActivity");
-            disallowedMethods.add("setProxy");
-            disallowedMethods.add("getProxy");
-
             emitter.setDisallowedMethods(disallowedMethods);
 
-            Vector allowedMethods = new Vector(methods.length);
-            for (int i = 0; i < methods.length; i++) {
-                allowedMethods.addElement(methods[i]);
+            if (methods != null) {
+                Vector allowedMethods = new Vector(methods.length);
+
+                for (int i = 0; i < methods.length; i++) {
+                    allowedMethods.addElement(methods[i]);
+                }
+
+                emitter.setAllowedMethods(allowedMethods);
             }
 
-            emitter.setAllowedMethods(allowedMethods);
             emitter.setLocationUrl(urlRouter);
-            //  emitter.setTargetService(serviceName);
+
             emitter.setIntfNamespace(namespace);
             emitter.setImplNamespace(namespace);
-            HashMap namespaceMap = new HashMap();
 
-            //namespaceMap.put(o.getClass().getPackage().getName(), serviceName);
-            //emitter.setNamespaceMap(namespaceMap);
             emitter.setCls(o.getClass());
+
             emitter.setServiceElementName(serviceName);
+
             String wsdl = emitter.emitToString(Emitter.MODE_ALL);
 
-            //Definition def = (com.ibm.wsdl.DefinitionImpl) emitter.getIntfWSDL();
-            //           def.setTargetNamespace(namespace);
-            //           def.setDocumentBaseURI(urlRouter);
-            //       
-            //           
-            //            Service service = def.createService();
-            //            emitter.setIntfNamespace(namespace);
-            //            service.setQName(new QName(serviceName));
-            //            def.addService(service);
-            //            
-            //            Iterator bindings = def.getBindings().values().iterator();
-            //            while (bindings.hasNext()) {
-            //                Binding binding = (Binding) bindings.next();
-            //                List listOp = binding.getBindingOperations();
-            //                for (int i=0; i<  listOp.size (); i ++) {
-            //                	BindingOperation op  = (BindingOperation) listOp.get(i);
-            //                  //  op.            	
-            //                }
-            //                
-            //                SOAPAddress addr = new SOAPAddressImpl();
-            //                addr.setLocationURI(urlRouter);
-            //
-            //                //Creation d'un port
-            //                Port port = def.createPort();
-            //                port.setName(serviceName);
-            //                port.setBinding(binding);
-            //                port.addExtensibilityElement(addr);
-            //                service.addPort(port);
-            //            }
-            //            javax.wsdl.factory.WSDLFactory.newInstance().newWSDLWriter()
-            //                                          .writeWSDL(def, sw);
-            //String result = sw.toString();
-            //        System.out.println("wsdl =  " + wsdl);
             return wsdl;
         } catch (WSDLException e) {
             e.printStackTrace();
@@ -137,6 +100,7 @@ public class WSDLGenerator {
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 }
