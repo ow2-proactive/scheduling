@@ -34,7 +34,6 @@
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest exclude="yes" class="nonregressiontest.descriptor.services.p2p.Test" />
-    		<unitTest exclude="yes" class="nonregressiontest.runtime.classloader.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.asynchronouscall.Test" />
@@ -65,9 +64,9 @@
 	<simpleGroup>
 		<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
 	</simpleGroup>		
-	
+
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
-    		<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
 		<idTest class="nonregressiontest.component.creation.local.newactive.composite.Test" id="1" />
 		<idTest class="nonregressiontest.component.assembly.local.composite.Test" id="2" />
 		<idTest class="nonregressiontest.component.binding.local.composite.Test" id="3" /> 
