@@ -139,33 +139,11 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         return this.creatorId;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#isAcquired()
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#hasProcess()
      */
     public boolean hasProcess() {
         return hasProcess;
-    }
-
-    /**
-     * @param isAcquired The isAcquired to set.
-     */
-
-    //    public void setAcquired(boolean isAcquired) {
-    //        this.isAcquired = isAcquired;
-    //    }
-
-    /**
-     * @return Returns the remoteRuntime.
-     */
-    public ProActiveRuntime getRemoteRuntime() {
-        return remoteRuntime;
-    }
-
-    /**
-     * @param remoteRuntime The remoteRuntime to set.
-     */
-    public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
-        this.remoteRuntime = remoteRuntime;
     }
 
     /**

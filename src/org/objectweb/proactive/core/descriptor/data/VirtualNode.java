@@ -141,9 +141,9 @@ public interface VirtualNode extends java.io.Serializable, Job {
     public Node getNode(String url) throws NodeException;
 
     /**
-     * Creates a node with the given protocol on the current jvm, ie the jvm that originates the creation of this VirtualNode.
+     * Creates a node with the given protocol(or null) on the current jvm, ie the jvm that originates the creation of this VirtualNode.
      * This newly created node will is mapped on this VirtualNode
-     * @param protocol the protocol to create the node. It has to be rmi or jini.
+     * @param protocol the protocol to create the node. If null protocol will be set to the system property: proactive.communication.protocol.
      */
     public void createNodeOnCurrentJvm(String protocol);
 
@@ -209,7 +209,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
     // SECURITY
 
     /**
-       //           * @return creator certificate
+     *@return creator certificate
      */
     public X509Certificate getCreatorCertificate() throws ProActiveException;
 
@@ -217,8 +217,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return policy server
      */
     public PolicyServer getPolicyServer();
-    
-    
+
     /**
      * checks the cardinality of the virtual node (i.e. whether the node is mapped to several nodes or not)
      * @return true if the virtual node is mapped to several nodes, false otherwise

@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-
-import java.io.IOException;
 
 
 /**
@@ -141,24 +140,9 @@ public interface VirtualMachine {
     public String getCreatorId();
 
     /**
-     * Returns true if this machine his mapped onto a process false if mapped 
+     * Returns true if this machine his mapped onto a process false if mapped
      * onto a service
      * @return boolean if the machine result of a lookup
      */
     public boolean hasProcess();
-
-//    /**
-//     * @param isAcquired The isAcquired to set.
-//     */
-//    public void setAcquired(boolean isAcquired);
-
-    /**
-     * @return Returns the remoteRuntime.
-     */
-    public ProActiveRuntime getRemoteRuntime();
-
-    /**
-     * @param remoteRuntime The remoteRuntime to set.
-     */
-    public void setRemoteRuntime(ProActiveRuntime remoteRuntime);
 }
