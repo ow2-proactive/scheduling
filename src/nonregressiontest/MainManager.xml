@@ -41,10 +41,13 @@
 			<unitTest class="nonregressiontest.group.exception.Test" />
 			<unitTest class="nonregressiontest.group.dynamicthreadpool.Test" />
 			<unitTest class="nonregressiontest.group.javaobject.Test" />
-		<!--	<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
+			<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
 			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
-			<unitTest class="nonregressiontest.component.descriptor.Test"/>-->
+			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
+			<unitTest class="nonregressiontest.component.binding.local.collective.Test"/>
+			<unitTest class="nonregressiontest.component.binding.remote.collective.Test"/>
+			<unitTest class="nonregressiontest.component.descriptor.Test"/>
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
