@@ -82,8 +82,11 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     /** the property of this virtualNode, property field can take five value: null,unique, unique_singleAO, multiple, multiple_cyclic */
     private String property;
 
-    /** the list of virtual machines associated with this VirtualNode */
+    /** the list of remote virtual machines associated with this VirtualNode */
     private java.util.ArrayList virtualMachines;
+    
+    /** the list of local virtual machine (normally one) associated with this VirtualNode */
+    private java.util.ArrayList localVirtualMachines;
 
     /** index of the last associated jvm used */
     private int lastVirtualMachineIndex;
@@ -134,6 +137,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         PolicyServer policyServer) {
         this.name = name;
         virtualMachines = new java.util.ArrayList(5);
+        localVirtualMachines = new java.util.ArrayList();
         createdNodes = new java.util.ArrayList();
         awaitedVirtualNodes = new Hashtable();
         proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -228,6 +232,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 //				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
                 //			}
                 increaseIndex();
+            }
+            
+            // local nodes creation 
+            for (int i = 0; i < localVirtualMachines.size(); i++) {
+            	String protocol = (String) localVirtualMachines.get(i);
+            	internalCreateNodeOnCurrentJvm(protocol);
             }
             isActivated = true;
             if (registration) {
@@ -400,6 +410,11 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
+    	localVirtualMachines.add(protocol);
+    	
+    }
+    
+    private void internalCreateNodeOnCurrentJvm(String protocol) {
         try {
             // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
             // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
