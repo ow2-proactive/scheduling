@@ -77,18 +77,29 @@ public class ClassServerHelper {
         shouldCreateClassServer = v;
     }
 
-    public synchronized void initializeClassServer() throws java.io.IOException {
+    public synchronized String initializeClassServer() throws java.io.IOException {
         if (!shouldCreateClassServer) {
-            return; // don't bother
+            return null; // don't bother
         }
         if (currentClassServer != null) {
-            return; // already created for this VM
+            return this.getCodebase(); // already created for this VM
         }
         if (classpath == null) {
             currentClassServer = new ClassServer();
         } else {
             currentClassServer = new ClassServer(classpath);
         }
+        String codebase = this.getCodebase();       
+        System.setProperty("java.rmi.server.codebase", codebase);
+        
+        return codebase;
+    }
+
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    // 
+
+    private String getCodebase(){
         String codebase;
         if (SshParameters.getSshTunneling ()) {
     		codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
@@ -97,10 +108,6 @@ public class ClassServerHelper {
     		codebase = "http://" + currentClassServer.getHostname() + ":" +
             	ClassServer.getServerSocketPort() + "/";
     	}
-        System.setProperty("java.rmi.server.codebase", codebase);
+        return codebase;
     }
-
-    //
-    // -- PRIVATE METHODS -----------------------------------------------
-    // 
 }
