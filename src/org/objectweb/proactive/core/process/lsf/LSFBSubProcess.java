@@ -38,11 +38,23 @@ import org.objectweb.proactive.core.util.MessageLogger;
 
 public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     
+  private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+  
+  private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home")+FILE_SEPARATOR+"ProActive"+FILE_SEPARATOR+"scripts"+FILE_SEPARATOR+"unix"+FILE_SEPARATOR+"cluster"+FILE_SEPARATOR+"startRuntime.sh ";
+  
   public static final String DEFAULT_QUEUE_NAME = "normal";
+  
+  protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
   
   protected int jobID;
   
   protected String queueName = DEFAULT_QUEUE_NAME;
+  
+  protected String hostList;
+  
+  protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
+  
+  protected String processor = DEFAULT_PROCESSOR_NUMBER;
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -50,6 +62,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
 
   public LSFBSubProcess() {
     super();
+    setCompositionType(GIVE_COMMAND_AS_PARAMETER);
     this.hostname = null;
   }
   
@@ -105,6 +118,26 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     if (queueName == null) throw new NullPointerException();
     this.queueName = queueName;
   }
+  
+  public void setHostList(String hostList){
+  	checkStarted();
+  	this.hostList = hostList;
+  }
+  
+  public String getHostList(){
+  	return hostList;
+  }
+  
+  public void setProcessorNumber(String processor){
+  	checkStarted();
+  	if(processor != null){
+  	this.processor = processor;
+  	}
+  }
+  
+  public String getProcessorNumber(){
+  	return processor;
+  }
 
 
   //
@@ -117,7 +150,16 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   
   protected String buildBSubCommand() {
-    return "bsub -n 1 -q "+queueName+" ";
+  	StringBuffer bSubCommand = new StringBuffer();
+  	bSubCommand.append("bsub -n "+processor+" -q "+queueName+" ");
+  	if(hostList != null){
+  		bSubCommand.append("-m "+hostList+" ");
+  	}
+  	if(getCompositionType() == GIVE_COMMAND_AS_PARAMETER){
+  	bSubCommand.append("-R 'span[ptile=2]' "+scriptLocation+getTargetProcess().getCommand());
+  	}
+  	System.out.println("bsub command is "+bSubCommand.toString());
+    return bSubCommand.toString();
   }
   
   
@@ -133,7 +175,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    *    Job <...>
    */
   protected int parseJobID(String message) {
-    //System.out.println("parseJobID analyzing "+message);
+    System.out.println("parseJobID analyzing "+message);
     String beginJobIDMarkup = "Job <";
     String endJobIDMarkup = ">";
     int n1 = message.indexOf(beginJobIDMarkup);
@@ -141,7 +183,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     int n2 = message.indexOf(endJobIDMarkup, n1+beginJobIDMarkup.length());
     if (n2 == -1) return 0;
     String id = message.substring(n1+beginJobIDMarkup.length(), n2);
-    //System.out.println("!!!!!!!!!!!!!! JOBID = "+id);
+    System.out.println("!!!!!!!!!!!!!! JOBID = "+id);
     try {
       return Integer.parseInt(id);
     } catch (NumberFormatException e) {
@@ -165,7 +207,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    * hostname if it is found.
    */
   protected String parseHostname(String message) {
-    //System.out.println("parseHostname analyzing "+message);
+    System.out.println("parseHostname analyzing "+message);
     java.util.StringTokenizer st = new java.util.StringTokenizer(message);
     if (st.countTokens() < 6) return null; // we expect at least 6 tokens
     try {
@@ -182,7 +224,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     st.nextToken(); // ignore queue
     st.nextToken(); // ignore fromHost
     String hostname = st.nextToken();
-    //System.out.println("!!!!!!!!!!!!!! hostname = "+hostname);
+    System.out.println("!!!!!!!!!!!!!! hostname = "+hostname);
+    System.out.println("token "+st.countTokens());
     return hostname;
   }
   
@@ -204,7 +247,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   /**
    * Implementation of a MessageLogger that look for the jobID of the launched job
    */  
-  public class ParserMessageLogger implements MessageLogger {
+  public class ParserMessageLogger implements MessageLogger,java.io.Serializable {
   
     private boolean foundJobID;
     private boolean foundHostname;
@@ -213,6 +256,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     }
     
     public void log(String message) {
+    	//int nbProcessor = (new Integer(processor)).intValue();
+    	//parseHostname(message);
       if (! foundJobID) {
         jobID = parseJobID(message);
         foundJobID = jobID != 0;
@@ -220,7 +265,12 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
       } else if (! foundHostname) {
         hostname = parseHostname(message);
         if (hostname != null) {
+        	//int counter=1;
           foundHostname = hostname.length() > 0;
+          //while(counter < nbProcessor){
+          	//parseHostname(message);
+          	//counter ++;
+          //}
           if (foundHostname) {
             // we are done
             outputMessageSink.setMessage(null);

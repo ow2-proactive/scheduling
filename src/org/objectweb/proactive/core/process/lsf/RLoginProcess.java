@@ -43,6 +43,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
 
   public RLoginProcess() {
     super();
+    setCompositionType(SEND_TO_OUTPUT_STREAM_COMPOSITION);
   }
   
   public RLoginProcess(ExternalProcess targetProcess) {
@@ -89,11 +90,13 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
   
   
   protected String buildRLoginCommand() {
-    return "rlogin "+hostname;
+    return "rlogin "+hostname+" ";
   }
   
   
   protected void internalStartProcess(String command) throws java.io.IOException {
+  	
+  	System.out.println("-----------------------command "+command);
     super.internalStartProcess(command);
     if (exitAfterCommand) {
       outputMessageSink.setMessage(null);
