@@ -55,11 +55,8 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath value="/net/home/rquilici/ProActive/classes"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/asm.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
+						<absolutePath value="/net/home/rquilici/ProActive/lib/log4j-core.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/fractal.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/xercesImpl.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/bouncycastle.jar"/>
