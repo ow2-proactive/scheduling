@@ -180,10 +180,13 @@ public class SshSocket extends Socket {
 	}
 
 	public synchronized void close() throws IOException {
+	
 		_socket.close();
 		try {
 			SshTunnelFactory.reportUnusedTunnel (_tunnel);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+			}
 		_tunnel = null;
 	}	
 

@@ -50,7 +50,9 @@ public class JSchSingleton {
 			    String hostfile = SshParameters.getSshKnownHostsFile ();
 				InputStream is = new FileInputStream (hostfile);
 				_jsch.setKnownHosts (is);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+				}
 			try {
 				String keydir = SshParameters.getSshKeyDirectory ();
 				logger.debug ("read key dir: " + keydir);
@@ -65,11 +67,15 @@ public class JSchSingleton {
 		            			try {
 		            				logger.debug ("adding identity " + privKeyFile.getPath ());
 		            				_jsch.addIdentity (privKeyFile.getPath (), null);
-		            			} catch (Exception e) {}
+		            			} catch (Exception e) {
+		            				e.printStackTrace();
+		            				}
 		            		}
 		            	}
 		            }
-			} catch (Exception e) {}
+			} catch (Exception e) {
+			    e.printStackTrace();
+			    }
 		}
 		return _jsch;
 	}
@@ -99,7 +105,6 @@ public class JSchSingleton {
 			try {
 				session.connect ();
 			} catch (JSchException e) {
-				System.out.println ("exception: " + e.getMessage ());
 				e.printStackTrace();
 				throw new IOException (e.getMessage ());
 			}
@@ -122,6 +127,8 @@ public class JSchSingleton {
 				_hash.remove (key);
 				session.disconnect ();
 			}
-		} catch (JSchException e) {}
+		} catch (JSchException e) {
+		    e.printStackTrace();
+		    }
 	}
 }

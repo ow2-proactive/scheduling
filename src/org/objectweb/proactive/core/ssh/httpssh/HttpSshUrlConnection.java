@@ -191,7 +191,9 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
 		connection.setInstanceFollowRedirects (getInstanceFollowRedirects ());
 		try {
 			connection.setRequestMethod (getRequestMethod ());
-		} catch (Exception e) {}
+		} catch (Exception e) {
+			e.printStackTrace();
+			}
 		
 		java.util.Set set = _properties.entrySet ();
 		for (java.util.Iterator i = set.iterator (); i.hasNext (); ) {
@@ -202,7 +204,9 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
 				String val = (String) j.next();
 				try {
 					connection.addRequestProperty (key, val);
-				} catch (Exception e) {}
+				} catch (Exception e) {
+					e.printStackTrace();
+					}
 			}
 		}
 	}

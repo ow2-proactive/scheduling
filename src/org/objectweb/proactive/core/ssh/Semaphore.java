@@ -14,7 +14,7 @@ public class Semaphore {
 	public synchronized void down() {
 		_value--;
 		if (_value < 0) {
-			try { wait(); } catch( Exception e ) {}
+			try { wait(); } catch( Exception e ) {e.printStackTrace();}
 		}
 	}
 
