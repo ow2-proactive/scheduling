@@ -51,6 +51,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+//import org.objectweb.proactive.examples.c3d.C3DRenderingEngine;
+//import org.objectweb.proactive.examples.c3d.Interval;
+//import org.objectweb.proactive.examples.c3d.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
@@ -62,7 +65,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 {
 
 
-	public static final String C3D_DISPATCHER_BIND_NAME = "C3DDispatcher";
+	protected VirtualNode vn;
 	/**
 	 * Uses active objects if set to true
 	 */
@@ -190,10 +193,11 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	/**
 	 * Constructor to call when using XML Descriptor
 	 */
-	public C3DDispatcher(String [] rendererNodes)
+	public C3DDispatcher(String [] rendererNodes,VirtualNode vn)
 	{
 		new C3DDispatcherFrame();
 		this.rendererNodes=rendererNodes;
+		this.vn = vn;
 	}
 	/**
 	 * Continues the initialization; called when the first user registers.
@@ -637,7 +641,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	 */
 	public void runActivity(org.objectweb.proactive.Body body)
 	{
-		registerDispatcher(body.getNodeURL());
+		//registerDispatcher(body.getNodeURL());
 		/* Creates the rendering engines */
 		init();
 		org
@@ -651,11 +655,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		/* Loops over lifetime */
 		while (body.isActive())
 		{
-			//if a user is migrating the dispatcher must first register it before rendering the scene
-//			Request migrationRequest = requestQueue.removeOldest("registerMigratedUser");
-//			if(migrationRequest != null){
-//				body.serve(migrationRequest);
-//			}else{
+
 				/* Waits on any method call */
 				Request r = requestQueue.blockingRemoveOldest();
 				String methodName = r.getMethodName();
@@ -681,46 +681,47 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 					body.serve(r);
 					}
 				}
+
 			}
 		//}
 	}
 
-	private void registerDispatcher(String nodeURL)
-	{
-		/* Register this C3DDispatcher, this will serve as entry point to the
-		 * raytracing system for the user frames */
-		 
-		try
-		{
-			org.objectweb.proactive.core.node.Node node =
-				org.objectweb.proactive.core.node.NodeFactory.getNode(nodeURL);
-			s_access_url =
-				"//"
-					+ node.getNodeInformation().getInetAddress().getHostName()
-					+ "/"
-					+ C3D_DISPATCHER_BIND_NAME;
-			org.objectweb.proactive.ProActive.register(
-				org.objectweb.proactive.ProActive.getStubOnThis(),
-				s_access_url);
-			log("Successfully registered at " + s_access_url + " and ready.");
-			
-		}
-		catch (org.objectweb.proactive.core.node.NodeException e)
-		{
-			log("Error: The node of the body cannot be found!");
-			e.printStackTrace();
-		}
-		catch (UnknownHostException e)
-		{
-			log("Error: Name of the local host could not be determined!");
-			e.printStackTrace();
-		}
-		catch (java.io.IOException e)
-		{
-			log("Error: could not register, RMI registry not found!");
-			e.printStackTrace();
-		}
-	}
+//	private void registerDispatcher(String nodeURL)
+//	{
+//		/* Register this C3DDispatcher, this will serve as entry point to the
+//		 * raytracing system for the user frames */
+//		 
+//		try
+//		{
+//			org.objectweb.proactive.core.node.Node node =
+//				org.objectweb.proactive.core.node.NodeFactory.getNode(nodeURL);
+//			s_access_url =
+//				"//"
+//					+ node.getNodeInformation().getInetAddress().getHostName()
+//					+ "/"
+//					+ C3D_DISPATCHER_BIND_NAME;
+//			org.objectweb.proactive.ProActive.register(
+//				org.objectweb.proactive.ProActive.getStubOnThis(),
+//				s_access_url);
+//			log("Successfully registered at " + s_access_url + " and ready.");
+//			
+//		}
+//		catch (org.objectweb.proactive.core.node.NodeException e)
+//		{
+//			log("Error: The node of the body cannot be found!");
+//			e.printStackTrace();
+//		}
+//		catch (UnknownHostException e)
+//		{
+//			log("Error: Name of the local host could not be determined!");
+//			e.printStackTrace();
+//		}
+//		catch (java.io.IOException e)
+//		{
+//			log("Error: could not register, RMI registry not found!");
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * Processes the requests which are relative to rotations
@@ -1093,9 +1094,10 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		
 		VirtualNode dispatcher =
 			proActiveDescriptor.getVirtualNode("Dispatcher");
+			
 			VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer");
 		String[] rendererNodes = renderer.getNodesURL();
-		Object param[] = new Object[]{rendererNodes};
+		Object param[] = new Object[]{rendererNodes,dispatcher};
 		//System.out.println("in main"+dispatcher.getVirtualMachine().getProcess().getCommand());	
 		//VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer1");
 		//System.out.println(renderer.getName());
@@ -1112,6 +1114,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 				"org.objectweb.proactive.examples.c3d.C3DDispatcher",
 				param,
 				node);
+		
 		}
 		catch (Exception e)
 		{
@@ -1143,7 +1146,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	 */
 	public int registerConsumer(C3DUser c3duser, Scene newscene, String s_name)
 	{
-		//System.out.println("User wan in: " + c3duser);
+		//System.out.println("User wan in: " + c3duser.getWidth());
 		c3duser.log("-> Remote call-back: dispatcher found, user registered");
 
 		log("New user " + s_name + "(" + i_lastuser + ") has joined");
@@ -1627,8 +1630,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		{
 			try
 			{
-				org.objectweb.proactive.ProActive.unregister(
-					C3D_DISPATCHER_BIND_NAME);
+				org.objectweb.proactive.ProActive.unregisterVirtualNode(
+					vn);
 			}
 			catch (Exception e)
 			{

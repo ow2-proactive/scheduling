@@ -44,6 +44,17 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
+//import org.objectweb.proactive.examples.c3d.EqualButton;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+//import org.objectweb.proactive.examples.c3d.Interval;
+//import org.objectweb.proactive.examples.c3d.MsgDialog;
+//import org.objectweb.proactive.examples.c3d.Scene;
+//import org.objectweb.proactive.examples.c3d.View;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
@@ -56,6 +67,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 	private MigrationStrategyManagerImpl myStrategyManager;
 	private boolean onMigration;
 	private String dispatcher_host;
+	
+	protected VirtualNode vnDispatcher;
   /**
    * Uses active objects if set to true
    */
@@ -166,12 +179,16 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   }
 
 
-  public void go() {
+  public void go(ProActiveDescriptor pad) {
+  	
+			
     me = (C3DUser)org.objectweb.proactive.ProActive.getStubOnThis();
-    // Creates the user Frame
-    //userframe = new UserFrame(this);    
+    
+    // Creates the user Frame  
+    vnDispatcher = pad.getVirtualNode("Dispatcher");  
     userframe = new UserFrame(me);
     userframe.createWelcomePanel();
+    
     setOnMigration(true);
   }
 
@@ -228,16 +245,34 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   /**
    * Entry point of the program
    */
-  public static void main(String argv[]) {
-    String nodeURL = null;
-    if (argv.length == 1) {
-      nodeURL = argv[0];
-    }
+  public static void main(String argv[]) throws NodeException{
+  	
+  	ProActiveDescriptor proActiveDescriptor = null;
+	
+		try
+		{
+			proActiveDescriptor =
+				ProActive.getProactiveDescriptor(
+					"file:"+argv[0]);
+			proActiveDescriptor.activateMappings();
+			
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+			System.out.println("Pb in main");
+		}
+ 
+    VirtualNode user =
+			proActiveDescriptor.getVirtualNode("User");
+			
+		Node	node = user.getNode();
     Object params[] = { new Boolean(false),new Boolean(false), ""};
     try {
     	
-      C3DUser c3duser = (C3DUser)org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DUser", params, nodeURL);
-      c3duser.go();
+      C3DUser c3duser = (C3DUser)org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DUser", params, node.getNodeInformation().getURL());
+      
+      c3duser.go(proActiveDescriptor);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -510,6 +545,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     /**
      * Button UP
      */
+    
     private Button b_up = new EqualButton("Up");
     /**
      * Button UP
@@ -634,7 +670,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      */
     public void createBot(String url) {
       s_username = "Benchmarking bot";
-      createFinalPanel(url, s_username);
+      //createFinalPanel(url, s_username);
     }
 
 
@@ -697,10 +733,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       toFront();
     }
 
-
-    public void createFinalPanel(String s_host, String s_name) {
-
-      setVisible(false);
+		public void createPanel(String s_host,String s_name){
+			setVisible(false);
       removeAll();
 
       mb = new MenuBar();
@@ -990,12 +1024,14 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       pack();
       setVisible(true);
       toFront();
+			
+		}
+    public void createFinalPanel(String s_host, String s_name){
+      createPanel(s_host,s_name);
 
       try {
-        String s_url = "//" + s_host + "/" + C3DDispatcher.C3D_DISPATCHER_BIND_NAME;
-        log("Looking for C3DDispatcher at " + s_url + " ...");
-        System.out.println("----------------------");
-        c3ddispatcher = (C3DDispatcher)org.objectweb.proactive.ProActive.lookupActive("org.objectweb.proactive.examples.c3d.C3DDispatcher", s_url);
+        vnDispatcher.setRuntimeInformations("LOOKUP_HOST",s_host); 
+				c3ddispatcher = (C3DDispatcher)vnDispatcher.getUniqueAO();
         i_user = c3ddispatcher.registerConsumer(me, createScene(), s_name);
         l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" + c3ddispatcher.getOSString() + ")");
       } catch (Exception ex) {
@@ -1006,296 +1042,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     }
     
     public void createPanelAfterMigration(String s_host, String s_name){
-    	setVisible(false);
-      removeAll();
-
-      mb = new MenuBar();
-      Menu m_file = new Menu("File", false);
-      m_file.setFont(f_standard);
-      mi_exit = new MenuItem("Exit");
-      mi_clear = new MenuItem("Clear log");
-      mi_list = new MenuItem("List users");
-      mi_clear.setFont(f_standard);
-      mi_exit.setFont(f_standard);
-      mi_list.setFont(f_standard);
-      mi_exit.addActionListener(this);
-      mi_clear.addActionListener(this);
-      mi_list.addActionListener(this);
-      m_file.add(mi_list);
-      m_file.add(mi_clear);
-      m_file.addSeparator();
-      m_file.add(mi_exit);
-      mb.add(m_file);
-
-      Menu m_c3d = new Menu("C3D ProActive PDC", false);
-      mi_about = new MenuItem("About ProActive PDC");
-      mi_about.setFont(f_standard);
-      mi_about.addActionListener(this);
-      m_c3d.add(mi_about);
-
-      mb.setHelpMenu(m_c3d);
-      setMenuBar(mb);
-
-      /* Instanciates the destination pixel array */
-      pix = new int[i_width * i_height];
-   
-      /* Creates a MemoryImageSource as a pixel source for the image */
-      mis = new MemoryImageSource(i_width, i_height, pix, 0, i_width);
-
-      /* Accomodates the changing nature (rotation) of the image */
-      mis.setAnimated(true);
-
-      /* Creates an image component from the image from the 
-       * MemoryImageSource; avoids drawing issues in the user frame 
-       * and places it in a panel
-       */     
-      Panel p_image = new Panel(new GridLayout(1, 1));
-      //System.out.println("p image "+p_image.getSize().width);
-
-      // PANEL CONSTRAINTS
-      c.insets = new Insets(5, 5, 0, 5);
-      
-      // position 
-      c.gridx = 0;
-      c.gridy = 0;
-      c.weightx = 1;
-      c.weighty = 1;
-      
-      // size;
-      c.gridwidth = 1;
-      c.gridheight = 1;
-
-      //fill
-      c.fill = GridBagConstraints.BOTH; // components will fill their whole area
-
-      gridbag.setConstraints(p_image, c);
-      //System.out.println("p image "+p_image.getSize().width);
-      p_image.add(new MyImageContainer(createImage(mis), i_width, i_height, p_image));
-      add(p_image);
-
-      /**
-       * The log and buttons area 
-       */
-      
-      // Creates the panel and places it in the main frame
-      Panel p_log = new Panel();
-      
-      // adds the panel
-      c.gridx = 1;
-      gridbag.setConstraints(p_log, c);
-      add(p_log);
-      
-      // Creates the panel's layout manager
-      GridBagLayout gb_panel = new GridBagLayout();
-      p_log.setLayout(gb_panel);
-      
-      // Label displaying the username
-      l_user = new Label("User " + s_name, Label.CENTER);
-      l_user.setFont(new Font("SansSerif", Font.ITALIC + Font.BOLD, 18));
-
-      GridBagConstraints pc = new GridBagConstraints();
-
-      pc.fill = GridBagConstraints.BOTH;
-      pc.insets = new Insets(5, 5, 0, 5);
-      pc.gridx = 0;
-      pc.gridy = 0;
-      pc.weightx = 1;
-      pc.weighty = 1;
-      pc.gridwidth = GridBagConstraints.REMAINDER;
-      gb_panel.setConstraints(l_user, pc);
-      p_log.add(l_user);
-      
-      // Label displaying local machine informations 
-      Label l_machine = new Label("Local host: " + s_localhost + " (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
-
-      // Adds the label in the panel
-      pc.gridy = 1;
-      gb_panel.setConstraints(l_machine, pc);
-      p_log.add(l_machine);
-      
-      
-      // Label displaying C3DDispatcher informations
-      l_c3ddispatcher = new Label("C3DDispatcher host: " + s_host);
-      pc.gridy = 2;
-      gb_panel.setConstraints(l_c3ddispatcher, pc);
-      p_log.add(l_c3ddispatcher);
-      
-      // Mesage log
-      pc.gridy = 3;
-      pc.weighty = 2;
-      ta_log = new TextArea(5, 25);
-      ta_log.setEditable(false);
-      gb_panel.setConstraints(ta_log, pc);
-      p_log.add(ta_log);
-      
-
-      //--------------------------------------------------
-      //    INPUTS
-
-
-      // Panel containing the buttons
-      Panel p_input = new Panel();
-
-      GridBagLayout gb_input = new GridBagLayout();
-      p_input.setLayout(gb_input);
-
-      c.gridx = 0;
-      c.gridy = 1;
-      c.gridwidth = 1;
-
-      gridbag.setConstraints(p_input, c);
-      add(p_input);
-      
-      
-      //---------------- Buttons
-      // unclock
-      pc.gridy = 0;
-      pc.gridx = 0;
-      pc.gridwidth = 1;
-      pc.fill = GridBagConstraints.NONE;
-
-      gb_input.setConstraints(b_unclock, pc);
-      b_unclock.addActionListener(this);
-      p_input.add(b_unclock);
-
-
-      // Clock
-      pc.gridx = 2;
-      gb_input.setConstraints(b_clock, pc);
-      b_clock.addActionListener(this);
-      p_input.add(b_clock);
-      
-      // Up
-      pc.gridy = 0;
-      pc.gridx = 1;
-      gb_input.setConstraints(b_up, pc);
-      b_up.addActionListener(this);
-      p_input.add(b_up);
-
-
-      // Down
-      pc.gridx = 1;
-      pc.gridy = 2;
-      gb_input.setConstraints(b_down, pc);
-      b_down.addActionListener(this);
-      p_input.add(b_down);
-      
-      // Left
-      pc.gridx = 0;
-      pc.gridy = 1;
-      b_left.addActionListener(this);
-      gb_input.setConstraints(b_left, pc);
-      p_input.add(b_left);
-
-      // Right
-      pc.gridx = 2;
-      gb_input.setConstraints(b_right, pc);
-      b_right.addActionListener(this);
-      p_input.add(b_right);      
-
-
-      // Add
-      // This one is added in the main frame
-      //c.gridwidth = c.REMAINDER;
-      c.gridheight = 1;
-      c.gridx = 1;
-      c.fill = GridBagConstraints.NONE;
-
-      gridbag.setConstraints(b_addSphere, c);
-      b_addSphere.addActionListener(this);
-      add(b_addSphere);      
-
-      // Reset
-      // This one is added in the main fram
-      c.gridx = 2;
-      c.gridy = 1;
-      c.fill = GridBagConstraints.NONE;
-
-      gridbag.setConstraints(b_reset, c);
-      b_reset.addActionListener(this);
-      add(b_reset);      
-
-
-
-      //-----------------------------------------
-      // MESSAGES
-
-      Panel p_mess = new Panel();
-
-      c.insets = new Insets(10, 10, 10, 10);
-      c.gridx = 0;
-      c.gridy = 2;
-      c.gridwidth = GridBagConstraints.REMAINDER;
-      c.fill = GridBagConstraints.BOTH;
-      gridbag.setConstraints(p_mess, c);
-      add(p_mess);
-
-      GridBagLayout g_mess = new GridBagLayout();
-      p_mess.setLayout(g_mess);
-
-      // Users list
-      li_users = new List(5, false);
-      li_users.add("~BROADCAST~");
-      li_users.select(0);
-      li_users.addItemListener(this);
-
-      pc.insets = new Insets(5, 5, 5, 5);
-      //      pc.anchor=pc.WEST;
-      pc.gridx = 0;
-      pc.gridy = 0;
-      pc.fill = GridBagConstraints.BOTH;
-      pc.gridwidth = GridBagConstraints.RELATIVE;
-      g_mess.setConstraints(li_users, pc);
-      p_mess.add(li_users);
-
-      // Output
-      ta_mess = new TextArea(5, 30);
-      ta_mess.setEditable(false);
-      pc.gridwidth = GridBagConstraints.REMAINDER;
-      pc.gridx = 1;
-      g_mess.setConstraints(ta_mess, pc);
-      p_mess.add(ta_mess);
-
-      // INPUT:::
-
-      Panel p_msg = new Panel();
-      GridBagLayout g_msg = new GridBagLayout();
-      pc = new GridBagConstraints();
-      p_msg.setLayout(g_msg);
-      c.gridy = 3;
-      gridbag.setConstraints(p_msg, c);
-      add(p_msg);
-
-      // SpyEvent
-      pc.gridx = 0;
-      pc.gridy = 0;
-      pc.fill = GridBagConstraints.NONE;
-      Label l_mess = new Label("SpyEvent:");
-      g_msg.setConstraints(l_mess, pc);
-      p_msg.add(l_mess);
-  
-      // Input
-      tf_mess = new TextField();
-      tf_mess.addActionListener(this);
-      pc.weightx = 1.0;
-      pc.gridwidth = GridBagConstraints.RELATIVE;
-      pc.fill = GridBagConstraints.BOTH;
-      pc.gridx = 1;
-      g_msg.setConstraints(tf_mess, pc);
-      p_msg.add(tf_mess);
-      
-      // Send button
-      pc.weightx = 0.0;
-      pc.gridwidth = GridBagConstraints.REMAINDER;
-      b_send.addActionListener(this);
-      pc.fill = GridBagConstraints.NONE;
-      pc.gridx = 2;
-      g_msg.setConstraints(b_send, pc);
-      p_msg.add(b_send);
-
-      pack();
-      setVisible(true);
-      toFront();
+    	createPanel(s_host,s_name);
       
       c3ddispatcher.registerMigratedUser(i_user);
       //System.out.println("i am here");
@@ -1380,6 +1127,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         if ((s_name.length() > 0) && (s_host.length() > 0)) {
           s_username = s_name;
           dispatcher_host = s_host;
+          
           createFinalPanel(s_host, s_name);
         }
       } else if (source == mi_clear) {
