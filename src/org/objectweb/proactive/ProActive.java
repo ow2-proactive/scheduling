@@ -32,8 +32,6 @@ package org.objectweb.proactive;
 
 import org.apache.log4j.Logger;
 
-import org.objectweb.fractal.api.Component;
-
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -49,8 +47,6 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -71,10 +67,12 @@ import org.objectweb.proactive.core.exceptions.handler.IHandler;
 import org.objectweb.proactive.core.exceptions.migration.ProActiveMigrationException;
 import org.objectweb.proactive.core.exceptions.security.ProActiveSecurityException;
 import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -87,7 +85,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import java.net.UnknownHostException;
 
 import java.util.HashMap;
-import java.util.Hashtable;
 
 
 public class ProActive {
@@ -263,16 +260,16 @@ public class ProActive {
     }
 
     /**
-     * Creates a new set of active objects based on classname attached to the given virtualnode.
-     * @param classname classname the name of the class to instanciate as active
-     * @param constructorParameters constructorParameters the parameters of the constructor.
-     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-     * on each node mapped to the given virtualnode in XML deployment descriptor.
-     * @return Object[] an array of references (possibly remote) on  Stub of newly created active objects
-     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-     * @throws NodeException if the virtualnode was null
-     */
-    public static Object[] newActive(String classname,
+            * Creates a new set of active objects based on classname attached to the given virtualnode.
+            * @param classname classname the name of the class to instanciate as active
+            * @param constructorParameters constructorParameters the parameters of the constructor.
+            * @param virtualnode The virtualnode where to create active objects. Active objects will be created
+            * on each node mapped to the given virtualnode in XML deployment descriptor.
+            * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
+            * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+            * @throws NodeException if the virtualnode was null
+            */
+    public static Object newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
         return ProActive.newActive(classname, constructorParameters,
@@ -289,12 +286,12 @@ public class ProActive {
      *               see the definition of the activity in the javadoc of this classe for more information.
      * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
      *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-     * @return Object[] an array of references (possibly remote) on  Stub of newly created active objects
+     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
      *
      */
-    public static Object[] newActive(String classname,
+    public static Object newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
@@ -303,143 +300,28 @@ public class ProActive {
                 virtualnode.activate();
             }
             Node[] nodeTab = virtualnode.getNodes();
-            Object[] aoTab = new Object[nodeTab.length];
-
+            Group aoGroup = null;
+            try {
+                aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
+                            classname));
+            } catch (ClassNotFoundException e) {
+                throw new ActiveObjectCreationException(
+                    "Cannot create group of active objects" + e);
+            } catch (ClassNotReifiableException e) {
+                throw new ActiveObjectCreationException(
+                    "Cannot create group of active objects" + e);
+            }
             for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = newActive(classname, constructorParameters,
-                        (Node) nodeTab[i], activity, factory);
-                aoTab[i] = tmp;
+            	Object tmp = newActive(classname, constructorParameters,
+				(Node) nodeTab[i], activity, factory);
+                aoGroup.add(tmp);
             }
 
-            return aoTab;
+            return aoGroup.getGroupByType();
         } else {
             throw new NodeException(
                 "VirtualNode is null, unable to activate the object");
         }
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class, according to the
-     * given component parameters, and returns a reference on the component of type Component.
-     * A reference on the active object base class can be retreived through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param classname the name of the base class. "Composite" if the component is a composite,
-     * "ParallelComposite" if the component is a parallel composite component
-     * @param constructorParameters the parameters of the constructor of the object
-     *    to instantiate as active. If some parameters are primitive types, the wrapper
-     *    class types should be given here. null can be used to specify that no parameter
-     *    are passed to the constructor.
-     * @param node the possibly null node where to create the active object. If null, the active object
-     *       is created localy on a default node
-     * @param activity the possibly null activity object defining the different step in the activity of the object.
-     *               see the definition of the activity in the javadoc of this classe for more information.
-     * @param factory should be null for components (automatically created)
-     * @param componentParameters the parameters of the component
-     * @return a component representative of type Component
-     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Component newActiveComponent(String classname,
-        Object[] constructorParameters, Node node, Active activity,
-        MetaObjectFactory factory, ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
-        // COMPONENTS
-        // instantiate the component metaobject factory with parameters of the component
-        if (factory == null) {
-            // first create a hashtable with the parameters
-            Hashtable factory_params = new Hashtable(1);
-            factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
-                componentParameters);
-            factory = new ProActiveMetaObjectFactory(factory_params);
-            //		   factory = ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
-        }
-
-        // keep class name (useful for later retreival of stub on reified object)
-        Object active = newActive(classname, constructorParameters, node,
-                activity, factory);
-        componentParameters.setStubOnReifiedObject(active);
-
-        // Find the proxy
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) active).getProxy();
-        if (myProxy == null) {
-            throw new ProActiveRuntimeException(
-                "Cannot find a Proxy on the stub object: " + active);
-        }
-
-        return ProActiveComponentRepresentativeFactory.instance()
-                                                      .createComponentRepresentative(componentParameters,
-            myProxy);
-    }
-
-    /**
-     * Creates a new ProActive component over the specified base class, according to the
-     * given component parameters, and returns a reference on the component of type Component.
-     *
-     * This method allows automatic of primitive components on Virtual Nodes. In that case, the appendix
-     * -cyclicInstanceNumber-<b><i>number</i></b> is added to the name of each of these components.
-     * If the component is not a primitive, only one instance of the component is created, on the first node
-     * retreived from the specified virtual node.
-     *
-     * A reference on the active object base class can be retreived through the component parameters controller's
-     * method "getStubOnReifiedObject".
-     *
-     * @param classname the name of the base class. "Composite" if the component is a composite,
-     * "ParallelComposite" if the component is a parallel composite component
-     * @param constructorParameters the parameters of the constructor of the object
-     *    to instantiate as active. If some parameters are primitive types, the wrapper
-     *    class types should be given here. null can be used to specify that no parameter
-     *    are passed to the constructor.
-     * @param node the possibly null node where to create the active object. If null, the active object
-     *       is created localy on a default node
-     * @param activity the possibly null activity object defining the different step in the activity of the object.
-     *               see the definition of the activity in the javadoc of this classe for more information.
-     * @param factory should be null for components (automatically created)
-     * @param componentParameters the parameters of the component
-     * @return a component representative of type Component
-     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
-     * @exception NodeException if the node was null and that the DefaultNode cannot be created
-     */
-    public static Component[] newActiveComponent(String className,
-        Object[] constructorParameters, VirtualNode vn,
-        ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
-        // COMPONENTS			
-        // first create a hashtable with the parameters
-        Hashtable factory_params = new Hashtable(1);
-        factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
-            componentParameters);
-        MetaObjectFactory factory = new ProActiveMetaObjectFactory(factory_params);
-
-        Component[] components = null;
-        Proxy proxy = null;
-        if (componentParameters.getHierarchicalType().equals(ComponentParameters.PRIMITIVE)) {
-            String original_component_name = componentParameters.getName();
-            Object[] active_objects = newActive(className,
-                    constructorParameters, vn, null, factory);
-            components = new Component[active_objects.length];
-            for (int i = 0; i < active_objects.length; i++) {
-                ComponentParameters parallel_comp_params = new ComponentParameters(componentParameters);
-                parallel_comp_params.setName(original_component_name +
-                    ComponentParameters.CYCLIC_NODE_APPENDIX + i);
-                // Find each proxy
-                proxy = ((StubObject) active_objects[i]).getProxy();
-                if (proxy == null) {
-                    throw new ProActiveRuntimeException(
-                        "Cannot find a Proxy on the stub object: " +
-                        active_objects[i]);
-                }
-                components[i] = ProActiveComponentRepresentativeFactory.instance()
-                                                                       .createComponentRepresentative(parallel_comp_params,
-                        proxy);
-            }
-        } else {
-            components = new Component[1];
-            components[0] = ProActive.newActiveComponent(className,
-                    constructorParameters, vn.getNode(), null, factory,
-                    componentParameters);
-        }
-        return components;
     }
 
     /**
@@ -593,20 +475,30 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object[] turnActive(Object target, String nameOfTargetType,
+    public static Object turnActive(Object target, String nameOfTargetType,
         VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
         if (virtualnode != null) {
             Node[] nodeTab = virtualnode.getNodes();
-            Object[] aoTab = new Object[nodeTab.length];
+			Group aoGroup = null;
+			try {
+				aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
+							target.getClass().getName()));
+			} catch (ClassNotFoundException e) {
+				throw new ActiveObjectCreationException(
+					"Cannot create group of active objects" + e);
+			} catch (ClassNotReifiableException e) {
+				throw new ActiveObjectCreationException(
+					"Cannot create group of active objects" + e);
+			}
 
             for (int i = 0; i < nodeTab.length; i++) {
                 Object tmp = turnActive(target, nameOfTargetType,
                         (Node) nodeTab[i], null, null);
-                aoTab[i] = tmp;
+                aoGroup.add(tmp);
             }
 
-            return aoTab;
+            return aoGroup;
         } else {
             throw new NodeException(
                 "VirtualNode is null, unable to active the object");
