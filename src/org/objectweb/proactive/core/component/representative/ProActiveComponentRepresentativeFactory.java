@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 
 /**
  * This is a factory for component representatives.
- * 
+ *
  * @author Matthieu Morel
  *
  */
@@ -60,16 +60,17 @@ public class ProActiveComponentRepresentativeFactory {
     }
 
     /**
-     * Creates a component representative according to the type of the component 
+     * Creates a component representative according to the type of the component
      * (it also generates the required functional interfaces), and connects the representative to
-     * the given proxy 
+     * the given proxy
      * @param componentType the type of the component
      * @param proxy the proxy to the active object
      * @return a corresponding component representative
      */
     public ProActiveComponentRepresentative createComponentRepresentative(
-        ComponentType componentType, Proxy proxy) {
-        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType);
+        ComponentType componentType, String hierarchicalType, Proxy proxy) {
+        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType,
+                hierarchicalType);
         representative.setProxy(proxy);
         return representative;
     }
