@@ -67,8 +67,8 @@ import java.util.ArrayList;
 public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
+    protected String vnName;
 
-	protected String vnName;
     //
     // ----------Constructors--------------------
     //
@@ -112,9 +112,7 @@ public class NodeImpl implements Node, Serializable {
                 this.nodeInformation.getURL(), e);
         }
         if (bodyArray.size() == 0) {
-            throw new NodeException(
-                "no ActiveObjects are registered for this node: " +
-                this.nodeInformation.getURL());
+            return new Object[0];
         } else {
             Object[] stubOnAO = new Object[bodyArray.size()];
             for (int i = 0; i < bodyArray.size(); i++) {
@@ -275,12 +273,21 @@ public class NodeImpl implements Node, Serializable {
             return name;
         }
 
-		/**
-		 * @see org.objectweb.proactive.Job#getJobID()
-		 */
-		public String getJobID() {
-			return jobID;
-		}
+        /**
+         * @see org.objectweb.proactive.Job#getJobID()
+         */
+        public String getJobID() {
+            return jobID;
+        }
+
+        /**
+         * Change the Job ID of this node. Used for P2P.
+         * @see org.objectweb.proactive.Job
+         * @param jobId The new JobID
+         */
+        public void setJobID(String jobId) {
+            this.jobID = jobId;
+        }
 
         /**
          * @see org.objectweb.proactive.core.node.NodeInformation#getHostName()
@@ -289,19 +296,20 @@ public class NodeImpl implements Node, Serializable {
             return this.hostname;
         }
     }
-    
-    // SECURITY
-	/**
-	  * @see org.objectweb.proactive.core.node.Node#getVnName()
-	  */
-	 public String getVnName() {
-		 return vnName;
-	 }
 
-	 /**
-	  * @see org.objectweb.proactive.core.node.Node#setVnName(String)
-	  */
-	 public void setVnName(String string) {
-		 vnName = string;
-	 }
+    // SECURITY
+
+    /**
+     * @see org.objectweb.proactive.core.node.Node#getVnName()
+     */
+    public String getVnName() {
+        return vnName;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.node.Node#setVnName(String)
+     */
+    public void setVnName(String string) {
+        vnName = string;
+    }
 }
