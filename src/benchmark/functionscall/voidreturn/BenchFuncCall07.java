@@ -47,16 +47,16 @@ public class BenchFuncCall07 extends FunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchFuncCall07 activeObject = (BenchFuncCall07) getActiveObject();
         String s = "toto";
         String t = "tutu";
         String u = "titi";
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(s, t, u);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public void f(String s, String t, String u) throws Exception {

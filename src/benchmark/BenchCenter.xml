@@ -5,8 +5,10 @@
 	<description>Manage all benchmarks.</description>
 	<nbRuns>100</nbRuns>
 	
+	<result type="html" file="../benchmark.html" />
+	
 	<properties>
-		<prop key="RemoteHostname" value="owenii" />
+		<prop key="RemoteHostname" value="amda" />
 	</properties>
 
 </Manager>

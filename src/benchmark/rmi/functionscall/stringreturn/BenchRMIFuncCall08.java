@@ -48,14 +48,14 @@ public class BenchRMIFuncCall08 extends RMIFunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchRMIFuncCall08 activeObject = (BenchRMIFuncCall08) getRmiObject();
         ReifiableObject o = new ReifiableObject();
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(o);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public String f(ReifiableObject o) throws Exception {

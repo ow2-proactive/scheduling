@@ -68,14 +68,12 @@ public class BenchNewActive extends ProActiveBenchmark {
      * @see testsuite.test.Benchmark#action()
      */
     public long action() throws Exception {
-        long start;
-        long end;
         String className = ReifiableObject.class.getName();
         Node node = getNode();
-        start = System.currentTimeMillis();
+        this.timer.start();
         object = (ReifiableObject) ProActive.newActive(className, null, node);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     /**

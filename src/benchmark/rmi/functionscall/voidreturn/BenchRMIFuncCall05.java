@@ -47,14 +47,14 @@ public class BenchRMIFuncCall05 extends RMIFunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchRMIFuncCall05 activeObject = (BenchRMIFuncCall05) getRmiObject();
         String s = "toto";
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(s);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public void f(String s) throws Exception {

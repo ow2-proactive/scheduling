@@ -48,13 +48,13 @@ public class BenchFuncCall02 extends FunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchFuncCall02 activeObject = (BenchFuncCall02) getActiveObject();
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(0);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public ReifiableObject f(int i) throws Exception {

@@ -66,15 +66,13 @@ public class BenchTurnActive extends ProActiveBenchmark {
      * @see testsuite.test.Benchmark#action()
      */
     public long action() throws Exception {
-        long start;
-        long end;
         ReifiableObject object = new ReifiableObject();
         String className = ReifiableObject.class.getName();
         Node node = getNode();
-        start = System.currentTimeMillis();
+        this.timer.start();
         object = (ReifiableObject) ProActive.turnActive(object, node);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     /**

@@ -51,28 +51,28 @@ import java.io.IOException;
 public class BenchCenter extends ProActiveBenchManager {
 
     /**
- * 
- */
+     *
+     */
     public BenchCenter() {
         super("ProActive's Benchmarks", "Manage all benchmarks.");
     }
 
     /**
- * @param name
- * @param description
- */
+     * @param name
+     * @param description
+     */
     public BenchCenter(String name, String description) {
         super(name, description);
     }
 
     /**
- * @param xmlDescriptor
- * @throws IOException
- * @throws SAXException
- * @throws ClassNotFoundException
- * @throws InstantiationException
- * @throws IllegalAccessException
- */
+     * @param xmlDescriptor
+     * @throws IOException
+     * @throws SAXException
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     */
     public BenchCenter(File xmlDescriptor)
         throws IOException, SAXException, ClassNotFoundException, 
             InstantiationException, IllegalAccessException {
@@ -80,8 +80,8 @@ public class BenchCenter extends ProActiveBenchManager {
     }
 
     /**
- * @see testsuite.manager.AbstractManager#initManager()
- */
+     * @see testsuite.manager.AbstractManager#initManager()
+     */
     public void initManager() throws Exception {
         super.initManager();
         Object[] paramsSame = { getSameVMNode() };
@@ -261,22 +261,17 @@ public class BenchCenter extends ProActiveBenchManager {
     public static void main(String[] args) {
         System.out.println("Start benchmark ...");
         BenchCenter center = null;
-        File html = null;
         String path = BenchCenter.class.getResource(
                 "/benchmark/BenchCenter.xml").getPath();
         File xml = new File(path);
         try {
             center = new BenchCenter(xml);
-            html = new File(System.getProperty("user.home") +
-                    File.separatorChar + "ProActiveBench");
-            html.mkdirs();
-            html = new File(html, "benchmark.html");
-            center.execute(false);
-            center.toHTML(html);
+            center.execute();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("You can see results in : " + html.getPath());
+        System.out.println(
+            "You can see results in benchmark.hmtl file in your ProActive directory.");
         System.exit(0);
     }
 }

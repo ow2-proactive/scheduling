@@ -48,14 +48,14 @@ public class BenchFuncCall05 extends FunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchFuncCall05 activeObject = (BenchFuncCall05) getActiveObject();
         String s = "toto";
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(s);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public ReifiableObject f(String s) throws Exception {

@@ -49,15 +49,15 @@ public class BenchFuncCall09 extends FunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
+        
+        
         BenchFuncCall09 activeObject = (BenchFuncCall09) getActiveObject();
         ReifiableObject o = new ReifiableObject();
         ReifiableObject p = new ReifiableObject();
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f(o, p);
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public int f(ReifiableObject o, ReifiableObject p)

@@ -47,17 +47,14 @@ public class BenchFuncCall01 extends FunctionCall {
     }
 
     public long action() throws Exception {
-        long start;
-        long end;
         BenchFuncCall01 activeObject = (BenchFuncCall01) getActiveObject();
-        start = System.currentTimeMillis();
+        this.timer.start();
         activeObject.f();
-        end = System.currentTimeMillis();
-        return end - start;
+        this.timer.stop();
+        return this.timer.getCumulatedTime();
     }
 
     public int f() throws Exception {
-        
         if (logger.isDebugEnabled()) {
             logger.debug(InetAddress.getLocalHost().getHostName());
         }
