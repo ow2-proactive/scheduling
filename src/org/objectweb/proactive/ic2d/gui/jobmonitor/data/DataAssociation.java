@@ -251,38 +251,22 @@ public class DataAssociation implements JobMonitorConstants {
 				}
 	}
 	
-	private void removeChild(BasicMonitoredObject parent, String childName) {
-/*		Set res = getWritableAsso(parent, parent.getKey() + 1);
-		res.remove(childName);
-		if (res.isEmpty())
-			removeItem(parent);
-			*/
-	}
-	
-	/* TODO : deleted = true */
-	public void removeItem(BasicMonitoredObject value) {
-/*		int key = value.getKey();
-		String name = value.getFullName();
+	public void deleteItem(BasicMonitoredObject value) {
+		int key = value.getKey();
 		
-		if (getSetForKey(key) == null || !getSetForKey(key).remove(name))
+		value.setDeleted(true);
+		if (getSetForKey(key) == null || !getSetForKey(key).contains(value))
 			return;
 		
 		if  (isSpecialKey(key))
 			// If we had a reference count : associatedNode.ref--
 			return;
 		
-		Set desc = getValues(value, key + 1, null);
+		MonitoredObjectSet desc = getValues(value, key + 1, null);
 		Iterator iter = desc.iterator();
 		while (iter.hasNext()) {
 			BasicMonitoredObject childValue = (BasicMonitoredObject) iter.next();
-			removeItem(childValue);
+			deleteItem(childValue);
 		}
-		
-		Set parent = getValues(value, key - 1, null);
-		iter = parent.iterator();
-		while (iter.hasNext()) {
-			BasicMonitoredObject parentValue = (BasicMonitoredObject) iter.next();
-			removeChild(parentValue, name);
-		} */
 	}
 }

@@ -225,11 +225,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     public void updateHost(final DataTreeNode hostNode) {
         new Thread(new Runnable() {
                 public void run() {
-                    asso.removeItem(hostNode.getObject());
+                    asso.deleteItem(hostNode.getObject());
                     handleHost(hostNode.getName());
 
                     for (int i = 0; i < views.length; i++)
-                        views[i].getModel().rebuild(hostNode);
+                        views[i].getModel().rebuild();
                 }
             }).start();
     }
