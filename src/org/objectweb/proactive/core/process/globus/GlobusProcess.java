@@ -235,7 +235,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   public void setGramPort(String gramPort){
   	this.gramPort = gramPort;
   }
-  
+
   public void setGISPort(String gisPort){
   	this.gisPort = gisPort;
   }
@@ -288,7 +288,20 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
 //  }
   
   protected String internalBuildCommand() {
-   return buildEnvironmentCommand()+buildRSLCommand();
+   return buildRSLCommand();
+  }
+  
+  protected String buildEnvironmentCommand(){
+  	if (environment == null) return "";
+  	StringBuffer sb = new StringBuffer();
+  	String[] globusEnvironment = new String[environment.length];
+  	for (int i=0; i<environment.length; i++) {
+  		globusEnvironment[i] = environment[i].replace('=',' ');
+  		sb.append("(");
+  		sb.append(globusEnvironment[i]);
+  		sb.append(")");
+  	}
+  	return sb.toString();
   }
 
   
@@ -493,9 +506,9 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
    * @param rslCommand to generate with buildRSLCommand
    */
   public void startGlobusProcessWithoutOutput (String rslCommand,String aHost){
- 
+
     String contact= aHost + ":" + this.gramPort;
- 
+
     job = new GramJob(rslCommand);
  
     // This listener is used to notify the implementer when the status of a GramJob has changed.
@@ -546,7 +559,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   private String buildRSLCommand (){
   	String rslCommand = "&(executable=" + ((JVMProcess)targetProcess).getJavaPath()+")" + 
   											"(arguments="+((JVMProcess)targetProcess).getClassname() + " " + ((JVMProcess)targetProcess).getParameters() +")"+
-  											"(environment=(CLASSPATH "+((JVMProcess)targetProcess).getClasspath()+"))";
+  											"(environment=(CLASSPATH "+((JVMProcess)targetProcess).getClasspath()+")"+buildEnvironmentCommand()+")";
 		return rslCommand;
   }
 
