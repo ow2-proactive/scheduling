@@ -64,7 +64,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
-public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer, Job {
+public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer {
 
   /**
    * Terminate the body. After this call the body is no more alive and no more active

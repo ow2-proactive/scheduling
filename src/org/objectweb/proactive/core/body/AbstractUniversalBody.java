@@ -67,6 +67,8 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   protected transient UniversalBody remoteBody;
 
   protected RemoteBodyFactory remoteBodyFactory;
+  
+  protected String jobID;
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
@@ -88,12 +90,13 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
    * @param remoteBodyFactory the factory able to construct new factories for each type of meta objects 
    *                needed by this body
    */
-  public AbstractUniversalBody(String nodeURL, RemoteBodyFactory remoteBodyFactory) {
+  public AbstractUniversalBody(String nodeURL, RemoteBodyFactory remoteBodyFactory, String jobID) {
     this.nodeURL = nodeURL;
     this.bodyID = new UniqueID();
     this.location = new BodyMap();
     this.remoteBodyFactory = remoteBodyFactory;
     this.remoteBody = remoteBodyFactory.newRemoteBody(this);
+    this.jobID = jobID;
   }
 
 
@@ -105,6 +108,10 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   // -- implements UniversalBody -----------------------------------------------
   //
 
+  public String getJobID() {
+  	return jobID;
+  }
+  
   public String getNodeURL() {
     return nodeURL;
   }

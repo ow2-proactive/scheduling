@@ -111,6 +111,10 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         return body.getID();
     }
 
+    public String getJobID() {
+    	return body.getJobID();
+    }
+    
     public void updateLocation(UniqueID id, UniversalBody remoteBody)
         throws java.io.IOException {
         body.updateLocation(id, remoteBody);

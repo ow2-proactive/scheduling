@@ -74,7 +74,7 @@ public class HalfBody extends AbstractBody {
     //
     private HalfBody(MetaObjectFactory factory) {
         //SECURITY 
-        super(new Object(), "LOCAL", factory);
+        super(new Object(), "LOCAL", factory, getRuntimeJobID());
         //super(new Object(),
         //	 NodeFactory.getDefaultNode().getNodeInformation().getURL(), factory);
         // creating a default psm for HalfBody
@@ -156,9 +156,13 @@ public class HalfBody extends AbstractBody {
      *  @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
-        return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
+        return getRuntimeJobID();
     }
 
+    private static String getRuntimeJobID() {
+    	return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
+    }
+    
     //
     // -- inner classes -----------------------------------------------
     //

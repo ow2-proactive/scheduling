@@ -108,6 +108,11 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     //
     // -- implements RemoteBody -----------------------------------------------
     //
+    
+    public String getJobID() {
+    	return body.getJobID();
+    }
+    
     public void receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
         body.receiveRequest(r);

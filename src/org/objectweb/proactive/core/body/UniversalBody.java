@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.body;
 
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -67,7 +68,7 @@ import java.util.HashMap;
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter
  */
-public interface UniversalBody {
+public interface UniversalBody extends Job {
 
     /**
      * Receives a request for later processing. The call to this method is non blocking

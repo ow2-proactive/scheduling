@@ -75,6 +75,11 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     protected UniqueID bodyID;
 
+    /**
+     * Cache the jobID locally for speed
+     */
+    protected String jobID;
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -103,6 +108,20 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
     // -- PUBLIC METHODS -----------------------------------------------
     //
 
+    public String getJobID() {
+    	if (jobID == null) {
+    		try {
+    			jobID = proxiedJiniBody.getJobID();
+    		} catch (java.rmi.RemoteException e) {
+    			e.printStackTrace();
+    			return "";
+    		}
+    	}
+    	
+    	return jobID;
+    }
+
+    
     /**
      * Registers an active object into a RMI registry. In fact it is the
      * jini version of the body of the active object that is registered into the

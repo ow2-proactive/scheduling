@@ -99,7 +99,6 @@ public abstract class BodyImpl extends AbstractBody
     /** The component in charge of receiving request */
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
-    protected String JobID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -120,9 +119,8 @@ public abstract class BodyImpl extends AbstractBody
      *                needed by this body
      */
     public BodyImpl(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory, String jobID) {
-        super(reifiedObject, nodeURL, factory);
-        this.JobID = jobID;
+        MetaObjectFactory factory, String jobId) {
+        super(reifiedObject, nodeURL, factory, jobId);
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
@@ -136,9 +134,6 @@ public abstract class BodyImpl extends AbstractBody
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public String getJobID() {
-        return this.JobID;
-    }
 
     //
     // -- implements MessageEventProducer -----------------------------------------------

@@ -95,6 +95,8 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
      */
     public UniqueID getID() throws ibis.rmi.RemoteException;
 
+    public String getJobID() throws ibis.rmi.RemoteException;
+    
     /**
      * Signals to this body that the body identified by id is now to a new
      * remote location. The body given in parameter is a new stub pointing

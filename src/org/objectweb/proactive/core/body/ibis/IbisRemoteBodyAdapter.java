@@ -76,6 +76,11 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
      * Cache the ID of the Body locally for speed
      */
     protected UniqueID bodyID;
+    
+    /**
+     * Cache the jobID locally for speed
+     */
+    protected String jobID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -188,6 +193,20 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     //
     // -- implements UniversalBody -----------------------------------------------
     //
+    public String getJobID() {
+    	if (jobID == null) {
+    		try {
+    			jobID = proxiedRemoteBody.getJobID();
+    		} catch (ibis.rmi.RemoteException e) {
+    			e.printStackTrace();
+    			return "";
+    		}
+    	}
+    	
+    	return jobID;
+    }
+
+    
     public void receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
         proxiedRemoteBody.receiveRequest(r);

@@ -98,6 +98,8 @@ public interface JiniBody extends java.rmi.Remote {
      */
     public UniqueID getID() throws java.rmi.RemoteException;
 
+    public String getJobID() throws java.rmi.RemoteException;
+    
     /**
      * Signals to this body that the body identified by id is now to a new
      * jini location. The body given in parameter is a new stub pointing

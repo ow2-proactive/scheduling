@@ -163,8 +163,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      *                needed by this body
      */
     public AbstractBody(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory) {
-        super(nodeURL, factory.newRemoteBodyFactory());
+        MetaObjectFactory factory, String jobId) {
+        super(nodeURL, factory.newRemoteBodyFactory(), jobId);
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 
         // GROUP

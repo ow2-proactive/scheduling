@@ -71,6 +71,11 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     protected UniqueID bodyID;
 
+    /**
+     * Cache the jobID locally for speed
+     */
+    protected String jobID;
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -106,6 +111,19 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+
+    public String getJobID() {
+    	if (jobID == null) {
+    		try {
+    			jobID = proxiedRemoteBody.getJobID();
+    		} catch (java.rmi.RemoteException e) {
+    			e.printStackTrace();
+    			return "";
+    		}
+    	}
+    	
+    	return jobID;
+    }
 
     /**
      * Registers an active object into a RMI registry. In fact it is the

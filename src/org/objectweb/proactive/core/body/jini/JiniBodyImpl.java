@@ -92,6 +92,10 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
     //
     // -- implements JiniBody -----------------------------------------------
     //
+    public String getJobID() {
+    	return body.getJobID();
+    }
+    
     public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException {
         //System.out.println("JiniBodyImpl: receiveRequest() for " + this.localBody);
         //System.out.println("JiniBodyImpl: receiveRequest() request is " + r.getMethodName());

@@ -40,6 +40,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     protected UniqueID id;
     protected boolean stop;
     protected long creationTime;
+    protected String jobID;
 
     //protected  Thread t ;
 
@@ -96,6 +97,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.id;
     }
 
+    public String getJobID() {
+    	if (jobID == null)
+    		jobID = wrappedBody.getJobID();
+    	
+    	return jobID;
+    }
+    
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
         this.wrappedBody.updateLocation(id, body);
