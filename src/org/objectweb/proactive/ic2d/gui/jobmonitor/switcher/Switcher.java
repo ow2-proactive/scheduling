@@ -1,34 +1,44 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.switcher;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JTree;
 import javax.swing.SwingConstants;
 
-public class Switcher extends JPanel
+import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+
+
+public class Switcher extends JPanel implements JobMonitorConstants
 {
-	private SwitcherModel model;
 	private JLabel [] labels;
 	
-	public Switcher (SwitcherModel _model, final JTree jtree, final boolean allowExchange)
+	public Switcher (final JTree jtree, final boolean allowExchange)
 	{
-		model = _model;
-		
+		final DataTreeModel treeModel = (DataTreeModel) jtree.getModel();
 		final JPopupMenu popupmenu = new JPopupMenu ();
-		int size = model.size();
+		int size = treeModel.getNbKey();
 		labels = new JLabel [size];
 		
 		setLayout (new GridLayout (1, size, 2, 0));
 		
 		for (int i = 0; i < size; ++i)
 		{
-			final JLabel l = new JLabel (model.getLabel (i), model.getIcon(i), SwingConstants.CENTER);
+			final Branch b = treeModel.getBranch(i);
+			final JLabel l = new JLabel (b.getName(), b.getIcon(), SwingConstants.CENTER);
 			
 			l.setHorizontalAlignment (SwingConstants.CENTER);
 			l.setOpaque (true);
@@ -38,12 +48,12 @@ public class Switcher extends JPanel
 				{
 					popupmenu.removeAll();
 					final JCheckBoxMenuItem hide = new JCheckBoxMenuItem("Hide '" + l.getText() + "'");
-					hide.setSelected(model.isHidden(l.getText()));
+					hide.setSelected(b.isHidden());
 					hide.addActionListener(new ActionListener () {
 						public void actionPerformed (ActionEvent e)
 						{
-							boolean wantToHide = !model.isHidden(l.getText());
-							performSwitch(l, !wantToHide);
+							boolean wantToHide = !b.isHidden();
+							performSwitch(treeModel, l, b.getKey(), !wantToHide);
 							hide.setSelected(wantToHide);
 							jtree.repaint();
 						}
@@ -51,49 +61,40 @@ public class Switcher extends JPanel
 					popupmenu.add(hide);
 					
 					final JCheckBoxMenuItem highlight = new JCheckBoxMenuItem("Highlight '" + l.getText() + "'");
-					highlight.setSelected(model.isHighlighted(l.getText()));
+					highlight.setSelected(b.isHighlighted());
 					highlight.addActionListener(new ActionListener () {
 						public void actionPerformed (ActionEvent e)
 						{
-							model.toggleHighlighted(l.getText());
-							highlight.setSelected(model.isHighlighted(l.getText()));
+							boolean wantToHighlight = !b.isHighlighted();
+							treeModel.setHighlighted(b.getKey(), wantToHighlight);
+							highlight.setSelected(wantToHighlight);
 							jtree.repaint();
 						}
 					});
 					popupmenu.add(highlight);
 
 					if (allowExchange) {
-						JMenu exchange = createExchangeMenu(l.getText(), jtree);
+						JMenu exchange = createExchangeMenu(b.getKey(), jtree);
 						popupmenu.add(exchange);
 					}
 
 					popupmenu.show (l, e.getX(), e.getY());
 				}
 			});
-
-			performSwitch (l, true);
 			
+			updateLabel(l, true);
 			add (l);
 				
 			labels [i] = l;
 		}		
 	}
 	
-	private void exchange(String fromName, String toName) {
-		model.exchange(fromName, toName);
+	private void exchange(DataTreeModel treeModel, int fromKey, int toKey) {
+		treeModel.exchange(fromKey, toKey);
 
-		int fromId = -1, toId = -1;
-		for (int i = 0; i < labels.length; i++) {
-			if (labels[i].getText().equals(fromName))
-				fromId = i;
-			
-			if (labels[i].getText().equals(toName))
-				toId = i;
-		}
-		
-		if (fromId < 0 || toId < 0)
-			throw new RuntimeException("Unknown labels : " + fromName + " or " + toName);
-		
+		int fromId = treeModel.indexOfKey(fromKey);
+		int toId = treeModel.indexOfKey(toKey);
+
 		JLabel tmp = labels[fromId];
 		labels[fromId] = labels[toId];
 		labels[toId] = tmp;
@@ -107,21 +108,22 @@ public class Switcher extends JPanel
 		repaint();
 	}
 	
-	private JMenu createExchangeMenu(String name, final JTree jtree) {
-		JMenu submenu = new JMenu("Exchange '" + name + "' with");
+	private JMenu createExchangeMenu(final int key, final JTree jtree) {
+		final DataTreeModel treeModel = (DataTreeModel) jtree.getModel();
+		JMenu submenu = new JMenu("Exchange '" + NAMES[KEY2INDEX[key]] + "' with");
 		
-		for (int i = 0, size = model.size(); i < size; i++)
-			if (!name.equals(model.getLabel(i))) {
-				final String fromName = name;
-				final String toName = model.getLabel(i);
-				JMenuItem menuItem = new JMenuItem(new AbstractAction(toName, model.getIcon(i)) {
+		for (int i = 0, size = treeModel.getNbKey(); i < size; i++) {
+			final Branch b = treeModel.getBranch(i);
+			if (key != b.getKey()) {
+				JMenuItem menuItem = new JMenuItem(new AbstractAction(b.getName(), b.getIcon()) {
 					public void actionPerformed(ActionEvent e) {
-						exchange(fromName, toName);
+						exchange(treeModel, key, b.getKey());
 						jtree.repaint();
 					}
 				});
 				submenu.add(menuItem);
 			}
+		}
 		return submenu;
 	}
 	
@@ -150,10 +152,14 @@ public class Switcher extends JPanel
 		return OFF_FONT;
 	}
 
-	private void performSwitch (JLabel label, boolean isNewStateON)
-	{
+	private void updateLabel(JLabel label, boolean isNewStateON) {
 		label.setFont (isNewStateON ? ON_Font() : OFF_Font());
 		label.setBackground (isNewStateON ? ON : OFF);
-		model.setHidden(label.getText(), !isNewStateON);
+	}
+	
+	private void performSwitch (DataTreeModel treeModel, JLabel label, int key, boolean isNewStateON)
+	{
+		updateLabel(label, isNewStateON);
+		treeModel.setHidden(key, !isNewStateON);
 	}
 }

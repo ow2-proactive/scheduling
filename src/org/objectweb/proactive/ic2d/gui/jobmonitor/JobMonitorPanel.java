@@ -12,7 +12,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -529,7 +528,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         addButtons(left, j);
 
-        Switcher s = new Switcher(model.getSwitcherModel(), j, allowExpand);
+        Switcher s = new Switcher(j, allowExpand);
         JPanel switcher = new JPanel(new GridLayout(1, 1));
         switcher.add(s);
         switcher.setBorder(BorderFactory.createEtchedBorder());
@@ -545,37 +544,29 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     private JPanel createJobView() {
-        SwitcherModel jobSwitchModel = new SwitcherModel(JOB_VIEW_KEYS);
-
         DataModelTraversal traversal = new DataModelTraversal(JOB_VIEW_KEYS);
-        jobViewModel = new DataTreeModel(asso, jobSwitchModel, traversal);
+        jobViewModel = new DataTreeModel(asso, traversal);
 
         return createPanel(jobViewModel, false);
     }
 
     private JPanel createHostView() {
-        SwitcherModel hostSwitchModel = new SwitcherModel(HOST_VIEW_KEYS);
-
         DataModelTraversal traversal = new DataModelTraversal(HOST_VIEW_KEYS);
-        hostViewModel = new DataTreeModel(asso, hostSwitchModel, traversal);
+        hostViewModel = new DataTreeModel(asso, traversal);
 
         return createPanel(hostViewModel, false);
     }
 
     private JPanel createVNView() {
-        SwitcherModel vnSwitchModel = new SwitcherModel(VN_VIEW_KEYS);
-
         DataModelTraversal traversal = new DataModelTraversal(VN_VIEW_KEYS);
-        vnViewModel = new DataTreeModel(asso, vnSwitchModel, traversal);
+        vnViewModel = new DataTreeModel(asso, traversal);
 
         return createPanel(vnViewModel, false);
     }
     
     private JPanel createCustomView() {
-        SwitcherModel customSwitchModel = new SwitcherModel(CUSTOM_VIEW_KEYS);
-
         DataModelTraversal traversal = new DataModelTraversal(CUSTOM_VIEW_KEYS);
-        customViewModel = new DataTreeModel(asso, customSwitchModel, traversal);
+        customViewModel = new DataTreeModel(asso, traversal);
 
         return createPanel(customViewModel, true);
     }

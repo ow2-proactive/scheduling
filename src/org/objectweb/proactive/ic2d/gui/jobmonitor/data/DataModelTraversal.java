@@ -1,25 +1,32 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import java.util.*;
-
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
 
 public class DataModelTraversal implements JobMonitorConstants
 {
-	private List keys;
-	private boolean[] hidden;
+	private Branch[] branches;
 	
-	public DataModelTraversal (int [] _keys)
+	public DataModelTraversal (int[] keys)
 	{
-		keys = new ArrayList();
-		for (int i = 0; i < _keys.length; i++)
-			keys.add(new Integer(_keys[i]));
-		
-		hidden = new boolean[_keys.length];
+		branches = new Branch[keys.length];
+		for (int i = 0; i < keys.length; i++)
+			branches[i] = new Branch(keys[i]);
 	}
 	
-	private int indexOf(int key) {
-		return keys.indexOf(new Integer(key));
+	public int getNbKey() {
+		return branches.length;
+	}
+	
+	public Branch getBranch(int index) {
+		return branches[index];
+	}
+	
+	public int indexOf(int key) {
+		for (int i = 0; i < branches.length; i++)
+			if (branches[i].getKey() == key)
+				return i;
+			
+		return -1;
 	}
 	
 	public boolean hasFollowingKey (int key)
@@ -39,9 +46,9 @@ public class DataModelTraversal implements JobMonitorConstants
 		}
 		
 		do {
-			if (newIndex == keys.size())
+			if (newIndex == branches.length)
 				return NO_KEY;
-			newKey = ((Integer) keys.get(newIndex)).intValue();
+			newKey = branches[newIndex].getKey();
 			newIndex++;
 		} while (isHidden(newKey));
 		
@@ -50,12 +57,24 @@ public class DataModelTraversal implements JobMonitorConstants
 	
 	public void setHidden(int key, boolean hide) {
 		if (key != NO_KEY)
-			hidden[KEY2INDEX[key]] = hide;
+			branches[indexOf(key)].setHidden(hide);
 	}
 	
 	public boolean isHidden(int key) {
 		if (key != NO_KEY)
-			return hidden[KEY2INDEX[key]];
+			return branches[indexOf(key)].isHidden();
+		
+		return false;
+	}
+	
+	public void setHighlighted(int key, boolean highlight) {
+		if (key != NO_KEY)
+			branches[indexOf(key)].setHighlighted(highlight);
+	}
+	
+	public boolean isHighlighted(int key) {
+		if (key != NO_KEY)
+			return branches[indexOf(key)].isHighlighted();
 		
 		return false;
 	}
@@ -64,11 +83,8 @@ public class DataModelTraversal implements JobMonitorConstants
 		int fromIndex = indexOf(fromKey);
 		int toIndex = indexOf(toKey);
 
-		boolean hiddenTmp = hidden[fromIndex];
-		hidden[fromIndex] = hidden[toIndex];
-		hidden[toIndex] = hiddenTmp;
-		
-		keys.set(fromIndex, new Integer(toKey));
-		keys.set(toIndex, new Integer(fromKey));
+		Branch tmp = branches[fromIndex];
+		branches[fromIndex] = branches[toIndex];
+		branches[toIndex] = tmp;
 	}
 }

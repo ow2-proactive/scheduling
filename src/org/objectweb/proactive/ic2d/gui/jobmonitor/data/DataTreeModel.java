@@ -2,25 +2,18 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
 import javax.swing.tree.DefaultTreeModel;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
 
 public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstants
 {
 	private DataAssociation asso;
 	private DataModelTraversal traversal;
-	private SwitcherModel smodel;
-	private boolean[] highlighted;
 	
-	public DataTreeModel (DataAssociation _asso, SwitcherModel _smodel, DataModelTraversal _traversal)
+	public DataTreeModel (DataAssociation _asso, DataModelTraversal _traversal)
 	{
 		super(new DataTreeNode(_traversal));
 		asso = _asso;
 		traversal = _traversal;
-		smodel = _smodel;
-		highlighted = new boolean[NB_KEYS];
-		
-		smodel.setTreeModel(this);
 	}
 	
 	public DataTreeNode root() {
@@ -44,28 +37,17 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		return asso;
 	}
 		
-	public SwitcherModel getSwitcherModel ()
-	{
-		return smodel;
-	}
-	
-	public void toggleHighlighted(int key) {
-		if (key != NO_KEY)
-			highlighted[KEY2INDEX[key]] = !highlighted[KEY2INDEX[key]];
+	public void setHighlighted(int key, boolean highlight) {
+		traversal.setHighlighted(key, highlight);
 	}
 	
 	public boolean isHighlighted(int key) {
-		if (key != NO_KEY)
-			return highlighted[KEY2INDEX[key]];
-
-		return false;
+		return traversal.isHighlighted(key);
 	}
 	
 	public void setHidden(int key, boolean hide) {
-		if (key != NO_KEY) {
-			traversal.setHidden(key, hide);
-			rebuild();
-		}
+		traversal.setHidden(key, hide);
+		rebuild();
 	}
 	
 	public boolean isHidden(int key) {
@@ -75,5 +57,17 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	public void exchange(int fromKey, int toKey) {
 		traversal.exchange(fromKey, toKey);
 		rebuild();
+	}
+	
+	public int getNbKey() {
+		return traversal.getNbKey();
+	}
+	
+	public Branch getBranch(int index) {
+		return traversal.getBranch(index);
+	}
+	
+	public int indexOfKey(int key) {
+		return traversal.indexOf(key);
 	}
 }
