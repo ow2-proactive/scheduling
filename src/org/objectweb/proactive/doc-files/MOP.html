@@ -41,7 +41,7 @@ open framework for implementing powerful libraries for the Java language.
 </p><p class="textNormal">
 As for any other element of ProActive, this MOP is entirely written in Java and does
 not require any modification or extension to the Java Virtual Machine, as opposed to
-other metaobject protocols for Java \cite{Kleinoeder96}. It makes extensive use of
+other metaobject protocols for Java {Kleinoeder96}. It makes extensive use of
 the Java Reflection API, thus requiring JDK 1.1 or higher. JDK 1.2 is required in
 order to suppress default Java language access control checks when executing reified
 non-public method or constructor calls.
@@ -170,9 +170,9 @@ using multiple inheritance in order to build new metabehaviors out of existing o
 
 <h2>Limitations</h2>
 <p class="textNormal">
-Due to its commitment to be a 100\% Java library, the MOP has a few limitations:
+Due to its commitment to be a 100% Java library, the MOP has a few limitations:
 <ul class="listWithSpace">
-    <li class="textNormal">Calls sent to instances of {\tt final} classes (which includes all arrays)
+    <li class="textNormal">Calls sent to instances of final classes (which includes all arrays)
 cannot be reified.</li>
     <li class="textNormal">Primitive types cannot be reified because they are not instance of a
 standard class.</li>

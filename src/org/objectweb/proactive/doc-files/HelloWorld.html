@@ -30,7 +30,7 @@
 
 <h1>Hello world ! example</h1>
 <p class="textNormal">
-This example implements a very simple client-server application. A client object display a <code>String</code> got from a remote server.
+This example implements a very simple client-server application. A client object display a <code>String</code> received from a remote server.
 We will see how to write classes from which active and remote objects can be created, how to find a remote object and how to invoke methods on remote objects.
 </p>
 <h2>The two classes</h2>
@@ -111,8 +111,8 @@ has to be contrasted with the RMI approach, where several more steps are needed:
 <h4>Why an empty no-arg constructor ?</h4>
 <p class="textNormal">
 You may have noticed that class <code>Hello</code> has a constructor with no parameters and an empty implementation. The presence of this empty no-arg
-constructor is imposed by ProActive and is actually a side-effect of ProActive's implementation of transparent of active remote objects (as a matter of fact, this
-side-effect is caused by ProActive being implemented on top of a 100% Java metaobject protocol). If no such constructor is provided, active objects could not be created.
+constructor is imposed by ProActive and is actually a side-effect of ProActive's transparent implementation of active remote objects (as a matter of fact, this
+side-effect is caused by ProActive being implemented on top of a 100% Java metaobject protocol). If no such constructor is provided, active objects cannot be created.
 <br></br>
 If no constructor at all is provided, active objects can still be created because, in this specific case, all Java compilers provide
 a default no-arg empty constructor. If a no-arg constructor is provided but its implementation is not empty, unwanted behavior may appear because the no-arg constructor
@@ -123,7 +123,7 @@ is always called when an active object is created, whatever code the user can wr
 <p class="textNormal">
 Now that we know how to write the class that implements the required server-side functionalities, let us see how to create the server object. In ProActive, there is actually no difference
 between a server and a client object as both are remote objects.Creating the active object is done through <i>instantiation-based creation</i>. We want
-this active object to be created on the current node, which is why the last parameter of <code>newActive</code> is set to <code>null</code>. In
+this active object to be created on the current node, which is why we use  <code>newActive</code> with only two parameters. In
 order for the client to obtain an initial reference onto this remote object, we need to register it in the registry (which is actually the well-known 
 <code>rmiregistry</code>) with a valid RMI URL.
 </p>

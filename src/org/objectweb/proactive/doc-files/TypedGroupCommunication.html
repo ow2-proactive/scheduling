@@ -80,7 +80,7 @@ vg.f1();
 Any object that is reifiable has the ability to be included in a
       group. Groups are created using the static method
       <code><a href="../core/group/ProActiveGroup.html#newGroup(java.lang.String)">ProActiveGroup.newGroup</a></code>.
-The  superclass common for all the group
+The  common superclass for all the group
 members has to be specified, thus giving the group a minimal type.
 <br><br>
 Let us take a standard Java class:
@@ -138,7 +138,7 @@ in the class A can be invoked on the group.
 
 <h2>Group representation and manipulation</h2>
 <p class="textNormal">
-The <b>typed group representation</b> we have presented in corresponds to the functional
+The <b>typed group representation</b> we have presented corresponds to the functional
 view of groups of objects.
 In order to provide a dynamic management of groups, a second
 and complementary representation of a group has been designed. In
@@ -215,7 +215,7 @@ vg.f1();
 </pre></blockquote>
 
 <p class="textNormal">
-As say in the Group creation section, groups whose type is based on final classes
+As said in the Group creation section, groups whose type is based on final classes
 or primitive types cannot be built. So, the construction of a  dynamic group 
 as a result of a group method call is also limited. 
 Consequently, only methods whose return type is either void or 
@@ -227,7 +227,7 @@ non-reifiable types fails.
 <br><br>
 
 To take advantage with the asynchronous remote method call model of ProActive, 
-some new synchronisation mechanisms have been added.
+some new synchronization mechanisms have been added.
 Static methods defined in the <code><a href="../core/group/ProActiveGroup.html">ProActiveGroup</a></code>
 class enable to execute various forms of synchronisation. For instance:
 <code><a href="../core/group/ProActiveGroup.html#waitOne(java.lang.Object)">waitOne</a></code>,

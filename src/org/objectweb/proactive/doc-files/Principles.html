@@ -30,14 +30,14 @@
 <h1>Principles</h1>
 
     <!-- Body -->
-    <h2><a name="intro"></a>Seamless sequential, multthreaded and distributed</h2>
+    <h2><a name="intro"></a>Seamless sequential, multithreaded and distributed</h2>
       <p class="textNormal">
       Most of the time, activities and distribution are not known at the beginning, and change over time. <b>Seamless implies reuse, smooth and incremental transitions</b>.</p>
     <div align="center"><img src="proActiveModelColor.gif"/></div><br>
       <p class="textNormal">
     A huge gap yet exists between multithreaded and distributed Java applications which forbids code reuse in order to build distributed
     applications from multithreaded applications. Both JavaRMI and JavaIDL, as examples of distributed object libraries in Java, put a heavy
-      burden on the programmer because they require deep modifications of existing code in order to turn local objects into remote-accessible
+      burden on the programmer because they require deep modifications of existing code in order to turn local objects into remote accessible
     ones. In these systems, remote objects need to be accessed through some specific interfaces. As a consequence, these distributed
     objects libraries do not allow polymorphism between local and remote objects. This feature is our first requirement for a metacomputing
       framework. It is strongly required in order to let the programmer concentrate first on modeling and algorithmic issues rather than
@@ -59,7 +59,7 @@ Object[] params = new Object[] { new Integer (26), "astring" };
 A a = (A) <font color="red">ProActive.newActive("example.A", params, node)</font>;
 </pre></blockquote>
 
-    <h3>Instanciation-based</h3>
+    <h3>Instantiation-based</h3>
     <blockquote><pre>
 public class AA extends A implements Active {}
 

@@ -96,7 +96,7 @@ storing these calls in a queue of pending calls (we also call <i>requests</i>.
 It also executes these calls in an order specified by
 a specific synchronization policy. If no specific synchronization
 policy is provided, calls are managed in a FIFO manner (first
-come, first served).
+come, first served)).
 </p><p class="textNormal">
 Then, the thread of an active object alternatively chooses a
 method in the queue of pending requests and executes it. It is
@@ -105,7 +105,7 @@ object. This is an important decision in the design of ProActive
  which enables the use of pre-post conditions and class
 invariants.
 </p><p class="textNormal">
-On the side of the subsystem which send a call to an active
+On the side of the subsystem which sends a call to an active
 object, this active object is represented by a <i>proxy</i>, whose
 main responsibility is to generate future objects for representing
 future values, transform calls into Request objects (in terms of

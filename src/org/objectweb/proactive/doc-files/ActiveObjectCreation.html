@@ -49,7 +49,7 @@ In <b>ProActive</b> there are two ways to create active objects. One way is to u
 </p>
 <h2>Instantiation-Based Creation</h2>
 <p class="textNormal">
-When using instantiation based creation, any argument passed to the constructor of the reified object through <code>ProActive.newActive</code> is serialized and passed by copy to the object. This is because the model behind <b>ProActive</b> is uniform whether the active object is instantiated locally or remotely. The parameters are therefore guarantee to be passed by copy to the constructor. When using <code>ProActive.newActive</code> you must make sure that the arguments of the constructor are <code>Serializable</code>. On the other hand, the class used to create the active object <b>does not need to be</b> <code>Serializable</code> even in the case the active object is created remotly. Remind also that to be created properly, the reified object must have a declared empty no-args constructor.
+When using instantiation based creation, any argument passed to the constructor of the reified object through <code>ProActive.newActive</code> is serialized and passed by copy to the object. This is because the model behind <b>ProActive</b> is uniform whether the active object is instantiated locally or remotely. The parameters are therefore guaranteed to be passed by copy to the constructor. When using <code>ProActive.newActive</code> you must make sure that the arguments of the constructor are <code>Serializable</code>. On the other hand, the class used to create the active object <b>does not need to be</b> <code>Serializable</code> even in the case of remotely created  active objects. Remind also that to be created properly, the reified object must have a declared empty no-args constructor.
 </p>
 <pre>
     A a;
@@ -132,7 +132,7 @@ Code for object-based creation looks like this :
 <p class="textNormal">
 As for <code>newActive</code>, the second parameter of <code>turnActive</code>
 if given is the location of the active object to be created. 
-No parameter or <code>null</code> means that the active object is created localy in the current
+No parameter or <code>null</code> means that the active object is created locally in the current
 node.
 </p><p class="textNormal">
 When using this method, the programmer has to make
@@ -146,7 +146,7 @@ could no more be guaranteed.
 
 <h2>Specifying the activity of an active object</h2>
 <p class="textNormal">
-Customizing the activity of the active object is at the core of ProActive because it allows to specify fully the behavior of an active object. By default, an object turned into an active object serves its incomming requests in a FIFO manner. In order to specify another policy for serving the requests or to speficy any other behaviors one can implement interfaces defining methods that will be automatically called by ProActive.
+Customizing the activity of the active object is at the core of ProActive because it allows to specify fully the behavior of an active object. By default, an object turned into an active object serves its incoming requests in a FIFO manner. In order to specify another policy for serving the requests or to specify any other behaviors one can implement interfaces defining methods that will be automatically called by ProActive.
 </p>
 <p class="textNormal">
 It is possible to specify what to do before the activity starts, what the activity is and what to do after it ends. The three steps are :
@@ -214,7 +214,7 @@ else
 
 <h3>Implementing the interfaces directly in the class used to create the active object</h3>
 <p class="textNormal">
-This is the easiest solution when you do control the class that you make active. Depending on which phase in the life of the active object you want to customize, you implement the corresponding interface (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>. Here an example that has a custom initialization and activity.
+This is the easiest solution when you do control the class that you make active. Depending on which phase in the life of the active object you want to customize, you implement the corresponding interface (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>. Here is an example that has a custom initialization and activity.
 </p>
 <p class="textNormal"><b>Example1: </b>
 <pre>
@@ -350,7 +350,7 @@ Some of these restrictions work at class-level :
     <li class="textNormal">Final classes cannot give birth to active object</li>
     <li class="textNormal">Same thing for non-public classes</li>
     <li class="textNormal">Classes without a no-argument constructor cannot be
-reified. This restriction will be softened in a latter release of
+reified. This restriction will be softened in a later release of
 ProActive</li>
 </ul>
 </p><p class="textNormal">
@@ -362,7 +362,7 @@ Some other happen at the level of a method in a specific class:
 </p>
 <h2>Using the Factory Method Design Pattern</h2>
 <p class="textNormal">
-Creating an active object using ProActive might be a little bit cumbersome and require more lines of code that for creating a regular object. A nice solution to this problem is through the use of the <b>factory</b> pattern. This mainly applies to class-based creation. It consists in adding a static method to class <code>pA</code> that takes care of instantiating the active object and returns it. The code is :
+Creating an active object using ProActive might be a little bit cumbersome and requires more lines of code that for creating a regular object. A nice solution to this problem is through the use of the <b>factory</b> pattern. This mainly applies to class-based creation. It consists in adding a static method to class <code>pA</code> that takes care of instantiating the active object and returns it. The code is :
 </p>
 <pre>
   public class AA extends A {
@@ -386,7 +386,7 @@ It is up to the programmer to decide whether this method has to throw exceptions
 <h3>Motivations</h3>
 <p class="textNormal">There are many cases where you may want to customize the body used when creating an active object. For instance, one may want to add some debug messages or some timing behavior when sending or receiving requests. The body is a non changeable object that delegates most of its tasks to helper objects called MetaObjects. Standard MetaObjects are already used by default in ProActive but one can easily replace any of those MetaObjects by a custom one.
 </p>
-<p class="textNormal">We have defined the <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> interface able to create factories for each of those MetaObject. This interface is implemented by <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> which provides all the default factories used in ProActive.
+<p class="textNormal">We have defined the <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> interface able to create factories for each of those MetaObjects. This interface is implemented by <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> which provides all the default factories used in ProActive.
 </p>
 <p class="textNormal">When creating an active object, as we saw above, it is possible to specify which <code>MetaObjectFactory</code> to use for that particular instance of active object being created. The class <a href="../ProActive.html">ProActive</a> provides extra <a href="../ProActive.html#newActive(java.lang.String, java.lang.Object[], org.objectweb.proactive.core.node.Node, org.objectweb.proactive.Active, org.objectweb.proactive.core.body.MetaObjectFactory)">newActive</a> and <a href="../ProActive.html#turnActive(java.lang.Object, org.objectweb.proactive.core.node.Node, org.objectweb.proactive.Active, org.objectweb.proactive.core.body.MetaObjectFactory)">turnActive</a> methods for that.
 </p>
@@ -427,7 +427,7 @@ public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
   } // end inner class MyRequestFactory
 }
 </pre></blockquote>
-<p class="textNormal">The factory above simply redefine the <code>RequestFactory</code> in order to make the body use a new type of request. The method <code>protected RequestFactory newRequestFactorySingleton()</code> is one convenience method that <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> to simplify the creation of factories as singleton. More explainations can be found in the javadoc of that class.
+<p class="textNormal">The factory above simply redefines the <code>RequestFactory</code> in order to make the body use a new type of request. The method <code>protected RequestFactory newRequestFactorySingleton()</code> is one convenience method that <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> to simplify the creation of factories as singleton. More explanations can be found in the javadoc of that class.
 The use of that new factory is fairly simple. All you have to do is to pass an instance of the factory when creating a new active object. If we take the same example as before we have :
 <pre>
   Object[] params = new Object[] {new Integer (26), "astring"};

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <title>MOP : Metaobject Protocol</title>
+  <title>FAQ</title>
   
   <link rel="stylesheet" href="ProActive.css">
 </head>
@@ -38,7 +38,7 @@
 <h1>Frequently Asked Questions</h1>
   
 <p class="textNormal"><b>Note:</b> This FAQ is under construction. If one
-of your question is not answered here, just  <a
+of your question is not answered here, just send it at  <a
  href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
 and we'll update the FAQ.</p>
       
@@ -152,7 +152,7 @@ script : </p>
  href="http://www.objectweb.org/asm/">ASM</a> for the on the fly generation
 of stub classes. The library <code>asm.jar</code>, provided in the directory
     <code>lib</code> of <b>ProActive</b> is needed in order for any active
-object to function properly. If the library if not in the <code>CLASSPATH</code>
+object to function properly. If the library is not in the <code>CLASSPATH</code>
 you will get the following exception or a similar one : </p>
     <pre>    Exception in thread "main" java.lang.NoClassDefFoundError: org/objectweb/asm/Constants<br>        at java.lang.ClassLoader.defineClass0(Native Method)<br>        at java.lang.ClassLoader.defineClass(ClassLoader.java:509)<br>        at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:123)<br>        at java.net.URLClassLoader.defineClass(URLClassLoader.java:246)<br>        at java.net.URLClassLoader.access$100(URLClassLoader.java:54)<br>        at java.net.URLClassLoader$1.run(URLClassLoader.java:193)<br>        at java.security.AccessController.doPrivileged(Native Method)<br>        at java.net.URLClassLoader.findClass(URLClassLoader.java:186)<br>        at java.lang.ClassLoader.loadClass(ClassLoader.java:306)<br>        at sun.misc.Launcher$AppClassLoader.loadClass(Launcher.java:265)<br>        at java.lang.ClassLoader.loadClass(ClassLoader.java:262)<br>        at java.lang.ClassLoader.loadClassInternal(ClassLoader.java:322)<br>        at org.objectweb.proactive.core.mop.MOP.&lt;clinit&gt;(MOP.java:88)<br>        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:836)<br>        at org.objectweb.proactive.ProActive.createStubObject(ProActive.java:830)<br>        at org.objectweb.proactive.ProActive.newActive(ProActive.java:255)<br>        at org.objectweb.proactive.ProActive.newActive(ProActive.java:180)<br>        at org.objectweb.proactive.examples.binarytree.TreeApplet.main(TreeApplet.java:103)<br></pre>
  
@@ -197,7 +197,7 @@ code using ProActive you may get the following exception or a similar one.
  href="http://java.sun.com/products/jdk/rmi/">RMI</a> as its underlying transport
 technology. Moreover it uses code downloading features to automatically move
 generated stub classes from one JVM to another one. For those reasons, ProActive
-needs to install a <code>SecurityManager</code> that control the execution
+needs to install a <code>SecurityManager</code> that controls the execution
 of the Java code based on a set of permissions given  to the JVM. Without
 explicit permissions nothing is granted for the code running outside <code>java.*</code>
 or <code>sun.*</code> packages. <br>
@@ -241,10 +241,10 @@ a lookup into a RMI registry. The class <code><a
     <p class="textNormal"> In order to start a node you can use the script
     <code>startNode</code> located in the <code>scripts</code> directory
 in the sub-directory <code>windows</code> or <code>unix</code>. At the moment,
-    <code>startNode</code> can only starts a node on the local machine. It
+    <code>startNode</code> can only start a node on the local machine. It
 is not possible to start a remote node using startNode. The reason is that
 starting a  node on a remote host implies the use of protocol such as RSH,
-SSH or rLogin that are platforms dependant and  that cannot be easily abstracted
+SSH or rLogin that are platform dependant and  that cannot be easily abstracted
 from java. We are working on that area at the moment with the XML-based deployment
 descriptor that will allow the remote creation of nodes using various protocol. 
     </p>
@@ -258,7 +258,7 @@ a new node </p>
     <p class="textNormal"> On host Y you can create an active object on host
 X </p>
  
-    <pre>  fr.inria.proactive.core.node.Node n = fr.inria.proactive.core.node.NodeFactory.getNode("//X/node1");<br>  ProActive.turnActive(myObject, n);<br></pre>
+    <pre>  org.objectweb.proactive.core.node.Node n = fr.inria.proactive.core.node.NodeFactory.getNode("//X/node1");<br>  ProActive.turnActive(myObject, n);<br></pre>
  
     <p class="textNormal"> You do not need to start any rmiregistry manually
 as they are started automatically as needed. </p>
@@ -288,10 +288,10 @@ node is generated based on a random number. </p>
     <h3>How does the RMI Registry creation happen ?</h3>
     </a> 
     <p class="textNormal"> <b>ProActive</b> relies on the RMI Registry for
-registering and discovering nodes. For this reason, the existance of a RMI
+registering and discovering nodes. For this reason, the existence of a RMI
 Registry is necessary for <b>ProActive</b> to be used. In order to simplify
 the deployment of <b>ProActive</b> applications, we have included the creation
-of the RMI Registry with the creation of nodes. Therefore, is no RMI Registry
+of the RMI Registry with the creation of nodes. Therefore, if no RMI Registry
 exists on the local machine, <b>ProActive</b> will automatically create one.
 If one exists, <b>ProActive</b> will automatically use it. </p>
  </li>
@@ -307,7 +307,7 @@ If one exists, <b>ProActive</b> will automatically use it. </p>
     </a> 
     <p class="textNormal"> In the RMI model, a class server is a HTTP Server
 able to answer simple HTTP requests for getting class files. It is needed
-in the case an object is sent to a remote location where the class the object
+in the case an object being sent to a remote location where the class the object
 belongs to is unknown. In such case, if the property <code>java.rmi.server.codebase</code>
 has been set properly to an existing class server, RMI will attempt to download
 the missing class files. </p>
@@ -316,7 +316,7 @@ the missing class files. </p>
 in memory, generated classes (the stubs), a class server is necessary for
 each JVM using active objects. For this reason, <b>ProActive</b> starts automatically
 one small class server per JVM. The launching and the use of this class server
-is transparent for you. </p>
+is transparent to you. </p>
  </li>
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
@@ -340,7 +340,7 @@ is FIFO. </p>
     <p class="textNormal"> The body of the active object should be the only
 object able to access directly the reified object. All other objects accessing
 the active object do so through the stub-proxy couple that eventually sends
-a request to the body. The body own its own thread that represent the activity
+a request to the body. The body owns its own thread that represent the activity
 of the active object.  </p>
  
     <p class="textNormal"> The body has two representations. One is local
@@ -367,7 +367,7 @@ active object. </p>
     <h3>What is a ProActive stub ?</h3>
     </a> 
     <p class="textNormal"> When you create an active object from a regular
-object, you get in return a reference on a automatically generated <b>ProActive</b>
+object, you get in return a reference on an automatically generated <b>ProActive</b>
 stub. <b>ProActive</b> uses <a href="http://jakarta.apache.org/bcel/">BCEL</a>
 to generate the stub on the fly. Suppose you have a class <code>A</code>
 and an instance <code>a</code> of this class. A way to turn the instance
@@ -411,10 +411,10 @@ attribute <code>a1</code> as the example below. </p>
 reference it through its associated stub (<a href="#stub">see definition
 of Stub</a>). The stub class inheriting from the reified class, it has also
 all its attributes. But those attributes are totally useless as the only
-role of the generated stub is to reify all public methods call into a request
+role of the generated stub is to reify every public methods call into a request
 passed to the associated proxy. Therefore accessing directly the attributes
 of an active object through its active reference would result in accessing
-the attributes of the generated stub. This certainly not the behavior one
+the attributes of the generated stub. This is certainly not the behavior one
 would expect. </p>
  
     <p class="textNormal"> The solution to this problem is very simple :
@@ -475,7 +475,7 @@ of the same <code>newActive</code> or <code>turnActive</code> methods allow
 you to specify where to create the active object (which node) and to customize
 its activity or its body (see questions below). </p>
  
-    <p class="textNormal"> Here a simple example creating an active object
+    <p class="textNormal"> Here is a simple example creating an active object
 of class <code>A</code> in the local JVM. If the invocation of the constructor
 of class <code>A</code> throws an exception, it is placed inside an exception
 of type <code>ActiveObjectCreationException</code>. When the call to <code>newActive</code>
@@ -505,7 +505,7 @@ and is based on the use of an existing object.</p>
 passed to the constructor of the reified object through <code>ProActive.newActive</code>
 is serialized and passed by copy to the object. This is because the model
 behind <b>ProActive</b> is uniform whether the active object is instantiated
-locally or remotely. The parameters are therefore guarantee to be passed
+locally or remotely. The parameters are therefore guaranteed to be passed
 by copy to the constructor. When using <code>ProActive.newActive</code> you
 must make sure that the arguments of the constructor are <code>Serializable</code>.
 On the other hand, the class used to create the active object <b>does not
@@ -649,7 +649,7 @@ the class that you make active. Depending on which phase in the life of the
 active object you want to customize, you implement the corresponding interface
 (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>,
     <code><a href="../RunActive.html">RunActive</a></code> and <code><a
- href="../EndActive.html">EndActive</a></code>. Here an example that has
+ href="../EndActive.html">EndActive</a></code>. Here is an example that has
 a custom initialization and activity. </p>
  
     <pre>  import org.objectweb.proactive.*;<br><br>  public class A implements InitActive, RunActive {<br>    private String myName;<br><br>    public String getName() {<br>      return myName;<br>    }<br><br>    // -- implements InitActive<br>    public void initActivity(Body body) {<br>      myName = body.getName();<br>    }<br><br>    // -- implements RunActive for serving request in a LIFO fashion<br>    public void runActivity(Body body) {<br>      Service service = new Service(Body);<br>      while (body.isActive()) {<br>        service.blockingServeYoungest();<br>      }<br>    }<br><br>    public static void main(String[] args) throws Exception {<br>      A a = (A) ProActive.newActive("A",null);<br>      System.out.println("Name = "+a.getName());<br>    }<br>  }<br></pre>
@@ -667,7 +667,7 @@ corresponding interface (one or more) amongst <code><a
  href="../EndActive.html">EndActive</a></code>. Here an example that has
 a custom activity. </p>
  
-    <p class="textNormal"> Comparing to the solution above where interfaces
+    <p class="textNormal"> Compared to the solution above where interfaces
 are directly implemented in the reified class, there is one restriction here
 : you cannot access the internal state of the reified object. Using an external
 object should therefore be used when the implementation of the activity is
@@ -696,11 +696,11 @@ in the <b>0.9.3</b> release </p>
  
     <p class="textNormal"> Up to <b>ProActive 0.9.3</b> the activity of an
 active object was given by a method <code>live(Body)</code> called by reflection
-of the reified object. Doing this way wouldn't allow compile time type checking
-of the method, was using reflection, wouldn't allow to externalize from the
-reified object its activity, wouldn't allow to give a custom activity to
-an active object created using <code>turnReified</code>. We addressed all
-those issues using the new mecanism based on the three interfaces <code><a
+of the reified object. Doing this way didn't allow compile time type checking
+of the method, was using reflection, didn't allow to externalize from the
+reified object its activity, didn't allow to give a custom activity to
+an active object created using <code>turnActive</code>. We addressed all
+those issues using the new mechanism based on the three interfaces <code><a
  href="../InitActive.html">InitActive</a></code>, <code><a
  href="../RunActive.html">RunActive</a></code> and <code><a
  href="../EndActive.html">EndActive</a></code>. </p>
@@ -710,7 +710,7 @@ containing a method <code>live</code> to the new interface you just need
 to : </p>
     <ul>
      <li>implement the new interface <code><a href="../RunActive.html">RunActive</a></code>
-(and remove <code>Active</code> if it was implemented</li>
+(and remove <code>Active</code> if it was implemented)</li>
      <li>changed the name of the method <code>live</code> to <code>runActivity</code></li>
  
     </ul>
@@ -737,7 +737,7 @@ to configure XML deployment descriptor are provided <a href="Descriptor.html">he
 <h3>Why do I get an exception when using <b>Jini </b>?</h3>
 </a>
 <p class="textNormal"></p>In order to get <b>Jini </b> working properly in ProActive, you have to put in your HOME directory a copy
-of proactive.java.policy located in ProActive/scripts/unix or windows. Indeed the rmid deamon need this file to start. If you try to use Jini without this policy file, it will not work.
+of proactive.java.policy located in ProActive/scripts/unix or windows. Indeed the rmid deamon needs this file to start. If you try to use Jini without this policy file, it will not work.
 Moreover, if you did it once, make sure that there is no file called machine_namejiniLockFile in your working directory. This file is usefull to avoid many Service Lookup to be created
  by concurrent threads. This file is removed automatically when a Lookup Service is created. If the application failed(for instance because of the policy file) it is possible that this file
 remains in the directory, in that case if you restart the application it will not work.  So checkout if this file is present in your working directory, if so remove it and restart the application</p>

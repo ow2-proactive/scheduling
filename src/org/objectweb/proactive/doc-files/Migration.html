@@ -37,8 +37,8 @@ a single primitive will eventually get called to perform the migration. It is th
 <code><a href="../core/body/migration/AbstractMigratableBody.html#migrateTo(org.objectweb.proactive.core.node.Node)">migrateTo</a></code>
 accessible from a migratable body (a body that inherits from <code><a href="../core/body/migration/AbstractMigratableBody.html">AbstractMigratableBody</a></code>).
 </p><p class="textNormal">
-In order to ease the use of the migration, we provide 2 set of static methods on the <code><a href="../ProActive.html">ProActive</a></code> class. The first 
-set is aimed at the migration triggered from the active object that wants to migrate. The methods rely of the fact that the calling thread <b>is</b> the 
+In order to ease the use of the migration, we provide 2 sets of static methods on the <code><a href="../ProActive.html">ProActive</a></code> class. The first 
+set is aimed at the migration triggered from the active object that wants to migrate. The methods rely on the fact that the calling thread <b>is</b> the 
 active thread of the active object :
 <ul class="listWithSpace">
 <li class="textNormal"><code><a href="../ProActive.html#migrateTo(java.lang.Object)">migrateTo(Object o)</a></code> : migrate to the same location as an existing active object</li>
@@ -58,9 +58,9 @@ Body of the active object it wants to migrate.
 <h2>Using migration</h2>
 <p class="textNormal">
 Any active object has the ability to migrate. If it references some passive objects, they will also migrate to the new location.
-Since we rely on the serialization to send the object on the network, <b>the active object must implements the serializable interface</b>.
+Since we rely on the serialization to send the object on the network, <b>the active object must implement the serializable interface</b>.
 To migrate, an active object must have a method which contains a call to the migration primitive. This call must be the last one in the
-method, i.e the method must returns immediately after. Here an example of a method in an active object :
+method, i.e the method must return immediately after. Here is an example of a method in an active object :
 </p>
 <blockquote><pre>
    public void moveTo(String t) {
@@ -124,12 +124,12 @@ Now to make this object move, you just have to call its <code>moveTo()</code> me
 The class SimpleAgent implements <code>Serializable</code> so the objects created will be able to migrate.
 We need to provide an empty constructor to avoid side effects during the creation of active objects.
 This object has two methods, <code>moveTo()</code> which makes it migrate to the specified location, 
-and <code>whereAreYou()</code> which return the hostname of the new location of the agent.
+and <code>whereAreYou()</code> which returns the hostname of the new location of the agent.
 </p>
 In the main method, we first need to create an active object, which is done through
 the call to <code>newActive()</code>. Once this is done, we can call
 methods on it as on any object. We call its <code>moveTo</code> method which
-will make it migrates to the node specified as parameter and then we ask it what is its current
+will make it migrate to the node specified as parameter and then we ask it what is its current
 location.
 
 <h2>Dealing with non-serializable attributes</h2>
