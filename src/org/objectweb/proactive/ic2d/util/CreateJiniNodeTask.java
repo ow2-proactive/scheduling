@@ -57,7 +57,7 @@ public class CreateJiniNodeTask implements Runnable {
     Node[] nodes;
     JiniNodeFinder finder = new JiniNodeFinder();
     nodes = finder.findNodes(host);
-    System.out.println("fin de la recherche NB de noeud: "+nodes.length);
+    //System.out.println("fin de la recherche NB de noeud: "+nodes.length);
     for (int i=0 ; i<nodes.length; i++){
       Node node = nodes[i];
       String nodeName = node.getNodeInformation().getName();
@@ -65,7 +65,7 @@ public class CreateJiniNodeTask implements Runnable {
       HostObject hostObject = worldObject.getHostObject(hostname);
       //System.out.println("hostObject: "+hostObject.getHostName());
       if (hostObject == null) {
-				System.out.println("CreateJiniNodeTask: creation d'un nouvel host");
+				//System.out.println("CreateJiniNodeTask: creation d'un nouvel host");
 				hostObject = new HostObject(worldObject, hostname);
 				worldObject.addHostsObject(hostObject);
 				worldObject.putChild(hostname, hostObject);
@@ -73,10 +73,10 @@ public class CreateJiniNodeTask implements Runnable {
       VMObject vmObject = hostObject.findVMObjectHavingExistingNode(nodeName);
       if (vmObject == null) {
 	// new NodeObject
-				System.out.println("CreateJiniNodeTask: creation d'une nouvelle VM ");
+				//System.out.println("CreateJiniNodeTask: creation d'une nouvelle VM ");
 				hostObject.addVMObject(node);
       } else {
-				System.out.println("CreateJiniNodeTask: creation d'un node dans une VM ");
+				//System.out.println("CreateJiniNodeTask: creation d'un node dans une VM ");
 				vmObject.addNodeObject(node);
 				vmObject.sendEventsForAllActiveObjects();
       }

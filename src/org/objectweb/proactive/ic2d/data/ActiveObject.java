@@ -68,6 +68,7 @@ public class ActiveObject extends AbstractDataObject {
     this.className = className;
     this.isActive = isActive;
     name = shortClassName(className)+"#"+counter(id);
+    //System.out.println("AO "+name+" created with Id "+id);
     this.id = id;
     //controller.log("ActiveObject "+className+" id="+id+" created.");
     if (isMonitoring()) monitoringMessageEventChanged(this, true);

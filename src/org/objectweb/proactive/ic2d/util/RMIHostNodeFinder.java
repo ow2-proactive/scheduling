@@ -124,7 +124,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
         try {
           nodes.add(new NodeImpl(new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj),"//"+host+"/"+list[i],"rmi"));
         } catch (ProActiveException e) {
-          log("Error while trying to create a RemoteNodeAdapter for "+list[i]);
+          log("Error while trying to create a RuntimeAdapter for "+list[i]+", check the version of ProActive or jdk");
         }
       }
      }

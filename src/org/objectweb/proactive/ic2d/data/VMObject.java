@@ -43,6 +43,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.event.SpyEventListener;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import java.rmi.dgc.VMID;
 
@@ -60,7 +61,7 @@ public class VMObject extends AbstractDataObject {
     } catch (java.net.UnknownHostException e) {
       currentHost = "localhost";
     }
-    System.out.println("current host: "+currentHost);
+    //System.out.println("current host: "+currentHost);
     try {
       SPY_LISTENER_NODE = NodeFactory.createNode("//"+currentHost+"/"+SPY_LISTENER_NODE_NAME, true);
     } catch (NodeException e) {
@@ -82,7 +83,7 @@ public class VMObject extends AbstractDataObject {
 
   public VMObject(HostObject host, VMID vmid, Node node) throws ActiveObjectCreationException, NodeException {
     super(host);
-    System.out.println("nodeURL : "+node.getNodeInformation().getURL());
+    //System.out.println("nodeURL : "+node.getNodeInformation().getURL());
     this.vmid = vmid;
     this.objectNodeMap = new java.util.HashMap();
     SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
@@ -308,11 +309,11 @@ public class VMObject extends AbstractDataObject {
   }
   
 
-  private String getNodeNameFromURL(String nodeURL) {
-    int n = nodeURL.indexOf('/', 2); // looking for the end of the host
-    if (n < 3) return nodeURL;
-    return nodeURL.substring(n+1);
-  }
+//  private String getNodeNameFromURL(String nodeURL) {
+//    int n = nodeURL.indexOf('/', 2); // looking for the end of the host
+//    if (n < 3) return nodeURL;
+//    return nodeURL.substring(n+1);
+//  }
   
   
   //
@@ -333,7 +334,9 @@ public class VMObject extends AbstractDataObject {
     //
   
     public void activeObjectAdded(UniqueID id, String nodeURL, String classname, boolean isActive) {
-      String nodeName = getNodeNameFromURL(nodeURL);
+      //String nodeName = getNodeNameFromURL(nodeURL);
+      String nodeName = UrlBuilder.getNameFromUrl(nodeURL);
+      //System.out.println("NodeName "+nodeName+" AO id "+id);
       NodeObject nodeObject = getNodeObject(nodeName);
       if (nodeObject != null) {
         nodeObject.addActiveObject(classname, id, isActive);
