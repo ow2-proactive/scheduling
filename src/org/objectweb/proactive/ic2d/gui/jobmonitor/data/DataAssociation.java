@@ -140,7 +140,6 @@ public class DataAssociation implements JobMonitorConstants {
 	 * Exemple : getValues(VN, "myVN", AO) ==> {"Object1", "Object2"}
 	 */
 	public Set getValues(int from, String name, int to) {
-		System.out.println(from + " - " + to);
 		if (to == from) {
 			Set res = new TreeSet();
 			res.add(name);
