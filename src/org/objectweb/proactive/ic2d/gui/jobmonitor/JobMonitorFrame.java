@@ -6,6 +6,8 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+
 public class JobMonitorFrame extends JFrame
 {
 	private static final int DEFAULT_WIDTH = 800;
@@ -13,12 +15,12 @@ public class JobMonitorFrame extends JFrame
 
 	private JobMonitorPanel panel;
 
-	public JobMonitorFrame ()
+	public JobMonitorFrame (IC2DGUIController controller)
 	{
 		super ("Job Monitoring");
 		setSize (new Dimension (DEFAULT_WIDTH, DEFAULT_HEIGHT));
 		
-		panel = new JobMonitorPanel ();
+		panel = new JobMonitorPanel (controller);
 		
 		Container c = getContentPane();
 		c.setLayout (new GridLayout (1, 1));
@@ -73,6 +75,7 @@ public class JobMonitorFrame extends JFrame
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
 	        {
+	        	System.out.println ("Set time to refresh asked");
 	        }
 	    });
 	    controlMenu.add(b);
@@ -82,6 +85,7 @@ public class JobMonitorFrame extends JFrame
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
 	        {
+	        	System.out.println ("Set depth control asked");
 	        }
 	    });
 	    controlMenu.add(b);

@@ -19,6 +19,7 @@ import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.*;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
@@ -35,6 +36,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	
 	private static final String EXTRACT_MENU_LABEL = "Extract view to a new window";
 	
+	private IC2DGUIController controller;
+	
 	private JTabbedPane tabs;
 	private Vector frames;
 	
@@ -47,9 +50,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private Vector monitoredHosts;
 	private Vector filteredJobs;
 	
-	public JobMonitorPanel ()
+	public JobMonitorPanel (IC2DGUIController _controller)
 	{		
 		setLayout (new GridLayout (1, 1));
+		
+		controller = _controller;
 		
 		aos = new HashMap();
 		monitoredHosts = new Vector();
@@ -334,16 +339,27 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 
 			System.out.println ("node " + (i + 1) + " / " + nodes.length + ": " + nodes [i] + 	" - vn name: " + vnName);
 			
-			ArrayList activeObjects = pr.getActiveObjects (nodeName);
+			ArrayList activeObjects = null;
+			try
+			{
+				activeObjects = pr.getActiveObjects (nodeName);
+			}
+			catch (ProActiveException e)
+			{
+				controller.log ("Unexpected ProActive exception caught while obtaining the active objects list", e);
+			}
 			
 			DataModelNode nodeVmA = handleVMNode (nodeName, vnName, vmA);
-			handleActiveObjects (nodeVmA, activeObjects);
+			if (activeObjects != null)
+				handleActiveObjects (nodeVmA, activeObjects);
 
 			DataModelNode nodeVmB = handleVMNode (nodeName, vnName, vmB);
-			handleActiveObjects (nodeVmB, activeObjects);
+			if (activeObjects != null)
+				handleActiveObjects (nodeVmB, activeObjects);
 
 			DataModelNode nodeJob = handleJobNode (hostname, vmName, nodeName, vnName, job);
-			handleActiveObjects (nodeJob, activeObjects);
+			if (activeObjects != null)
+				handleActiveObjects (nodeJob, activeObjects);
 		}
 	}
 

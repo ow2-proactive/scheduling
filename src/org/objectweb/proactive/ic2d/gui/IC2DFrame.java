@@ -259,7 +259,7 @@ public void activeObjectAdded(ActiveObject activeObject) {
   }
 
   private JobMonitorFrame createJobMonitorFrame () {
-	  final JobMonitorFrame frame = new JobMonitorFrame ();
+	  final JobMonitorFrame frame = new JobMonitorFrame (controller);
 	  frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
 	  // Listeners
 	  frame.addWindowListener(new java.awt.event.WindowAdapter() {
