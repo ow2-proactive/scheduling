@@ -12,6 +12,65 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for infrastructure/processes/processDefinition element-->
 		</xs:unique>
+		<xs:keyref name="VirtNodeName" refer="vnName">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@name"/>
+		</xs:keyref>
+		<xs:keyref name="vnNameinAcquisitionPart" refer="virtualNodeNameForLookup">
+			<xs:selector xpath="componentDefinition/virtualNodesAcquisition/virtualNode"/>
+			<xs:field xpath="@name"/>
+			<!--This section references the virtualNodeNameForLookup key defined above to ensure that the value of attribute name in virtualNodeAcquisition/virtualNode element will have the corresponding definition in deployment/lookup@virtualNode -->
+		</xs:keyref>
+		<xs:keyref name="vnNameinRegisterPart" refer="virtualNodeDefinitionName">
+			<xs:selector xpath="deployment/register"/>
+			<xs:field xpath="@virtualNode"/>
+			<!--This section references the virtualNodeDefinitionName key defined above to ensure that the virtualNode attribute of element register has a corresponding value defined in attribute name of  componentDefinition/virtualNodesDefinition/virtualNode-->
+		</xs:keyref>
+		<xs:keyref name="vmNameinMappingPart" refer="jvmNameinJvmsPart">
+			<xs:selector xpath="deployment/mapping/map/jvmSet/vmName"/>
+			<xs:field xpath="@value"/>
+			<!--This section references the jvmNameinJvmsPart key defined above to ensure that the value attribute of element mapping/map/jvmSet/vmName has a corresponding value defined in attribute name of  jvms/jvm-->
+		</xs:keyref>
+		<xs:keyref name="vnNameinLookupPart" refer="virtualNodeAcquisitionName">
+			<xs:selector xpath="deployment/lookup"/>
+			<xs:field xpath="@virtualNode"/>
+			<!--This section references the virtualNodeAcquisitionName key defined above to ensure that the virtualNode attribute of element lookup  has a corresponding value defined in attribute name of  componentDefinition/virtualNodesAcquisition/virtualNode-->
+		</xs:keyref>
+		<xs:keyref name="processReferenceid" refer="processid">
+			<xs:selector xpath="deployment/jvms/jvm/creation/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="rshprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/rshProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="MapRshprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/maprshProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/maprshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="sshprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/sshProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This sectionreferences the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/sshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="rloginprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/rloginProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rloginProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="bsubprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/bsubProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/bsubProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="globusprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/globusProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:key name="virtualNodeDefinitionName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
@@ -69,66 +128,14 @@ The following element ProActiveDescriptor defines the root of the schema
 					<xs:field xpath="@name"/>
 					<!-- uniqueness of every name attribute in the component definition part -->
 				</xs:unique>
-				<xs:keyref name="VirtNodeName" refer="vnName">
+				<!--<xs:keyref name="VirtNodeName" refer="vnName">
 					<xs:selector xpath="virtualNodesDefinition/virtualNode"/>
-					<xs:field xpath="@name"/>
-					<!--This section references the vnName key defined above to ensure that the value of attribute name in virtualNodeDefinition/virtualNode element will have the corresponding definition in deployment/mapping/map@virtualNode -->
-				</xs:keyref>
-				<xs:keyref name="vnNameinAcquisitionPart" refer="virtualNodeNameForLookup">
-					<xs:selector xpath="virtualNodesAcquisition/virtualNode"/>
-					<xs:field xpath="@name"/>
-					<!--This section references the virtualNodeNameForLookup key defined above to ensure that the value of attribute name in virtualNodeAcquisition/virtualNode element will have the corresponding definition in deployment/lookup@virtualNode -->
-				</xs:keyref>
+					<xs:field xpath="@name"/> -->
+				<!--This section references the vnName key defined above to ensure that the value of attribute name in virtualNodeDefinition/virtualNode element will have the corresponding definition in deployment/mapping/map@virtualNode -->
+				<!-- </xs:keyref>-->
 			</xs:element>
-			<xs:element name="deployment" type="DeploymentType">
-				<xs:keyref name="vnNameinRegisterPart" refer="virtualNodeDefinitionName">
-					<xs:selector xpath="register"/>
-					<xs:field xpath="@virtualNode"/>
-					<!--This section references the virtualNodeDefinitionName key defined above to ensure that the virtualNode attribute of element register has a corresponding value defined in attribute name of  componentDefinition/virtualNodesDefinition/virtualNode-->
-				</xs:keyref>
-				<xs:keyref name="vmNameinMappingPart" refer="jvmNameinJvmsPart">
-					<xs:selector xpath="mapping/map/jvmSet/vmName"/>
-					<xs:field xpath="@value"/>
-					<!--This section references the jvmNameinJvmsPart key defined above to ensure that the value attribute of element mapping/map/jvmSet/vmName has a corresponding value defined in attribute name of  jvms/jvm-->
-				</xs:keyref>
-				<xs:keyref name="vnNameinLookupPart" refer="virtualNodeAcquisitionName">
-					<xs:selector xpath="lookup"/>
-					<xs:field xpath="@virtualNode"/>
-					<!--This section references the virtualNodeAcquisitionName key defined above to ensure that the virtualNode attribute of element lookup  has a corresponding value defined in attribute name of  componentDefinition/virtualNodesAcquisition/virtualNode-->
-				</xs:keyref>
-				<xs:keyref name="processReferenceid" refer="processid">
-					<xs:selector xpath="jvms/jvm/creation/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-			</xs:element>
-			<xs:element name="infrastructure" type="InfrastructureType">
-				<xs:keyref name="rshprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/rshProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="sshprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/sshProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This sectionreferences the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/sshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="rloginprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/rloginProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rloginProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="bsubprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/bsubProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/bsubProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="globusprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/globusProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-			</xs:element>
+			<xs:element name="deployment" type="DeploymentType"/>
+			<xs:element name="infrastructure" type="InfrastructureType"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--component definition element has one child, that is a group of element, one element(or many) of the group has to appear at least once or more -->
@@ -161,7 +168,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--virtualNode of type VirtualNodeExtType is an exyension of VirtualNodeType. It has another attribute: property that may not appear and can take four defined values. This attribute just aims to provide informations about the virtualNode, in case of different people writing different part of the document. If property unique is set whereas the virtualNode has more than one machine defined in the jvmSet element, an exception will be generated when parsing the document, even if the document is valid against the schema. -->
+	<!--virtualNode of type VirtualNodeExtType is an exyension of VirtualNodeType. It has two other attributes: property that may not appear and can take four defined values. This attribute just aims to provide informations about the virtualNode, in case of different people writing different part of the document. If property unique is set whereas the virtualNode has more than one machine defined in the jvmSet element, an exception will be generated when parsing the document, even if the document is valid against the schema. The other attribute is timeout, its value is defined in second. When activating the virtualNode, if this attribute is set, the VirtualNode will wait until timeout expires before giving access to all its nodes -->
 	<xs:complexType name="VirtualNodeExtType">
 		<xs:complexContent>
 			<xs:extension base="VirtualNodeType">
@@ -175,6 +182,7 @@ The following element ProActiveDescriptor defines the root of the schema
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
+				<xs:attribute name="timeout" type="xs:positiveInteger" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -303,6 +311,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:choice>
 			<xs:element name="jvmProcess" type="JvmProcessType"/>
 			<xs:element name="rshProcess" type="RshProcessType"/>
+			<xs:element name="maprshProcess" type="MapRshProcessType"/>
 			<xs:element name="sshProcess" type="SshProcessType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
@@ -316,6 +325,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="log4jpropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
@@ -374,6 +384,22 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
+	<!--maprshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote hosts with rsh protocol a jvm will be created on the remote host.This element has also  a scriptPath child which represents the location of the script oasis-exp.sh and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.rsh.maprsh.MapRSHProcess,  netgroup which is required and represents  group of remote hosts to log on with rsh. and parallelize which is optional and represents the parallelization degree -->
+	<xs:complexType name="MapRshProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference" minOccurs="0"/>
+			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="parallelize" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="hostname" type="HostListType" use="required"/>
+	</xs:complexType>
 	<!--sshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id).and environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.ssh.SSHJVMProcess or org.objectweb.proactive.core.process.ssh.SSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with ssh-->
 	<xs:complexType name="SshProcessType">
 		<xs:sequence>
@@ -400,13 +426,26 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.RLoginProcess"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and one attribute: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess.This element will be used to run bsub command-->
+	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference" minOccurs="0"/>
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
+		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="queue" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal"/>
+					<xs:enumeration value="priority"/>
+					<xs:enumeration value="night"/>
+					<xs:enumeration value="short"/>
+					<xs:enumeration value="idle"/>
+					<xs:enumeration value="exclusive"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="BsubOptionType">
