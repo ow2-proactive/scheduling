@@ -4,14 +4,14 @@
 # This variable should be set to the directory where is installed ProActive
 #
 
-if [ ! $PROACTIVE ]
+if [ -z "$PROACTIVE" ]
 then
 workingDir=`dirname $0`
 PROACTIVE=$workingDir/../../.
 CLASSPATH=.
 fi
 
-
+ 
 # ----------------------------------------------------------------------------
 
 JAVA_HOME=${JAVA_HOME-NULL};
@@ -37,78 +37,97 @@ if [ -f $PROACTIVE/ProActive.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive.jar
 fi
-if [ -f $PROACTIVE/lib/bcel.jar ]
+if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
 fi
 if [ -f $PROACTIVE/lib/asm.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 fi
-if [ -f $PROACTIVE/ProActive_examples.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
-fi
-if [ -f $PROACTIVE/ic2d.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
-fi
-if [ -f $PROACTIVE/lib/jini-core.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-core.jar
-fi
-if [ -f $PROACTIVE/lib/jini-ext.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-ext.jar
-fi
-if [ -f $PROACTIVE/lib/reggie.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
-fi
-if [ -f $PROACTIVE/lib/cog-jglobus.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog-jglobus.jar
-fi
-if [ -f $PROACTIVE/lib/cryptix.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix.jar
-fi
-if [ -f $PROACTIVE/lib/cryptix32.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix32.jar
-fi
 if [ -f $PROACTIVE/lib/log4j.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j.jar
-fi
-if [ -f $PROACTIVE/lib/ibis.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ibis.jar
 fi
 if [ -f $PROACTIVE/lib/xercesImpl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xercesImpl.jar
 fi
-if [ -f $PROACTIVE/lib/components/fractal.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal.jar
-fi
-if [ -f $PROACTIVE/lib/cryptix-asn1.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix-asn1.jar
-fi
-if [ -f $PROACTIVE/lib/puretls.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/puretls.jar
-fi
-if [ -f $PROACTIVE/lib/cog-ogce.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog-ogce.jar
-fi
 if [ -f $PROACTIVE/lib/bouncycastle.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bouncycastle.jar
 fi
+if [ -f $PROACTIVE/lib/components/fractal.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal.jar
+fi
+if [ -f $PROACTIVE/ic2d.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
+fi
+if [ -f $PROACTIVE/lib/bcel.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+fi
+
+#--------------------------------------------------
+# jar to set when using RMI/SSH
+if [ -f $PROACTIVE/lib/jsch.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
+fi
+
+#--------------------------------------------------
+# jars to set when using Jini
+if [ -f $PROACTIVE/lib/jini/jini-core.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/jini-core.jar
+fi
+if [ -f $PROACTIVE/lib/jini/jini-ext.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/jini-ext.jar
+fi
+if [ -f $PROACTIVE/lib/jini/reggie.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini/reggie.jar
+fi
+
+#--------------------------------------------------
+# jars to set when using Globus
+if [ -f $PROACTIVE/lib/globus/cog-jglobus.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cog-jglobus.jar
+fi
+if [ -f $PROACTIVE/lib/globus/cryptix.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cryptix.jar
+fi
+if [ -f $PROACTIVE/lib/globus/cryptix32.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cryptix32.jar
+fi
+if [ -f $PROACTIVE/lib/globus/cryptix-asn1.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cryptix-asn1.jar
+fi
+if [ -f $PROACTIVE/lib/globus/puretls.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/puretls.jar
+fi
+if [ -f $PROACTIVE/lib/globus/cog-ogce.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cog-ogce.jar
+fi
+
+#--------------------------------------------------
+# jar to set when using Ibis
+if [ -f $PROACTIVE/lib/ibis/ibis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ibis/ibis.jar
+fi
+
+#--------------------------------------------------
+# jars to set when using Fractal GUI
 if [ -f $PROACTIVE/lib/components/fractal-adl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-adl.jar
@@ -145,14 +164,55 @@ if [ -f $PROACTIVE/lib/components/SVGGraphics.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/SVGGraphics.jar
 fi
-if [ -f $PROACTIVE/lib/jsch.jar ]
+
+#--------------------------------------------------
+# jars to set when using Web Services
+if [ -f $PROACTIVE/lib/ws/soap.jar ] 
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/soap.jar
+fi
+if [ -f $PROACTIVE/lib/ws/wsdl4j.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/wsdl4j.jar
+fi
+
+if [ -f $PROACTIVE/lib/ws/axis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/axis.jar
+fi
+if [ -f $PROACTIVE/lib/ws/jaxrpc.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/jaxrpc.jar
+fi
+if [ -f $PROACTIVE/lib/ws/activation.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/activation.jar
+fi
+if [ -f $PROACTIVE/lib/ws/saaj-api.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/saaj-api.jar
+fi 
+
+if [ -f $PROACTIVE/lib/ws/commons-logging.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/commons-logging.jar
+fi
+if [ -f $PROACTIVE/lib/ws/commons-discovery.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/commons-discovery.jar
+fi
+if [ -f $PROACTIVE/lib/ws/mail.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/mail.jar
 fi
 
  
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.library.path=$PROACTIVE/lib -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
+
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
 export JAVACMD
+
+
+
