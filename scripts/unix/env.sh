@@ -84,22 +84,17 @@ if [ -f $PROACTIVE/lib/log4j-core.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
 fi
-if [ -f $PROACTIVE/lib/jaxp.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jaxp.jar
-fi
-if [ -f $PROACTIVE/lib/crimson.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/crimson.jar
-fi
 if [ -f $PROACTIVE/lib/ibis.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ibis.jar
 fi
-CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
+if [ -f $PROACTIVE/lib/xercesImpl.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xercesImpl.jar
+fi
 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy"
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
 export JAVACMD
