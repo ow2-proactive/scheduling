@@ -241,6 +241,12 @@ The component will be instantiated on the virtual node it specified (or the one 
     <p>When specifying "null" as the name of an exported virtual node, the components will be deployed on the current virtual machine. This can be useful for debugging purposes.</p>
 <br>
     <p>This new ADL will facilitate integration with other tools from the Fractal community, notably the Fractal GUI and the packaging tools. We are currently finalizing an extension of the FractalGUI for ProActive.</p>
+
+<h3>Usage</h3>
+<p>The parser is launched from the <code>org.objectweb.proactive.core.component.adl.Launcher</code> class :</p>
+<pre class="snippet">Launcher [-java|-fractal] &#060;definition&#062; [ &#060;itf&#062; ] [deployment-descriptor]) </pre>
+<p>where [-java|-fractal] comes from the Fractal ADL Launcher (put -fractal for ProActive components, this will be made optional for ProActive components in the next release), &#060;definition&#062; is the name of the component to be instantiated and started, &#060;itf&#062; is the name of its Runnable interface, if it has one, and &#060;deployment-descriptor&#062; the location of the ProActive deployment descriptor to use.
+It is also possible to use this class directly from its static main method.</p>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
@@ -606,6 +612,7 @@ History :<BR>
 March 2004 : 1st version<br>
 June 2004 : typo fix (bindFc method in "conformance ... / collective bindings" references i, not i2)<br>
 November 2004 : updated ADL documentation and examples ; updated perspectives ; super controller now included (not a limitation anymore)
+February 2005 : added ADL parser usage
 </i></p>
 
 <!--
