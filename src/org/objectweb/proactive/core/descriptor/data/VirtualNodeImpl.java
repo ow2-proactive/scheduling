@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
@@ -405,7 +406,13 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	ExternalProcess processImpl = process;
   	ExternalProcessDecorator processImplDecorator;
   	JVMProcess jvmProcess;
+  	LSFBSubProcess bsub = null;
   	while(ExternalProcessDecorator.class.isInstance(processImpl)){
+  		if(processImpl instanceof LSFBSubProcess){
+  			//if the process is bsub we have to increase the node count by the number of processors
+  			bsub = (LSFBSubProcess)processImpl;
+  			increaseNodeCount((new Integer(bsub.getProcessorNumber()).intValue()));
+  		}
   		processImplDecorator = (ExternalProcessDecorator)processImpl;
   		processImpl = processImplDecorator.getTargetProcess();
   	}
@@ -418,8 +425,13 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   		String vnName = this.name;
   		String acquisitionMethod = vm.getAcquisitionMethod();
   		String nodeNumber = vm.getNodeNumber();
+  		
   		//we increment the index of nodecount
+  		if(bsub == null){
+  			//if bsub is null we can increase the nodeCount
   		increaseNodeCount((new Integer(nodeNumber)).intValue());
+  		}
+  		
   		//System.out.println("Aquisition method :"+acquisitionMethod);
   		//System.out.println(vnName);
   		String localruntimeURL = proActiveRuntimeImpl.getURL();
@@ -467,6 +479,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   
   private void increaseNodeCount(int n){
   	nodeCount = nodeCount + n;
+  	//System.out.println("NodeCount: "+nodeCount);
   }
 
   
