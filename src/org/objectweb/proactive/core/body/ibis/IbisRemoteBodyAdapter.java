@@ -36,14 +36,28 @@ package org.objectweb.proactive.core.body.ibis;
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to another remote objects library.
  */
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
+import org.objectweb.proactive.ext.security.Policy;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 
 
 public class IbisRemoteBodyAdapter implements UniversalBody,
@@ -171,7 +185,7 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request r) throws java.io.IOException {
+    public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException  {
         proxiedRemoteBody.receiveRequest(r);
     }
 
@@ -221,6 +235,120 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
         throws java.io.IOException {
         return proxiedRemoteBody.getProActiveComponent();
     }
+
+	// SECURITY
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(org.objectweb.proactive.core.body.UniversalBody)
+	 */
+	public void initiateSession(int type,UniversalBody body) throws IOException, CommunicationForbiddenException, AuthenticationException, RenegotiateSessionException, SecurityNotAvailableException {
+		proxiedRemoteBody.initiateSession(type,body);
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
+	 */
+	public void terminateSession(long sessionID) throws IOException, SecurityNotAvailableException {
+proxiedRemoteBody.terminateSession(sessionID)		;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getCertificate()
+	 */
+	public X509Certificate getCertificate() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getCertificate();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveSecurityManager()
+	 */
+	public ProActiveSecurityManager getProActiveSecurityManager() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getProActiveSecurityManager();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyFrom(java.security.cert.X509Certificate)
+	 */
+	public Policy getPolicyFrom(X509Certificate certificate) throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getPolicyFrom(certificate);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Policy)
+	 */
+	public long startNewSession(Communication policy) throws SecurityNotAvailableException, IOException, RenegotiateSessionException {
+		return proxiedRemoteBody.startNewSession(policy);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#negociateKeyReceiverSide(org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket, long)
+	 */
+	public ConfidentialityTicket negociateKeyReceiverSide(ConfidentialityTicket confidentialityTicket, long sessionID) throws SecurityNotAvailableException, KeyExchangeException, IOException {
+		return proxiedRemoteBody.negociateKeyReceiverSide(confidentialityTicket,sessionID);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getPublicKey()
+	 */
+	public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getPublicKey();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
+	 */
+	public byte[] randomValue(long sessionID, byte[] cl_rand) throws SecurityNotAvailableException, Exception {
+		return proxiedRemoteBody.randomValue(sessionID,cl_rand);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
+	 */
+	public byte[][] publicKeyExchange(long sessionID, UniversalBody distantBody, byte[] my_pub, byte[] my_cert, byte[] sig_code) throws SecurityNotAvailableException, Exception, RenegotiateSessionException {
+		return proxiedRemoteBody.publicKeyExchange(sessionID,distantBody,my_pub,my_cert,sig_code);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
+	 */
+	public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1, byte[] tmp2, byte[] tmp3, byte[] tmp4) throws SecurityNotAvailableException, Exception, RenegotiateSessionException {
+		return proxiedRemoteBody.secretKeyExchange(sessionID,tmp,tmp1,tmp2,tmp3,tmp4);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyTo(java.lang.String, java.lang.String, java.lang.String)
+	 */
+	public Communication getPolicyTo(String type, String from, String to) throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getPolicyTo(type,from,to);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+	 */
+	public SecurityContext getPolicy(SecurityContext securityContext) throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getPolicy(securityContext);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
+	 */
+	public String getVNName() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getVNName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+	 */
+	public byte[] getCertificateEncoded() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getCertificateEncoded();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
+	 */
+	public ArrayList getEntities() throws SecurityNotAvailableException, IOException {
+		return proxiedRemoteBody.getEntities();
+	}
 
     //
     // -- PRIVATE METHODS -----------------------------------------------

@@ -80,6 +80,9 @@ public class JVMProcessImpl extends AbstractExternalProcess
             "user.dir") + FILE_SEPARATOR + LOG4J_FILE;
     public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
+    
+	private final static String PROACTIVE_POLICYFILE_OPTION = " -Dproactive.runtime.security=";
+    
     protected String classpath = DEFAULT_CLASSPATH;
     protected String bootClasspath;
     protected String javaPath = DEFAULT_JAVAPATH;
@@ -249,6 +252,15 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(LOG4J_OPTION);
             javaCommand.append(log4jFile);
         }
+		// append proactive policy File
+	   // if (securityFile != null) {
+	   //      javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
+	   //      javaCommand.append(securityFile);
+	   //  }// else if (System.getProperty("proactive.runtime.security") != null) {
+	     //    javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
+	    //      javaCommand.append(System.getProperty("proactive.runtime.security"));
+	//	 }
+
 
         // append classname
         javaCommand.append(" ");

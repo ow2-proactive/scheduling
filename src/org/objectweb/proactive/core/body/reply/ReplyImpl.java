@@ -30,11 +30,18 @@
 */ 
 package org.objectweb.proactive.core.body.reply;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInputStream;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 
 
 public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializable {
@@ -44,10 +51,24 @@ public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializabl
    */
   protected Object result;
   
+  //security  features
+
+   /**
+	* the encrypted result
+	*/
+   protected byte[][] encryptedResult;
+
+
+   /*
+	* the session ID used to find the key and decrypt the reply
+	*/
+   protected long sessionID;
+   protected transient ProActiveSecurityManager psm = null;
   
-  public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, Object result) {
+  public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, Object result, ProActiveSecurityManager psm) {
     super(senderID, sequenceNumber, true, methodName);
     this.result = result;
+	this.psm = psm;
   }
 
   public Object getResult() {
@@ -64,6 +85,64 @@ public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializabl
   	if (isLocal) {
   		result = Utils.makeDeepCopy(result);
   	}
+	// security issue	
+	   //	System.out.println("ReplyImpl send : Current Thread " + Thread.currentThread().getName() + " result : " + result + "!");
+	   if (!ciphered) {
+		   long sessionID = 0;
+
+		   try {
+			   sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
+
+			   if (sessionID == 0) {
+				   psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO, destinationBody);
+				   sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
+			   }
+
+			   if (sessionID != 0) {
+				   encryptedResult = psm.encrypt(sessionID, result);
+
+				   ciphered = true;
+				   this.sessionID = sessionID;
+			   }
+
+			   //   result = null;
+		   } catch (SecurityNotAvailableException e) {
+			   // do nothing 
+		   } catch (Exception e) {
+			   e.printStackTrace();
+		   }
+	   }
+
+	   // end security
     destinationBody.receiveReply(this);
   }
+  
+  // security issue
+  public boolean isCiphered() {
+	  return ciphered;
+  }
+
+  public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException {
+	  if ((sessionID != 0) && ciphered) {
+		  byte[] decryptedMethodCall = psm.decrypt(sessionID, encryptedResult);
+		  try {
+			  ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
+			  ObjectInputStream in = new ObjectInputStream(bin);
+			  result = (Object) in.readObject();
+			  in.close();
+			  return true;
+		  } catch (Exception e) {
+			  e.printStackTrace();
+		  }
+	  }
+
+	  return false;
+  }
+
+/* (non-Javadoc)
+ * @see org.objectweb.proactive.core.body.reply.Reply#getSessionId()
+ */
+public long getSessionId() {
+	return sessionID;
+}
 }

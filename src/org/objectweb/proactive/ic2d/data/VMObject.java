@@ -66,7 +66,8 @@ public class VMObject extends AbstractDataObject {
     }
     //System.out.println("current host: "+currentHost);
     try {
-      SPY_LISTENER_NODE = NodeFactory.createNode("//"+currentHost+"/"+SPY_LISTENER_NODE_NAME, true);
+    	// TODO add security here
+      SPY_LISTENER_NODE = NodeFactory.createNode("//"+currentHost+"/"+SPY_LISTENER_NODE_NAME, true,null,null);
     } catch (NodeException e) {
       SPY_LISTENER_NODE = null;
     }

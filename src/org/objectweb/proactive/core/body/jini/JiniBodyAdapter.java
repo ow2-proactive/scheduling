@@ -30,12 +30,28 @@
 */
 package org.objectweb.proactive.core.body.jini;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
+import org.objectweb.proactive.ext.security.Policy;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 
 
 /**
@@ -158,7 +174,7 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request r) throws java.io.IOException {
+    public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException {
         proxiedJiniBody.receiveRequest(r);
     }
 
@@ -208,6 +224,106 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
         // COMPONENTS
         return proxiedJiniBody.getProActiveComponent();
     }
+
+	// SECURITY
+
+	public void initiateSession(int type,UniversalBody body)
+		throws RemoteException, IOException, CommunicationForbiddenException, 
+			AuthenticationException, RenegotiateSessionException, 
+			SecurityNotAvailableException {
+		proxiedJiniBody.initiateSession(type, body);
+	}
+
+	public void terminateSession(long sessionID)
+		throws java.io.IOException, SecurityNotAvailableException {
+		proxiedJiniBody.terminateSession(sessionID);
+	}
+
+	public X509Certificate getCertificate()
+		throws java.io.IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getCertificate();
+	}
+
+	public ProActiveSecurityManager getProActiveSecurityManager()
+		throws java.io.IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getProActiveSecurityManager();
+	}
+
+	public Policy getPolicyFrom(X509Certificate certificate)
+		throws java.io.IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getPolicyFrom(certificate);
+	}
+
+	public long startNewSession(Communication policy)
+		throws IOException, RenegotiateSessionException, 
+			SecurityNotAvailableException {
+		return proxiedJiniBody.startNewSession(policy);
+	}
+
+	public ConfidentialityTicket negociateKeyReceiverSide(
+		ConfidentialityTicket confidentialityTicket, long sessionID)
+		throws java.io.IOException, KeyExchangeException, 
+			SecurityNotAvailableException {
+		return proxiedJiniBody.negociateKeyReceiverSide(confidentialityTicket,
+			sessionID);
+	}
+
+	public PublicKey getPublicKey()
+		throws java.io.IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getPublicKey();
+	}
+
+	public byte[] randomValue(long sessionID, byte[] cl_rand)
+		throws Exception, SecurityNotAvailableException {
+		return proxiedJiniBody.randomValue(sessionID, cl_rand);
+	}
+
+	public byte[][] publicKeyExchange(long sessionID,
+		UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
+		byte[] sig_code) throws Exception, SecurityNotAvailableException {
+		return proxiedJiniBody.publicKeyExchange(sessionID, distantBody,
+			my_pub, my_cert, sig_code);
+	}
+
+	public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
+		byte[] tmp2, byte[] tmp3, byte[] tmp4)
+		throws Exception, SecurityNotAvailableException {
+		return proxiedJiniBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
+			tmp3, tmp4);
+	}
+
+	public Communication getPolicyTo(String type, String from, String to)
+		throws java.io.IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getPolicyTo(type, from, to);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
+	 */
+	public String getVNName() throws IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getVNName();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+	 */
+	public byte[] getCertificateEncoded()
+		throws IOException, SecurityNotAvailableException {
+		return proxiedJiniBody.getCertificateEncoded();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+	 */
+	public SecurityContext getPolicy(SecurityContext securityContext)
+		throws SecurityNotAvailableException, IOException {
+		return proxiedJiniBody.getPolicy(securityContext);
+	}
+
+	public ArrayList getEntities() throws SecurityNotAvailableException, IOException {
+			return proxiedJiniBody.getEntities();
+		}
+
 
     //
     // -- PRIVATE METHODS -----------------------------------------------

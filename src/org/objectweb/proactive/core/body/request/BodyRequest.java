@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 public class BodyRequest extends MessageImpl implements Request, java.io.Serializable {
 
@@ -59,6 +60,21 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
   }
 
 
+	// SECURITY
+	public boolean isCiphered() {
+		return false;
+	}
+
+	public boolean decrypt(ProActiveSecurityManager psm) {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	  * @see org.objectweb.proactive.core.body.request.Request#getSessionId()
+	  */
+	 public long getSessionId() {
+		 return 0;
+	 }
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //

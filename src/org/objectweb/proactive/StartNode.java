@@ -231,7 +231,8 @@ public class StartNode {
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
-                    node = NodeFactory.createNode(nodeURL, !noRebind);
+                	//TODO allow start alone node with security parameters 
+                    node = NodeFactory.createNode(nodeURL, !noRebind,null,null);
                 }
 
                 //System.out.println("nodeurl "+node.getNodeInformation().getURL());

@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.apache.log4j.Logger;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -40,8 +42,8 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
-
-import java.util.ArrayList;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**
@@ -79,7 +81,7 @@ public interface ProActiveRuntime {
      * @exception NodeException if the new node cannot be created
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding) throws NodeException;
+        boolean replacePreviousBinding,PolicyServer policyServer, String vnName) throws NodeException;
 
     /**
      * <i><font size="-1" color="#FF0000">**Under development** </font></i>
@@ -288,4 +290,68 @@ public interface ProActiveRuntime {
      */
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException;
+        
+	// SECURITY
+	/**
+	* @return creator's certificate if exists
+	*/
+	public X509Certificate getCreatorCertificate() throws ProActiveException;
+
+	/**
+	 * @return
+	 */
+	public PolicyServer getPolicyServer() throws ProActiveException;
+
+	public void setProActiveSecurityManager(ProActiveSecurityManager ps) throws ProActiveException;
+
+	public String getVNName(String Nodename) throws ProActiveException;
+
+	public void setDefaultNodeVirtualNodeName(String s)
+		throws ProActiveException;
+
+	public void listVirtualNodes() throws ProActiveException;
+    
+	public PolicyServer getNodePolicyServer(String nodeName)throws ProActiveException;
+
+
+	/**
+	 *  sets all needed modifications to enable security components
+	 * MUST be called when the descriptor is ready 
+	 */
+	public void enableSecurityIfNeeded()throws ProActiveException ;
+
+
+	/**
+	 * @param nodeName
+	 * @return return certificate associated to the node designed by nodeName
+	 */
+	public X509Certificate getNodeCertificate(String nodeName) throws ProActiveException;
+
+
+	
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(String nodeName)throws ProActiveException;
+
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(UniversalBody uBody)throws ProActiveException;
+
+
+
+	/**
+	 * @return returns all entities associated to this runtime
+	 */
+	public ArrayList getEntities() throws ProActiveException;
+
+
+	/**
+	 * @param PART
+	 */
+	//public void setUpSecurityForRemoteLauch(ProActiveRuntime PART)throws ProActiveException;
+
 }

@@ -112,6 +112,10 @@ if [ -f $PROACTIVE/lib/cog-ogce.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog-ogce.jar
 fi
+if [ -f $PROACTIVE/lib/bouncycastle.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/boucycastle.jar
+fi
 
 
 echo "CLASSPATH"=$CLASSPATH

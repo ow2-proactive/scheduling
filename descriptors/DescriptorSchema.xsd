@@ -134,6 +134,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<!--This section references the vnName key defined above to ensure that the value of attribute name in virtualNodeDefinition/virtualNode element will have the corresponding definition in deployment/mapping/map@virtualNode -->
 				<!-- </xs:keyref>-->
 			</xs:element>
+                        <xs:element name="security" type="SecurityType"/> 
 			<xs:element name="deployment" type="DeploymentType"/>
 			<xs:element name="infrastructure" type="InfrastructureType"/>
 		</xs:sequence>
@@ -522,4 +523,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="count" type="xs:positiveInteger" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+        <xs:simpleType name="SecurityType">
+		<xs:attribute name="file" type="xs:string"/>
+        </xs:simpleType>
 </xs:schema>

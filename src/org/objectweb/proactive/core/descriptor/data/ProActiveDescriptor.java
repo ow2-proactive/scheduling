@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.descriptor.data;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 /**
  * <p>
@@ -178,4 +179,15 @@ public interface ProActiveDescriptor extends java.io.Serializable{
 	 * @return int
 	 */
 	public int getVirtualNodeMappingSize();
+	
+	// SECURITY
+	/**
+	 * Intialize application security policy
+	 * @param file
+	 */
+	public void createPolicyServer(String file);
+	
+	public PolicyServer getPolicyServer();
+	public String getSecurityFilePath();
+
 }

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime.ibis;
 import ibis.rmi.Remote;
 import ibis.rmi.RemoteException;
 
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**
@@ -57,7 +60,7 @@ public interface RemoteProActiveRuntime extends Remote {
     static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
 
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding) throws RemoteException, NodeException;
+        boolean replacePreviousBinding,PolicyServer ps, String vnname) throws RemoteException, NodeException;
 
     public void killAllNodes() throws RemoteException;
 
@@ -111,4 +114,62 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws RemoteException;
+	/**
+		 * @return
+		 */
+		public X509Certificate getCreatorCertificate()
+			throws RemoteException;
+
+		public PolicyServer getPolicyServer() throws RemoteException;
+
+		public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+			throws RemoteException;
+
+		public String getVNName(String Nodename) throws RemoteException;
+
+		/**
+		 * @param s
+		 */
+		public void setDefaultNodeVirtualNodeName(String s) throws RemoteException;
+
+		public void updateLocalNodeVirtualName() throws RemoteException;
+	   public void listVirtualNodes() throws RemoteException ;
+	   public PolicyServer getNodePolicyServer(String nodeName)throws RemoteException;
+
+
+		 /**
+		  *  sets all needed modifications to enable security components
+		  * MUST be called when the descriptor is ready 
+		  */
+		 public void enableSecurityIfNeeded()throws RemoteException;
+
+
+
+	   /**
+		* @param nodeName
+		* @return
+		*/
+	   public X509Certificate getNodeCertificate(String nodeName)throws RemoteException;
+	
+	
+	   /**
+		* @param nodeName
+		* @return returns all entities associated to the node
+		*/
+	   public ArrayList getEntities(String nodeName)throws RemoteException;
+
+	   /**
+		* @param nodeName
+		* @return returns all entities associated to the node
+		*/
+	   public ArrayList getEntities(UniversalBody uBody)throws RemoteException;
+
+
+
+	   /**
+		* @return returns all entities associated to this runtime
+		*/
+	   public ArrayList getEntities() throws RemoteException;
+
+	
 }

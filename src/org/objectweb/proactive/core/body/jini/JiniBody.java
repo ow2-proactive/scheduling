@@ -30,11 +30,26 @@
 */
 package org.objectweb.proactive.core.body.jini;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.ext.security.Communication;
+import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
+import org.objectweb.proactive.ext.security.Policy;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 
 
 /**
@@ -56,7 +71,7 @@ public interface JiniBody extends java.rmi.Remote {
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    public void receiveRequest(Request r) throws java.io.IOException;
+    public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
@@ -119,4 +134,67 @@ public interface JiniBody extends java.rmi.Remote {
     // COMPONENTS
     public ProActiveComponent getProActiveComponent()
         throws java.io.IOException;
+        
+  // SECURITY
+  public void initiateSession(int type,UniversalBody body)
+	  throws java.io.IOException, CommunicationForbiddenException, 
+		  AuthenticationException, java.rmi.RemoteException, 
+		  RenegotiateSessionException, SecurityNotAvailableException;
+
+  public void terminateSession(long sessionID)
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public X509Certificate getCertificate()
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public ProActiveSecurityManager getProActiveSecurityManager()
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public Policy getPolicyFrom(X509Certificate certificate)
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public long startNewSession(Communication policy)
+	  throws java.io.IOException, RenegotiateSessionException, 
+		  SecurityNotAvailableException;
+
+  public ConfidentialityTicket negociateKeyReceiverSide(
+	  ConfidentialityTicket confidentialityTicket, long sessionID)
+	  throws java.io.IOException, KeyExchangeException, 
+		  SecurityNotAvailableException;
+
+  public PublicKey getPublicKey()
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public byte[] randomValue(long sessionID, byte[] cl_rand)
+	  throws Exception, SecurityNotAvailableException;
+
+  public byte[][] publicKeyExchange(long sessionID,
+	  UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
+	  byte[] sig_code) throws Exception, SecurityNotAvailableException;
+
+  public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
+	  byte[] tmp2, byte[] tmp3, byte[] tmp4)
+	  throws Exception, SecurityNotAvailableException;
+
+  public Communication getPolicyTo(String type, String from, String to)
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  /**
+   * @return
+   */
+  public String getVNName()
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  /**
+   * @return
+   */
+  public byte[] getCertificateEncoded()
+	  throws java.io.IOException, SecurityNotAvailableException;
+
+  public SecurityContext getPolicy(SecurityContext securityContext)
+	  throws SecurityNotAvailableException, IOException;
+        
+  public ArrayList getEntities() throws SecurityNotAvailableException, IOException;
+
+
 }

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.security.cert.X509Certificate;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -37,6 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -292,4 +295,36 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new ProActiveException(exceptionMessage);
         }
     }
+    
+    // SECURITY
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
+	 */
+	public X509Certificate getCreatorCertificate() throws ProActiveException {
+		return virtualNode.getCreatorCertificate();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
+	 */
+	public PolicyServer getPolicyServer() {
+		return virtualNode.getPolicyServer();
+	}
+
+	/* (non-Javadoc)
+			 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyServer()
+			 */
+	public void setPolicyServer(PolicyServer ps) {
+		System.out.println(message);
+	//	virtualNode.setPolicyServer(ps);
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
+	 */
+	public void setPolicyFile(String file) {
+		
+	}
+    
 }

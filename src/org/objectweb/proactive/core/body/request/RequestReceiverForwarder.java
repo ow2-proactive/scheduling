@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 
 public class RequestReceiverForwarder implements RequestReceiver {
@@ -42,7 +43,7 @@ public class RequestReceiverForwarder implements RequestReceiver {
     }
 
 
-  public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
+  public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException {
     request.send(remoteBody);
   }
 

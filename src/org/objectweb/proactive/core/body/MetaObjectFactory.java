@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.body;
 
+import java.util.Hashtable;
+
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
@@ -37,8 +39,7 @@ import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
-
-import java.util.Hashtable;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**
@@ -117,4 +118,14 @@ public interface MetaObjectFactory {
 
     // COMPONENTS
     public Hashtable getParameters();
+    
+    //SECURITY
+	/**
+	 * Creates the ProActiveSecurityManager
+	 * @return a new ProActiveSecurityManager
+	 * @see ProActiveSecurityManager
+	 */
+	public ProActiveSecurityManager getProActiveSecurityManager();
+
+	public void setProActiveSecurityManager(ProActiveSecurityManager psm);    
 }

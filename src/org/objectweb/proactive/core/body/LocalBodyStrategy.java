@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 /**
  * <P>
@@ -86,7 +87,7 @@ public interface LocalBodyStrategy {
    * @param destinationBody the body the request is sent to
    * @exception java.io.IOException if the request cannot be sent to the destination body
    */
-  public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException;
+  public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException;;
 
 
   /**

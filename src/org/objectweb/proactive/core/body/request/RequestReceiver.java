@@ -31,10 +31,11 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 public interface RequestReceiver {
 
-  public void receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException;
+  public void receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException;
   
   public void setImmediateService(String methodName) throws java.io.IOException ;
 

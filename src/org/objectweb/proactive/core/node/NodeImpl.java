@@ -68,6 +68,7 @@ public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
 
+	protected String vnName;
     //
     // ----------Constructors--------------------
     //
@@ -270,4 +271,19 @@ public class NodeImpl implements Node, Serializable {
             return name;
         }
     }
+    
+    // SECURITY
+	/**
+	  * @return
+	  */
+	 public String getVnName() {
+		 return vnName;
+	 }
+
+	 /**
+	  * @param string
+	  */
+	 public void setVnName(String string) {
+		 vnName = string;
+	 }
 }

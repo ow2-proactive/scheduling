@@ -69,8 +69,9 @@ package org.objectweb.proactive.core.body;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-import org.apache.log4j.Logger;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -93,8 +94,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
-
-import java.util.Hashtable;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 public class ProActiveMetaObjectFactory implements MetaObjectFactory,
@@ -120,6 +120,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected RemoteBodyFactory remoteBodyFactoryInstance;
     protected ThreadStoreFactory threadStoreFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
+	protected ProActiveSecurityManager proActiveSecurityManager;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -351,4 +352,13 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             return new ProActiveComponentImpl(componentParameters, myBody);
         }
     }
+    
+    // SECURITY
+	public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
+		proActiveSecurityManager = psm;
+	}
+
+	public ProActiveSecurityManager getProActiveSecurityManager() {
+		return proActiveSecurityManager;
+	}    
 }

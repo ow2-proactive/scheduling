@@ -4,8 +4,13 @@ import ibis.rmi.AlreadyBoundException;
 import ibis.rmi.Naming;
 import ibis.rmi.NotBoundException;
 import ibis.rmi.RemoteException;
-
 import ibis.rmi.server.UnicastRemoteObject;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -19,14 +24,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.UnknownHostException;
-
-import java.util.ArrayList;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**
@@ -63,7 +62,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding) throws RemoteException, NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vnname) throws RemoteException, NodeException {
         String nodeURL = null;
 
         //Node node;
@@ -75,7 +74,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
             //register the url in rmi registry
             register(nodeURL, replacePreviousBinding);
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,vnname);
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -223,6 +222,103 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public UniversalBody receiveBody(String nodeName, Body body) {
         return proActiveRuntime.receiveBody(nodeName, body);
     }
+
+	// SECURITY
+	/* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
+	*/
+   public X509Certificate getCreatorCertificate()
+	   throws RemoteException {
+	   return proActiveRuntime.getCreatorCertificate();
+   }
+
+   /**
+	* @return
+	*/
+   public PolicyServer getPolicyServer() throws RemoteException {
+	   return proActiveRuntime.getPolicyServer();
+   }
+
+   public String getVNName(String nodename) throws RemoteException {
+	   return proActiveRuntime.getVNName(nodename);
+   }
+
+   public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+	   throws RemoteException {
+	   proActiveRuntime.setProActiveSecurityManager(ps);
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
+	*/
+   public void setDefaultNodeVirtualNodeName(String s)
+	   throws RemoteException {
+	   proActiveRuntime.setDefaultNodeVirtualNodeName(s);
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
+	*/
+   public void updateLocalNodeVirtualName() throws RemoteException {
+	//   proActiveRuntime.updateLocalNodeVirtualName();
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#listVirtualNodes()
+	*/
+   public void listVirtualNodes() throws RemoteException {
+	proActiveRuntime.listVirtualNodes();
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
+	*/
+   public PolicyServer getNodePolicyServer(String nodeName) throws RemoteException {
+	   return null;
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#enableSecurityIfNeeded()
+	*/
+   public void enableSecurityIfNeeded() throws RemoteException {
+	   // TODOremove this function
+		
+   }
+
+   /* (non-Javadoc)
+	* @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
+	*/
+   public X509Certificate getNodeCertificate(String nodeName) throws RemoteException{
+	   return  proActiveRuntime.getNodeCertificate(nodeName);
+   }
+	
+   /**
+	* @param nodeName
+	* @return returns all entities associated to the node
+	*/
+   public ArrayList getEntities(String nodeName)throws RemoteException {
+	   return proActiveRuntime.getEntities(nodeName);
+   }
+
+   /**
+	* @param nodeName
+	* @return returns all entities associated to the node
+	*/
+   public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
+	   return proActiveRuntime.getEntities(uBody);
+   }
+ 
+
+
+   /**
+	* @return returns all entities associated to this runtime
+	*/
+   public ArrayList getEntities() throws RemoteException {
+	   return proActiveRuntime.getEntities();
+   }
+
+		
+
 
     //
     // ---PRIVATE METHODS--------------------------------------

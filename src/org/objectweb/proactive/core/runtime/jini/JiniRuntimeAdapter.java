@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.runtime.jini;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
@@ -44,6 +46,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 /**
  *   An adapter for a JiniRuntime to be able to receive remote calls. This helps isolate JINI-specific
@@ -105,10 +109,10 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
   // -- Implements ProActiveRuntime -----------------------------------------------
   //
   
-  public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws NodeException
+  public String createLocalNode(String nodeName,boolean replacePreviousBinding, PolicyServer ps, String vnname) throws NodeException
 	{
 		try{
-		return jiniRuntime.createLocalNode(nodeName,replacePreviousBinding);
+		return jiniRuntime.createLocalNode(nodeName,replacePreviousBinding,ps,vnname);
 		}catch(java.rmi.RemoteException e){
 		throw new NodeException (e);
 		}
@@ -350,6 +354,141 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 		}
 	}
 
+
+	// SECURITY
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
+	 */
+	public X509Certificate getCreatorCertificate() throws ProActiveException {
+		try {
+			return jiniRuntime.getCreatorCertificate();
+		} catch (RemoteException e) {
+			throw new ProActiveException(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicyServer()
+	 */
+	public PolicyServer getPolicyServer() throws ProActiveException {
+		try {
+			return jiniRuntime.getPolicyServer();
+		} catch (RemoteException e) {
+			throw new ProActiveException(e);
+		}
+	}
+
+	public String getVNName(String Nodename) throws ProActiveException {
+		try {
+			return jiniRuntime.getVNName(Nodename);
+		} catch (java.rmi.RemoteException re) {
+			throw new ProActiveException(re);
+		}
+	}
+
+	public void setProActiveSecurityManager(ProActiveSecurityManager ps) throws ProActiveException {
+		try {
+			jiniRuntime.setProActiveSecurityManager(ps);
+		} catch (RemoteException e) {
+			throw new ProActiveException(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
+	 */
+	public void setDefaultNodeVirtualNodeName(String s)
+		throws ProActiveException {
+		try {
+			jiniRuntime.setDefaultNodeVirtualNodeName(s);
+		} catch (RemoteException e) {
+			throw new ProActiveException(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#updateLocalNodeVirtualName()
+	 */
+	public void listVirtualNodes() throws ProActiveException {
+		try {
+			jiniRuntime.updateLocalNodeVirtualName();
+		} catch (RemoteException e) {
+			throw new ProActiveException(e);
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
+	 */
+	public PolicyServer getNodePolicyServer(String nodeName) throws ProActiveException{
+		try {
+		  return jiniRuntime.getNodePolicyServer(nodeName);
+	  } catch (RemoteException e) {
+		  throw new ProActiveException(e);
+	  }
+  
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
+	 */
+	public void enableSecurityIfNeeded() throws ProActiveException{
+		try {
+		   jiniRuntime.enableSecurityIfNeeded();
+	  } catch (RemoteException e) {
+		  throw new ProActiveException(e);
+	  }
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
+	 */
+	public X509Certificate getNodeCertificate(String nodeName) throws ProActiveException {
+		try {
+	   return jiniRuntime.getNodeCertificate(nodeName);
+  } catch (RemoteException e) {
+	  throw new ProActiveException(e);
+  }
+		
+	}
+	
+	
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(String nodeName) throws ProActiveException {
+		try {
+			return jiniRuntime.getEntities(nodeName);
+		} catch (java.rmi.RemoteException re) {
+			throw new ProActiveException(re);
+		}
+	}
+
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
+		try {
+			return jiniRuntime.getEntities(uBody);
+		} catch (java.rmi.RemoteException re) {
+			throw new ProActiveException(re);
+		}
+	}
+
+	/**
+	 * @return returns all entities associated to this runtime
+	 */
+	public ArrayList getEntities() throws ProActiveException {
+		try {
+			return jiniRuntime.getEntities();
+		} catch (java.rmi.RemoteException re) {
+			throw new ProActiveException(re);
+		}
+	}
+	
 
   //
   // -- PROTECTED METHODS -----------------------------------------------

@@ -104,4 +104,5 @@ public interface ProActiveDescriptorConstants  {
   
   public static final String JVMPARAMETERS_TAG = "jvmParameters";
   public static final String JVMPARAMETER_TAG = "parameter";
+  public static final String SECURITY_TAG = "security";
 }

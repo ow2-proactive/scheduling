@@ -30,8 +30,10 @@
 */ 
 package org.objectweb.proactive.core.body.reply;
 
-import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.message.Message;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 public interface Reply extends Message {
 
@@ -44,4 +46,11 @@ public interface Reply extends Message {
    */
   public void send(UniversalBody destinationBody) throws java.io.IOException;
   
+  // SECURITY
+  
+   public boolean isCiphered();
+  
+   public long getSessionId() ;
+  
+   public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException;
 }

@@ -82,5 +82,10 @@ public interface Node
 	 * @return Object[].The set of activeObjects deployed on this node with the given name
 	 */
 	public Object[] getActiveObjects(String className) throws NodeException,ActiveObjectCreationException;
+	
+
+	public String getVnName();
+
+	public void setVnName(String virtualNodeName);
 
 }

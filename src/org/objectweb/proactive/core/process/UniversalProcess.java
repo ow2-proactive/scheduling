@@ -140,4 +140,17 @@ public interface UniversalProcess extends java.io.Serializable {
    */
   public boolean isFinished();
   
+  // SECURITY
+  public void setCertificateLocation(String file);
+
+  public String getCertificateLocation();
+
+  public void setPrivateKeyLocation(String privatekey);
+
+  public String getPrivateKeyLocation();
+
+  public void setSecurityFile(String privatekey);
+
+  public String getSecurityFile();
+  
 }

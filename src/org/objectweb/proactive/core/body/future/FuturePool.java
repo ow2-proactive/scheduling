@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.future;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -39,6 +40,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.ProActiveProperties;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 
 public class FuturePool extends Object implements java.io.Serializable {
 
@@ -208,7 +211,14 @@ public class FuturePool extends Object implements java.io.Serializable {
 			if (acEnabled) {
 				java.util.ArrayList bodiesToContinue = futures.getAutomaticContinuation(id, creatorID);
 				if ((bodiesToContinue != null) && (bodiesToContinue.size() != 0)) {
-					queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null, result)));
+					ProActiveSecurityManager psm = null;
+					 try {
+						 psm = ProActive.getBodyOnThis()
+										.getProActiveSecurityManager();
+					 } catch (SecurityNotAvailableException e) {
+						 psm = null;
+					 }
+					queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null, result,psm)));
 				}
 			}
 

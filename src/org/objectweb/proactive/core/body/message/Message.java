@@ -82,5 +82,8 @@ public interface Message {
    * @return the time this message was created or deserialized
    */
   public long getTimeStamp();
-
+  
+ 
+  
+  
 }

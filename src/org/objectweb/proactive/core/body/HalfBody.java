@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.security.cert.X509Certificate;
+
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -44,6 +46,13 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
+import org.objectweb.proactive.ext.security.InternalBodySecurity;
+import org.objectweb.proactive.ext.security.ProActiveSecurity;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 
 
 public class HalfBody extends AbstractBody {
@@ -64,10 +73,24 @@ public class HalfBody extends AbstractBody {
     // -- CONSTRUCTORS -----------------------------------------------
     //
     private HalfBody(MetaObjectFactory factory) {
+    	//SECURITY 
         super(new Object(), "LOCAL", factory);
+		//super(new Object(),
+		//	 NodeFactory.getDefaultNode().getNodeInformation().getURL(), factory);
+		// creating a default psm for HalfBody
+		// TODO get application certificate instead of generated one
+       
+		//Object[] o = ProActiveSecurity.generateGenericCertificate();
+		//psm = new ProActiveSecurityManager((X509Certificate) o[0], (PrivateKey) o[1], null);
+	   //psm = new ProActiveSecurityManager();
+		//isSecurityOn = true;
+		//psm.setBody(this);
+		internalBodySecurity = new InternalBodySecurity(null);
+			    
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+        
     }
 
     //
@@ -104,8 +127,15 @@ public class HalfBody extends AbstractBody {
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-        replyReceiver.receiveReply(reply, this, getFuturePool());
-    }
+		try {
+			if (reply.isCiphered()) {
+				reply.decrypt(psm);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		replyReceiver.receiveReply(reply, this, getFuturePool());
+	}
 
     public void setImmediateService(String methodName) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
@@ -169,7 +199,7 @@ public class HalfBody extends AbstractBody {
         }
 
         public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody) throws java.io.IOException {
+            UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException {
             long sequenceID = getNextSequenceID();
             Request request = internalRequestFactory.newRequest(methodCall,
                     HalfBody.this, future == null, sequenceID);
@@ -184,7 +214,45 @@ public class HalfBody extends AbstractBody {
                 future.setID(sequenceID);
                 futures.receiveFuture(future);
             }
-            request.send(destinationBody);
+            
+            // SECURITY 
+			long sessionID = 0;
+		//	logger.debug("send Request Body" + destinationBody);
+		 //   logger.debug(" halfbla" + destinationBody.getRemoteAdapter());
+			  try {
+				try {
+				  if (!isSecurityOn) {
+					logger.debug("security is off");
+					throw new SecurityNotAvailableException();
+				  }
+				  if (internalBodySecurity.isLocalBody()) {
+		
+					byte[] certE = destinationBody.getRemoteAdapter().getCertificateEncoded();
+					X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+					if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
+					  psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO, destinationBody.getRemoteAdapter());
+					  sessionID = psm.getSessionIDTo(cert);
+					}
+				  }
+				} catch (SecurityNotAvailableException e) {
+				  // do nothing 
+				  logger.debug("communication without security");
+				  //e.printStackTrace();
+				}
+			  request.send(destinationBody);
+			  } catch (RenegotiateSessionException e) {
+				//e.printStackTrace();
+		
+				updateLocation(destinationBody.getID(), e.getUniversalBody());
+				psm.terminateSession(sessionID);
+				logger.debug("renegotiate session");
+				sendRequest(methodCall, future, e.getUniversalBody());
+			  } catch (CommunicationForbiddenException e) {
+				logger.warn(e);
+				//e.printStackTrace();
+			  } catch (AuthenticationException e) {
+				e.printStackTrace();
+			  }
         }
 
         //

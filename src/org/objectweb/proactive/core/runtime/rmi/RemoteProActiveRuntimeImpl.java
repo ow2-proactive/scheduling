@@ -7,6 +7,7 @@ import java.rmi.AccessException;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
@@ -21,6 +22,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 
 /**
@@ -62,7 +65,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding)
+        boolean replacePreviousBinding,PolicyServer ps, String VNname)
         throws java.rmi.RemoteException, NodeException {
         String nodeURL = null;
 
@@ -76,7 +79,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             //register the url in rmi registry
             register(nodeURL, replacePreviousBinding);
 
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,VNname);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -241,6 +244,95 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public UniversalBody receiveBody(String nodeName, Body body) {
         return proActiveRuntime.receiveBody(nodeName, body);
     }
+
+	// SECURITY
+	
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
+	 */
+	public X509Certificate getCreatorCertificate()
+		throws java.rmi.RemoteException {
+		return proActiveRuntime.getCreatorCertificate();
+	}
+
+	/**
+	 * @return
+	 */
+	public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
+		return proActiveRuntime.getPolicyServer();
+	}
+
+	public String getVNName(String nodename) throws java.rmi.RemoteException {
+		return proActiveRuntime.getVNName(nodename);
+	}
+
+	public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+		throws java.rmi.RemoteException {
+		proActiveRuntime.setProActiveSecurityManager(ps);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
+	 */
+	public void setDefaultNodeVirtualNodeNAme(String s)
+		throws RemoteException {
+		proActiveRuntime.setDefaultNodeVirtualNodeName(s);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
+	 */
+	public void updateLocalNodeVirtualName() throws RemoteException {
+		proActiveRuntime.listVirtualNodes();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
+	 */
+	public PolicyServer getNodePolicyServer(String nodeName) throws RemoteException {
+		return proActiveRuntime.getNodePolicyServer(nodeName);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#enableSecurityIfNeeded()
+	 */
+	public void enableSecurityIfNeeded() throws RemoteException {
+		proActiveRuntime.enableSecurityIfNeeded();
+		
+	}
+	/* (non-Javadoc)
+		 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
+		 */
+	public X509Certificate getNodeCertificate(String nodeName) throws RemoteException {
+		return proActiveRuntime.getNodeCertificate(nodeName);
+	}
+	
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(String nodeName)throws RemoteException {
+		return proActiveRuntime.getEntities(nodeName);
+	}
+
+	/**
+	 * @param nodeName
+	 * @return returns all entities associated to the node
+	 */
+	public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
+		return proActiveRuntime.getEntities(uBody);
+	}
+ 
+
+
+	/**
+	 * @return returns all entities associated to this runtime
+	 */
+	public ArrayList getEntities() throws RemoteException {
+		return proActiveRuntime.getEntities();
+	}
+
+	
 
     //
     // ---PRIVATE METHODS--------------------------------------

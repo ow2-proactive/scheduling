@@ -30,16 +30,16 @@
  */
 package org.objectweb.proactive.core.node;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.net.UnknownHostException;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -110,7 +110,7 @@ public class NodeFactory {
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
-                        false);
+                        false,defaultRuntime.getPolicyServer(), "currentJVM");
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }
@@ -143,7 +143,7 @@ public class NodeFactory {
      * @exception NodeException if the node cannot be created
      */
     public static Node createNode(String nodeURL) throws NodeException {
-        return createNode(nodeURL, false);
+        return createNode(nodeURL, false,null,null);
     }
 
     /**
@@ -161,7 +161,7 @@ public class NodeFactory {
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String url, boolean replacePreviousBinding)
+    public static Node createNode(String url, boolean replacePreviousBinding, PolicyServer ps, String vnname)
         throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
@@ -178,7 +178,7 @@ public class NodeFactory {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
             nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding);
+                    replacePreviousBinding,ps,vnname);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }

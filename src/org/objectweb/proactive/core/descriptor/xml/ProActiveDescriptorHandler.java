@@ -60,6 +60,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     proActiveDescriptor = new ProActiveDescriptorImpl();
     addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
     addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
+	addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
     {
     PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
     PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
@@ -199,4 +200,30 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     }
   } // end inner class VirtualNodeLookupHandler
 
+	// SECURITY
+	/**
+			* This class receives Security events
+			*/
+	  private class SecurityHandler extends BasicUnmarshaller {
+		  private ProActiveDescriptor proActiveDescriptor;
+
+		  public SecurityHandler(ProActiveDescriptor proActiveDescriptor) {
+			  super();
+			  this.proActiveDescriptor = proActiveDescriptor;
+		  }
+
+		  public void startContextElement(String name, Attributes attributes)
+			  throws org.xml.sax.SAXException {
+			  // create and register a VirtualNode
+			  String file = attributes.getValue("file");
+
+        
+			  if (!checkNonEmpty(file)) {
+				  throw new org.xml.sax.SAXException("Empty security file");
+			  }
+			  logger.debug("creating PolicyServer : " + file);
+			  proActiveDescriptor.createPolicyServer(file);
+		  }
+	  }
+	   // end inner class SecurityHandler
 }

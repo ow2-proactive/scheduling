@@ -8,6 +8,7 @@ import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 public class TimedProxyForBody extends UniversalBodyProxy implements Serializable {
 
@@ -20,7 +21,7 @@ public class TimedProxyForBody extends UniversalBodyProxy implements Serializabl
   // -- PROTECTED METHODS -----------------------------------------------
   //
   
-  protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {
+  protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException,RenegotiateSessionException {
     System.out.println("TimedProxyForBody");
     super.sendRequestInternal(methodCall, future, sourceBody);
   }

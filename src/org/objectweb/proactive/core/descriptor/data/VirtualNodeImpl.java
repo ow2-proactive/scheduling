@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.Serializable;
+import java.security.cert.X509Certificate;
+import java.util.Hashtable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
@@ -48,10 +52,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.Serializable;
-
-import java.util.Hashtable;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -110,6 +111,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     protected int MAX_RETRY = 70;
     private Object uniqueActiveObject = null;
 
+	private X509Certificate creatorCertificate;
+	 private PolicyServer policyServer;
+	 private String policyServerFile;
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
@@ -123,7 +127,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     /**
      * Contructs a new intance of VirtualNode
      */
-    VirtualNodeImpl(String name) {
+    VirtualNodeImpl(String name ,X509Certificate creatorCertificate,
+	PolicyServer policyServer) {
         this.name = name;
         virtualMachines = new java.util.ArrayList(5);
         createdNodes = new java.util.ArrayList();
@@ -135,6 +140,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         }
         proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
         proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
+        // SECURITY
+		this.creatorCertificate = creatorCertificate;
+		  this.policyServer = policyServer;
     }
 
     //
@@ -200,6 +208,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 // will register.
                 if (!vmAlreadyAssigned) {
                     setParameters(process, vm);
+					process.setSecurityFile(policyServerFile);
                     // It is this virtual Node that originates the creation of the vm
                     try {
                         proActiveRuntimeImpl.createVM(process);
@@ -417,7 +426,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                         protocol));
 
             //create the node
-            url = defaultRuntime.createLocalNode(nodeName, false);
+            url = defaultRuntime.createLocalNode(nodeName, false,policyServer, this.getName());
             //add this node to this virtualNode
             //  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
             //		nodeCreated = true;
@@ -505,7 +514,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 								  url = buildURL(nodeHost, nodeName, protocol, port);
 								  // nodes are created from the registered runtime, since this virtualNode is
 								  // waiting for runtime registration to perform co-allocation in the jvm.
-								  proActiveRuntimeRegistered.createLocalNode(url, false);
+								  proActiveRuntimeRegistered.createLocalNode(url, false,policyServer,this.getName());
 								  performOperations(proActiveRuntimeRegistered, url, protocol);
 						  }
             } catch (ProActiveException e) {
@@ -554,7 +563,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     url = buildURL(nodeHost, nodeName, protocol, port);
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
-                    proActiveRuntimeRegistered.createLocalNode(url, false);
+                    proActiveRuntimeRegistered.createLocalNode(url, false, policyServer, this.getName());
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 } catch (ProActiveException e) {
                     e.printStackTrace();
@@ -750,7 +759,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             try {
                 localruntimeURL = RuntimeFactory.getDefaultRuntime().getURL();
             } catch (ProActiveException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -891,4 +899,34 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
+    
+    // SECURITY
+	/* (non-Javadoc)
+	  * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
+	  */
+	 public X509Certificate getCreatorCertificate() {
+		 return creatorCertificate;
+	 }
+
+	 /* (non-Javadoc)
+	  * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
+	  */
+	 public PolicyServer getPolicyServer() {
+		 return policyServer;
+	 }
+
+	 /**
+		   * @param server
+		   */
+	 public void setPolicyServer(PolicyServer server) {
+		 // logger.debug("Setting PolicyServer " + server + " to VN " +name);
+		 policyServer = server;
+	 }
+
+	 /* (non-Javadoc)
+	  * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setPolicyFile(java.lang.String)
+	  */
+	 public void setPolicyFile(String file) {
+			 policyServerFile = file;
+	 }
 }

@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 
 /**
@@ -159,7 +160,7 @@ public abstract class BodyImpl extends AbstractBody
      * @exception java.io.IOException if the request cannot be accepted
      */
     protected void internalReceiveRequest(Request request)
-        throws java.io.IOException {
+        throws java.io.IOException, RenegotiateSessionException {
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(request,
                 MessageEvent.REQUEST_RECEIVED, bodyID,
@@ -296,7 +297,7 @@ public abstract class BodyImpl extends AbstractBody
         }
 
         public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody) throws java.io.IOException {
+            UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException {
             long sequenceID = getNextSequenceID();
             Request request = internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);

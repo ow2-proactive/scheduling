@@ -59,6 +59,9 @@ public class MessageImpl implements Message, java.io.Serializable {
 
   protected boolean isOneWay;
  
+  protected long sessionID;
+  
+  protected boolean ciphered;
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -126,5 +129,7 @@ public class MessageImpl implements Message, java.io.Serializable {
   	s.defaultReadObject();
 	  this.timeStamp = System.currentTimeMillis();
   }
+
+ 
 
 }

@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 
 public abstract class AbstractBodyProxy extends AbstractProxy
@@ -143,7 +144,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
    *
    */
 
-  protected void reifyAsOneWay(MethodCall methodCall) throws MethodCallExecutionFailedException {
+  protected void reifyAsOneWay(MethodCall methodCall) throws MethodCallExecutionFailedException, RenegotiateSessionException {
     try {
       sendRequest(methodCall, null);
     } catch (java.io.IOException e) {
@@ -152,7 +153,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
   }
 
 
-  protected Object reifyAsAsynchronous(MethodCall methodCall) throws MethodCallExecutionFailedException {
+  protected Object reifyAsAsynchronous(MethodCall methodCall) throws MethodCallExecutionFailedException, RenegotiateSessionException {
     StubObject futureobject;
     // Creates a stub + FutureProxy for representing the result
     try {
@@ -180,7 +181,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
   }
 
 
-  protected Object reifyAsSynchronous(MethodCall methodCall) throws Throwable, MethodCallExecutionFailedException {
+  protected Object reifyAsSynchronous(MethodCall methodCall) throws Throwable, MethodCallExecutionFailedException , RenegotiateSessionException{
     // Setting methodCall.res to null means that we do not use the future mechanism
     Future f = FutureProxy.getFutureProxy();
     f.setCreatorID(bodyID);
@@ -202,8 +203,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
 
 
-    protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException;
+    protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException, RenegotiateSessionException;
 	
-	protected abstract void sendRequest(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException;
+	protected abstract void sendRequest(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException, RenegotiateSessionException;
 
 }

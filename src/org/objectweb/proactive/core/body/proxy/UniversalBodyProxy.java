@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -226,7 +227,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException {
+        throws java.io.IOException , RenegotiateSessionException{
         // Determines the body that is at the root of the subsystem from which the
         // call was sent.
         // It is always true that the body that issued the request (and not the body
@@ -239,7 +240,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequest(MethodCall methodCall, Future future,
-        Body sourceBody) throws java.io.IOException {
+        Body sourceBody) throws java.io.IOException, RenegotiateSessionException {
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
         UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
@@ -259,7 +260,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     }
 
     protected void sendRequestInternal(MethodCall methodCall, Future future,
-        Body sourceBody) throws java.io.IOException {
+        Body sourceBody) throws java.io.IOException, RenegotiateSessionException {
         sourceBody.sendRequest(methodCall, future, universalBody);
     }
 

@@ -30,11 +30,13 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.security.cert.X509Certificate;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 
 /**
@@ -201,4 +203,18 @@ public interface VirtualNode extends java.io.Serializable {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
+        
+    // SECURITY
+	/**
+//	   * @return creator certificate
+	   */
+	  public X509Certificate getCreatorCertificate() throws ProActiveException;
+
+	  /**
+	   * @return
+	   */
+	  public PolicyServer getPolicyServer();
+
+	  public void setPolicyServer(PolicyServer server);
+	  public void setPolicyFile(String file);
 }

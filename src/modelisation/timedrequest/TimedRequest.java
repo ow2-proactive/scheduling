@@ -3,6 +3,7 @@ package modelisation.timedrequest;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 
 public class TimedRequest extends RequestImpl implements java.io.Serializable {
@@ -16,7 +17,7 @@ public class TimedRequest extends RequestImpl implements java.io.Serializable {
     }
 
     protected void sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException {
+        throws java.io.IOException, RenegotiateSessionException {
         long startTime = 0;
 
         //        if (shouldMesureTime) {

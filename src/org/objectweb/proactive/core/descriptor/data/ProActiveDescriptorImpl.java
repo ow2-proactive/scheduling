@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.IOException;
+import java.security.cert.X509Certificate;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -37,6 +39,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -69,6 +74,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     /** map process id and process updater for later update of the process */
     private java.util.HashMap pendingProcessMapping;
+    
+	/** security rules */
+	 public PolicyServer policyServer;
+	 public X509Certificate creatorCertificate;
+	 public String securityFile;
+
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -116,7 +127,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
-                vn = new VirtualNodeImpl(vnName);
+                vn = new VirtualNodeImpl(vnName, creatorCertificate, policyServer);
             }
 
             virtualNodeMapping.put(vnName, vn);
@@ -239,6 +250,40 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return virtualNodeMapping.size();
     }
 
+	// SECURITY
+	/**
+	   * Intialize application security policy
+	   * @param file
+	   */
+	 public void createPolicyServer(String file) {
+		 securityFile = file;
+		 try {
+		 policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
+   //      policyServer = ps;
+	//         ProActiveRuntime prR = RuntimeFactory.getDefaultRuntime();
+	 //        ProActiveSecurityManager psm = new ProActiveSecurityManager(file);
+	  //       prR.setProActiveSecurityManager(psm);
+	  //   } catch (ProActiveException e) {
+	  //       e.printStackTrace();
+		 } catch (IOException e) {
+			 // TODO Auto-generated catch block
+			 e.printStackTrace();
+		 } catch (SAXException e) {
+			 // TODO Auto-generated catch block
+			 e.printStackTrace();
+		 }
+	 }
+
+ public PolicyServer getPolicyServer() {
+	 return policyServer;
+ }
+	
+ /* (non-Javadoc)
+  * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getSecurityFilePath()
+  */
+ public String getSecurityFilePath() {
+	 return securityFile;
+ }
     //
     //  ----- PROTECTED METHODS -----------------------------------------------------------------------------------
     //

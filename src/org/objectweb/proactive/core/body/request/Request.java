@@ -35,6 +35,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 
 /**
  * <p>
@@ -90,7 +92,7 @@ public interface Request extends Message {
    * @param destinationBody the body destination of this request
    * @exception java.io.IOException if the request fails to be sent
    */
-  public void send(UniversalBody destinationBody) throws java.io.IOException;
+  public void send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException;
 
 
   /**
@@ -113,5 +115,12 @@ public interface Request extends Message {
    * operation upon that notification
    */
   public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException;
+ 
+  // SECURITY
   
+   public boolean isCiphered();
+  
+   public long getSessionId() ;
+  
+   public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException; 
 }

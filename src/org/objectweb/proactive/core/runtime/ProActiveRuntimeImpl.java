@@ -30,6 +30,16 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Random;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -42,9 +52,12 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
-
-import java.util.ArrayList;
-import java.util.Random;
+import org.objectweb.proactive.ext.security.Entity;
+import org.objectweb.proactive.ext.security.EntityCertificate;
+import org.objectweb.proactive.ext.security.EntityVirtualNode;
+import org.objectweb.proactive.ext.security.PolicyServer;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 
 
 /**
@@ -73,6 +86,20 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return prng.nextInt();
     }
 
+	//	map nodes and an ArrayList of PolicyServer 
+	private java.util.Hashtable policyServerMap;
+
+	// creator certificate
+	private X509Certificate creatorCertificate;
+	private X509Certificate certificate;
+	private PrivateKey privateKey;
+
+	// link to domain policy server 
+	// private PolicyServer policyServer;
+	private ProActiveSecurityManager psm;
+    
+	private String defaultNodeVirtualNode = null;
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------------------
     //
@@ -98,6 +125,23 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable();
             this.virtualNodesMap = new java.util.Hashtable();
+			this.policyServerMap= new java.util.Hashtable();
+			String file = System.getProperties().getProperty("proactive.runtime.security");
+
+			if ((file != null) && new File(file).exists()) {
+				// loading security from a file
+				logger.info("Runtime : loading policy file" + file);
+				Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+				Security.addProvider(myProvider);
+			   // policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
+			   psm = new ProActiveSecurityManager(file);
+			} else {
+				// creating a generic certificate
+				logger.info("Runtime : loading policy file is null");
+				//Object[] tmp = ProActiveSecurity.generateGenericCertificate();
+				//certificate = (X509Certificate) tmp[0];
+				//privateKey = (PrivateKey) tmp[1];
+			}
 
             //System.out.println(vmInformation.getVMID().toString());
         } catch (java.net.UnknownHostException e) {
@@ -106,7 +150,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // System.out.println();
             e.printStackTrace();
             System.exit(1);
-        }
+        } catch (IOException e) {
+			e.printStackTrace();
+		}
     }
 
     //
@@ -134,7 +180,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean)
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding) throws NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vnName) throws NodeException {
         //Node node = new NodeImpl(this,nodeName);
         //System.out.println("node created with name "+nodeName+"on proActiveruntime "+this);
         if (replacePreviousBinding) {
@@ -148,6 +194,25 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         nodeMap.put(nodeName, new java.util.ArrayList());
+        
+		if ((vnName != null) && (vnName.equals("currentJVM"))) {
+				// if Jvm has been started using the currentJVM tag
+				vnName = defaultNodeVirtualNode;
+				logger.debug("++++++++++++++++++++++++++++++++++++++++++++CurrentJVM Tag ! Local Node : " + nodeName + " VN name : " + vnName  + " policyserver " + ps);
+			} else {
+				logger.debug("----------------------------------------Local Node : " + nodeName + " VN name : " + vnName + " policyserver " + ps);
+			}
+        
+			if (ps != null) {
+				logger.debug("generating node certificate");
+				ps.generateNodeCertificate(vnName + " " + nodeName,vmInformation);
+				policyServerMap.put(nodeName, ps);
+			}
+
+			if (vnName != null) {
+				virtualNodesMap.put(nodeName, vnName);
+			}
+			
         return nodeName;
     }
 
@@ -155,6 +220,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#DeleteAllNodes()
      */
     public void killAllNodes() {
+		virtualNodesMap.clear();
+		policyServerMap.clear();
         nodeMap.clear();
     }
 
@@ -162,6 +229,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killNode(String)
      */
     public void killNode(String nodeName) {
+		virtualNodesMap.remove(nodeName);
+		policyServerMap.remove(nodeName);
         nodeMap.remove(nodeName);
     }
 
@@ -392,20 +461,34 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             java.lang.reflect.InvocationTargetException {
         //  System.out.println("XXXXXX creating body on " + this.getURL());
         //   ProActiveConfiguration.getConfiguration().dumpAddedProperties();
+       
+		Body localBody = (Body) bodyConstructorCall.execute();
+       
+       // SECURITY
+		try {
+				localBody.getProActiveSecurityManager().setPolicyServer((PolicyServer) policyServerMap.get(
+						nodeName));
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (SecurityNotAvailableException e) {
+				// do nothing  
+				// security not available
+			}
+        
+
+	
+		registerBody(nodeName, localBody);
+
         if (isLocal) {
             // if the body and proxy are on the same vm, returns the local view
             //System.out.println("body and proxy on the same vm");
-            Body localBody = (Body) bodyConstructorCall.execute();
-
             //System.out.println(localBody.getReifiedObject().getClass().getName());
             //register the body in the nodemap
-            registerBody(nodeName, localBody);
+         
             return (UniversalBody) localBody;
         } else {
             //otherwise return the adapter
             //System.out.println ("RemoteProActiveImpl.createBody "+vmInformation.getInetAddress().getHostName() +" -> new "+bodyConstructorCall.getTargetClassName()+" on node "+nodeName);
-            Body localBody = (Body) bodyConstructorCall.execute();
-            registerBody(nodeName, localBody);
             //System.out.println ("RemoteProActiveRuntimeImpl.localBody created localBody="+localBody+" on node "+nodeName);
             return localBody.getRemoteAdapter();
         }
@@ -415,8 +498,18 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(String, Body)
      */
     public UniversalBody receiveBody(String nodeName, Body body) {
-        registerBody(nodeName, body);
-        UniversalBody boa = body.getRemoteAdapter();
+  
+		UniversalBody boa = body.getRemoteAdapter();
+		try {
+			boa.getProActiveSecurityManager().setPolicyServer((PolicyServer) policyServerMap.get(
+					nodeName)); 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (SecurityNotAvailableException e) {
+			// do nothing 
+		}
+        
+		registerBody(nodeName, body);   
         return boa;
     }
 
@@ -554,4 +647,166 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.processCreatorId = protocolId;
         }
     }
+    
+    // SECURITY
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
+	 */
+	public X509Certificate getCreatorCertificate() {
+		return creatorCertificate;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicyServer()
+	 */
+	public PolicyServer getPolicyServer() {
+		// System.out.println("return my policy server " + policyServer);
+		if (psm != null)
+		return psm.getPolicyServer();
+		return null;
+	}
+
+	public String getVNName(String nodeName) {
+		return (String) virtualNodesMap.get(nodeName);
+	}
+
+	/**
+	 * set policy server to all virtual nodes
+	 */
+	public void setProActiveSecurityManager(ProActiveSecurityManager server) {
+		if (psm != null) {
+			return;
+		}
+		psm = server;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
+	 */
+	public void setDefaultNodeVirtualNodeName(String s) {
+		System.out.println(
+			" ************************ **********************************setting current node as currentJVM tag " +
+			s);
+		defaultNodeVirtualNode = s;
+	}
+
+	public void listVirtualNodes() {
+
+		/*
+		if (defaultNodeVirtualNode != null) {
+		String nodeName = null;
+						try {
+										nodeName = NodeFactory.getDefaultNode().getNodeInformation().getURL();
+								} catch (NodeException e) {
+
+										e.printStackTrace();
+								}
+
+		distantVNMap.put(nodeName,defaultNodeVirtualNode);
+		}
+		*/
+		System.out.println("Local node 1");
+
+		for (Enumeration e = nodeMap.keys(); e.hasMoreElements();) {
+			//VirtualNode vn =(VirtualNode) e.nextElement();
+			String key = (String) e.nextElement();
+			System.out.println("local element " + key);
+		}
+
+		System.out.println("Local node ");
+		for (Enumeration e = virtualNodesMap.elements(); e.hasMoreElements();) {
+			String key = (String) e.nextElement();
+
+			//String s = (String) distantVNMap.get(key);
+			System.out.println(" node " + key + " belongs to ");
+		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
+	 */
+	public PolicyServer getNodePolicyServer(String nodeName) {
+		return (PolicyServer) policyServerMap.get(nodeName);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
+	 */
+	public void enableSecurityIfNeeded() {
+	/*	Enumeration e = virtualNodesMap.elements();
+		for (; e.hasMoreElements(); ){
+			VirtualNode vn = (VirtualNode) e.nextElement();
+			logger.debug("Setting VN " + vn+"-");
+			logger.debug(vn.getName() );
+			logger.debug(" - policyserver " + policyServer);
+			vn.setPolicyServer(policyServer);
+	}
+	*/
+   }
+
+	/** (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
+	 */
+	public X509Certificate getNodeCertificate(String nodeName)  {
+		PolicyServer ps = null ;
+		
+		ps =(PolicyServer) policyServerMap.get(nodeName);
+		if ( ps != null) 
+			return ps.getCertificate();
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
+	 */
+	public ArrayList getEntities(String nodeName)  {
+		PolicyServer ps = null ;
+		Entity nodeEntity = null;
+		String nodeVirtualName = (String) virtualNodesMap.get(nodeName);
+		ps =(PolicyServer) policyServerMap.get(nodeName);
+		
+		if ( ps != null) 
+				 nodeEntity = new EntityVirtualNode(nodeVirtualName,ps.getApplicationCertificate(),ps.getCertificate());
+		
+		ArrayList entities = null;
+		//entities = getEntities();
+		if (entities == null) {
+			entities = new ArrayList();
+		}
+
+		entities.add(nodeEntity);
+		return entities;
+
+		}
+		
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(org.objectweb.proactive.core.body.UniversalBody)
+	 */
+	public ArrayList getEntities(UniversalBody uBody)  {
+		try {
+			return uBody.getEntities();
+			
+		} catch (SecurityNotAvailableException e) {
+			return null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities()
+	 */
+	public ArrayList getEntities()  {
+		PolicyServer  policyServer = psm.getPolicyServer();
+		Entity e = new EntityCertificate(policyServer.getApplicationCertificate(),policyServer.getCertificate());
+		ArrayList array = new ArrayList();
+		array.add(e);
+		
+		return array;
+	}
+	
+	
+
 }
