@@ -117,17 +117,19 @@ public final class MethodCall implements java.io.Serializable {
    * transform the effectiveArguments into a byte[]
    * */
   public void transformEffectiveArgumentsIntoByteArray () {
-	try {
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-	    objectOutputStream.writeObject(effectiveArguments);
-	    objectOutputStream.flush();
-    	objectOutputStream.close();
-    	byteArrayOutputStream.close();
-	    serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+	if ((serializedEffectiveArguments == null) && (effectiveArguments != null)) {
+        try {
+   		   ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+	       ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+	       objectOutputStream.writeObject(effectiveArguments);
+	       objectOutputStream.flush();
+    	   objectOutputStream.close();
+    	   byteArrayOutputStream.close();
+	       serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+	   }
+	   catch (Exception e) { e.printStackTrace(); }
+	   effectiveArguments = null;
 	}
-	catch (Exception e) { e.printStackTrace(); }
-	effectiveArguments = null;
   }
   
 
