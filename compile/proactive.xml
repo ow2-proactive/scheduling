@@ -168,7 +168,18 @@
       ==
       ================================================================
 	-->
-	<target name="testsuite" depends="ext">
+	<target name="copyDivers">
+    	<copy toDir="${classes.dir}">
+        	<fileset dir="${src.dir}">
+            	<include name="**/*.prop"/>
+            	<include name="**/*.css"/>
+            	<include name="**/*.xml"/>
+            	<include name="**/*.xsl"/>
+            	<include name="**/*.xsd"/>
+    		</fileset>
+   		</copy>
+	</target>
+	<target name="testsuite" depends="ext, copyDivers">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>

@@ -183,7 +183,8 @@ public class Group {
                         //                        if (file.getName().matches("Test.*") ||
                         //                                file.getName().matches("Bench.*")) {
                         Class superClass = c;
-                        while (superClass.getSuperclass() != Object.class)
+                        while ((superClass.getSuperclass() != null) &&
+                                (superClass.getSuperclass() != Object.class))
                             superClass = superClass.getSuperclass();
 
                         if (superClass.getName().compareTo(AbstractTest.class.getName()) == 0) {
