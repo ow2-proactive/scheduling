@@ -1,45 +1,45 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.node;
 
-import java.net.UnknownHostException;
-
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.Constants;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+import java.net.UnknownHostException;
 
 
 /**
@@ -71,12 +71,23 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  */
 public class NodeFactory {
     protected static Logger logger = Logger.getLogger(NodeFactory.class.getName());
-    private static final String DEFAULT_NODE_NAME = "//localhost/Node";
+    private static final String DEFAULT_NODE_NAME;
     private static Node defaultNode = null;
 
-	static {
-		ProActiveConfiguration.load();
-	}
+    static {
+        ProActiveConfiguration.load();
+
+        String protocol = UrlBuilder.checkProtocol(System.getProperty(
+                    "proactive.rmi"));
+        String port = System.getProperty("proactive.rmi.port");
+        if (port != null) {
+            DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
+                    protocol, new Integer(port).intValue());
+        } else {
+            DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
+                    protocol);
+        }
+    }
 
     // test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
@@ -104,7 +115,7 @@ public class NodeFactory {
                 throw new NodeException("Cannot create the default Node", e);
             }
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+                    UrlBuilder.checkProtocol(System.getProperty("proactive.rmi")));
         }
         return defaultNode;
     }
@@ -166,8 +177,8 @@ public class NodeFactory {
         //then create a node
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
-            nodeURL = proActiveRuntime.createLocalNode(UrlBuilder.removeProtocol(
-                        url, protocol), replacePreviousBinding);
+            nodeURL = proActiveRuntime.createLocalNode(url,
+                    replacePreviousBinding);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }
@@ -192,9 +203,10 @@ public class NodeFactory {
 
         //do we have any association for this node?
         String protocol = UrlBuilder.getProtocol(nodeURL);
-        String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
+
+        //String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
         try {
-            url = UrlBuilder.checkUrl(noProtocolUrl);
+            url = UrlBuilder.checkUrl(nodeURL);
             proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
@@ -203,5 +215,26 @@ public class NodeFactory {
         }
         Node node = new NodeImpl(proActiveRuntime, url, protocol);
         return node;
+    }
+
+    /**
+     * Kills the node of the given url
+     * @param nodeURL
+     * @throws NodeException if a problem occurs when killing the node
+     */
+    public static void killNode(String nodeURL) throws NodeException {
+        ProActiveRuntime proActiveRuntime;
+        String url;
+
+        String protocol = UrlBuilder.getProtocol(nodeURL);
+        try {
+            url = UrlBuilder.checkUrl(nodeURL);
+            proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
+            proActiveRuntime.killNode(url);
+        } catch (ProActiveException e) {
+            throw new NodeException("Cannot get the node based on " + nodeURL, e);
+        } catch (UnknownHostException e) {
+            throw new NodeException("Cannot get the node based on " + nodeURL, e);
+        }
     }
 }
