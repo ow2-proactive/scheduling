@@ -508,7 +508,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 objectPolicyServer.generateEntityCertificate(objectName);
 
                 localBody.setPolicyServer(objectPolicyServer);
-                localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMap.get(
+                localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMapNodes.get(
                         nodeName));
             }
 
