@@ -958,7 +958,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
             if ((bsub == null) && (prun == null) && (globus == null) &&
-                    (pbs == null) && (oar == null)) {
+                    (pbs == null) && (oar == null) && (sge == null) {
                 //if bsub and prun and globus are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
