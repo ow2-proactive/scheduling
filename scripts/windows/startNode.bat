@@ -12,8 +12,10 @@ echo    - 1 : the url of the node to create
 echo. 
 echo ex : startNode  rmi://localhost/node1
 echo ex : startNode jini://localhost/node2
+echo.
+echo Node started with a random name
 echo. 
-goto end
+goto doit
 
 
 :doit
