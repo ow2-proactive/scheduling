@@ -10,6 +10,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -19,6 +20,7 @@ import org.objectweb.proactive.core.component.controller.ProActiveBindingControl
 import org.objectweb.proactive.core.component.controller.ProActiveComponentParametersController;
 import org.objectweb.proactive.core.component.controller.ProActiveContentController;
 import org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
@@ -32,7 +34,7 @@ import java.util.Vector;
 
 /**
  * The base class for managing components.
- * It defines the "membrane" of the fractal model : the controllers of the
+ * It builds the "membrane" in the Fractal terminology : the controllers of the
  * components.
  *
  *
@@ -62,7 +64,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         //this.body = myBody;
         //this.componentParameters = componentParameters;
         boolean component_is_primitive = componentParameters.getHierarchicalType()
-                                                            .equals(ComponentParameters.PRIMITIVE);
+                                                            .equals(Constants.PRIMITIVE);
 
         // add interface references
         Vector interface_references_vector = new Vector(4);
@@ -80,7 +82,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
 
         // add a binding controller
         // only exception : primitive without any client interface 
-        if (!(componentParameters.getHierarchicalType().equals(ComponentParameters.PRIMITIVE) &&
+        if (!(componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 (componentParameters.getClientInterfaceTypes().length == 0))) {
             interface_references_vector.add(new ProActiveBindingController(this));
         } else {
@@ -93,8 +95,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         }
 
         // create a content controller only if the component is a composite (or a parallel composite)
-        if (componentParameters.getHierarchicalType().equals(ComponentParameters.COMPOSITE) ||
-                (componentParameters.getHierarchicalType().equals(ComponentParameters.PARALLEL))) {
+        if (componentParameters.getHierarchicalType().equals(Constants.COMPOSITE) ||
+                (componentParameters.getHierarchicalType().equals(Constants.PARALLEL))) {
             // add and resize
             interface_references_vector.addElement(new ProActiveContentController(
                     this));
@@ -115,7 +117,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                             component_is_primitive);
                 }
                 // if we have a server port of a  PARALLEL component, we also create a group proxy on the delegatee field
-                else if (componentParameters.getHierarchicalType().equals(ComponentParameters.PARALLEL) &&
+                else if (componentParameters.getHierarchicalType().equals(Constants.PARALLEL) &&
                         (!interface_types[i].isFcClientItf())) {
                     // parallel component have a collective port on their server interfaces
                     itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i],
@@ -130,7 +132,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                 }
 
                 // set delegation link
-                if (componentParameters.getHierarchicalType().equals(ComponentParameters.PRIMITIVE)) {
+                if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
                     // no group case
                     if (!interface_types[i].isFcCollectionItf()) {
                         if (!interface_types[i].isFcClientItf()) {
@@ -145,10 +147,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                     // the designation of the delegation object (impl) is deferred to binding time
                 }
                 interface_references_vector.addElement(itf_ref);
-
-                if (logger.isDebugEnabled()) {
-                    //logger.debug(((ProActiveInterface) itf_ref).toString());
-                }
             }
         } catch (Exception e) {
             if (logger.isDebugEnabled()) {
@@ -182,7 +180,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * @see org.objectweb.fractal.api.Component#getFcInterface(String)
+     * see {@link org.objectweb.fractal.api.Component#getFcInterface(String)}
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
@@ -225,7 +223,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * @see org.objectweb.fractal.api.Component#getFcInterfaces()
+     * see {@link org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
         Vector external_interfaces = new Vector(interfaceReferences.length);
@@ -239,7 +237,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * @see org.objectweb.fractal.api.Component#getFcType()
+     * see {@link org.objectweb.fractal.api.Component#getFcType()}
      */
     public Type getFcType() {
         try {
@@ -253,42 +251,42 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * @see org.objectweb.fractal.api.Interface#getFcItfName()
+     * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
     public String getFcItfName() {
         return Constants.COMPONENT;
     }
 
     /**
-     * @see org.objectweb.fractal.api.Interface#getFcItfOwner()
+     * see {@link org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
     public Component getFcItfOwner() {
         return (Component) this;
     }
 
     /**
-     * @see org.objectweb.fractal.api.Interface#getFcItfType()
+     * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public Type getFcItfType() {
         return getFcType();
     }
 
     /**
-     * @see org.objectweb.fractal.api.Interface#isFcInternalItf()
+     * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
      */
     public boolean isFcInternalItf() {
         return false;
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.component.ProActiveComponent#getComponentIdentity()
+     * see {@link org.objectweb.proactive.core.body.component.ProActiveComponent#getComponentIdentity()}
      */
     public Component getComponentIdentity() {
         return this;
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.component.ProActiveComponent#getHierarchicalType()
+     * see {@link org.objectweb.proactive.core.body.component.ProActiveComponent#getHierarchicalType()}
      */
     public String getHierarchicalType() throws NoSuchInterfaceException {
         //return componentParameters.getHierarchicalType();
@@ -330,23 +328,30 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * components are equal if they have the same parameters.
-     * @see org.objectweb.proactive.core.component.ProActiveComponent#equals(org.objectweb.fractal.api.Component)
+     * Components are equal if they have the same UniqueID.
+     * However, it is only possible to compare the current component with a reference
+     * on another component, in other words with a ProActiveComponentRepresentative object.
+     *
+     * see {@link org.objectweb.proactive.core.component.ProActiveComponent#equals(org.objectweb.fractal.api.Component)}
      */
-    public boolean equals(Component componentIdentity) {
-        try {
-            return ((ComponentParametersController) componentIdentity
-                    .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                    .equals(getComponentParameters());
-        } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException("cannot compare objects", nsie);
+    public boolean equals(Object component) {
+        if (component instanceof ProActiveComponentRepresentative) {
+            return getBody().getID().equals(((ProActiveComponentRepresentative) component).getID());
+        } else {
+            logger.error(
+                "can only compare the current component with component representatives");
+            return false;
         }
     }
 
-    /**
-     * FIXME : improper implementation ?
-     */
     public int hashCode() {
-        return 0;
+        return getBody().hashCode();
+    }
+
+    /**
+     * see {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getID()}
+     */
+    public UniqueID getID() {
+        return getBody().getID();
     }
 }
