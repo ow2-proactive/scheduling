@@ -79,12 +79,9 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RemoteBodyAdapter() {
-    }
-
-    public RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
-        //	Thread.dumpStack();
-        //	ProActiveConfiguration.getConfiguration().dumpLoadedProperties();
+    protected RemoteBodyAdapter() {}
+    
+    protected void construct (RemoteBody remoteBody) throws ProActiveException {
         this.proxiedRemoteBody = remoteBody;
         if (logger.isDebugEnabled()) {
             logger.debug(proxiedRemoteBody.getClass());
@@ -93,19 +90,20 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
             this.bodyID = remoteBody.getID();
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
-        }
+        }    	
+    }
+    
+    private RemoteBodyAdapter (RemoteBody remoteBody) throws ProActiveException {
+    	construct (remoteBody);
     }
 
     public RemoteBodyAdapter(UniversalBody body) throws ProActiveException {
         try {
-            this.proxiedRemoteBody = new RemoteBodyImpl(body);
+        		RemoteBody remoteBody = new RemoteBodyImpl(body);
+                construct (remoteBody);
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(proxiedRemoteBody.getClass());
-        }
-        this.bodyID = body.getID();
     }
 
     //

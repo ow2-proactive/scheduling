@@ -51,6 +51,7 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
 import java.rmi.UnmarshalException;
+import java.rmi.server.UnicastRemoteObject;
 
 import java.security.cert.X509Certificate;
 
@@ -78,19 +79,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     // -- Constructors -----------------------------------------------
     //
     public RemoteProActiveRuntimeAdapter() throws ProActiveException {
-        try {
-            this.remoteProActiveRuntime = createRemoteProActiveRuntime();
-
-            //System.out.println(remoteProActiveRuntime.getClass().getName());
-            this.vmInformation = remoteProActiveRuntime.getVMInformation();
-            this.proActiveRuntimeURL = remoteProActiveRuntime.getURL();
-        } catch (java.rmi.RemoteException e) {
-            throw new ProActiveException("Cannot create the remoteProactiveRuntime or get the VMInformation from the RemoteProActiveRuntime",
-                e);
-        } catch (java.rmi.AlreadyBoundException e) {
-            throw new ProActiveException(
-                "Cannot bind remoteProactiveRuntime to" + proActiveRuntimeURL, e);
-        }
+   
     }
 
     public RemoteProActiveRuntimeAdapter(
@@ -531,14 +520,4 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
             throw new ProActiveException(re);
         }
     }
-
-	//
-    // -- PROTECTED METHODS -----------------------------------------------
-    //
-    protected RemoteProActiveRuntime createRemoteProActiveRuntime()
-        throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
-        return new RemoteProActiveRuntimeImpl();
-    }
-
-
 }

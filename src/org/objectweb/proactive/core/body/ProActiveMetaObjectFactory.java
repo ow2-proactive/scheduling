@@ -337,6 +337,12 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                     }
 
                     return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
+                } else if ("rmissh".equals(System.getProperty(
+                			"proactive.communication.protocol"))) {
+                	if (logger.isDebugEnabled()) {
+                		logger.debug("Factory is rmissh");
+                	}
+                	return new org.objectweb.proactive.core.body.rmi.SshRemoteBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmi");

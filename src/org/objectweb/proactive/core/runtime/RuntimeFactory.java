@@ -249,6 +249,9 @@ public abstract class RuntimeFactory {
 
         setFactory(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
             "org.objectweb.proactive.core.runtime.http.RemoteRuntimeFactory");
+        
+        setFactory(Constants.RMISSH_PROTOCOL_IDENTIFIER,
+        "org.objectweb.proactive.core.runtime.rmi.SshRemoteRuntimeFactory");
 
         setFactory(Constants.RMI_PROTOCOL_IDENTIFIER,
             "org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory");

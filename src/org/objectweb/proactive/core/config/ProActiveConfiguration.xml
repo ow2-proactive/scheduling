@@ -21,6 +21,17 @@
 		<prop key="ibis.name_server.key" value="12"/>
 		<prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive"/>
 		<prop key="ibis.name" value="tcp"/>
+		
+		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
+
+		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
+		<prop key="proactive.tunneling.try_normal_first" value="yes"/>
+		<prop key="proactive.tunneling.use_gc" value="yes"/>
+		<prop key="proactive.tunneling.gc_period" value="10000"/>
+		<!-- <prop key="proactive.ssh.known_hosts" value="/user/mlacage/home/.ssh/known_hosts"/> -->
+		<!-- <prop key="proactive.ssh.key_directory" value="/user/mlacage/home/.ssh/"/> -->
+		<!-- <prop key="proactive.ssh.port" value="22"/> -->
+		<!-- <prop key="proactive.ssh.username" value="mlacage"/> -->
 	</properties>
 </ProActiveUserProperties>
  

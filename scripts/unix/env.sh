@@ -120,6 +120,10 @@ if [ -f $PROACTIVE/lib/ow_deployment_scheduling.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ow_deployment_scheduling.jar
 fi
+if [ -f $PROACTIVE/lib/jsch.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
+fi
 
 
 echo "CLASSPATH"=$CLASSPATH

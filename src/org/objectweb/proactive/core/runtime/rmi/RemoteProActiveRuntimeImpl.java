@@ -16,6 +16,9 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.Constants;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
 
 import java.io.IOException;
 
@@ -54,8 +57,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     //	
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RemoteProActiveRuntimeImpl()
-        throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
+    private void construct () throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         //System.out.println("toto");
         this.hasCreatedRegistry = RegistryHelper.getRegistryCreator();
         this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -65,7 +67,18 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         this.proActiveRuntimeURL = buildRuntimeURL();
         //            java.rmi.Naming.bind(proActiveRuntimeURL, this);
         register(proActiveRuntimeURL, false);
-        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
+        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);    	
+    }
+    
+    public RemoteProActiveRuntimeImpl()
+        throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
+    	construct ();
+    }
+    
+    public RemoteProActiveRuntimeImpl (RMIClientSocketFactory csf, RMIServerSocketFactory ssf) 
+    	throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
+    	super (0, csf, ssf);
+    	construct ();
     }
 
     //
@@ -370,10 +383,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         throws java.rmi.RemoteException {
         try {
             if (replacePreviousBinding) {
-                java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url, "rmi:"),
+                java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url, getProtocol ()),
                     this);
             } else {
-                java.rmi.Naming.bind(UrlBuilder.removeProtocol(url, "rmi:"),
+                java.rmi.Naming.bind(UrlBuilder.removeProtocol(url, getProtocol ()),
                     this);
             }
             if (url.indexOf("PA_JVM") < 0) {
@@ -390,7 +403,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
     private void unregister(String url) throws java.rmi.RemoteException {
         try {
-            java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, "rmi:"));
+            java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, getProtocol ()));
             if (url.indexOf("PA_JVM") < 0) {
                 logger.info(url + " unbound in registry");
             }
@@ -413,13 +426,17 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             logger.info(url + "is not bound in the registry", e);
         }
     }
+    
+    protected String getProtocol () {
+    	return Constants.RMI_PROTOCOL_IDENTIFIER;
+    }
 
     private String buildRuntimeURL() {
         int port = RemoteRuntimeFactory.getRegistryHelper()
                                        .getRegistryPortNumber();
         String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
-        return UrlBuilder.buildUrl(host, name, "rmi:", port);
+        return UrlBuilder.buildUrl(host, name, getProtocol (), port);
     }
 
     private String buildNodeURL(String url)
@@ -431,7 +448,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
             int port = RemoteRuntimeFactory.getRegistryHelper()
                                            .getRegistryPortNumber();
-            return UrlBuilder.buildUrl(host, url, "rmi:", port);
+            return UrlBuilder.buildUrl(host, url, getProtocol (), port);
         } else {
             return UrlBuilder.checkUrl(url);
         }

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.rmi;
 
+import org.objectweb.proactive.core.ssh.SshParameters;
+
 public class ClassServerHelper {
 
     /**
@@ -87,9 +89,15 @@ public class ClassServerHelper {
         } else {
             currentClassServer = new ClassServer(classpath);
         }
-        System.setProperty("java.rmi.server.codebase",
-            "http://" + currentClassServer.getHostname() + ":" +
-            ClassServer.getServerSocketPort() + "/");
+        String codebase;
+        if (SshParameters.getSshTunneling ()) {
+    		codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
+            	ClassServer.getServerSocketPort() + "/"; 
+    	} else {
+    		codebase = "http://" + currentClassServer.getHostname() + ":" +
+            	ClassServer.getServerSocketPort() + "/";
+    	}
+        System.setProperty("java.rmi.server.codebase", codebase);
     }
 
     //

@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.runtime.rmi;
 
 import java.rmi.RemoteException;
+import java.rmi.registry.Registry;
+import java.rmi.registry.LocateRegistry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
@@ -102,9 +104,9 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         throws ProActiveException {
         //if (s == null) return null;
         try {
-            RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(UrlBuilder.removeProtocol(
-                        s, "rmi:"));
-
+        	RemoteProActiveRuntime remoteProActiveRuntime;
+        	String URL = UrlBuilder.removeProtocol(s, "rmi:");
+        	remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(URL);
             //System.out.println(remoteProActiveRuntime.getClass().getName());
             return createRuntimeAdapter(remoteProActiveRuntime);
         } catch (java.rmi.RemoteException e) {
@@ -124,14 +126,19 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
 
     protected RemoteProActiveRuntimeAdapter createRuntimeAdapter()
         throws ProActiveException {
-        return new RemoteProActiveRuntimeAdapter();
+    	RemoteProActiveRuntimeImpl impl;
+        try {
+        	impl = new RemoteProActiveRuntimeImpl ();
+        } catch (java.rmi.RemoteException e) {
+            throw new ProActiveException("Cannot create the RemoteProActiveRuntimeImpl", e);
+        } catch (java.rmi.AlreadyBoundException e) {
+            throw new ProActiveException(
+                "Cannot bind remoteProactiveRuntime", e);
+        }
+        return new RemoteProActiveRuntimeAdapter (impl);
     }
 
     public static RegistryHelper getRegistryHelper() {
         return registryHelper;
     }
-
-    //
-    // -- PRIVATE METHODS -----------------------------------------------
-    //
 }
