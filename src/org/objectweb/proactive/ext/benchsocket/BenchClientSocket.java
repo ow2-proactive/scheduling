@@ -11,84 +11,90 @@ import java.net.SocketException;
 
 import java.nio.channels.SocketChannel;
 
-
-/**
- *
- * @author fabrice
- *
- * A wrapper to a real socket
- * to measure the size of data sent
- */
 public class BenchClientSocket extends Socket {
     private static int counter;
     private Socket realSocket;
     private BenchOutputStream output;
     private BenchInputStream input;
     private int number;
-
-    public BenchClientSocket() throws IOException {
-        this.realSocket = new Socket();
-        //        this.output = this.createOutputStream();
-        //        this.input = this.createInputStream();
-        this.createStreams();
-    }
-
-    public BenchClientSocket(Socket s) throws IOException {
-    	this.realSocket =s;
-    	//        this.output = this.createOutputStream();
-    	//        this.input = this.createInputStream();
-    	this.createStreams();
-    }
+	private BenchFactory parent;
     
-    public BenchClientSocket(String host, int port) throws IOException {
-        this.realSocket = new Socket(host, port);
-        //        this.output = this.createOutputStream();
-        //        this.input = this.createInputStream();
-        this.createStreams();
+    public BenchClientSocket() throws IOException {
+        synchronized (BenchClientSocket.class) {
+            BenchClientSocket.counter++;
+            this.number = BenchClientSocket.counter;
+            this.realSocket = new Socket();
+            this.createStreams();
+        }
     }
 
-    protected BenchOutputStream createOutputStream() throws IOException {
+    public BenchClientSocket(Socket s, BenchFactory parent) throws IOException {
         synchronized (BenchClientSocket.class) {
-            this.number = BenchClientSocket.counter;
             BenchClientSocket.counter++;
+            this.number = BenchClientSocket.counter;
+            this.realSocket = s;
+            this.parent = parent;
+            this.createStreams();
         }
-        return new BenchOutputStream(realSocket.getOutputStream(), this.number);
     }
 
-    protected BenchInputStream createInputStream() throws IOException {
+    public BenchClientSocket(String host, int port, BenchFactory parent) throws IOException {
         synchronized (BenchClientSocket.class) {
-            this.number = BenchClientSocket.counter;
             BenchClientSocket.counter++;
+            this.number = BenchClientSocket.counter;
+            this.realSocket = new Socket(host, port);
+            this.parent = parent;
+            this.createStreams();
         }
-        return new BenchInputStream(realSocket.getInputStream(), this.number);
+    }
+
+    public BenchClientSocket(InetAddress address, int port, BenchFactory parent)
+        throws IOException {
+        synchronized (BenchClientSocket.class) {
+            BenchClientSocket.counter++;
+            this.number = BenchClientSocket.counter;
+            this.realSocket = new Socket(address, port);
+            this.parent = parent;
+            this.createStreams();
+        }
     }
 
     public void createStreams() throws IOException {
         synchronized (BenchClientSocket.class) {
             this.number = BenchClientSocket.counter;
-            BenchClientSocket.counter++;
         }
+
         this.output = new BenchOutputStream(realSocket.getOutputStream(),
-                this.number);
-        ;
+                this.number, this);
+        this.parent.addStream(this.output);
+
         this.input = new BenchInputStream(realSocket.getInputStream(),
-                this.number);
+                this.number, this);
+        this.parent.addStream(this.input);
     }
 
-    /* (non-Javadoc)
-     * @see java.net.Socket#bind(java.net.SocketAddress)
-     */
+    public String toString() {
+        return this.realSocket.toString();
+    }
+
     public void bind(SocketAddress bindpoint) throws IOException {
-        //  Auto-generated method stub
         this.realSocket.bind(bindpoint);
     }
 
-    /* (non-Javadoc)
-     * @see java.net.Socket#close()
-     */
+
     public synchronized void close() throws IOException {
-        //  Auto-generated method stub
+        if (this.input != null) {
+            this.input.close();
+            this.input=null;
+        }
+        if (this.output != null) {
+            this.output.close();
+            this.output = null;
+        }
+        if (this.realSocket!=null) {
         this.realSocket.close();
+        this.realSocket=null;
+        }
     }
 
     /* (non-Javadoc)
