@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
+import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
@@ -877,6 +878,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         GlobusProcess globus = null;
         PBSSubProcess pbs = null;
         OARSubProcess oar = null;
+        GridEngineSubProcess sge = null;
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
@@ -934,6 +936,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 //if the process is globus we have to increase the node count by the number of processors
                 globus = (GlobusProcess) processImpl;
                 increaseNodeCount((new Integer(globus.getCount()).intValue()) * nodeNumber);
+            }
+            
+            if (processImpl instanceof GridEngineSubProcess){
+                sge = (GridEngineSubProcess)processImpl;
+                increaseNodeCount((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
             }
 
             processImplDecorator = (ExternalProcessDecorator) processImpl;
