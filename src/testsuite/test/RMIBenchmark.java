@@ -20,15 +20,15 @@ import java.rmi.Remote;
  *
  */
 public abstract class RMIBenchmark extends ProActiveBenchmark
-    implements Serializable {
+    implements Serializable, Remote {
     private String rmiObjectName = "RMIBenchmark";
+    private RMIBenchmark rmiObject = null;
 
     /**
      *
      */
     public RMIBenchmark() {
         super(null, "RMI Benchmark", "Create benchmark with Java RMI.");
-        initRegistry();
     }
 
     /**
@@ -59,6 +59,7 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
             RMIBenchmark active = (RMIBenchmark) ProActive.newActive(getClass()
                                                                          .getName(),
                     null, getNode());
+            active.setRmiObjectName(rmiObjectName);
             active.bind();
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Can't create an active object", e);
@@ -73,17 +74,21 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
     }
 
     public void bind() throws Exception {
-        Class c = getClass().getClassLoader().loadClass(getClass().getName());
-        RMIBenchmark o = (RMIBenchmark) c.newInstance();
-        Naming.rebind(getNode().getNodeInformation().getURL().replaceAll("Dispatcher.*",
-                "") + rmiObjectName, (Remote)o);
+        Naming.rebind("//localhost/" + getRmiObjectName(), this);
+    }
+
+    public void unbind() throws Exception {
+        Naming.unbind("//localhost/" + getRmiObjectName());
     }
 
     /**
+     * Don't override this one
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        // nothing to do
+        rmiObject = (RMIBenchmark) Naming.lookup("//" +
+                getNode().getNodeInformation().getInetAddress().getHostAddress() +
+                "/" + getRmiObjectName());
     }
 
     /**
@@ -105,5 +110,12 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
      */
     public void setRmiObjectName(String rmiObjectName) {
         this.rmiObjectName = rmiObjectName;
+    }
+
+    /**
+     * @return
+     */
+    public RMIBenchmark getRmiObject() {
+        return rmiObject;
     }
 }
