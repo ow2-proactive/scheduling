@@ -34,13 +34,11 @@ import java.io.Serializable;
 
 public class FixWrapper implements Serializable {
 
-  public boolean isPrimitive = false;
-  public Class encapsulated = null;
+  public boolean isPrimitive;
+  public Class encapsulated;
 
 
-  public FixWrapper() {
-    isPrimitive = false;
-  }
+  public FixWrapper() {}
 
 
   /**
@@ -48,19 +46,15 @@ public class FixWrapper implements Serializable {
    */
   public FixWrapper(Class c) {
     if (!c.isPrimitive()) {
-      this.isPrimitive = false;
       this.encapsulated = c;
       return;
     }
     if (c.getName().equals("int")) {
       this.isPrimitive = true;
       this.encapsulated = Integer.class;
-      return;
-    }
-    if (c.getName().equals("boolean")) {
+    } else if (c.getName().equals("boolean")) {
       this.isPrimitive = true;
       this.encapsulated = Boolean.class;
-      return;
     }
 
   }
@@ -71,7 +65,6 @@ public class FixWrapper implements Serializable {
    *
    */
   public Class getWrapped() {
-
     if (this.isPrimitive) {
       if (this.encapsulated.getName().equals("java.lang.Integer")) {
         //	System.out.println("Found an encapsulated integer");

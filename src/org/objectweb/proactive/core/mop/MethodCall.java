@@ -295,29 +295,6 @@ public final class MethodCall extends Object implements Serializable {
     return tmp;
   }
 
-  //  public void debugInt(Class[] para)
-  //     {
-  // 	for (int i = 0; i < para.length; i++)
-  // 	    {
-  // 	 	if (para[i].getName().equals("int"))
-  //  		    {
-  //  			para[i] = IntWrapper.class;
-  //  		    }
-  // 	    }
-  //     }
-
-  //     public void debugIntWrapper(Class[] para)
-  //     {
-  // 	for (int i = 0; i < para.length; i++)
-  // 	    {
-  // 		if (para[i].getName().equals("org.objectweb.proactive.core.mop.IntWrapper"))
-  // 		    {
-  // 			// para[i] = int.class;
-  // 			para[i] = Integer.TYPE;
-  // 		    }
-  // 	    }
-  //     }
-
 
   //
   // PRIVATE METHODS -----------------------------------------------------------------------
@@ -330,20 +307,6 @@ public final class MethodCall extends Object implements Serializable {
     String simpleName;
     Class[] parameters;
 
-    //MODIFIE POUR FLORIAN
-    //26-08-99
-
-    // 	boolean exception;
-    // 	do
-    // 	    {
-    // 		exception = false;
-    // 		try {
-    // We want to implement a workaround the Method class
-    // not being Serializable
-    // 	for (int i = 0; i < this.effectiveArguments.length; i++)
-    // 	    {
-    // 		System.out.println("Effective argument class = " + this.effectiveArguments[i].getClass());
-    // 	    }
     out.writeObject(this.effectiveArguments);
 
       
@@ -353,25 +316,9 @@ public final class MethodCall extends Object implements Serializable {
 
     simpleName = this.reifiedMethod.getName();
     out.writeObject(simpleName);
-
-      
-    //MODIFIED 14/02/01 BY FAB
-    //	parameters = this.reifiedMethod.getParameterTypes ();
-    //	this.debugInt(parameters);
-    //out.writeObject(parameters);
     out.writeObject(this.fixBugWrite(this.reifiedMethod.getParameterTypes()));
-
     out.writeObject(this.res);
     out.writeLong(this.id);
-
-      
-    //	out.writeBoolean(this.forwarded);
-    // 	} catch (Exception e) 
-    // 		    {
-    // 			System.out.println("WARNING MethodCall: Exception " +e);
-    // 			exception = true;
-    // 		    }
-    // 	    } while (exception);
   }
 
 
@@ -387,10 +334,6 @@ public final class MethodCall extends Object implements Serializable {
     // up the method
     declaringClass = (Class)in.readObject();
     simpleName = (String)in.readObject();
-
-    //MODIFIED 14/02/01 BY FAB
-    //parameters = (Class[]) in.readObject();
-    // this.debugIntWrapper(parameters);
     parameters = this.fixBugRead((FixWrapper[])in.readObject());
 
   

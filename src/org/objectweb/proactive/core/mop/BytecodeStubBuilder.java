@@ -54,33 +54,22 @@ public class BytecodeStubBuilder {
 
     // We only instanciate the following InstructionList objet once and then
     // clean it and reuse it for each new method that we want to build
-    protected InstructionList il = new InstructionList();
+    protected InstructionList instructionList = new InstructionList();
 
     // A few constants that come in handy when using BCEL in our case
-    protected static final Type CLASS_TYPE;
-    protected static final Type CLASS_ARRAY_TYPE;
-    protected static final Type OBJECT_TYPE;
-    protected static final Type OBJECT_ARRAY_TYPE;
-    protected static final Type METHOD_TYPE;
-    protected static final Type METHOD_ARRAY_TYPE;
-    protected static final Type PROXY_TYPE;
+    protected static final Type CLASS_TYPE = convertClassNameToType("java.lang.Class");
+    protected static final Type CLASS_ARRAY_TYPE = new ArrayType(CLASS_TYPE, 1);
+    protected static final Type OBJECT_TYPE = convertClassNameToType("java.lang.Object");
+    protected static final Type OBJECT_ARRAY_TYPE = new ArrayType(OBJECT_TYPE, 1);
+    protected static final Type METHOD_TYPE = convertClassNameToType("java.lang.reflect.Method");
+    protected static final Type METHOD_ARRAY_TYPE = new ArrayType(METHOD_TYPE, 1);
+    protected static final Type PROXY_TYPE = convertClassNameToType("org.objectweb.proactive.core.mop.Proxy");
+    protected static final Type METHODCALL_TYPE = convertClassNameToType("org.objectweb.proactive.core.mop.MethodCall");
 
-    protected static final String STUB_INTERFACE_NAME;
-    protected static final String PROXY_FIELD_NAME;
 
-    // The static initializer that sets up all the constant fields
-    static {
-        CLASS_TYPE = convertClassNameToType("java.lang.Class");
-        CLASS_ARRAY_TYPE = new ArrayType(CLASS_TYPE, 1);
-        OBJECT_TYPE = convertClassNameToType("java.lang.Object");
-        OBJECT_ARRAY_TYPE = new ArrayType(OBJECT_TYPE, 1);
-        METHOD_TYPE = convertClassNameToType("java.lang.reflect.Method");
-        METHOD_ARRAY_TYPE = new ArrayType(METHOD_TYPE, 1);
-        PROXY_TYPE = convertClassNameToType("org.objectweb.proactive.core.mop.Proxy");
-
-        STUB_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
-        PROXY_FIELD_NAME = "myProxy";
-    }
+    protected static final String STUB_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
+    protected static final String PROXY_FIELD_NAME = "myProxy";
+    
 
     public BytecodeStubBuilder(String classname) throws ClassNotFoundException {
 //      System.out.println ("Creating builder for class "+classname);
@@ -130,7 +119,7 @@ public class BytecodeStubBuilder {
         for (int i = 0; i < this.methods.length; i++) {
             MethodGen mg = this.createMethod(i, this.methods[i]);
             this.classGenerator.addMethod(mg.getMethod());
-            il.dispose();
+            instructionList.dispose();
         }
 
         // Creates the two methods getProxy and setProxy
@@ -148,8 +137,9 @@ public class BytecodeStubBuilder {
 
         // Actually creates the class and returns the result
         JavaClass theClass = this.classGenerator.getJavaClass();
-        /*
+        
         // Next few lines for debugging only
+        /*
         try {
           theClass.dump (theClass.getClassName()+".class");
         } catch (java.io.IOException e) {
@@ -167,9 +157,10 @@ public class BytecodeStubBuilder {
 
         // Extracts return and arguments types
         Type returnType = convertClassToType(m.getReturnType());
-        Type[] argumentTypes = new Type[m.getParameterTypes().length];
+        Class[] methodParams = m.getParameterTypes();
+        Type[] argumentTypes = new Type[methodParams.length];
         for (int i = 0; i < argumentTypes.length; i++) {
-            argumentTypes[i] = convertClassToType(m.getParameterTypes()[i]);
+          argumentTypes[i] = convertClassToType(methodParams[i]);
         }
 
         // Creates argument names
@@ -185,10 +176,9 @@ public class BytecodeStubBuilder {
                                      argumentNames, // arg names
                                      m.getName(), // Method name
                                      this.stubClassFullName, // Class name
-                                     il, // Instructions list
+                                     instructionList, // Instructions list
                                      this.classGenerator.getConstantPool()
         );
-
         return mg;
     }
 
@@ -246,93 +236,82 @@ public class BytecodeStubBuilder {
     }
 
     protected MethodGen createMethod(int methodIndex, Method m) {
-        ConstantPoolGen cp = this.classGenerator.getConstantPool();
-        MethodGen mg = this.createMethodGenerator(m);
-
-        InstructionFactory factory = new InstructionFactory(this.classGenerator);
+        ConstantPoolGen cp = classGenerator.getConstantPool();
+        MethodGen mg = createMethodGenerator(m);
+        InstructionFactory factory = new InstructionFactory(classGenerator);
 
         // First, check if the method is called from within the constructor
         // Load 'this' onto the stack
-        il.append(factory.createThis());
+        instructionList.append(factory.createThis());
 
+        // System.out.println ("BOO m="+m);
         // Gets the value of the field 'outsideConstructor'
-//    System.out.println ("BOO:"+this.stubClassFullName);
-        il.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
+        instructionList.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
 
         // Now we create the code for the case where we are outside of
         // the constructor, i.e. we want the call to be reified
 
         // Pushes on the stack the reference to the proxy object
-        InstructionHandle outsideConstructorHandle = il.append(factory.createThis());
-        il.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
+        InstructionHandle outsideConstructorHandle = instructionList.append(factory.createThis());
+        instructionList.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
 
         // Pushes on the stack the Method object that represents the current method
-        il.append(factory.createGetStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
-        il.append(new PUSH(this.classGenerator.getConstantPool(), methodIndex));
-        il.append(factory.createArrayLoad(METHOD_TYPE));
+        instructionList.append(factory.createGetStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
+        instructionList.append(new PUSH(this.classGenerator.getConstantPool(), methodIndex));
+        instructionList.append(factory.createArrayLoad(METHOD_TYPE));
 
+        Class[] paramTypes = m.getParameterTypes();
         // Create an array of type Object[] for holding all the parameters
         // Push on the stack the size of the array
-        il.append(new PUSH(this.classGenerator.getConstantPool(), m.getParameterTypes().length));
+        instructionList.append(new PUSH(this.classGenerator.getConstantPool(), paramTypes.length));
         // Creates an array of class objects of that size
-        il.append((Instruction) factory.createNewArray(OBJECT_TYPE, (byte) 1));
-
+        instructionList.append((Instruction) factory.createNewArray(OBJECT_TYPE, (byte) 1));
         // Fill in the array with the parameters
-        for (int i = 0; i < m.getParameterTypes().length; i++) {
+        for (int i = 0; i < paramTypes.length; i++) {
             // First, duplicate the reference to the array of type Object[]
             // That currently sits on top of the stack
-            il.append(factory.createDup(1));
+            instructionList.append(factory.createDup(1));
 
             // Load the array index for storing the result
-            il.append(new PUSH(this.classGenerator.getConstantPool(), i));
+            PUSH push = new PUSH(this.classGenerator.getConstantPool(), i);
+            instructionList.append(push);
 
-            Type theType = convertClassToType(m.getParameterTypes()[i]);
+            Type theType = convertClassToType(paramTypes[i]);
 
             // If it is a primitive type, we need to create the wrapper here
-            if (m.getParameterTypes()[i].isPrimitive()) {
+            if (paramTypes[i].isPrimitive()) {
                 // If we have a primitive type, we need to first create a wrapper objet
-                String nameOfWrapper = Utils.nameOfWrapper(m.getParameterTypes()[i]);
-                il.append(factory.createNew(nameOfWrapper));
-                il.append(factory.createDup(1));
-
+                String nameOfWrapper = Utils.nameOfWrapper(paramTypes[i]);
+                instructionList.append(factory.createNew(nameOfWrapper));
+                instructionList.append(factory.createDup(1));
                 // Load the primitive value on to the stack
-                il.append(factory.createLoad(theType, (i + 1)));
+                instructionList.append(factory.createLoad(theType, i + 1));
 
                 // Now, we call the constructor of the wrapper
-                Type[] argtypes = new Type[1];
-                argtypes[0] = convertClassToType(m.getParameterTypes()[i]);
-                il.append(factory.createInvoke(nameOfWrapper,
-                                               "<init>",
-                                               Type.VOID,
-                                               argtypes,
-                                               Constants.INVOKESPECIAL));
+                Type[] argtypes = new Type[] { convertClassToType(paramTypes[i]) };
+                instructionList.append(factory.createInvoke(nameOfWrapper, "<init>", Type.VOID, argtypes, Constants.INVOKESPECIAL));
             } else {
                 // Simply pushes the argument on to the stack
-                il.append(factory.createLoad(theType, (i + 1)));
+                instructionList.append(factory.createLoad(theType, i + 1));
             }
 
             // Stores the object in the array
-            il.append(factory.createArrayStore(OBJECT_TYPE));
+            instructionList.append(factory.createArrayStore(OBJECT_TYPE));
         }
 
         // So now we have the Method object and the array of objects on the stack,
         // Let's call the static method MethodCall.getMethodCall.
-        Type[] argtypes = new Type[2];
-        argtypes[0] = METHOD_TYPE;
-        argtypes[1] = OBJECT_ARRAY_TYPE;
-        il.append(factory.createInvoke("org.objectweb.proactive.core.mop.MethodCall",
+        instructionList.append(factory.createInvoke("org.objectweb.proactive.core.mop.MethodCall",
                                        "getMethodCall",
-                                       convertClassNameToType("org.objectweb.proactive.core.mop.MethodCall"),
-                                       argtypes,
+                                       METHODCALL_TYPE,
+                                       new Type[] { METHOD_TYPE, OBJECT_ARRAY_TYPE },
                                        Constants.INVOKESTATIC));
 
         // Now, call 'reify' on the proxy object
-        argtypes = new Type[1];
-        argtypes[0] = convertClassNameToType("org.objectweb.proactive.core.mop.MethodCall");
-        il.append(factory.createInvoke("org.objectweb.proactive.core.mop.Proxy",
+        instructionList.append(factory.createInvoke("org.objectweb.proactive.core.mop.Proxy",
                                        "reify",
                                        Type.OBJECT,
-                                       argtypes,
+                                       new Type[] { METHODCALL_TYPE },
                                        Constants.INVOKEINTERFACE));
 
         // If the return type of the method is a primitive type,
@@ -342,38 +321,39 @@ public class BytecodeStubBuilder {
         } else {
             // If the return type is a reference type,
             // we need to insert a type check
-            il.append(factory.createCheckCast((ReferenceType) convertClassToType(m.getReturnType())));
+            instructionList.append(factory.createCheckCast((ReferenceType) convertClassToType(m.getReturnType())));
         }
 
         // Writes the code for inside constructor
 
         // Now we need to perform the call to super.blablabla if need be
         // Let's stack up the arguments
-        InstructionHandle inConstructorHandle = il.append(factory.createThis());
+        InstructionHandle inConstructorHandle = instructionList.append(factory.createThis());
 
         // The following line is for inserting the conditional branch instruction
         // at the beginning of the method. If the condition is satisfied, the
         // control flows move to the previous instruction
-        il.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
+        instructionList.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
 
-        for (int i = 0; i < m.getParameterTypes().length; i++) {
-            Type theType = convertClassToType(m.getParameterTypes()[i]);
-            il.append(factory.createLoad(theType, (i + 1)));
+        for (int i = 0; i < paramTypes.length; i++) {
+            Type theType = convertClassToType(paramTypes[i]);
+            LocalVariableInstruction lvi = factory.createLoad(theType, i + 1);
+            instructionList.append(lvi);
         }
 
         // And perform the call
         String declaringClassName = this.methods[methodIndex].getDeclaringClass().getName();
-        il.append(factory.createInvoke(declaringClassName,
+        instructionList.append(factory.createInvoke(declaringClassName,
                                        m.getName(),
                                        convertClassToType(m.getReturnType()),
-                                       convertClassArrayToTypeArray(m.getParameterTypes()),
+                                       convertClassArrayToTypeArray(paramTypes),
                                        Constants.INVOKESPECIAL));
 
         // Returns the result to the caller
-        InstructionHandle returnHandle = il.append(factory.createReturn(convertClassToType(m.getReturnType())));
+        InstructionHandle returnHandle = instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
 
         // insert  a jump from the
-        il.insert(inConstructorHandle, new GOTO(returnHandle));
+        instructionList.insert(inConstructorHandle, new GOTO(returnHandle));
 
         mg.removeLocalVariables();
         mg.setMaxStack(); // Needed stack size
@@ -389,15 +369,15 @@ public class BytecodeStubBuilder {
 
         if (c.equals(Void.TYPE)) {
             // There is nothing to do, simply pop the object returned by reify
-            il.append(factory.createPop(1));
+            instructionList.append(factory.createPop(1));
         } else {
             String nameOfPrimitiveType = c.getName();
             String nameOfWrapperClass = Utils.nameOfWrapper(c);
             // First, we should check that the object on top of
             // the stack is of the correct type
-            il.append(factory.createCheckCast((ReferenceType) convertClassNameToType(nameOfWrapperClass)));
+            instructionList.append(factory.createCheckCast((ReferenceType) convertClassNameToType(nameOfWrapperClass)));
             // And then perform the call
-            il.append(factory.createInvoke(nameOfWrapperClass,
+            instructionList.append(factory.createInvoke(nameOfWrapperClass,
                                            nameOfPrimitiveType + "Value",
                                            convertClassToType(c),
                                            new Type[0],
@@ -439,7 +419,7 @@ public class BytecodeStubBuilder {
                                      new String[0], // arg names
                                      "<init>", // Method name
                                      this.stubClassFullName, // Class name
-                                     il, // Instructions list
+                                     instructionList, // Instructions list
                                      this.classGenerator.getConstantPool()
         );
 
@@ -447,16 +427,16 @@ public class BytecodeStubBuilder {
         InstructionFactory factory = new InstructionFactory(this.classGenerator);
 
         // Calls the constructor of the super class
-        il.append(factory.createLoad(Type.OBJECT, 0));
-        il.append(factory.createInvoke(this.className, "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
+        instructionList.append(factory.createLoad(Type.OBJECT, 0));
+        instructionList.append(factory.createInvoke(this.className, "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
 
         // Sets the value of 'outsideConstructor' to true
-        il.append(factory.createLoad(Type.OBJECT, 0));
-        il.append(new ICONST(1));
-        il.append(factory.createPutField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
+        instructionList.append(factory.createLoad(Type.OBJECT, 0));
+        instructionList.append(new ICONST(1));
+        instructionList.append(factory.createPutField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
 
         // And returns from the constructor
-        il.append(InstructionConstants.RETURN);
+        instructionList.append(InstructionConstants.RETURN);
 
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed locals
@@ -465,7 +445,7 @@ public class BytecodeStubBuilder {
         this.classGenerator.addMethod(mg.getMethod());
 
         // Recycling the InstructionList object
-        this.il.dispose();
+        this.instructionList.dispose();
 
         return;
     }
@@ -494,7 +474,7 @@ public class BytecodeStubBuilder {
                                      new String[0],
                                      Constants.STATIC_INITIALIZER_NAME,
                                      this.stubClassFullName,
-                                     il,
+                                     instructionList,
                                      this.classGenerator.getConstantPool()
         );
 
@@ -504,12 +484,12 @@ public class BytecodeStubBuilder {
         // Creates an array of Method objects that we will store into the static
         // variable 'methods' of type 'Method[]'
         // Pushes the size of the array on to the stack
-        il.append(new PUSH(this.classGenerator.getConstantPool(), this.methods.length));
+        instructionList.append(new PUSH(this.classGenerator.getConstantPool(), this.methods.length));
         // Creates an array of Method objects of that size
-        il.append((Instruction) factory.createNewArray(METHOD_TYPE, (byte) 1));
+        instructionList.append((Instruction) factory.createNewArray(METHOD_TYPE, (byte) 1));
 
         // Stores the reference to this newly-created array into the static variable 'methods'
-        il.append(factory.createPutStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
+        instructionList.append(factory.createPutStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
 
         // Creates an array of Class objects that represent all the superclasses of
         // the stub class.
@@ -521,25 +501,25 @@ public class BytecodeStubBuilder {
         }
 
         // Pushes on the stack the size of the array
-        il.append(new PUSH(this.classGenerator.getConstantPool(), vectorOfSuperClasses.size()));
+        instructionList.append(new PUSH(this.classGenerator.getConstantPool(), vectorOfSuperClasses.size()));
         // Creates an array of class objects of that size
-        il.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
+        instructionList.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
         // Stores the reference to this newly-created array as the local variable with index '1'
-        il.append(factory.createStore(Type.OBJECT, 1));
+        instructionList.append(factory.createStore(Type.OBJECT, 1));
 
         // Make as many calls to Class.forName as is needed to fill in the array
         for (int i = 0; i < vectorOfSuperClasses.size(); i++) {
             // Load onto the stack a pointer to the array
-            il.append(factory.createLoad(Type.OBJECT, 1));
+            instructionList.append(factory.createLoad(Type.OBJECT, 1));
             // Load the index in the array where we want to store the result
-            il.append(new PUSH(this.classGenerator.getConstantPool(), i));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), i));
             // Loads the name of the class onto the stack
             String s = ((Class) vectorOfSuperClasses.elementAt(i)).getName();
-            il.append(new PUSH(this.classGenerator.getConstantPool(), s));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), s));
             // Performs the call to Class.forName
             Type[] argstypes = new Type[1];
             argstypes[0] = Type.STRING;
-            il.append(factory.createInvoke("java.lang.Class",
+            instructionList.append(factory.createInvoke("java.lang.Class",
                                            "forName",
                                            CLASS_TYPE,
                                            argstypes,
@@ -548,14 +528,14 @@ public class BytecodeStubBuilder {
             // Stores the result of the invocation of forName into the array
             // The index into which to store as well as the reference to the array
             // are already on the stack
-            il.append(factory.createArrayStore(Type.OBJECT));
+            instructionList.append(factory.createArrayStore(Type.OBJECT));
         }
 
         // Now, lookup each of the Method objects and store it into the 'method' array
         for (int i = 0; i < this.methods.length; i++) {
             // Stacks up the reference to the array of methods and the index in the array
-            il.append(factory.createGetStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
-            il.append(new PUSH(this.classGenerator.getConstantPool(), i));
+            instructionList.append(factory.createGetStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), i));
 
             // Now, we load onto the stack a pointer to the class that contains the method
             int indexInClassArray = vectorOfSuperClasses.indexOf(this.methods[i].getDeclaringClass());
@@ -563,46 +543,46 @@ public class BytecodeStubBuilder {
                 System.err.println("Problem : cannot find index for class " + this.methods[i].getDeclaringClass());
             }
             // Load a pointer to the Class array (local variable number 1)
-            il.append(factory.createLoad(Type.OBJECT, 1));
+            instructionList.append(factory.createLoad(Type.OBJECT, 1));
             // Access element number 'indexInClassArray'
-            il.append(new PUSH(this.classGenerator.getConstantPool(), indexInClassArray));
-            il.append(factory.createArrayLoad(CLASS_TYPE));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), indexInClassArray));
+            instructionList.append(factory.createArrayLoad(CLASS_TYPE));
             // Now, perform a call to 'getDeclaredMethod'
             // First, stack up the simple name of the method to solve
-            il.append(new PUSH(this.classGenerator.getConstantPool(), this.methods[i].getName()));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), this.methods[i].getName()));
             // Now, we want to create an array of type Class[] for representing
             // the parameters to this method. We choose to store this array into the
             // slot number 2
             // Pushes the size of the array
-            il.append(new PUSH(this.classGenerator.getConstantPool(), this.methods[i].getParameterTypes().length));
+            instructionList.append(new PUSH(this.classGenerator.getConstantPool(), this.methods[i].getParameterTypes().length));
             // Creates an array of class objects of that size
-            il.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
+            instructionList.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
             // Stores the reference to this newly-created array as the local variable with index '2'
-            il.append(factory.createStore(Type.OBJECT, 2));
+            instructionList.append(factory.createStore(Type.OBJECT, 2));
 
             // Stack up the class objects that represent the types of all the arguments to this method
             for (int j = 0; j < this.methods[i].getParameterTypes().length; j++) {
                 Class currentParameter = this.methods[i].getParameterTypes()[j];
 
                 // Load onto the stack a pointer to the array of Class objects (for parameters)
-                il.append(factory.createLoad(Type.OBJECT, 2));
+                instructionList.append(factory.createLoad(Type.OBJECT, 2));
                 // Load the index in the array where we want to store the result
-                il.append(new PUSH(this.classGenerator.getConstantPool(), j));
+                instructionList.append(new PUSH(this.classGenerator.getConstantPool(), j));
 
                 // If the type of the parameter is a primitive one, we use the predefined
                 // constants (like java.lang.Integer.TYPE) instead of calling Class.forName
                 if (currentParameter.isPrimitive()) {
                     // Loads that static variable
-                    il.append(factory.createGetStatic(Utils.getWrapperClass(currentParameter).getName(),
+                    instructionList.append(factory.createGetStatic(Utils.getWrapperClass(currentParameter).getName(),
                                                       "TYPE",
                                                       CLASS_TYPE));
                 } else {
                     // Load the name of the parameter class onto the stack
-                    il.append(new PUSH(this.classGenerator.getConstantPool(), currentParameter.getName()));
+                    instructionList.append(new PUSH(this.classGenerator.getConstantPool(), currentParameter.getName()));
                     // Performs a call to Class.forName
                     Type[] argstypes = new Type[1];
                     argstypes[0] = Type.STRING;
-                    il.append(factory.createInvoke("java.lang.Class",
+                    instructionList.append(factory.createInvoke("java.lang.Class",
                                                    "forName",
                                                    CLASS_TYPE,
                                                    argstypes,
@@ -610,27 +590,27 @@ public class BytecodeStubBuilder {
                 }
 
                 // Stores the result in the array
-                il.append(factory.createArrayStore(Type.OBJECT));
+                instructionList.append(factory.createArrayStore(Type.OBJECT));
             }
 
             // Loads the array
-            il.append(factory.createLoad(Type.OBJECT, 2));
+            instructionList.append(factory.createLoad(Type.OBJECT, 2));
 
             // Perform the actual call to 'getDeclaredMethod'
             Type[] argstypes = new Type[2];
             argstypes[0] = Type.STRING;
             argstypes[1] = CLASS_ARRAY_TYPE;
-            il.append(factory.createInvoke("java.lang.Class",
+            instructionList.append(factory.createInvoke("java.lang.Class",
                                            "getDeclaredMethod",
                                            METHOD_TYPE,
                                            argstypes,
                                            Constants.INVOKEVIRTUAL));
             // Now that we have the result, let's store it into the array
-            il.append(factory.createArrayStore(Type.OBJECT));
+            instructionList.append(factory.createArrayStore(Type.OBJECT));
         }
 
         // And returns
-        il.append(InstructionConstants.RETURN);
+        instructionList.append(InstructionConstants.RETURN);
 
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed locals
@@ -639,7 +619,7 @@ public class BytecodeStubBuilder {
         this.classGenerator.addMethod(mg.getMethod());
 
         // Recycling the InstructionList object
-        this.il.dispose();
+        this.instructionList.dispose();
 
         return;
     }
@@ -652,23 +632,23 @@ public class BytecodeStubBuilder {
                                      new String[0], // arg names
                                      "getProxy", // Method name
                                      this.stubClassFullName, // Class name
-                                     il, // Instructions list
+                                     instructionList, // Instructions list
                                      this.classGenerator.getConstantPool()
         );
 
         // Now, fills in the instruction list
         InstructionFactory factory = new InstructionFactory(this.classGenerator);
 
-        il.append(factory.createLoad(Type.OBJECT, 0));
-        il.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
-        il.append(factory.createReturn(Type.OBJECT));
+        instructionList.append(factory.createLoad(Type.OBJECT, 0));
+        instructionList.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
+        instructionList.append(factory.createReturn(Type.OBJECT));
 
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed locals
 
         this.classGenerator.addMethod(mg.getMethod());
 
-        this.il.dispose();
+        this.instructionList.dispose();
 
         // Now, do the setProxy method
         Type[] types = new Type[1];
@@ -682,24 +662,24 @@ public class BytecodeStubBuilder {
                            argnames,
                            "setProxy", // Method name
                            this.stubClassFullName, // Class name
-                           il, // Instructions list
+                           instructionList, // Instructions list
                            this.classGenerator.getConstantPool()
         );
 
         // Now, fills in the instruction list
         factory = new InstructionFactory(this.classGenerator);
 
-        il.append(factory.createLoad(Type.OBJECT, 0));
-        il.append(factory.createLoad(Type.OBJECT, 1));
-        il.append(factory.createPutField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
-        il.append(factory.createReturn(Type.VOID));
+        instructionList.append(factory.createLoad(Type.OBJECT, 0));
+        instructionList.append(factory.createLoad(Type.OBJECT, 1));
+        instructionList.append(factory.createPutField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
+        instructionList.append(factory.createReturn(Type.VOID));
 
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed locals
 
         this.classGenerator.addMethod(mg.getMethod());
 
-        this.il.dispose();
+        this.instructionList.dispose();
 
         return;
     }
@@ -745,7 +725,7 @@ public class BytecodeStubBuilder {
             } else {
                 return new ObjectType(cl.getName());
             }
-        }
+        }                                
     }
 
     protected static Type[] convertClassArrayToTypeArray(Class[] cl) {
