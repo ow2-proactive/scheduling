@@ -3,6 +3,7 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,15 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JFrame;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -547,6 +540,29 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	    return showMenu;
 	}
 
+	private static void addButtons(JPanel panel, final JTree tree) {
+		JPanel buttons = new JPanel();
+		buttons.setLayout(new FlowLayout());
+		panel.add(buttons, BorderLayout.SOUTH);
+		JButton expand = new JButton("Expand all");
+		expand.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				for (int row = 0; row < tree.getRowCount(); row++)
+					tree.expandRow(row);
+			}
+		});
+		buttons.add(expand);
+
+		JButton collapse = new JButton("Collapse all");
+		collapse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				for (int row = tree.getRowCount() - 1; row >= 0; row--)
+					tree.collapseRow(row);
+			}
+		});
+		buttons.add(collapse);
+	}
+	
 	private Container createContent (DataTreeModel model)
 	{
 		//JSplitPane sp = new JSplitPane ();
@@ -599,6 +615,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		    }
 		});
 
+		addButtons(left, j);
+		
 		return left;
 	}
 	
