@@ -55,7 +55,11 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
 
         prettyName = (String) prettyNames.get(fullname);
         if (prettyName == null) {
-            prettyName = prefix + "#" + incLastID();
+        	int id = incLastID();
+        	if (getKey() == HOST)
+        		prettyName = prefix;
+        	else
+        		prettyName = prefix + "#" + id;
             prettyNames.put(fullname, prettyName);
         }
     }
