@@ -27,81 +27,66 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.ext.locationserver;
 
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.util.ProActiveProperties;
 
 
 public class LocationServerFactory {
-
-
-  //
-  // -- PUBLIC MEMBERS -----------------------------------------------
-  //
-  
-  
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-
+    //
+    // -- PUBLIC MEMBERS -----------------------------------------------
+    //
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
     public LocationServerFactory() {
-
     }
 
- 
-  //
-  // -- PUBLIC METHOD -----------------------------------------------
-  //
-  
-
-   //  public static String getLocationServerClassName() {
-//       return  ProActiveProperties.getLocationServerClass();
-//     }
- 
-//     public static String getLocationServerClassName(UniqueID id) {
-//       return  LocationServerFactory.getLocationServerClassName();
-//     }
-
-//     public static String getLocationServerName() {
-// 	return ProActiveProperties.getLocationServerRmi();
-//     }
-    
-//     public static String getLocationServerName(UniqueID unique) {
-// 	return LocationServerFactory.getLocationServerName();
-//     }
-
+    //
+    // -- PUBLIC METHOD -----------------------------------------------
+    //
+    //  public static String getLocationServerClassName() {
+    //       return  ProActiveProperties.getLocationServerClass();
+    //     }
+    //     public static String getLocationServerClassName(UniqueID id) {
+    //       return  LocationServerFactory.getLocationServerClassName();
+    //     }
+    //     public static String getLocationServerName() {
+    // 	return ProActiveProperties.getLocationServerRmi();
+    //     }
+    //     public static String getLocationServerName(UniqueID unique) {
+    // 	return LocationServerFactory.getLocationServerName();
+    //     }
     public static LocationServer getLocationServer() {
-	LocationServer server = null;
-	try {
-	    server = (LocationServer)ProActive.lookupActive(ProActiveProperties.getLocationServerClass(),
-							    ProActiveProperties.getLocationServerRmi());
-	} catch (Exception e) {
-	    e.printStackTrace();
-	}       	
-	return server;
-//	try {
-//		Object t = null;
-//		t.toString();
-//	} catch (Exception e) {
-//		System.out.println("-----------------------");
-//		e.printStackTrace();
-//			System.out.println("-----------------------");
-//	}
-//	
-//	return null;
+        LocationServer server = null;
+        try {
+            server = (LocationServer) ProActive.lookupActive(ProActiveProperties.getLocationServerClass(),
+                    ProActiveProperties.getLocationServerRmi());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return server;
+        //	try {
+        //		Object t = null;
+        //		t.toString();
+        //	} catch (Exception e) {
+        //		System.out.println("-----------------------");
+        //		e.printStackTrace();
+        //			System.out.println("-----------------------");
+        //	}
+        //	
+        //	return null;
     }
 
     /**
-     * Return the location server associated with the 
-     * <code>id</code>
-     * 
-     */
+ * Return the location server associated with the 
+ * <code>id</code>
+ * 
+ */
     public static LocationServer getLocationServer(UniqueID id) {
-	return LocationServerFactory.getLocationServer();
+        return LocationServerFactory.getLocationServer();
     }
-
 }

@@ -47,7 +47,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 public class RequestWithMixedLocation extends RequestImpl
     implements java.io.Serializable {
     static Logger logger = Logger.getLogger(RequestWithMixedLocation.class.getName());
-    private static final int MAX_TRIES = 30;
+    private static final int MAX_TRIES = 15;
     private static int counter = 0;
     private int tries;
     transient protected LocationServer server;
@@ -56,15 +56,19 @@ public class RequestWithMixedLocation extends RequestImpl
         UniversalBody sender, boolean isOneWay, long nextSequenceID,
         LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID);
-        System.out.println("RequestWithMixedLocation.RequestWithMixedLocation " +
-            ++counter);
+        if (logger.isDebugEnabled()) {
+            logger.debug("RequestWithMixedLocation.RequestWithMixedLocation " +
+                ++counter);
+        }
         this.server = server;
     }
 
     protected void sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
-        System.out.println("RequestWithMixedLocation: sending to universal " +
-            counter);
+        if (logger.isDebugEnabled()) {
+            logger.debug("RequestWithMixedLocation: sending to universal " +
+                counter);
+        }
         try {
             destinationBody.receiveRequest(this);
         } catch (Exception e) {
@@ -73,8 +77,8 @@ public class RequestWithMixedLocation extends RequestImpl
     }
 
     /**
-     * Implements the backup solution
-     */
+ * Implements the backup solution
+ */
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         boolean ok = false;
@@ -101,7 +105,7 @@ public class RequestWithMixedLocation extends RequestImpl
                 }
                 ok = true;
             } catch (Exception e) {
-                logger.debug("FAILED = " + " for method " + methodName);
+                logger.error("FAILED = " + " for method " + methodName);
                 tries++;
             }
         }

@@ -47,12 +47,12 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 public class RequestWithLocationServer extends RequestImpl
     implements java.io.Serializable {
-    static Logger logger = Logger.getLogger(RequestWithLocationServer.class.getName());
     private static final int MAX_TRIES = 30;
+    static Logger logger = Logger.getLogger(RequestWithLocationServer.class.getName());
 
     /**
-     * the number of time we try before reporting a failure
-     */
+ * the number of time we try before reporting a failure
+ */
     private int tries;
     private transient LocationServer server;
 
@@ -81,8 +81,8 @@ public class RequestWithLocationServer extends RequestImpl
     }
 
     /**
-     * Implements the backup solution
-     */
+ * Implements the backup solution
+ */
     protected void backupSolution(UniversalBody destinationBody)
         throws java.io.IOException {
         boolean ok = false;
@@ -121,8 +121,10 @@ public class RequestWithLocationServer extends RequestImpl
             server = LocationServerFactory.getLocationServer();
         }
         UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+
         logger.debug(
             "RequestWithLocationServer: backupSolution() server has sent an answer");
+
         ProActive.waitFor(mobile);
         return mobile;
     }

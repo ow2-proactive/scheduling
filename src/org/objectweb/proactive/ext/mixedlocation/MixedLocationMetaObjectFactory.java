@@ -64,8 +64,8 @@ public class MixedLocationMetaObjectFactory
     //
 
     /**
-    * Constructor for LocationServerMetaObjectFactory.
-    */
+* Constructor for LocationServerMetaObjectFactory.
+*/
     protected MixedLocationMetaObjectFactory() {
         super();
     }
@@ -108,7 +108,7 @@ public class MixedLocationMetaObjectFactory
     protected static class MigrationManagerFactoryImpl
         implements MigrationManagerFactory, java.io.Serializable {
         public MigrationManager newMigrationManager() {
-            System.out.println("BodyWithMixedLocation.createMigrationManager");
+            //System.out.println("BodyWithMixedLocation.createMigrationManager");
             return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());
         }
     }

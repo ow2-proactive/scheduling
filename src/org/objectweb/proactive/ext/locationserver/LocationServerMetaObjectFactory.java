@@ -63,8 +63,8 @@ public class LocationServerMetaObjectFactory
     //
 
     /**
-     * Constructor for LocationServerMetaObjectFactory.
-     */
+ * Constructor for LocationServerMetaObjectFactory.
+ */
     protected LocationServerMetaObjectFactory() {
         super();
     }

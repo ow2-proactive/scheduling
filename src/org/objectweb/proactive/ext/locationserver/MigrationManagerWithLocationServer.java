@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.ext.locationserver;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -40,6 +42,7 @@ import org.objectweb.proactive.core.node.Node;
 
 
 public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
+    static Logger logger = Logger.getLogger(MigrationManagerWithLocationServer.class.getName());
     transient private LocationServer locationServer;
 
     //
@@ -57,16 +60,18 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     //
 
     /**
-     * update our location on the Location Server
-     */
+ * update our location on the Location Server
+ */
     public void updateLocation(Body body) {
         if (locationServer == null) {
             this.locationServer = LocationServerFactory.getLocationServer();
         }
 
         //  if (locationServer != null) {
-        System.out.println("Updating location with this stub " +
-            body.getRemoteAdapter());
+        if (logger.isDebugEnabled()) {
+            logger.debug("Updating location with this stub " +
+                body.getRemoteAdapter());
+        }
         locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
         //   }
     }

@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.ext.util;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
@@ -43,6 +45,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
  */
 public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
     LocationServer {
+    static Logger logger = Logger.getLogger(SimpleLocationServer.class.getName());
     private BodyMap table;
     private String url;
 
@@ -55,26 +58,26 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
     }
 
     /**
-     * Update the location for the mobile object s
-     * with id
-     */
+ * Update the location for the mobile object s
+ * with id
+ */
     public void updateLocation(UniqueID i, UniversalBody s) {
- //       System.out.println("Server: updateLocation() " + i + " object = " + s);
+        //       System.out.println("Server: updateLocation() " + i + " object = " + s);
         table.updateBody(i, s);
     }
 
     /**
-     * Return a reference to the remote body if available.
-     * Return null otherwise
-     */
+ * Return a reference to the remote body if available.
+ * Return null otherwise
+ */
     public UniversalBody searchObject(UniqueID id) {
         return (UniversalBody) table.getBody(id);
     }
 
     /**
-     * First register with the specified url
-     * Then wait for request
-     */
+ * First register with the specified url
+ * Then wait for request
+ */
     public void runActivity(org.objectweb.proactive.Body body) {
         this.register();
         org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
@@ -97,11 +100,11 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
 
     protected void register() {
         try {
-            System.err.println("Attempt at binding : " + url);
+            logger.info("Attempt at binding : " + url);
             ProActive.register(ProActive.getStubOnThis(), url);
-            System.err.println("Location Server bound in registry : " + url);
+            logger.info("Location Server bound in registry : " + url);
         } catch (Exception e) {
-            System.err.println("Cannot bind in registry - aborting " + url);
+            logger.fatal("Cannot bind in registry - aborting " + url);
             e.printStackTrace();
             return;
         }
@@ -109,7 +112,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println(
+            logger.error(
                 "usage: java org.objectweb.proactive.ext.util.SimpleLocationServer <server url> [node]");
             System.exit(-1);
         }
