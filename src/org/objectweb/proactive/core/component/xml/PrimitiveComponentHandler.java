@@ -7,16 +7,13 @@ package org.objectweb.proactive.core.component.xml;
 import org.apache.log4j.Logger;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.factory.InstantiationException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -38,15 +35,20 @@ public class PrimitiveComponentHandler extends ComponentHandler {
     public PrimitiveComponentHandler(ProActiveDescriptor deploymentDescriptor,
         ComponentsCache componentsCache, HashMap componentTypes) {
         super(deploymentDescriptor, componentsCache, componentTypes);
-        componentParameters.setHierarchicalType(ComponentParameters.PRIMITIVE);
+        controllerDescription.setHierarchicalType(Constants.PRIMITIVE);
     }
 
+    /**
+     * handles the creation of primitive component on a virtual node
+     * If the virtual node attribute is set to "null", then the component is created in the current vm
+     * If the virtual node is cyclic, several instances of the primitive are created, with suffixed names
+     */
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
         names = null;
         if (logger.isDebugEnabled()) {
             logger.debug("startContextElement : " + name + "of : " +
-                this.componentParameters.getName());
+                controllerDescription.getName());
         }
 
         //		for (int i = 0; i < attributes.getLength(); i++) {
@@ -56,7 +58,18 @@ public class PrimitiveComponentHandler extends ComponentHandler {
 
         String implementation = attributes.getValue(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_IMPLEMENTATION_TAG);
         if (!checkNonEmpty(implementation)) {
-            throw new SAXException("component's implementation unspecified");
+            throw new SAXException("Component's implementation unspecified");
+        }
+
+        // check whether the given parameter is actually a class. A possible error is to put an interface
+        try {
+            if (Class.forName(implementation).isInterface()) {
+                throw new SAXException(implementation +
+                    " is an interface. You cannot specify an interface as the implementation of a component.");
+            }
+        } catch (ClassNotFoundException e) {
+            throw new SAXException("Specified class for implementation of the component is not in the classpath ",
+                e);
         }
 
         // instantiate the component and add a stub on it to the cache
@@ -67,13 +80,10 @@ public class PrimitiveComponentHandler extends ComponentHandler {
             VirtualNode vn = null;
             try {
                 if (virtualNode.equals(ComponentsDescriptorConstants.NULL)) {
-                    //					componentsCache.addComponent(componentParameters.getName(),
-                    //					//PrimitiveComponentB.class.getName(),
-                    componentsCache.addComponent(componentParameters.getName(),
-                        //PrimitiveComponentB.class.getName(),
-                    ProActive.newActiveComponent(implementation,
-                            new Object[] {  }, null, null, null,
-                            componentParameters));
+                    componentsCache.addComponent(controllerDescription.getName(),
+                        cf.newFcInstance(componentType, controllerDescription,
+                            new ContentDescription(implementation,
+                                new Object[] {  })));
                     return;
                 }
                 vn = deploymentDescriptor.getVirtualNode(virtualNode);
@@ -82,57 +92,36 @@ public class PrimitiveComponentHandler extends ComponentHandler {
                     "Could not find virtual node. Maybe virtual node names do not match between components descriptor and deployment descriptor");
                 return;
             }
-            Node[] nodes = vn.getNodes();
-            if (nodes.length == 0) {
-                throw new NodeException("No node defined for virtual node " +
-                    vn.getName());
-            }
-            if ((nodes.length == 1)) {
-                //					componentsCache.addComponent(componentParameters.getName(),
-                //					//PrimitiveComponentB.class.getName(),
-                componentsCache.addComponent(componentParameters.getName(),
-                    //PrimitiveComponentB.class.getName(),
-                ProActive.newActiveComponent(implementation, new Object[] {  },
-                        vn.getNode(), null, null, componentParameters));
+            Component components = cf.newFcInstance(componentType,
+                    controllerDescription,
+                    new ContentDescription(implementation, new Object[] {  }, vn));
+
+            if (!ProActiveGroup.isGroup(components)) {
+                // 1. virtual node was corresponding to 1 node ==> only 1 component has been created
+                componentsCache.addComponent(controllerDescription.getName(),
+                    components);
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
-                        "**************************************************************\n" +
-                        "Deployment of a primitive component on a cyclic virtual node will result in the" +
-                        "creation of one instance of the primitive on each node, with an extended name of type : " +
-                        "primitiveName-cyclicInstanceNumber-theNumber" +
-                        "**************************************************************\n");
-                }
-                Component[] primitives = null;
-                primitives = ProActive.newActiveComponent(implementation,
-                        new Object[] {  }, vn, componentParameters);
-                if (primitives != null) {
-                    names = new String[primitives.length];
-                    for (int i = 0; i < primitives.length; i++) {
-                        // consider all generated names
-                        names[i] = Fractal.getComponentParametersController(primitives[i])
-                                          .getComponentParameters().getName();
-                        componentsCache.addComponent(names[i], primitives[i]);
-                    }
+                // 2. virtual node is cyclic; components are created on multiple nodes
+                Component[] components_table = (Component[]) (ProActiveGroup.getGroup(components)
+                                                                            .toArray(new Component[ProActiveGroup.getGroup(
+                            components).size()]));
+
+                // keep the names of all components for binding them later
+                names = new String[components_table.length];
+                // ordering in iteration is guaranteed as underlying class containing the elements of the group is a vector
+                for (int i = 0; i < components_table.length; i++) {
+                    names[i] = controllerDescription.getName() +
+                        Constants.CYCLIC_NODE_SUFFIX + i;
+                    componentsCache.addComponent(names[i], components_table[i]);
                 }
             }
-        } catch (NodeException ne) {
-            logger.error("cannot create active component: node exception : " +
-                ne.getMessage());
-            ne.printStackTrace();
-        } catch (ActiveObjectCreationException aoce) {
-            logger.error(
-                "cannot create active component : active object creation exception");
-            aoce.printStackTrace();
-        } catch (NoSuchInterfaceException e) {
-            logger.error(
-                "cannot create active component : interface not found " +
-                e.getMessage());
-            e.printStackTrace();
+        } catch (InstantiationException e) {
+            logger.error("cannot create active component " + e.getMessage());
+            throw new SAXException(e);
         }
         if (logger.isDebugEnabled()) {
             logger.debug("created primitive component : " +
-                componentParameters.getName());
+                controllerDescription.getName());
         }
     }
 
@@ -144,7 +133,7 @@ public class PrimitiveComponentHandler extends ComponentHandler {
             // there are several primitives components based on the same name
             return new ComponentResultObject(names);
         } else {
-            return new ComponentResultObject(componentParameters.getName());
+            return new ComponentResultObject(controllerDescription.getName());
         }
     }
 
