@@ -59,7 +59,7 @@
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
             <xs:attribute name="implementation" type="xs:string" use="required"/>
-            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <!--
@@ -73,7 +73,7 @@
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
-            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="parallel-composite-component">
@@ -91,7 +91,7 @@
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
-            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="optional"/>
         </xs:complexType>
     </xs:element>
     <!--
@@ -115,7 +115,7 @@
         <xs:complexType>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="signature" type="xs:string" use="required"/>
-            <xs:attribute default="mandatory" name="contingency" use="optional">
+            <xs:attribute name="contingency" use="optional">
                 <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="mandatory"/>
@@ -124,7 +124,7 @@
                 </xs:simpleType>
             </xs:attribute>
             <xs:attribute default="single" name="cardinality" use="optional">
-                <xs:simpleType>
+               <xs:simpleType>
                     <xs:restriction base="xs:string">
                         <xs:enumeration value="single"/>
                         <xs:enumeration value="collection"/>
