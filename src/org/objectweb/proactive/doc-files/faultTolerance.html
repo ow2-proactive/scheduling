@@ -42,7 +42,7 @@ fault-tolerant is <b>fully transparent</b>; active objects are turned
 fault-tolerant using Java properties that can be set in the <A
 href="Descriptor.html">deployment descriptor</A>. Persistence of active
 objects is obtained through standard Java serialization; a checkpoint thus
-consists in an object containing a serialized copy of an active object and a
+consists in an object containing a serialized copy of an active object and
 few informations related to the protocol. As a consequence, a fault-tolerant
 active object must be serializable. <BR><BR>
 
@@ -65,7 +65,6 @@ descriptor.
 
 
 
-
 </p>
 
 <BR><BR> 
@@ -78,8 +77,9 @@ Fault-tolerance mechanism needs servers for the checkpoints storage, the
 localization of the active objects, and the failure detection. This server are
 implemented in the current version as a unique server
 (<code>ft.util.GlobalFTServer</code>), that implements the interfaces of each
-server (<code>ft.util.*.*</code>). This server is still implemented using Java
-RMI, but an active object version will come soon.
+server (<code>ft.util.*.*</code>). This server is still a prototype version:
+it is implemented using Java RMI, and it is not persistent. An enhanced active
+object version with persistence will come soon.
 </p>
 <p class="textNormal">
 The global fault-tolerance server can be launched using the
@@ -91,7 +91,9 @@ The global fault-tolerance server can be launched using the
 	number is 1100.
 <li>the fault detection period: <code>-fdperiod
 	  &lt;periodInSec&gt;</code>. This value defines the time between two
-	consecutive fault detection scanning. The default value is 10 sec.
+	consecutive fault detection scanning. The default value is 10
+	sec. Note that an active object is considered as faulty when it becomes unreachable,
+	i.e. when it becomes unable to receive a message from another active object.
 </ul>
 <p class="textNormal">
 The server can also be directly launched in the java source code, using
@@ -159,30 +161,40 @@ default value (30 sec) is used.
 
 <h3>A deployment descriptor example</h3>
 <p class="textNormal">
-Here is an example of deployment descriptor that deploys 2 virtual nodes : one
-for starting the application, and one as resource for recovery. This two behaviors
-correspond to two fault-tolerance services, <code>appli</code> and
-<code>resource</code>. TTC is set to 5 sec for all the application.
+Here is an example of deployment descriptor that deploys 3 virtual nodes : one
+for deploying fault-tolerant active objects, one for deploying
+non-fault-tolerant active object (if needed), and one as resource for
+recovery. The two fault-tolerance behaviors correspond to two fault-tolerance
+services, <code>appli</code> and <code>resource</code>. Note that
+non-fault-tolerant active objects can communicate with fault-tolerant active
+objects as usual. TTC is set to 5 sec for all the application.
 </p>
 
 <pre>
 &lt;ProActiveDescriptor&gt;
  &lt;componentDefinition&gt;
   &lt;virtualNodesDefinition&gt;
-   &lt;virtualNode name="Workers" property="multiple" <b>ftServiceId="appli"</b>/&gt; 
+   &lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;    
+   &lt;virtualNode name="FT-Workers" property="multiple" <b>ftServiceId="appli"</b>/&gt; 
    &lt;virtualNode name="Failed" property="multiple" <b>ftServiceId="resource"</b>/&gt;
   &lt;/virtualNodesDefinition&gt;
  &lt;/componentDefinition&gt;
  &lt;deployment&gt;
   &lt;mapping&gt;
-   &lt;mapvirtualNode="Workers"&gt;
+   &lt;mapvirtualNode="NonFT-Workers"&gt;
     &lt;jvmSet&gt;
-     &lt;vmNamevalue="Jvm1"/&gt;&lt;vmName value="Jvm2"/&gt;
+     &lt;vmNamevalue="Jvm1"/&gt;
+    &lt;/jvmSet&gt;
+   &lt;/map&gt;
+   &lt;mapvirtualNode="FT-Workers"&gt;
+    &lt;jvmSet&gt;
+     &lt;vmNamevalue="Jvm2"/&gt;
     &lt;/jvmSet&gt;
    &lt;/map&gt;
    &lt;mapvirtualNode="Failed"&gt;
     &lt;jvmSet&gt;
-     &lt;vmNamevalue="JvmS1"/&gt;&lt;vmName value="JvmS2"/&gt;
+     &lt;vmName value="JvmS1"/&gt;
+     &lt;vmName value="JvmS2"/&gt;
     &lt;/jvmSet&gt;
    &lt;/map&gt;
   &lt;/mapping&gt;
@@ -304,7 +316,7 @@ public void infiniteMethod(){
 }
 ...
 </pre></blockquote>
-<BR><BR>
+
 
 <p>
 The second consequence concerns the definition of the
@@ -361,7 +373,7 @@ Fault-tolerance in ProActive is still not compliant with the following
 <ul>
 <li> active objects exposed as <A href="WSDoc.html">Web services</A>, or reachable using http protocol,
 <li> <A href="OOSPMD.html">OO-SPMD barriers<A>,
-<li> <A href="./Security.html">security</A>.
+<li> and <A href="./Security.html">security</A>.
 </ul>
 </p>
 
