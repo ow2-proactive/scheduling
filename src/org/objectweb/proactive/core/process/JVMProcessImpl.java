@@ -77,18 +77,28 @@ public class JVMProcessImpl extends AbstractExternalProcess
                 "java.class.path"));
     public final static String DEFAULT_JAVAPATH = System.getProperty(
             "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "java";
-    public final static String DEFAULT_POLICY_FILE = System.getProperty(
+    public static String DEFAULT_POLICY_FILE = System.getProperty(
             "java.security.policy");
-    public final static String DEFAULT_LOG4J_FILE = System.getProperty(
+    public static String DEFAULT_LOG4J_FILE = System.getProperty(
             "log4j.configuration");
+
+    static {
+        if (DEFAULT_POLICY_FILE != null) {
+            DEFAULT_POLICY_FILE = getAbsolutePath(DEFAULT_POLICY_FILE);
+        }
+        if (DEFAULT_LOG4J_FILE != null) {
+            DEFAULT_LOG4J_FILE = getAbsolutePath(DEFAULT_LOG4J_FILE);
+        }
+    }
+
     public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
     private final static String PROACTIVE_POLICYFILE_OPTION = " -Dproactive.runtime.security=";
     protected String classpath = DEFAULT_CLASSPATH;
     protected String bootClasspath;
     protected String javaPath = DEFAULT_JAVAPATH;
-    protected String policyFile = getAbsolutePath(DEFAULT_POLICY_FILE);
-    protected String log4jFile = getAbsolutePath(DEFAULT_LOG4J_FILE);
+    protected String policyFile = DEFAULT_POLICY_FILE;
+    protected String log4jFile = DEFAULT_LOG4J_FILE;
     protected String classname = DEFAULT_CLASSNAME;
 
     //    protected String parameters = DEFAULT_JVMPARAMETERS;
@@ -312,7 +322,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
             return new File(path).getCanonicalPath();
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return path;
+       		return path;
         }
     }
 }
