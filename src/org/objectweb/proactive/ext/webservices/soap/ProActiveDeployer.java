@@ -242,7 +242,7 @@ public class ProActiveDeployer extends WSConstants {
 
         while (e.hasMoreElements()) {
             Method m = (Method) e.nextElement();
-            System.out.println("Method =  " + m);
+            
 
             if (sMethods.contains(m.getName())) {
                 Class[] parameters = m.getParameterTypes();
