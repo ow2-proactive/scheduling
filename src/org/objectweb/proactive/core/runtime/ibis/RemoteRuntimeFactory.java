@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.IbisProperties;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class RemoteRuntimeFactory extends RuntimeFactory {
@@ -61,8 +62,12 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
+//		String port = System.getProperty("proactive.rmi.port");
+//				
+//		if ( port != null){
+//			registryHelper.setRegistryPortNumber(new Integer(port).intValue());
+//		}
 
-        //random = new java.util.Random(System.currentTimeMillis());
         registryHelper.initializeRegistry();
     }
 
@@ -108,7 +113,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
             logger.debug("looking for " + s);
         }
         try {
-            RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) ibis.rmi.Naming.lookup(s);
+            RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(s,"ibis:"));
             if (logger.isDebugEnabled()) {
                 logger.debug(remoteProActiveRuntime.getClass().getName());
             }

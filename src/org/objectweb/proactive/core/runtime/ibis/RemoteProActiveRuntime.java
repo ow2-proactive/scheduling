@@ -59,7 +59,7 @@ public interface RemoteProActiveRuntime extends Remote {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding) throws RemoteException, NodeException;
 
-    public void DeleteAllNodes() throws RemoteException;
+    public void killAllNodes() throws RemoteException;
 
     public void killNode(String nodeName) throws RemoteException;
 
@@ -101,6 +101,8 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws RemoteException;
+        
+	public void unregisterAllVirtualNodes() throws RemoteException;
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)

@@ -60,7 +60,7 @@ public interface JiniRuntime extends java.rmi.Remote
   
   
   
-  public void DeleteAllNodes() throws java.rmi.RemoteException;   
+  public void killAllNodes() throws java.rmi.RemoteException;   
   
   
   
@@ -128,6 +128,8 @@ public interface JiniRuntime extends java.rmi.Remote
   
   
   public void unregisterVirtualNode(String virtualNodeName)throws java.rmi.RemoteException;
+  
+  public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
   
   
   public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall,boolean isNodeLocal) throws java.rmi.RemoteException,

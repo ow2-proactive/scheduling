@@ -16,6 +16,8 @@ import java.io.IOException;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.net.UnknownHostException;
+
 import java.rmi.server.UnicastRemoteObject;
 
 import java.util.ArrayList;
@@ -29,12 +31,15 @@ import java.util.ArrayList;
  */
 public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     implements RemoteProActiveRuntime {
-
     protected transient ProActiveRuntimeImpl proActiveRuntime;
     protected String proActiveRuntimeURL;
 
-    protected int portNumber=1099;
-    
+    //stores nodes urls to be able to unregister nodes
+    protected ArrayList nodesArray;
+
+    //store vn urls to be able to unregister vns
+    protected ArrayList vnNodesArray;
+
     //	
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -42,15 +47,13 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         //System.out.println("toto");
         this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        this.nodesArray = new java.util.ArrayList();
+        this.vnNodesArray = new java.util.ArrayList();
         //this.urlBuilder = new UrlBuilder();
-        try {
-            this.proActiveRuntimeURL = buildRuntimeURL();
-            java.rmi.Naming.bind(proActiveRuntimeURL, this);
-            //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
-        } catch (java.net.MalformedURLException e) {
-            throw new java.rmi.RemoteException("Cannot bind in registry at " +
-                proActiveRuntimeURL, e);
-        }
+        this.proActiveRuntimeURL = buildRuntimeURL();
+        //            java.rmi.Naming.bind(proActiveRuntimeURL, this);
+        register(proActiveRuntimeURL, false);
+        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
     }
 
     //
@@ -59,49 +62,44 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding)
         throws java.rmi.RemoteException, NodeException {
-
         String nodeURL = null;
 
         //Node node;
         try {
             //first we build a well-formed url
             nodeURL = buildNodeURL(nodeName);
-
             //then take the name of the node
             String name = UrlBuilder.getNameFromUrl(nodeURL);
 
-            //System.out.println("name is : "+ name);
-//           System.out.println("url is : "+ nodeURL);
-            //register it with the url
-            if (replacePreviousBinding) {
-                java.rmi.Naming.rebind(nodeURL, this);
-            } else {
-                java.rmi.Naming.bind(nodeURL, this);
-            }
 
-            //create the node with the name 
+            //register the url in rmi registry
+            register(nodeURL, replacePreviousBinding);
+
             proActiveRuntime.createLocalNode(name, replacePreviousBinding);
-
-            logger.info("Node " + nodeURL +
-                " successfully bound in registry at " + nodeURL);
-        } catch (java.rmi.AlreadyBoundException e) {
-            throw new java.rmi.RemoteException("Node " + nodeURL +
-                " already bound in registry", e);
-        } catch (java.net.MalformedURLException e) {
-            throw new java.rmi.RemoteException("cannot bind in registry at " +
-                nodeURL, e);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
-
+        nodesArray.add(nodeURL);
         return nodeURL;
     }
 
-    public void DeleteAllNodes() {
-        proActiveRuntime.DeleteAllNodes();
+    public void killAllNodes() throws java.rmi.RemoteException {
+        for (int i = 0; i < nodesArray.size(); i++) {
+            String url = (String) nodesArray.get(i);
+            killNode(url);
+        }
     }
 
-    public void killNode(String nodeName) {
+    public void killNode(String nodeName) throws java.rmi.RemoteException {
+        String nodeUrl = null;
+        String name = null;
+        try {
+            nodeUrl = buildNodeURL(nodeName);
+            name = UrlBuilder.getNameFromUrl(nodeUrl);
+            unregister(nodeUrl);
+        } catch (UnknownHostException e) {
+            throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
+        }
         proActiveRuntime.killNode(nodeName);
     }
 
@@ -154,7 +152,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void killRT() {
+    public void killRT() throws java.rmi.RemoteException {
+        killAllNodes();
+        unregisterAllVirtualNodes();
+        unregister(proActiveRuntimeURL);
         proActiveRuntime.killRT();
     }
 
@@ -162,13 +163,13 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntimeURL;
     }
 
-    public void setPortNumber(int p) {
-    	this.portNumber = p;
-    }
-    
-    public int getPortNumber() {
-    	return this.portNumber;
-    }
+//    public void setPortNumber(int p) {
+//    	this.portNumber = p;
+//    }
+//    
+//    public int getPortNumber() {
+//    	return this.portNumber;
+//    }
     
     public ArrayList getActiveObjects(String nodeName) {
         return proActiveRuntime.getActiveObjects(nodeName);
@@ -184,54 +185,40 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws java.rmi.RemoteException {
-
         String virtualNodeURL = null;
 
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualNodeName);
-
-            //then take the name of the virtualnode
-            //String name = UrlBuilder.getNameFromUrl(virtualNodeURL);
             //register it with the url
-            if (replacePreviousBinding) {
-                java.rmi.Naming.rebind(virtualNodeURL, this);
-            } else {
-                java.rmi.Naming.bind(virtualNodeURL, this);
-            }
-            logger.info("VirtualNode " + virtualNodeURL +
-                " successfully bound in registry at " + virtualNodeURL);
-        } catch (java.rmi.AlreadyBoundException e) {
-            throw new java.rmi.RemoteException("VirtualNode " + virtualNodeURL +
-                " already bound in registry", e);
-        } catch (java.net.MalformedURLException e) {
-            throw new java.rmi.RemoteException("cannot bind in registry at " +
-                virtualNodeURL, e);
+            register(virtualNodeURL, replacePreviousBinding);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
         }
+        vnNodesArray.add(virtualNodeURL);
     }
 
     public void unregisterVirtualNode(String virtualnodeName)
         throws java.rmi.RemoteException {
-
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualnodeName));
         try {
             //first we build a well-formed url
             virtualNodeURL = buildNodeURL(virtualnodeName);
-            java.rmi.Naming.unbind(virtualNodeURL);
-        } catch (java.net.MalformedURLException e) {
-            throw new java.rmi.RemoteException("cannot unbind in registry at " +
-                virtualNodeURL, e);
-        } catch (java.rmi.NotBoundException e) {
-            throw new java.rmi.RemoteException(virtualNodeURL +
-                "is not bound in the registry", e);
+            unregister(virtualNodeURL);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " +
                 virtualNodeURL, e);
+        }
+        vnNodesArray.remove(virtualNodeURL);
+    }
+
+    public void unregisterAllVirtualNodes() throws java.rmi.RemoteException {
+        for (int i = 0; i < vnNodesArray.size(); i++) {
+            String url = (String) vnNodesArray.get(i);
+            unregisterVirtualNode(url);
         }
     }
 
@@ -250,24 +237,62 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     //
     // ---PRIVATE METHODS--------------------------------------
     //
-    private String buildRuntimeURL() {
+    private void register(String url, boolean replacePreviousBinding)
+        throws java.rmi.RemoteException {
+        try {
+            if (replacePreviousBinding) {
+                java.rmi.Naming.rebind(UrlBuilder.removeProtocol(url, "rmi:"),
+                    this);
+            } else {
+                java.rmi.Naming.bind(UrlBuilder.removeProtocol(url, "rmi:"),
+                    this);
+            }
+			if(url.indexOf("PA_RT")<0){
+				logger.info(url + " successfully bound in registry at " + url);
+			}
+        } catch (java.rmi.AlreadyBoundException e) {
+            throw new java.rmi.RemoteException(url +
+                " already bound in registry", e);
+        } catch (java.net.MalformedURLException e) {
+            throw new java.rmi.RemoteException("cannot bind in registry at " +
+                url, e);
+        }
+    }
 
+    private void unregister(String url) throws java.rmi.RemoteException {
+        try {
+            java.rmi.Naming.unbind(UrlBuilder.removeProtocol(url, "rmi:"));
+            if(url.indexOf("PA_RT")<0){
+				logger.info(url + " unbound in registry");
+            }  
+        } catch (java.net.MalformedURLException e) {
+            throw new java.rmi.RemoteException("cannot unbind in registry at " +
+                url, e);
+        } catch (java.rmi.NotBoundException e) {
+            throw new java.rmi.RemoteException(url +
+                "is not bound in the registry", e);
+        }
+    }
+
+    private String buildRuntimeURL() {
         int port = RemoteRuntimeFactory.getRegistryHelper()
                                        .getRegistryPortNumber();
         String host = getVMInformation().getInetAddress().getHostName();
         String name = getVMInformation().getName();
-        return UrlBuilder.buildUrl(host, name, port);
+        return UrlBuilder.buildUrl(host, name, "rmi:", port);
     }
 
     private String buildNodeURL(String url)
         throws java.net.UnknownHostException {
-
         int i = url.indexOf('/');
         if (i == -1) {
-
             //it is an url given by a descriptor
             String host = getVMInformation().getInetAddress().getHostName();
-            return UrlBuilder.buildUrl(host+":"+portNumber, url);
+
+            int port = RemoteRuntimeFactory.getRegistryHelper()
+                                           .getRegistryPortNumber();
+            return UrlBuilder.buildUrl(host, url, "rmi:", port);
+
         } else {
             return UrlBuilder.checkUrl(url);
         }

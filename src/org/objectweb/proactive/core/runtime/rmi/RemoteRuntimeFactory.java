@@ -1,4 +1,5 @@
 /*
+   <<<<<<< RemoteRuntimeFactory.java
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -35,6 +36,7 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class RemoteRuntimeFactory extends RuntimeFactory {
@@ -53,7 +55,11 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
+        //		String port = System.getProperty("proactive.rmi.port");
         //random = new java.util.Random(System.currentTimeMillis());
+        //        if ( port != null){
+        //			registryHelper.setRegistryPortNumber(new Integer(port).intValue());
+        //        }
         registryHelper.initializeRegistry();
     }
 
@@ -95,9 +101,9 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
     protected ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException {
         //if (s == null) return null;
-    //	System.out.println("YYYY url = " +s);
         try {
-            RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(s);
+            RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(UrlBuilder.removeProtocol(
+                        s, "rmi:"));
 
             //System.out.println(remoteProActiveRuntime.getClass().getName());
             return createRuntimeAdapter(remoteProActiveRuntime);

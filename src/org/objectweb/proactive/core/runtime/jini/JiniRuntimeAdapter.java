@@ -115,24 +115,22 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 
 	
-	public void DeleteAllNodes()
+	public void killAllNodes() throws ProActiveException
 	{
 		try{
-		jiniRuntime.DeleteAllNodes();
+		jiniRuntime.killAllNodes();
 		}catch(java.rmi.RemoteException re){
-			re.printStackTrace();
-			// behavior to be defined
+			throw new ProActiveException(re);
 		}
 	}
 
 	
-	public void killNode(String nodeName)
+	public void killNode(String nodeName) throws ProActiveException
 	{
 		try{
 		jiniRuntime.killNode(nodeName);
 		}catch(java.rmi.RemoteException re){
-			re.printStackTrace();
-			// behavior to be defined
+			throw new ProActiveException(re);
 		}
 	}
 
@@ -253,12 +251,13 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	
 	public void killRT() throws Exception
 	{
-//		try{
+		try{
 		jiniRuntime.killRT();
-//		}catch(java.rmi.RemoteException re){
+		}catch(java.rmi.RemoteException re){
+			throw new ProActiveException(re);
 //			re.printStackTrace();
 //			// behavior to be defined
-//		}
+		}
 	}
 	
 	public String getURL()throws ProActiveException{
@@ -317,6 +316,16 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 	
 	
+	public void unregisterAllVirtualNodes() throws ProActiveException {
+		try{
+		jiniRuntime.unregisterAllVirtualNodes();
+		}catch(java.rmi.RemoteException re){
+			throw new ProActiveException(re);
+		}
+	
+	}
+	
+	
 	public UniversalBody createBody(String nodeName,ConstructorCall bodyConstructorCall,boolean isNodeLocal)
 		throws
 			ProActiveException,
@@ -349,4 +358,8 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
   protected JiniRuntime createJiniRuntime() throws java.rmi.RemoteException {
     return new JiniRuntimeImpl();
   }
+
+
+
+
 }

@@ -58,7 +58,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
         boolean replacePreviousBinding)
         throws java.rmi.RemoteException, NodeException;
 
-    public void DeleteAllNodes() throws java.rmi.RemoteException;
+    public void killAllNodes() throws java.rmi.RemoteException;
 
     public void killNode(String nodeName) throws java.rmi.RemoteException;
 
@@ -87,10 +87,6 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public String getURL() throws java.rmi.RemoteException;
 
-    public void setPortNumber(int port) throws java.rmi.RemoteException;
-    
-    public int getPortNumber() throws java.rmi.RemoteException;
-    
     public ArrayList getActiveObjects(String nodeName)
         throws java.rmi.RemoteException;
 
@@ -105,6 +101,8 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws java.rmi.RemoteException;
+
+    public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)

@@ -41,12 +41,15 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
+
 import java.io.IOException;
 import java.io.Serializable;
 
 import java.lang.reflect.InvocationTargetException;
 
+import java.rmi.UnmarshalException;
 import java.util.ArrayList;
+
 
 
 /**
@@ -55,12 +58,17 @@ import java.util.ArrayList;
  *   to another remote objects library.
  *          @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
+
 public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     Serializable {
     //-----------Protected Members--------------------------------
     protected RemoteProActiveRuntime remoteProActiveRuntime;
     protected VMInformation vmInformation;
     protected String proActiveRuntimeURL;
+    
+    //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
+    // which is already dead
+    protected boolean alreadykilled = false;
 
     //
     // -- Constructors -----------------------------------------------
@@ -79,16 +87,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
                 "Cannot bind remoteProactiveRuntime to" + proActiveRuntimeURL, e);
         }
     }
-
-//    public RemoteProActiveRuntimeAdapter(int port) throws ProActiveException {
-//        this();
-//        try {
-//            this.remoteProActiveRuntime.setPortNumber(port);
-//        } catch (java.rmi.RemoteException e) {
-//            throw new ProActiveException("Cannot create the remoteProactiveRuntime or get the VMInformation from the RemoteProActiveRuntime",
-//                e);
-//        }
-//    }
 
     public RemoteProActiveRuntimeAdapter(
         RemoteProActiveRuntime remoteProActiveRuntime)
@@ -130,21 +128,20 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void DeleteAllNodes() {
+    public void killAllNodes() throws ProActiveException{
         try {
-            remoteProActiveRuntime.DeleteAllNodes();
+            remoteProActiveRuntime.killAllNodes();
         } catch (java.rmi.RemoteException re) {
-            re.printStackTrace();
+			throw new ProActiveException(re);
             // behavior to be defined
         }
     }
 
-    public void killNode(String nodeName) {
+    public void killNode(String nodeName) throws ProActiveException {
         try {
             remoteProActiveRuntime.killNode(nodeName);
         } catch (java.rmi.RemoteException re) {
-            re.printStackTrace();
-            // behavior to be defined
+            throw new ProActiveException(re);
         }
     }
 
@@ -248,12 +245,17 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     public void killRT() throws Exception {
-        //		try{
-        remoteProActiveRuntime.killRT();
-        //		}catch(java.rmi.RemoteException re){
-        //			re.printStackTrace();
-        //			// behavior to be defined
-        //		}
+        try{
+        	if(!alreadykilled){
+				remoteProActiveRuntime.killRT();
+        	}
+        }catch(UnmarshalException e){
+        	//here should be caught the exception from System.exit
+			alreadykilled = true;
+        	throw e ;
+        }catch(java.rmi.RemoteException re){
+			throw new ProActiveException(re);
+        }
     }
 
     public String getURL() throws ProActiveException {
@@ -312,6 +314,14 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    public void unregisterAllVirtualNodes() throws ProActiveException {
+        try {
+            remoteProActiveRuntime.unregisterAllVirtualNodes();
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
         throws ProActiveException, ConstructorCallExecutionFailedException, 
@@ -333,23 +343,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void setPortNumber(int p)  throws ProActiveException {
-    	try {
-    		remoteProActiveRuntime.setPortNumber(p);
-    	} catch (java.rmi.RemoteException re) {
-    		throw new ProActiveException(re);
-    	}
-    	
-    }
-    
-    public int getPortNumber()  throws ProActiveException {
-    	try {
-    		return remoteProActiveRuntime.getPortNumber();
-    	} catch (java.rmi.RemoteException re) {
-    		throw new ProActiveException(re);
-    	}
-    }
-    
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -357,4 +350,5 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         return new RemoteProActiveRuntimeImpl();
     }
+
 }
