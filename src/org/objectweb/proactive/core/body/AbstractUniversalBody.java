@@ -111,7 +111,6 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   }
 
   public UniversalBody getRemoteAdapter() {
-  	System.out.println("getRemoteAdapter " + this.remoteBody);
     return remoteBody;
   }
 
