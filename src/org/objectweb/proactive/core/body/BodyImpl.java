@@ -263,6 +263,7 @@ public abstract class BodyImpl extends AbstractBody
 				Reply reply = request.serve(BodyImpl.this);
 				
 				if (reply == null) {
+					if(!isActive()) return;//test if active in case of terminate() method otherwise eventProducer would be null
 					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, 
 							bodyID, getRequestQueue().size());
 					return;
