@@ -32,4 +32,6 @@ package org.objectweb.proactive.examples.penguin;
 
 public interface PenguinMessageReceiver {
   public void receiveMessage(String s);
+
+  public void receiveMessage(String s, java.awt.Color c);
 }
