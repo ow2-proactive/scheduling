@@ -9,6 +9,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
 import java.awt.BorderLayout;
@@ -393,6 +394,24 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                             }
                             rebuildAll();
                             tree.repaint();
+                        }
+                    };
+
+            menuItem = new JMenuItem(a);
+            menuItem.setEnabled(!objects.isEmpty());
+            popupmenu.add(menuItem);
+
+            a = new AbstractAction("Kill Job(s)") {
+                        public void actionPerformed(ActionEvent e) {
+                            Iterator iter = objects.iterator();
+                            MonitoredObjectSet jobs = new MonitoredObjectSet();
+                            while (iter.hasNext()) {
+                                BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+                                MonitoredObjectSet set = asso.getValues(object,
+                                        JOB, null);
+                                jobs.addAll(set);
+                            }
+                            explorator.killJobs(jobs);
                         }
                     };
 

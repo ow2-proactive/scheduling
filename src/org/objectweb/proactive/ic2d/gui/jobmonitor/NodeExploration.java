@@ -322,6 +322,33 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
+    private void killJVM(MonitoredJVM jvm) {
+    	ProActiveRuntime part = urlToRuntime(jvm.getFullName());
+    	try {
+    		part.killRT(false);
+    	} catch (Exception e) {
+    		log(e);
+    	}
+    }
+    
+    private void killJob(MonitoredJob job) {
+        MonitoredObjectSet jvms = asso.getValues(job, JVM, null);
+        Iterator iter = jvms.iterator();
+        
+        while (iter.hasNext()) {
+        	MonitoredJVM jvm = (MonitoredJVM) iter.next();
+        	killJVM(jvm);
+        }
+    }
+
+    public void killJobs(MonitoredObjectSet jobs) {
+        Iterator iter = jobs.iterator();
+        while (iter.hasNext()) {
+            MonitoredJob job = (MonitoredJob) iter.next();
+            killJob(job);
+        }
+    }
+
     public void startExploration() {
         visitedVM = new TreeSet();
     }
