@@ -246,7 +246,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
 
   /**
-   * Informs the iser that another user left
+   * Informs the user that another user left
    * @param nUser The id of the old user
    * @version ADDON 16/8/98
    * @author Florian DOYON
@@ -905,7 +905,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       gridbag.setConstraints(p_msg, c);
       add(p_msg);
 
-// SpyEvent
+      // SpyEvent
       pc.gridx = 0;
       pc.gridy = 0;
       pc.fill = pc.NONE;
