@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <!--
+
+
+    ROOT ELEMENTS-->
+    <xs:element name="componentsDescriptor">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="types"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="components"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="bindings"/>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:key name="componentTypeKey">
+            <xs:selector xpath="types/component-type"/>
+            <xs:field xpath="@name"/>
+        </xs:key>
+        <xs:keyref name="componentTypeKeyRefPrimitive" refer="componentTypeKey">
+            <xs:selector xpath="components/primitive-component"/>
+            <xs:field xpath="@type"/>
+        </xs:keyref>
+        <xs:keyref name="componentTypeKeyRefComposite" refer="componentTypeKey">
+            <xs:selector xpath="components/composite-component"/>
+            <xs:field xpath="@type"/>
+        </xs:keyref>
+        <xs:keyref name="componentTypeKeyRefParallel" refer="componentTypeKey">
+            <xs:selector xpath="components/parallel-composite-component"/>
+            <xs:field xpath="@type"/>
+        </xs:keyref>
+    </xs:element>
+    <xs:element name="types">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="1" ref="component-type"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="component-type" type="componentType"/>
+    <!--
+
+
+    COMPONENTS -->
+    <xs:element name="components">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="primitive-component"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="composite-component"/>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="parallel-composite-component"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <!--
+
+
+    COMPONENT DEFINITIONS (PRIMITIVE AND COMPOSITE) -->
+    <xs:element name="primitive-component">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="implementation" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <!--
+
+    -->
+    <xs:element name="composite-component">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="1" minOccurs="1" ref="components"/>
+                <xs:element maxOccurs="1" minOccurs="1" ref="bindings"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="parallel-composite-component">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="1" minOccurs="1" ref="components"/>
+                <xs:element maxOccurs="1" minOccurs="0" ref="bindings"/>
+                <!-- bindings are automatic between interfaces of the same name :
+													-> primitive1.itfA
+							parallel-composite.itfA -> primitive2.itfA
+													-> primitive3.itfA
+										
+						<xs:element maxOccurs="1" minOccurs="1" ref="bindings"/>
+						-->
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="virtualNode" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+    <!--
+
+
+    TYPES
+    -->
+    <xs:complexType name="componentType">
+        <xs:sequence>
+            <xs:element maxOccurs="1" minOccurs="1" name="provides" type="port"/>
+            <xs:element maxOccurs="1" minOccurs="0" name="requires" type="port"/>
+        </xs:sequence>
+        <xs:attribute name="name" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="port">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" ref="interface"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:element name="interface">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="signature" type="xs:string" use="required"/>
+            <xs:attribute default="mandatory" name="contingency" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="mandatory"/>
+                        <xs:enumeration value="optional"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute default="single" name="cardinality" use="optional">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="single"/>
+                        <xs:enumeration value="collection"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!--
+
+
+    BINDINGS -->
+    <xs:element name="bindings">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" ref="binding"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="binding">
+        <xs:complexType>
+            <xs:attribute name="client">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value=".*\..*"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="server">
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:pattern value=".*\..*"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
