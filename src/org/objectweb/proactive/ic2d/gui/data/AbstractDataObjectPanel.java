@@ -57,11 +57,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
             java.awt.Font.BOLD, 10);
     protected static final java.awt.Font VERY_SMALL_FONT = new java.awt.Font("SansSerif",
             java.awt.Font.BOLD, 8);
-    protected static final int REGULAR_FONT_SIZE = 10;
-    protected static final int BIG_FONT_SIZE = 20;
-    protected static final int VERY_BIG_FONT_SIZE = 30;
-    protected static final int SMALL_FONT_SIZE = 50;
-    protected static final int VERY_SMALL_FONT_SIZE = 70;
     protected static final int MINIMUM_WIDTH = 100;
     protected static final int MINIMUM_HEIGHT = 40;
     protected java.awt.Dimension minimumSize = new java.awt.Dimension(MINIMUM_WIDTH,
@@ -150,7 +145,8 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
     }
 
     //
-    // -- implements MessageMonitoringListener -----------------------------------------------
+    // -- implements MessageMonitoringListener
+    // -----------------------------------------------
     //
     public void viewingInEventListChanged(boolean b) {
         monitoringMenu.viewingInEventListChanged(b);
@@ -193,10 +189,12 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
     protected abstract AbstractDataObject getAbstractDataObject();
 
     protected void displayDataObjectInfo() {
-        javax.swing.JOptionPane.showMessageDialog(parentFrame, // Component parentComponent,
-            new DataObjectInfoPanel(), // Object message,
+        javax.swing.JOptionPane.showMessageDialog(parentFrame, // Component
+            // parentComponent,
+        new DataObjectInfoPanel(), // Object message,
             type + " info :" + name, // String title,
-            javax.swing.JOptionPane.INFORMATION_MESSAGE // int messageType,
+            javax.swing.JOptionPane.INFORMATION_MESSAGE // int
+        // messageType,
         );
     }
 
@@ -265,7 +263,8 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
      */
     protected synchronized void addChild(AbstractDataObject key,
         AbstractDataObjectPanel child) {
-        //System.out.println("AbstractDataObjectPanel addChild name="+child.name+" type="+child.type);
+        //System.out.println("AbstractDataObjectPanel addChild
+        // name="+child.name+" type="+child.type);
         putChild(key, child);
         add(child);
         revalidate();
@@ -279,7 +278,8 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         AbstractDataObject key) {
         AbstractDataObjectPanel panel = (AbstractDataObjectPanel) childs.remove(key);
         if (panel != null) {
-            //System.out.println("AbstractDataObjectPanel removeChild name="+panel.name+" type="+panel.type);
+            //System.out.println("AbstractDataObjectPanel removeChild
+            // name="+panel.name+" type="+panel.type);
             panel.destroy();
             remove(panel);
             revalidate();
@@ -300,28 +300,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         return childs.values().iterator();
     }
 
-    protected void setFontSize(int size) {
-        switch (size) {
-        case REGULAR_FONT_SIZE:
-            setFontSize(REGULAR_FONT);
-            break;
-        case BIG_FONT_SIZE:
-            setFontSize(BIG_FONT);
-            break;
-        case VERY_BIG_FONT_SIZE:
-            setFontSize(VERY_BIG_FONT);
-            break;
-        case SMALL_FONT_SIZE:
-            setFontSize(SMALL_FONT);
-            break;
-        case VERY_SMALL_FONT_SIZE:
-            setFontSize(VERY_SMALL_FONT);
-            break;
-        }
-        revalidate();
-        repaint();
-    }
-
     protected synchronized void setFontSize(java.awt.Font font) {
         defaultFont = font;
         java.util.Iterator iterator = childsIterator();
@@ -329,6 +307,8 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
             AbstractDataObjectPanel o = (AbstractDataObjectPanel) iterator.next();
             o.setFontSize(font);
         }
+        revalidate();
+        repaint();
     }
 
     protected synchronized void addAllActiveObjectsToWatcher() {
@@ -423,65 +403,78 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
                 });
         }
 
-        //    public void setRightRadioButtonFont(){
-        //        Enumeration e = fontSizeMenu.getGroup().getElements();
-        //        for (Enumeration e = v.elements() ; e.hasMoreElements() ;) {
-        //            System.out.println(e.nextElement());
-        //
-        //        }
-        //        
-        //    }
         //
         // -- INNER CLASSES -------------------------------------------------
         //
         private class MyMouseListener extends java.awt.event.MouseAdapter {
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                	coherentMenu();
+                    coherentMenu();
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
 
             public void mouseReleased(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
+                    coherentMenu();
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
-            
-            private void coherentMenu(){
-            	
+
+            // call for the menu cohesion
+            private void coherentMenu() {
+                fontSizeMenu.coherentMenu();
             }
         } // end inner class MyMouseListener
 
         private class FontSizeMenu extends javax.swing.JMenu {
             private javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+            private java.util.HashMap HashMenuFontSize = new java.util.HashMap();
 
             public FontSizeMenu() {
                 super("Change font size");
-                //System.out.println("font = " + getFont());
-                add(createItem("Very large font size", VERY_BIG_FONT_SIZE, false));
-                add(createItem("Large font size", BIG_FONT_SIZE, false));
-                add(createItem("Regular font size", REGULAR_FONT_SIZE, true));
-                add(createItem("Small font size", SMALL_FONT_SIZE, false));
-                add(createItem("Very small font size", VERY_SMALL_FONT_SIZE,
-                        false));
+                HashMenuFontSize.put(SMALL_FONT, new String("Small font size"));
+                HashMenuFontSize.put(VERY_SMALL_FONT,
+                    new String("Very small font size"));
+                HashMenuFontSize.put(VERY_BIG_FONT,
+                    new String("Very large font size"));
+                HashMenuFontSize.put(BIG_FONT, new String("Large font size"));
+                HashMenuFontSize.put(REGULAR_FONT,
+                    new String("Regular font size"));
+                java.util.Iterator iter = HashMenuFontSize.entrySet().iterator();
+                while (iter.hasNext()) {
+                    java.util.Map.Entry keyval = (java.util.Map.Entry) iter.next();
+                    add(createItem((String) keyval.getValue(),
+                            (java.awt.Font) keyval.getKey(), false));
+                }
             }
 
             private javax.swing.JMenuItem createItem(String text,
-                final int size, final boolean stat) {
+                final java.awt.Font font, final boolean stat) {
                 javax.swing.JRadioButtonMenuItem menuItem = new javax.swing.JRadioButtonMenuItem(text,
                         stat);
                 menuItem.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(
                             java.awt.event.ActionEvent event) {
-                            setFontSize(size);
+                            setFontSize(font);
                         }
                     });
                 group.add(menuItem);
                 return menuItem;
             }
-            public void selectRightRB(){
-            	}
+
+            // select the right rb button of the right font
+            public void coherentMenu() {
+                String txtvalue = (String) HashMenuFontSize.get(defaultFont);
+                java.util.Enumeration e = getGroup().getElements();
+                while (e.hasMoreElements()) {
+                    javax.swing.JRadioButtonMenuItem rb = (javax.swing.JRadioButtonMenuItem) e.nextElement();
+                    if (rb.getText() == txtvalue) {
+                        rb.setSelected(true);
+                    }
+                }
+            }
+
             /**
              * @return Returns the group.
              */
