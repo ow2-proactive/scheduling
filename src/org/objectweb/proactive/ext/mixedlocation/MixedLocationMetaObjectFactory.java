@@ -38,8 +38,9 @@ import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
+import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
+
 
 /**
  * <p>
@@ -53,64 +54,61 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
  */
 public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
 
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
+    //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
+    private static MetaObjectFactory instance = null;
 
-  private static MetaObjectFactory instance = null;
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-
-  /**
+    /**
    * Constructor for LocationServerMetaObjectFactory.
    */
-  protected MixedLocationMetaObjectFactory() {
-    super();
-  }
-
-  //
-  // -- PUBLICS METHODS -----------------------------------------------
-  //
-
-  public static synchronized MetaObjectFactory newInstance() {
-  	if (instance == null) {
-  	instance =  new MixedLocationMetaObjectFactory();
-  	}
-    return instance;
-  }
-
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-
-  protected RequestFactory newRequestFactorySingleton() {
-    return new RequestWithMixedLocationFactory();
-  }
-
-  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
-    return new MigrationManagerFactoryImpl();
-  }
-
-  //
-  // -- INNER CLASSES -----------------------------------------------
-  //
-
-  protected class RequestWithMixedLocationFactory implements RequestFactory, java.io.Serializable {
-    private LocationServer server = LocationServerFactory.getLocationServer();
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-      return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server);
+    protected MixedLocationMetaObjectFactory() {
+        super();
     }
-  } // end inner class RequestWithMixedLocationFactory
 
-
-
-  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
-    public MigrationManager newMigrationManager() {
-      System.out.println("BodyWithMixedLocation.createMigrationManager");
-      return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public static synchronized MetaObjectFactory newInstance() {
+        if (instance == null) {
+            instance = new MixedLocationMetaObjectFactory();
+        }
+        return instance;
     }
-  } // end inner class MigrationManagerFactoryImpl
 
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+    protected RequestFactory newRequestFactorySingleton() {
+        return new RequestWithMixedLocationFactory();
+    }
+
+    protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
+        return new MigrationManagerFactoryImpl();
+    }
+
+    //
+    // -- INNER CLASSES -----------------------------------------------
+    //
+    protected class RequestWithMixedLocationFactory implements RequestFactory,
+                                                               java.io.Serializable {
+
+       transient private LocationServer server = LocationServerFactory.getLocationServer();
+
+        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+            return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server);
+        }
+    } // end inner class RequestWithMixedLocationFactory
+
+    protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
+                                                                  java.io.Serializable {
+        public MigrationManager newMigrationManager() {
+            System.out.println("BodyWithMixedLocation.createMigrationManager");
+            return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());
+        }
+    } // end inner class MigrationManagerFactoryImpl
 }

@@ -38,25 +38,26 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 
+
 /**
  *   An adapter for a LocalBody to be able to receive remote calls. This helps isolate RMI-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
  */
-public class RemoteBodyImpl
-  extends java.rmi.server.UnicastRemoteObject
-  implements RemoteBody, java.rmi.server.Unreferenced {
+public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
+    implements RemoteBody,
+               java.rmi.server.Unreferenced {
 
-  /**
+    /**
    * A custom socket Factory
    */
-  protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(37002, 5000);
-
-  /**
+    protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(
+                                                              37002, 5000);
+    /**
    * The encapsulated local body
    * transient to deal with custom serialization of requests.
    */
-  protected transient UniversalBody body;
+    protected transient UniversalBody body;
 
   //
   // -- CONSTRUCTORS -----------------------------------------------

@@ -175,9 +175,5 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
 	 */
   public Node getNode(String url) throws NodeException;
   	
-  
-  
-  
-  
-   
+ 
 }

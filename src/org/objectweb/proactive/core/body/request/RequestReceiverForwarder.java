@@ -27,19 +27,20 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.request;
 
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.UniversalBody;
+
 
 public class RequestReceiverForwarder implements RequestReceiver {
+    private UniversalBody remoteBody;
 
-  private UniversalBody remoteBody;
+    public RequestReceiverForwarder(UniversalBody b) {
+        this.remoteBody = b;
+    }
 
-  public RequestReceiverForwarder(UniversalBody b) {
-    this.remoteBody = b;
-  }
 
   public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
     request.send(remoteBody);
@@ -49,5 +50,3 @@ public class RequestReceiverForwarder implements RequestReceiver {
   	remoteBody.setImmediateService(methodName);
   }	
 }
-
-

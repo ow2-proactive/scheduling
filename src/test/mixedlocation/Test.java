@@ -24,6 +24,7 @@ public class Test implements Serializable {
             e.printStackTrace();
         }
     }
+   
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -31,6 +32,7 @@ public class Test implements Serializable {
             System.exit(0);
         }
         Test t = null;
+       
         Source s = null;
         Object[] arg = new Object[1];
         arg[0] = args;

@@ -83,6 +83,16 @@ public class LocationServerFactory {
 	    e.printStackTrace();
 	}       	
 	return server;
+//	try {
+//		Object t = null;
+//		t.toString();
+//	} catch (Exception e) {
+//		System.out.println("-----------------------");
+//		e.printStackTrace();
+//			System.out.println("-----------------------");
+//	}
+//	
+//	return null;
     }
 
     /**

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.node.Node;
 
 public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
 
-  private LocationServer locationServer;
+transient  private LocationServer locationServer;
 
 
 
@@ -78,8 +78,9 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
   //
   
   public UniversalBody migrateTo(Node node, Body body) throws MigrationException {
+  	 locationServer = null;
     UniversalBody remoteBody = super.migrateTo(node,body);
-    locationServer = null;
+   
     return remoteBody;
   }
 

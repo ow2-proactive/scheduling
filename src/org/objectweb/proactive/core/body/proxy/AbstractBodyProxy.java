@@ -30,58 +30,54 @@
 */
 package org.objectweb.proactive.core.body.proxy;
 
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
 
-public abstract class AbstractBodyProxy extends AbstractProxy implements BodyProxy, java.io.Serializable  {
 
-  //
-  // -- STATIC MEMBERS -----------------------------------------------
-  //
+public abstract class AbstractBodyProxy extends AbstractProxy
+    implements BodyProxy,
+               java.io.Serializable {
+    //
+    // -- STATIC MEMBERS -----------------------------------------------
+    //
+    //
+    // -- PROTECTED MEMBERS -----------------------------------------------
+    //
+    protected UniqueID bodyID;
 
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public AbstractBodyProxy() {
+    }
 
-  //
-  // -- PROTECTED MEMBERS -----------------------------------------------
-  //
+    AbstractBodyProxy(UniqueID bodyID) {
+        this.bodyID = bodyID;
+    }
 
-  protected UniqueID bodyID;
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    //
+    // -- implements BodyProxy -----------------------------------------------
+    //
+    public UniqueID getBodyID() {
+        return bodyID;
+    }
 
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
+    //
+    // -- implements Proxy -----------------------------------------------
+    //
 
-  public AbstractBodyProxy() {
-  }
-
-  AbstractBodyProxy(UniqueID bodyID) {
-    this.bodyID = bodyID;
-  }
-
-  //
-  // -- PUBLIC METHODS -----------------------------------------------
-  //
-
-  //
-  // -- implements BodyProxy -----------------------------------------------
-  //
-
-  public UniqueID getBodyID() {
-    return bodyID;
-  }
-
-  //
-  // -- implements Proxy -----------------------------------------------
-  //
-
-  /**
+    /**
    * Performs operations on the Call object created by the stub, thus changing
    * the semantics of message-passing to asynchronous message-passing with
    * future objects
@@ -96,54 +92,56 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
    * <LI>The Call <code>methodCall</code> is passed to the skeleton for execution.
    * </UL>
    */
-  public Object reify(MethodCall methodCall) throws Throwable {
-    if (methodCall.getName().equals("equals")) {
-      //there is only one argument to this method
-      Object arg = methodCall.getParameter(0);
-      if (MOP.isReifiedObject(arg)) {
-        AbstractBodyProxy bodyProxy = (AbstractBodyProxy) ((StubObject)arg).getProxy();
-        return new Boolean(bodyID.equals(bodyProxy.bodyID));
-      } else {
-        return new Boolean(false);
-      }
-    }
-
-    // Now gives the MethodCall object to the body
-    try {
-      if (isOneWayCall(methodCall)) {
-        reifyAsOneWay(methodCall);
-        return null;
-      }
-      if (isAsynchronousCall(methodCall)) {
-        return reifyAsAsynchronous(methodCall);
-      }
-      return reifyAsSynchronous(methodCall);
-    } catch (MethodCallExecutionFailedException e) {
-      throw new ProActiveRuntimeException(e.getMessage(), e.getTargetException());
-    } catch (Throwable t) {
-      if (t instanceof RuntimeException) {
-        throw (RuntimeException) t;
-      } else if (t instanceof Error) {
-        throw (Error) t;
-      } else {
-        // check now which exception can be safely thrown
-        Class[] declaredExceptions = methodCall.getReifiedMethod().getExceptionTypes();
-        for (int i = 0; i<declaredExceptions.length; i++) {
-          Class exceptionClass = declaredExceptions[i];
-          if (exceptionClass.isAssignableFrom(t.getClass())) {
-            throw t;
-          }
+    public Object reify(MethodCall methodCall)
+                 throws Throwable {
+        if (methodCall.getName().equals("equals")) {
+            //there is only one argument to this method
+            Object arg = methodCall.getParameter(0);
+            if (MOP.isReifiedObject(arg)) {
+                AbstractBodyProxy bodyProxy = (AbstractBodyProxy)((StubObject)arg).getProxy();
+                return new Boolean(bodyID.equals(bodyProxy.bodyID));
+            } else {
+                return new Boolean(false);
+            }
         }
-        // Here we should extend the behavior to accept exception Handler
-        throw new ProActiveRuntimeException(t);
-      }
+        // Now gives the MethodCall object to the body
+        try {
+            if (isOneWayCall(methodCall)) {
+                reifyAsOneWay(methodCall);
+                return null;
+            }
+            if (isAsynchronousCall(methodCall)) {
+                return reifyAsAsynchronous(methodCall);
+            }
+            return reifyAsSynchronous(methodCall);
+        } catch (MethodCallExecutionFailedException e) {
+            throw new ProActiveRuntimeException(e.getMessage(), 
+                                                e.getTargetException());
+        }
+         catch (Throwable t) {
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException)t;
+            } else if (t instanceof Error) {
+                throw (Error)t;
+            } else {
+                // check now which exception can be safely thrown
+                Class[] declaredExceptions = methodCall.getReifiedMethod().getExceptionTypes();
+                for (int i = 0; i < declaredExceptions.length; i++) {
+                    Class exceptionClass = declaredExceptions[i];
+                    if (exceptionClass.isAssignableFrom(t.getClass())) {
+                        throw t;
+                    }
+                }
+                // Here we should extend the behavior to accept exception Handler
+                throw new ProActiveRuntimeException(t);
+            }
+        }
     }
-  }
 
-
-  /**
+    /**
    *
    */
+
   protected void reifyAsOneWay(MethodCall methodCall) throws MethodCallExecutionFailedException {
     try {
       sendRequest(methodCall, null);
@@ -199,6 +197,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
   }
 
 
-  protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException;
 
+    protected abstract void sendRequest(MethodCall methodCall, Future future)
+                                 throws java.io.IOException;
 }

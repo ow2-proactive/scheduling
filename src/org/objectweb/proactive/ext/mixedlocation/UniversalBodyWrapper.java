@@ -8,6 +8,8 @@
  */
 package org.objectweb.proactive.ext.mixedlocation;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -15,13 +17,16 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
-import java.io.IOException;
 
-public class UniversalBodyWrapper implements UniversalBody, Runnable {
+public class UniversalBodyWrapper implements UniversalBody,
+                                             Runnable {
 
     protected UniversalBody wrappedBody;
     protected long time;
     protected UniqueID id;
+
+	protected boolean stop;
+	protected long creationTime;
 
     /**
      * Create a time-limited wrapper around a UniversalBody
@@ -31,25 +36,40 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     public UniversalBodyWrapper(UniversalBody body, long time) {
         this.wrappedBody = body;
         this.time = time;
+this.creationTime = System.currentTimeMillis();
         Thread t = new Thread(this);
         this.id = this.wrappedBody.getID();
-        t.start();
+        
+     //   t.start();
     }
 
-    public void receiveRequest(Request request) throws IOException {
-       System.out.println("UniversalBodyWrapper.receiveRequest");
+    public void receiveRequest(Request request)
+                        throws IOException {
+        //       System.out.println("UniversalBodyWrapper.receiveRequest");
         if (this.wrappedBody == null) {
             throw new IOException();
         }
-        try    {
-        this.wrappedBody.receiveRequest(request);
+        //the forwarder should be dead
+        if (System.currentTimeMillis() > (this.creationTime + this.time)) {
+        	   this.updateServer();
+        this.wrappedBody = null;
+        System.gc();
+        	  throw new IOException();
+        	  
+        } else {
+        
+        try {
+            this.wrappedBody.receiveRequest(request);
         } catch (IOException e) {
             e.printStackTrace();
             throw e;
         }
+        }
+  //      this.stop();
     }
 
-    public void receiveReply(Reply r) throws IOException {
+    public void receiveReply(Reply r)
+                      throws IOException {
         this.wrappedBody.receiveReply(r);
     }
 
@@ -61,7 +81,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.id;
     }
 
-    public void updateLocation(UniqueID id, UniversalBody body) throws IOException {
+    public void updateLocation(UniqueID id, UniversalBody body)
+                        throws IOException {
         this.wrappedBody.updateLocation(id, body);
     }
 
@@ -82,24 +103,42 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     protected void updateServer() {
-        System.out.println("UniversalBodyWrapper.updateServer");
-        LocationServer server = LocationServerFactory.getLocationServer();
-        try {
-            server.updateLocation(id, this.wrappedBody);
-        } catch (Exception e) {
-            System.out.println("XXXX Error XXXX");
-           // e.printStackTrace();
-        }
+        //        System.out.println("UniversalBodyWrapper.updateServer");
+        //  LocationServer server = LocationServerFactory.getLocationServer();
+        //        try {
+        //            server.updateLocation(id, this.wrappedBody);
+        //        } catch (Exception e) {
+        //            System.out.println("XXXX Error XXXX");
+        //           // e.printStackTrace();
+        //        }
     }
 
+//protected synchronized void stop() {
+// this.stop=true;	
+// this.notifyAll();
+//}
+//
+//protected synchronized void waitForStop(long time) {
+//	if (!this.stop) {
+//	 try {
+//		 wait(time);	
+//	} catch (InterruptedException e) {
+//		e.printStackTrace();
+//	}
+//	}
+//	
+//}
+
+
     public void run() {
-        System.out.println("UniversalBodyWrapper.run life expectancy " + time);
+        //        System.out.println("UniversalBodyWrapper.run life expectancy " + time);
         try {
-            Thread.currentThread().sleep(time);
+           // Thread.currentThread().sleep(time);
+         //  this.waitForStop(time);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("UniversalBodyWrapper.run end of life...");
+        //        System.out.println("UniversalBodyWrapper.run end of life...");
         this.updateServer();
         this.wrappedBody = null;
         System.gc();

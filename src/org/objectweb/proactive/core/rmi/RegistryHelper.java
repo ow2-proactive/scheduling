@@ -75,10 +75,14 @@ public class RegistryHelper {
   
 
   public synchronized void initializeRegistry() throws java.rmi.RemoteException {
+  	try {
     if (! shouldCreateRegistry) return; // don't bother
     if (registryChecked) return; // already done for this VM
     getOrCreateRegistry(registryPortNumber);
     registryChecked = true;
+  	} catch (Exception e) {
+  	 e.printStackTrace();	
+  	}
   }
 
 

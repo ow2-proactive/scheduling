@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.futurelist;
 
 import org.objectweb.proactive.ext.util.FutureList;
 
+
 public class FutureReceiver implements java.io.Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far

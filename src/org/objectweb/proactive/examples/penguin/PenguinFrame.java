@@ -28,6 +28,7 @@
 * 
 * ################################################################
 */ 
+
 package org.objectweb.proactive.examples.penguin;
 
 public class PenguinFrame extends javax.swing.JFrame {
@@ -52,7 +53,6 @@ public class PenguinFrame extends javax.swing.JFrame {
     toFront();
     setVisible(true);
   }
-
 
   /**
    *  Build the image panel

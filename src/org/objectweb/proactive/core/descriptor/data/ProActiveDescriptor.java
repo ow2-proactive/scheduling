@@ -162,4 +162,3 @@ public interface ProActiveDescriptor extends java.io.Serializable{
 	 */
 	public int getVirtualNodeMappingSize();
 }
-

@@ -120,6 +120,7 @@ public interface VirtualMachine {
    * was launched.
    * @return String
    */
+
   public String getHostName();
   
   
@@ -135,4 +136,5 @@ public interface VirtualMachine {
 	 * @return String The Id of the VirtualNode that created this VirtualMachine
 	 */
   public String getCreatorId();
+
 }

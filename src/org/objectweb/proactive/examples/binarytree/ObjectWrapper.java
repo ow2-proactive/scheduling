@@ -33,8 +33,7 @@ package org.objectweb.proactive.examples.binarytree;
 public class ObjectWrapper implements java.io.Serializable {
 
   private Object value;
-
-
+ 
     public ObjectWrapper(){}
 
 

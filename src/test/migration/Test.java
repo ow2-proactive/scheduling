@@ -22,14 +22,13 @@ public class Test implements Serializable {
 
 
   public void migrateTo(String url) {
+  	System.out.println("Test migrating to " + url);
     try {
-
       ProActive.migrateTo(url);
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
-
 
   public void runtimeException() {
     Integer s = null;

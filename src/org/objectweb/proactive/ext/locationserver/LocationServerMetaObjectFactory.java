@@ -95,7 +95,7 @@ public class LocationServerMetaObjectFactory extends ProActiveMetaObjectFactory 
   //
 
   protected class RequestWithLocationServerFactory implements RequestFactory, java.io.Serializable {
-    private LocationServer server = LocationServerFactory.getLocationServer();
+    transient private LocationServer server = LocationServerFactory.getLocationServer();
     public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
       return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server);
     }

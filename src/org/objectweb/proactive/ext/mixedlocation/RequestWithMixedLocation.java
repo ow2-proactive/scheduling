@@ -44,7 +44,7 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
   private static int counter = 0;
 
   private int tries;
-  protected LocationServer server;
+  transient protected LocationServer server;
 
   public RequestWithMixedLocation(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, LocationServer server) {
     super(methodCall, sender, isOneWay, nextSequenceID);

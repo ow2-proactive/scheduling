@@ -131,8 +131,6 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
     }
     
   }
-//=======
-
 
 //  public static void main(String args[]) {
 //      //args modification to replace relative name of nodes to them absolute name

@@ -30,11 +30,10 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.recording;
 
-import org.objectweb.proactive.ic2d.data.DataObjectController;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.DataObjectController;
 import org.objectweb.proactive.ic2d.gui.EventListsPanel;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
 
 public class PlayerFrameTimeLine extends javax.swing.JFrame {
 

@@ -18,6 +18,7 @@ public class Test implements org.objectweb.proactive.RunActive, Serializable {
     index = 0;
     destinations = nodes;
   }
+ 
 
   public void runActivity(Body body) {
     try {
@@ -28,6 +29,7 @@ public class Test implements org.objectweb.proactive.RunActive, Serializable {
         }
         if (index < destinations.length) {
           index++;
+//          body.getRequestQueue().clear();
           ProActive.migrateTo(destinations[index - 1]);
         } else {
           try {

@@ -49,6 +49,12 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 /**
+ * @author fhuet
+ *
+ * 
+ *
+ */
+/**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * <p>
  * This class gives a common implementation of the Body interface. It provides all
