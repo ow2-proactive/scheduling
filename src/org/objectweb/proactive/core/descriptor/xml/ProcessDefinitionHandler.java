@@ -220,6 +220,16 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             //	System.out.println("ProcessDefinitionHandler.PrunProcessHandler()");
         }
 
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            
+            super.startContextElement(name, attributes);
+            String queueName = (attributes.getValue("queue"));
+            if (checkNonEmpty(queueName)) {
+                ((PrunSubProcess) targetProcess).setQueueName(queueName);
+            }
+        }
+
         protected class PrunOptionHandler extends PassiveCompositeUnmarshaller {
             //  	private static final String HOSTLIST_ATTRIBUTE = "hostlist";
             //  	private static final String PROCESSOR_ATRIBUTE = "processor";
