@@ -144,6 +144,17 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   public String getProcessorNumber(){
   	return processor;
   }
+  
+  public void setScriptLocation(String location){
+  	checkStarted();
+  	if(location != null){
+  		this.scriptLocation = location;
+  	}
+  }
+  
+  public String getScriptLocation(){
+  	return scriptLocation;
+  }
 
 
   //
