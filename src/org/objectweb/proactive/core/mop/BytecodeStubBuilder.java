@@ -135,12 +135,12 @@ public class BytecodeStubBuilder {
         JavaClass theClass = this.classGenerator.getJavaClass();
         
         // Next few lines for debugging only
-        /*
+        
         try {
           theClass.dump (theClass.getClassName()+".class");
         } catch (java.io.IOException e) {
           e.printStackTrace();
-	  }*/
+	  }
         return theClass.getBytes();
     }
 
@@ -236,13 +236,17 @@ public class BytecodeStubBuilder {
         MethodGen mg = createMethodGenerator(m);
         InstructionFactory factory = new InstructionFactory(classGenerator);
 
-        // First, check if the method is called from within the constructor
-        // Load 'this' onto the stack
-        instructionList.append(factory.createThis());
 
-        // Gets the value of the field 'outsideConstructor'
-        instructionList.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
-
+	if (this.cl.isInterface() == false)
+	    {
+		// First, check if the method is called from within the constructor
+		// Load 'this' onto the stack
+		instructionList.append(factory.createThis());
+		
+		// Gets the value of the field 'outsideConstructor'
+		instructionList.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
+	    }
+	
         // Now we create the code for the case where we are outside of
         // the constructor, i.e. we want the call to be reified
 
@@ -325,40 +329,51 @@ public class BytecodeStubBuilder {
         }
 
         // Writes the code for inside constructor
-
-        // Now we need to perform the call to super.blablabla if need be
-        // Let's stack up the arguments
-        InstructionHandle inConstructorHandle = instructionList.append(factory.createThis());
-
-        // The following line is for inserting the conditional branch instruction
-        // at the beginning of the method. If the condition is satisfied, the
-        // control flows move to the previous instruction
-        instructionList.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
-
-	// This is for browsing the parameter array, not forgetting that some parameters
-	// require two slots (longs and doubles)
-	indexInParameterArray = 1;
-        for (int i = 0; i < paramTypes.length; i++) {
-            Type theType = convertClassToType(paramTypes[i]);
-            LocalVariableInstruction lvi = factory.createLoad(theType, indexInParameterArray);
-            instructionList.append(lvi);
-	    indexInParameterArray = indexInParameterArray + lengthOfType (paramTypes[i]);
-        }
-
-        // And perform the call
-        String declaringClassName = this.methods[methodIndex].getDeclaringClass().getName();
-        instructionList.append(factory.createInvoke(declaringClassName,
-                                       m.getName(),
-                                       convertClassToType(m.getReturnType()),
-                                       convertClassArrayToTypeArray(paramTypes),
-                                       Constants.INVOKESPECIAL));
-
-        // Returns the result to the caller
-        InstructionHandle returnHandle = instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
-
-        // insert  a jump from the
-        instructionList.insert(inConstructorHandle, new GOTO(returnHandle));
-
+	// What follows is a quick (but not dirty, simply non-optimized) fix to the problem
+	// of stubs built for interfaces, not classes. We simply do not perform the call
+	if (this.cl.isInterface() == false)
+	    {
+		// Now we need to perform the call to super.blablabla if need be
+		// Let's stack up the arguments
+		InstructionHandle inConstructorHandle = instructionList.append(factory.createThis());
+		
+		// The following line is for inserting the conditional branch instruction
+		// at the beginning of the method. If the condition is satisfied, the
+		// control flows move to the previous instruction
+		instructionList.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
+		
+		// This is for browsing the parameter array, not forgetting that some parameters
+		// require two slots (longs and doubles)
+		indexInParameterArray = 1;
+		for (int i = 0; i < paramTypes.length; i++) {
+		    Type theType = convertClassToType(paramTypes[i]);
+		    LocalVariableInstruction lvi = factory.createLoad(theType, indexInParameterArray);
+		    instructionList.append(lvi);
+		    indexInParameterArray = indexInParameterArray + lengthOfType (paramTypes[i]);
+		}
+		
+		// And perform the call
+		String declaringClassName = this.methods[methodIndex].getDeclaringClass().getName();
+		instructionList.append(factory.createInvoke(declaringClassName,
+							    m.getName(),
+							    convertClassToType(m.getReturnType()),
+							    convertClassArrayToTypeArray(paramTypes),
+							    Constants.INVOKESPECIAL));
+		
+		// Returns the result to the caller
+		InstructionHandle returnHandle = instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
+		
+		// insert  a jump from the
+		instructionList.insert(inConstructorHandle, new GOTO(returnHandle));
+	    }
+	else
+	    {
+		// If we are an interface, we need to remove from the top of the stack
+		// the value of  boolean field that tells whether we are inside a constructor
+		// or not
+	//	instructionList.append(factory.createPop(1));
+		instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
+	    }
         mg.removeLocalVariables();
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed stack size
@@ -430,21 +445,30 @@ public class BytecodeStubBuilder {
         // Now, fills in the instruction list
         InstructionFactory factory = new InstructionFactory(this.classGenerator);
 
-        // Calls the constructor of the super class
-        instructionList.append(factory.createLoad(Type.OBJECT, 0));
-        instructionList.append(factory.createInvoke(this.className, "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
+	if (!this.cl.isInterface())
+	    {
+		// Calls the constructor of the super class
+		instructionList.append(factory.createLoad(Type.OBJECT, 0));
+		instructionList.append(factory.createInvoke(this.className, "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
+		
+		// Sets the value of 'outsideConstructor' to true
+		instructionList.append(factory.createLoad(Type.OBJECT, 0));
+		instructionList.append(new ICONST(1));
+		instructionList.append(factory.createPutField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
+	    }	
+	else
+	    {
+		// Calls the constructor of the super class
+		instructionList.append(factory.createLoad(Type.OBJECT, 0));
+		instructionList.append(factory.createInvoke("java.lang.Object", "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));		
+	    }
 
-        // Sets the value of 'outsideConstructor' to true
-        instructionList.append(factory.createLoad(Type.OBJECT, 0));
-        instructionList.append(new ICONST(1));
-        instructionList.append(factory.createPutField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
-
-        // And returns from the constructor
-        instructionList.append(InstructionConstants.RETURN);
-
+		// And returns from the constructor
+		instructionList.append(InstructionConstants.RETURN);
+		
         mg.setMaxStack(); // Needed stack size
         mg.setMaxLocals(); // Needed locals
-
+ 
         // Add the method to the class
         this.classGenerator.addMethod(mg.getMethod());
 
