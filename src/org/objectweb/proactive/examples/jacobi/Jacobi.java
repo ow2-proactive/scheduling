@@ -39,9 +39,7 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 
-/**
- * @author Laurent Baduel
- */
+
 public class Jacobi {
 
 	/**
