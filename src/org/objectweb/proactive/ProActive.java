@@ -1125,7 +1125,7 @@ public class ProActive {
 		while ((handler == null) && (exClass.getName().compareTo(NonFunctionalException.class.getName()) != 0)) {
             
 			// Information
-			System.out.println("*** SEARCHING HANDLER FOR " + exClass.getName() + " IN LEVEL " + levelID);
+			// System.out.println("*** SEARCHING HANDLER FOR " + exClass.getName() + " IN LEVEL " + levelID);
             
 			// Research algorithm
 			if (level.containsKey(exClass)) {
@@ -1159,7 +1159,7 @@ public class ProActive {
 	public static void setExceptionHandler(int ID_level, Object obj, Class hName, Class exName) {
     	
 		// Information
-		System.out.print("*** SET [" +hName.getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level + " ");
+		// System.out.print("*** SET [" +hName.getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level + " ");
         
 		// The correct level is identified
 		HashMap level = null;
@@ -1226,7 +1226,7 @@ public class ProActive {
 				String hName = (String) ((Class) level.remove(exName)).getName();
 				if (hName != null) {
 					handler = (IHandler) Class.forName(hName).newInstance();            
-					System.out.println("*** REMOVE [" + handler.getClass().getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level);
+					// System.out.println("*** REMOVE [" + handler.getClass().getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level);
 				} else
 					System.out.println("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
 			} catch (Exception e) {
