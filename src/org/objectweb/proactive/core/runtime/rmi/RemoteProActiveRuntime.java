@@ -142,7 +142,6 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 	public void setDefaultNodeVirtualNodeNAme(String s)
 		throws java.rmi.RemoteException;
 
-	public void updateLocalNodeVirtualName() throws RemoteException;
 	public PolicyServer getNodePolicyServer(String nodeName)throws RemoteException;
 
 

@@ -296,8 +296,6 @@ public interface ProActiveRuntime extends Job {
     public void setDefaultNodeVirtualNodeName(String s)
         throws ProActiveException;
 
-    public void listVirtualNodes() throws ProActiveException;
-
     public PolicyServer getNodePolicyServer(String nodeName)
         throws ProActiveException;
 

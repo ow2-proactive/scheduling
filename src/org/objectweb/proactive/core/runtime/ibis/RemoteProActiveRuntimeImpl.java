@@ -282,13 +282,6 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#listVirtualNodes()
-     */
-    public void listVirtualNodes() throws RemoteException {
-        proActiveRuntime.listVirtualNodes();
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)

@@ -312,13 +312,6 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
-     */
-    public void updateLocalNodeVirtualName() throws RemoteException {
-        proActiveRuntime.listVirtualNodes();
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)
@@ -430,7 +423,6 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             logger.info(url + "is not bound in the registry", e);
         }
     }
-
 
     protected String getProtocol() {
         return Constants.RMI_PROTOCOL_IDENTIFIER;

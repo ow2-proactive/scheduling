@@ -146,8 +146,6 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public void updateLocalNodeVirtualName() throws RemoteException;
 
-    public void listVirtualNodes() throws RemoteException;
-
     public PolicyServer getNodePolicyServer(String nodeName)
         throws RemoteException;
 

@@ -407,17 +407,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#updateLocalNodeVirtualName()
-     */
-    public void listVirtualNodes() throws ProActiveException {
-        try {
-            remoteProActiveRuntime.updateLocalNodeVirtualName();
-        } catch (java.rmi.RemoteException re) {
-            throw new ProActiveException(re);
-        }
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)

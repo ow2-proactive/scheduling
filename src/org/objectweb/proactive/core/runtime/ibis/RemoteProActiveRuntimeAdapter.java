@@ -430,17 +430,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#listVirtualNodes()
-     */
-    public void listVirtualNodes() throws ProActiveException {
-        try {
-            remoteProActiveRuntime.listVirtualNodes();
-        } catch (RemoteException re) {
-            throw new ProActiveException(re);
-        }
-    }
-
-    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)

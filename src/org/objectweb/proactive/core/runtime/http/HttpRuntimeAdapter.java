@@ -231,14 +231,6 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     /**
-     * 
-     */
-    public void listVirtualNodes() throws ProActiveException {
-        //  remoteProActiveRuntime.updateLocalNodeVirtualName();
-        this.runtimestrategyadapter.listVirtualNodes();
-    }
-
-    /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
      */
     public PolicyServer getNodePolicyServer(String nodeName)
