@@ -30,7 +30,7 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
 
   public String getName() {
     try {
-      System.out.println("getName called");
+      //System.out.println("getName called");
       //return the name of the Host  
       return java.net.InetAddress.getLocalHost().getHostName().toUpperCase();
     } catch (Exception e) {
@@ -42,7 +42,7 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
 
   public String getNodeName() {
     try {
-      System.out.println("getNodeName called");
+      //System.out.println("getNodeName called");
       //return the name of the Node  
       return ProActive.getBodyOnThis().getNodeURL().toUpperCase();
     } catch (Exception e) {
@@ -78,7 +78,7 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
       //service.waitForRequest();
       //System.out.println(" I am going to serve " + service.getYoungest().getMethodName());
       //service.serveYoungest();
-      System.out.println("served");
+      //System.out.println("served");
     }
   }
 
