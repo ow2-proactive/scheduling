@@ -29,11 +29,6 @@ public class DataModelTraversal implements JobMonitorConstants
 		return -1;
 	}
 	
-	public boolean hasFollowingKey (int key)
-	{
-		return getFollowingKey(key) != NO_KEY;
-	}
-
 	public int getFollowingKey (int key)
 	{
 		int newIndex, newKey;

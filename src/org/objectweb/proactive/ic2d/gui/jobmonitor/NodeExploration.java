@@ -129,7 +129,8 @@ public class NodeExploration implements JobMonitorConstants {
         String hostname = pr.getVMInformation().getInetAddress()
                             .getCanonicalHostName();
 
-        asso.addChild(JOB, jobId, vmName);
+        asso.addChild(HOST, hostname, JVM, vmName);
+        asso.addChild(JOB, pr.getJobID(), JVM, vmName);
 
         String[] nodes = pr.getLocalNodeNames();
 
@@ -141,10 +142,13 @@ public class NodeExploration implements JobMonitorConstants {
             ArrayList activeObjects = null;
             activeObjects = pr.getActiveObjects(nodeName);
 
-            asso.addChild(JVM, vmName, nodeName);
-            asso.addChild(HOST, hostname, JVM, vmName);
+            asso.addChild(JVM, vmName, NODE, nodeName);
+            asso.addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE, nodeName);
             if (vnName != null) {
                 asso.addChild(VN, vnName, NODE, nodeName);
+                
+                // Currently broken in ProActiveRuntimeImpl
+                // asso.addChild(JOB, pr.getVirtualNode(vnName).getJobID(), VN, vnName);
             }
             if (activeObjects != null) {
                 handleActiveObjects(nodeName, activeObjects);
@@ -179,7 +183,8 @@ public class NodeExploration implements JobMonitorConstants {
                 aos.put(rba.getID(), aoName);
             }
 
-            asso.addChild(NODE, nodeName, aoName);
+            asso.addChild(NODE, nodeName, AO, aoName);
+            // Job de l'AO
         }
     }
 

@@ -37,12 +37,17 @@ class AssoKey implements Comparable {
 }
 
 /*
- *         Host        VN
- *           |         |
- *           *         *
- *           |         |
- *           v         v
- * Job -*-> JVM -*-> Node -*-> AO
+ *           Job Job-*->VN     Job
+ *            |         |       |
+ *            *         *       *
+ *            |         |       |
+ *            v         v       v
+ * Host -*-> JVM -*-> Node -*-> AO
+ *                      ^
+ *                      |
+ *                      *
+ *                      |
+ *                     Job
  *
  */
 
@@ -91,21 +96,9 @@ public class DataAssociation implements JobMonitorConstants {
 		addAsso(toKey, toValue, fromKey, fromValue);
 	}
 
-	/* Example : addChild(HOST, "camel.inria.fr", "PA_JVM_0123456798") */
-	public void addChild(int key, String lvalue, String rvalue) {
-		if (getSpecialPath(key) != key)
-			throw new RuntimeException("This key does not have any child");
-		else
-			addChild(key, lvalue, key + 1, rvalue);
+	private boolean isSpecialKey(int key) {
+		return key == VN || key == JOB;
 	}
-
-	private int getSpecialPath(int key) {
-		for (int i = 0; i < SPECIAL_PATHS.length; i++)
-			if (key == SPECIAL_PATHS[i][0])
-				return SPECIAL_PATHS[i][1];
-
-		return key;
-	} 
 	
 	private Set getWritableAsso(int from, String name, int to) {
 		AssoKey key = new AssoKey(from, to, name);
@@ -151,23 +144,53 @@ public class DataAssociation implements JobMonitorConstants {
 		return filter(to, res, constraints);
 	}
 	
-	private Set handleSpecialPath(int from, String name, int to, Map constraints) {
-		int fromStep = getSpecialPath(from);
-		int toStep = getSpecialPath(to);
+	private static boolean isPermutation(int a, int b, int aa, int bb) {
+		if (a > b) {
+			a += b;
+			b = a - b;
+			a -= b; 
+		}
 		
-		if (to == fromStep || from == toStep)
+		if (aa > bb) {
+			aa += bb;
+			bb = aa - bb;
+			aa -= bb; 
+		}
+		
+		return a == aa && b == bb;
+	}
+	
+	private Set handleSpecialPath(int from, String name, int to, Map constraints) {		
+		if (isPermutation(from, to, JOB, VN))
 			return getAsso(from, name, to, constraints);
+			
+		if (isPermutation(from, to, JOB, HOST)) {
+			int[] steps = {JVM, NODE, VN, AO};
+			Set res = new TreeSet();
+			for (int i = 0; i < steps.length; i++)
+				res.addAll(getValues(from, name, to, constraints, steps[i]));
+			return res;
+		}
 		
-		int step = (fromStep != from) ? fromStep : toStep;
+		if ((from == VN || to == VN) && !isPermutation(from, to, JOB, VN) && !isPermutation(from, to, NODE, VN))
+			return getValues(from, name, to, constraints, NODE);
 
-		Set stepValues = getValues(from, name, step, constraints);
+		return getAsso(from, name, to, constraints);
+	}
+	
+	private Set getValues(int from, String name, int to, Map constraints, int step) {
+		Set stepSet = getValues(from, name, step, constraints);
+		if (stepSet.isEmpty())
+			return new TreeSet();
+		
+		Iterator iter = stepSet.iterator();
 		Set res = new TreeSet();
-		Iterator iter = stepValues.iterator();
 		while (iter.hasNext()) {
 			String stepName = (String) iter.next();
 			Set temp = getValues(step, stepName, to, constraints);
 			res.addAll(temp);
 		}
+		
 		return res;
 	}
 	
@@ -184,26 +207,15 @@ public class DataAssociation implements JobMonitorConstants {
 		if (from == NO_KEY)
 			return list(to, constraints);
 		
-		if (getSpecialPath(from) != from || getSpecialPath(to) != to)
+		if (isSpecialKey(from) || isSpecialKey(to))
 			return handleSpecialPath(from, name, to, constraints);
 		
 		if (to == from + 1 || to == from - 1)
 			return getAsso(from, name, to, constraints);
 
 		int inc = (to > from) ? 1 : -1;
-		Set step = getValues(from, name, to - inc, constraints);
-		if (step.isEmpty())
-			return new TreeSet();
-		
-		Iterator iter = step.iterator();
-		Set res = new TreeSet();
-		while (iter.hasNext()) {
-			String stepName = (String) iter.next();
-			Set temp = getValues(to - inc, stepName, to, constraints);
-			res.addAll(temp);
-		}
-		
-		return res;
+		int step = to - inc;
+		return getValues(from, name, to, constraints, step);
 	}
 	
 	private Set list(int key, Map constraints) {
@@ -231,7 +243,7 @@ public class DataAssociation implements JobMonitorConstants {
 		if (getSetForKey(key) == null || !getSetForKey(key).remove(name))
 			return;
 		
-		if  (getSpecialPath(key) != key)
+		if  (isSpecialKey(key))
 			/* If we had a reference count : associatedNode.ref-- */
 			return;
 		
