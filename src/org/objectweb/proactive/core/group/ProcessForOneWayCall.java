@@ -31,13 +31,15 @@ public class ProcessForOneWayCall implements Runnable {
 	public synchronized void run() {
 		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 		Object object = this.memberList.get(this.index);
-		try {
-			((StubObject) object).getProxy().reify(this.mc);
-		} catch (Throwable e) {
-			this.exceptionList.add(new ExceptionInGroup(object,e));
+
+		/* only do the communication (reify) if the object is not an error nor an exception */ 
+		if (!(object instanceof Throwable)) {
+			try {
+				((StubObject) object).getProxy().reify(this.mc);
+			} catch (Throwable e) {
+				this.exceptionList.add(new ExceptionInGroup(object,e));
+			}
 		}
-		finally {
-			this.proxyGroup.decrementWaitedAndNotifyAll();			
-		}
+		this.proxyGroup.decrementWaitedAndNotifyAll();			
 	}
 }

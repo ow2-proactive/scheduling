@@ -41,7 +41,7 @@ public class ProcessForAsyncCall implements Runnable {
 				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object).getProxy().reify(this.mc), this.index);
 			} catch (Throwable e) {
 				/* when an exception occurs, put it in the result group instead of the (unreturned) value */ 
-				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,e,this.index);
+				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,new ExceptionInGroup(this.memberList.get(this.index),e),this.index);
 			}
 		}
 		else {
