@@ -108,6 +108,22 @@ public class Legend extends JFrame {
         getContentPane().add(comp);
         getContentPane().add(new JLabel("Rmi VM"));
       }
+      
+      {
+        JComponent comp = new JPanel() {
+
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+            
+            g.setColor(java.awt.Color.cyan);
+            g.fillRect(0, 0, w, h);
+          }
+        };
+        getContentPane().add(comp);
+        getContentPane().add(new JLabel("Jini VM"));
+      }
 
       {
         JComponent comp = new JPanel() {
