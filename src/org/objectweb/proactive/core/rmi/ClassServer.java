@@ -37,7 +37,7 @@ import java.net.UnknownHostException;
 
 public class ClassServer implements Runnable {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
-    public static int DEFAULT_SERVER_BASE_PORT = 2222;
+    public static final int DEFAULT_SERVER_BASE_PORT = 2222;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 20;
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
@@ -48,12 +48,10 @@ public class ClassServer implements Runnable {
         if (System.getProperty("proactive.communication.protocol").equals("http")) {
             if(System.getProperty("proactive.http.port") != null){
                 newport = System.getProperty("proactive.http.port");
-            }else{
+            } else {
                 newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
                 System.setProperty("proactive.http.port", newport);
             }
-             
-            DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
         }
     }
 
@@ -73,7 +71,7 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
-            port = boundServerSocket(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
+            port = boundServerSocket(Integer.parseInt(System.getProperty("proactive.http.port")), MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
@@ -206,10 +204,10 @@ public class ClassServer implements Runnable {
         for (int i = 0; i < numberOfTry; i++) {
             try {
                 server = new java.net.ServerSocket(basePortNumber);
-
                 return basePortNumber;
             } catch (java.io.IOException e) {
                 basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
+                System.setProperty("proactive.http.port", basePortNumber + "");
             }
         }
 
