@@ -226,7 +226,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
   }
 
 
-  public boolean isViewingInEventList() {
+  public boolean isViewedInEventList() {
     return viewingInEventList;
   }
 

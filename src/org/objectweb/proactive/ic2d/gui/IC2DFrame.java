@@ -123,7 +123,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
   
   
   public void activeObjectRemoved(ActiveObject activeObject) {
-    eventListsPanel.removeActiveObject(activeObject);
     communicationRecorder.removeActiveObject(activeObject);
   }
   

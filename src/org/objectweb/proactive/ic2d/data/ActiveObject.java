@@ -119,9 +119,6 @@ public class ActiveObject extends AbstractDataObject {
   
   public void setIsActive(boolean value) {
     if (isDestroyed) return;
-    
-    System.out.println("setIsActive value="+value+" isActive="+isActive);
-
     if (value != isActive) {
       isActive = value;
       if (listener != null) listener.activeStatusChanged(value);

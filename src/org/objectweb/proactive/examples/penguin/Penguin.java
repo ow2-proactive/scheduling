@@ -73,7 +73,7 @@ public class Penguin implements java.io.Serializable {
     Body body = ProActive.getBodyOnThis();
     myFrame = new PenguinFrame(face, body.getNodeURL(), index);
     //System.out.println("Penguin is here");
-    this.sendMessageToControler();
+    sendMessageToControler("I just got in node "+ProActive.getBodyOnThis().getNodeURL());
     try {
       Thread.currentThread().sleep(2000);
     } catch (InterruptedException e) {
@@ -160,37 +160,51 @@ public class Penguin implements java.io.Serializable {
   }
 
 
-  public void startItinerary() {
+  public void start() {
+    sendMessageToControler("I am starting my itinerary");
     myStrategy.reset();
-    this.onItinerary = true;
+    onItinerary = true;
   }
 
 
-  public void stopItinerary() {
-    this.onItinerary = false;
+  public void stop() {
+    if (! onItinerary) {
+      sendMessageToControler("I'm already stopped");
+    } else {
+      sendMessageToControler("I stopped my itinerary");
+      onItinerary = false;
+    }
   }
 
 
-  public void continueItinerary() {
-    this.onItinerary = true;
+  public void resume() {
+    if (onItinerary) {
+      sendMessageToControler("I'm already on my itinerary");
+    } else {
+      sendMessageToControler("I'm resuming my itinerary");
+      onItinerary = true;
+    }
   }
 
 
-  public Message getPosition() {
-    return new Message("I am working on node " + ProActive.getBodyOnThis().getNodeURL());
+  public String call() {
+    return "["+name+"] : I am working on node " + ProActive.getBodyOnThis().getNodeURL();
   }
 
 
-  public void callOther() {
-    //	System.out.println("Other pinguin is " + this.otherPenguin);
-    if (otherPenguin != null)
-      this.otherPenguin.callOther();
+  public void chainedCall() {
+    if (otherPenguin != null) {
+      sendMessageToControler("I'm calling my peer agent");
+      otherPenguin.chainedCall();
+    } else {
+      sendMessageToControler("I don't have a peer agent to call");
+    }
   }
 
 
-  public void sendMessageToControler() {
+  private void sendMessageToControler(String message) {
     if (controler != null)
-      controler.receiveMessage(ProActive.getBodyOnThis().getNodeURL());
+      controler.receiveMessage("["+name+"] : "+message);
   }
 
 

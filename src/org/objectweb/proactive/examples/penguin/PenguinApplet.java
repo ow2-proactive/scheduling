@@ -10,7 +10,13 @@ import org.objectweb.proactive.examples.StandardFrame;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 public class PenguinApplet extends StandardFrame implements PenguinMessageReceiver {
+  
   private PenguinControler controler;
+  private Action startAction;
+  private Action stopAction;
+  private Action resumeAction;
+  private Action callAction;
+  private Action chainedCallAction;
   protected PenguinListModel penguinListModel;
   protected javax.swing.JList agentList;
 
@@ -18,6 +24,11 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
     super("Advanced Penguin Controler");
     this.controler = c; 
     this.penguinListModel = new PenguinListModel(penguinList);
+    this.startAction = new StartAction();
+    this.stopAction = new StopAction();
+    this.resumeAction = new ResumeAction();
+    this.callAction = new CallAction();
+    this.chainedCallAction = new ChainedCallAction();
     init(500, 300);
   }
 
@@ -28,84 +39,62 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
   protected javax.swing.JPanel createRootPanel() {
     javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
 
-    // SOUTH PANEL
-    javax.swing.JPanel southPanel = new javax.swing.JPanel();
+    // WEST PANEL
+    javax.swing.JPanel p1 = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
     javax.swing.JButton bStart = new javax.swing.JButton("Start");
     bStart.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        int n = getIndex();
-        if (n >= 0) {
-          receiveMessage("Start pressed for Agent "+n);
-          PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(n);
-          p.penguin.startItinerary();
-        }
+        executeAction(agentList.getSelectedIndices(), startAction);
       }
     });
-    southPanel.add(bStart);
+    p1.add(bStart);
 
     javax.swing.JButton bResume = new javax.swing.JButton("Resume");
     bResume.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        int n = getIndex();
-        if (n >= 0) {
-          receiveMessage("Resume pressed for Agent "+n);
-          PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(n);
-          p.penguin.continueItinerary();
-        }
+        executeAction(agentList.getSelectedIndices(), resumeAction);
       }
     });
-    southPanel.add(bResume);
+    p1.add(bResume);
 
     javax.swing.JButton bStop = new javax.swing.JButton("Stop");
     bStop.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        int n = getIndex();
-        if (n >= 0) {  
-          receiveMessage("Stop pressed for Agent "+n);
-          PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(n);
-          p.penguin.stopItinerary();
-        }
+        executeAction(agentList.getSelectedIndices(), stopAction);
       }
     });
-    southPanel.add(bStop);
-    rootPanel.add(southPanel, java.awt.BorderLayout.SOUTH);
-    
-    // WEST PANEL
-    javax.swing.JPanel westPanel = new javax.swing.JPanel(new java.awt.GridLayout(3, 1));
-    javax.swing.JButton bCall = new javax.swing.JButton("Call Agent");
+    p1.add(bStop);
+
+    javax.swing.JButton bCall = new javax.swing.JButton("Call");
     bCall.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        int n = getIndex();
-        if (n >= 0) {  
-          receiveMessage("Call agent pressed for Agent "+n);
-          PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(n);
-          Message m = p.penguin.getPosition();
-          receiveMessage(m.getMessage());
-        }
+        executeAction(agentList.getSelectedIndices(), callAction);
       }
     });
-    westPanel.add(bCall);
-    javax.swing.JButton bCallOther = new javax.swing.JButton("Call Other Agent");
-    bCallOther.addActionListener(new java.awt.event.ActionListener() {
-      public void actionPerformed(java.awt.event.ActionEvent e) {
-        int n = getIndex();
-        if (n >= 0) {  
-          receiveMessage("Call Other pressed for Agent "+n);
-          PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(n);
-          p.penguin.callOther();
-        }
-      }
-    });
-    westPanel.add(bCallOther);
-    javax.swing.JButton bAddAgent = new javax.swing.JButton("add agent");
+    p1.add(bCall);
+
+    rootPanel.add(p1, java.awt.BorderLayout.WEST);
+    
+    // SOUTH PANEL
+    javax.swing.JPanel p2 = new javax.swing.JPanel(new java.awt.GridLayout(1, 0));
+    javax.swing.JButton bAddAgent = new javax.swing.JButton("Add one new agent");
     bAddAgent.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        receiveMessage("Add new agent pressed");
+        //receiveMessage("Add new agent pressed");
         addAgent();
       } 
     });
-    westPanel.add(bAddAgent);
-    rootPanel.add(westPanel, java.awt.BorderLayout.WEST);
+    p2.add(bAddAgent);
+
+    javax.swing.JButton bCallOther = new javax.swing.JButton("Chained calls from selected agent");
+    bCallOther.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent e) {
+        executeAction(agentList.getSelectedIndices(), chainedCallAction);
+      }
+    });
+    p2.add(bCallOther);
+
+    rootPanel.add(p2, java.awt.BorderLayout.SOUTH);
 
     // CENTER PANEL
     agentList = new javax.swing.JList(penguinListModel);
@@ -113,17 +102,8 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
     return rootPanel;
   }
 
-  private int getIndex() {
-    int n = agentList.getSelectedIndex();
-    if (n == -1) {
-      receiveMessage("You must select an agent in the list first or add one if none is already present");
-    }
-    return agentList.getSelectedIndex();
-  }
 
-
-
-  public void addAgent() {
+  private void addAgent() {
     int n = penguinListModel.getSize();
     try {
       Penguin newPenguin = controler.createPenguin(n);
@@ -136,11 +116,60 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
       PenguinWrapper p1 = (PenguinWrapper) penguinListModel.getElementAt(n - 1);
       PenguinWrapper p2 = (PenguinWrapper) penguinListModel.getElementAt(n);
       (p1.penguin).setOther(p2.penguin);
+    } else {
+      agentList.setSelectedIndex(0);
     }
   }
 
+  
+  private void executeAction(int[] selection, Action action) {
+    if (selection.length == 0) {
+      receiveMessage("You must select an agent in the list first or add one if none is already present");
+    } else {
+      for (int i = 0; i < selection.length; i++) {
+        int value = selection[i];
+        PenguinWrapper p = (PenguinWrapper) penguinListModel.getElementAt(value);
+        action.execute(p.penguin);
+      }
+    }
+  }
 
+  
+  private interface Action {
+    public void execute(Penguin p);
+  }
 
+  private class StartAction implements Action {
+    public void execute(Penguin p) {
+      p.start();
+    }  
+  }
+  
+  private class StopAction implements Action {
+    public void execute(Penguin p) {
+      p.stop();
+    }  
+  }
+
+  private class ResumeAction implements Action {
+    public void execute(Penguin p) {
+      p.resume();
+    }  
+  }
+
+  private class CallAction implements Action {
+    public void execute(Penguin p) {
+      receiveMessage(p.call());
+    }  
+  }
+
+  private class ChainedCallAction implements Action {
+    public void execute(Penguin p) {
+      p.chainedCall();
+    }  
+  }
+  
+  
   private static class PenguinListModel extends javax.swing.AbstractListModel {
   
     private CircularArrayList penguinList;

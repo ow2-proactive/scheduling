@@ -42,7 +42,6 @@ public class PenguinControler implements PenguinMessageReceiver, java.io.Seriali
   private transient PenguinApplet display;
   protected CircularArrayList penguinList;
   String[] args;
-  private PenguinControler activeRef;
   private MigrationStrategyManagerImpl myStrategyManager;
 
 
@@ -82,7 +81,7 @@ public class PenguinControler implements PenguinMessageReceiver, java.io.Seriali
     try {
       Penguin newPenguin = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), new Object[] { new Integer(n) });
       newPenguin.initialize(args);
-      newPenguin.setControler(activeRef);
+      newPenguin.setControler((PenguinControler) ProActive.getStubOnThis());
       return newPenguin;
     } catch (Exception e) {
       e.printStackTrace();

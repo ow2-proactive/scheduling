@@ -279,7 +279,7 @@ public class SpyEventManager {
     public void bodyCreated(BodyEvent event) {
       Body body = checkBody(event.getBody());
       if (body == null) return;
-      System.out.println("bodyCreated name="+body.getNodeURL());
+      //System.out.println("bodyCreated name="+body.getNodeURL());
       addEvent(new BodyCreationSpyEvent(body.getID(), body.getNodeURL(), body.getName()));
       addListenersToNewBody(body);
     }
@@ -287,7 +287,7 @@ public class SpyEventManager {
     public void bodyDestroyed(BodyEvent event) {
       Body body = checkBody(event.getBody());
       if (body == null) return;
-      System.out.println("bodyDestroyed name="+body.getNodeURL());
+      //System.out.println("bodyDestroyed name="+body.getNodeURL());
       addEvent(new BodySpyEvent(body.getID(), false, false));
       removeListenersFromDeadBody(body);
     }
@@ -295,7 +295,7 @@ public class SpyEventManager {
     public void bodyChanged(BodyEvent event) {
       Body body = checkBody(event.getBody());
       if (body == null) return;
-      System.out.println("bodyChanged name="+body.getNodeURL()+" isActive="+body.isActive());
+      //System.out.println("bodyChanged name="+body.getNodeURL()+" isActive="+body.isActive());
       addEvent(new BodySpyEvent(body.getID(), body.isActive(), body.isAlive()));
       removeListenersFromDeadBody(body);
     }

@@ -54,7 +54,7 @@ public interface MessageMonitoringController {
 
   public boolean isMonitoringReplySender();
   
-  public boolean isViewingInEventList();
+  public boolean isViewedInEventList();
   
 }
 

@@ -119,11 +119,14 @@ public class NodePanel extends AbstractDataObjectPanel implements NodeObjectList
     addChild(activeObject, panel);
     activeObject.registerListener(panel);
     showBorder(STANDARD_LINE_BORDER);
+    if (activeObject.isViewedInEventList())
+      activeObjectWatcher.addActiveObject(activeObject);
   }
   
   
   public void activeObjectRemoved(ActiveObject activeObject) {
     removeChild(activeObject);
+    activeObjectWatcher.removeActiveObject(activeObject);
   }
 
 

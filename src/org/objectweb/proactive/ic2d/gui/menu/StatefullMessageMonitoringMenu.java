@@ -87,7 +87,7 @@ public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMen
     //
     // ViewEventList
     //
-    viewInEventListMenuItem = new javax.swing.JCheckBoxMenuItem("View in event list", controller.isViewingInEventList());
+    viewInEventListMenuItem = new javax.swing.JCheckBoxMenuItem("View in event list", controller.isViewedInEventList());
     viewInEventListMenuItem.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent event) {
           controller.viewInEventList(viewInEventListMenuItem.isSelected());
