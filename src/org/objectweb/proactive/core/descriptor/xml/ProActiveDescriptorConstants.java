@@ -48,6 +48,8 @@ public interface ProActiveDescriptorConstants  {
   public static final String VIRTUAL_NODE_TAG = "virtualNode"; 
   public static final String MAPPING_TAG = "mapping"; 
   public static final String MAP_TAG = "map"; 
+  public static final String JVMSET_TAG = "jvmSet";
+  public static final String VMNAME_TAG = "vmName";
   public static final String JVMS_TAG = "jvms"; 
   public static final String JVM_TAG = "jvm"; 
   public static final String ACQUISITION_TAG = "acquisition"; 
@@ -57,6 +59,14 @@ public interface ProActiveDescriptorConstants  {
   public static final String PROCESSES_TAG = "processes"; 
   
   public static final String ENVIRONMENT_TAG = "environment"; 
+  public static final String HOST_LIST_TAG = "hostlist";
+  public static final String BSUB_OPTIONS_TAG = "bsubOption";
+  public static final String GLOBUS_OPTIONS_TAG = "globusOption";
+  public static final String GLOBUS_HOST_TAG = "globusHost";
+  public static final String GLOBUS_HOST_LIST_TAG = "globusHostList";
+  public static final String GRAM_PORT_TAG = "GramPort";
+  public static final String GIS_PORT_TAG = "GISPort";
+  public static final String PROCESSOR_TAG = "processor";
   public static final String VARIABLE_TAG = "variable"; 
   public static final String CLASSPATH_TAG = "classpath"; 
   public static final String JAVA_PATH_TAG = "javaPath"; 
