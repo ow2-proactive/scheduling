@@ -1,38 +1,35 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.node;
 
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -42,6 +39,12 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+
+import java.util.ArrayList;
+
 
 /**
  * <p>
@@ -61,7 +64,6 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  * @since   ProActive 0.9
  *
  */
-
 public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
@@ -218,31 +220,43 @@ public class NodeImpl implements Node, Serializable {
         }
 
         /**
-        * @see org.objectweb.proactive.core.node.NodeInformation#getName()
-        */
+         * @see org.objectweb.proactive.core.node.NodeInformation#getName()
+         */
         public String getName() {
             return nodeName;
         }
 
         /**
-        * @see org.objectweb.proactive.core.node.NodeInformation#getProtocol()
-        */
+         * @see org.objectweb.proactive.core.node.NodeInformation#getProtocol()
+         */
         public String getProtocol() {
             return protocol;
         }
 
         /**
-        * @see org.objectweb.proactive.core.node.NodeInformation#getURL()
-        */
+         * @see org.objectweb.proactive.core.node.NodeInformation#getURL()
+         */
         public String getURL() {
             return nodeURL;
         }
 
         /**
-        * @see org.objectweb.proactive.core.runtime.VMInformation#getInetAddress()
-        */
+         * @see org.objectweb.proactive.core.runtime.VMInformation#getInetAddress()
+         */
         public java.net.InetAddress getInetAddress() {
             return hostInetAddress;
+        }
+
+        public String getCreationProtocolID() {
+            return proActiveRuntime.getVMInformation().getCreationProtocolID();
+        }
+
+        /**
+         * @see org.objectweb.proactive.core.runtime.VMInformation#setCreationProtocolID(java.lang.String)
+         * This method has no effect.
+         */
+        public void setCreationProtocolID(String protocolId) {
+            //Do nothing since we do not want to be able to set vm infos from Node
         }
 
         /**
