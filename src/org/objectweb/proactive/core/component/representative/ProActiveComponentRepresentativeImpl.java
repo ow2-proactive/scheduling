@@ -75,9 +75,6 @@ public class ProActiveComponentRepresentativeImpl
     private ComponentType componentType = null; // immutable
     private StubObject stubOnBaseObject = null;
 
-    // kept for possible direct invocations on the base object
-    //    public ProActiveComponentRepresentativeImpl() {
-    //    }
     public ProActiveComponentRepresentativeImpl(ComponentType componentType) {
         this.componentType = componentType;
 
@@ -342,15 +339,12 @@ public class ProActiveComponentRepresentativeImpl
      * identifiers accross jvms.
      */
     public boolean equals(Object component) {
-        if (getID() == null) {
-            return false;
-        }
         if (!(component instanceof ProActiveComponent)) {
             logger.error(
                 "can only compare proactive components to proactive components ");
             return false;
         }
-        return getID().equals(((ProActiveComponent) component).getID());
+        return getProxy().equals(((ProActiveComponentRepresentative)component).getProxy());
     }
 
     public int hashCode() {
@@ -362,13 +356,14 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
+    /**
+     * Only valid for a single element. return null for a group.
+     */
     public UniqueID getID() {
         if (!(getProxy() instanceof ProxyForGroup)) {
             return ((UniversalBodyProxy) getProxy()).getBodyID();
         } else {
-            // TODO test this + what about hashCode?
-            return (UniqueID) reifyCall(ProActiveComponentRepresentativeImpl.class.getName(),
-                "getID", new Class[] {  }, new Object[] {  });
+           return null;
         }
     }
 
