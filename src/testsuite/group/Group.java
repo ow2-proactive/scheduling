@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import testsuite.exception.BrowsePackageException;
 
+import testsuite.manager.AbstractManager;
 import testsuite.result.ResultsCollections;
 
 import testsuite.test.AbstractTest;
@@ -84,13 +85,13 @@ public class Group {
      * @throws BrowsePackageException if some errors.
      */
     public Group(String name, String description, File directory,
-        String packageName, Object[] params, boolean useInitFile)
+        String packageName, Object[] params, boolean useInitFile, AbstractManager manager)
         throws BrowsePackageException {
         logger = Logger.getLogger(getClass().getName());
         this.name = name;
         this.description = description;
 
-        addTests(directory, packageName, packageName, params, useInitFile);
+        addTests(directory, packageName, packageName, params, useInitFile, manager);
     }
 
     private static FileFilter dirFilter = new FileFilter() {
@@ -121,7 +122,7 @@ public class Group {
      * @throws BrowsePackageException if an error.
      */
     private void addTests(File directory, String packageName,
-        String parentPackage, Object[] params, boolean useInitFile)
+        String parentPackage, Object[] params, boolean useInitFile, AbstractManager manager)
         throws BrowsePackageException {
         if (!directory.isDirectory()) {
             throw new BrowsePackageException(
@@ -149,7 +150,7 @@ public class Group {
                         nextPackageName = null;
                     }
                     addTests(file, nextPackageName, parentPackage, params,
-                        useInitFile);
+                        useInitFile, manager);
                 } else {
                     continue;
                 }
@@ -169,7 +170,7 @@ public class Group {
                 File file = files[i];
                 if (file.isDirectory()) {
                     addTests(file, null, parentPackage + "." + file.getName(),
-                        params, useInitFile);
+                        params, useInitFile, manager);
                 } else if (file.getName().matches("Test.*") ||
                         file.getName().matches("Bench.*")) {
                     try {
@@ -181,6 +182,7 @@ public class Group {
                         if (parameterTypes != null) {
                             Constructor constructor = c.getConstructor(parameterTypes);
                             test = (AbstractTest) constructor.newInstance(params);
+                            test.setManager(manager);
                         } else {
                             test = (AbstractTest) c.newInstance();
                         }
