@@ -529,7 +529,7 @@ public class Service  {
 
 
   /**
-   * Returns the oldest request from the queue
+   * Returns the youngest request from the queue
    * If no request is available the method block until one request can be returned
    * The request queue is unchanged by this call
    * @return the oldest request or null
