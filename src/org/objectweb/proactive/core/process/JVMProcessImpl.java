@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.core.process;
 
-import java.io.Serializable;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.MessageLogger;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 
 
 /**
@@ -61,36 +64,37 @@ import org.objectweb.proactive.core.util.MessageLogger;
  */
 public class JVMProcessImpl extends AbstractExternalProcess
     implements JVMProcess, Serializable {
-	
-	protected static Logger logger = Logger.getLogger(JVMProcessImpl.class.getName());
-	
+    protected static Logger logger = Logger.getLogger(JVMProcessImpl.class.getName());
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
-    private final static String POLICY_FILE = "proactive.java.policy";
+
+    //private final static String POLICY_FILE = "proactive.java.policy";
     private final static String POLICY_OPTION = " -Djava.security.policy=";
     private final static String LOG4J_OPTION = " -Dlog4j.configuration=file:";
-    private final static String LOG4J_FILE = "proactive-log4j";
+
+    //private final static String LOG4J_FILE = "proactive-log4j";
     public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System.getProperty(
                 "java.class.path"));
     public final static String DEFAULT_JAVAPATH = System.getProperty(
             "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "java";
     public final static String DEFAULT_POLICY_FILE = System.getProperty(
-            "user.dir") + FILE_SEPARATOR + POLICY_FILE;
+            "java.security.policy");
     public final static String DEFAULT_LOG4J_FILE = System.getProperty(
-            "user.dir") + FILE_SEPARATOR + LOG4J_FILE;
+            "log4j.configuration");
     public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
-    
-	private final static String PROACTIVE_POLICYFILE_OPTION = " -Dproactive.runtime.security=";
-    
+    private final static String PROACTIVE_POLICYFILE_OPTION = " -Dproactive.runtime.security=";
     protected String classpath = DEFAULT_CLASSPATH;
     protected String bootClasspath;
     protected String javaPath = DEFAULT_JAVAPATH;
-    protected String policyFile = DEFAULT_POLICY_FILE;
-    protected String log4jFile = DEFAULT_LOG4J_FILE;
+    protected String policyFile = getAbsolutePath(DEFAULT_POLICY_FILE);
+    protected String log4jFile = getAbsolutePath(DEFAULT_LOG4J_FILE);
     protected String classname = DEFAULT_CLASSNAME;
-    protected String parameters = DEFAULT_JVMPARAMETERS;
-    protected String jvmParameters;
+
+    //    protected String parameters = DEFAULT_JVMPARAMETERS;
+    //    protected String jvmParameters;
+    protected StringBuffer parameters = new StringBuffer();
+    protected StringBuffer jvmParameters = new StringBuffer();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -195,26 +199,26 @@ public class JVMProcessImpl extends AbstractExternalProcess
     }
 
     public String getParameters() {
-        return parameters;
+        return parameters.toString();
     }
 
     public void setParameters(String parameters) {
         checkStarted();
-        this.parameters = parameters;
+        this.parameters.append(parameters + " ");
     }
 
     public void setJvmOptions(String string) {
-        jvmParameters = string;
+        jvmParameters.append(string + " ");
     }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
     protected String buildCommand() {
-        return buildJavaCommand(classname, parameters);
+        return buildJavaCommand();
     }
 
-    protected String buildJavaCommand(String classname, String parameters) {
+    protected String buildJavaCommand() {
         StringBuffer javaCommand = new StringBuffer();
 
         // append java command
@@ -252,21 +256,21 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(LOG4J_OPTION);
             javaCommand.append(log4jFile);
         }
-		// append proactive policy File
-	   // if (securityFile != null) {
-	   //      javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
-	   //      javaCommand.append(securityFile);
-	   //  }// else if (System.getProperty("proactive.runtime.security") != null) {
-	     //    javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
-	    //      javaCommand.append(System.getProperty("proactive.runtime.security"));
-	//	 }
 
-
+        // append proactive policy File
+        // if (securityFile != null) {
+        //      javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
+        //      javaCommand.append(securityFile);
+        //  }// else if (System.getProperty("proactive.runtime.security") != null) {
+        //    javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
+        //      javaCommand.append(System.getProperty("proactive.runtime.security"));
+        //	 }
         // append classname
         javaCommand.append(" ");
         javaCommand.append(classname);
         if (logger.isDebugEnabled()) {
-        	logger.debug("JVMProcessImpl.buildJavaCommand()  Parameters " + parameters);
+            logger.debug("JVMProcessImpl.buildJavaCommand()  Parameters " +
+                parameters);
         }
         if (parameters != null) {
             javaCommand.append(" ");
@@ -276,11 +280,10 @@ public class JVMProcessImpl extends AbstractExternalProcess
             logger.debug(javaCommand.toString());
         }
         if (logger.isDebugEnabled()) {
-            logger.debug(javaCommand.toString() +"\n");
-		
+            logger.debug(javaCommand.toString() + "\n");
         }
         if (logger.isDebugEnabled()) {
-             logger.debug("JVMProcessImpl.buildJavaCommand() " + javaCommand);
+            logger.debug("JVMProcessImpl.buildJavaCommand() " + javaCommand);
         }
         return javaCommand.toString();
     }
@@ -298,5 +301,18 @@ public class JVMProcessImpl extends AbstractExternalProcess
             absoluteClasspath.append(pathSeparator);
         }
         return absoluteClasspath.substring(0, absoluteClasspath.length() - 1);
+    }
+
+    private static String getAbsolutePath(String path) {
+        if (path.startsWith("file:")) {
+            //remove file part to build absolute path
+            path = path.substring(5);
+        }
+        try {
+            return new File(path).getCanonicalPath();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return path;
+        }
     }
 }
