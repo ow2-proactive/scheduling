@@ -3,9 +3,11 @@
  */
 package nonregressiontest.group.barrier;
 
-import nonregressiontest.descriptor.defaultnodes.TestNodes;
-import nonregressiontest.group.A;
+import java.util.Iterator;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 
@@ -35,15 +37,26 @@ public class Test  extends FunctionalTest {
 		 this.spmdgroup = (A) ProSPMD.newSPMDGroup(A.class.getName(),
 				 params, nodes);
 
-		 return (this.spmdgroup != null);
+		 return ((this.spmdgroup != null) && (ProActiveGroup.size(this.spmdgroup) == 3));
 	 }
 
 
 	public void action() throws Exception {
-		spmdgroup.invokeBarrier();
+		this.spmdgroup.start();
 	}
 
+	
+	public boolean postConditions() throws Exception {
+		String errors ="";
+		Iterator it = ProActiveGroup.getGroup(this.spmdgroup).iterator();
+		while (it.hasNext()) {
+			errors += ((A) it.next()).getErrors();
+		}
+		System.err.print(errors);
+		return "".equals(errors);
+	 }
 
+	
 	public void endTest() throws Exception {
 		// nothing to do
 	}
