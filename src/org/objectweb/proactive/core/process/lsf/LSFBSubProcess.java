@@ -86,6 +86,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   protected String interactive = "false";
   
+  protected String res_requirement="";
+  
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -246,7 +248,18 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   public String getScriptLocation(){
   	return scriptLocation;
   }
+  
+  
+ 
+  
+  public String getRes_requirement() {
+	  return res_requirement;
+  }
 
+  
+  public void setRes_requirement(String res_requirement) {
+	  this.res_requirement = "-R "+res_requirement+" ";
+  }
 
   //
   // -- PROTECTED METHODS -----------------------------------------------
@@ -266,7 +279,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   		bSubCommand.append("-m "+hostList+" ");
   	}
   	if(getCompositionType() == GIVE_COMMAND_AS_PARAMETER){
-  	bSubCommand.append(scriptLocation+" "+getTargetProcess().getCommand());
+  	bSubCommand.append(getRes_requirement()+scriptLocation+" "+getTargetProcess().getCommand());
   	}
   	
   	//logger.info("bsub command is "+bSubCommand.toString());
@@ -404,4 +417,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     }
   
   } // end inner class CompositeMessageLogger
+
+
+
+
 }

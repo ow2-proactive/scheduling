@@ -281,7 +281,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
                 cu.addHandler(ABS_PATH_TAG, pathHandler);
                 cu.addHandler(REL_PATH_TAG, pathHandler);
-                cu.addHandler(JVMPARAMETER_TAG, new JVMParameterHandler());
+                cu.addHandler(JVMPARAMETER_TAG, new SimpleValueHandler());
                 this.addHandler(CLASSPATH_TAG, cu);
                 this.addHandler(BOOT_CLASSPATH_TAG, cu);
                 this.addHandler(JVMPARAMETERS_TAG, cu);
@@ -355,9 +355,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
             } else if (name.equals(LOG4J_FILE_TAG)) {
                 jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
-            } else if(name.equals(PROACTIVE_PROPS_FILE_TAG)) {
-            	jvmProcess.setJvmOptions("-Dproactive.configuration="+(String) activeHandler.getResultObject());
-            }else if (name.equals(CLASSNAME_TAG)) {
+            } else if (name.equals(PROACTIVE_PROPS_FILE_TAG)) {
+                jvmProcess.setJvmOptions("-Dproactive.configuration=" +
+                    (String) activeHandler.getResultObject());
+            } else if (name.equals(CLASSNAME_TAG)) {
                 jvmProcess.setClassname((String) activeHandler.getResultObject());
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
@@ -457,6 +458,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler pathHandler = new PathHandler();
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
                 this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
+                this.addHandler(RES_REQ_TAG, new SimpleValueHandler());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -477,6 +479,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     bSubProcess.setHostList((String) activeHandler.getResultObject());
                 } else if (name.equals(PROCESSOR_TAG)) {
                     bSubProcess.setProcessorNumber((String) activeHandler.getResultObject());
+                } else if (name.equals(RES_REQ_TAG)) {
+                    bSubProcess.setRes_requirement((String) activeHandler.getResultObject());
                 } else if (name.equals(SCRIPT_PATH_TAG)) {
                     bSubProcess.setScriptLocation((String) activeHandler.getResultObject());
                 } else {
@@ -529,7 +533,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
     }
 
-    private class JVMParameterHandler extends BasicUnmarshaller {
+    private class SimpleValueHandler extends BasicUnmarshaller {
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             // read from XML

@@ -75,6 +75,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String ENVIRONMENT_TAG = "environment"; 
   public static final String HOST_LIST_TAG = "hostlist";
   public static final String BSUB_OPTIONS_TAG = "bsubOption";
+  public static final String RES_REQ_TAG = "resourceRequirement";
   public static final String SCRIPT_PATH_TAG = "scriptPath";
   public static final String GLOBUS_OPTIONS_TAG = "globusOption";
   public static final String GLOBUS_COUNT_TAG = "count";
@@ -95,7 +96,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String JAVA_PATH_TAG = "javaPath"; 
   public static final String POLICY_FILE_TAG = "policyFile"; 
   public static final String LOG4J_FILE_TAG = "log4jpropertiesFile";
-  public static final String PROACTIVE_PROPS_FILE_TAG = "proActivePropertiesFile";
+  public static final String PROACTIVE_PROPS_FILE_TAG = "ProActiveUserPropertiesFile";
   public static final String CLASSNAME_TAG = "classname"; 
   public static final String PARAMETERS_TAG = "parameters"; 
   
