@@ -44,7 +44,7 @@ cd ..\..\src
 
 
 set PROACTIVE=..\.
-call init.bat
+call %PROACTIVE%\scripts\windows\init.bat
 
 echo CLASSPATH=%CLASSPATH%
 
