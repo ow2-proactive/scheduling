@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="Dispatcher1-AC"/>
-			<virtualNode name="Dispatcher2-AC"/>
+			<virtualNode name="VN1"/>
+			<virtualNode name="VN2"/>
+			<virtualNode name="VN3"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
 		<mapping>
-			<map virtualNode="Dispatcher1-AC">
+			<map virtualNode="VN1">
 				<jvmSet>
 					<vmName value="Jvm1-AC"/>
 				</jvmSet>
 			</map>
-			<map virtualNode="Dispatcher2-AC">
+			<map virtualNode="VN2">
 				<jvmSet>
 					<vmName value="Jvm2-AC"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="VN3">
+				<jvmSet>
+                    <vmName value="Jvm3-AC"/>
+					<vmName value="Jvm4-AC"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -31,6 +38,19 @@
 				<creation>
 					<!--<processReference refid="rshProcess-AC"/>-->
 					<processReference refid="linuxJVM-AC"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3-AC">
+				<acquisition method="rmi"/>
+				<creation>
+					<processReference refid="rshProcess-AC"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4-AC">
+				<acquisition method="rmi"/>
+				<creation>
+					<!--<processReference refid="rshProcess-AC"/>-->
+					<processReference refid="rshProcess-AC"/>
 				</creation>
 			</jvm>
 		</jvms>
