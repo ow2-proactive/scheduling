@@ -77,6 +77,11 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
     display.receiveMessage(s);
   }
 
+
+  public void receiveMessage(String s, java.awt.Color c) {
+    display.receiveMessage(s, c);
+  }
+
   public Penguin createPenguin(int n) {
     try {
       Penguin newPenguin = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), new Object[] { new Integer(n) });
@@ -88,7 +93,6 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
       return null;
     }
   }
-
 
   public void runActivity(Body b) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
@@ -103,11 +107,27 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
 
 
   public static void main(String args[]) {
-    try {
-      // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
-      new PenguinControler(args);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+      //args modification to replace relative name of nodes to them absolute name
+      try {
+	  java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
+	  for (int i=0; i<args.length; i++) {
+	      if (args[i].startsWith("//localhost")) {
+		  String nodeName;
+		  int index = args[i].lastIndexOf('/');
+		  if (index > 0 &&  index < args[i].length() - 1) {
+		      nodeName = args[i].substring(index + 1);
+		      args[i] = "//" + localhost.getHostName() + "/" + nodeName;
+		  }
+	      }
+	  }
+      } catch (java.net.UnknownHostException e) {
+	  e.printStackTrace();
+      }
+      try {
+	  // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
+	  new PenguinControler(args);
+      } catch (Exception e) {
+	  e.printStackTrace();
+      }
   }
 }

@@ -42,7 +42,7 @@ public class PenguinFrame extends javax.swing.JFrame {
     imagePanel = buildImagePanel(f);
     this.addWindowListener(new java.awt.event.WindowAdapter() {
       public void windowClosing(java.awt.event.WindowEvent e) {
-        System.exit(0);
+	System.exit(0);
       }
     });
     getContentPane().setLayout(new java.awt.BorderLayout());

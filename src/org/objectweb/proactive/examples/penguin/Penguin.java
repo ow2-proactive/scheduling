@@ -33,10 +33,10 @@ package org.objectweb.proactive.examples.penguin;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
-
 
 public class Penguin implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
@@ -49,6 +49,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
   private org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;
   private int index;
   private String name;
+  private String[] itinerary;
 
 
   /**
@@ -108,6 +109,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
             (org.objectweb.proactive.core.body.migration.Migratable) org.objectweb.proactive.ProActive.getBodyOnThis());
     myStrategyManager.onDeparture("clean");
     myStrategy = new MigrationStrategyImpl();
+    itinerary = s;
     for (int i = 0; i < s.length; i++)
       myStrategy.add(s[i], null);
   }
@@ -149,7 +151,9 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
       if (onItinerary) {
         r = nextHop();
         try {
-          ProActive.migrateTo(r.getDestination());
+	    //Non migration to the same node or a null node
+	    if (r != null && !NodeFactory.isNodeLocal(NodeFactory.getNode(r.getDestination())))
+		ProActive.migrateTo(r.getDestination());
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -160,18 +164,32 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
   }
 
 
+  public String[] getItinerary() {
+    return itinerary;
+  }
+
+
+  public void setItinerary(String[] newItinerary) {
+    sendMessageToControler("I changed my itinerary", java.awt.Color.blue);
+    myStrategy = new MigrationStrategyImpl();
+    itinerary = newItinerary;
+    for (int i = 0; i < newItinerary.length; i++)
+      myStrategy.add(newItinerary[i], null);
+  }
+
+
   public void start() {
-    sendMessageToControler("I am starting my itinerary");
+    sendMessageToControler("I am starting my itinerary", new java.awt.Color(0, 150, 0));
     myStrategy.reset();
     onItinerary = true;
   }
 
 
-  public void stop() {
+  public void suspend() {
     if (! onItinerary) {
-      sendMessageToControler("I'm already stopped");
+      sendMessageToControler("I'm already suspended");
     } else {
-      sendMessageToControler("I stopped my itinerary");
+      sendMessageToControler("I suspended my itinerary", java.awt.Color.red);
       onItinerary = false;
     }
   }
@@ -181,7 +199,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
     if (onItinerary) {
       sendMessageToControler("I'm already on my itinerary");
     } else {
-      sendMessageToControler("I'm resuming my itinerary");
+      sendMessageToControler("I'm resuming my itinerary", new java.awt.Color(0, 150, 0));
       onItinerary = true;
     }
   }
@@ -205,6 +223,12 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
   private void sendMessageToControler(String message) {
     if (controler != null)
       controler.receiveMessage("["+name+"] : "+message);
+  }
+
+
+  private void sendMessageToControler(String message, java.awt.Color color) {
+    if (controler != null)
+      controler.receiveMessage("[" + name + "] : " + message, color);
   }
 
 
