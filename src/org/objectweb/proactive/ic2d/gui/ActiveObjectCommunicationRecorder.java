@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
+import java.awt.RenderingHints;
+
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
 
@@ -47,6 +49,7 @@ public class ActiveObjectCommunicationRecorder {
     private int maxCommunicationCounter = 1;
     private int drawingStyle;
     private boolean enabled;
+    private boolean antiAlias;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -220,7 +223,12 @@ public class ActiveObjectCommunicationRecorder {
             ratio = -1;
             break;
         }
-
+        //anti alias added ebe 07/2004
+        if (antiAlias) {
+        	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);	
+		}
+        
         //System.out.println("ratio = "+ratio+"  proportionalLinks="+proportionalLinks+" maxCommunicationCounter="+maxCommunicationCounter);
         java.util.Iterator sourceEntryIterator = panelToPanelsMap.entrySet()
                                                                  .iterator();
@@ -369,8 +377,8 @@ public class ActiveObjectCommunicationRecorder {
     }
 
     private void drawOneArcDifferentNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
-		System.out.println("-->source : x=" + xSource + " y=" + ySource + " width=" + sourceWidth);
-		System.out.println("-->destin  : x=" + xDest + " y=" + yDest + " width=" + destWidth);
+//		System.out.println("-->source : x=" + xSource + " y=" + ySource + " width=" + sourceWidth);
+//		System.out.println("-->destin  : x=" + xDest + " y=" + yDest + " width=" + destWidth);
 		boolean alignVertic = false;
 		boolean upWay     = false;
 		// align vertical -> arc arrow
@@ -443,4 +451,17 @@ public class ActiveObjectCommunicationRecorder {
             throw new UnsupportedOperationException();
         }
     } // end inner class SourceIterator
+
+	/**
+	 * @param antiAlias The antiAlias to set.
+	 */
+	public void setAntiAlias(boolean antiAlias) {
+		this.antiAlias = antiAlias;
+	}
+	/**
+	 * @return Returns the antiAlias.
+	 */
+	public boolean isAntiAlias() {
+		return antiAlias;
+	}
 }
