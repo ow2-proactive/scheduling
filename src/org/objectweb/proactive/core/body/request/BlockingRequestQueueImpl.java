@@ -312,25 +312,25 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             return null;
         }
         int index = -1;
-        boolean canServe = false;
+        boolean found = false;
 
         // if there is no barrier currently active, avoid the iteration
         if (this.spmdManager.isCurrentBarriersEmpty()) {
             index = 0;
-            canServe = true;
+            found = true;
         } else { // there is at least one active barrier
             Iterator it = requestQueue.iterator();
 
             // look for the first request in the queue we can serve
-            while (!canServe && it.hasNext()) {
+            while (!found && it.hasNext()) {
                 index++;
                 MethodCall mc = ((Request) it.next()).getMethodCall();
-                canServe = this.spmdManager.checkExecution(mc.getBarrierTags());
+                found = this.spmdManager.checkExecution(mc.getBarrierTags());
             }
         }
 
         // we found a method to serve (a method not blocked by a current barrier)
-        if (canServe) {
+        if (found) {
             Request r = (Request) requestQueue.remove(index);
             if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
                 this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
