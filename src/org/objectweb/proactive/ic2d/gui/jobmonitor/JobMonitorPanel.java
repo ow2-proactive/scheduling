@@ -1,18 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -24,25 +11,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
+
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
-    private static final String PA_JVM = "PA_JVM";
     private static final String VN_VIEW_LABEL = "Job view / Virtual Nodes";
     private static final String JOB_VIEW_LABEL = "Job view / Hosts";
     private static final String HOST_VIEW_LABEL = "Host view";
@@ -53,7 +37,6 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private static final int[] HOST_VIEW_KEYS = { HOST, JOB, JVM, VN, NODE, AO };
     private static final int[] VN_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
     private static final int[] CUSTOM_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
-    private IC2DGUIController controller;
     private JTabbedPane tabs;
     private Vector frames;
     private DataAssociation asso;
@@ -62,7 +45,6 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private DataTreeModel vnViewModel;
     private DataTreeModel hostViewModel;
     private DataTreeModel customViewModel;
-    private Map aos;
     private Vector monitoredHosts;
     private Vector filteredJobs;
     private JPopupMenu popupmenu;
@@ -72,15 +54,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
     public JobMonitorPanel(IC2DGUIController _controller) {
     	asso = new DataAssociation();
-    	explorator = new NodeExploration(asso);
     	
         setLayout(new GridLayout(1, 1));
 
-        controller = _controller;
-
         createRefresher();
 
-        aos = new HashMap();
         monitoredHosts = new Vector();
         filteredJobs = new Vector();
         filteredJobs.add(ProActive.getJobId());
@@ -88,6 +66,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
+    	explorator = new NodeExploration(asso, filteredJobs, _controller);
+        
         add(tabs);
 
         final JPopupMenu extractMenu = new JPopupMenu();
@@ -267,124 +247,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             hostname = host.substring(0, pos);
         }
 
-        handleHost(hostname, port);
-    }
-
-    private void handleHost(String hostname, int port) {
-        try {
-            Registry registry = LocateRegistry.getRegistry(hostname, port);
-            String[] list = registry.list();
-
-            for (int idx = 0; idx < list.length; ++idx) {
-                String id = list[idx];
-                if (id.indexOf(PA_JVM) != -1) {
-                    RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
-
-                    //					System.out.println("Found runtime id: " + id);
-                    List x = new ArrayList();
-                    try {
-                        ProActiveRuntime part = new RemoteProActiveRuntimeAdapter(r);
-                        x.add(part);
-
-                        ProActiveRuntime[] runtimes = r.getProActiveRuntimes();
-                        x.addAll(Arrays.asList(runtimes));
-
-                        //						System.out.println ("Found " + runtimes.length + " ProActiveRuntimes in this RemoteProActiveRuntime");
-                        for (int i = 0, size = x.size(); i < size; ++i) {
-                            //							System.out.println ("\nRuntime " + (i + 1) + " / " + size);
-                            handleProActiveRuntime((ProActiveRuntime) x.get(i));
-                        }
-                    } catch (ProActiveException e) {
-                        //						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance - The RMI reference might be dead: " + e);
-                        //						e.printStackTrace();
-                    } catch (RemoteException e) {
-                        //						System.out.println ("Unexpected remote exception caught while getting proactive runtimes: " + e);
-                        //						e.printStackTrace();
-                    }
-                }
-            }
-        } catch (RemoteException e) {
-            //			System.out.println("Unexpected exception caught while getting registry reference: " + e);
-            //			e.printStackTrace();
-        } catch (NotBoundException e) {
-            //			System.out.println("Unexpected not bound exception caught while looking up object reference: " + e);
-            //			e.printStackTrace();
-        }
-    }
-
-    public boolean isJobFiltered(String jobId) {
-        for (int i = 0, size = filteredJobs.size(); i < size; ++i) {
-            String job = (String) filteredJobs.get(i);
-            if (job.equalsIgnoreCase(jobId)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private void handleProActiveRuntime(ProActiveRuntime pr)
-        throws ProActiveException {
-        if (isJobFiltered(pr.getJobID())) {
-            return;
-        }
-
-        //		System.out.println ("Runtimes: " + pr.getProActiveRuntimes().length);
-        //		System.out.println ("Job id: " + pr.getJobID() + " - vm info [job id: " + pr.getVMInformation().getJobID()
-        //				+ ", vm name: " + pr.getVMInformation().getName() + "]");
-        String jobId = pr.getJobID();
-        String hostname = pr.getVMInformation().getInetAddress()
-                            .getCanonicalHostName();
-        String vmName = pr.getVMInformation().getName();
-
-        asso.addChild(JOB, jobId, vmName);
-
-        String[] nodes = pr.getLocalNodeNames();
-
-        //		System.out.println ("Found " + nodes.length + " nodes on this runtime");
-        for (int i = 0; i < nodes.length; ++i) {
-            String nodeName = nodes[i];
-            String vnName = pr.getVNName(nodeName);
-
-            //			System.out.println ("node " + (i + 1) + " / " + nodes.length + ": " + nodes [i] + 	" - vn name: " + vnName);
-            ArrayList activeObjects = null;
-            try {
-                activeObjects = pr.getActiveObjects(nodeName);
-            } catch (ProActiveException e) {
-                controller.log("Unexpected ProActive exception caught while obtaining the active objects list",
-                    e);
-            }
-
-            asso.addChild(JVM, vmName, nodeName);
-            asso.addChild(HOST, hostname, JVM, vmName);
-            if (vnName != null) {
-                asso.addChild(VN, vnName, NODE, nodeName);
-            }
-            handleActiveObjects(nodeName, activeObjects);
-        }
-    }
-
-    private void handleActiveObjects(String nodeName, ArrayList activeObjects) {
-        for (int i = 0, size = activeObjects.size(); i < size; ++i) {
-            ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
-            RemoteBodyAdapter rba = (RemoteBodyAdapter) aoWrapper.get(0);
-
-            //			System.out.println ("Active object " + (i + 1) + " / " + size + " class: " + aoWrapper.get (1));
-            String className = (String) aoWrapper.get(1);
-            if (className.equalsIgnoreCase(
-                        "org.objectweb.proactive.ic2d.spy.Spy")) {
-                continue;
-            }
-
-            className = className.substring(className.lastIndexOf(".") + 1);
-            String aoName = (String) aos.get(rba.getID());
-            if (aoName == null) {
-                aoName = className + "#" + (aos.size() + 1);
-                aos.put(rba.getID(), aoName);
-            }
-
-            asso.addChild(NODE, nodeName, aoName);
-        }
+        explorator.exploreHost(hostname, port);
     }
 
     private void dump(Object o) {
