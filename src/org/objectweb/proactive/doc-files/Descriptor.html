@@ -445,12 +445,12 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
   &lt;processDefinition id="<b>jvmProcess</b>"&gt;
    &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;
     &lt;classpath&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/classes"/&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/lib/asm.jar"/&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/lib/jini-core.jar"/&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/lib/jini-ext.jar"/&gt;
-     &lt;relativePath origin="user.home" value="/ProActive/lib/reggie.jar"/&gt;
+     &lt;absolutePath value="/home/ProActive/classes"/&gt;
+     &lt;absolutePath value="/home/ProActive/lib/bcel.jar"/&gt;
+     &lt;absolutePath value="/home/ProActive/lib/asm.jar"/&gt;
+     &lt;absolutePath value="/home/ProActive/lib/jini-core.jar"/&gt;
+     &lt;absolutePath value="/home/ProActive/lib/jini-ext.jar"/&gt;
+     &lt;absolutePath value="/home/ProActive/lib/reggie.jar"/&gt;
     &lt;/classpath&gt;
     &lt;javaPath&gt;
      &lt;absolutePath value="/usr/local/jdk1.4.0/bin/java"/&gt;
@@ -476,13 +476,13 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 		</pre>
 		
 			As shown in the example above, <b>ProActive </b>provides the ability to define or change the <b>classpath </b>environment variable, the <b>java path</b>, the <b>policy file path</b>, the <b>log4j properties file path</b>, the <b>ProActive properties file path </b>(see <a href="Configuration.html">configuration file</a> for more details) and also to pass <b>parameters</b> to the JVM to be created. <b><font color="#FF0000">Note that parameters to be passed here are related to the jvm in opposition to properties given in the  <a href="Configuration.html">configuration file</a>(more focused on ProActive or application behaviour). In fact parameters given here will be part of the java command to create other jvms, whereas properties given in the config file will be loaded once the jvm is created.</font></b><br>
- If not specified, there is a default value (except for the jvmParameters element) for each of these variables. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa.<br>
+ If not specified, there is a default value (except for the jvmParameters element) for each of these variables. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa. As shown in the example <b>paths</b> to files can be either <b>absolute</b> or <b>relative</b>. If relative, an origin must be provided, it can be <b>user.home</b> or <b>user.dir</b> or <b>user.classpath</b> and it is resolved <b>locally</b>, i.e on the jvm reading the descriptor and not on the remote jvm that is going to be created.<br>
 As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;ProActiveUserPropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br>
 Even if not shown in this example, a specific tag is provided for XbootClasspath option under the form<br>
 <pre>
 &lt;bootclasspath>
- &lt;absolutePath value="/home1/fabrice/IOFAb/Ibis/"/&gt;
- &lt;absolutePath value="/home1/fabrice/IOFAb/classlibs/jdk"/&gt;
+ &lt;relativePath origin="user.home" value="/IOFAb/Ibis/"/&gt;
+ &lt;relativePath origin="user.home" value="/IOFAb/classlibs/jdk"/&gt;
 &lt;/bootclasspath>
 </pre>
 <br></br>
