@@ -74,8 +74,11 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="globusProcess">
-				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
+				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="cluster.inria.fr">
 					<processReference refid="linuxJVM1"/>
+					<globusOption>
+						<count>2</count>
+					</globusOption>
 				</globusProcess>
 			</processDefinition>
 		</processes>
