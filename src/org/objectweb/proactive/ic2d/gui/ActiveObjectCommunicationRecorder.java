@@ -49,7 +49,7 @@ public class ActiveObjectCommunicationRecorder {
     private int maxCommunicationCounter = 1;
     private int drawingStyle;
     private boolean enabled;
-    private boolean antiAlias;
+    private boolean antiAlias=true;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------

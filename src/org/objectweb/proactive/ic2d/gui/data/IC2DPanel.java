@@ -228,18 +228,6 @@ public class IC2DPanel extends AbstractDataObjectPanel
             p.add(cb);
         }
 
-        {
-            final javax.swing.JCheckBox antialias = new javax.swing.JCheckBox(
-                    "AntiAlias");
-            antialias.setSelected(communicationRecorder.isAntiAlias());
-            antialias.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        communicationRecorder.setAntiAlias(antialias.isSelected());
-                        repaint();
-                    }
-                });
-            p.add(antialias);
-        }
         return p;
     }
 
