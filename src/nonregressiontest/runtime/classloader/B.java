@@ -24,7 +24,7 @@ public class B {
 
     public void createActiveObjectC() throws Exception {
         ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(getClass()
-                                                                              .getResource("/deployment.xml")
+                                                                              .getResource("/deployment-tmp.xml")
                                                                               .getPath());
         descriptor.activateMappings();
         Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.C",

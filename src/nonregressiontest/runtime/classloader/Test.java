@@ -30,6 +30,12 @@
  */
 package nonregressiontest.runtime.classloader;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -44,7 +50,7 @@ import testsuite.test.FunctionalTest;
  * 2. B is created from A, and creates a remote object C on a place where C is not available.
  * => class C is asked to the runtime of A and B, which asks to the initial deployment runtime
  * 
- * 
+ * There is no need to configure paths, as a deployment file with the correct paths is created on the fly
  * 
  * @author Matthieu Morel
  */
@@ -69,10 +75,20 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        //descriptor = ProActive.getProactiveDescriptor(getClass().getResource("/nonregressiontest/runtime/classloader/deployment.xml").getPath());
         System.setProperty("proactive.classloader", "enable");
+        String oldFilePath = getClass().getResource("/nonregressiontest/runtime/classloader/deployment.xml").getPath();
+        String newFilePath=oldFilePath.replaceFirst("deployment.xml", "deployment-tmp.xml");
+        // if tests are run from the /compile directory : getParent for root directory 
+        File userDir = new File(System.getProperty("user.dir"));
+        String proactiveDir;
+        if (userDir.getName().equals("compile")) {
+            proactiveDir = userDir.getParent();
+        } else {
+            proactiveDir = userDir.getPath();
+        }
+        searchAndReplace(oldFilePath, newFilePath, "proactive.home", proactiveDir);
         descriptor = ProActive.getProactiveDescriptor(getClass()
-                                                          .getResource("/nonregressiontest/runtime/classloader/deployment.xml")
+                                                          .getResource("/nonregressiontest/runtime/classloader/deployment-tmp.xml")
                                                           .getPath());
         descriptor.activateMappings();
     }
@@ -88,4 +104,26 @@ public class Test extends FunctionalTest {
     public boolean postConditions() throws Exception {
         return true;
     }
+    
+    private void searchAndReplace(String oldFilePath, String newFilePath , String oldString, String newString) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(oldFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(newFilePath));
+            while (true) {
+                String oldLine = reader.readLine();
+                if (oldLine == null) {
+                    break;
+                }
+                String newLine = oldLine.replaceAll(oldString, newString);
+                writer.write(newLine);
+                writer.newLine();
+            }
+            reader.close();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
+
 }
