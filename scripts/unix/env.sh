@@ -108,6 +108,18 @@ if [ -f $PROACTIVE/lib/bouncycastle.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bouncycastle.jar
 fi
+if [ -f $PROACTIVE/lib/fractal-adl.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal-adl.jar
+fi
+if [ -f $PROACTIVE/lib/dtdparser.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/dtdparser.jar
+fi
+if [ -f $PROACTIVE/lib/ow_deployment_scheduling.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ow_deployment_scheduling.jar
+fi
 
 
 echo "CLASSPATH"=$CLASSPATH
