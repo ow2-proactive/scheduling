@@ -282,7 +282,7 @@ public abstract class FunctionalTest extends AbstractTest
                 "Test run with success but Postconditions not verified");
         } else {
             if (logger.isInfoEnabled()) {
-                logger.info(this.getName() + ": [SUCESS]");
+                logger.info(this.getName() + ": [SUCCESS]");
             }
             return new TestResult(this, TestResult.RESULT, " runs with success");
         }
