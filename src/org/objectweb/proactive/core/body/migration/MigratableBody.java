@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.migration;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -154,7 +155,7 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
             try {
                 ProActiveRuntime pr = null;
                 pr = node.getProActiveRuntime();
-                System.out.println("internal runtime" + pr.getURL());
+                ProActive.loggerSecurity.debug("internal runtime" + pr.getURL());
                 ArrayList entitiesFrom = null;
                 ArrayList entitiesTo = null;
                 try {

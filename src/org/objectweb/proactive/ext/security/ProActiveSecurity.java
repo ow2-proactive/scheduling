@@ -89,8 +89,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 public class ProActiveSecurity {
 	
-	public static Logger logger = Logger.getLogger("SECURITY");	
-	public static Logger logger2 = Logger.getLogger("GROUP");	
+
     public static Object[] generateGenericCertificateSelfSigned() {
 		Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
 		  Security.addProvider(myProvider);

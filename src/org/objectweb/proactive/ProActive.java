@@ -88,6 +88,8 @@ import java.util.HashMap;
 
 public class ProActive {
     protected static Logger logger = Logger.getLogger(ProActive.class.getName());
+	public static Logger loggerSecurity = Logger.getLogger("SECURITY");	
+	public static Logger loggerGroup = Logger.getLogger("GROUP");	
 
     //
     // -- STATIC MEMBERS -----------------------------------------------
