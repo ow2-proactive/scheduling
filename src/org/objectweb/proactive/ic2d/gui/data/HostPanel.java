@@ -92,7 +92,6 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
-
   //
   // -- implements HostObjectListener -----------------------------------------------
   //

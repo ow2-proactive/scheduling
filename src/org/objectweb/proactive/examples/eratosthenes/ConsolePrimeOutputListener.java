@@ -38,6 +38,7 @@ package org.objectweb.proactive.examples.eratosthenes;
 public class ConsolePrimeOutputListener implements PrimeOutputListener, java.io.Serializable {
 
   private long startTime;
+  private int numberCounter;
 
   /**
    * Constructor for ConsolePrimeOutputListener.
@@ -47,15 +48,22 @@ public class ConsolePrimeOutputListener implements PrimeOutputListener, java.io.
   }
 
   public void newPrimeNumberFound(long n) {
+  	numberCounter ++;
   	if (startTime == 0) startTime = System.currentTimeMillis();
   	String time = Long.toString((System.currentTimeMillis() - startTime) / 1000);
+  	String counter = Integer.toString(numberCounter);
   	StringBuffer line = new StringBuffer(50);
   	line.append("    ");
+  	line.append("Prime number ");
+  	for (int i = counter.length(); i < 6; i ++) line.append(' ');
+  	line.append('#');
+  	line.append(counter);
+  	line.append(" found with value ");
+  	line.append(n);
+  	line.append("\t (");
   	for (int i = time.length(); i < 6; i ++) line.append('0');
   	line.append(time);
-  	line.append(":\tNew prime number found: ");
-  	line.append(n);
-  	line.append('\n');
+  	line.append("s)\n");
   	System.out.print(line);
   }
 

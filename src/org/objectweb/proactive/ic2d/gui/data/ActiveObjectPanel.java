@@ -42,8 +42,8 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   private static final String SERVING_REQUEST_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- ServingRequest";
   private static final String WAITING_BY_NECESSITY_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- WaitByNecessity";
   private static final String ACTIVE_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- Active, not serving request";
-  public static final java.awt.Color COLOR_WHEN_ACTIVE = new java.awt.Color(225, 255, 225);
-  public static final java.awt.Color COLOR_WHEN_WAITING_BY_NECESSITY = new java.awt.Color(238, 208, 156);
+  public static final java.awt.Color COLOR_WHEN_ACTIVE = new java.awt.Color(180, 255, 180);
+  public static final java.awt.Color COLOR_WHEN_WAITING_BY_NECESSITY = new java.awt.Color(255, 205, 110);
   public static final java.awt.Color COLOR_WHEN_SERVING_REQUEST = java.awt.Color.white;
   public static final java.awt.Color COLOR_WHEN_WAITING_REQUEST = new java.awt.Color(225, 225, 225);
   public static final java.awt.Color COLOR_WHEN_MIGRATING = java.awt.Color.red;

@@ -63,6 +63,12 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   private Node listenerNode;
   private Node sourceNode;
   private ProActiveDescriptor pad;
+  private boolean gui;
+  private Node lastNode;
+  private int nodeCount;
+  /** Place four ActivePrimeContainers in a Node before using the next for the distributed version. */
+  private static final int ACTIVEPRIMECONTAINERS_PER_NODE = 4;
+
 
   /**
    * Constructor for Main.
@@ -70,10 +76,11 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   public Main() {
   }
   
-  public Main(String [] xmlDescriptor) throws ProActiveException {
+  public Main(String xmlDescriptor, boolean gui) throws ProActiveException {
   	// read XML Descriptor
-  	if (xmlDescriptor.length > 0)
-      pad = ProActive.getProactiveDescriptor(xmlDescriptor[0]);   
+  	if (xmlDescriptor.length() > 0)
+      pad = ProActive.getProactiveDescriptor(xmlDescriptor);   
+    this.gui = gui;
   }
 
   /** Creates a new ActivePrimeContainer starting with number n */
@@ -88,7 +95,19 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
 
 		// find correct node or use default node  		
   		Node node;
-  		if (containersVirtualNode != null) node = containersVirtualNode.getNode();
+  		if (containersVirtualNode != null) { // alternate between nodes for creating containers
+  			if (lastNode == null) {
+  			  lastNode = containersVirtualNode.getNode();
+  			  node = sourceNode;
+  			  nodeCount = 0;
+  			} else if (nodeCount < ACTIVEPRIMECONTAINERS_PER_NODE) {
+  			  node = lastNode;
+  			  nodeCount ++;	
+  			} else {
+  			  lastNode = node = containersVirtualNode.getNode();
+  			  nodeCount = 1;
+  			}
+  		}
   		else node = NodeFactory.getDefaultNode();
   		
   		System.out.println("    Creating container with size "+containerSize+" starting with number "+n);
@@ -136,7 +155,8 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   	  
   	  source.setFirst(first);
   	  
-  	  new ControlFrame(this);
+  	  if (gui) new ControlFrame(this);
+  	  else source.pause(false); // start immediately if no gui
   			
   	} catch (Exception ex) {
   		ex.printStackTrace();
@@ -175,8 +195,16 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   }
 
   public static void main(String[] args) throws ProActiveException {  	
+  	String xmlDescriptor = "";
+  	boolean gui = true;
+  	if (args.length > 0) {
+  	  if (args[0].equalsIgnoreCase("-nogui")) {
+  	  	gui = false;
+  	  	if (args.length > 1) xmlDescriptor = args[1];
+  	  } else xmlDescriptor = args[0];
+  	}
   	Main main = (Main)ProActive.newActive(Main.class.getName(), 
-  	  new Object[] {args});
+  	  new Object[] {xmlDescriptor, new Boolean(gui)});
   }
 
   /** class for control window. */

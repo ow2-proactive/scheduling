@@ -39,7 +39,7 @@ public class ActiveObjectCommunicationRecorder {
   public static final int RATIO_DRAWING_STYLE = 2;
   public static final int FILAIRE_DRAWING_STYLE = 3;
 
-  private static final java.awt.Color STROKE_COLOR = new java.awt.Color(125, 125, 125, 125);
+  private static final java.awt.Color STROKE_COLOR = new java.awt.Color(0, 0, 0, 125);
   private static final int MAX_STROKE_WIDTH_RATIO = 12;
   private static final int MAX_STROKE_WIDTH_PROPORTIONAL = 80;
 
@@ -268,7 +268,7 @@ public class ActiveObjectCommunicationRecorder {
       // drawing line
       g2.setPaint(STROKE_COLOR);
       float strokeWidth;
-      if (ratio == -1) strokeWidth = 2;
+      if (ratio == -1) strokeWidth = 1.5f;
       else strokeWidth = communicationCount * ratio + 1;
       g2.setStroke(new java.awt.BasicStroke(strokeWidth));
       boolean sameNode =  sourcePanel.getActiveObject().isInsideSameNode(destPanel.getActiveObject());
@@ -300,6 +300,10 @@ public class ActiveObjectCommunicationRecorder {
   	                          yDest-(int)(Math.sin(angle-Math.PI/4) * 6));
   	g2.drawLine(xDest, yDest, xDest-(int)(Math.cos(angle+Math.PI/4) * 6), 
   	                          yDest-(int)(Math.sin(angle+Math.PI/4) * 6));
+  	g2.drawLine(xDest-(int)(Math.cos(angle+Math.PI/4) * 6), 
+  	            yDest-(int)(Math.sin(angle+Math.PI/4) * 6),
+  	            xDest-(int)(Math.cos(angle-Math.PI/4) * 6), 
+  	            yDest-(int)(Math.sin(angle-Math.PI/4) * 6));
   }
   
   
