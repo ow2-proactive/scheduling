@@ -30,27 +30,27 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.apache.log4j.Logger;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;
+import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Vector;
 
 
 public class ProxyForGroup extends AbstractProxy
@@ -797,15 +797,26 @@ public class ProxyForGroup extends AbstractProxy
 	 * Strongly synchronizes all the members of the group
 	 */
 	public void barrier () {
-		System.out.println("BARRIER est invoque");
 		try {
-			this.reify(new MethodCallControlForGroup()); }
+			this.reify(new MethodCallBarrier()); }
 		catch (InvocationTargetException e) {
 			logger.info("Unable to invoke the \"barrier\" method");
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Communicates the SPMD Group to members
+	 * @param spmdGroup - the SPMD group
+	 */
+	public void setSPMDGroup (Object spmdGroup) {
+		try {
+			this.reify(new MethodCallSetSPMDGroup(spmdGroup)); }
+		catch (InvocationTargetException e) {
+			logger.info("Unable to set the SPMD group");
+			e.printStackTrace();
+		}
+	}
 
     /**
      * To debug, display the size of the Group and all its members with there position

@@ -183,10 +183,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   
   public void receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
     //System.out.println("  --> receiveRequest m="+request.getMethodName());
-
-//	MethodCall mc = request.getMethodCall();
-//	System.out.println("The body receives " + mc.getName());
-
 	try {
 		this.enterInThreadStore();
 		if (this.isDead) {
@@ -203,14 +199,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 				// do nothing
 			}
 		}
-//		if ("GroupControlCall".equals(mc.getName())) {
-//			System.out.println("* Le body ignore " + mc.getName());
-//		}
-//		else {
-//			System.out.println("* Le body sert " + mc.getName());
-			this.registerIncomingFutures();
-			this.internalReceiveRequest(request);
-//		}
+		this.registerIncomingFutures();
+		this.internalReceiveRequest(request);
 	} finally {
 		this.exitFromThreadStore();
 	}
@@ -861,10 +851,26 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     LocalBodyStore.getInstance().registerBody(this);
   }
 
+  /**
+   * Set the SPMD group for the active object
+   * @param o - the new SPMD group
+   */
+  public void setSPMDGroup(Object o) {
+	  this.pgm.setSPMDGroup(o);
+  }
+	
+  /**
+   * Returns the SPMD group of the active object
+   * @return the SPMD group of the active object
+   */
+  public Object getSPMDGroup() {
+	  return this.pgm.getSPMDGroup();
+  }
 
-  //
-  // -- PRIVATE METHODS -----------------------------------------------
-  //
+	public void test() {
+		this.pgm.test();
+	}
+
 
   //
   // -- SERIALIZATION METHODS -----------------------------------------------
@@ -880,8 +886,4 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 	  logger = Logger.getLogger("AbstractBody");
   }
 
-
-  //
-  // -- inner classes -----------------------------------------------
-  //
 }

@@ -38,16 +38,10 @@ import org.objectweb.proactive.core.mop.MethodCall;
 /**
  * @author Laurent Baduel
  */
-public class MethodCallControlForGroup extends MethodCall {
+public abstract class MethodCallControlForGroup extends MethodCall {
 
-	public MethodCallControlForGroup () {
-//		this.key = "GroupGroupControlCall";
-	}
+	public MethodCallControlForGroup () { }
 
-	public String getName() {
-		return "GroupControlCall";
-	}
-	
 	public Method getReifiedMethod () {
 		return null;
 	}
@@ -71,13 +65,11 @@ public class MethodCallControlForGroup extends MethodCall {
 	}
 
 	/**
-	 * ControlCall have no parameter.
+	 * Returns the number of parmeters
 	 * @return 0 
 	 * @see org.objectweb.proactive.core.mop.MethodCall#getNumberOfParameter()
 	 */
-	public int getNumberOfParameter() {
-		return 0;
-	}
+	public abstract int getNumberOfParameter();
 
 	//
 	// --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
@@ -109,6 +101,6 @@ public class MethodCallControlForGroup extends MethodCall {
 
 	// Overloaded to avoid this MethodCallControlForGroup object
 	// go inside the recycling pool of MethodCall.
-	protected void finalize () {
-	}
+	protected void finalize () { }
+
 }
