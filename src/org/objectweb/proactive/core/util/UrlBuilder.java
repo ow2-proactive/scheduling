@@ -217,9 +217,14 @@ public class UrlBuilder {
     public static int getPortFromUrl(String url) {
         try {
             String validUrl = checkUrl(url);
+            System.out.println(validUrl);
             int n = validUrl.indexOf("//");
             int m = validUrl.lastIndexOf("/");
-            return getPortNumber(validUrl.substring(n + 2, m));
+            if (m == (n + 1)) {
+                return getPortNumber(validUrl.substring(n + 2));
+            } else {
+                return getPortNumber(validUrl.substring(n + 2, m));
+            }
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
             return DEFAULT_REGISTRY_PORT;
@@ -265,7 +270,8 @@ public class UrlBuilder {
                     } else if (name.indexOf("/") < 0) {
                         // there is a port and no name, it is a host url
                         return buildHostUrl("//" +
-                            hostInetAddress.getCanonicalHostName(), protocol);
+                            hostInetAddress.getCanonicalHostName() + name,
+                            protocol);
                     }
 
                     //port is define, extract port and build url
