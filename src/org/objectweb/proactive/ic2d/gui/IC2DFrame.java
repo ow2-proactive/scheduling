@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.gui;
 
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
 
+import org.objectweb.fractal.gui.FractalGUI;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.process.ExternalProcess;
@@ -558,6 +559,34 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         //	globusMenu.add(b);
         //    }
         menuBar.add(globusMenu);
+        
+        //*******************************************************
+        // Components gui
+        //*******************************************************
+        javax.swing.JMenu componentsMenu = new javax.swing.JMenu("Components");
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Start the components GUI");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                            try {
+                                System.setProperty(
+                                        "fractal.provider", "org.objectweb.fractal.julia.Julia");
+                                      System.setProperty(
+                                        "julia.loader", "org.objectweb.fractal.julia.loader.DynamicLoader");
+                                      System.setProperty(
+                                        "julia.config", "org/objectweb/fractal/gui/julia.cfg");
+                                FractalGUI.main(new String[] {"org.objectweb.proactive.ic2d.gui.components.ProActiveGUI"});
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
+                    }
+                });
+            componentsMenu.add(b);
+        }
+
+        menuBar.add(componentsMenu);
+        //*******************************************************
 
         return menuBar;
     }
