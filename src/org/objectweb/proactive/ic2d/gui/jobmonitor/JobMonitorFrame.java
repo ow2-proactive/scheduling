@@ -155,17 +155,15 @@ public class JobMonitorFrame extends JFrame {
 
         return menuBar;
     }
-
-    public void hide() {
-        super.setVisible(false);
-
-        panel.hideOwnedFrames();
-    }
-
-    public void show() {
-        super.setVisible(true);
-
-        panel.showOwnedFrames();
+    
+    public void setVisible(boolean b) {
+        super.setVisible(b);
+        if (b) {
+            panel.showOwnedFrames();
+    	}
+    	else {
+            panel.hideOwnedFrames();
+    	}
     }
 
     public JobMonitorPanel getPanel() {

@@ -287,11 +287,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private void hideOrShow(boolean hide) {
         for (int i = 0, size = frames.size(); i < size; ++i) {
             JFrame f = (JFrame) frames.get(i);
-            if (hide) {
-                f.setVisible(false);
-            } else {
-                f.setVisible(true);
-            }
+            f.setVisible(!hide);
         }
     }
 
