@@ -110,18 +110,18 @@ public class ProActiveBenchManager extends BenchmarkManager
         if (logger.isDebugEnabled()) {
             logger.debug("Begin nodes initialization ...");
         }
-        rshJVM = new RSHJVMProcess(new StandardOutputMessageLogger(),
-                new StandardOutputMessageLogger());
-        rshJVM.setHostname(remoteHostname);
-        String remoteNodeName = "node" + System.currentTimeMillis();
-        rshJVM.setParameters("///" + remoteNodeName);
-        try {
-            rshJVM.startProcess();
-        } catch (IOException e3) {
-            logger.fatal("Can't start a remote JVM with RSH on " +
-                remoteHostname, e3);
-            new RuntimeException(e3);
-        }
+//        rshJVM = new RSHJVMProcess(new StandardOutputMessageLogger(),
+//                new StandardOutputMessageLogger());
+//        rshJVM.setHostname(remoteHostname);
+//        String remoteNodeName = "node" + System.currentTimeMillis();
+//        rshJVM.setParameters("///" + remoteNodeName);
+//        try {
+//            rshJVM.startProcess();
+//        } catch (IOException e3) {
+//            logger.fatal("Can't start a remote JVM with RSH on " +
+//                remoteHostname, e3);
+//            new RuntimeException(e3);
+//        }
 
         try {
             pad = ProActive.getProactiveDescriptor("file:" + xmlFileLocation);
@@ -140,11 +140,12 @@ public class ProActiveBenchManager extends BenchmarkManager
                 } else if (virtualNode.getName().compareTo("Dispatcher1") == 0) {
                     localVMNode = virtualNode.getNode();
                 } else {
-                    continue;
+                	remoteVMNode = virtualNode.getNode();
                 }
             }
-            remoteVMNode = NodeFactory.getNode("//" + remoteHostname + "/" +
-                    remoteNodeName);
+//            remoteVMNode = NodeFactory.getNode("//" + remoteHostname + "/" +
+//                    remoteNodeName);
+					setRemoteHostname(remoteVMNode.getNodeInformation().getInetAddress().getHostName());
         } catch (NodeException e1) {
             logger.fatal("Problem with a node", e1);
             throw new RuntimeException(e1);
@@ -191,7 +192,7 @@ public class ProActiveBenchManager extends BenchmarkManager
         if (pad != null) {
             pad.killall();
         }
-        rshJVM.stopProcess();
+        //rshJVM.stopProcess();
     }
 
     /**

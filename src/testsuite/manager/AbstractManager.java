@@ -101,6 +101,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
         this.name = name;
         this.description = description;
         logger = Logger.getLogger(getClass().getName());
+        
         testAppender();
     }
 
@@ -127,8 +128,11 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
             }
             Logger.getRootLogger().addAppender(new WriterAppender(
                     new PatternLayout("%d [%t] %-5p %c %x - %m%n"), out));
+
             Logger.getRootLogger().setLevel((Level) Level.INFO);
+
         }
+        
     }
 
     public abstract void initManager() throws Exception;
@@ -446,6 +450,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      * @see testsuite.bean.Beanable#loadAttributes(java.util.Properties)
      */
     public void loadAttributes(Properties properties) {
+    	if(properties != null){
     	this.properties = properties;
         Class[] parameterTypes = { String.class };
         Enumeration enum = properties.propertyNames();
@@ -493,6 +498,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
         if (logger.isInfoEnabled()) {
             logger.info("Test Suite's attributes readed");
         }
+    	}
     }
 
     /**
