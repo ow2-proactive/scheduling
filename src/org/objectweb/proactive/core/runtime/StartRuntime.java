@@ -59,7 +59,7 @@ public class StartRuntime {
     protected String nodeURL;
     protected String creatorID;
     protected ProActiveRuntime proActiveRuntime;
-    protected String acquisitionMethod;
+    //protected String acquisitionMethod;
     protected String nodeNumber;
     protected String vmName;
     protected int nodenumber; //it is only the int value of nodeNumber
@@ -75,12 +75,12 @@ public class StartRuntime {
         this.creatorID = args[0].trim();
         //System.out.println(creatorID);
         this.DefaultRuntimeURL = args[1];
-        this.acquisitionMethod = args[2];
-        this.nodeNumber = args[3];
+        //this.acquisitionMethod = args[2];
+        this.nodeNumber = args[2];
      //   this.portNumber = Integer.parseInt(args[4]);
         this.nodenumber = (new Integer(nodeNumber)).intValue();
-		this.protocolId = args[4];
-		this.vmName = args[5];
+		this.protocolId = args[3];
+		this.vmName = args[4];
     }
 
     public static void main(String[] args) {
@@ -118,8 +118,10 @@ public class StartRuntime {
         try {
 
             //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
-			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.rmi")+":");
+			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.protocol")+":");
+			
 			proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
+			
 /*
             for (int i = 1; i <= nodenumber; i++) {
                 proActiveRuntime.createLocalNode(nodeURL +
@@ -149,23 +151,12 @@ public class StartRuntime {
      */
     private void register(String hostName) {
         try {
-            //          System.out.println("//"+hostName+"/"+DefaultRuntimeName);
-            //            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
-            //                    Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-//            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
-//                    System.getProperty("proactive.rmi") + ":");
+            
 			ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
 								UrlBuilder.getProtocol(DefaultRuntimeURL));
-            //System.out.println("get ok");
-            //System.out.println(PART.getClass());
-            //System.out.println(PART.getURL());
-            //System.out.println(proActiveRuntime.getURL());
-            //PART.killRT();
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID, System.getProperty("proactive.rmi")+":",vmName);
-            //System.out.println("coucou");
-            //System.out.println("register ok");
-            //System.out.println(PART.getProActiveRuntime("renderer").getURL());
+                creatorID, System.getProperty("proactive.protocol")+":",vmName);
+            
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

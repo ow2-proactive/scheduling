@@ -84,8 +84,8 @@ public interface ProActiveRuntime extends Job {
      * @exception NodeException if the new node cannot be created
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer policyServer, String vnName, String jobId)
-        throws NodeException;
+        boolean replacePreviousBinding, PolicyServer policyServer,
+        String vnName, String jobId) throws NodeException;
 
     /**
      * <i><font size="-1" color="#FF0000">**Under development** </font></i>
@@ -100,16 +100,6 @@ public interface ProActiveRuntime extends Job {
      */
     public void killNode(String nodeName) throws ProActiveException;
 
-    //  /**
-    //   * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-    //   * Creates a new ProActiveRuntime associated with a new VM on the same host as this ProActiveRuntime.
-    //   * @param jvmProcess the process to spawn localy
-    //   * @exception java.io.IOException if the new VM cannot be created
-    //   * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-    //   */
-    //  public void createLocalVM(JVMProcess jvmProcess) throws java.io.IOException,ProActiveException;
-    //  
-
     /**
      * Creates a new ProActiveRuntime associated with a new VM on the host defined in the given process.
      * @param remoteProcess the process that will originate the creation of the runtime
@@ -119,44 +109,12 @@ public interface ProActiveRuntime extends Job {
     public void createVM(UniversalProcess remoteProcess)
         throws java.io.IOException, ProActiveException;
 
-    //  /**
-    //   * Returns all nodes known by this ProActiveRuntime on this VM
-    //   * @return all nodes known by this ProActiveRuntime on this VM
-    //   * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-    //   */
-    // // public Node[] getLocalNodes() throws ProActiveException;
-
     /**
      * Returns the name of all nodes known by this ProActiveRuntime on this VM
      * @return the name of all nodes known by this ProActiveRuntime on this VM
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public String[] getLocalNodeNames() throws ProActiveException;
-
-    //  /**
-    //   * Returns the url of the node with specified name known by this ProActiveRuntime on this VM
-    //   * @return the url of the node with specified name known by this ProActiveRuntime on this VM
-    //   * or null if such a node cannot be found.
-    //   * @param nodeName the name of the node.
-    //   * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-    //   */
-    //  public String getLocalNode(String nodeName) throws ProActiveException;
-    //  
-    //
-    //  /**
-    //   * Returns the url of the node with specified name or null if such a node cannot be found.
-    //   * @return the url of the node identified by the given name known by this ProActiveRuntime on this VM
-    //   * or null if such a node cannot be found.
-    //   * @param nodeName the name of the node
-    //   * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
-    //   */
-    //  public String getNode(String nodeName) throws ProActiveException;
-    //  /**
-    //   * Returns the default Node name associated with this ProActiveRuntime on this VM or null
-    //   * if this node does not yet exist.
-    //   * @return the default Node associated with this ProActiveRuntime on this VM.
-    //   */
-    //  public String getDefaultNodeName() throws ProActiveException;
 
     /**
      * Returns the JVM information as one object. This method allows to

@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.runtime;
 
 import org.apache.log4j.Logger;
@@ -71,8 +71,7 @@ public abstract class RuntimeFactory {
 
     // test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
-		
-		
+
     /** the table where associations Protocol - Factory are kept */
     private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
     private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();
@@ -83,7 +82,7 @@ public abstract class RuntimeFactory {
     public static boolean IBIS_ENABLED;
 
     static {
-		ProActiveConfiguration.load();
+        ProActiveConfiguration.load();
         createClassServer();
         JINI_ENABLED = isJiniEnabled();
         IBIS_ENABLED = isIbisEnabled();
@@ -142,7 +141,8 @@ public abstract class RuntimeFactory {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-			defaultRuntime = getProtocolSpecificRuntime(System.getProperty("proactive.rmi") +":");
+            defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
+                        "proactive.protocol") + ":");
             if (logger.isDebugEnabled()) {
                 logger.debug("default runtime = " + defaultRuntime.getURL());
             }
@@ -194,6 +194,7 @@ public abstract class RuntimeFactory {
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         RuntimeFactory factory = getFactory(protocol);
+
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
         if (logger.isDebugEnabled()) {
             logger.debug("factory = " + factory);
@@ -206,12 +207,12 @@ public abstract class RuntimeFactory {
     //
 
     /**
-           * Returns the reference of the only one instance of the ProActiveRuntime
-           * associated with the local JVM.
-           * If this runtime does not yet exist, it creates it with the associated protocol.
-           * @return ProActiveRuntime
-           * @throws ProActiveException if this ProActiveRuntime cannot be created
-           */
+     * Returns the reference of the only one instance of the ProActiveRuntime
+     * associated with the local JVM.
+     * If this runtime does not yet exist, it creates it with the associated protocol.
+     * @return ProActiveRuntime
+     * @throws ProActiveException if this ProActiveRuntime cannot be created
+     */
     protected abstract ProActiveRuntime getProtocolSpecificRuntimeImpl()
         throws ProActiveException;
 
@@ -253,7 +254,7 @@ public abstract class RuntimeFactory {
             // test if Jini is available
             Class.forName("net.jini.discovery.DiscoveryManagement");
             if (logger.isInfoEnabled()) {
-                logger.info("Jini enabled");     
+                logger.info("Jini enabled");
             }
             return true;
         } catch (ClassNotFoundException e) {
@@ -296,9 +297,9 @@ public abstract class RuntimeFactory {
     private static RuntimeFactory createRuntimeFactory(
         String factoryClassName, String protocol) throws ProActiveException {
         Class factoryClass = null;
-      if (logger.isDebugEnabled()) {
-      	logger.debug("factoryClassName " + factoryClassName);
-      }
+        if (logger.isDebugEnabled()) {
+            logger.debug("factoryClassName " + factoryClassName);
+        }
         try {
             factoryClass = Class.forName(factoryClassName);
         } catch (ClassNotFoundException e) {
@@ -315,7 +316,7 @@ public abstract class RuntimeFactory {
         if (logger.isDebugEnabled()) {
             logger.debug("protocol = " + protocol);
         }
-  
+
         RuntimeFactory factory = (RuntimeFactory) instanceFactoryMapping.get(protocol);
         if (factory != null) {
             return factory;
