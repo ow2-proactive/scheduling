@@ -312,13 +312,13 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             public void startContextElement(String name, Attributes attributes)
                 throws org.xml.sax.SAXException {
                 String acquisitionMethod = attributes.getValue("method");
-                String portNumber = attributes.getValue("port");
+                //String portNumber = attributes.getValue("port");
                 if (acquisitionMethod != null) {
                     currentVM.setAcquisitionMethod(acquisitionMethod);
                 }
-                if (portNumber != null) {
-                    currentVM.setPortNumber(portNumber);
-                }
+//                if (portNumber != null) {
+//                    currentVM.setPortNumber(portNumber);
+//                }
             }
         }
 
