@@ -47,15 +47,6 @@ import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
 
-/**
- * This class receives deployment events
- *
- * @author  ProActive Team
- * @version 1.0,  2003/04/20
- * @since   ProActive 1.0.2
- */
-import org.apache.log4j.Logger;
-
 public class ProcessDefinitionHandler
 
 
@@ -439,7 +430,7 @@ public class ProcessDefinitionHandler
 				if (checkNonEmpty(interactive))
 				((LSFBSubProcess) targetProcess).setInteractive(interactive);
 				String queueName = (attributes.getValue("queue"));
-				if (checkNonEmpty(interactive)){
+				if (checkNonEmpty(queueName)){
 					((LSFBSubProcess) targetProcess).setQueueName(queueName);
 				}
 			}
