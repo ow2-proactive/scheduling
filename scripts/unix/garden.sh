@@ -11,7 +11,5 @@ sleep 4
 
 $JAVACMD org.objectweb.proactive.examples.garden.Flower
 
-killall java
-
 echo
 echo ------------------------------------------------------------
