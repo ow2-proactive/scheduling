@@ -87,9 +87,17 @@ public void terminate() {
 <p>Code is <a href="code/InitializedHelloClient.java.html">here</a>.</p>
 <p>The only differences from the HelloClient of the previous example is the class instantiated, which is now InitializedHello (and not Hello), and you will add a call to hello.terminate(). The source code is <a href="code/InitializedHelloClient.java">here</a>.
 </p>
-
+<p>So, create InitializedHelloClient.java and InitializedHello.java in src/org/objectweb/proactive/examples/hello </p>
+<p>Add "./classes" directory to CLASSPATH to use these two new source files</p>
+<pre>windows>set CLASSPATH=.;.\classes;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\fractal.jar;.\lib\bouncycastle.jar</pre>
+<pre>linux>export CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/fractal.jar:./lib/bouncycastle.jar</pre>
+<p>Now compile all proactive sources</p>
+<pre>cd compile
+windows>build.bat examples
+linux>build examples
+cd ..</pre>
 <h2>Execution</h2>
-<p>Execution is similar to the previous example; just use the InitializedHelloClient client class.<br>
+<p>Execution is similar to the previous example; just use the InitializedHelloClient client class and InitializedHello server class.<br>
 
 </body>
 </html>
