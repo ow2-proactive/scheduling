@@ -68,6 +68,9 @@ public class BindingsHandler extends AbstractUnmarshallerDecorator {
 			setServer(server);
 			// perform binding (binding is automatically stored within the component)
 			try {
+				if(!componentsCache.containsComponentNamed(serverComponent)) {
+					throw new SAXException("tried to perform a binding from " + serverComponent +'.' + serverInterface + " , but " + serverComponent + " does not exist");
+				}
 				(
 					(BindingController) componentsCache.getComponent(clientComponent).getFcInterface(
 						Constants.BINDING_CONTROLLER)).bindFc(
