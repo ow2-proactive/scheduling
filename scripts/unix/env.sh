@@ -84,7 +84,10 @@ if [ -f $PROACTIVE/lib/log4j-core.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
 fi
-
+if [ -f $PROACTIVE/lib/xerces.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xerces.jar
+fi
 CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 
 echo "CLASSPATH"=$CLASSPATH

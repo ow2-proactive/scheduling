@@ -31,7 +31,7 @@ IF EXIST %PROACTIVE%\lib\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\c
 IF EXIST %PROACTIVE%\lib\iaik_jce_full.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_jce_full.jar
 IF EXIST %PROACTIVE%\lib\iaik_ssl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_ssl.jar
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar
-
+IF EXIST %PROACTIVE%\lib\xerces.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xerces.jar
 echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy 
