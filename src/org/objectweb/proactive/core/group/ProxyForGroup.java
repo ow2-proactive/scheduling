@@ -35,6 +35,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -67,8 +68,8 @@ public class ProxyForGroup extends AbstractProxy
 	/** The list of member : it contains exclusively, StubObjects connected to Proxies, or Java Objects */
 	protected Vector memberList;
 
-	/** The hashmap : to associate a name to the members */
-	protected HashMap hashList;
+	/** The map : to name members of the group*/
+	protected Map elementNames;
 
     /** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */
 
@@ -97,6 +98,7 @@ public class ProxyForGroup extends AbstractProxy
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
+        this.elementNames = new HashMap();
     }
 
     public ProxyForGroup(String nameOfClass, Integer size)
@@ -105,12 +107,14 @@ public class ProxyForGroup extends AbstractProxy
         this.memberList = new Vector(size.intValue());
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
+		this.elementNames = new HashMap();
     }
 
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
+		this.elementNames = new HashMap();
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p)
@@ -118,6 +122,7 @@ public class ProxyForGroup extends AbstractProxy
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
+		this.elementNames = new HashMap();
     }
 
     /* ----------------------------- GENERAL ---------------------------------- */
@@ -586,10 +591,20 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Removes the element at the specified position.
-     * @param index - the rank of the object to remove in the Group.
+     * @param index the rank of the object to remove in the Group.
+     * @return the object that has been removed
      */
-    public void remove(int index) {
-        this.memberList.remove(index);
+    public Object remove(int index) {
+    	// decrease indexes in the map element names <-> indexes
+    	Iterator it = elementNames.keySet().iterator();
+    	while (it.hasNext()) {
+    		String key = (String)it.next();
+    		Integer value = (Integer)elementNames.get(key);
+    		if (value.intValue() > index) {
+    			elementNames.put(key, new Integer(value.intValue() - 1));
+    		}
+    	}
+        return this.memberList.remove(index);
     }
 
     /**
@@ -964,6 +979,9 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Builds the members using the threads (of the threadpool).
      * @param className - the name of the Class of the members.
+     * @param params - an array that contains the parameters for the constructor of member.
+     * @param nodeList - the nodes where the member will be created.
+     * @param className - the name of the Class of the members.
      * @param params - an array that contains the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
@@ -1004,7 +1022,7 @@ public class ProxyForGroup extends AbstractProxy
      * @param index - the position
      * @param o - the object to add
      */
-    protected void set(int index, Object o) {
+    public void set(int index, Object o) {
         this.memberList.set(index, o);
     }
 
@@ -1035,7 +1053,7 @@ public class ProxyForGroup extends AbstractProxy
 	 * @throws NullPointerException - if the key is null and this Group does not not permit null keys (optional).
 	 */
 	public boolean containsKey(String key) {
-		return this.hashList.containsKey(key);
+		return this.elementNames.containsKey(key);
 	}
 
 	/**
@@ -1067,8 +1085,8 @@ public class ProxyForGroup extends AbstractProxy
  	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
  	 * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
 	 */
-	public Object get(String key) {
-		return this.hashList.get(key);
+	public synchronized Object getNamedElement(String key) {
+		return this.elementNames.get(key);
 	}
 
 	/**
@@ -1076,6 +1094,7 @@ public class ProxyForGroup extends AbstractProxy
 	 * If the Group previously contained a mapping for this key, the old value is replaced by
 	 * the specified value. (A map <code>m</code> is said to contain a mapping for a key
 	 * <code>k</code> if and only if <code>m.containsKey(k)</code> would return <code>true</code>.))
+	 * In that case, the old value is also removed from the group.
 	 * @param key - key with which the specified value is to be associated.
 	 * @param value - value to be associated with the specified key.
 	 * @throws UnsupportedOperationException - if the put operation is not supported by this Group.
@@ -1083,9 +1102,12 @@ public class ProxyForGroup extends AbstractProxy
 	 * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
 	 * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
 	 */
-	public synchronized void put(String key, Object value) {
+	public synchronized void addNamedElement(String key, Object value) {
+		if (elementNames.containsKey(key)) {
+			removeNamedElement(key);
+		}
+		this.elementNames.put(key,new Integer(this.size()-1));
 		this.add(value);
-		this.hashList.put(key,new Integer(this.size()-1));
 	}
 
 
@@ -1100,7 +1122,21 @@ public class ProxyForGroup extends AbstractProxy
 	 * @return a set view of the keys contained in this Group.
 	 */
 	public Set keySet() {
-		return this.hashList.keySet();
+		return this.elementNames.keySet();
+	}
+	
+	
+	/**
+	 * Removes the named element of the group. It also returns this element.
+	 * @param key the name of the element
+	 * @return the removed element
+	 */
+	public synchronized Object removeNamedElement(String key) {
+		int index = ((Integer)elementNames.get(key)).intValue();
+		Object removed = get(index);
+		remove(index);
+		elementNames.remove(key);
+		return removed;
 	}
 
 
