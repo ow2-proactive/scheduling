@@ -212,10 +212,22 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     //  //
     
       protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
-        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-            return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
-        }
-      } // end inner class RequestFactoryImpl
+				public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+			//########### example de code pour les nouvelles factories
+//			if(System.getProperty("migration.stategy").equals("locationserver")){
+//				  return new RequestWithLocationServer(methodCall, sourceBody,
+//                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
+//			}else{
+			return new org.objectweb.proactive.core.body.request.RequestImpl(
+				methodCall,
+				sourceBody,
+				isOneWay,
+				sequenceID);
+			//}
+		}
+	} // end inner class RequestFactoryImpl
+
+
     
       
       protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
@@ -241,9 +253,15 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     
       protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
         public MigrationManager newMigrationManager() {
-            return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
-        }
-      } // end inner class MigrationManagerFactoryImpl
+			//########### example de code pour les nouvelles factories
+//			if(System.getProperty("migration.stategy").equals("locationserver")){
+//				return new MigrationManagerWithLocationServer(LocationServerFactory.getLocationServer());
+//			}else{
+			return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
+			//}
+		}
+	} // end inner class MigrationManagerFactoryImpl
+
     
     
       protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
