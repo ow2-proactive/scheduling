@@ -61,7 +61,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DERInputStream;

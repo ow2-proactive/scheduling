@@ -30,36 +30,11 @@
  */
 package org.objectweb.proactive.ext.security;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.examples.garden.Flower;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
-import org.objectweb.proactive.ext.security.crypto.Session;
-import org.objectweb.proactive.ext.security.exceptions.*;
-
-import org.xml.sax.SAXException;
-
-import sun.rmi.server.MarshalOutputStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -77,7 +52,6 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -88,6 +62,27 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.examples.garden.Flower;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
+import org.objectweb.proactive.ext.security.crypto.Session;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+import org.xml.sax.SAXException;
+
+import sun.rmi.server.MarshalOutputStream;
 
 
 /**

@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
