@@ -6,6 +6,7 @@ package modelisation.server;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
@@ -34,7 +35,7 @@ public class SelectiveRequest extends RequestImpl implements java.io.Serializabl
   public Reply serve(Body targetBody) throws ServeException {
     Reply reply = null;
     microTimer.start();
-    Object result = serveInternal(targetBody);
+    FutureResult result = serveInternal(targetBody);
     if (! isOneWay && sender != null) {
       reply = createReply(targetBody, result);
       if ("searchObject".equals(methodName)) {

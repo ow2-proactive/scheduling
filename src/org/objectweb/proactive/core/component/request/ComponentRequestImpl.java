@@ -44,6 +44,7 @@ import org.objectweb.fractal.api.control.SuperController;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
@@ -85,12 +86,14 @@ public class ComponentRequestImpl extends RequestImpl
     /**
      * redirects the call to the adequate component metaobject
      */
-    protected Object serveInternal(Body targetBody) throws ServeException {
+    protected FutureResult serveInternal(Body targetBody) throws ServeException {
+    	Object result = null;
+    	Throwable exception = null;
+
         //		if (logger.isDebugEnabled()) {
         //			//logger.debug("ComponentRequestImpl.serveInternal : redirecting the call to the component metaobject");
         //		}
         try {
-            Object result = null;
             Class target_class = methodCall.getReifiedMethod()
                                            .getDeclaringClass();
             if (target_class.equals(BindingController.class)) {
@@ -167,7 +170,6 @@ public class ComponentRequestImpl extends RequestImpl
                         "trying to execute a component method on an object that is not a component");
                 }
             }
-            return result;
         } catch (NoSuchInterfaceException nsie) {
             nsie.printStackTrace();
             throw new ServeException("cannot serve request : problem accessing a component controller",
@@ -177,16 +179,16 @@ public class ComponentRequestImpl extends RequestImpl
             throw new ServeException("serve method " +
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable t = e.getTargetException();
+            exception = e.getTargetException();
 
             // t.printStackTrace();
             if (isOneWay) {
                 throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed", t);
-            } else {
-                return t;
+                    methodCall.getReifiedMethod().toString() + " failed", exception);
             }
         }
+        
+        return new FutureResult(result, exception, null);
     }
 
     /**

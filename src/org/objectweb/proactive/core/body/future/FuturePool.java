@@ -186,7 +186,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param result value to update with the futures
      */
     public synchronized int receiveFutureValue(long id, UniqueID creatorID,
-        Object result, Reply reply) throws java.io.IOException {
+        FutureResult result, Reply reply) throws java.io.IOException {
         // get all aiwated futures
         java.util.ArrayList futuresToUpdate = futures.getFuturesToUpdate(id,
                 creatorID);
@@ -211,7 +211,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             setMigrationTag();
             for (int i = 1; i < futuresToUpdate.size(); i++) {
                 Future otherFuture = (Future) (futuresToUpdate.get(i));
-                otherFuture.receiveReply(Utils.makeDeepCopy(result));
+                otherFuture.receiveReply((FutureResult) Utils.makeDeepCopy(result));
             }
             unsetMigrationTag();
             stateChange();
@@ -258,7 +258,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
                 this.receiveFutureValue(id, creatorID,
-                    valuesForFutures.remove("" + id + creatorID),null);
+                	(FutureResult) valuesForFutures.remove("" + id + creatorID), null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }

@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.body.ft.logging.MessageLog;
 import org.objectweb.proactive.core.body.ft.logging.ReplyLog;
 import org.objectweb.proactive.core.body.ft.logging.RequestLog;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.body.request.AwaitedRequest;
@@ -342,12 +343,12 @@ public class FTManagerCIC
                 try {
                     toLog = new ReplyImpl(reply.getSourceBodyID(),
                             reply.getSequenceNumber(), reply.getMethodName(),
-                            Utils.makeDeepCopy(reply.getResult()),
+                            (FutureResult) Utils.makeDeepCopy(reply.getResult()),
                             owner.getProActiveSecurityManager());
                 } catch (SecurityNotAvailableException e1) {
                     toLog = new ReplyImpl(reply.getSourceBodyID(),
                             reply.getSequenceNumber(), reply.getMethodName(),
-                            Utils.makeDeepCopy(reply.getResult()), null);
+                            (FutureResult) Utils.makeDeepCopy(reply.getResult()), null);
                 }
                 MessageLog log = new ReplyLog(toLog, destination);
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {

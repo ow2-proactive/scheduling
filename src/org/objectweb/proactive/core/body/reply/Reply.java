@@ -31,13 +31,14 @@
 package org.objectweb.proactive.core.body.reply;
 
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public interface Reply extends Message {
-    public Object getResult();
+    public FutureResult getResult();
 
     /**
      * Sends this reply to the body destination

@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
@@ -105,13 +106,9 @@ public class RequestImpl extends MessageImpl implements Request,
         if (logger.isDebugEnabled()) {
             logger.debug("Serving " + this.getMethodName());
         }
-        Object result = serveInternal(targetBody);
+        FutureResult result = serveInternal(targetBody);
         if (logger.isDebugEnabled()) {
-            if (result != null) {
-                logger.debug("result  " + result.getClass().getName());
-            } else {
-                logger.debug("result null");
-            }
+        	logger.debug("result: " + result);
         }
         if (isOneWay){ // || (sender == null)) {
             return null;
@@ -133,7 +130,7 @@ public class RequestImpl extends MessageImpl implements Request,
 		if (isOneWay){// || (sender == null)) {
 			return null;
 		}
-		return createReply(targetBody, nfe);
+		return createReply(targetBody, new FutureResult(null, null, nfe));
 	}
 
     public boolean hasBeenForwarded() {
@@ -170,29 +167,31 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected Object serveInternal(Body targetBody) throws ServeException {
-    	
+    protected FutureResult serveInternal(Body targetBody) throws ServeException {
+    	Object result = null;
+    	Throwable exception = null;
         try {
         	//loggerNFE.warn("CALL to " + targetBody);
-            return methodCall.execute(targetBody.getReifiedObject());
+            result = methodCall.execute(targetBody.getReifiedObject());
         } catch (MethodCallExecutionFailedException e) {
             // e.printStackTrace();
             throw new ServeException("serve method " +
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            Throwable t = e.getTargetException();
+            exception = e.getTargetException();
 
             // t.printStackTrace();
-            if (isOneWay) { 
+            if (isOneWay) {
+                exception.printStackTrace();
                 throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed", t);
-            } else {
-                return t;
+                    methodCall.getReifiedMethod().toString() + " failed", exception);
             }
         }
+        
+        return new FutureResult(result, exception, null);
     }
 
-    protected Reply createReply(Body targetBody, Object result) {
+    protected Reply createReply(Body targetBody, FutureResult result) {
         ProActiveSecurityManager psm = null;
         try {
             psm = ProActive.getBodyOnThis().getProActiveSecurityManager();

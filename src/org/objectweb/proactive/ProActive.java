@@ -752,6 +752,27 @@ public class ProActive {
 		return body.getNodeURL();
 	}
 	
+	/**
+	 * Find out if the object contains an exception that should be thrown
+	 * @param future the future object that is examinated
+	 * @return true iff an exception should be thrown when accessing the object
+	 */
+	public static boolean isException(Object future) {
+	    // If the object is not reified, it cannot be a future
+        if ((MOP.isReifiedObject(future)) == false) {
+            return false;
+        } else {
+            org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+
+            // If it is reified but its proxy is not of type future it's not an exception
+            if (!(theProxy instanceof Future)) {
+                return false;
+            } else {
+                return ((Future) theProxy).getRaisedException() != null;
+            }
+        }
+	}
+	
     /**
      * Blocks the calling thread until the object <code>future</code>
      * is available. <code>future</code> must be the result object of an
@@ -1126,7 +1147,7 @@ public class ProActive {
                 while (it.hasNext()) {
                     Object current = it.next();
 
-                    if (!(isAwaited(current))) {
+                    if (!isAwaited(current)) {
                         return index;
                     }
 

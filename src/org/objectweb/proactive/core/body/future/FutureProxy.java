@@ -89,7 +89,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     /**
      *        The object the proxy sends calls to
      */
-    protected Object target;
+    protected FutureResult target;
 
     /**
      * To mark the Proxy before migration
@@ -120,21 +120,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     protected UniqueID senderID;
 
     /**
-     * This flag indicates the status of the future object
-     */
-    protected boolean isAvailable;
-
-    /**
-     * Indicates if the returned object is an exception
-     */
-    protected boolean isException;
-
-    /**
-    * Indicates if the returned object is a Non Functional Exception (thus the communication failed)
-    */
-    protected boolean isNFE;
-
-    /**
      * This table is needed for the NFE mechanism
      */
     protected HashMap futureLevel = null;
@@ -144,6 +129,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     protected static Logger logger = Logger.getLogger("NFE");
 
+    /**
+     * Max timeout when waiting for a future
+     * Can be set with the property proactive.future.maxdelay
+     */
+    protected static long futureMaxDelay = -1;
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -176,17 +167,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * <code>false</code> if <code>obj</code> is not a future object.
      */
     public static boolean isAwaited(Object obj) {
-        // If the object is not reified, it cannot be a future
-        if ((MOP.isReifiedObject(obj)) == false) {
-            return false;
-        }
-        Proxy theProxy = ((StubObject) obj).getProxy();
-
-        // If it is reified but its proxy is not of type future, we cannot wait
-        if (!(theProxy instanceof Future)) {
-            return false;
-        }
-        return ((Future) theProxy).isAwaited();
+    	return ProActive.isAwaited(obj);
     }
 
     public synchronized static FutureProxy getFutureProxy() {
@@ -238,23 +219,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * into an object of class InvocationTargetException and returned, just like
      * for any returned object
      */
-    public synchronized void receiveReply(Object obj)
+    public synchronized void receiveReply(FutureResult obj)
         throws java.io.IOException {
-        if (target != null) {
+        if (isAvailable()) {
             throw new java.io.IOException(
                 "FutureProxy receives a reply and this target field is not null");
         }
-        target = obj;
-        if (target != null) {
-            isException = (target instanceof Throwable);
-            isNFE = (target instanceof NonFunctionalException);
-        }
-        isAvailable = true;
-
-        if (this.isNFE) {
-            Handler handler = ProActive.searchExceptionHandler((NonFunctionalException) this.target,
-                    this);
-            handler.handle((NonFunctionalException) this.target, ProActive.getBodyOnThis().getNodeURL());
+        target = obj; 
+        NonFunctionalException nfe = target.getNFE();
+        if (nfe != null) {
+            Handler handler = ProActive.searchExceptionHandler(nfe, this);
+            handler.handle(nfe, ProActive.getBodyOnThis().getNodeURL());
             //throw ((InvocationTargetException) this.target);
         }
 
@@ -268,24 +243,27 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public synchronized Throwable getRaisedException() {
         waitFor();
-        if (isException) {
-            return (Throwable) target;
-        }
-        return null;
+        return target.getExceptionToRaise();
     }
 
+    /**
+     * @return true iff the future has arrived.
+     */
+    public boolean isAvailable() {
+    	return target != null;
+    }
+    
     /**
      * Returns the result this future is for. The method blocks until the future is available
      * @return the result of this future object once available.
      */
     public synchronized Object getResult() {
         waitFor();
-        return target;
+        return target.getResult();
     }
 
     public synchronized void setResult(Object o) {
-        target = o;
-        isAvailable = true;
+        target = new FutureResult(o, null, null);
     }
 
     /**
@@ -293,14 +271,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * @return <code>true</code> if the future object is NOT yet available, <code>false</code> if it is.
      */
     public synchronized boolean isAwaited() {
-        return !isAvailable;
+        return !isAvailable();
     }
 
     /**
      * Blocks the calling thread until the future object is available.
      */
 /*    public synchronized void waitFor() {
-        if (isAvailable) {
+        if (isAvailable()) {
             return;
         }
 
@@ -317,7 +295,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 id = null;
             }
         }
-        while (!isAvailable) {
+        while (!isAvailable()) {
             try {
                 this.wait();
             } catch (InterruptedException e) {
@@ -334,13 +312,24 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     
     /**
      * Blocks the calling thread until the future object is available.
-     */
+     */ 
     public synchronized void waitFor() {
+        if (futureMaxDelay == -1) {
+            /* First time, hopefully the configuration file has been read */
+            try {
+                futureMaxDelay = Long.parseLong(System.getProperty("proactive.future.maxdelay"));
+            } catch (IllegalArgumentException iea) {
+                /* The property is not set, that's not a problem */
+                futureMaxDelay = 0;
+            }
+        }
+
         try {
-            waitFor(0);
+            waitFor(futureMaxDelay);
         } catch (ProActiveException e) {
-            // Exception above should never be thrown since wait(0) means no timeout
             e.printStackTrace();
+            target = new FutureResult(null, e, null);
+            notifyAll();
         }
     }
 
@@ -350,7 +339,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * @throws ProActiveException if the timeout expires
      */
     public synchronized void waitFor(long timeout) throws ProActiveException {
-        if (isAvailable) {
+        if (isAvailable()) {
             return;
         }
 
@@ -368,7 +357,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
         int timeoutCounter = 1;
-        while (!isAvailable) {
+        while (!isAvailable()) {
             timeoutCounter--;
             // counter < 0 means that it is the second time we enter in the loop
             // while still not available, i.e timeout has expired
@@ -454,20 +443,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }*/
 
         // Now that the object is available, execute the call
-        if (this.isException) {
-            throw ((InvocationTargetException) this.target);
-        } else {
-            try {
-                result = c.execute(this.target);
-            } catch (MethodCallExecutionFailedException e) {
-                throw new ProActiveRuntimeException(
+        Object resultObject = target.getResult();
+        try {
+        	result = c.execute(resultObject);
+        } catch (MethodCallExecutionFailedException e) {
+            throw new ProActiveRuntimeException(
                     "FutureProxy: Illegal arguments in call " + c.getName());
-            }
         }
 
         // If target of this future is another future, make a shortcut !
-        if (target instanceof StubObject) {
-            Proxy p = ((StubObject) target).getProxy();
+       if (resultObject instanceof StubObject) {
+            Proxy p = ((StubObject) resultObject).getProxy();
             if (p instanceof FutureProxy) {
                 target = ((FutureProxy) p).target;
             }
@@ -599,24 +585,16 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         //Pass the creatorID
         out.writeObject(creatorID);
 
-        // It is impossible that a future object can be passed
-        // as a parameter if it has raised a checked exception
-        // For the other exceptions...
-        out.writeBoolean(isException);
-        out.writeBoolean(isAvailable);
-
         //unset the current continuation tag
         this.continuation = false;
     }
 
     private synchronized void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-        target = (Object) in.readObject();
+        target = (FutureResult) in.readObject();
         continuation = (boolean) in.readBoolean();
         ID = (long) in.readLong();
         creatorID = (UniqueID) in.readObject();
-        isException = (boolean) in.readBoolean();
-        isAvailable = (boolean) in.readBoolean();
 
         if (continuation && isAwaited()) {
             continuation = false;
@@ -680,8 +658,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             // the object is picked out of the pool, because it allows
             // garbage-collecting the objects referenced in here
             futureProxy.target = null;
-            futureProxy.isAvailable = false;
-            futureProxy.isException = false;
 
             // Inserts the object in the pool
             recyclePool[index] = futureProxy;

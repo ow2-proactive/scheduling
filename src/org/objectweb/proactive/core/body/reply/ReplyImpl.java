@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.reply;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -53,7 +54,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
     /**
      * The hypothetic result
      */
-    protected Object result;
+    protected FutureResult result;
 
     //security  features
 
@@ -69,13 +70,13 @@ public class ReplyImpl extends MessageImpl implements Reply,
     protected transient ProActiveSecurityManager psm = null;
 
     public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-        Object result, ProActiveSecurityManager psm) {
+        FutureResult result, ProActiveSecurityManager psm) {
         super(senderID, sequenceNumber, true, methodName);
         this.result = result;
         this.psm = psm;
     }
 
-    public Object getResult() {
+    public FutureResult getResult() {
         return result;
     }
 
@@ -87,7 +88,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
             (LocalBodyStore.getInstance().getLocalHalfBody(destinationID) != null));
 
         if (isLocal) {
-            result = Utils.makeDeepCopy(result);
+            result = (FutureResult) Utils.makeDeepCopy(result);
         }
 
         // security issue	
@@ -144,7 +145,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
             try {
                 ByteArrayInputStream bin = new ByteArrayInputStream(decryptedMethodCall);
                 ObjectInputStream in = new ObjectInputStream(bin);
-                result = (Object) in.readObject();
+                result = (FutureResult) in.readObject();
                 in.close();
                 return true;
             } catch (Exception e) {
