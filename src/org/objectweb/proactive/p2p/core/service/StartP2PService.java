@@ -64,9 +64,17 @@ public class StartP2PService {
     protected Vector serverList;
     protected P2PServiceImpl p2pService;
 
+    public StartP2PService(String fileUrl) {
+        this(new Vector());
+        parser(fileUrl);
+    }
+
     public StartP2PService(String acquisitionMethod, String portNumber,
         Vector serverList) {
         this.acquisitionMethod = acquisitionMethod;
+        if (!this.acquisitionMethod.endsWith(":")) {
+            this.acquisitionMethod += ":";
+        }
         this.portNumber = portNumber;
         this.serverList = serverList;
     }
@@ -201,10 +209,10 @@ public class StartP2PService {
                     paRuntime.getJobID());
 
             // P2PService Active Object Creation
-            Object[] params = new Object[3];
+            Object[] params = new Object[2];
             params[0] = this.acquisitionMethod;
             params[1] = this.portNumber;
-            params[2] = paRuntime;
+            //            params[2] = paRuntime;
             this.p2pService = (P2PServiceImpl) ProActive.newActive(P2PServiceImpl.class.getName(),
                     params, url);
 
