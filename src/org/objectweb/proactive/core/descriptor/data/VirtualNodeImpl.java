@@ -30,13 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.Serializable;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
@@ -63,6 +58,14 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -147,12 +150,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
-
     private Vector p2pNodes = new Vector();
 
     /** Logger */
     private final static Logger P2P_LOGGER = Logger.getLogger(Loggers.P2P_VN);
-
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -304,16 +305,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (registration) {
                 register();
             }
-            
+
             // FAULT TOLERANCE
-            try{
-                if (this.ftService!=null){
+            try {
+                if (this.ftService != null) {
                     // register nodes only if ressource is not null
-                    this.ftService.registerRessources(this.getNodes());}
+                    this.ftService.registerRessources(this.getNodes());
+                }
             } catch (NodeException e) {
                 logger.error(e.getMessage());
             }
-            
         } else {
             logger.info("VirtualNode " + this.name + " already activated !!!");
         }
@@ -469,7 +470,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 //we have to be carefull. Indeed if the node is local, we do not
                 // want to kill the runtime, otherwise the application is over
                 // so if the node is local, we just unregister this node from any registry
-                if (!NodeFactory.isNodeLocal(node) ) {
+                if (!NodeFactory.isNodeLocal(node)) {
                     try {
                         part.killRT(softly);
                     } catch (ProActiveException e1) {
@@ -481,14 +482,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                 part.getVMInformation().getInetAddress()) +
                             " terminated!!!");
                     }
-                } else  {
+                } else {
                     try {
                         //					the node is local, unregister it.
                         part.killNode(node.getNodeInformation().getURL());
                     } catch (ProActiveException e) {
                         e.printStackTrace();
                     }
-                } 
+                }
             }
             isActivated = false;
             try {
@@ -710,10 +711,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
      */
     public void setService(UniversalService service) throws ProActiveException {
-        if (FaultToleranceService.FT_SERVICE_NAME.equals(service.getServiceName())){
-            this.ftService = (FaultToleranceService)service;
+        if (FaultToleranceService.FT_SERVICE_NAME.equals(
+                    service.getServiceName())) {
+            this.ftService = (FaultToleranceService) service;
         } else {
-            throw new ProActiveException(" Unable to bind the given service to a virtual node");
+            throw new ProActiveException(
+                " Unable to bind the given service to a virtual node");
         }
     }
 
@@ -752,8 +755,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     //  SECURITY
-
-   
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
@@ -927,7 +928,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return copyProcess;
         } else {
             //increment the node count by askedNodes
-            increaseNumberOfNodes(new Integer(vm.getNodeNumber()).intValue());
+            increaseNumberOfNodes(process.getNodeNumber() * new Integer(
+                    vm.getNodeNumber()).intValue());
             return process;
         }
     }
@@ -940,91 +942,89 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //ExternalProcess processImpl = process;
         //ExternalProcessDecorator processImplDecorator;
         JVMProcess jvmProcess;
+
         //LSFBSubProcess bsub = null;
         //PrunSubProcess prun = null;
         //GlobusProcess globus = null;
         //PBSSubProcess pbs = null;
         //OARSubProcess oar = null;
         //GridEngineSubProcess sge = null;
-        
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
             logger.debug("askedNodes " + nodeNumber);
         }
         protocolId = process.getProcessId();
-        
-        increaseNumberOfNodes(process.getNodeNumber()* nodeNumber);
-        
-        
 
-//        while (ExternalProcessDecorator.class.isInstance(processImpl)) {
-//            String processClassname = processImpl.getClass().getName();
-//            protocolId = protocolId +
-//                findProtocolId(processClassname).toLowerCase();
-//            if (processImpl instanceof LSFBSubProcess) {
-//                //if the process is bsub we have to increase the node count by the number of processors
-//                bsub = (LSFBSubProcess) processImpl;
-//                increaseNumberOfNodes((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
-//            }
-//            if (processImpl instanceof PrunSubProcess) {
-//                //if the process is prun we have to increase the node count by the number of processors            
-//                prun = (PrunSubProcess) processImpl;
-//                if (logger.isDebugEnabled()) {
-//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-//                        prun.getHostsNumber());
-//                    logger.debug("VirtualNodeImpl getnodeNumber() " +
-//                        prun.getProcessorPerNodeNumber());
-//                    logger.debug("VM " + vm);
-//                }
-//
-//                increaseNumberOfNodes((new Integer(
-//                        prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
-//                        prun.getHostsNumber()).intValue()) * nodeNumber);
-//            }
-//            if (processImpl instanceof PBSSubProcess) {
-//                //if the process is pbs we have to increase the node count by the number of processors            
-//                pbs = (PBSSubProcess) processImpl;
-//                if (logger.isDebugEnabled()) {
-//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-//                        pbs.getHostsNumber());
-//                    logger.debug("VirtualNodeImpl getnodeNumber() " +
-//                        pbs.getProcessorPerNodeNumber());
-//                    logger.debug("VM " + vm);
-//                }
-//
-//                increaseNumberOfNodes((new Integer(
-//                        pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
-//                        pbs.getHostsNumber()).intValue()) * nodeNumber);
-//            }
-//            if (processImpl instanceof OARSubProcess) {
-//                //if the process is oar we have to increase the node count by the number of processors            
-//                oar = (OARSubProcess) processImpl;
-//                if (logger.isDebugEnabled()) {
-//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-//                        oar.getHostsNumber());
-//                    logger.debug("VM " + vm);
-//                }
-//                increaseNumberOfNodes((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
-//            }
-//            if (processImpl instanceof GlobusProcess) {
-//                //if the process is globus we have to increase the node count by the number of processors
-//                globus = (GlobusProcess) processImpl;
-//                increaseNumberOfNodes((new Integer(globus.getCount()).intValue()) * nodeNumber);
-//            }
-//
-//            if (processImpl instanceof GridEngineSubProcess) {
-//                sge = (GridEngineSubProcess) processImpl;
-//                increaseNumberOfNodes((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
-//            }
-//
-//            processImplDecorator = (ExternalProcessDecorator) processImpl;
-//            processImpl = processImplDecorator.getTargetProcess();
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("processImplDecorator " +
-//                    processImplDecorator.getClass().getName());
-//            }
-//        }
+        increaseNumberOfNodes(process.getNodeNumber() * nodeNumber);
+
+        //        while (ExternalProcessDecorator.class.isInstance(processImpl)) {
+        //            String processClassname = processImpl.getClass().getName();
+        //            protocolId = protocolId +
+        //                findProtocolId(processClassname).toLowerCase();
+        //            if (processImpl instanceof LSFBSubProcess) {
+        //                //if the process is bsub we have to increase the node count by the number of processors
+        //                bsub = (LSFBSubProcess) processImpl;
+        //                increaseNumberOfNodes((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
+        //            }
+        //            if (processImpl instanceof PrunSubProcess) {
+        //                //if the process is prun we have to increase the node count by the number of processors            
+        //                prun = (PrunSubProcess) processImpl;
+        //                if (logger.isDebugEnabled()) {
+        //                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+        //                        prun.getHostsNumber());
+        //                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+        //                        prun.getProcessorPerNodeNumber());
+        //                    logger.debug("VM " + vm);
+        //                }
+        //
+        //                increaseNumberOfNodes((new Integer(
+        //                        prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+        //                        prun.getHostsNumber()).intValue()) * nodeNumber);
+        //            }
+        //            if (processImpl instanceof PBSSubProcess) {
+        //                //if the process is pbs we have to increase the node count by the number of processors            
+        //                pbs = (PBSSubProcess) processImpl;
+        //                if (logger.isDebugEnabled()) {
+        //                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+        //                        pbs.getHostsNumber());
+        //                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+        //                        pbs.getProcessorPerNodeNumber());
+        //                    logger.debug("VM " + vm);
+        //                }
+        //
+        //                increaseNumberOfNodes((new Integer(
+        //                        pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+        //                        pbs.getHostsNumber()).intValue()) * nodeNumber);
+        //            }
+        //            if (processImpl instanceof OARSubProcess) {
+        //                //if the process is oar we have to increase the node count by the number of processors            
+        //                oar = (OARSubProcess) processImpl;
+        //                if (logger.isDebugEnabled()) {
+        //                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+        //                        oar.getHostsNumber());
+        //                    logger.debug("VM " + vm);
+        //                }
+        //                increaseNumberOfNodes((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
+        //            }
+        //            if (processImpl instanceof GlobusProcess) {
+        //                //if the process is globus we have to increase the node count by the number of processors
+        //                globus = (GlobusProcess) processImpl;
+        //                increaseNumberOfNodes((new Integer(globus.getCount()).intValue()) * nodeNumber);
+        //            }
+        //
+        //            if (processImpl instanceof GridEngineSubProcess) {
+        //                sge = (GridEngineSubProcess) processImpl;
+        //                increaseNumberOfNodes((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
+        //            }
+        //
+        //            processImplDecorator = (ExternalProcessDecorator) processImpl;
+        //            processImpl = processImplDecorator.getTargetProcess();
+        //            if (logger.isDebugEnabled()) {
+        //                logger.debug("processImplDecorator " +
+        //                    processImplDecorator.getClass().getName());
+        //            }
+        //        }
         //protocolId = protocolId + "jvm";
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
@@ -1032,15 +1032,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-//            if ((bsub == null) && (prun == null) && (globus == null) &&
-//                    (pbs == null) && (oar == null) && (sge == null)) {
-//                //if bsub and prun and globus are null we can increase the nodeCount
-//                increaseNumberOfNodes(nodeNumber);
-//            }
-//            if( ! useScheduler){
-//                increaseNumberOfNodes(nodeNumber);
-//            }
-
+            //            if ((bsub == null) && (prun == null) && (globus == null) &&
+            //                    (pbs == null) && (oar == null) && (sge == null)) {
+            //                //if bsub and prun and globus are null we can increase the nodeCount
+            //                increaseNumberOfNodes(nodeNumber);
+            //            }
+            //            if( ! useScheduler){
+            //                increaseNumberOfNodes(nodeNumber);
+            //            }
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
 
@@ -1057,12 +1056,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 nodeNumber + " " + protocolId + " " + vm.getName());
-        
+
             // FAULT TOLERANCE settings
-            if (this.ftService!=null){
+            if (this.ftService != null) {
                 jvmProcess.setJvmOptions(this.ftService.buildParamsLine());
             }
- 
         }
     }
 
@@ -1245,8 +1243,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeUrl, e);
         }
         if (remoteAO.size() == 1) {
-           P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
-           remoteNodeManager.leaveNode(node);
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
+            remoteNodeManager.leaveNode(node);
             if (P2P_LOGGER.isInfoEnabled()) {
                 P2P_LOGGER.info("Node at " + nodeUrl + " succefuly killed");
             }
