@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.mop;
 
 import sun.rmi.server.MarshalInputStream;
@@ -256,14 +256,52 @@ public final class MethodCall implements java.io.Serializable {
     }
 
     /**
-     *        Builds a new MethodCall object. This constructor is private to this class
-     *        because we want to enforce the use of factory methods for getting fresh
-     * instances of this class (see <I>Factory</I> pattern in GoF).
+     * Builds a new MethodCall object.
+     * Please, consider use the factory method  <code>getMethodCall</code>
+     * instead of build a new MethodCall object.
      */
+
+    // This constructor is private to this class
+    // because we want to enforce the use of factory methods for getting fresh
+    // instances of this class (see <I>Factory</I> pattern in GoF).
     public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
         this.reifiedMethod = reifiedMethod;
         this.effectiveArguments = effectiveArguments;
         this.key = buildKey(reifiedMethod);
+    }
+
+    /**
+     * Builds a new MethodCall object. This constructor is a copy constructor.
+     * Fields of the object are also copied.
+     * Please, consider use the factory method  <code>getMethodCall</code>
+     * instead of build a new MethodCall object.
+     */
+    public MethodCall(MethodCall mc) {
+        try {
+            this.fcFunctionalInterfaceName = mc.getFcFunctionalInterfaceName();
+            this.reifiedMethod = mc.getReifiedMethod();
+            this.tag = mc.getTag();
+            if (mc.serializedEffectiveArguments == null) {
+                serializedEffectiveArguments = null;
+            } else {
+                // array copy
+                byte[] source = mc.serializedEffectiveArguments;
+                serializedEffectiveArguments = new byte[source.length];
+                for (int i = 0; i < serializedEffectiveArguments.length; i++) {
+                    serializedEffectiveArguments[i] = source[i];
+                }
+            }
+            if (mc.effectiveArguments == null) {
+                effectiveArguments = null;
+            } else {
+                // je crois que c'est bon ...
+                effectiveArguments = (Object[]) Utils.makeDeepCopy(mc.effectiveArguments);
+            }
+            this.key = MethodCall.buildKey(mc.getReifiedMethod());
+            // methodcallID?
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

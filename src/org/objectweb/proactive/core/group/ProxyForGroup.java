@@ -635,7 +635,7 @@ public class ProxyForGroup extends AbstractProxy
         Object result;
         try { // a new proxy is generated
             result = MOP.newInstance(this.className, null,
-                    "org.objectweb.proactive.core.group.ProxyForGroup", null);
+                    ProxyForGroup.class.getName(), null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

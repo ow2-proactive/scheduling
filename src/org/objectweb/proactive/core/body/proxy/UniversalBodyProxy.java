@@ -284,6 +284,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         }
     }
 
+	public boolean isLocal() {
+		return this.isLocal;
+	}
+
+
     //
     // -- SERIALIZATION -----------------------------------------------
     //
