@@ -60,7 +60,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
     processDefinitionPanel = new ProcessDefinitionPanel();
     processOutputPanel = new ProcessOutputPanel();
     javax.swing.JSplitPane topSplitPanel = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT, false, processListPanel, processDefinitionPanel);
-    //topSplitPanel.setDividerLocation(getWidth()/2);
+    topSplitPanel.setDividerLocation(200);
     topSplitPanel.setOneTouchExpandable(true);
     
     //Create the full split pane

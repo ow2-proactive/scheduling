@@ -47,7 +47,6 @@ import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectWatcher;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.menu.StatelessMessageMonitoringMenu;
 
 public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationEventListener {
 
@@ -70,8 +69,7 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     this.ic2dObject = ic2dObject;
     this.communicationRecorder = communicationRecorder;
     this.activeObjectWatcher = activeObjectWatcher;
-    this.setBackground(java.awt.Color.white);
-    //setBorder(javax.swing.BorderFactory.createTitledBorder("IC2D Panel"));
+    setBackground(java.awt.Color.white);
     
     //Create the worldPanel
     worldPanel = new WorldPanel(this, ic2dObject.getWorldObject(), communicationRecorder);
@@ -82,9 +80,7 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     // create panel to host WorldPanel
     javax.swing.JScrollPane scrollableWorldPanel = new javax.swing.JScrollPane(worldPanel, javax.swing.JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, javax.swing.JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     scrollableWorldPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("World Panel"));
-    //scrollableWorldPanel.setPreferredSize(parentFrame.getPreferredSize());
     scrollableWorldPanel.setBackground(java.awt.Color.white);
-    
     add(scrollableWorldPanel, java.awt.BorderLayout.CENTER);
     add(createControlPanel(), java.awt.BorderLayout.SOUTH);
   }
@@ -94,7 +90,11 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
-
+  public void updateFilteredClasses() {
+    removeAllActiveObjectsFromWatcher();
+    worldPanel.filterChangeParentNotification(null);
+  }
+  
   //
   // -- implements CommunicationEventListener -----------------------------------------------
   //
@@ -226,7 +226,7 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
         }
       });
     p.add(cb);
-    }    
+    }
 
     return p;
   }

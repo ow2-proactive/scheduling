@@ -37,8 +37,6 @@ import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 
-import org.objectweb.proactive.ic2d.gui.menu.StatelessMessageMonitoringMenu;
-
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
 
   private VMObject vmObject;
@@ -49,7 +47,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
 
   public VMPanel(AbstractDataObjectPanel parentDataObjectPanel, VMObject targetVMObject) {
     super(parentDataObjectPanel, "VM id="+targetVMObject.getID().toString(), "VMObject");
-    activeObjectFilter.filterClass(SpyListenerImpl.class.getName());
+    activeObjectFilter.addClass(SpyListenerImpl.class.getName());
     this.vmObject = targetVMObject;
     this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));
     createBorder(name);

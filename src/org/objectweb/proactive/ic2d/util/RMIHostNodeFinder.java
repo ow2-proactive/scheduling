@@ -84,7 +84,8 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     log("Trying " + hostname + ":" + port);
 
     // Hook the registry
-    return findNodes(LocateRegistry.getRegistry(hostname, port));
+    Registry registry = LocateRegistry.getRegistry(hostname, port);
+    return findNodes(registry);
   }
   
   

@@ -37,8 +37,6 @@ import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 
-import org.objectweb.proactive.ic2d.gui.menu.StatelessMessageMonitoringMenu;
-
 import java.rmi.dgc.VMID;
 
 public class HostPanel extends AbstractDataObjectPanel implements HostObjectListener {

@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.ic2d.gui.data;
 
 import org.objectweb.proactive.ic2d.IC2D;
@@ -36,7 +36,7 @@ import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.ActiveObjectListener;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 
-import org.objectweb.proactive.ic2d.gui.menu.StatefullMessageMonitoringMenu;
+import org.objectweb.proactive.ic2d.gui.menu.MessageMonitoringMenu;
 
 public class ActiveObjectPanel extends AbstractDataObjectPanel implements ActiveObjectListener {
 
@@ -48,7 +48,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   private static final java.awt.Color COLOR_WHEN_WAITING = new java.awt.Color(248, 208, 156);
   private static final java.awt.Color COLOR_WHEN_WAITING_REQUEST = java.awt.Color.white;
   private static final java.awt.Color COLOR_WHEN_MIGRATED = java.awt.Color.red;
-  
+
   private ActiveObject activeObject;
   private javax.swing.JLabel nameLabel;
 
@@ -59,7 +59,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   private java.awt.dnd.DragSourceListener dragSourceListener;
 
   private boolean isGhost;
-  
+
   //
   // -- CONTRUCTORS -----------------------------------------------
   //
@@ -69,54 +69,57 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
     activeObject = targetActiveObject;
     if (activeObject.isActive())
       setBackground(COLOR_WHEN_WAITING_REQUEST);
-    else setBackground(COLOR_WHEN_INACTIVE);
+    else
+      setBackground(COLOR_WHEN_INACTIVE);
     setOpaque(false);
     nameLabel = new javax.swing.JLabel(activeObject.getName());
     setFontSize(defaultFont);
     add(nameLabel);
-    
+
     // dnd stuff
     dragSource = java.awt.dnd.DragSource.getDefaultDragSource();
-    dragSource.createDefaultDragGestureRecognizer(this, java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE, new MyDragGestureListener());
+    dragSource.createDefaultDragGestureRecognizer(
+      this,
+      java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE,
+      new MyDragGestureListener());
     dragSourceListener = new MyDragSourceListener();
-    
+
     // Popup menu
     PanelPopupMenu popup = new PanelPopupMenu("Object " + name);
     popup.add(new javax.swing.AbstractAction("Filter class " + name, null) {
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        boolean b = activeObjectFilter.filterClass(activeObject.getClassName());
-        if (b) filterChangeParentNotification();
+        boolean b = activeObjectFilter.addClass(activeObject.getClassName());
+        if (b) {
+          filterChangeParentNotification(activeObject.getClassName());
+        }
       }
     });
     addMouseListener(popup.getMenuMouseListener());
+    setVisibleFromFilter();
   }
-
-
 
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
-
   public ActiveObject getActiveObject() {
     return activeObject;
   }
-  
-  
+
   /** Redraw the component */
   public void paintComponent(java.awt.Graphics g) {
     super.paintComponent(g);
     java.awt.Color old = g.getColor();
     if (isGhost)
       g.setColor(COLOR_WHEN_MIGRATED);
-    else g.setColor(getBackground());
+    else
+      g.setColor(getBackground());
     // 	g.fillRoundRect(0,0,getWidth(),getHeight(),20,20);
     g.fillOval(0, 0, getWidth(), getHeight());
     g.setColor(old);
     paintChildren(g);
   }
 
-  
   //
   // -- implements ActiveObjectListener -----------------------------------------------
   //
@@ -134,9 +137,9 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
     repaint();
   }
 
-  
   public void activeStatusChanged(boolean b) {
-    if (isGhost) isGhost = false;
+    if (isGhost)
+      isGhost = false;
     if (b) {
       // is active
       setBackground(COLOR_WHEN_WAITING_REQUEST);
@@ -149,7 +152,6 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
     repaint();
   }
 
-  
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
@@ -157,8 +159,15 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   protected AbstractDataObject getAbstractDataObject() {
     return activeObject;
   }
-  
-  
+
+  protected void activeObjectAddedToFilter() {
+    setVisibleFromFilter();
+  }
+
+  protected void activeObjectRemovedFromFilter() {
+    setVisibleFromFilter();
+  }
+
   protected void setFontSize(java.awt.Font font) {
     nameLabel.setFont(font);
   }
@@ -166,40 +175,41 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   protected java.awt.Dimension getMinimumSizeInternal() {
     return null;
   }
-  
+
   protected Object[][] getDataObjectInfo() {
-    return new Object[][] {
-        {"Class", name},
-        {"ID", activeObject.getID()}
-      };
+    return new Object[][] { { "Class", name }, {
+        "ID", activeObject.getID()
+        }
+    };
   }
-  
-  
+
   protected ActiveObjectPanel findActiveObjectPanelByActiveObject(ActiveObject activeObject) {
-    if (activeObject == this.activeObject) 
+    if (activeObject == this.activeObject)
       return this;
-    else return null;  
+    else
+      return null;
   }
-  
-    
-  protected void addActiveObjectToWatcher() {
+
+  protected void addAllActiveObjectsToWatcher() {
     activeObjectWatcher.addActiveObject(activeObject);
   }
-  
-  
-  protected void removeActiveObjectFromWatcher() {
+
+  protected void removeAllActiveObjectromWatcher() {
     activeObjectWatcher.removeActiveObject(activeObject);
   }
 
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
-  
+
+  private void setVisibleFromFilter() {
+    setVisible(!activeObjectFilter.isClassFiltered(activeObject.getClassName()));
+  }
   
   //
   // -- INNER CLASSES -----------------------------------------------
   //
-  
+
   /**
    * a listener that will start the drag.
    * has access to top level's dsListener and dragSource
@@ -216,22 +226,22 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
      */
     public void dragGestureRecognized(java.awt.dnd.DragGestureEvent event) {
       // if the action is ok we go ahead otherwise we punt
-      if (isGhost || ! activeObject.isActive()) return; // cannot migrate if isGhost or if non active
-      if((event.getDragAction() & java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE) == 0) return;
+      if (isGhost || !activeObject.isActive())
+        return; // cannot migrate if isGhost or if non active
+      if ((event.getDragAction() & java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE) == 0)
+        return;
       // get the label's text and put it inside a Transferable
       // Transferable transferable = new StringSelection( DragLabel.this.getText() );
-      java.awt.datatransfer.Transferable transferable = new TransferableUniqueID(activeObject.getID());      
+      java.awt.datatransfer.Transferable transferable = new TransferableUniqueID(activeObject.getID());
       // now kick off the drag
       try {
         // initial cursor, transferrable, dsource listener      
         event.startDrag(java.awt.dnd.DragSource.DefaultMoveNoDrop, transferable, dragSourceListener);
-      } catch(java.awt.dnd.InvalidDnDOperationException e) {
+      } catch (java.awt.dnd.InvalidDnDOperationException e) {
       }
     }
   }
-  
-  
-  
+
   /**
    * MyDragSourceListener
    * a listener that will track the state of the DnD operation
@@ -245,13 +255,14 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
      * @param e the event
      */
     public void dragDropEnd(java.awt.dnd.DragSourceDropEvent event) {
-      if (! event.getDropSuccess()) return;
+      if (!event.getDropSuccess())
+        return;
       if (event.getDropAction() == java.awt.dnd.DnDConstants.ACTION_MOVE) {
         if (controller != null)
-          controller.log("Object "+activeObject.getName()+" migrated.");
+          controller.log("Object " + activeObject.getName() + " migrated.");
       } else if (event.getDropAction() == java.awt.dnd.DnDConstants.ACTION_COPY) {
         if (controller != null)
-          controller.log("Object "+activeObject.getName()+" cloned.");
+          controller.log("Object " + activeObject.getName() + " cloned.");
       }
       isGhost = true;
       repaint();
@@ -264,25 +275,25 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
       java.awt.dnd.DragSourceContext context = event.getDragSourceContext();
       //intersection of the users selected action, and the source and target actions
       int myaction = event.getDropAction();
-      if ((myaction & java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE) != 0) {	
-	      context.setCursor(java.awt.dnd.DragSource.DefaultCopyDrop);	  
+      if ((myaction & java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE) != 0) {
+        context.setCursor(java.awt.dnd.DragSource.DefaultCopyDrop);
       } else {
-	      context.setCursor(java.awt.dnd.DragSource.DefaultCopyNoDrop);	  	
+        context.setCursor(java.awt.dnd.DragSource.DefaultCopyNoDrop);
       }
     }
-    
+
     /**
      * @param e the event
      */
     public void dragOver(java.awt.dnd.DragSourceDragEvent event) {
     }
-    
+
     /**
      * @param e the event
      */
     public void dragExit(java.awt.dnd.DragSourceEvent event) {
       java.awt.dnd.DragSourceContext context = event.getDragSourceContext();
-      context.setCursor(java.awt.dnd.DragSource.DefaultCopyNoDrop);	  	
+      context.setCursor(java.awt.dnd.DragSource.DefaultCopyNoDrop);
     }
 
     /**
@@ -290,10 +301,9 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
      * a link action
      * @param e the event     
      */
-    public void dropActionChanged (java.awt.dnd.DragSourceDragEvent event) {
-      dragEnter(event);	  	
+    public void dropActionChanged(java.awt.dnd.DragSourceDragEvent event) {
+      dragEnter(event);
     }
   } // end inner class MyDraSourceListener
-
 
 }

@@ -49,8 +49,13 @@ public class ActiveObjectFilter {
   //
 
   
-  public boolean filterClass(String classname) {
+  public boolean addClass(String classname) {
     return filter.add(classname);
+  }
+
+
+  public boolean removeClass(String classname) {
+    return filter.remove(classname);
   }
 
 

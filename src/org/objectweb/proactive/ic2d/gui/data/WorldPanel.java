@@ -37,8 +37,6 @@ import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
-import org.objectweb.proactive.ic2d.gui.menu.StatelessMessageMonitoringMenu;
-
 import java.rmi.dgc.VMID;
 
 public class WorldPanel extends AbstractDataObjectPanel implements WorldObjectListener, javax.swing.Scrollable {
@@ -171,6 +169,13 @@ public class WorldPanel extends AbstractDataObjectPanel implements WorldObjectLi
   protected Object[][] getDataObjectInfo() {
     return new Object[][] {
       };
+  }
+
+
+  protected void filterChangeParentNotification(String qname) {
+    activeObjectAddedToFilter();
+    revalidate();
+    repaint();
   }
 
 

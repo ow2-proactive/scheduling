@@ -33,7 +33,9 @@ package org.objectweb.proactive.ic2d.gui.menu;
 import org.objectweb.proactive.ic2d.data.MessageMonitoringController;
 import org.objectweb.proactive.ic2d.event.MessageMonitoringListener;
 
-public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMenu implements MessageMonitoringListener {
+public class MessageMonitoringMenu extends javax.swing.JMenu implements MessageMonitoringListener {
+
+  protected MessageMonitoringController controller;  
 
   protected javax.swing.JCheckBoxMenuItem monitorRequestSenderMenuItem;
   protected javax.swing.JCheckBoxMenuItem monitorRequestReceiverMenuItem;
@@ -45,8 +47,32 @@ public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMen
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  public StatefullMessageMonitoringMenu(String name, MessageMonitoringController controller) {
-    super(name, controller);
+  public MessageMonitoringMenu(String name, MessageMonitoringController aController) {
+    super(name);
+    this.controller = aController;
+
+    //
+    // Monitor All
+    //
+    javax.swing.JMenuItem monitorAllMenuItem = new javax.swing.JMenuItem("Monitor All");
+    monitorAllMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent event) {
+          controller.monitorAll(true);
+        }
+      });
+    this.add(monitorAllMenuItem);
+    
+    javax.swing.JMenuItem monitorNoneMenuItem = new javax.swing.JMenuItem("Monitor None");
+    monitorNoneMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent event) {
+          controller.monitorAll(false);
+        }
+      });
+    this.add(monitorNoneMenuItem);
+    
+    this.addSeparator();
+
+    addMenuOptions();
   }  
   
 

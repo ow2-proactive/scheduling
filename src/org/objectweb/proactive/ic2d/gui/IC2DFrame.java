@@ -40,7 +40,6 @@ import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
-import org.objectweb.proactive.ic2d.gui.dialog.FilterDialog;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 
@@ -280,10 +279,10 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     
     // Edit the filter list
     {
-    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Filter Objects");
+    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Show filtered classes");
     b.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          doEditFilter();
+          DialogUtils.openFilteredClassesDialog(IC2DFrame.this, ic2dPanel, activeObjectFilter);
         }
       });
     b.setToolTipText("Filter active objects");
@@ -379,16 +378,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     return menuBar;
   }
 
-
-  private void doEditFilter() {
-    FilterDialog diag = new FilterDialog(this, activeObjectFilter);
-    diag.setVisible(true);
-    if (diag.success) {
-      boolean b = diag.updateFilter(activeObjectFilter);
-      if (b)
-        ic2dPanel.repaint();
-    }
-  }
 
   private void doLegend() {
     Legend legend = Legend.uniqueInstance();

@@ -231,7 +231,7 @@ public class ActiveObjectCommunicationRecorder {
         java.util.Map.Entry sourceEntry = (java.util.Map.Entry) sourceEntryIterator.next();
         // source
         ActiveObjectPanel sourcePanel = (ActiveObjectPanel) sourceEntry.getKey();
-        if (sourcePanel.isDestroyed()) continue;
+        if (sourcePanel.isDestroyed() || ! sourcePanel.isVisible()) continue;
         java.util.HashMap destMap = (java.util.HashMap) sourceEntry.getValue();
         java.util.Iterator destEntryIterator = destMap.entrySet().iterator();
         synchronized(destMap) {
@@ -259,7 +259,7 @@ public class ActiveObjectCommunicationRecorder {
       java.util.Map.Entry destEntry = (java.util.Map.Entry) destEntryIterator.next();
       // destination
       ActiveObjectPanel destPanel =(ActiveObjectPanel) destEntry.getKey();
-      if (destPanel.isDestroyed()) continue;
+      if (destPanel.isDestroyed() || ! destPanel.isVisible()) continue;
       int communicationCount = ((int[]) destEntry.getValue())[0];
       java.awt.Point pDest = destPanel.getLocationOnScreen();
       int xDest = pDest.x - topLeftCornerScreenCoordinate.x;

@@ -38,8 +38,6 @@ import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.NodeObjectListener;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 
-import org.objectweb.proactive.ic2d.gui.menu.StatelessMessageMonitoringMenu;
-
 public class NodePanel extends AbstractDataObjectPanel implements NodeObjectListener {
 
   private static javax.swing.border.Border STANDARD_LINE_BORDER = javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 128, 128));
