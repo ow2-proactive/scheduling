@@ -48,6 +48,7 @@ public class Test extends FunctionalTest {
     Node rmiNode;
     Node jiniNode;
     private String rmiURL = "//localhost/RMINode" + System.currentTimeMillis();
+    private String jiniURL = "jini://localhost/JININode" + System.currentTimeMillis();
 
     //Node ibisNode;
 
@@ -64,7 +65,7 @@ public class Test extends FunctionalTest {
      */
     public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
-        NodeFactory.createNode("jini://localhost/JININode");
+        NodeFactory.createNode(jiniURL);
         //NodeFactory.createNode("ibis://localhost/IBISNode");
     }
 
@@ -82,7 +83,7 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         rmiNode = NodeFactory.getNode(rmiURL);
-        jiniNode = NodeFactory.getNode("jini://localhost/JININode");
+        jiniNode = NodeFactory.getNode(jiniURL);
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
         return ((rmiNode != null) && (jiniNode != null) &&
         NodeFactory.isNodeLocal(rmiNode));
