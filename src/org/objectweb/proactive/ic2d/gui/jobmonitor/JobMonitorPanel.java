@@ -349,19 +349,26 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             menuItem.setEnabled(monitoredHosts.size() > 0);
             popupmenu.add(menuItem);
 
-            final Set objects = new TreeSet();
+            final MonitoredObjectSet objects = new MonitoredObjectSet();
             boolean hasHosts = false;
-
+            int sameKey = NO_KEY;
+            
             if (selection != null) {
                 for (int i = 0; i < selection.length; i++) {
                     DataTreeNode node = (DataTreeNode) selection[i].getLastPathComponent();
-                    BasicMonitoredObject object = node.getObject();
                     if (!node.isRoot()) {
-                        if (object.getKey() == HOST) {
+                        BasicMonitoredObject object = node.getObject();
+                        objects.add(object);
+                    	int key = object.getKey();
+
+                        if (key == HOST) {
                             hasHosts = true;
                         }
 
-                        objects.add(object);
+                        if (i == 0)
+                        	sameKey = key;
+                        else if (key != sameKey)
+                        	sameKey = NO_KEY;
                     }
                 }
             }
@@ -401,22 +408,14 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             menuItem.setEnabled(!objects.isEmpty());
             popupmenu.add(menuItem);
 
-            a = new AbstractAction("Kill Job(s)") {
+            a = new AbstractAction("Kill selected objects") {
                         public void actionPerformed(ActionEvent e) {
-                            Iterator iter = objects.iterator();
-                            MonitoredObjectSet jobs = new MonitoredObjectSet();
-                            while (iter.hasNext()) {
-                                BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
-                                MonitoredObjectSet set = asso.getValues(object,
-                                        JOB, null);
-                                jobs.addAll(set);
-                            }
-                            explorator.killJobs(jobs);
+                            explorator.killObjects(objects);
                         }
                     };
 
             menuItem = new JMenuItem(a);
-            menuItem.setEnabled(!objects.isEmpty());
+            menuItem.setEnabled(sameKey == JOB || sameKey == JVM);
             popupmenu.add(menuItem);
         }
 

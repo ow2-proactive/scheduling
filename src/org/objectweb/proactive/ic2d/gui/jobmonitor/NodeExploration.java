@@ -7,6 +7,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
@@ -323,29 +324,36 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     private void killJVM(MonitoredJVM jvm) {
-    	ProActiveRuntime part = urlToRuntime(jvm.getFullName());
-    	try {
-    		part.killRT(false);
-    	} catch (Exception e) {
-    		log(e);
-    	}
-    }
-    
-    private void killJob(MonitoredJob job) {
-        MonitoredObjectSet jvms = asso.getValues(job, JVM, null);
-        Iterator iter = jvms.iterator();
-        
-        while (iter.hasNext()) {
-        	MonitoredJVM jvm = (MonitoredJVM) iter.next();
-        	killJVM(jvm);
+        ProActiveRuntime part = urlToRuntime(jvm.getFullName());
+        try {
+            part.killRT(false);
+        } catch (Exception e) {
+            log(e);
         }
     }
 
-    public void killJobs(MonitoredObjectSet jobs) {
-        Iterator iter = jobs.iterator();
+    private void killJob(MonitoredJob job) {
+        MonitoredObjectSet jvms = asso.getValues(job, JVM, null);
+        Iterator iter = jvms.iterator();
+
         while (iter.hasNext()) {
-            MonitoredJob job = (MonitoredJob) iter.next();
-            killJob(job);
+            MonitoredJVM jvm = (MonitoredJVM) iter.next();
+            killJVM(jvm);
+        }
+    }
+
+    public void killObjects(MonitoredObjectSet objects) {
+        Iterator iter = objects.iterator();
+        while (iter.hasNext()) {
+            BasicMonitoredObject o = (BasicMonitoredObject) iter.next();
+            int key = o.getKey();
+            if (key == JOB) {
+                killJob((MonitoredJob) o);
+            }
+
+            if (key == JVM) {
+                killJVM((MonitoredJVM) o);
+            }
         }
     }
 
