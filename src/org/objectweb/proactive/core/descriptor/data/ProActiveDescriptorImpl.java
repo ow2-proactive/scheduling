@@ -218,7 +218,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             compositeProcess.setTargetProcess(process);
         }
     }
-    
+
     public void addService(String serviceID, UniversalService service) {
         ServiceUpdater serviceUpdater = (ServiceUpdater) pendingServiceMapping.remove(serviceID);
         if (serviceUpdater != null) {
@@ -239,7 +239,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
                 serviceUser.setService(service);
             } catch (ProActiveException e) {
                 e.printStackTrace();
-                logger.error("the given service "+service.getServiceName()+ " cannot be set for class "+serviceUser.getUserClass());
+                logger.error("the given service " + service.getServiceName() +
+                    " cannot be set for class " + serviceUser.getUserClass());
             }
         }
     }
@@ -367,16 +368,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         compositeProcessUpdater.addProcessUpdater(processUpdater);
     }
 
-    
-
-    private void addPendingService(String serviceID,
-        ServiceUser serviceUser) {
+    private void addPendingService(String serviceID, ServiceUser serviceUser) {
         ServiceUpdater updater = null;
-    	if(serviceUser instanceof VirtualNode){
-    	    updater = new VirtualNodeUpdater(serviceUser);
-    	}else if (serviceUser instanceof VirtualMachine){
-    	    updater = new VirtualMachineUpdater((VirtualMachine)serviceUser);
-    	}
+        if (serviceUser instanceof VirtualMachine) {
+            updater = new VirtualMachineUpdater((VirtualMachine) serviceUser);
+        } else {
+            updater = new ServiceUpdaterImpl(serviceUser);
+        }
         addServiceUpdater(serviceID, updater);
     }
 
@@ -482,24 +480,25 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             virtualMachine.setService(s);
         }
     }
-    private class VirtualNodeUpdater implements 
-    ServiceUpdater {
-    private ServiceUser serviceUser;
 
-    public VirtualNodeUpdater(ServiceUser serviceUser) {
-        this.serviceUser = serviceUser;
-    }
+    private class ServiceUpdaterImpl implements ServiceUpdater {
+        private ServiceUser serviceUser;
 
-    public void updateService(UniversalService s) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Updating VirtualMachine Service");
+        public ServiceUpdaterImpl(ServiceUser serviceUser) {
+            this.serviceUser = serviceUser;
         }
-        try {
-            serviceUser.setService(s);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-            logger.error("the given service "+s.getServiceName()+ " cannot be set for class "+serviceUser.getUserClass());
+
+        public void updateService(UniversalService s) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Updating VirtualMachine Service");
+            }
+            try {
+                serviceUser.setService(s);
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+                logger.error("the given service " + s.getServiceName() +
+                    " cannot be set for class " + serviceUser.getUserClass());
+            }
         }
     }
-}
 }

@@ -686,7 +686,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
      */
     public void setService(UniversalService service) {
-        // TODO Auto-generated method stub
+        
     }
 
     /**
