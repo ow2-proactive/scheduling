@@ -66,7 +66,7 @@ public class Test extends ProActiveFunctionalTest {
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
         A b = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "local" }, vnAgent.getNode());
-
+				Thread.sleep(3000);
         VirtualNode vnLookup = ProActive.lookupVirtualNode("//localhost/Agent",
                 "rmi:");
         a = (A) vnLookup.getUniqueAO();
