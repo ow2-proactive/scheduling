@@ -259,6 +259,19 @@ public final class MethodCall implements java.io.Serializable {
 
   public Object execute(Object targetObject) throws InvocationTargetException, MethodCallExecutionFailedException {
     // A test at how non-public methods can be reflected
+    
+	if ((serializedEffectiveArguments != null) && (effectiveArguments == null)) {
+		try {
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
+			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			effectiveArguments = (Object[])objectInputStream.readObject();
+			objectInputStream.close();
+			byteArrayInputStream.close();
+		}
+		catch (Exception e) { e.printStackTrace(); }
+		serializedEffectiveArguments = null;
+	}
+    
     if (reifiedMethod.getParameterTypes().length > 0)
       reifiedMethod.setAccessible(true);
     try {
