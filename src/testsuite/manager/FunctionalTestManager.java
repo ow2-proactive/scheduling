@@ -3,7 +3,7 @@
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
  *
@@ -21,7 +21,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- * 
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
  *  Contributor(s):
@@ -44,7 +44,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
- 
+
 
 /**
  * @author Alexandre di Costanzo
@@ -127,8 +127,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 Iterator itTest = group.iterator();
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Lauching test: " + test.getName());
+                    if (logger.isInfoEnabled()) {
+                        logger.info("Lauching test: " + test.getName());
                     }
                     AbstractResult result = test.runTest();
                     if (result != null) {
