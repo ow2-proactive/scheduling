@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.control.AttributeController;
+import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.proactive.core.component.ComponentParameters;
 
 
@@ -69,7 +70,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
  * that allow configuration of the components with this implementation 
  * @author Matthieu Morel
  */
-public interface ComponentParametersController extends AttributeController {
+public interface ComponentParametersController extends AttributeController, NameController {
 
 	/**
 	 * getter
@@ -83,9 +84,4 @@ public interface ComponentParametersController extends AttributeController {
 	 */
 	public void setComponentParameters(ComponentParameters componentParameters);
     
-    /**
-     * setter
-     * @param componentName the new name of the component
-     */
-    public void setComponentName(String componentName);
 }
