@@ -30,39 +30,21 @@
 */
 package testsuite.exception;
 
+
 /**
+ * Use it in default action method in inter-linked tests. If a manager try to execute an
+ * interlinked in a normal group and the default action method throw this exception the test
+ * will be not executed.
  * @author Alexandre di Costanzo
  *
  */
 public class NotStandAloneException extends Exception {
 
-	/**
-	 * 
-	 */
-	public NotStandAloneException() {
-		super("This test doesn't work in standalone mode: it is an inter-linked test.");
-	}
-
-	/**
-	 * @param message
-	 */
-	public NotStandAloneException(String message) {
-		super(message);
-	}
-
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public NotStandAloneException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * @param cause
-	 */
-	public NotStandAloneException(Throwable cause) {
-		super(cause);
-	}
-
+    /**
+     *  To create a new NotStanAloneException.
+     */
+    public NotStandAloneException() {
+        super(
+            "This test doesn't work in standalone mode: it is an inter-linked test.");
+    }
 }
