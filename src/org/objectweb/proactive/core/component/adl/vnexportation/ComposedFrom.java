@@ -37,8 +37,22 @@ package org.objectweb.proactive.core.component.adl.vnexportation;
  */
 public interface ComposedFrom {
     
+    /**
+     * 
+     * @return an array of composing virtual nodes  
+     */
     ComposingVirtualNode[] getComposingVirtualNodes();
+    
+    /**
+     * add a composing virtual node
+     * @param cvn the composing virtual node to add
+     */
     void addComposingVirtualNode(ComposingVirtualNode cvn);
+    
+    /**
+     * removes a composing virtual node
+     * @param cvn the composing virtual node to remove
+     */
     void removeComposingVirtualNode(ComposingVirtualNode cvn);
 
 }

@@ -45,6 +45,15 @@ public interface VirtualNode extends org.objectweb.fractal.adl.nodes.VirtualNode
 	public static String SINGLE = "single";
 	public static String MULTIPLE = "multiple";
 	
+	/**
+	 * getter for the cardinality
+	 * @return the cardinality of the virtual node
+	 */
   String getCardinality();
+  
+  /**
+   * setter for the cardinality
+   * @param cardinality the cardinality of the virtual node
+   */
   void setCardinality (String cardinality);
 }
