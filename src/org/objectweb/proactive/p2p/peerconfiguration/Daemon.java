@@ -2,7 +2,15 @@ package org.objectweb.proactive.p2p.peerconfiguration;
 
 import java.beans.*;
 import java.io.*;
+import java.rmi.RemoteException;
 import java.util.*;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.*;
+
+import org.objectweb.proactive.p2p.registry.P2PRegistryImpl;
 
 /**
  * @author jbustos
@@ -13,13 +21,14 @@ import java.util.*;
 public class Daemon implements Runnable{
 
 private ScheduleBean[] schedule;
-private String loadBalancer;
 private String p2pRegistry;
 private String protocol;
 private boolean isAlive;
 private Process process;
+private P2PRegistryImpl register=null;
+private ProActiveRuntime runtime=null;
 
-public Daemon(String file, String lb) {
+public Daemon(String file) {
 			// Read the XML descriptor and create the schedule
 
 isAlive = false;
@@ -38,21 +47,25 @@ XMLDecoder d;
 				System.err.println("[Daemon ERROR] Cannot open "+file);
 				System.exit(-1);
 			}
-		if (lb != null) {
-			loadBalancer = lb;
-			} else {
-			loadBalancer = "./loadbalancer.sh"; 
-			}
+		
+		try {
+			register = (P2PRegistryImpl) ProActive.lookupActive(P2PRegistryImpl.class.getName(),p2pRegistry);
+		} catch (ActiveObjectCreationException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
 		if (schedule != null) this.run();
 		}
 
 public static void main(String[] args) {
 	
-	if (args.length < 2) {
-		System.err.println("[Daemon ERROR] use: daemon    file_schedule.xml   load_balancer.exe");
+	if (args.length < 1) {
+		System.err.println("[Daemon ERROR] use: daemon    file_schedule.xml");
 		System.exit(-1);
 	}
-	Daemon daemon = new Daemon(args[0],args[1]);
+	Daemon daemon = new Daemon(args[0]);
 	}
 	
 public synchronized void run() {
@@ -167,17 +180,29 @@ private synchronized void sortSchedule(Object[] schedArray) {
 
 private synchronized void startIt(double maxload) {
 	isAlive = true;	
-	System.out.println("[Daemon] Started application");
+	System.out.println("[Daemon] Runtime started");
+	if (runtime == null) runtime = ProActiveRuntimeImpl.getProActiveRuntime();
+	
 	try {
-		process = Runtime.getRuntime().exec(new String[] {loadBalancer,maxload+"",p2pRegistry,protocol});
-	} catch (IOException e) {
-		System.err.println("[Daemon ERROR] cannot start the scheduled application");
+		register.register(runtime.getURL(),runtime);
+	} catch (RemoteException e) {
+		System.err.println("[Daemon ERROR] Cannot register in the P2PRegistry");
+	} catch (ProActiveException e) {
+		System.err.println("[Daemon ERROR] Cannot get the ProActive Runtime");
 	}
+	
 }
 private synchronized void killIt() {
-	System.out.println("[Daemon] Application Stoped");
+	System.out.println("[Daemon] Runtime stoped");
 	isAlive = false;
-	process.destroy();
+	try {
+		register.unregister(runtime.getURL(),runtime);
+	} catch (RemoteException e) {
+		System.err.println("[Daemon ERROR] Cannot unregister in the P2PRegistry");
+	} catch (ProActiveException e) {
+		System.err.println("[Daemon ERROR] Cannot get the ProActive Runtime");
+	}
+	
 }
 
 /* (non-Javadoc)
@@ -189,3 +214,4 @@ protected void finalize() throws Throwable {
 }
 
 }
+
