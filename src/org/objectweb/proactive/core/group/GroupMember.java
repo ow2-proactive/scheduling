@@ -39,6 +39,9 @@ public abstract class GroupMember {
 
 	/** the group of the object */
 	private Object myGroup = null;
+	/** index of the object into the Group */
+	private int myRank;
+
 	
 	/**
 	 * Returns the group of the object.
@@ -53,10 +56,26 @@ public abstract class GroupMember {
 	
 	/**
 	 * Specifies the group of the object.
-	 * @param o - a group 
+	 * @param <code>o</code> - a typed group 
 	 */
 	public void setMyGroup(Object o) {
 		this.myGroup = o;
+	}
+
+	/**
+	 * Returns the rank (position) of the object in the Group
+	 * @return the index of the object
+	 */
+	public int getMyRank() {
+		return myRank;
+	}
+
+	/**
+	 * Specifies the rank (position) of the object in the Group
+	 * @param <code>index</code> - the index of the object
+	 */
+	public void setMyRank(int index) {
+		this.myRank = index;
 	}
 
 }

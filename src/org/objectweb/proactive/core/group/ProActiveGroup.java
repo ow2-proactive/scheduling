@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.group;
 
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
@@ -68,6 +69,10 @@ import org.objectweb.proactive.core.node.NodeFactory;
  */
 public class ProActiveGroup {
 
+	/** The logger for the Class */
+	protected static Logger logger = Logger.getLogger(ProxyForGroup.class.getName());
+
+
 	/** The name of the default proxy for group communication */
 	public static final Class DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
 
@@ -75,6 +80,7 @@ public class ProActiveGroup {
     public static final String DEFAULT_PROXYFORGROUP_CLASS_NAME = "org.objectweb.proactive.core.group.ProxyForGroup";
 
 
+	/** This constructor with a private acces permits the javadoc to hide the default constructor method in the html file */  
 	private ProActiveGroup () {}
 
 
@@ -118,10 +124,14 @@ public class ProActiveGroup {
 	try {
 	    result = MOP.newInstance (className, null, DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
  	}
- 	catch (ClassNotReifiableException e) { System.err.println("**** ClassNotReifiableException ****"); }
- 	catch (InvalidProxyClassException e) { System.err.println("**** InvalidProxyClassException ****"); }
- 	catch (ConstructionOfProxyObjectFailedException e) { System.err.println("**** ConstructionOfProxyObjectFailedException ****"); }
- 	catch (ConstructionOfReifiedObjectFailedException e) { System.err.println("**** ConstructionOfReifiedObjectFailedException ****"); }
+ 	catch (ClassNotReifiableException e) {
+ 		if (logger.isInfoEnabled()) logger.info("**** ClassNotReifiableException ****"); }
+ 	catch (InvalidProxyClassException e) {
+		if (logger.isInfoEnabled()) logger.info("**** InvalidProxyClassException ****"); }
+ 	catch (ConstructionOfProxyObjectFailedException e) {
+		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfProxyObjectFailedException ****"); }
+ 	catch (ConstructionOfReifiedObjectFailedException e) {
+		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfReifiedObjectFailedException ****"); }
 
 	ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup)((StubObject)result).getProxy();
 	proxy.className = className;

@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -47,15 +48,10 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
-/**
- * This proxy class manages the semantic of group communication and implements the Group Interface.
- *
- * @author Laurent Baduel
- * @see org.objectweb.proactive.core.mop.Proxy
- *
- */
 public class ProxyForGroup extends AbstractProxy implements org.objectweb.proactive.core.mop.Proxy, Group, java.io.Serializable {
 
+	/** The logger for the Class */
+	protected static Logger logger = Logger.getLogger(ProxyForGroup.class.getName());
 
 	/** The name of the Class : all members of the group are "className" assignable */
 	protected String className;
@@ -68,7 +64,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/** Flag to deternime the semantic of communication (broadcast or dispatching) */
 	protected boolean dispatching = false;
 	/** Flag to deternime the semantic of communication (unique serialization of parameters or not) */
-	protected boolean uniqueSerialization = true;
+	protected boolean uniqueSerialization = false;
 	/** The stub of the typed group */
 	protected StubObject stub;
 
@@ -156,8 +152,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
 	 */
 	public Object reify(MethodCall mc) throws InvocationTargetException {
-
-		if (memberList.size() == 0) {System.out.println("TABLEAU VIDE !!!!");} 
 
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
@@ -339,8 +333,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 				/* if o is an reified object and if it is "assignableFrom" the class of the group, ... add it into the group */
 				if (MOP.isReifiedObject(o)) {
 					boolean result = this.memberList.add(o);
+					/* in the particular case that o extends GroupMember, there are few more operations */
 					if (o instanceof org.objectweb.proactive.core.group.GroupMember) {
 						((org.objectweb.proactive.core.group.GroupMember)o).setMyGroup(stub);
+						((org.objectweb.proactive.core.group.GroupMember)o).setMyRank(this.memberList.indexOf(o));
 					}
 					return result;
 				} /* if o is a Group */
@@ -353,18 +349,22 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 					try {
 						tmp = MOP.newInstance(o.getClass().getName(), null, "org.objectweb.proactive.core.body.future.FutureProxy", null);
 					} catch (Exception e) {
-						System.err.println("Unable to create a stub+proxy for the new member of the group");
+						if (logger.isInfoEnabled())
+							logger.info("Unable to create a stub+proxy for the new member of the group");
 					}
 					((org.objectweb.proactive.core.body.future.FutureProxy)((StubObject)tmp).getProxy()).setResult(o);
 					return this.add(tmp);
 				}
 			}
 			else {
-				System.err.println("uncompatible Object");
+				if (logger.isInfoEnabled())
+					logger.info("uncompatible Object");
 				return false;
 			}
 		}
-		catch (java.lang.ClassNotFoundException e) { System.err.println("Unknown class : " + this.className); }
+		catch (java.lang.ClassNotFoundException e) {
+			if (logger.isInfoEnabled())
+				logger.info("Unknown class : " + this.className); }
 		return true;
 	}
 
@@ -547,7 +547,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 				memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) oGroup).memberList);
 			}
 		} catch (java.lang.ClassNotFoundException e) {
-			System.err.println("Unknown class : " + this.className);
+			if (logger.isInfoEnabled())
+				logger.info("Unknown class : " + this.className);
 		}
 	}
 
@@ -639,9 +640,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 */
 	public void display() {
 		System.out.println("Number of member : " + memberList.size());
-		for (int i = 0; i < memberList.size(); i++) {
+		for (int i = 0; i < memberList.size(); i++)
 			System.out.println("  " + i + " : " + memberList.get(i).getClass().getName());
-		}
 	}
 
 
