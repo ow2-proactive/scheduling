@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * An object implementing this interface, contains an UniversalService
  * @author  ProActive Team
  * @version 1.0,  2005/01/20
- * @since   ProActive 2.0.4
+ * @since   ProActive 2.2
  * @see UniversalService
  */
 public interface ServiceUser {
