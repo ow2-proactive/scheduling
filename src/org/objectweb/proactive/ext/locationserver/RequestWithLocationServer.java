@@ -45,7 +45,9 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
 
   protected transient LocationServer server;
 
-  public RequestWithLocationServer(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, LocationServer server) {
+  public RequestWithLocationServer(MethodCall methodCall, UniversalBody sender,
+                                   boolean isOneWay, long nextSequenceID,
+                                   LocationServer server) {
     super(methodCall, sender, isOneWay, nextSequenceID);
     this.server = server;
   }
@@ -60,16 +62,14 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     }
   }
 
-
-
   /**
    * Implements the backup solution
    */
   protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
-    System.out.println("RequestSenderWithLocationServer: backupSolution() contacting server " + server); 
+    System.out.println("RequestWithLocationServer: backupSolution() contacting server " + server);
     //get the new location from the server
     UniversalBody mobile = (UniversalBody)server.searchObject(destinationBody.getID());
-    System.out.println("RequestSenderWithLocationServer: backupSolution() server has sent an answer");
+    System.out.println("RequestWithLocationServer: backupSolution() server has sent an answer");
     //we want to bypass the stub/proxy
     UniversalBody newDestinationBody = (UniversalBody)((FutureProxy)((StubObject)mobile).getProxy()).getResult();
     // !!!!
@@ -78,7 +78,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     sendRequest(newDestinationBody);
     //everything went fine, we have to update the current location of the object
     //so that next requests don't go through the server
-    System.out.println("RequestSenderWithLocationServer: backupSolution() updating location");
+    System.out.println("RequestWithLocationServer: backupSolution() updating location");
     if (sender != null) {
       sender.updateLocation(newDestinationBody.getID(), newDestinationBody.getRemoteAdapter());
     }

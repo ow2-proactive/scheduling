@@ -59,7 +59,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-  
+
   public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID) {
     super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
     this.methodCall = methodCall;
@@ -103,7 +103,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   
   public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
     if (! hasBeenForwarded()) return;
-    //System.out.println("the request has been forwarded " + forwardCounter + " times");
+   // System.out.println("the request has been forwarded " + forwardCounter + " times");
     //we know c.res is a remoteBody since the call has been forwarded
     //if it is null, this is a one way call
     if (sender != null) {
@@ -131,7 +131,9 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   }
 
   protected void sendRequest(UniversalBody destinationBody) throws java.io.IOException {
+//      try {
     destinationBody.receiveRequest(this);
+//      } catch (Exception e) {e.printStackTrace();}
   }
   
   //

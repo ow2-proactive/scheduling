@@ -78,7 +78,8 @@ public class Agent extends SimulatorElement {
 //       time=1000/nu;
         if (this.expoNu == null) {
             this.expoNu = RandomNumberFactory.getGenerator("nu");
-            this.expoNu.initialize(nu, System.currentTimeMillis() + 42673931);
+//            this.expoNu.initialize(nu, System.currentTimeMillis() + 42673931);
+            this.expoNu.initialize(nu, 39566417);
         }
         double time = expoNu.next() * 1000;
         this.remainingTime = time;
@@ -89,21 +90,22 @@ public class Agent extends SimulatorElement {
         this.startTime = startTime;
         if (this.expoDelta == null) {
             this.expoDelta = RandomNumberFactory.getGenerator("delta");
-            this.expoDelta.initialize(delta, System.currentTimeMillis() + 395672917);
+//            this.expoDelta.initialize(delta, System.currentTimeMillis() + 395672917);
+            this.expoDelta.initialize(delta,  58373435);
         }
 
         double time = expoDelta.next() * 1000;
         this.remainingTime = time;
         this.state = MIGRATING;
-//         System.out.println("Agent: migration started, will last " + this.remainingTime);
+         System.out.println("Agent: migration started, will last " + this.remainingTime);
     }
 
-    public void callServer(double time) {
-        System.out.println("Agent.callServer: Calling server will last " +
-                           time);
-        this.state = CALLING_SERVER;
-        this.remainingTime = time;
-    }
+//    public void callServer(double time) {
+//        System.out.println("Agent.callServer: Calling server will last " +
+//                           time);
+//        this.state = CALLING_SERVER;
+//        this.remainingTime = time;
+//    }
 
     /**
      * Called by the simulator when the server has sent a

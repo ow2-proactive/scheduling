@@ -143,7 +143,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     } catch (Exception e) {
       throw new InvocationTargetException(e);
     }
-
     // Send the request
     try {
       sendRequest(methodCall, (Future)futureobject.getProxy());

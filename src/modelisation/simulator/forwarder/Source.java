@@ -33,7 +33,7 @@ public class Source {
     public void waitBeforeCommunication() {
       if (this.expoLambda == null) {
                 this.expoLambda = RandomNumberFactory.getGenerator("lambda");
-                this.expoLambda.initialize(lambda, System.currentTimeMillis() + 98672);
+                this.expoLambda.initialize(lambda,  8936917);
             }
        double time = expoLambda.next() * 1000;
 //        double time = 1/lambda*1000;

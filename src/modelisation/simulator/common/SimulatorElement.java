@@ -1,6 +1,6 @@
 package modelisation.simulator.common;
 
-public class SimulatorElement {
+public abstract class SimulatorElement {
     protected int state;
     protected double remainingTime;
 
@@ -23,4 +23,6 @@ public class SimulatorElement {
     public void decreaseRemainingTime(double l) {
         this.remainingTime -= l;
     }
+
+//    public abstract void update(double time);
 }

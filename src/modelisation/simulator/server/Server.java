@@ -1,9 +1,8 @@
 package modelisation.simulator.server;
 
-import modelisation.statistics.ExponentialLaw;
+import modelisation.simulator.common.SimulatorElement;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
-import modelisation.simulator.common.SimulatorElement;
 
 public class Server extends SimulatorElement {
 
@@ -40,18 +39,20 @@ public class Server extends SimulatorElement {
 
     public double getNextMu1Int() {
 
-          if (this.expoMu1 == null) {
+        if (this.expoMu1 == null) {
             this.expoMu1 = RandomNumberFactory.getGenerator("mu1");
-            this.expoMu1.initialize(mu1, System.currentTimeMillis() + 120457);
+//            this.expoMu1.initialize(mu1, System.currentTimeMillis() + 120457);
+            this.expoMu1.initialize(mu1, 120457);
         }
-        double tmp = this.expoMu1.next() *1000;
+        double tmp = this.expoMu1.next() * 1000;
         return tmp;
     }
 
     public double getNextMu2Int() {
-           if (this.expoMu2 == null) {
+        if (this.expoMu2 == null) {
             this.expoMu2 = RandomNumberFactory.getGenerator("mu2");
-            this.expoMu2.initialize(mu1, System.currentTimeMillis() + 120457);
+            //            this.expoMu2.initialize(mu1, System.currentTimeMillis() + 120457);
+            this.expoMu2.initialize(mu1, 67457);
         }
         double tmp = this.expoMu2.next() * 1000;
         return tmp;

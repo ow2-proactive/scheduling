@@ -54,10 +54,11 @@ public class Simulator {
 //        return this.rvGamma.rand() * 1000;
         if (this.rvGamma == null) {
                 this.rvGamma = RandomNumberFactory.getGenerator("gamma");
-                this.rvGamma.initialize(gamma, System.currentTimeMillis() + 98672);
+                this.rvGamma.initialize(gamma, 372917);
             }
-
-          return this.rvGamma.next()*1000;
+          double tmp = this.rvGamma.next()*1000;
+        System.out.println("Gamma1 = " + tmp);
+          return tmp;
 //        return 1000/gamma;
     }
 
@@ -103,7 +104,6 @@ public class Simulator {
             return;
         }
     }
-
 
     public void sourceBehaviour() {
         if (this.source.getState() == source.WAITING) {
@@ -233,7 +233,8 @@ public class Simulator {
         System.out.println("     length = " + args[4]);
 
         Simulator simulator = new Simulator(Double.parseDouble(args[0]), Double.parseDouble(args[1]),
-                                            Double.parseDouble(args[2]), Double.parseDouble(args[3]), Double.parseDouble(args[4]));
+                                            Double.parseDouble(args[2]), Double.parseDouble(args[3]),
+                                            Double.parseDouble(args[4]));
         simulator.initialise();
         simulator.simulate();
     }

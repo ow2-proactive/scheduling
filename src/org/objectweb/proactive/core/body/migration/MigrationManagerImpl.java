@@ -84,9 +84,9 @@ public class MigrationManagerImpl extends AbstractEventProducer implements Migra
     if (hasListeners())
       notifyAllListeners(new MigrationEvent(body, MigrationEvent.BEFORE_MIGRATION));
     try {
-      long l1 = System.currentTimeMillis();
+//      long l1 = System.currentTimeMillis();
       UniversalBody remoteBody = node.receiveBody(body);
-      long l2 = System.currentTimeMillis();
+//      long l2 = System.currentTimeMillis();
       //System.out.println("Migration took "+(l2-l1));
       if (hasListeners())
         notifyAllListeners(new MigrationEvent(body, MigrationEvent.AFTER_MIGRATION));

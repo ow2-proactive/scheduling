@@ -69,7 +69,7 @@ public class Agent {
     public void waitBeforeMigration() {
         if (this.expoNu == null) {
                 this.expoNu = RandomNumberFactory.getGenerator("nu");
-                this.expoNu.initialize(nu, System.currentTimeMillis() + 98672);
+                this.expoNu.initialize(nu,  39566417);
             }
         double time = expoNu.next() * 1000;
         this.remainingTime = time;
@@ -80,7 +80,7 @@ public class Agent {
     public void startMigration() {
         if (this.expoDelta == null) {
                 this.expoDelta = RandomNumberFactory.getGenerator("delta");
-                this.expoDelta.initialize(delta, System.currentTimeMillis() + 98672);
+                this.expoDelta.initialize(delta,  58373435);
             }
 
         double time = expoDelta.next() * 1000;

@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.ProActiveException;
 public class ServeException extends ProActiveException {
 
   /**
-  * Constructs a <code>CommunicationException</code> with no specified
+  * Constructs a <code>ServeException</code> with no specified
   * detail message.
   */
   public ServeException() {}

@@ -1,6 +1,5 @@
 package modelisation.simulator.server;
 
-import modelisation.statistics.ExponentialLaw;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 
@@ -55,22 +54,28 @@ public class Simulator {
     }
 
     public double getNextGamma1Int() {
-          if (this.expoGamma1 == null) {
+        if (this.expoGamma1 == null) {
             this.expoGamma1 = RandomNumberFactory.getGenerator("gamma1");
-            this.expoGamma1.initialize(gamma1, System.currentTimeMillis() + 98672);
+//            this.expoGamma1.initialize(gamma1, System.currentTimeMillis() + 98672);
+            this.expoGamma1.initialize(gamma1, 372917);
         }
 
-       return this.expoGamma1.next() * 1000;
+        return this.expoGamma1.next() * 1000;
 //        return 1000/this.gamma1;
     }
 
     public double getNextGamma2Int() {
-          if (this.expoGamma2 == null) {
+        if (this.expoGamma2 == null) {
             this.expoGamma2 = RandomNumberFactory.getGenerator("gamma2");
-            this.expoGamma2.initialize(gamma2, System.currentTimeMillis() + 276371);
+//            this.expoGamma2.initialize(gamma2, System.currentTimeMillis() + 276371);
+            this.expoGamma2.initialize(gamma2, 276371);
         }
 
-        return this.expoGamma2.next() * 1000;
+//        return this.expoGamma2.next() * 1000;
+            double tmp = this.expoGamma2.next()*1000;
+        System.out.println("expoGamma2 = " + tmp);
+        return tmp;
+
 //        return 1000/gamma2;
     }
 
@@ -79,6 +84,7 @@ public class Simulator {
         double lengthOfState = 0;
         while (this.currentTime < length) {
             lengthOfState = this.updateTime();
+            System.out.println("length of state = " + lengthOfState);
 //            System.out.println(" -------------- Time " + this.currentTime + " ----------------------");
 //            System.out.println("*** states before update ***");
 //            System.out.println("STATE: " + this.server + "" + this.source
@@ -104,6 +110,7 @@ public class Simulator {
 //            System.out.println("--------------------------------------------------------------------");
 
         }
+                System.out.println("Simulator.simulate currentTime " + currentTime);
         // System.out.println("T1 is " + t1);
     }
 
@@ -147,7 +154,7 @@ public class Simulator {
             this.server.endOfSendReply(this.currentTime);
 
             this.source.continueCommunication(getNextGamma1Int());
-         return;
+            return;
         }
     }
 
@@ -160,17 +167,18 @@ public class Simulator {
         if (this.agent.getState() == agent.MIGRATING) {
             agent.endMigration(this.currentTime);
             server.receiveRequestFromAgent();
+//            agent.callServer(this.getNextGamma2Int());
             return;
             // agent.callServer(this.getNextGamma2Int());
             //          this.agentHasMigrated = true;
             //agent.waitBeforeMigration();
             //   return;
         }
-        if (this.agent.getState() == agent.CALLING_SERVER) {
-            agent.endMigration(this.currentTime);
-            server.receiveRequestFromAgent();
-            return;
-        }
+//        if (this.agent.getState() == agent.CALLING_SERVER) {
+//            agent.endMigration(this.currentTime);
+//            server.receiveRequestFromAgent();
+//            return;
+//        }
     }
 
     public void sourceBehaviour() {
@@ -201,7 +209,7 @@ public class Simulator {
             //  this.source.continueCommunication(getNextGamma1Int());
             if (agent.migrated) {
                 source.startCommunicationServer(getNextGamma2Int());
-              //  source.waitForError(getNextGamma1Int());
+                //  source.waitForError(getNextGamma1Int());
             } else {
                 this.source.setRemainingTime(agent.getRemainingTime());
             }
@@ -229,7 +237,7 @@ public class Simulator {
         // StringBuffer tmp = new StringBuffer();
         //first we check the state of the source
         //  System.out.println("---- State at time " + this.currentTime);
-       System.out.println("STATE: " + this.server + "" + this.source + "" + this.agent);
+        System.out.println("STATE: " + this.server + "" + this.source + "" + this.agent);
         //    System.out.println(this.source);
         //      System.out.println(this.agent);
 

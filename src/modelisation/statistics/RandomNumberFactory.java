@@ -21,14 +21,14 @@ public class RandomNumberFactory {
             Class factoryClass = Class.forName(className);
             Constructor constructor = factoryClass.getConstructor(argsClass);
             tmp = (RandomNumberGenerator) constructor.newInstance(args);
-            System.out.println("RandomNumberFactory: generator for " +
-                               variableName + " is  " + tmp);
+//            System.out.println("RandomNumberFactory: generator for " +
+//                               variableName + " is  " + tmp);
             return tmp;
         } catch (Exception e) {
         }
         tmp = _getDefaultGenerator();
-        System.out.println("RandomNumberFactory: default generator for " +
-                           variableName + " is  " + tmp);
+//        System.out.println("RandomNumberFactory: default generator for " +
+//                           variableName + " is  " + tmp);
         return tmp;
     }
 

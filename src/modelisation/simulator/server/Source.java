@@ -5,7 +5,7 @@ import modelisation.statistics.RandomNumberGenerator;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.simulator.common.SimulatorElement;
 
-public class Source extends SimulatorElement {
+public class Source  extends SimulatorElement {
 
 
     public static final int WAITING = 0;
@@ -36,7 +36,8 @@ public class Source extends SimulatorElement {
 //            this.expo = new ExponentialLaw(lambda, System.currentTimeMillis() + 15498387);
         if (this.expo == null) {
             this.expo = RandomNumberFactory.getGenerator("lambda");
-            this.expo.initialize(lambda, System.currentTimeMillis() + 15498387);
+//            this.expo.initialize(lambda, System.currentTimeMillis() + 15498387);
+            this.expo.initialize(lambda,  8936917);
         }
         double time = expo.next() * 1000;
 //        time = 1000/lambda;
