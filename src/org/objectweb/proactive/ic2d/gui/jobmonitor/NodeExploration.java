@@ -127,7 +127,7 @@ public class NodeExploration implements JobMonitorConstants {
         try {
             ProActiveRuntime[] registered = from.getProActiveRuntimes();
             known = new ArrayList(Arrays.asList(registered));
-            parents = from.getParents();
+            parents = from.getAcquaintances();
         } catch (ProActiveException e) {
             log(e);
             return new ArrayList();
