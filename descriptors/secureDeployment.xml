@@ -64,7 +64,7 @@
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jce-jdk13-117.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-core.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-ext.jar"/>
-<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j-core.jar"/>
+<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/puretls.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/reggie.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/xercesImpl.jar"/>
@@ -97,7 +97,7 @@
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jce-jdk13-117.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-core.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-ext.jar"/>
-<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j-core.jar"/>
+<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/puretls.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/reggie.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/xercesImpl.jar"/>
@@ -129,7 +129,7 @@
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jce-jdk13-117.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-core.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/jini-ext.jar"/>
-<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j-core.jar"/>
+<absolutePath  value="/net/home/acontes/dev/ProActive/lib/log4j.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/puretls.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/reggie.jar"/>
 <absolutePath  value="/net/home/acontes/dev/ProActive/lib/xercesImpl.jar"/>

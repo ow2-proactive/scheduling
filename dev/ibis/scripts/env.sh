@@ -123,7 +123,7 @@ $HOME/dev/ProActive/lib/asm.jar:\
 $HOME/dev/ProActive/lib/jini-core.jar:\
 $HOME/dev/ProActive/lib/jini-ext.jar:\
 $HOME/dev/ProActive/lib/reggie.jar:\
-$HOME/dev/ProActive/lib/log4j-core.jar:\
+$HOME/dev/ProActive/lib/log4j.jar:\
 $HOME/dev/ProActive/lib/xercesImpl.jar:\
 $HOME/dev/ProActive/lib/fractal.jar"
 BOOTCLASSPATH=""
@@ -147,7 +147,7 @@ $HOME/dev/ProActive/lib/asm.jar:\
 $HOME/dev/ProActive/lib/jini-core.jar:\
 $HOME/dev/ProActive/lib/jini-ext.jar:\
 $HOME/dev/ProActive/lib/reggie.jar:\
-$HOME/dev/ProActive/lib/log4j-core.jar:\
+$HOME/dev/ProActive/lib/log4j.jar:\
 $HOME/dev/ProActive/lib/xercesImpl.jar:\
 $HOME/dev/ProActive/lib/bouncycastle.jar:\
 $HOME/dev/ProActive/lib/fractal.jar"
@@ -273,7 +273,7 @@ $ROOT/workProActive/ProActive/lib/iaik_ssl.jar:\
 $ROOT/workProActive/ProActive/lib/javaxCrypto.jar:\
 $ROOT/workProActive/ProActive/lib/jini-core.jar:\
 $ROOT/workProActive/ProActive/lib/jini-ext.jar:\
-$ROOT/workProActive/ProActive/lib/log4j-core.jar:\
+$ROOT/workProActive/ProActive/lib/log4j.jar:\
 $ROOT/workProActive/ProActive/lib/reggie.jar:\
 $ROOT/workProActive/ProActive/lib/xercesImpl.jar:\
 $ROOT/workProActive/ProActive/dev/lib/Jama-1.0.1.jar:\

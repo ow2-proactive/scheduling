@@ -33,7 +33,7 @@
 						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/jini-core.jar"/>
 						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar"/>
 						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/reggie.jar"/>
-						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/log4j-core.jar"/>
+						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/log4j.jar"/>
 						<absolutePath value="/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar"/>
 					</classpath>
 					<javaPath>

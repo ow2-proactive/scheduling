@@ -38,7 +38,7 @@ echo "###### LIB ######"
 cd $baseDir/lib && \
 rm -r * 
 
-JAR_LIST="/home1/fabrice/workProActive/ProActive/lib/asm.jar /home1/fabrice/workProActive/ProActive/lib/bcel.jar  /home1/fabrice/workProActive/ProActive/lib/log4j-core.jar /home1/fabrice/workProActive/ProActive/lib/reggie.jar /home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar /home1/fabrice/workProActive/ProActive/lib/fractal.jar"
+JAR_LIST="/home1/fabrice/workProActive/ProActive/lib/asm.jar /home1/fabrice/workProActive/ProActive/lib/bcel.jar  /home1/fabrice/workProActive/ProActive/lib/log4j.jar /home1/fabrice/workProActive/ProActive/lib/reggie.jar /home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar /home1/fabrice/workProActive/ProActive/lib/fractal.jar"
 
  for file in  $JAR_LIST # /home1/fabrice/workProActive/ProActive/lib/*jar # /home1/fabrice/workProActive/ProActive/dev/lib/*jar
   do

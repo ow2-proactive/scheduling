@@ -67,7 +67,7 @@ given with the example take care of everything</li>
 <ul>
       <li class="textNormal">Download and unzip the ProActive archive</li>
       <li class="textNormal">Include in your <code>CLASSPATH</code> the following  
-jar files <code>ProActive/ProActive.jar, ProActive/lib/asm.jar, ProActive/lib/log4j-core.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, ProActive/lib/bouncycastle.jar</code></li>
+jar files <code>ProActive/ProActive.jar, ProActive/lib/asm.jar, ProActive/lib/log4j.jar, ProActive/lib/xercesImpl.jar, ProActive/lib/fractal.jar, ProActive/lib/bouncycastle.jar</code></li>
       <li class="textNormal">Don't forget to launch the JVM with a <a
  href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security 
 policy file</a>. You can also specify a <a
@@ -218,7 +218,7 @@ itself</li>
       <li class="textNormal"><code><b>asm.jar </b></code>in <code>lib</code> 
 directory : ASM the default bytecode manipulation framework used to dynamically 
 generate the java bytecode of the Stubs</li>
- <li class="textNormal"><code><b>log4j-core.jar </b></code>in <code>lib</code> 
+ <li class="textNormal"><code><b>log4j.jar </b></code>in <code>lib</code> 
 directory : <a
  href="http://logging.apache.org/log4j/docs/manual.html">Log4j</a> is the logging mechanism used in ProActive. You can define the way you want to log(console, file, GUI) by creating 
  a log4j configuration file, like the one used in ProActive's example and located under ProActive/scripts/unix or windows. In that case, remind to run your java command 
@@ -309,7 +309,7 @@ above. If it doesn't help, here is a list of the most common mistakes:
    <li class="textNormal"> <b>Java complains about not being able to find 
 ProActive's classes.</b> Your <code>CLASSPATH</code> environment variable 
 does not contain the entry for the ProActive's or ASM's or  Log4j's or Xerces' or Fractal's or BouncyCastle's classes.
-    <code>ProActive.jar,     </code><code>asm.jar, log4j-core.jar, xercesImpl.jar, fractal.jar, bouncycastle.jar</code> must
+    <code>ProActive.jar,     </code><code>asm.jar, log4j.jar, xercesImpl.jar, fractal.jar, bouncycastle.jar</code> must
 be in your <code>CLASSPATH</code>.   <br></br>
  </li>
    <li class="textNormal"> <b>Java complains about denial of access.</b>

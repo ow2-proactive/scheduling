@@ -56,7 +56,7 @@
 					<classpath>
 						<absolutePath value="/net/home/rquilici/ProActive/classes"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/asm.jar"/>
-						<absolutePath value="/net/home/rquilici/ProActive/lib/log4j-core.jar"/>
+						<absolutePath value="/net/home/rquilici/ProActive/lib/log4j.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/fractal.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/xercesImpl.jar"/>
 						<absolutePath value="/net/home/rquilici/ProActive/lib/bouncycastle.jar"/>
