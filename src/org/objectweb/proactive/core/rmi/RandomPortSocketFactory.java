@@ -57,7 +57,7 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClien
 
 
   public RandomPortSocketFactory(int basePort, int range) {
-    System.out.println("RandomPortSocketFactory constructor(2) basePort = " + basePort + " range " + range);
+    //System.out.println("RandomPortSocketFactory constructor(2) basePort = " + basePort + " range " + range);
     this.basePort = basePort;
     this.range = range;
   }
