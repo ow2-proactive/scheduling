@@ -84,7 +84,7 @@ public class NonFunctionalException extends ProActiveException implements Serial
 	  
 	  
 	/**
-	 * @return
+	 * @return description
 	 */
 	public String getDescription() {
 		return description;
