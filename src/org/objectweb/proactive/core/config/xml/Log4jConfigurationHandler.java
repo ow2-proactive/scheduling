@@ -25,14 +25,16 @@ public class Log4jConfigurationHandler extends AbstractUnmarshallerDecorator
         String file = attributes.getValue("file");
       //  System.out.println("file is " + file);
       //we check if there is an already defined property
-//      if (System.getProperty("log4j.configuration") != null) {
+      if (System.getProperty("log4j.configuration") == null) {
+		PropertyConfigurator.configure(relativeToAbsolute(file));
+      }
 //      	System.out.println("Already defined configuration for log4j");
 //		System.out.println(System.getProperty("log4j.configuration"));
 //		PropertyConfigurator.configure(System.getProperty("log4j.configuration"));
 //      	
 //      } else {
 //      
-        PropertyConfigurator.configure(relativeToAbsolute(file));
+        
     //  }
 	 // System.out.println(ProActiveConfiguration.class.getResource("ProActiveConfiguration.xml"));
 	//	String s = "jar:file:/home1/fabrice/workProActive/ProActive/dist/ProActive/ProActive.jar!/org/objectweb/proactive/core/config/../../../../../../scripts/unix/proactive-log4j";
