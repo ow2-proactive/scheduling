@@ -32,15 +32,28 @@ package org.objectweb.proactive.core.component.adl.vnexportation;
 
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 
-
-
-
 /**
+ * A builder interface for composing exported virtual nodes.
+ * 
  * @author Matthieu Morel
  *
  */
 public interface ExportedVirtualNodesBuilder {
     
+    /**
+     * <p> Composes exported virtual nodes. This is a way to reorganize the physical deployment of the components. </p>
+     * <p> The exported virtual nodes that do not have parents (they are not themselves exported) *must* correspond
+     * to the virtual nodes specified in the proactive deployment descriptor. They must also match cardinalities : if an 
+     * exported virtual node has a "multiple" cardinality", it must be corresponding to a "multiple" virtual node, i.e. a 
+     * virtual node that contains several nodes. </p>
+     * <p>This method validates and performs the linkage, keeps it in memory, and allows hierarchical composition 
+     * of exported virtual nodes. </p>
+     * 
+     * @param componentName the name of the component
+     * @param exportedVirtualNodes an array of the exported virtual nodes elements for this component
+     * @param currentComponentVN the virtual node to export
+     * @throws Exception in case of a composition error
+     */
     void compose(String componentName, ExportedVirtualNode[] exportedVirtualNodes, VirtualNode currentComponentVN) throws Exception;
     
 

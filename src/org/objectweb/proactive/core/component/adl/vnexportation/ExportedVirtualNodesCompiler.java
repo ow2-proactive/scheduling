@@ -48,6 +48,11 @@ import java.util.Map;
 
 
 /**
+ * A {@link org.objectweb.fractal.adl.components.PrimitiveCompiler} to compile 
+ * {@link org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodes} 
+ * in definitions.
+ * 
+ * 
  * @author Matthieu Morel
  *
  */
@@ -86,27 +91,26 @@ public class ExportedVirtualNodesCompiler implements PrimitiveCompiler,
             if (exported_vns != null) {
 //                InstanceProviderTask c = (InstanceProviderTask) tasks.getTask("create",
 //                        container);
-                String component_name;
-                if (container instanceof Component) {
-                    component_name = ((Component) container).getName();
-                } else {
+                String component_name = null;
+                if (container instanceof Definition) {
                     component_name = ((Definition) container).getName();
                 }
+                else if (container instanceof Component) {
+                    component_name = ((Component) container).getName();
+                } 
+//                else {
+//                    component_name = ((Definition) container).getName();
+//                }
                 VirtualNode current_component_vn = (VirtualNode)((VirtualNodeContainer)container).getVirtualNode();
                 SetExportedVirtualNodesTask t = new SetExportedVirtualNodesTask(component_name,
                         builder, exported_vns.getExportedVirtualNodes(), current_component_vn);
 
-                //t.setInstanceProviderTask(createTask);
-                
                 InstanceProviderTask createTask = 
                     (InstanceProviderTask)tasks.getTask("create", container);
 
-                
+                // exportations to be known *before* the creation of components.
                 createTask.addPreviousTask(t);
                 
-                //tasks.addTask("attr" + attrs[i].getName(), container, t);
-
-                //t.setInstanceProviderTask(c);
                 tasks.addTask("exportedVirtualNodes", container, t);
             }
         }
