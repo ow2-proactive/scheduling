@@ -94,22 +94,22 @@ windows>build.bat examples
 linux>build examples
 cd ..</pre>
 <p>Add "./classes" directory to CLASSPATH to use these two new source files</p>
-<pre>windows>set CLASSPATH=.;.\classes;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\fractal.jar;.\lib\bouncycastle.jar</pre>
-<pre>linux>export CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/fractal.jar:./lib/bouncycastle.jar</pre>
+<code>windows>set CLASSPATH=.;.\classes;.\ProActive_examples.jar;.\ProActive.jar;.\lib\bcel.jar;.\lib\asm.jar;.\lib\log4j.jar;.\lib\xercesImpl.jar;.\lib\fractal.jar;.\lib\bouncycastle.jar</code>
+<code>linux>export CLASSPATH=.:./classes:./ProActive_examples.jar:./ProActive.jar:./lib/bcel.jar:./lib/asm.jar:./lib/log4j.jar:./lib/xercesImpl.jar:./lib/fractal.jar:./lib/bouncycastle.jar</code>
 
 <h2>Execution</h2>
 <p>Execution is similar to the previous example; just use the InitializedHelloClient client class and InitializedHello server class.<br>
 <h4>Starting the server</h4>
-<pre>
-linux>   java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.InitializedHello &
-windows> java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.InitializedHello
-</pre>
+<code>
+linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.InitializedHello<br><br>
+windows> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.InitializedHello &
+</code>
 
 <h4>Launching the client</h4>
-<pre>
-linux>   java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello
-windows> java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello
-</pre>
+<code>
+linux>   java -Djava.security.policy=scripts/unix/proactive.java.policy -Dlog4j.configuration=file:scripts/unix/proactive-log4j org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello<br><br>
+windows> java -Djava.security.policy=scripts\unix\proactive.java.policy -Dlog4j.configuration=file:scripts\unix\proactive-log4j org.objectweb.proactive.examples.hello.InitializedHelloClient //localhost/Hello
+</code>
 
 </body>
 </html>
