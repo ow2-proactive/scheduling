@@ -10,6 +10,7 @@ import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 
 //import org.objectweb.fractal.adl.Registry;
+import org.objectweb.proactive.core.component.adl.Launcher;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -83,7 +84,7 @@ public class Test extends FunctionalTest {
 	 * @see testsuite.test.AbstractTest#endTest()
 	 */
 	public void endTest() throws Exception {
-		//deploymentDescriptor.killall(false);
+		Launcher.killNodes(false);
 	}
 
 	public boolean postConditions() throws Exception {
