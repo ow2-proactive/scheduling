@@ -316,7 +316,7 @@ public class DataAssociation implements JobMonitorConstants {
             Iterator iter = desc.iterator();
             while (iter.hasNext()) {
                 BasicMonitoredObject childObject = (BasicMonitoredObject) iter.next();
-                t.doSomething(childObject);
+                traverse(childObject, t);
             }
         }
     }
