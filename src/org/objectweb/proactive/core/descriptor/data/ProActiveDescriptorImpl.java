@@ -30,16 +30,13 @@
 */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.util.Collection;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-
-import java.util.Collection;
-import java.util.Iterator;
 
 
 /**
@@ -199,20 +196,25 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public void killall() throws ProActiveException {
-        ProActiveRuntime proactiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-        ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
-        for (int i = 0; i < runtimeArray.length; i++) {
-            try {
-            	System.out.println("ProActiveDescriptorImpl.killall() on " + i);
-            	System.out.println("ProActiveDescriptorImpl.killall() on " +  runtimeArray[i].getURL());
-                runtimeArray[i].killRT();
-            } catch (Exception e) {
-                logger.info(" Virutal Machine " +
-                    runtimeArray[i].getVMInformation().getVMID() + " on host " +
-                    runtimeArray[i].getVMInformation().getInetAddress()
-                                   .getHostName() + " terminated!!!");
-            }
-        }
+//        ProActiveRuntime proactiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+//        ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
+//        for (int i = 0; i < runtimeArray.length; i++) {
+//            try {
+//            	System.out.println("ProActiveDescriptorImpl.killall() on " + i);
+//            	System.out.println("ProActiveDescriptorImpl.killall() on " +  runtimeArray[i].getURL());
+//                runtimeArray[i].killRT();
+//            } catch (Exception e) {
+//                logger.info(" Virutal Machine " +
+//                    runtimeArray[i].getVMInformation().getVMID() + " on host " +
+//                    runtimeArray[i].getVMInformation().getInetAddress()
+//                                   .getHostName() + " terminated!!!");
+//            }
+//        }
+		VirtualNode [] vnArray = getVirtualNodes();
+		for (int i = 0; i < vnArray.length; i++){
+			vnArray[i].killAll();
+			vnArray[i] = null;		
+		}
     }
 
     //  public void desactivateMapping(){
