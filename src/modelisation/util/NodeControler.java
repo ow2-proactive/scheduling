@@ -74,7 +74,7 @@ public class NodeControler {
 
         //	Matcher m = p.matcher(nodeName);
         Matcher m = p.matcher(nodeName);
-        boolean matchFound = m.find();
+      //  boolean matchFound = m.find();
 
         //	  if (matchFound) {
         //		  // Get all groups for this match
@@ -96,7 +96,6 @@ public class NodeControler {
     }
 
     public boolean startNode(String name, String redirect) {
-        int currentTry = 1;
         boolean result;
         RSHNodeProcessImpl p = null;
 
@@ -170,7 +169,6 @@ public class NodeControler {
 
     public boolean startAllNodes(String names, String redirect) {
         StringTokenizer st = null;
-        String tmp;
         boolean ok = true;
 
         //boolean tmp;
@@ -197,7 +195,6 @@ public class NodeControler {
     public boolean getAllNodes(String names) {
         System.out.println("NodeControler: getAllNodes() " + names);
         StringTokenizer st = null;
-        String tmp;
         boolean ok = true;
         for (st = new StringTokenizer(names); st.hasMoreTokens();) {
             ok = ok && getNode(st.nextToken());
