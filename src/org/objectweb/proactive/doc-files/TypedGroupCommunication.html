@@ -59,7 +59,7 @@ Here, a short compilation about the syntax and some method used in
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
-A ag1 = (A) ProActiveGroup.newActiveGroup( "A", params, [nodes]);
+A ag1 = (A) ProActiveGroup.newGroup( "A", params, [nodes]);
 
    // A general group communication without result
    // A request to foo is sent in parallel to all active objects 
@@ -79,7 +79,7 @@ vg.f1();
 <p class="textNormal">
 Any object that is reifiable has the ability to be included in a
       group. Groups are created using the static method
-      <code><a href="../core/group/ProActiveGroup.html#newActiveGroup(java.lang.String)">ProActiveGroup.newActiveGroup</a></code>.
+      <code><a href="../core/group/ProActiveGroup.html#newGroup(java.lang.String)">ProActiveGroup.newGroup</a></code>.
 The  superclass common for all the group
 members has to be specified, thus giving the group a minimal type.
 <br><br>
@@ -108,23 +108,21 @@ Node[] nodes  = { ... , ..., ... };
 
    // Solution 1: 
    // create an empty group of type "A"
-A ag1 = (A) ProActiveGroup.newActiveGroup("A");
+A ag1 = (A) ProActiveGroup.newGroup("A");
 
    // Solution 2: 
    // a group of type "A" and its members are 
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
-A ag2 = (A) ProActiveGroup.newActiveGroup(
-                               "A", params, nodes);
+A ag2 = (A) ProActiveGroup.newGroup("A", params, nodes);
 
    // Solution 3: 
    // a group of type "A"  and its members are 
    // created at once, 
    // with parameters specified in params,
    // and on the nodes directly specified 
-A ag3 = (A) ProActiveGroup.newActiveGroup(
-                   "A", params[], 
+A ag3 = (A) ProActiveGroup.newGroup("A", params[], 
                    {rmi://globus1.inria.fr/Node1,
                     rmi://globus2.inria.fr/Node2});
 </pre></blockquote>
