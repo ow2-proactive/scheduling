@@ -36,6 +36,8 @@ import java.lang.reflect.Modifier;
 
 import java.util.HashMap;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * A place where static methods go
@@ -47,6 +49,7 @@ public abstract class MOP {
      */
     protected static String STUB_OBJECT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
     protected static Class STUB_OBJECT_INTERFACE;
+	protected static Logger logger = Logger.getLogger(MOP.class.getName());
 
     /**
      * The root interface of all metabehaviors
@@ -254,7 +257,7 @@ public abstract class MOP {
 			   if (stubClass.getClassLoader() != null) {
 				 targetClass = stubClass.getClassLoader().loadClass(nameOfClass);
 			   } else {
-			 		System.out.println("TargetClass  " + targetClass + " has null classloader");
+			 		logger.info("TargetClass  " + targetClass + " has null classloader");
         		
 			 	}
 				// MOP.forName(nameOfClass);//   addClassToCache(nameOfStubClass, targetClass);
