@@ -1195,26 +1195,28 @@ public class ProActive {
        */
     public static Handler searchExceptionHandler(NonFunctionalException ex,
         Object target) {
-        
-		// Temporary handler
+        // Temporary handler
         Handler handler = null;
-        
+
         // Try to get a handler from object level (active object = body or proxy)
         if (target != null) {
-        
-			// Try to get an handler from code level
-			if ((handler = searchExceptionHandler(ex.getClass(), (HashMap) codeLevel.get(new Integer(target.hashCode())),
-									Handler.ID_Code)) != null) {
-						return handler;
-					}
-    
+            // Try to get an handler from code level
+            if (codeLevel != null) {
+                if ((handler = searchExceptionHandler(ex.getClass(),
+                                (HashMap) codeLevel.get(
+                                    new Integer(target.hashCode())),
+                                Handler.ID_Code)) != null) {
+                    return handler;
+                }
+            }
+
             // target is local body (i.e. active object level) ?			
             if (target instanceof ActiveBody) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("*** SEARCHING HANDLER IN LOCAL BODY");
                 }
                 try {
-					UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                    UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Body)) != null) {
@@ -1225,14 +1227,14 @@ public class ProActive {
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-                
-			// target is remote body (i.e. active object level) ?
+
+                // target is remote body (i.e. active object level) ?
             } else if (target instanceof RemoteBodyAdapter) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("*** SEARCHING HANDLER IN REMOTE BODY");
                 }
                 try {
-					UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                    UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getRemoteAdapter()
                                    .getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
@@ -1244,15 +1246,15 @@ public class ProActive {
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-                
-			// target is a proxy (i.e. a ref. to a body) ?
+
+                // target is a proxy (i.e. a ref. to a body) ?
             } else if (target instanceof AbstractProxy) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("*** SEARCHING HANDLER IN PROXY");
-				}
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCHING HANDLER IN PROXY");
+                }
                 try {
-                	HashMap map = ((AbstractProxy) target).getHandlersLevel();
-					if ((handler = searchExceptionHandler(ex.getClass(), map,
+                    HashMap map = ((AbstractProxy) target).getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Proxy)) != null) {
                         return handler;
                     }
@@ -1286,7 +1288,6 @@ public class ProActive {
      */
     public static Handler searchExceptionHandler(Class NFEClass, HashMap level,
         int levelID) {
-        	
         // Test level capacity
         if ((level == null) || level.isEmpty()) {
             return null;
@@ -1385,9 +1386,10 @@ public class ProActive {
                     }
                 }
             } else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("*** ERROR: CANNOT ADD HANDLER TO NULL BODY OBJECT");
-				}
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD HANDLER TO NULL BODY OBJECT");
+                }
             }
             break;
         case (Handler.ID_Proxy):
@@ -1403,30 +1405,35 @@ public class ProActive {
                     }
                 }
             } else {
-				if (logger.isDebugEnabled()) {
-					logger.debug("*** ERROR: CANNOT ADD HANDLER TO NULL PROXY OBJECT");
-				}
-			}
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD HANDLER TO NULL PROXY OBJECT");
+                }
+            }
             break;
         case (Handler.ID_Future):
             break;
         case (Handler.ID_Code):
-			if (target != null) { 
-            	if (codeLevel == null) {
-                	codeLevel = new HashMap();
-            	}
-            	// Try to get the hashmap associated to this object
-            	if (codeLevel.containsKey(new Integer(target.hashCode()))) {
-            		((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception, handler);
-            	} else {
-            		codeLevel.put(new Integer(target.hashCode()), new HashMap());
-					((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception, handler);
-            	}
-			} else {
-				if (logger.isDebugEnabled()) {
-						logger.debug("*** ERROR: CANNOT ADD TEMP. HANDLER TO NULL OBJECT");
-				}
-			}
+            if (target != null) {
+                if (codeLevel == null) {
+                    codeLevel = new HashMap();
+                }
+
+                // Try to get the hashmap associated to this object
+                if (codeLevel.containsKey(new Integer(target.hashCode()))) {
+                    ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
+                        handler);
+                } else {
+                    codeLevel.put(new Integer(target.hashCode()), new HashMap());
+                    ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
+                        handler);
+                }
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD TEMP. HANDLER TO NULL OBJECT");
+                }
+            }
             break;
         }
     }
@@ -1460,14 +1467,13 @@ public class ProActive {
         case (Handler.ID_Body):
             // The target must be a body
             if (((target != null) && target instanceof UniversalBody)) {
-                
                 //	Get the body of target (remote) object
                 UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                 try {
                     if (body instanceof ActiveBody) {
-                                  body.unsetExceptionHandler(exception);
+                        body.unsetExceptionHandler(exception);
                     } else if (body instanceof RemoteBodyAdapter) {
-                             body.getRemoteAdapter().unsetExceptionHandler(exception);
+                        body.getRemoteAdapter().unsetExceptionHandler(exception);
                     }
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
@@ -1480,7 +1486,6 @@ public class ProActive {
         case (Handler.ID_Proxy):
             // The target must be a proxy
             if (((target != null) && target instanceof AbstractProxy)) {
-                
                 // Create a request to associate handler to the distant body
                 try {
                     handler = ((AbstractProxy) target).unsetExceptionHandler(exception);
@@ -1496,12 +1501,13 @@ public class ProActive {
         case (Handler.ID_Future):
             break;
         case (Handler.ID_Code):
-			if (target != null && codeLevel != null) {
-				if (codeLevel.containsKey(new Integer(target.hashCode()))) {
-					handlerClass = (Class) ((HashMap) codeLevel.get(new Integer(target.hashCode()))).remove(exception);
-				}
-			}
-			break;
+            if ((target != null) && (codeLevel != null)) {
+                if (codeLevel.containsKey(new Integer(target.hashCode()))) {
+                    handlerClass = (Class) ((HashMap) codeLevel.get(new Integer(
+                                target.hashCode()))).remove(exception);
+                }
+            }
+            break;
         }
 
         // Instantiation of the removed handler
