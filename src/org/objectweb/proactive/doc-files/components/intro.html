@@ -168,19 +168,78 @@ The <code>Fractive</code> class acts as :
 
 <h2>Architecture Description Language</h2>
 <p class="textNormal">The Architecture Description Language (ADL) is used to configure and deploy component systems. The architecture of the system is described in a normalized XML file.</p>
-<p class="textNormal">Currently, it uses the ProActive parser, does not support type extensions, and does not allow template components. This is why it looks different from Julia's (or the Fractal ADL version 1). However, it fulfills its role, as it allows the deployment of the components.</p>
-<p class="textNormal">The word "deployment" is used here to designate the instantiation of components on a distributed environment. The distributed deployment facilities offered by ProActive are reused, and the notion of virtual node is integrated in the component ADL. For this reason, the components ADL has to be associated with a deployment descriptor (this is done at parsing time : both files are given to the parser).</p>
-<p class="textNormal">The easiest way to understand the ADL is to see <a href="helloworld-distributed.html" target="_blank">an example</a>. It corresponds to the helloworld example described later.<br>
-As you can see, the document is validated against an xml schema (first line of the document), and contains 2 sections. The first section is the definition of the types of the components. The second section defines the instances of the components.</p>
-<p class="textNormal"><b>Primitive </b>components have the following attributes : name, type, implementation (signature of the implementation class), and virtualNode.<br>
-<b>Composite </b>components have the following attributes : name, type, virtualNode. They contain a list of components, which are bound in the bindings element<br>
-<b>Parallel </b>components have the following attributes : name, type, virtualNode. They must contain a list of components of the same type, and these elements are bound automatically. The bindings element is not useful here.</p>
+<p><b>The ADL has been updated </b>and is now an extension of the standard Fractal ADL, allowing to reuse ProActive-specific features such as distributed deployment using deployment descriptors.</p><p>The distributed deployment facilities offered by ProActive are reused, and the notion of virtual node is integrated in the component ADL. For this reason, the components ADL has to be associated with a deployment descriptor (this is done at parsing time : both files are given to the parser).</p>
+<p>One should refer to the <a href="http://fractal.objectweb.org/tutorials/adl/index.html">Fractal ADL tutorial</a> for more detailed information about the ADL. Here is a short overview, and a presentation of some added features.</p>
 
-<p class="textNormal">The <b>virtualNode</b> attribute offers deployment information. It is an optional atribute : when omitted, the component is deployed in the current virtual machine (the virtual machine of the parser). If the attribute is present, it can be "null", otherwise it must contain the name of a virtual node that appears in its associated deployment descriptor. Having the "null" value is equivalent to omitting the virtualNode attribute. If a virtual node is specified, then the component will be instantiated on the virtual node. For a composite or a parallel component, it means it will be instantiated on the (first if there are several nodes defined) node of the virtual node. For a primitive component, if the virtual node defines several nodes, then there will be as many instances of the primitive component as there are underlying nodes. Each of these instances will have a suffixed name like : "primiveComponentName-cyclicInstanceNumber-n", where primitiveComponentName is the name defined in the ADL. This automatic replication is used in the parallel components.</p>
-
-<p class="textNormal">The ADL will most probably evolve towards the new version of the ADL for Fractal, which is more flexible. As a consequence Fractal projects and implementations would share a common base for configuration and deployment tools.</p>
-
-
+<h3>Overview</h3>
+<p>Components are defined in <b>definition</b> files, which are .fractal files. The syntax of the document is validated against a DTD retreived from the classpath <pre class="snippet">classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd</pre></p>
+<p>The <b>definition</b> element has a name (which must be the same name that the file's) and inheritance is supported through the attribute "extends" :
+<pre class="snippet">definition name="org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers"</pre></p>
+<p>The exportedVirtualNodes elements is described later in this section</p>
+<p>Components can be specified and created in this definition, and these components can themselves be defined in other definition files :
+<pre class="snippet">component name="client-wrapper" definition="org.objectweb.proactive.examples.components.helloworld.ClientType"</pre></p>
+<p>Nesting is allowed for composite components and is done by adding other "component" elements.</p>
+<p>The <b>binding</b> element specifies bindings between interfaces of components ", and specifying "this" as the name of the component refers to the current enclosing component.
+<pre class="snippet">binding client="this.r" server="client.r"/</pre> </p>
+<p>The <b>controller</b> elements can have the following "desc" values : "composite", "parallel" or "primitive". A parallel component and the components it contains should be type-compatible</p>
+<p>Primitive components specify the <b>content</b> element, which indicates the implementation class containing the business logic for this component :
+<pre class="snippet">content class="org.objectweb.proactive.examples.components.helloworld.ClientImpl"</pre> </p>
+<p>The <b>virtual-node</b> element offers distributed deployment information. It can be exported and composed in the exportedVirtualNodes element.<br>
+The component will be instantiated on the virtual node it specified (or the one that it exported). For a composite or a parallel component, it means it will be instantiated on the (first if there are several nodes mapped) node of the virtual node. For a primitive component, if the virtual node defines several nodes (cardinality="multiple"), there will be as many instances of the primitive component as there are underlying nodes. Each of these instances will have a suffixed name looking like : "primiveComponentName-cyclicInstanceNumber-n", where primitiveComponentName is the name defined in the ADL. This automatic replication is used in the parallel components.
+<pre class="snippet">virtual-node name="client-node" cardinality="single"</pre></p>
+<p></p>
+<p>The syntax is similar to the standard Fractal ADL, and the parsing engine has been extended. Features specific to ProActive are : <ul>
+   <li>Virtual nodes have a cardinality property : either "single" or "multiple". When "single", it means the virtual node in the deployment descriptor should contain 1 node ; when "multiple", it means the virtual node in the deployment descriptor should contain more than 1 node. </li>
+   <li>Virtual nodes can be <b>exported</b> and <b>composed</b>. </li>
+   <li>Template components are not handled.  </li>
+   <li>The controller description includes "parallel" as a valid attribute.</li>
+   <li>The validating DTD has to be specified as : classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd</li>
+ </ul>
+</p>
+<h3>Example</h3>
+<p class="textNormal">The easiest way to understand the ADL is to see <a href="helloworld-distributed.html" target="_blank">an example</a>. It corresponds to the helloworld example described later in this document.<br>
+<p></p>
+<h3>Exportation and composition of virtual nodes</h3>
+<p>Components are deployed on the virtual node that is specified in their definition ; it has to appear in the deployment descriptor <u>unless</u> this virtual node is exported. In this case, the name of the exported virtual node should appear in the deployment descriptor, unless this exported virtual node is itself exported.</p>
+<p>When exported, a virtual node can take part in the composition of other exported virtual nodes. The idea is to further extend reusability of existing (and packaged, packaging being a forthcoming feature of Fractal) components.</p>
+<p>In the example, the component defined in helloworld-distributed-wrappers.fractal exports the virtual nodes VN1 and VN2:
+<pre class="snippet">exportedVirtualNodes
+    	exportedVirtualNode name="VN1"
+    		composedFrom
+        		composingVirtualNode component="client" name="client-node"
+    		/composedFrom
+    	/exportedVirtualNode
+    	exportedVirtualNode name="VN2"
+    		composedFrom
+        		composingVirtualNode component="server" name="server-node"/
+    		/composedFrom
+    	/exportedVirtualNode
+    /exportedVirtualNodes</pre></p>
+<p>VN1 is composed of the exported virtual node "client-node" from the component named client</p>
+<p>In the definition of the client component (ClientImpl.fractal), we can see that client-node is an exportation of a virtual node which is also name "client-node" :
+<pre class="snippet">exportedVirtualNodes
+    	exportedVirtualNode name="client-node"
+    		composedFrom
+        		composingVirtualNode component="this" name="client-node"/
+    		/composedFrom
+    	/exportedVirtualNode
+    /exportedVirtualNodes
+    ...
+    virtual-node name="client-node" cardinality="single"/</pre></p>
+    <p>Although this is a simplistic example, one should foresee a situation where ClientImpl would be a prepackaged component, where its ADL could not be modified ; the exportation and composition of virtual nodes allow to adapt the deployment of  the system depending on the existing infrastructure. Colocation can be specified in the enclosing component definition (helloworld-distributed-wrappers.fractal) :
+<pre class="snippet">exportedVirtualNodes
+    	exportedVirtualNode name="VN1"
+    		composedFrom
+        		composingVirtualNode component="client" name="client-node"
+        		composingVirtualNode component="server" name="server-node"/
+    		/composedFrom
+    	/exportedVirtualNode
+    /exportedVirtualNodes</pre></p>
+    </p>
+    <p> As a result, the client and server component will be colocated / deployed on the same virtual node. This can be profitable if there is a lot of communications between these two components.</p>
+    <p>When specifying "null" as the name of an exported virtual node, the components will be deployed on the current virtual machine. This can be useful for debugging purposes.</p>
+   
+    <p>This new ADL will facilitate integration with other tools from the Fractal community, notably the Fractal GUI and the packaging tools. We are currently finalizing an extension of the FractalGUI for ProActive.</p>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
@@ -190,14 +249,14 @@ As you can see, the document is validated against an xml schema (first line of t
 </p>
 
 <h3>From objects to active objects to distributed components</h3>
-<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes, while components are created from component definitions. Let us first consider the "Toto" interface :</p>
-<pre class="snippet">public interface Toto {
+<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes, while components are created from component definitions. Let us first consider the "A" interface :</p>
+<pre class="snippet">public interface A {
         public String foo(); // dummy method
 }
 </pre>
-<p>"TotoImpl" is the class implementing this interface :</p>
-<pre class="snippet">public class TotoImpl implements Toto {
-        public Toto() {}
+<p>"AImpl" is the class implementing this interface :</p>
+<pre class="snippet">public class AImpl implements A {
+        public AImpl() {}
 
         public String foo() {
                 // do something
@@ -206,12 +265,12 @@ As you can see, the document is validated against an xml schema (first line of t
 </pre>
 <p>The class is then instantiated in a standard way :
 </p>
-<pre class="snippet">Toto object = new TotoImpl();</pre>
+<pre class="snippet">A object = new AImpl();</pre>
 
 <p>Active objects are instantiated using factory methods from the ProActive class (see the <a href="../HelloWorld.html">ProActive Hello World example </a>). It is also possible to specify the activity of the active object, the location (node or virtual node), or a factory for meta-objects, using the appropriate factory method.
 </p>
-<pre class="snippet">Toto active_object = (Toto)ProActive.newActive(
-        TotoImpl, // signature of the base class
+<pre class="snippet">A active_object = (A)ProActive.newActive(
+        AImpl, // signature of the base class
         new Object[] {}, // Object[]
         aNode, // location, could also be a virtual node
         );
@@ -229,11 +288,11 @@ We then get the TypeFactory interface provided by this bootstrap component:
 <pre class="snippet">TypeFactory tf = (TypeFactory)boot.getFcInterface("type-factory");
 </pre>
 <p>
-We can then create the type of the first component, which only provides a Toto server interface named "toto":
+We can then create the type of the first component, which only provides a A server interface named "a":
 </p>
-<pre class="snippet">// type of the toto component
-ComponentType totoType = tf.createFcType(new InterfaceType[] {
-  tf.createFcItfType("toto", "Toto", false, false, false)
+<pre class="snippet">// type of the a component
+ComponentType aType = tf.createFcType(new InterfaceType[] {
+  tf.createFcItfType("a", "A", false, false, false)
 });
 </pre>
 
@@ -241,7 +300,7 @@ ComponentType totoType = tf.createFcType(new InterfaceType[] {
 <p>The second step in the definition of a component is the definition of its content. In this implementation, this is done through the ContentDescription class :
 </p>
 <pre class="snippet">ContentDescription contentDesc = new ContentDescription(
-            TotoImpl, // signature of the base class
+            AImpl, // signature of the base class
             new Object[] {}, // Object[]
             aNode, // location, could also be a virtual node
             );
@@ -266,14 +325,14 @@ ComponentType totoType = tf.createFcType(new InterfaceType[] {
 <h4>From attributes to client interfaces</h4>
 <p>There are 2 kinds of interfaces for a component : those that offer services, and those that require services. They are named respectively server and client interfaces.
 </p>
-<p>From a Java class, it is fairly natural to identify server interfaces : they (can) correspond to the Java interfaces implemented by the class. In the above example, "toto" is the name of an interface provided by the component, corresponding to the "Toto" Java interface.
+<p>From a Java class, it is fairly natural to identify server interfaces : they (can) correspond to the Java interfaces implemented by the class. In the above example, "a" is the name of an interface provided by the component, corresponding to the "A" Java interface.
 </p>
-<p>On the other hand, client interfaces usually correspond to attributes of the class, in the case of a primitive component. If the component defined above requires a service from another component, say the one corresponding to the "Service" Java interface, the TotoImpl class should be modified. As we use the <i>inversion of control </i>pattern, a BindingController is provided, and a binding operation on the "requiredService" interface will actually set the value of the "service" attribute, of type "Service".</p>
+<p>On the other hand, client interfaces usually correspond to attributes of the class, in the case of a primitive component. If the component defined above requires a service from another component, say the one corresponding to the "Service" Java interface, the AImpl class should be modified. As we use the <i>inversion of control </i>pattern, a BindingController is provided, and a binding operation on the "requiredService" interface will actually set the value of the "service" attribute, of type "Service".</p>
 <p>First, the type of the component is changed :</p>
-<pre class="snippet">// type of the toto component
-ComponentType totoType = tf.createFcType(new InterfaceType[] {
-  tf.createFcItfType("toto", "Toto", false, false, false),
-  tf.createFcItfType("requiredService", "Toto", true, false, false)
+<pre class="snippet">// type of the a component
+ComponentType aType = tf.createFcType(new InterfaceType[] {
+  tf.createFcItfType("a", "A", false, false, false),
+  tf.createFcItfType("requiredService", "A", true, false, false)
 });
 </pre>
 <p>The Service interface is the following :
@@ -283,15 +342,15 @@ public interface Service {
         public String bar();
 }
 </pre>
-<p>And the TotoImpl class is :
+<p>And the AImpl class is :
 </p>
-<pre class="snippet">// The modified TotoImpl class
-public class TotoImpl implements Toto, BindingController {
+<pre class="snippet">// The modified AImpl class
+public class AImpl implements A, BindingController {
         Service service; // attribute corresponding to a client interface
 
-        public TotoImpl() {}
+        public AImpl() {}
 
-        // implementation of the Toto interface
+        // implementation of the A interface
         public String foo() {
                 return s.bar(); // for example
         }
@@ -339,10 +398,11 @@ You can find the code for this example in the package org.objectweb.proactive.ex
  <p class="textNormal">
  The differences are the following :
 <ul>
-<li class="textNormal">The reference example is provided for level 3.3. implementation, whereas this current implementation is at level 3.2 : templates are not provided. Thus you will have to skip the specific code for templates. </LI>
+<li class="textNormal">The reference example is provided for level 3.3. implementation, whereas this current implementation is compliant up to level 3.2 : templates are not provided. Thus you will have to skip the specific code for templates. </LI>
 <li class="textNormal">The <code>newFcInstance</code> method of the <code>GenericFactory</code> interface, used for directly creating components, takes 2 implementation-specific parameters. So you should use the <code>org.objectweb.proactive.component.ControllerDescription</code> and <code>org.objectweb.proactive.component.ContentDescription</code> classes to define ProActive components. (It is possible to use the same parameters than in Julia, but that hinders you from using some functionalities specific to ProActive, such as distributed deployment or definition of the activity).</li>
 <li class="textNormal">Collective interfaces could be implemented the same way than suggested, but using the <code>Fractive.createCollectiveClientInterface</code> method will prove useful with this implementation : you are then able to use the functionalities provided by the typed groups API.</li>
 <li class="textNormal">Components can be distributed</li>
+<li class="textNormal">the ClientImpl provides an empty no-args constructor.</li>
 </ul>
 
 
@@ -358,9 +418,9 @@ Another configuration is also possible, where client and server are wrapped arou
 
 <h4>Distributed deployment</h4>
 <P class="textNormal">This section is specific to the ProActive implementation, as it uses the deployment framework of this library.</P>
-<p class="textNormal">If the application is started with the parameter "distributed", a different ADL is used, where virtualNode attributes are specified for primitive components. The loader (the parser) then loads the ADL file "helloworld-distributed.xml". Virtual node names match those defined in the deployment descriptor "deployment.xml".</p>
+<p class="textNormal">If the application is started with (only) the parameter "distributed", the ADL used is "helloworld-distributed.fractal", where virtualNode of the client and server components are exported as VN1 and VN2. Exported virtual node names from the ADL match those defined in the deployment descriptor "deployment.xml".</p>
 <p class="textNormal">One can of course customize the deployment descriptor and deploy components onto virtually any computer, provided it is connectable by supported protocols. Supported protocols include LAN, clusters and Grid protocols (see <a href="../Descriptor.html">deployment descriptors documentation</a>).</p>
-<p class="textNormal">Have a look at this ADL file "helloworld-distributed.xml". To sum it up, it says : "the primitive component of the application (client and server) will run on Virtual Nodes, whereas the other components (wrappers, root components) will run on the current JVM.</p>
+<p class="textNormal">Have a look at the ADL files "helloworld-distributed.fractal" and "helloworld-distributed-wrappers.fractal". In a nutshell, they say : "the primitive components of the application (client and server) will run on given exported virtual nodes, whereas the other components (wrappers, root component) will run on the current JVM.</p>
 <p class="textNormal">
 </p>
 
@@ -376,40 +436,126 @@ Another configuration is also possible, where client and server are wrapped arou
 <img align="middle" src="pics/distributed-components-wrappers.gif" alt="distributed-components, wrappers"/>
 <p class="textNormal">
 </p>
-<p class="textNormal">One can now figure how easy it is to define and deploy a distributed component system with ProActive.</p>
-<p class="textNormal">Currently, bindings are not optimized. For example, in the configuration with wrappers, there is an indirection that can be costly, between the client and the server. We are currently working on optimizations that would allow to shortcut communications. It is the same idea than in Julia, but we are dealing here with distributed components. It will probably imply compromises between dynamicity and performance issues.
+<p class="textNormal">Currently, bindings are not optimized. For example, in the configuration with wrappers, there is an indirection that can be costly, between the client and the server. We are currently working on optimizations that would allow to shortcut communications, while still allowing coherent dynamic reconfiguration. It is the same idea than in Julia, but we are dealing here with distributed components. It could imply compromises between dynamicity and performance issues.
 </p>
 
 <h4>Execution</h4>
-<p>You should get something like :</p>
+<p>You can either compile and run the code yourself, or follow the instructions for preparing the examples and use the script helloworld_fractal.sh (or .bat)</p>
+<p>If you run the program with no arguments (i.e. not using the parser, no wrapper composite components, and local deployment) , you should get something like this: </p>
+<pre class="snippet">
+01  --> This ClassFileServer is reading resources from classpath
+02 Jini enabled
+03 Ibis enabled
+04 Created a new registry on port 1099
+05 //crusoe.inria.fr/Node363257273 successfully bound in registry at //crusoe.inria.fr/Node363257273
+06 Generating class : pa.stub.org.objectweb.proactive.core.component.type.Stub_Composite
+07 Generating class : pa.stub.org.objectweb.proactive.examples.components.helloworld.Stub_ClientImpl
+08 Generating class : pa.stub.org.objectweb.proactive.examples.components.helloworld.Stub_ServerImpl
+</pre>
+<p>You can see : <ul>
+<li>line 01 : the creation of the class file server which handles the on-the-fly generation and distribution of ProActive stubs and component functional interfaces</li>
+<li>line 04 : the creation of a rmi registry</li>
+<li>line 05 : the registration of the default runtime node</li>
+<li>line 06 to 08 : the on-the-fly generation of ProActive stubs (the generation of component functional interfaces is silent)</li>
+</ul>
+<p>Then you have : </p>
 <pre class="snippet">
 01 Server: print method called
-02 Server: begin printing...
-03 Server: print done.
-04	at org.objectweb.proactive.examples.components.helloworld.ServerImpl.print(ServerImpl.java:36)
-05	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
-06	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
-07	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
-08	at java.lang.reflect.Method.invoke(Method.java:324)
-09	at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:358)
-10	at org.objectweb.proactive.core.component.request.ComponentRequestImpl.serveInternal(ComponentRequestImpl.java:122)
-11	at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:105)
-12	at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:274)
-13	at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:753)
-14	at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivity(ActiveBody.java:230)
-15	at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
-16	at java.lang.Thread.run(Thread.java:536)
+02        at org.objectweb.proactive.examples.components.helloworld.ServerImpl.print(ServerImpl.java:37)
+03        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+04        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+05        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+06        at java.lang.reflect.Method.invoke(Method.java:324)
+07        at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:373)
+08        at org.objectweb.proactive.core.component.request.ComponentRequestImpl.serveInternal(ComponentRequestImpl.java:163)
+09        at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:108)
+10        at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:297)
+11        at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:799)
+12        at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivity(ActiveBody.java:230)
+13        at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
+14        at java.lang.Thread.run(Thread.java:534)
+15 Server: begin printing...
+16 --------> hello world
+17 Server: print done.
 </pre>
 <p>What can be seen is very different from the output you would get with the Julia implementation. Here is what happens (from bottom to top of the
 stack):
 <ul>
-<LI>line 16 : The active object runs its activity in its own Thread</LI>
-<LI>line 14 : The default activity is to serve incoming request in a FIFO order</LI>
-<li>line 10 : Requests (reified method calls) are encapsulated in ComponentRequestImpl objects</li>
-<li>line 08 : A request is served using reflection</li>
-<li>line 04 : The method invoked by is the print method of an instance of ServerImpl</li>
+<LI>line 14 : The active object runs its activity in its own Thread</LI>
+<LI>line 12 : The default activity is to serve incoming request in a FIFO order</LI>
+<li>line 08 : Requests (reified method calls) are encapsulated in ComponentRequestImpl objects</li>
+<li>line 06 : A request is served using reflection</li>
+<li>line 02 : The method invoked is the print method of an instance of ServerImpl</li>
 </ul>
 </P>
+
+<p>Now let us have a look at the distributed deployment : execute the program with the parameters "distributed parser". You should get the following :</p>
+<pre class="snippet">
+01 --> This ClassFileServer is reading resources from classpath
+02 Jini enabled
+03 Ibis enabled
+04 Created a new registry on port 1099
+05 ************* Reading deployment descriptor: file:/0/user/mmorel/ProActive/classes/org/objectweb/proactive/examples/components/helloworld/deployment.xml ********************
+06 created VirtualNode name=VN1
+07 created VirtualNode name=VN2
+08 created VirtualNode name=VN3
+09 **** Starting jvm on crusoe.inria.fr
+10 --> This ClassFileServer is reading resources from classpath
+11 Jini enabled
+12 Ibis enabled
+13 Detected an existing RMI Registry on port 1099
+14 //crusoe.inria.fr/VN1462549848 successfully bound in registry at //crusoe.inria.fr/VN1462549848
+15 **** Mapping VirtualNode VN1 with Node: //crusoe.inria.fr/VN1462549848 done
+16 Generating class : pa.stub.org.objectweb.proactive.examples.components.helloworld.Stub_ClientImpl
+17 **** Starting jvm on crusoe.inria.fr
+18 --> This ClassFileServer is reading resources from classpath
+19 Jini enabled
+20 Ibis enabled
+21 Detected an existing RMI Registry on port 1099
+22 //crusoe.inria.fr/VN21334775605 successfully bound in registry at //crusoe.inria.fr/VN21334775605
+23 **** Mapping VirtualNode VN2 with Node: //crusoe.inria.fr/VN21334775605 done
+24 Generating class : pa.stub.org.objectweb.proactive.examples.components.helloworld.Stub_ServerImpl
+25 //crusoe.inria.fr/Node1145479146 successfully bound in registry at //crusoe.inria.fr/Node1145479146
+26 Generating class : pa.stub.org.objectweb.proactive.core.component.type.Stub_Composite
+27 MOPClassLoader: class not found, trying to generate it
+28 ClassServer sent class Generated_java_lang_Runnable_r_representative successfully
+39 MOPClassLoader: class not found, trying to generate it
+30 ClassServer sent class Generated_java_lang_Runnable_r_representative successfully
+31 MOPClassLoader: class not found, trying to generate it
+32 ClassServer sent class Generated_org_objectweb_proactive_examples_components_helloworld_Service_s_representative successfully
+33 MOPClassLoader: class not found, trying to generate it
+34 ClassServer sent class Generated_org_objectweb_proactive_examples_components_helloworld_ServiceAttributes_attribute_controller_representative successfully
+35 ClassServer sent class pa.stub.org.objectweb.proactive.examples.components.helloworld.Stub_ServerImpl successfully
+</pre>
+<p>What is new is  : <ul>
+<li>line 05 the parsing of the deployment descriptor</li>
+<li>line 09 and 17 : the creation of 2 virtual machines on the host "crusoe.inria.fr"</li>
+<li>line 15 and 24 : the mapping of virtual nodes VN1 and VN2 to the nodes specified in the deployment descriptor</li>
+<li>line 35 : the dynamic downloading of the stub class for ServerImpl: the stub class loader does not find the classes of the stubs in the current VM, and fetches the classes from the ClassServer</li>
+<li>line 28, 30, 32, 34 : the dynamic downloading of the classes corresponding to the components functional interfaces</b> (they were silently generated)</li>
+</ul>
+</p>
+<p>Then we get the same output than for a local deployment, the activity of active objects is independent from its location.</p>
+<pre class="snippet">
+01 Server: print method called
+02 at org.objectweb.proactive.examples.components.helloworld.ServerImpl.print(ServerImpl.java:37)
+03 at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+04 at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+05 at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+06 at java.lang.reflect.Method.invoke(Method.java:324)
+07 at org.objectweb.proactive.core.mop.MethodCall.execute(MethodCall.java:373)
+08 at org.objectweb.proactive.core.component.request.ComponentRequestImpl.serveInternal(ComponentRequestImpl.java:163)
+09 at org.objectweb.proactive.core.body.request.RequestImpl.serve(RequestImpl.java:108)
+10 at org.objectweb.proactive.core.body.BodyImpl$ActiveLocalBodyStrategy.serve(BodyImpl.java:297)
+11 at org.objectweb.proactive.core.body.AbstractBody.serve(AbstractBody.java:799)
+12 at org.objectweb.proactive.core.body.ActiveBody$FIFORunActive.runActivity(ActiveBody.java:230)
+13 at org.objectweb.proactive.core.body.ActiveBody.run(ActiveBody.java:145)
+14 at java.lang.Thread.run(Thread.java:534)
+15 Server: begin printing...
+16 ->hello world
+17 Server: print done.
+</pre>
+
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <h3>The Comanche example</h3>
  <p class="textNormal"><a href="http://fractal.objectweb.org/tutorial/index.html">
@@ -430,14 +576,14 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <p>Reusability and Components should be accessible through predefined / preconfigured packages. A bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that should be addressed</p>
 
 <h3>Tools</h3>
-<p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems. Notably, we are thinking of reusing the new version of the Fractal ADL, which is highly customizable. This sharing of a common base for configuration with other Fractal implementations would allow the sharing of common tools, such as the Fractal GUI, and as a result, a synergy on the tools.
-</p>
+<p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems. We are currently finalizing an extended version of theFractalGUI that will allow a graphical and interactive design and visualization of component systems.</p>
 <h3>Other</h3>
 <p class="textNormal">Other areas of research that we are opening around this work include :
 <UL>
-<LI class="textNormal">wrapping legacy codes (MPI) for interoperability with other protocols</LI>
+<LI class="textNormal">wrapping legacy codes (MPI for instance) for interoperability with existing software</li>
 <LI class="textNormal">behavioral studies with asynchronous distributed components</LI>
 <LI class="textNormal">formalism (ProActive is based on a formal deterministic model for asynchronous distributed objects)</LI>
+<LI class="textNormal">MxN data redistribution : automatic redistribution of data from M components to N components</LI>
 </UL>
 </p>
 
@@ -450,7 +596,6 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <ul>
 <li class="textNormal">Shared components</li>
 <li class="textNormal">Templates (generic factories)</li>
-<li class="textNormal">Super-controllers</li>
 </ul>
 </p>
 
@@ -458,7 +603,8 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <p class="textSmall"><i>
 History :<BR>
 March 2004 : 1st version<br>
-June 2004 : typo fix (bindFc method in "conformance ... / collective bindings" references i, not i2)
+June 2004 : typo fix (bindFc method in "conformance ... / collective bindings" references i, not i2)<br>
+November 2004 : updated ADL documentation and examples ; updated perspectives ; super controller now included (not a limitation anymore)
 </i></p>
 
 <!--
