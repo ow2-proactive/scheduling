@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 0.9.4
  */
 public class RSHProcess extends AbstractExternalProcessDecorator {
+    public final static String DEFAULT_RSHPATH = "/usr/bin/rsh ";
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -68,6 +69,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess() {
         super();
+        this.command_path = DEFAULT_RSHPATH;
     }
 
     /**
@@ -77,6 +79,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
      */
     public RSHProcess(ExternalProcess targetProcess) {
         super(targetProcess);
+        this.command_path = DEFAULT_RSHPATH;
     }
 
     //
@@ -132,7 +135,7 @@ public class RSHProcess extends AbstractExternalProcessDecorator {
 
     protected String buildUnixRSHCommand() {
         StringBuffer command = new StringBuffer();
-        command.append("rsh");
+        command.append(DEFAULT_RSHPATH);
         // append username
         if (username != null) {
             command.append(" -l ");

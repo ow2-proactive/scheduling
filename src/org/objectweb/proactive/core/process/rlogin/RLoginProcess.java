@@ -56,7 +56,9 @@ import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
  * @since   ProActive 0.9.4
  */
 public class RLoginProcess extends AbstractExternalProcessDecorator {
+    public final static String DEFAULT_RLOGINPATH = "/usr/bin/rlogin ";
     private boolean exitAfterCommand;
+    
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -69,6 +71,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
     public RLoginProcess() {
         super();
         setCompositionType(SEND_TO_OUTPUT_STREAM_COMPOSITION);
+        this.command_path = DEFAULT_RLOGINPATH;
     }
 
     /**
@@ -78,6 +81,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
      */
     public RLoginProcess(ExternalProcess targetProcess) {
         this(targetProcess, false);
+        
     }
 
     /**
@@ -89,6 +93,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
     public RLoginProcess(ExternalProcess targetProcess, boolean exitAfterCommand) {
         super(targetProcess, SEND_TO_OUTPUT_STREAM_COMPOSITION);
         this.exitAfterCommand = exitAfterCommand;
+        this.command_path = DEFAULT_RLOGINPATH;
     }
 
     //
@@ -154,7 +159,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
     }
 
     protected String buildRLoginCommand() {
-        return "rlogin " + hostname + " ";
+        return DEFAULT_RLOGINPATH + hostname + " ";
     }
 
     protected void internalStartProcess(String command)

@@ -106,6 +106,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
         this.hostname = null;
+        this.command_path = DEFAULT_PRUNPATH;
     }
 
     /**
@@ -116,6 +117,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     public PrunSubProcess(ExternalProcess targetProcess) {
         super(targetProcess);
         this.hostname = null;
+        this.command_path = DEFAULT_PRUNPATH;
     }
 
     //
@@ -374,7 +376,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     protected String buildCommand() {
         StringBuffer prunCommand = new StringBuffer();
-        prunCommand.append(DEFAULT_PRUNPATH);
+        prunCommand.append(command_path);
         if (interactive.equals("true")) {
             prunCommand.append(" -I");
         }

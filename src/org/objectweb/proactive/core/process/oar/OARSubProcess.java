@@ -89,11 +89,13 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
         this.hostname = null;
+        this.command_path = DEFAULT_OARSUBPATH;
     }
 
     public OARSubProcess(ExternalProcess targetProcess) {
         super(targetProcess);
         this.hostname = null;
+        this.command_path = DEFAULT_OARSUBPATH;
     }
 
     //  ----------------------------------------------------------------------------------------
@@ -309,7 +311,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         oarsubCommand.append(targetProcess.getCommand());
         oarsubCommand.append(" \\&  done  \\; wait > ");
         oarsubCommand.append(scriptLocation).append(" ; ");
-        oarsubCommand.append(DEFAULT_OARSUBPATH);
+        oarsubCommand.append(command_path);
         oarsubCommand.append(" ");
         oarsubCommand.append(buildResourceString()).append(" ");
         oarsubCommand.append(scriptLocation).append(" '");
