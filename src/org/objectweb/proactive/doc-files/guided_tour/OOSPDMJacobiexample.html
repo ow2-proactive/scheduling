@@ -145,27 +145,6 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">	Again, the classes managing topologies will permit to simplify this
 	code.</p>
 
-<p class="textNormal">	The group of neighbors built above is important wrt synchronization.
-	Below in method "loop()", an efficient barrier is achieved only using
-	the direct neighbors:</p>
-<p class="textNormal"><code>		ProSPMD.barrier("SynchronizationWithNeighbors"+
-				this.iterationsToStop,
-				this.neighbors);</code></p>
-<p class="textNormal">	This barrier takes as a parameter the group to synchronize with: it
-	will be passed only when the 4 neighbors in the current 2D example
-	have reached the same point. Adding the rank of the current iteration
-	allows to have a unique identifier for each instance of the barrier.</p>
-<p class="textNormal">	Try to change the barrier instruction to a total barrier:</p>
-<p class="textNormal">		<code>ProSPMD.barrier("SynchronizationWithNeighbors"+ this.iterationsToStop);</code></p>
-<p class="textNormal">	Then recompile and execute again. Using IC2D observe that many more
-	communications are necessary.
-</p>
-<p class="textNormal">	In order to get details and documentation on Groups and OO SPMD, have a
-	look at:</p>
-<p class="textNormal"><code>	ProActive/src/org/objectweb/proactive/doc-files/</code></p>
-<p class="textNormal">	<code>				TypedGroupCommunication.html</code></p>
-<p class="textNormal">	<code>				OOSPMD.html</code></p>
-
 
 <h3 class="textNormal">3.3 Adding a Method barrier for a step by step execution</h3>
 <p class="textNormal">	Let say we would like to control step by step the execution of the
@@ -206,6 +185,28 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 
 <p class="textNormal">	You can imagine and test other modifications to the Jacobi code.</p>
 <p class="textNormal"><center><img src="pics/screenshots/jacobiic2d.png"></center></p>
+<h3 class="textNormal">3.4 Undestanding various different kind of barriers</h3>
+<p class="textNormal">	The group of neighbors built above is important wrt synchronization.
+	Below in method "loop()", an efficient barrier is achieved only using
+	the direct neighbors:</p>
+<p class="textNormal"><code>		ProSPMD.barrier("SynchronizationWithNeighbors"+
+				this.iterationsToStop,
+				this.neighbors);</code></p>
+<p class="textNormal">	This barrier takes as a parameter the group to synchronize with: it
+	will be passed only when the 4 neighbors in the current 2D example
+	have reached the same point. Adding the rank of the current iteration
+	allows to have a unique identifier for each instance of the barrier.</p>
+<p class="textNormal">	Try to change the barrier instruction to a total barrier:</p>
+<p class="textNormal">		<code>ProSPMD.barrier("SynchronizationWithNeighbors"+ this.iterationsToStop);</code></p>
+<p class="textNormal">	Then recompile and execute again. Using IC2D observe that many more
+	communications are necessary.
+</p>
+<p class="textNormal">	In order to get details and documentation on Groups and OO SPMD, have a
+	look at:</p>
+<p class="textNormal"><code>	ProActive/src/org/objectweb/proactive/doc-files/</code></p>
+<p class="textNormal">	<code>				TypedGroupCommunication.html</code></p>
+<p class="textNormal">	<code>				OOSPMD.html</code></p>
+
 
 <h3 class="textNormal">4. Virtual Nodes and Deployment descriptors</h3>
 
