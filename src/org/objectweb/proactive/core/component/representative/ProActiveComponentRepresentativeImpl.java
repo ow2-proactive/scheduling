@@ -45,8 +45,6 @@ public class ProActiveComponentRepresentativeImpl
 		this.proxy = proxy;
 
 		this.componentParameters = componentParameters;
-		boolean component_is_primitive =
-			componentParameters.getHierarchicalType().equals(ComponentParameters.PRIMITIVE);
 
 		// create the interface references tables
 		// the size is the addition of :  
@@ -76,8 +74,7 @@ public class ProActiveComponentRepresentativeImpl
 						interface_types[j].getFcItfName(),
 						this,
 						interface_types[j],
-						false,
-						component_is_primitive);
+						false);
 
 				((StubObject) interface_reference).setProxy(proxy);
 
