@@ -34,6 +34,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 /**
@@ -46,6 +47,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
  */
 
 public class Launcher {
+	
+	static ProActiveDescriptor deploymentDescriptor;
 
   private Launcher () {
   }
@@ -96,9 +99,9 @@ public class Launcher {
 		}
 		// PROACTIVE
     	if (pargs[3] != null) {
-			ProActiveDescriptor deployment_descriptor = ProActive.getProactiveDescriptor(pargs[3]);
+			deploymentDescriptor = ProActive.getProactiveDescriptor(pargs[3]);
 			HashMap context = new HashMap(1);
-			context.put("deployment-descriptor", deployment_descriptor);
+			context.put("deployment-descriptor", deploymentDescriptor);
 			return f.newComponent(pargs[1], context);
     	} else {
     	  return f.newComponent(pargs[1], new HashMap());
@@ -135,5 +138,9 @@ public class Launcher {
     System.out.println("its Runnable interface, if it has one,");
     System.out.println("\nand [deployment-descriptor] is the deployment descriptor that should be used for ProActive");
     System.exit(1);
+  }
+  
+  public static void killNodes (boolean softly) throws ProActiveException {
+  	deploymentDescriptor.killall(softly);
   }
 }
