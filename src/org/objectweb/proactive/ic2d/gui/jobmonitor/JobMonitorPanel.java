@@ -291,6 +291,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         return explorator;
     }
 
+    public void clearDeleted() {
+    	asso.clearDeleted();
+    	rebuildAll();
+    }
+    
     class TreeView {
         private String label;
         private JTree tree;
@@ -364,6 +369,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             JPanel buttons = new JPanel();
             buttons.setLayout(new FlowLayout());
             panel.add(buttons, BorderLayout.SOUTH);
+            
             JButton expand = new JButton("Expand all");
             expand.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {

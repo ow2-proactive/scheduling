@@ -1,7 +1,6 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.Calendar;

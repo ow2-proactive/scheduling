@@ -58,6 +58,8 @@ public class DataAssociation implements JobMonitorConstants {
 	public DataAssociation() {
 		asso = new TreeMap();
 		sets = new MonitoredObjectSet[NB_KEYS];
+		for (int i = 0; i < sets.length; i++)
+			sets[i] = new MonitoredObjectSet();
 	}
 	
 	private MonitoredObjectSet getSetForKey(int key) {
@@ -65,17 +67,9 @@ public class DataAssociation implements JobMonitorConstants {
 		return sets[index];
 	}
 	
-	private void makeSet(int key) {
-		int index = KEY2INDEX[key];
-		sets[index] = new MonitoredObjectSet();
-	}
-	
 	private BasicMonitoredObject addToSet(BasicMonitoredObject value) {
 		int key = value.getKey();
 		int index = KEY2INDEX[key];
-		if (getSetForKey(key) == null)
-			makeSet(key);
-		
 		MonitoredObjectSet set = getSetForKey(key);
 		BasicMonitoredObject orig = set.get(value); 
 		if (orig == null) {
@@ -231,9 +225,6 @@ public class DataAssociation implements JobMonitorConstants {
 	}
 	
 	private MonitoredObjectSet list(int key, Set constraints) {
-		if (getSetForKey(key) == null)
-			makeSet(key);
-		
 		MonitoredObjectSet res = getSetForKey(key); 
 		res = filter(res, constraints);
 		return res;
@@ -248,22 +239,63 @@ public class DataAssociation implements JobMonitorConstants {
 				}
 	}
 	
+	/* Mark as deleted */
 	public void deleteItem(BasicMonitoredObject value) {
 		int key = value.getKey();
-		
-		value.setDeleted(true);
-		if (getSetForKey(key) == null || !getSetForKey(key).contains(value))
+
+		MonitoredObjectSet set = getSetForKey(key); 
+		if (!set.contains(value))
 			return;
+
+		value.setDeleted(true);
 		
 		if  (isSpecialKey(key))
 			// If we had a reference count : associatedNode.ref--
 			return;
 		
-		MonitoredObjectSet desc = getValues(value, key + 1, null);
+		MonitoredObjectSet desc = getWritableAsso(value, key + 1);
 		Iterator iter = desc.iterator();
 		while (iter.hasNext()) {
 			BasicMonitoredObject childValue = (BasicMonitoredObject) iter.next();
 			deleteItem(childValue);
+		}
+	}
+	
+	public void removeItem(BasicMonitoredObject value) {
+		int key = value.getKey();
+
+		MonitoredObjectSet set = getSetForKey(key); 
+		if (!set.contains(value))
+			return;
+
+		set.remove(value);
+		
+		if  (isSpecialKey(key))
+			// If we had a reference count : associatedNode.ref--
+			return;
+		
+		int[] keys = new int[] {key + 1, key - 1, JOB, VN};
+		for (int i = 0; i < keys.length; i++) {
+			AssoKey removeKey = new AssoKey(value, keys[i]);
+			asso.remove(removeKey);
+		}
+	}		
+	
+	public void clearDeleted() {
+		List toDelete = new LinkedList();
+		
+		for (int i = 0; i < sets.length; i++) {
+			Iterator iter = sets[i].iterator();
+			while (iter.hasNext()) {
+				BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+				if (object.isDeleted())
+					toDelete.add(object);
+			}
+		}
+		
+		Iterator iter = toDelete.iterator();
+		while (iter.hasNext()) {
+			removeItem((BasicMonitoredObject) iter.next());
 		}
 	}
 }
