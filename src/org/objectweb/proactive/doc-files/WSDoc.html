@@ -1,0 +1,168 @@
+
+<html>
+<head>
+<title>Exporting Active Objects as web services</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Descriptor.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="AC.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>Exporting Active Objects as web services</h1>
+
+
+<h2>Overview</h2>
+ <p class="textNormal">
+This feature allows the monitoring of active objects from any client written in any foreign language. <br>
+We choose the web services technology that enable interoperability
+ with foreign languages, such as C#. By using Web Services, any active object  can be  accessed by any
+languages or hardware thanks to HTTP, and SOAP, the XML-based protocol.
+
+<h2>Principles </h2> 
+ <p class="textNormal">
+The steps for exporting and using  an active object as a web service are the
+following :
+<ul>
+<li> Write your active object in a classic way </li>
+<li> Deploy it onto a web server </li>
+<li> Once it is deployed, you can access it via any web service
+enabled client ( such as C#).
+<li> First of all, the client will get the WSDL file matching this
+active object. This WSDL file is the "identity card" of the
+service. It contains the accessible methods and the location of the service. 
+<li> Now that this client knows what and where to call the service, il will send a SOAP message to
+the web server, the web server looks into the message and perform the
+right call then returns the reply into another SOAP message to the client.</li>
+<li> Of course, it is possible to undeploy an active object.
+</ul>
+
+<h2>Installing the Web Server and the SOAP engine</h2>
+ <p class="textNormal">
+First of all, you need to install the Jakarta Tomcat web server here
+and install it. You can find some documentation about it <a
+href="http://apache.crihan.fr/dist/jakarta/tomcat-4/v4.1.31/bin/"> here </a>. <br>
+You don't really have to do a lot of installation. Just
+uncompress the archive.<br>
+To start and stop the server,launch the start and the shutdown scripts in the bin directory. 
+
+ <p class="textNormal">
+We also use a SOAP engine which is the Apache SOAP engine, available
+<a href="http://www.apache.org/dyn/closer.cgi/ws/soap/"> here </a>. This SOAP engine will be responsible of
+locating and calling the service.<br>
+Uncompress the apache SOAP archive, then copy the
+$APACHE-SOAP/webapps/soap into the $TOMCAT/webapps directory.
+ <p class="textNormal">
+The SOAP Engine is now installed ! You can verify, after starting the
+server that you access to the welcome page of Apache SOAP at : <a href="http://localhost:8080/soap/index.html">
+http://localhost:8080/soap/index.html</a>.
+ <p class="textNormal">
+Now we have to install ProActive into this SOAP engine. For that,
+please follow these steps :
+<ul>
+<li> Create a lib directory under the $TOMCAT/webapps/soap/WEB-INF/ directory </li>
+<li> Copy the ProActive.jar file into this new directory </li>
+<li>Copy the $APACHE-SOAP/lib/soap.jar into the $TOMCAT/webapps/soap/WEB-INF/lib</li>
+<li> Replace the  $TOMCAT/webapps/soap/WEB-INF/web.xml by <a 
+href="web.xml" > this one </a> </li>
+</ul>
+ <p class="textNormal">
+You are now able to export active objects as Web Services !
+<h2>Exporting active objects </h2>
+ <p class="textNormal">
+To expose an active object as a web service, simply use only one
+method :
+<pre>
+     public static  void exposeAsWebService (Object o, String url,
+     String urn, String [] methods )
+</pre>
+ <p class="textNormal">
+where :
+<ul>
+<li> o is the active object </li>
+<li> url is the url of the web server ( typically <a
+href="http://localhost:8080" > http://localhost:8080 </a> </li>
+<li> urn is the name you give to the service ( for instance "compute" )</li>
+<li> methods is an array containing the names of the methods you want
+to export </li>
+</ul>
+
+<p class="textNormal">
+As an example here a simple class that creates an active object and
+expose it as a web service :
+
+<pre>
+public class Compute {
+
+	public Compute () {
+		
+	} 
+	
+	public int add (int a , int b) {
+		return a + b;
+	} 
+	
+	public int sub (int a , int b) {
+		return a - b;
+	} 
+
+
+	public static void main(String[] args) {
+		try{
+		Compute t = (Test)ProActive.newActive("Compute",new Object []{});
+			ProActive.exposeAsWebService(t, "http://localhost:8080","compute",new String []{"add","sub"});
+		} catch (ActiveObjectCreationException e) {
+			e.printStackTrace();
+		} catch (NodeException e) {
+			e.printStackTrace();
+		}
+		
+	}
+}
+</pre>
+ <p class="textNormal">
+
+To undeploy the service, use the following method :
+<pre>
+  public static void unExposeAsWebService (String urn, String url)
+</pre>
+ <p class="textNormal">
+where :
+<ul>
+<li> urn is the name of the service </li>
+<li> url is the url where the service is deployed </li>
+</ul>
+<h2> Access to the web service </h2>
+ <p class="textNormal">
+For a given service, say "compute" ,you can get the WSDL document at
+<a
+href="http://localhost:8080/servlet/wsdl?id=compute">hrrp://localhost:8080/servlet/wsdl?id=compute</a>.
+
+<p class="textNormal">
+This WSDL is generally  used by tools or languages to generate a proxy
+to the service. 
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; April 2004 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>
