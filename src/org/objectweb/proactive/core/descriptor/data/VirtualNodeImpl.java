@@ -124,6 +124,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private boolean registration = false;
     private boolean waitForTimeout = false;
 
+    //boolean used to know if the vn is mapped only with a P2P service that request MAX nodes
+    // indeed the behavior is different when returning nodes
+    private boolean MAX_P2P = false;
+
     //protected int MAX_RETRY = 70;
 
     /** represents the timeout in ms*/
@@ -195,7 +199,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * before giving access to its nodes.
      */
     public void setTimeout(long timeout, boolean waitForTimeout) {
-        System.out.println("timeour set " + timeout);
         this.timeout = timeout;
         this.waitForTimeout = waitForTimeout;
     }
@@ -349,8 +352,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
         } else {
-            throw new NodeException(
-                "Cannot return nodes, no nodes hava been created");
+            if (!MAX_P2P) {
+                throw new NodeException(
+                    "Cannot return nodes, no nodes have been created");
+            } else {
+                logger.warn("WARN: No nodes have yet been created.");
+                logger.warn(
+                    "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
+                logger.warn("WARN: Returning empty tab");
+                return new String[0];
+            }
         }
         return nodeNames;
     }
@@ -370,8 +381,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 }
             }
         } else {
-            throw new NodeException(
-                "Cannot return nodes, no nodes have been created");
+            if (!MAX_P2P) {
+                throw new NodeException(
+                    "Cannot return nodes, no nodes have been created");
+            } else {
+                logger.warn("WARN: No nodes have yet been created.");
+                logger.warn(
+                    "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
+                logger.warn("WARN: Returning empty tab");
+                return new Node[0];
+            }
         }
         return nodeTab;
     }
@@ -755,6 +774,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private synchronized void waitForAllNodesCreation()
         throws NodeException {
         int tempNodeCount = nodeCount;
+        if (tempNodeCount != 0) {
+            //nodeCount equal 0 means there is only a P2P service with MAX number of nodes requested
+            // so if different of 0, we can set to false the boolean
+            MAX_P2P = false;
+        }
         if (waitForTimeout) {
             try {
                 Thread.sleep(timeout);
@@ -1033,6 +1057,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 increaseNodeCount(nodeRequested);
                 //nodeRequested = MAX means that the service will try to get every nodes 
                 // it can. So we can't predict how many nodes will return.
+            } else {
+                MAX_P2P = true;
             }
         } else {
             //increase with 1 node
