@@ -53,4 +53,9 @@ public interface ComponentParametersController extends AttributeController {
 	 */
 	public void setComponentParameters(ComponentParameters componentParameters);
     
+    /**
+     * setter
+     * @param componentName the new name of the component
+     */
+    public void setComponentName(String componentName);
 }
