@@ -34,8 +34,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 
 import testsuite.test.FunctionalTest;
 
@@ -95,11 +95,11 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
+        boolean resultTest = (nodeTab.length == 3);
         this.process.stopProcess();
         this.process1.stopProcess();
-        this.pad.killall(false);
-        // TODO kill realy everything...
-        return nodeTab.length == 3;
+        this.pad.killall(false); 
+        return resultTest;
     }
 
     public static void main(String[] args) {
