@@ -85,7 +85,7 @@ public class PropertiesHandler extends AbstractUnmarshallerDecorator
             //   System.out.println("**** PropHandler");
             String key = attributes.getValue("key");
             String value = attributes.getValue("value");
-            PropertiesHandler.logger.debug("Key " + key + " value  " + value);
+            //PropertiesHandler.logger.debug("Key " + key + " value  " + value);
 
             // System.out.println("Key " + key + " value  " + value);
             //  if (checkNonEmpty(key) && checkNonEmpty(value)) {
