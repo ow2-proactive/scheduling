@@ -76,23 +76,38 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         super(targetProcess);
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
     }
+    
 
+		/**
+		 * Set the -n option with the given parameter for the maprsh command
+		 * @param parallelize
+		 */
     public void setParallelization(String parallelize) {
         this.parallelize = parallelize;
-    }
+    } 
 
+		/**
+		 * Returns the degree of parallelization of maprsh command (value of -n option)
+		 * @return String
+		 */
     public String getParallelization() {
         return this.parallelize;
     }
+    
 
     /**
-     * Method setScriptLocation.
+     * Sets the variable scriptLocation with the given location
      * @param string
      */
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
     }
+    
 
+		/**
+		 * Returns the value of scriptLocation 
+		 * @return String
+		 */
     public String getScriptLocation() {
         return scriptLocation;
     }
@@ -137,6 +152,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         }
         return command.toString();
     }
+    
 
     /**
      * Method appendJavaCommand.
@@ -152,6 +168,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         return newScriptText.toString();
     }
 
+
     /**
      * Method removeJavaCommand.
      * @param scriptText
@@ -164,6 +181,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         //System.out.println(newScriptText);
         return newScriptText;
     }
+    
 
     public static void main(String[] args) {
         try {
@@ -178,6 +196,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
             e.printStackTrace();
         }
     }
+    
 
     /**
     * Returns an array of bytes containing the bytecodes for
