@@ -47,6 +47,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -166,7 +167,7 @@ public class Group {
         AbstractManager manager) throws BrowsePackageException {
         if (!directory.isDirectory()) {
             throw new BrowsePackageException(
-                "Directory is not a valid directory");
+                "Directory " + directory.getPath() + " is not a valid directory");
         }
 
         if ((packageName != null) && (packageName.length() != 0)) {
@@ -227,6 +228,10 @@ public class Group {
 
                         if (superClass.getName().compareTo(AbstractTest.class.getName()) == 0) {
                             AbstractTest test = null;
+                            if (Modifier.isAbstract(c.getModifiers())) {
+                                // class is abstract
+                                continue;
+                            }
 
                             if (parameterTypes != null) {
                                 Constructor constructor = c.getConstructor(parameterTypes);
