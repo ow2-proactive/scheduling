@@ -577,7 +577,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getURL()
      */
     public String getURL() {
-        return this.peerUrl;
+        return this.acquisitionMethod +  this.peerUrl;
     }
 
     // -------------------------------------------------------------------------
