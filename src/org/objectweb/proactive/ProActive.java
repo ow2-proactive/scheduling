@@ -33,6 +33,7 @@ package org.objectweb.proactive;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -114,12 +115,12 @@ public class ProActive {
     /**
      * Declaration of the handler manager with a default policy
      */
-    // static public HandlerManager handlerManager;
 
+    // static public HandlerManager handlerManager;
     static {
         ProActiveConfiguration.load();
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
-        
+
         // Creation of the default level which contains standard exception handlers
         ProActive.defaultLevel = new HashMap();
         HandlerManager.initialize();
@@ -228,17 +229,52 @@ public class ProActive {
         }
 
         try {
-        	Object stub = createStubObject(classname, constructorParameters, node, activity, factory);
-        	Handler handler;
-        	if ((handler = HandlerManager.isHandlerAssociatedToProxyObject(stub.getClass())) != null) {
-        		try {
-        			((org.objectweb.proactive.core.mop.StubObject) stub).getProxy().setExceptionHandler(handler, NonFunctionalException.class);
-        		} catch (IOException e) {
-        			logger.debug("Cannot add automatic handler to object of class " + stub.getClass());
-        			e.printStackTrace();
-        		}
-        	}
-        	return stub;
+            // create stub object
+            Object stub = createStubObject(classname, constructorParameters,
+                    node, activity, factory);
+            HashMap handlermap;
+
+            // AHA : Associate handler to proxy automatically
+            if ((handlermap = HandlerManager.isHandlerAssociatedToProxyObject(
+                            classname)) != null) {
+                Set keyset = handlermap.keySet();
+                while (keyset.iterator().hasNext()) {
+                    NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                                .next();
+                    try {
+                        ((org.objectweb.proactive.core.mop.StubObject) stub).getProxy()
+                         .setExceptionHandler((Handler) handlermap.get(
+                                nfe.getClass()), nfe.getClass());
+                    } catch (IOException e) {
+                        logger.debug(
+                            "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                            stub.getClass());
+                    }
+                }
+            }
+
+            // AHA : Associate handler to body automatically
+            if ((handlermap = HandlerManager.isHandlerAssociatedToProxyObject(
+                            classname)) != null) {
+                Set keyset = handlermap.keySet();
+                while (keyset.iterator().hasNext()) {
+                    NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                                .next();
+                    try {
+                        ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) stub)
+                         .getProxy()).getBody().getRemoteAdapter()
+                         .setExceptionHandler((Handler) handlermap.get(
+                                nfe.getClass()), nfe.getClass());
+                    } catch (IOException e) {
+                        logger.debug(
+                            "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                            stub.getClass());
+                    }
+                }
+            }
+
+            // Return stub of the handlerized object
+            return stub;
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -1704,7 +1740,7 @@ public class ProActive {
                     return handler;
                 } catch (Exception e) {
                     if (loggerNFE.isDebugEnabled()) {
-                    	loggerNFE.debug("[NFE_ERROR] Removing handler [" +
+                        loggerNFE.debug("[NFE_ERROR] Removing handler [" +
                             handler.getClass().getName() +
                             "] from FUTURE level failed");
                     }

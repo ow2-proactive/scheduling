@@ -110,9 +110,8 @@ public abstract class BodyImpl extends AbstractBody
     protected MessageEventProducerImpl messageEventProducer;
 
     /** Used for profiling */
-    private  CompositeAverageMicroTimer timer;
+    private CompositeAverageMicroTimer timer;
 
-    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -142,16 +141,15 @@ public abstract class BodyImpl extends AbstractBody
                 factory.newRequestQueueFactory().newRequestQueue(bodyID),
                 factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
-    	if (Profiling.SERVICE) {
-			timer = new CompositeAverageMicroTimer("Service");
-			PAProfilerEngine.registerTimer(timer);
-		}
+        if (Profiling.SERVICE) {
+            timer = new CompositeAverageMicroTimer("Service");
+            PAProfilerEngine.registerTimer(timer);
+        }
     }
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-
     //
     // -- implements MessageEventProducer -----------------------------------------------
     //
@@ -196,15 +194,16 @@ public abstract class BodyImpl extends AbstractBody
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-    	//System.out.print("Body receives Reply -> ");
+        //System.out.print("Body receives Reply -> ");
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(reply,
                 MessageEvent.REPLY_RECEIVED, bodyID);
         }
+
         /*if (reply.getResult() != null) {
-        	System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
+                System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
         } else {
-        	System.out.println("Reply is : " + reply);
+                System.out.println("Reply is : " + reply);
         }*/
         replyReceiver.receiveReply(reply, this, getFuturePool());
     }
@@ -292,13 +291,13 @@ public abstract class BodyImpl extends AbstractBody
                 Reply reply = null;
                 try {
                     if (Profiling.SERVICE) {
-                    	timer.setTimer("serve."+request.getMethodName());
-                    	timer.start();
+                        timer.setTimer("serve." + request.getMethodName());
+                        timer.start();
                     }
                     reply = request.serve(BodyImpl.this);
                     if (Profiling.SERVICE) {
-                    	//timer.setTimer("serve."+this.getMethodName());
-                    	timer.stop();
+                        //timer.setTimer("serve."+this.getMethodName());
+                        timer.stop();
                     }
                 } catch (ServeException e) {
                     // Create a non functional exception encapsulating the service exception
@@ -307,8 +306,10 @@ public abstract class BodyImpl extends AbstractBody
                             request.getMethodName(), e);
 
                     // Runtime exception are not throwed anymore: node may not be stopped by the service handler
-                    Handler handler = ProActive.searchExceptionHandler(calleeNFE, this);
-                    handler.handle(calleeNFE, ProActive.getBodyOnThis().getNodeURL());
+                    Handler handler = ProActive.searchExceptionHandler(calleeNFE,
+                            this);
+                    handler.handle(calleeNFE,
+                        ProActive.getBodyOnThis().getNodeURL());
 
                     // Create a non functional exception encapsulating the service exception
                     NonFunctionalException callerNFE = new ServiceFailedCallerNFE(
@@ -316,49 +317,52 @@ public abstract class BodyImpl extends AbstractBody
                             request.getMethodName(), e);
 
                     // Create a new reply that contains this NFE instead of the result
-					Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this, callerNFE);
+                    Reply replyAlternate = null;
+                    replyAlternate = request.serveAlternate(BodyImpl.this,
+                            callerNFE);
                     //System.out.println("*** Reply contains " + replyAlternate.getResult().getClass());
-
                     // Send reply and stop local node if desired
-                    // TODO : create a way to define whether or not the node must be stopped
-					if (replyAlternate == null) {
-						if (!isActive()) {
-							return; //test if active in case of terminate() method otherwise eventProducer would be null
-						}
-						messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID, getRequestQueue().size());
-						return;
-					}
-                    if (true) {
-                        UniqueID destinationBodyId = request.getSourceBodyID();
-                        if ((destinationBodyId != null) &&
-                                (messageEventProducer != null)) {
-                            messageEventProducer.notifyListeners(reply,
-                                MessageEvent.REPLY_SENT, destinationBodyId,
-                                getRequestQueue().size());
+                    if (replyAlternate == null) {
+                        if (!isActive()) {
+                            return; //test if active in case of terminate() method otherwise eventProducer would be null
                         }
-                        this.getFuturePool().registerDestination(request.getSender());
-						replyAlternate.send(request.getSender());
-                        this.getFuturePool().removeDestination();
+                        messageEventProducer.notifyListeners(request,
+                            MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                            getRequestQueue().size());
                         return;
-                        //System.exit(0);
                     }
+                    UniqueID destinationBodyId = request.getSourceBodyID();
+                    if ((destinationBodyId != null) &&
+                            (messageEventProducer != null)) {
+                        messageEventProducer.notifyListeners(reply,
+                            MessageEvent.REPLY_SENT, destinationBodyId,
+                            getRequestQueue().size());
+                    }
+                    this.getFuturePool().registerDestination(request.getSender());
+                    replyAlternate.send(request.getSender());
+                    this.getFuturePool().removeDestination();
+                    return;
                 }
-                             
-				if (reply == null) {
-					if (!isActive()) {
-						return; //test if active in case of terminate() method otherwise eventProducer would be null
-					}
-					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID, getRequestQueue().size());
-					return;
-				}
-				UniqueID destinationBodyId = request.getSourceBodyID();
-				if ((destinationBodyId != null) && (messageEventProducer != null)) {
-					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId, getRequestQueue().size());
-				}
-				this.getFuturePool().registerDestination(request.getSender());
-				reply.send(request.getSender());
-				this.getFuturePool().removeDestination();
+
+                if (reply == null) {
+                    if (!isActive()) {
+                        return; //test if active in case of terminate() method otherwise eventProducer would be null
+                    }
+                    messageEventProducer.notifyListeners(request,
+                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                        getRequestQueue().size());
+                    return;
+                }
+                UniqueID destinationBodyId = request.getSourceBodyID();
+                if ((destinationBodyId != null) &&
+                        (messageEventProducer != null)) {
+                    messageEventProducer.notifyListeners(reply,
+                        MessageEvent.REPLY_SENT, destinationBodyId,
+                        getRequestQueue().size());
+                }
+                this.getFuturePool().registerDestination(request.getSender());
+                reply.send(request.getSender());
+                this.getFuturePool().removeDestination();
             } catch (java.io.IOException e) {
                 // Create a non functional exception encapsulating the network exception
                 NonFunctionalException nfe = new SendReplyCommunicationException(

@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.communication.SendRequestCommunicationException;
 import org.objectweb.proactive.core.exceptions.creation.FutureCreationException;
@@ -47,6 +48,11 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+
+import java.io.IOException;
+
+import java.util.HashMap;
+import java.util.Set;
 
 
 public abstract class AbstractBodyProxy extends AbstractProxy
@@ -120,12 +126,12 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 return reifyAsAsynchronous(methodCall);
             }
             return reifyAsSynchronous(methodCall);
-        } catch (MethodCallExecutionFailedException e) {        
+        } catch (MethodCallExecutionFailedException e) {
             throw new ProActiveRuntimeException(e.getMessage(),
                 e.getTargetException());
         } catch (Throwable t) {
             if (t instanceof NonFunctionalException) {
-            	throw (NonFunctionalException) t;
+                throw (NonFunctionalException) t;
             } else if (t instanceof RuntimeException) {
                 throw (RuntimeException) t;
             } else if (t instanceof Error) {
@@ -165,7 +171,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsOneWay while sending request for methodcall = " +
                     methodCall.getName(), e));
@@ -190,7 +196,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-                    ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
                     methodCall.getName(), e));
@@ -203,15 +209,34 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                    methodCall.getName(), e));                
+                    methodCall.getName(), e));
         }
 
         // Set the id of the body creator in the created future
         FutureProxy fp = (FutureProxy) (futureobject.getProxy());
         fp.setCreatorID(bodyID);
+
+        // AHA : Associate handler to future automatically
+        HashMap handlermap = null;
+        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
+                        this.getClass().toString())) != null) {
+            Set keyset = handlermap.keySet();
+            while (keyset.iterator().hasNext()) {
+                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                            .next();
+                try {
+                    fp.setExceptionHandler((Handler) handlermap.get(
+                            nfe.getClass()), nfe.getClass());
+                } catch (IOException e) {
+                    logger.debug(
+                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                        fp.getClass());
+                }
+            }
+        }
 
         // Send the request
         try {
@@ -227,7 +252,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
                     methodCall.getName(), e));
@@ -242,6 +267,25 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         // Setting methodCall.res to null means that we do not use the future mechanism
         Future f = FutureProxy.getFutureProxy();
         f.setCreatorID(bodyID);
+
+        // AHA : Associate handler to future automatically
+        HashMap handlermap = null;
+        if ((handlermap = HandlerManager.isHandlerAssociatedToFutureObject(
+                        this.getClass().toString())) != null) {
+            Set keyset = handlermap.keySet();
+            while (keyset.iterator().hasNext()) {
+                NonFunctionalException nfe = (NonFunctionalException) keyset.iterator()
+                                                                            .next();
+                try {
+                    FutureProxy.getFutureProxy().setExceptionHandler((Handler) handlermap.get(
+                            nfe.getClass()), nfe.getClass());
+                } catch (IOException e) {
+                    logger.debug(
+                        "[NFE_ERROR] Cannot associate handler automatically with object of class " +
+                        FutureProxy.getFutureProxy().getClass());
+                }
+            }
+        }
 
         // Set it as the 'thing' to send results to methodCall.res = f;
         // Send the request
@@ -258,7 +302,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
             handler.handle(nfe,
-            		ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL(),
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
                     methodCall.getName(), e));

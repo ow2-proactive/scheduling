@@ -252,7 +252,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         isAvailable = true;
 
         if (this.isNFE) {
-            //System.out.println("GET NFE");
             Handler handler = ProActive.searchExceptionHandler((NonFunctionalException) this.target,
                     this);
             handler.handle((NonFunctionalException) this.target, ProActive.getBodyOnThis().getNodeURL());

@@ -205,23 +205,23 @@ public class HandlerManager {
      * Search and return the handler that must me automatically associated to the body of active object
      * @param obj is an active object
      */
-    public static Handler isHandlerAssociatedToBodyObject(Object obj) {
-        return (Handler) handlerAssociatedToBodyObject.get(obj);
+    public static HashMap isHandlerAssociatedToBodyObject(Object obj) {
+        return (HashMap) handlerAssociatedToBodyObject.get(obj);
     }
 
     /**
      * Search and return the handler that must me automatically associated to the future of active object
      * @param obj is an active object
      */
-    public static Handler isHandlerAssociatedToFutureObject(Object obj) {
-        return (Handler) handlerAssociatedToFutureObject.get(obj);
+    public static HashMap isHandlerAssociatedToFutureObject(Object obj) {
+        return (HashMap) handlerAssociatedToFutureObject.get(obj);
     }
 
     /**
      * Search and return the handler that must me automatically associated to the proxy of active object
      * @param obj is an active object
      */
-    public static Handler isHandlerAssociatedToProxyObject(Object obj) {
-        return (Handler) handlerAssociatedToProxyObject.get(obj);
+    public static HashMap isHandlerAssociatedToProxyObject(Object obj) {
+        return (HashMap) handlerAssociatedToProxyObject.get(obj);
     }
 }
