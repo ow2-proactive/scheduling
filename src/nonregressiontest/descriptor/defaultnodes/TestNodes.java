@@ -124,7 +124,11 @@ public class TestNodes extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        killNodes();
+        //killNodes();
+    }
+    
+    public void uponEndOfGroupOfTests() throws Exception {
+    	killNodes();
     }
 
     public static void killNodes() throws ProActiveException {
