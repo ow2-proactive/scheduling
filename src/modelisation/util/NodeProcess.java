@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 public class NodeProcess {
 
     private static final String NODEOK = "Node successfully bound";
-  //   protected String javaPath;
+    //   protected String javaPath;
 //     protected String className;
 //     protected String classPath;
 //     protected String nodeName;
@@ -21,10 +21,10 @@ public class NodeProcess {
     // protected boolean running;
     protected BufferedReader d_error;
     // protected BufferedReader d_standard;
-    protected static final String JAVA_NESSIE = "/u/dea_these/fhuet/solaris/j2re1_3_0_02/bin/java  -Xmx256m ";
-    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/java/classes";
-    protected static final String JAVA_SATURA = " /u/satura/0/oasis/fhuet/linux/bin/jdk1.3.0_02/bin/java";
-    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/java/classes";
+//    protected static final String JAVA_NESSIE = "/u/dea_these/fhuet/solaris/j2re1_3_0_02/bin/java  -Xmx256m ";
+//    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/java/classes:/u/dea_these/fhuet/java/lib/bcel.jar";
+//    protected static final String JAVA_SATURA = " /u/satura/0/oasis/fhuet/linux/bin/jdk1.3.0_02/bin/java";
+//    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/java/classes:/u/satura/0/oasis/fhuet/java/lib/bcel.jar";
 
 
     // public NodeProcess(String className, String javaPath, String classPath, String nodeName, String hostName, String file) {
@@ -36,12 +36,11 @@ public class NodeProcess {
 // 	this.redirect=file;
 //     }
 
-    public NodeProcess(String commandLine)
-    {
-	this.commandLine=commandLine;	
+    public NodeProcess(String commandLine) {
+        this.commandLine = commandLine;
     }
 
- //    public boolean initialise() {
+    //    public boolean initialise() {
 // 	String s = null;
 // 	try {
 // 	    System.out.println("NodeProcess: hostname is " + hostName);
@@ -84,7 +83,7 @@ public class NodeProcess {
 // 		return false;
 // 	    } catch (IllegalThreadStateException e) {
 // 	    }//e.printStackTrace();}
-	
+
 // 	    return true;
 // 	}
 //     }
@@ -95,79 +94,79 @@ public class NodeProcess {
      *
      */
     protected String removePortNumber(String s) {
-	int deb = s.indexOf(":");
-	if (deb > -1) {
-	    //there is a port number specified
-	    return s.substring(0, deb);
-	} else
-	    return s;
+        int deb = s.indexOf(":");
+        if (deb > -1) {
+            //there is a port number specified
+            return s.substring(0, deb);
+        } else
+            return s;
     }
 
 
     public boolean initialise() {
-	String s = null;
+        String s = null;
 
-	System.err.println("NodeProcess: using command " + commandLine);
-	try {
-	    p = Runtime.getRuntime().exec(commandLine);
- 	    d_error = new BufferedReader(new InputStreamReader(p.getInputStream()));
- 	    while ((s = d_error.readLine()) != null && (s.indexOf(NODEOK) == -1)) {
- 		System.out.println(s);
- 	    }
- 	} catch (Exception e) {
- 	    e.printStackTrace();
- 	}
- 	if (s == null) {
- 	    System.err.println("NodeProcess: cannot read output from process");
- 	    return false;
- 	} else {
- 	    System.err.println("NodeProcess: output from process is " + s);
- 	    //ok, we read until the end, but maybe the process has exited
- 	    //check wether the process has terminated
- 	    try {
- 		p.exitValue();
- 		return false;
- 	    } catch (IllegalThreadStateException e) {
- 	    }//e.printStackTrace();}
-	
- 	    return true;
- 	}
-     }     
+        System.err.println("NodeProcess: using command " + commandLine);
+        try {
+            p = Runtime.getRuntime().exec(commandLine);
+            d_error = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            while ((s = d_error.readLine()) != null && (s.indexOf(NODEOK) == -1)) {
+                System.out.println(s);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (s == null) {
+            System.err.println("NodeProcess: cannot read output from process");
+            return false;
+        } else {
+            System.err.println("NodeProcess: output from process is " + s);
+            //ok, we read until the end, but maybe the process has exited
+            //check wether the process has terminated
+            try {
+                p.exitValue();
+                return false;
+            } catch (IllegalThreadStateException e) {
+            }//e.printStackTrace();}
+
+            return true;
+        }
+    }
 
 
     public void destroy() {
-	p.destroy();
-	r1.setRunning(false);
-	r2.setRunning(false);
-	//	this.running = false; 
+        p.destroy();
+        r1.setRunning(false);
+        r2.setRunning(false);
+        //	this.running = false;
     }
 
 
     public void run() {
-	System.out.println("NodeProcess Running");
-	//	running = true;
-	String s = null;
-	r1 = new ThreadedReader(p.getInputStream());
-	r2 = new ThreadedReader(p.getErrorStream());
+        System.out.println("NodeProcess Running");
+        //	running = true;
+        String s = null;
+        r1 = new ThreadedReader(p.getInputStream());
+        r2 = new ThreadedReader(p.getErrorStream());
 
-	Thread t1 = new Thread(r1);
-	Thread t2 = new Thread(r2);
-	t1.start();
-	t2.start();
-	
-	// 	try {
-	//BufferedReader d_standard = new BufferedReader(new InputStreamReader(p.getInputStream()));
-	// BufferedReader d_error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-       
-	//  while (((s=d_standard.readLine()) != null)   && (running))
-	// 		{
-	// 		    System.out.println(s);
-	// 		}    
-	// 	} catch (Exception e) { e.printStackTrace();} 		
+        Thread t1 = new Thread(r1);
+        Thread t2 = new Thread(r2);
+        t1.start();
+        t2.start();
+
+        // 	try {
+        //BufferedReader d_standard = new BufferedReader(new InputStreamReader(p.getInputStream()));
+        // BufferedReader d_error = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+        //  while (((s=d_standard.readLine()) != null)   && (running))
+        // 		{
+        // 		    System.out.println(s);
+        // 		}
+        // 	} catch (Exception e) { e.printStackTrace();}
     }
 
 
-  //   public static void main(String[] args) {
+    //   public static void main(String[] args) {
 // 	if (args.length < 5) {
 // 	    System.err.println("Usage:java modelisation.util.NodeProcess className javaPath classPath nodeName hostName");
 // 	    System.exit(-1);

@@ -3,6 +3,7 @@ package modelisation.simulator.server;
 import modelisation.statistics.ExponentialLaw;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
+import modelisation.simulator.common.SimulatorElement;
 
 public class Agent extends SimulatorElement {
 

@@ -14,18 +14,18 @@ public class NodeControler {
     protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Xmx256m -Djava.compiler=NONE ";
     // protected static final String JAVA = "/usr/local/jdk1.3.1/bin/java  -Xmx256m  -Djava.compiler=NONE ";
     private static final String NODECLASS = " org.objectweb.proactive.StartNode ";
-    private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:.";
+    private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:/u/tuba/0/oasis/fhuet/workProActive/ProActive/lib/bcel.jar:.";
     protected static final String USER = "fhuet";
 
     protected static final String JAVA_NESSIE = " /u/dea_these/fhuet/java.sh ";
-    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/proactive-tmp:/u/dea_these/fhuet/java/classes";
+    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/proactive-tmp:/u/dea_these/fhuet/java/classes:/u/dea_these/fhuet/java/lib/bcel.jar";
     protected static final String USER_NESSIE = "fhuet";
 
     protected static final String USER_POLYA = "salouf";
 
 
     protected static final String JAVA_SATURA = "/u/satura/0/oasis/fhuet/java.sh";
-    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/proactive-tmp:/u/satura/0/oasis/fhuet/java/classes";
+    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/proactive-tmp:/u/satura/0/oasis/fhuet/java/classes:/u/satura/0/oasis/fhuet/java/lib/bcel.jar";
     protected static final String USER_SATURA = "fhuet";
 
     private Vector process;

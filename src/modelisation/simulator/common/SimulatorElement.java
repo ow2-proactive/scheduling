@@ -1,4 +1,4 @@
-package modelisation.simulator.server;
+package modelisation.simulator.common;
 
 public class SimulatorElement {
     protected int state;
