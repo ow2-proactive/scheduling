@@ -5,7 +5,6 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
@@ -97,7 +96,4 @@ public class A implements InitActive, RunActive, EndActive,
         throw new Exception();
     }
 
-    public void invokeBarrier() {
-        ProSPMD.barrier("MyBarrier");
-    }
 }
