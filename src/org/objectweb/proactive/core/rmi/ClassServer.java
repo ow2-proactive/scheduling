@@ -46,14 +46,14 @@ public class ClassServer implements Runnable {
     protected static int port;
 
     static {
-        String newport;
+        String newport = System.getProperty("proactive.http.port");;
 
-        if (System.getProperty("proactive.http.port") != null) {
-            newport = System.getProperty("proactive.http.port");
-        } else {
-            newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            System.setProperty("proactive.http.port", newport);
-        }
+//        if (System.getProperty("proactive.http.port") != null) {
+//            newport = System.getProperty("proactive.http.port");
+//        } else {
+//            newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
+//            System.setProperty("proactive.http.port", newport);
+//        }
     }
 
     protected String hostname;
