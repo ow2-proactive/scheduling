@@ -63,10 +63,24 @@ public class MigratableHello extends InitializedHello implements Serializable {
 		System.out.println("starting migration to node : " + destination_node);
 		System.out.println("...");
 		try {
+			// THIS MUST BE THE LAST CALL OF THE METHOD
 			ProActive.migrateTo(destination_node);
-			System.out.println("\nsuccessfully migrated to node : " + destination_node);
 		} catch (MigrationException me) {
 			System.out.println("migration failed : " + me.toString());
 		}
 	}
+	
+	
+		public void moveTo(Object destination_object_node) {
+		System.out.println("\n-----------------------------");
+		System.out.println("starting migration to node " );
+		System.out.println("...");
+		try {
+			// THIS MUST BE THE LAST CALL OF THE METHOD
+			ProActive.migrateTo(destination_object_node);
+		} catch (MigrationException me) {
+			System.out.println("migration failed : " + me.toString());
+		}
+	}
+
 }
