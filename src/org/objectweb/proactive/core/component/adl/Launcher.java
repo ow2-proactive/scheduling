@@ -115,7 +115,7 @@ public class Launcher {
                 try {
                     return f.newComponent(pargs[1], new HashMap());
                 } catch (ClassCastException e) {
-                    if (e.getMessage().contains("attribute_controller_representative")) {
+                    if (e.getMessage().indexOf("attribute_controller_representative")!=(-1)) {
                         System.out.println(
                             "Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
                         throw e;
