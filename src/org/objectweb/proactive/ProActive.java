@@ -292,9 +292,12 @@ public class ProActive {
         }
     }
 
-    /**
-     * Creates a new set of active objects based on classname attached to the given virtualnode.
-     * @param classname classname the name of the class to instanciate as active
+     /**
+     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
+     * correspond to the classname parameter. 
+     * This group will contain one active object per node mapped onto the virtual node
+     * given as a parameter. 
+      * @param classname classname the name of the class to instanciate as active
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
      * on each node mapped to the given virtualnode in XML deployment descriptor.
@@ -310,7 +313,10 @@ public class ProActive {
     }
 
     /**
-     * Creates a new ActiveObject based on classname attached to the given virtualnode.
+     * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
+     * correspond to the classname parameter. 
+     * This group will contain one active object per node mapped onto the virtual node
+     * given as a parameter. 
      * @param classname classname the name of the class to instanciate as active
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
@@ -319,7 +325,7 @@ public class ProActive {
      *               see the definition of the activity in the javadoc of this classe for more information.
      * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
      *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
+     * @return Object a Group of references (possibly remote) on Stubs of newly created active objects
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
      *
@@ -590,8 +596,8 @@ public class ProActive {
     }
 
     /**
-     * Turns a Java object into an Active Object and send it to remote Nodes mapped to the given virtualnode in
-     * the XML deployment descriptor.
+     * Turns a Java object into a group of Active Objects and sends the elements of the group
+     * to remote Nodes mapped to the given virtualnode in the XML deployment descriptor.
      * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
      * @param target The object to turn active
      * @param nameOfTargetType the fully qualified name of the type the stub class should
@@ -602,7 +608,7 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
+    public static Object turnActiveAsGroup(Object target, String nameOfTargetType,
         VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
         if (virtualnode != null) {
