@@ -1,27 +1,24 @@
-call env.bat
+rem ----------------------------------------------------------------------------
+rem
+rem This variable should be set to the directory where is installed ProActive
+rem
+
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\.
+
+rem ----------------------------------------------------------------------------
+
 
 if NOT DEFINED JAVA_HOME goto javahome
 if "%JAVA_HOME%" == "" goto javahome
 
 rem ----
-rem Try to set proactive-tmp to the right place
-rem 
-rem -- try to set proactive-tmp at the same level as ProActive directory
-IF NOT EXIST "%PROACTIVE_TMP%" set PROACTIVE_TMP=..\..\..\proactive-tmp
-rem -- try to set proactive-tmp one level above ProActive directory
-IF NOT EXIST "%PROACTIVE_TMP%" set PROACTIVE_TMP=..\..\..\..\proactive-tmp
-rem -- proactive-tmp not created yet : back up to user directory
-IF NOT EXIST "%PROACTIVE_TMP%" set PROACTIVE_TMP=%USERPROFILE%\proactive-tmp
-
-
-rem ----
 rem Set up the classpath using classes dir or jar files
 rem 
-set CLASSPATH=.;%PROACTIVE_TMP%
+set CLASSPATH=.
 IF EXIST %PROACTIVE%\classes set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
-IF EXIST %PROACTIVE%\lib\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ProActive.jar
-IF EXIST %PROACTIVE%\lib\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ProActive_examples.jar
-IF EXIST %PROACTIVE%\lib\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ic2d.jar
+IF EXIST %PROACTIVE%\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
+IF EXIST %PROACTIVE%\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
+IF EXIST %PROACTIVE%\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
 
 IF EXIST %PROACTIVE%\lib\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini-core.jar
 IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini-ext.jar
