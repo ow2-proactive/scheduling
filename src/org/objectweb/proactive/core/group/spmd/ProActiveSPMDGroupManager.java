@@ -154,7 +154,10 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
      * @return true if barrierTags contains no tags of the current barriers, false if barrierTags contains at least one tag of the current barriers
      */
     public boolean checkExecution(LinkedList barrierTags) {
-        Iterator it = this.barrierTags.iterator();
+    	if (barrierTags == null) {
+    		return true;
+    	}
+        Iterator it = barrierTags.iterator();
         while (it.hasNext()) {
             if (this.currentBarriers.get((String) it.next()) != null) {
                 return false;
