@@ -142,20 +142,18 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        Group message_group = ProActiveGroup.getGroup(message);
-        Message result = new Message();
-
-        // result is a group
-        for (int i = 0; i < message_group.size(); i++) {
-            result.append((Message) message_group.get(i));
+        StringBuffer resulting_msg = new StringBuffer();
+        int message_size = ProActiveGroup.size(message);
+        for (int i = 0; i < message_size; i++) {
+            resulting_msg.append(((Message) ProActiveGroup.get(message, i)).toString());
         }
 
-        return (result.toString().equals((Test.MESSAGE +
-            PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
-            PrimitiveComponentA.MESSAGE + Test.MESSAGE) +
-            (Test.MESSAGE + PrimitiveComponentA.MESSAGE +
+        // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)
+        String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE +
             PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
-            Test.MESSAGE)));
+            Test.MESSAGE;
+
+        return resulting_msg.toString().equals(single_message + single_message);
     }
 
     public static void main(String[] args) {
