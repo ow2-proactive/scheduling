@@ -280,6 +280,7 @@
 				<include name="src/org/**"/>
 				<include name="compile/**"/>
 				<include name="lib/**"/>
+				<include name="descriptors/**"/>
 			</fileset>
 		</copy>
 		<!-- 
@@ -289,6 +290,7 @@
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
 			<zipfileset dir="${PAdist.dir}/scripts" prefix="ProActive/scripts"/>
 			<zipfileset dir="${PAdist.dir}/lib" prefix="ProActive/lib"/>
+			<zipfileset dir="${PAdist.dir}/descriptors" prefix="ProActive/descriptors"/>
 		</zip>
 		<!-- 
 			create zip version of ProActive with source
