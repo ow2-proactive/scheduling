@@ -60,17 +60,17 @@ if [ -f $PROACTIVE/lib/reggie.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
 fi
-if [ -f $PROACTIVE/lib/cog.jar ]
+if [ -f $PROACTIVE/lib/cog-jglobus.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog-jglobus.jar
 fi
-if [ -f $PROACTIVE/lib/iaik_jce_full.jar ]
+if [ -f $PROACTIVE/lib/cryptix.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/iaik_jce_full.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix.jar
 fi
-if [ -f $PROACTIVE/lib/iaik_ssl.jar ]
+if [ -f $PROACTIVE/lib/cryptix32.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/iaik_ssl.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix32.jar
 fi
 if [ -f $PROACTIVE/lib/javaxCrypto.jar ]
 then
@@ -95,6 +95,22 @@ fi
 if [ -f $PROACTIVE/lib/fractal.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal.jar
+fi
+if [ -f $PROACTIVE/lib/jce-jdk13-117.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jce-jdk13-117.jar
+fi
+if [ -f $PROACTIVE/lib/cryptix-asn1.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix-asn1.jar
+fi
+if [ -f $PROACTIVE/lib/puretls.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/puretls.jar
+fi
+if [ -f $PROACTIVE/lib/cog-ogce.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog-ogce.jar
 fi
 
 
