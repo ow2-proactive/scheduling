@@ -117,7 +117,7 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
     // Textfields
     // 	tfHost=new JTextField("localhost");
     try {
-      tfHost = new JTextField(InetAddress.getLocalHost().getHostName());
+      tfHost = new JTextField(InetAddress.getLocalHost().getCanonicalHostName());
     } catch (Exception e) {
       tfHost = new JTextField("localhost");
     }

@@ -143,7 +143,7 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
             }
 //            remoteVMNode = NodeFactory.getNode("//" + remoteHostname + "/" +
 //                    remoteNodeName);
-					setRemoteHostname(remoteVMNode.getNodeInformation().getInetAddress().getHostName());
+					setRemoteHostname(remoteVMNode.getNodeInformation().getInetAddress().getCanonicalHostName());
         } catch (NodeException e1) {
             logger.fatal("Problem with a node", e1);
             throw new RuntimeException(e1);
@@ -160,10 +160,10 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
         ResultsCollections results = getResults();
         try {
             results.add(AbstractResult.IMP_MSG,
-                "Local hostname : " + InetAddress.getLocalHost().getHostName());
+                "Local hostname : " + InetAddress.getLocalHost().getCanonicalHostName());
             if (logger.isInfoEnabled()) {
                 logger.info("Local hostname : " +
-                    InetAddress.getLocalHost().getHostName());
+                    InetAddress.getLocalHost().getCanonicalHostName());
             }
             results.add(AbstractResult.IMP_MSG,
                 "Remote hostname : " + getRemoteHostname());
@@ -191,10 +191,10 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
         ResultsCollections results = getResults();
         try {
             results.add(AbstractResult.IMP_MSG,
-                "Local hostname : " + InetAddress.getLocalHost().getHostName());
+                "Local hostname : " + InetAddress.getLocalHost().getCanonicalHostName());
             if (logger.isInfoEnabled()) {
                 logger.info("Local hostname : " +
-                    InetAddress.getLocalHost().getHostName());
+                    InetAddress.getLocalHost().getCanonicalHostName());
             }
             results.add(AbstractResult.IMP_MSG,
                 "Remote hostname : " + getRemoteHostname());

@@ -156,7 +156,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 	
 		protocol = event.getProtocol();
 		proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
-		host = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
+		host = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getCanonicalHostName();
 		try {
 			ic2dObject.getWorldObject().addHostObject(host,protocol);
 		} catch (RemoteException e) {

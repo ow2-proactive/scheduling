@@ -60,7 +60,7 @@ public class VMObject extends AbstractDataObject {
   static {
     String currentHost;
     try {
-      currentHost = java.net.InetAddress.getLocalHost().getHostName();
+      currentHost = java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (java.net.UnknownHostException e) {
       currentHost = "localhost";
     }

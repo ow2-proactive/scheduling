@@ -49,7 +49,7 @@ public class DialogUtils {
     IC2DMessageLogger logger) {
     String initialHostValue = "localhost";
     try {
-      initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
+      initialHostValue = java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (java.net.UnknownHostException e) {
     }
     Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -77,7 +77,7 @@ public class DialogUtils {
 	IC2DMessageLogger logger) {
 	String initialHostValue = "localhost";
 	try {
-	  initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
+	  initialHostValue = java.net.InetAddress.getLocalHost().getCanonicalHostName();
 	} catch (java.net.UnknownHostException e) {
 	}
 	Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -114,7 +114,7 @@ public class DialogUtils {
     IC2DMessageLogger logger) {
     String initialHostValue = "localhost";
     try {
-      initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
+      initialHostValue = java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (java.net.UnknownHostException e) {
     }
     Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -213,7 +213,7 @@ public class DialogUtils {
 	{
 		String initialHostValue = "localhost";
     try {
-      initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
+      initialHostValue = java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (java.net.UnknownHostException e) {
     	e.printStackTrace();
     }
