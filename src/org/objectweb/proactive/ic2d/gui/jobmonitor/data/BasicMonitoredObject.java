@@ -8,6 +8,7 @@ import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -20,14 +21,45 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     private Set references;
 
     protected BasicMonitoredObject(int key, String fullname) {
+    	this(key, fullname, fullname);
+    }
+    
+    protected BasicMonitoredObject(int key, String prettyPrefix, String fullname) {
         this.key = key;
         this.fullname = fullname;
-        this.prettyName = fullname;
         this.deletedSince = null;
         this.reallyDeleted = false;
         this.references = new HashSet();
+        computePrettyName(prettyPrefix);
     }
 
+    protected int incLastID() {
+    	return 0;
+    }
+
+    protected Map getPrettyNames() {
+    	return null;
+    }
+    
+    private void computePrettyName(String prefix) {
+    	Map prettyNames = getPrettyNames();
+    	if (prettyNames == null) {
+    		prettyName = null;
+    		return;
+    	}
+
+    	if (prefix == null) {
+    		prettyName = fullname;
+    		return;
+    	}
+    		
+    	prettyName = (String) prettyNames.get(fullname);
+    	if (prettyName == null) {
+    		prettyName = prefix + "#" + incLastID();
+    		prettyNames.put(fullname, prettyName);
+    	}
+    }
+    
     public void addReference(MonitoredObjectSet set) {
         references.add(set);
     }

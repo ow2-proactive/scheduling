@@ -1,11 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.util.HashMap;
 import java.util.Map;
 
 
 public class MonitoredJVM extends BasicMonitoredObject {
     static protected int lastID = 0;
-    static protected Map prettyNames;
+    static protected Map prettyNames = new HashMap();
     private int depth;
 
     protected int incLastID() {
@@ -16,8 +17,8 @@ public class MonitoredJVM extends BasicMonitoredObject {
         return prettyNames;
     }
 
-    public MonitoredJVM(String host, String name, int depth) {
-        super(JVM, host + "/" + name);
+    public MonitoredJVM(String url, int depth) {
+        super(JVM, "JVM",  url);
         this.depth = depth;
     }
 

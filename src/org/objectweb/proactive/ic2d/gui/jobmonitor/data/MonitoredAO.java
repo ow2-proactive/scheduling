@@ -1,10 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.util.HashMap;
 import java.util.Map;
+
 
 public class MonitoredAO extends BasicMonitoredObject {
     static protected int lastID = 0;
-    static protected Map prettyNames;
+    static protected Map prettyNames = new HashMap();
 
     protected int incLastID() {
         return ++lastID;
@@ -14,7 +16,8 @@ public class MonitoredAO extends BasicMonitoredObject {
         return prettyNames;
     }
 
-    public MonitoredAO(String fullname) {
-        super(AO, fullname);
+    public MonitoredAO(String className, String instanceName) {
+        super(AO, className.substring(className.lastIndexOf(".") + 1),
+            instanceName);
     }
 }

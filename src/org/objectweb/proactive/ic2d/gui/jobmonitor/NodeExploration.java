@@ -14,6 +14,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredVN;
 
 import java.rmi.registry.LocateRegistry;
@@ -69,8 +70,7 @@ public class NodeExploration implements JobMonitorConstants {
 
     /* url : "//host:port/object" */
     private ProActiveRuntime resolveURL(String url) {
-        System.out.println(url);
-        Pattern p = Pattern.compile("(.*//)?(.+):?([0-9]*)/(.+)");
+        Pattern p = Pattern.compile("(.*//)?([^:]+):?([0-9]*)/(.+)");
         Matcher m = p.matcher(url);
         if (!m.matches()) {
             return null;
@@ -182,9 +182,15 @@ public class NodeExploration implements JobMonitorConstants {
         VMInformation infos = pr.getVMInformation();
         String vmName = infos.getName();
 
-        MonitoredJVM jvmObject = new MonitoredJVM(infos.getInetAddress()
-                                                       .getCanonicalHostName(),
-                vmName, depth);
+        String url;
+        try {
+            url = pr.getURL();
+        } catch (ProActiveException e) {
+            log(e);
+            return;
+        }
+
+        MonitoredJVM jvmObject = new MonitoredJVM(url, depth);
 
         if (visitedVM.contains(vmName) || skippedObjects.contains(jvmObject)) {
             return;
@@ -196,8 +202,7 @@ public class NodeExploration implements JobMonitorConstants {
             return;
         }
 
-        String hostname = pr.getVMInformation().getInetAddress()
-                            .getCanonicalHostName();
+        String hostname = infos.getInetAddress().getCanonicalHostName();
         MonitoredHost hostObject = new MonitoredHost(hostname);
         if (skippedObjects.contains(hostObject)) {
             return;
@@ -292,14 +297,8 @@ public class NodeExploration implements JobMonitorConstants {
                 continue;
             }
 
-            className = className.substring(className.lastIndexOf(".") + 1);
-            String aoName = (String) aos.get(rba.getID());
-            if (aoName == null) {
-                aoName = className + "#" + (aos.size() + 1);
-                aos.put(rba.getID(), aoName);
-            }
-
-            MonitoredAO aoObject = new MonitoredAO(aoName);
+            MonitoredAO aoObject = new MonitoredAO(className,
+                    rba.getID().toString());
             if (!skippedObjects.contains(aoObject)) {
                 asso.addChild(nodeObject, aoObject);
                 asso.addChild(jobObject, aoObject);
@@ -325,5 +324,18 @@ public class NodeExploration implements JobMonitorConstants {
     public void endExploration() {
         visitedVM = null;
         asso.updateReallyDeleted();
+    }
+
+    private void killJob(MonitoredJob job) {
+    	MonitoredObjectSet objects = asso.getValues(job, AO, null);
+    	
+    }
+
+    public void killJobs(MonitoredObjectSet jobs) {
+        Iterator iter = jobs.iterator();
+        while (iter.hasNext()) {
+            MonitoredJob job = (MonitoredJob) iter.next();
+            killJob(job);
+        }
     }
 }
