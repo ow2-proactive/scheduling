@@ -35,6 +35,7 @@ import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
+import org.objectweb.proactive.ic2d.spy.Spy;
 
 import java.awt.Color;
 
@@ -52,6 +53,8 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         super(parentDataObjectPanel,
             "VM id=" + targetVMObject.getID().toString(), "VMObject");
         activeObjectFilter.addClass(SpyListenerImpl.class.getName());
+//      ebe la classe Spy est aussi filtrée par defaut
+        activeObjectFilter.addClass(Spy.class.getName());
         this.vmObject = targetVMObject;
         //this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));
         HostPanel parent = (HostPanel) getParentDataObjectPanel(); // get parent
