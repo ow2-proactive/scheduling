@@ -54,8 +54,8 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
     private AbstractManager manager = null;
 
     /**
- * @param lenient
- */
+     * @param lenient
+     */
     public ManagerDescriptorHandler(AbstractManager manager) {
         super(true);
         this.manager = manager;
@@ -71,6 +71,8 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
                 new InterLinkedHandler((FunctionalTestManager) manager));
         }
         addHandler(PROPERTIES_TAG, new PropertiesHandler());
+        addHandler(LOG4J_TAG, new SingleValueUnmarshaller());
+        addHandler(RESULT_TAG, new ResultHandler(this.manager));
     }
 
     public static void createManagerDescriptor(String xmlDescriptorUrl,
@@ -92,32 +94,34 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
     }
 
     /**
- * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
- */
+     * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
+     */
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
         if (name.equalsIgnoreCase(MANAGER_NAME_TAG)) {
-            manager.setName((String) activeHandler.getResultObject());
+            this.manager.setName((String) activeHandler.getResultObject());
         } else if (name.equalsIgnoreCase(MANAGER_DESCRIPTION_TAG)) {
-            manager.setDescription((String) activeHandler.getResultObject());
+            this.manager.setDescription((String) activeHandler.getResultObject());
         } else if (name.equalsIgnoreCase(MANAGER_NB_RUNS_TAG)) {
-            manager.setNbRuns(Integer.parseInt(
+            this.manager.setNbRuns(Integer.parseInt(
                     (String) activeHandler.getResultObject()));
         } else if (name.equalsIgnoreCase(PROPERTIES_TAG)) {
-            manager.setProperties((Properties) activeHandler.getResultObject());
+            this.manager.setProperties((Properties) activeHandler.getResultObject());
+        } else if (name.equalsIgnoreCase(LOG4J_TAG)) {
+            this.manager.loggerConfigure((String) activeHandler.getResultObject());
         }
     }
 
     /**
- * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
- */
+     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
+     */
     public Object getResultObject() throws SAXException {
         return this.manager;
     }
 
     /**
- * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
- */
+     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
+     */
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
     }

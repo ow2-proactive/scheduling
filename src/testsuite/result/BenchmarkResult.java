@@ -93,6 +93,12 @@ public class BenchmarkResult extends TestResult {
                 (getType() == AbstractResult.GLOBAL_RESULT)) {
             Element result = document.createElement("Benchmark");
 
+            Element unit = document.createElement("Unit");
+            Text unitText = document.createTextNode(((Benchmark) this.getTest()).getTimer()
+                                                     .getUnit());
+            unit.appendChild(unitText);
+            result.appendChild(unit);
+
             Element bestTime = document.createElement("BestTime");
             Text bestTimeValue = document.createTextNode(min + "");
             bestTime.appendChild(bestTimeValue);

@@ -33,6 +33,7 @@ package testsuite.manager;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.WriterAppender;
 
 import org.w3c.dom.Document;
@@ -82,7 +83,8 @@ import javax.xml.transform.TransformerException;
  * @author Alexandre di Costanzo
  *
  */
-public abstract class AbstractManager implements ResultsExporter, Beanable {
+public abstract class AbstractManager implements ResultsExporter, Beanable,
+    AbstractManagerConstants {
     private String name = "AbstractManager with no name";
     private String description = "AbstractManager with no description.";
     private ArrayList groups = new ArrayList();
@@ -90,7 +92,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
     private int nbRuns = 1;
     private ResultsCollections results = new ResultsCollections();
     private Properties properties = null;
-	protected ArrayList interLinkedGroups = null;
+    protected ArrayList interLinkedGroups = null;
+    private int resultType = 0;
+    private String outputPath = null;
 
     public AbstractManager() {
         logger = Logger.getLogger(getClass().getName());
@@ -101,7 +105,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
         this.name = name;
         this.description = description;
         logger = Logger.getLogger(getClass().getName());
-        
+
         testAppender();
     }
 
@@ -130,12 +134,14 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
                     new PatternLayout("%d [%t] %-5p %c %x - %m%n"), out));
 
             Logger.getRootLogger().setLevel((Level) Level.INFO);
-
         }
-        
     }
 
     public abstract void initManager() throws Exception;
+
+    public void execute() {
+        this.execute(false);
+    }
 
     public abstract void execute(boolean useAttributesFile);
 
@@ -248,12 +254,12 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
             logger.debug("Nb runs change in " + nbRuns);
         }
     }
-    
-    public void setNbRuns(String i){
-    	this.nbRuns = Integer.parseInt(i);
-		if (logger.isDebugEnabled()) {
-			logger.debug("Nb runs change in " + this.nbRuns);
-		}
+
+    public void setNbRuns(String i) {
+        this.nbRuns = Integer.parseInt(i);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Nb runs change in " + this.nbRuns);
+        }
     }
 
     /**
@@ -450,55 +456,107 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      * @see testsuite.bean.Beanable#loadAttributes(java.util.Properties)
      */
     public void loadAttributes(Properties properties) {
-    	if(properties != null){
-    	this.properties = properties;
-        Class[] parameterTypes = { String.class };
-        Enumeration enum = properties.propertyNames();
-        Method setter = null;
+        if (properties != null) {
+            this.properties = properties;
+            Class[] parameterTypes = { String.class };
+            Enumeration enum = properties.propertyNames();
+            Method setter = null;
 
-        while (enum.hasMoreElements()) {
-            String name = (String) enum.nextElement();
-            String value = properties.getProperty(name);
-            try {
-                setter = getClass().getMethod("set" + name, parameterTypes);
-                Object[] args = { value };
+            while (enum.hasMoreElements()) {
+                String name = (String) enum.nextElement();
+                String value = properties.getProperty(name);
                 try {
-                    setter.invoke(this, args);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("set " + name + " with " + value);
+                    setter = getClass().getMethod("set" + name, parameterTypes);
+                    Object[] args = { value };
+                    try {
+                        setter.invoke(this, args);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("set " + name + " with " + value);
+                        }
+                    } catch (IllegalArgumentException e1) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e1);
+                        }
+                    } catch (IllegalAccessException e1) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e1);
+                        }
+                    } catch (InvocationTargetException e1) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(e1);
+                        }
                     }
-                } catch (IllegalArgumentException e1) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(e1);
-                    }
-                } catch (IllegalAccessException e1) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(e1);
-                    }
-                } catch (InvocationTargetException e1) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(e1);
-                    }
+                } catch (SecurityException e) {
+                    // do nothing
+                } catch (NoSuchMethodException e) {
+                    // do nothing
                 }
-            } catch (SecurityException e) {
-                // do nothing
-            } catch (NoSuchMethodException e) {
-                // do nothing
             }
-        }
 
-        for (int i = 0; i < groups.size(); i++) {
-            Group group = (Group) groups.get(0);
-            Iterator it = group.iterator();
-            while (it.hasNext()) {
-                AbstractTest test = (AbstractTest) it.next();
-                test.loadAttributes(properties);
+            for (int i = 0; i < groups.size(); i++) {
+                Group group = (Group) groups.get(0);
+                Iterator it = group.iterator();
+                while (it.hasNext()) {
+                    AbstractTest test = (AbstractTest) it.next();
+                    test.loadAttributes(properties);
+                }
+            }
+            if (logger.isInfoEnabled()) {
+                logger.info("Test Suite's attributes readed");
             }
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("Test Suite's attributes readed");
+    }
+
+    protected void showResult() {
+        if (this.getResultType() != 0) {
+            switch (this.getResultType()) {
+            case AbstractManager.HTML:
+                try {
+                    this.toHTML(new File(this.getOutputPath()));
+                } catch (ParserConfigurationException e) {
+                    logger.warn("Parser Configuration error", e);
+                } catch (TransformerException e) {
+                    logger.warn("Transformer error", e);
+                } catch (IOException e) {
+                    logger.warn("IO error", e);
+                }
+                break;
+            case AbstractManager.TEXT:
+                try {
+                    this.toOutPutStream(new FileOutputStream(
+                            this.getOutputPath()));
+                } catch (FileNotFoundException e) {
+                    logger.warn("File " + this.getOutputPath() + " not found", e);
+                } catch (IOException e) {
+                    logger.warn("IO error", e);
+                }
+                break;
+            case AbstractManager.CONSOLE:
+                try {
+                    this.toOutPutStream(System.out);
+                } catch (IOException e) {
+                    logger.warn("Can't write results in the console", e);
+                }
+                break;
+            case AbstractManager.XML:
+                try {
+                    Document document = this.toXML();
+                    String xslPath = "/" +
+                        AbstractManager.class.getName().replace('.', '/')
+                                             .replaceAll("manager.*",
+                            "/xslt/xmlExport.xsl");
+                    TransformerXSLT.transformerTo(document,
+                        new File(this.getOutputPath()), xslPath);
+                } catch (ParserConfigurationException e) {
+                    logger.warn("Parser Configuration error", e);
+                } catch (TransformerException e) {
+                    logger.warn("Transformer error", e);
+                } catch (IOException e) {
+                    logger.warn("IO error", e);
+                }
+                break;
+            }
         }
-    	}
     }
 
     /**
@@ -513,5 +571,37 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      */
     public void setProperties(Properties properties) {
         this.properties = properties;
+    }
+
+    public void loggerConfigure(String path) {
+        PropertyConfigurator.configure(path);
+    }
+
+    /**
+     * @return
+     */
+    public int getResultType() {
+        return resultType;
+    }
+
+    /**
+     * @param i
+     */
+    public void setResultType(int i) {
+        resultType = i;
+    }
+
+    /**
+     * @return
+     */
+    public String getOutputPath() {
+        return outputPath;
+    }
+
+    /**
+     * @param string
+     */
+    public void setOutputPath(String string) {
+        outputPath = string;
     }
 }

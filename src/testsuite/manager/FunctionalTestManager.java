@@ -53,17 +53,17 @@ import java.util.Iterator;
 public abstract class FunctionalTestManager extends AbstractManager {
 
     /**
- *
- */
+     *
+     */
     public FunctionalTestManager() {
         super("FunctionalTestManager with no name",
             "FunctionalTestManager with no description");
     }
 
     /**
- * @param name
- * @param description
- */
+     * @param name
+     * @param description
+     */
     public FunctionalTestManager(String name, String description) {
         super(name, description);
     }
@@ -75,8 +75,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
     }
 
     /**
- * @see testsuite.manager.AbstractManager#execute()
- */
+     * @see testsuite.manager.AbstractManager#execute()
+     */
     public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
@@ -171,6 +171,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+
+        this.showResult();
     }
 
     private int runs = 0;
@@ -266,6 +268,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+
+        this.showResult();
     }
 
     public void executeInterLinkedTest() {
@@ -349,6 +353,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+
+        this.showResult();
     }
 
     public void addInterLinkedGroup(Group group) {
@@ -356,15 +362,15 @@ public abstract class FunctionalTestManager extends AbstractManager {
     }
 
     /**
-         * @return
-         */
+             * @return
+             */
     public ArrayList getInterLinkedGroups() {
         return this.interLinkedGroups;
     }
 
     /**
- * @param list
- */
+     * @param list
+     */
     public void setInterLinkedGroups(ArrayList list) {
         this.interLinkedGroups = list;
     }

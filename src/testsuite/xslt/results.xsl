@@ -38,7 +38,7 @@
 				<xsl:if test="@failed = 'false'"><b><span style="color: rgb(0, 255, 0);"> [SUCCESS] </span></b></xsl:if>
 			</xsl:if>
 			<xsl:if test="Benchmark">
-				<a href="bench_results_files/Bench{$i}.png">See the chart</a> Max=<xsl:value-of select ="Benchmark/MaxTime" />ms Moy=<xsl:value-of select ="Benchmark/MoyTime" />ms STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" />ms --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
+				<a href="bench_results_files/Bench{$i}.png">See the chart</a> Max=<xsl:value-of select ="Benchmark/MaxTime" /><xsl:value-of select="Benchmark/Unit" /> Moy=<xsl:value-of select ="Benchmark/MoyTime" /><xsl:value-of select="Benchmark/Unit" /> STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" /><xsl:value-of select="Benchmark/Unit" /> --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i><xsl:value-of select="Benchmark/Unit" /></i>
 			</xsl:if>
 			<xsl:if test="Exception">
 				<p class="error">Stack Trace :<br />

@@ -28,28 +28,51 @@
 *
 * ################################################################
 */
-package testsuite.xml;
+package testsuite.timer;
 
 
 /**
  * @author adicosta
  *
  */
-public interface ManagerDescriptorConstants {
-    public static final String MANAGER_TAG = "Manager";
-    public static final String MANAGER_NAME_TAG = "name";
-    public static final String MANAGER_DESCRIPTION_TAG = "description";
-    public static final String MANAGER_NB_RUNS_TAG = "nbRuns";
-    public static final String SIMPLE_GROUP_TAG = "simpleGroup";
-    public static final String PACKAGE_GROUP_TAG = "packageGroup";
-    public static final String UNIT_TEST_TAG = "unitTest";
-    public static final String PROPERTIES_TAG = "properties";
-    public static final String PROP_TAG = "prop";
-    public static final String INTERLINKED_TESTS_TAG = "interLinkedTests";
-    public static final String INTERLINKS_TAG = "interLinks";
-    public static final String LINK_TAG = "link";
-    public static final String ID_TEST_TAG = "idTest";
-    public static final String PARENT_TAG = "parent";
-    public static final String LOG4J_TAG = "log4j";
-    public static final String RESULT_TAG = "result";
+public class MsTimer implements Timeable {
+    private static final String unit = "ms";
+    private long time;
+    private long start;
+
+    /**
+     *
+     */
+    public MsTimer() {
+        this.time = 0;
+    }
+
+    /**
+     * @see testsuite.timer.Timeable#start()
+     */
+    public void start() {
+        this.start = System.currentTimeMillis();
+    }
+
+    /**
+     * @see testsuite.timer.Timeable#stop()
+     */
+    public void stop() {
+        long stop = System.currentTimeMillis();
+        this.time = (stop - this.start);
+    }
+
+    /**
+     * @see testsuite.timer.Timeable#getCumulatedTime()
+     */
+    public long getCumulatedTime() {
+        return this.time;
+    }
+
+    /**
+     * @see testsuite.timer.Timeable#getUnit()
+     */
+    public String getUnit() {
+        return unit;
+    }
 }

@@ -113,7 +113,7 @@
 			</xsl:if>
 			<xsl:if test="Benchmark">
 			    <xsl:variable name="i" ><xsl:number level="any"  from="AllMessages" count="Benchmark" /></xsl:variable>
-				 --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
+				 --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i><xsl:value-of select="Benchmark/Unit" /></i>
 			</xsl:if>
 			<xsl:if test="Exception">
 				<p class="error">Stack Trace :<br />
@@ -144,7 +144,7 @@
 			</xsl:if>
 			<xsl:if test="Benchmark">
 			    <xsl:variable name="i" ><xsl:number level="any"  from="AllMessages" count="Benchmark" /></xsl:variable>
-				<a href="bench_results_files/Bench{$i}.png">See the chart</a> Max=<xsl:value-of select ="Benchmark/MaxTime" />ms Moy=<xsl:value-of select ="Benchmark/MoyTime" />ms STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" />ms --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
+				<a href="bench_results_files/Bench{$i}.png">See the chart</a> Max=<xsl:value-of select ="Benchmark/MaxTime" /><xsl:value-of select="Benchmark/Unit" /> Moy=<xsl:value-of select ="Benchmark/MoyTime" /><xsl:value-of select="Benchmark/Unit" /> STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" /><xsl:value-of select="Benchmark/Unit" /> --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i><xsl:value-of select="Benchmark/Unit" /></i>
 			</xsl:if>
 			<xsl:if test="Exception">
 				<p class="error">Stack Trace :<br />

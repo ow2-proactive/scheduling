@@ -30,13 +30,6 @@
 */
 package testsuite.manager;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -44,16 +37,31 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.StandardXYItemRenderer;
+
 import org.jfree.data.DefaultCategoryDataset;
 import org.jfree.data.TableXYDataset;
 import org.jfree.data.XYSeries;
+
 import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
+
 import testsuite.result.AbstractResult;
 import testsuite.result.BenchmarkResult;
 import testsuite.result.ResultsCollections;
+
 import testsuite.test.Benchmark;
+
+import testsuite.timer.MsTimer;
+import testsuite.timer.Timeable;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.Iterator;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 
 /**
@@ -61,19 +69,20 @@ import testsuite.test.Benchmark;
  *
  */
 public abstract class BenchmarkManager extends AbstractManager {
+    protected Timeable timer = new MsTimer();
 
     /**
-*
-*/
+    *
+    */
     public BenchmarkManager() {
         super("BenchmarkManager with no name",
             "BenchmarkManager with no description");
     }
 
     /**
-* @param name
-* @param description
-*/
+    * @param name
+    * @param description
+    */
     public BenchmarkManager(String name, String description) {
         super(name, description);
     }
@@ -85,8 +94,8 @@ public abstract class BenchmarkManager extends AbstractManager {
     }
 
     /**
-* @see testsuite.manager.AbstractManager#execute()
-*/
+    * @see testsuite.manager.AbstractManager#execute()
+    */
     public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
@@ -125,7 +134,7 @@ public abstract class BenchmarkManager extends AbstractManager {
             ResultsCollections resultsGroup = group.getResults();
 
             try {
-                group.initGroup();
+                group.initGroup(this.timer);
             } catch (Exception e) {
                 logger.warn("Can't init group : " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
@@ -190,11 +199,13 @@ public abstract class BenchmarkManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+
+        this.showResult();
     }
 
     /**
-* @see testsuite.result.ResultsExporter#toHTML(java.io.File)
-*/
+    * @see testsuite.result.ResultsExporter#toHTML(java.io.File)
+    */
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
         createBenchGraph(location.getParentFile());
@@ -294,6 +305,34 @@ public abstract class BenchmarkManager extends AbstractManager {
 
         if (logger.isInfoEnabled()) {
             logger.info("... Finish to create charts");
+        }
+    }
+
+    /**
+     * @return
+     */
+    public Timeable getTimer() {
+        return this.timer;
+    }
+
+    /**
+     * @param timeable
+     */
+    public void setTimer(Timeable timeable) {
+        this.timer = timeable;
+    }
+
+    public void setTimer(String className) {
+        try {
+            Class c = getClass().getClassLoader().loadClass(className);
+            this.timer = (Timeable) c.newInstance();
+        } catch (ClassNotFoundException e) {
+            logger.warn(className + " was not found. Use default timer", e);
+        } catch (InstantiationException e) {
+            logger.warn(className +
+                " could't be instancied. Use default timer", e);
+        } catch (IllegalAccessException e) {
+            logger.warn(className + " illegal access. Use default timer", e);
         }
     }
 }
