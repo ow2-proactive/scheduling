@@ -138,7 +138,15 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     public int getNodeCount() {
         return virtualNode.getNodeCount();
     }
+    
+    
 
+    /* 
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createdNodeCount()
+     */
+    public int createdNodeCount() {
+        throw new RuntimeException("This method is deprecated, use getNumberOfCurrentlyCreatedNodes() or getNumberOfCreatedNodesAfterDeployment()");
+    }
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
