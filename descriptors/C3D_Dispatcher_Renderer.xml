@@ -53,11 +53,7 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<log4jpropertiesFile>
-						<relativePath type="relative" origin="userHome"  value="ProActive/scripts/unix/proactive-log4j"/>
-					</log4jpropertiesFile>
-				</jvmProcess>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 		</processes>
 	</infrastructure>
