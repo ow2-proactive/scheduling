@@ -39,17 +39,11 @@ package org.objectweb.proactive.core.component.exceptions;
  */
 public class NoSuchComponentException extends Exception {
 
-	/**
-	 * 
-	 */
 	public NoSuchComponentException() {
 		super();
 		
 	}
 
-	/**
-	 * @param message
-	 */
 	public NoSuchComponentException(String message) {
 		super(message);
 		

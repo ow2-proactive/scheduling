@@ -40,6 +40,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
 
 import java.io.Serializable;
 
@@ -64,35 +65,35 @@ public abstract class ProActiveController implements Interface, Serializable {
         this.owner = owner;
     }
 
-    /**
+    /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
     public Component getFcItfOwner() {
         return owner;
     }
 
-    /**
+    /*
      * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
      */
     public boolean isFcInternalItf() {
         return isInternal;
     }
 
-    /**
+    /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfName()}
      */
     public String getFcItfName() {
         return interfaceType.getFcItfName();
     }
 
-    /**
+    /*
      * see {@link org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public Type getFcItfType() {
         return interfaceType;
     }
 
-    /**
+    /*
      * some control operations are to be performed while the component is stopped
      */
     protected void checkLifeCycleIsStopped() throws IllegalLifeCycleException {
@@ -111,10 +112,8 @@ public abstract class ProActiveController implements Interface, Serializable {
     // component parameters controller has to to be instantiated prior to this call
     protected String getHierarchicalType() {
         try {
-            ComponentParametersController controller = (ComponentParametersController) getFcItfOwner()
-                                                                                           .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);
-            return controller.getComponentParameters().getHierarchicalType();
-            //return (((ComponentParametersController))getFcItfOwner().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getHierarchicalType();
+            return Fractive.getComponentParametersController(getFcItfOwner())
+                           .getComponentParameters().getHierarchicalType();
         } catch (NoSuchInterfaceException e) {
             throw new ProActiveRuntimeException(
                 "There is no component parameters controller for this component");

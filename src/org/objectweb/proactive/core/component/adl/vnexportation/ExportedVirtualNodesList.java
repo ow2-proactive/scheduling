@@ -158,7 +158,7 @@ public class ExportedVirtualNodesList {
 
     public boolean addLeafVirtualNode(String componentName,
         String virtualNodeName, String cardinality) {
-        boolean added = false;
+        
         LinkedVirtualNode oldLeaf = getLeafVirtualNode(componentName);
         if (oldLeaf != null) {
             // ensure only 1 leaf per component
@@ -336,7 +336,6 @@ public class ExportedVirtualNodesList {
 
         //String[] split = composingVirtualNodes.split(COMPOSING_VIRTUAL_NODES_REGEX);
         String[] split = composingVirtualNodes.split(";");
-        LinkedVirtualNode[] composing_vns = new LinkedVirtualNode[split.length];
         for (int i = 0; i < split.length; i++) {
             String vn = null;
             if (split[i].indexOf(".") == -1) {
@@ -447,7 +446,6 @@ public class ExportedVirtualNodesList {
 
         // 2. add new composing virtual nodes
         String[] split = composingVirtualNodes.split(";");
-        LinkedVirtualNode[] composing_vns = new LinkedVirtualNode[split.length];
         for (int i = 0; i < split.length; i++) {
             String component = split[i].substring(0, split[i].indexOf("."));
             String vn = split[i].substring(split[i].indexOf(".") + 1,
