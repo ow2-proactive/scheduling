@@ -896,4 +896,9 @@ public class BytecodeStubBuilder {
 
         return;
     }
+
+    public String getStubClassFullName ()
+    {
+	return this.stubClassFullName;
+    }
 }

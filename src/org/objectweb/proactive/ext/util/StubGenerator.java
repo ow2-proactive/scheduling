@@ -8,6 +8,9 @@ public class StubGenerator
 {
     public static void main (String[] args)
     {
+
+	String fileName = null;
+
 	// Check number of arguments
 	if (args.length <= 0)
 	    {
@@ -16,6 +19,15 @@ public class StubGenerator
 
 	// Name of the class
 	String classname = args[0];
+
+
+
+	try
+	    {	
+		// Generates the bytecode for the class
+		BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
+		byte[] data = bsb.create();
+		classname = bsb.getStubClassFullName ();
 
 	// Deals with directory name
 	String directoryName;
@@ -33,13 +45,7 @@ public class StubGenerator
 		directoryName = directoryName + System.getProperty ("file.separator");		
 	    }
 	char sep = System.getProperty ("file.separator").toCharArray() [0];
-	String fileName = directoryName + classname.replace ('.', sep) + ".class";
-
-	try
-	    {
-		// Generates the bytecode for the class
-		BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
-		byte[] data = bsb.create();
+	fileName = directoryName + classname.replace ('.', sep) + ".class";
 
 		// And writes it to a file
 		new File (fileName.substring (0, fileName.lastIndexOf (sep))).mkdirs();
