@@ -12,6 +12,31 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for infrastructure/processes/processDefinition element-->
 		</xs:unique>
+		<xs:keyref name="rshprocessReferenceid" refer="processid">
+					<xs:selector xpath="infrastructure/processes/processDefinition/rshProcess/processReference"/>
+					<xs:field xpath="@refid"/>
+					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="sshprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/sshProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+					<!--This sectionreferences the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/sshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="rloginprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/rloginProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+		<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rloginProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="bsubprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/bsubProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/bsubProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="globusprocessReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/globusProcess/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:key name="processid">
 			<xs:selector xpath="infrastructure/processes/processDefinition"/>
 			<xs:field xpath="@id"/>
@@ -38,33 +63,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--ProActiveDescriptor element has one childs: infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
-			<xs:element name="infrastructure" type="InfrastructureType">
-				<xs:keyref name="rshprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/rshProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="sshprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/sshProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This sectionreferences the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/sshProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="rloginprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/rloginProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/rloginProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="bsubprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/bsubProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/bsubProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-				<xs:keyref name="globusprocessReferenceid" refer="processid">
-					<xs:selector xpath="processes/processDefinition/globusProcess/processReference"/>
-					<xs:field xpath="@refid"/>
-					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>
-			</xs:element>
+			<xs:element name="infrastructure" type="InfrastructureType"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--infrastructure element has one child: processes element that must appear once and only once -->
@@ -91,12 +90,13 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--jvmProcess element has five childs: classpath, javaPath, policyFile, classname, parameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess. jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. classname represents the class to start with the enclosing jvmProcess. parameters represent parameters of the class to start.This element has also one attribute: class which is required. This attribute can take two values: org.objectweb.proactive.core.process.JVMProcessImpl, org.objectweb.proactive.core.process.JVMNodeProcess(in that case the class to start is alrady set(see api). This element is used to create a local jvm-->
+	<!--jvmProcess element has five childs: classpath, javaPath, policyFile, log4jpropertiesFile, jvmParameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess.log4jpropertiesFilerepresents the location of the log4j properties file.  jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. This element has also one attribute: class which is required. This attribute can take only one value: org.objectweb.proactive.core.process.JVMNodeProcess. This element is used to create a local jvm-->
 	<xs:complexType name="JvmProcessType">
 		<xs:sequence>
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="log4jpropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 			<xs:element name="classname" type="xs:string" minOccurs="0"/>
 			<xs:element name="parameters" type="xs:string" minOccurs="0"/>
@@ -147,7 +147,6 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:simpleType name="JvmParameterType">
 		<xs:list itemType="xs:string"/>
 	</xs:simpleType>
-
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only three values: org.objectweb.proactive.core.process.rsh.RSHNodeProcess, org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
 		<xs:sequence>
@@ -193,13 +192,26 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.RLoginProcess"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and one attribute: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess.This element will be used to run bsub command-->
+	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference" minOccurs="0"/>
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
+		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="queue" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal"/>
+					<xs:enumeration value="priority"/>
+					<xs:enumeration value="night"/>
+					<xs:enumeration value="short"/>
+					<xs:enumeration value="idle"/>
+					<xs:enumeration value="exclusive"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="BsubOptionType">
