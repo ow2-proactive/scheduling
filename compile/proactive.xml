@@ -164,6 +164,18 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Compile Test Suite
+      ==
+      ================================================================
+	-->
+	<target name="testsuite" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" debug="${debug}">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	<!--
+	   ================================================================
+	   ==
       ==  Compile essai
       ==
       ================================================================
