@@ -136,9 +136,16 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
         Object arg[] = new Object[1];
         arg[0] = args[0];
         SelectiveServer server = null;
+        
+        
+    
+
+        
         try {
-            if (args.length == 2)
+            if (args.length == 2){
+            System.out.println("Creating server on node " + args[1]);
                 server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(), arg, NodeFactory.getNode(args[1]));
+            }
             else
                 server = (SelectiveServer) ProActive.newActive(SelectiveServer.class.getName(), arg);
         } catch (Exception e) {

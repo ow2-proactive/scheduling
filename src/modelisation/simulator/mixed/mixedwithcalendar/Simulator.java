@@ -1,81 +1,57 @@
-package modelisation.simulator.mixed;
+package modelisation.simulator.mixed.mixedwithcalendar;
 
+//import modelisation.simulator.mixed.Agent;
+//import modelisation.simulator.mixed.ForwarderChain;
+//import modelisation.simulator.mixed.Source;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 
 
-public class Simulator {
+public class Simulator
+    extends modelisation.simulator.mixed.multiqueue.Simulator {
 
-    protected static final int MAX = 20;
-    protected Source source;
-    protected Agent agent;
+    protected Source[] sourceArray;
+    protected Agent[] agentArray;
+    protected ForwarderChain[] forwarderChainArray;
+    protected Calendar calendar;
     protected Server server;
-    protected ForwarderChain forwarderChain;
-    protected double currentTime;
-    protected double eventTime;
-    protected double eventLength;
-    protected double length;
-    protected double gamma1;
-    protected double gamma2;
-    protected double mu1;
-    protected double mu2;
-    protected double delta;
-    protected double nu;
-    protected double lambda;
-    protected double alpha;
-    protected int maxMigration;
-    protected boolean agentHasMigrated;
-    protected String state;
-    protected RandomNumberGenerator expoGamma1;
-    protected RandomNumberGenerator expoGamma2;
-    protected RandomNumberGenerator expoMu1;
-    protected RandomNumberGenerator expoMu2;
-    protected RandomNumberGenerator expoDelta;
-    protected RandomNumberGenerator expoLambda;
-    protected RandomNumberGenerator expoNu;
-    protected RandomNumberGenerator randomTTL;
-    protected double previousTime;
-    protected int sameTimeAsPrevious;
 
     public Simulator() {
     }
 
     public Simulator(double lambda, double nu, double delta, double gamma1, 
-                     double gamma2, double mu1, double mu2, double alpha, 
-                     int maxMigration, double length) {
-        this.length = length;
-        this.gamma1 = gamma1;
-        this.gamma2 = gamma2;
-        this.mu1 = mu1;
-        this.mu2 = mu2;
-        this.delta = delta;
-        this.nu = nu;
-        this.lambda = lambda;
-        this.alpha = alpha;
-        this.maxMigration = maxMigration;
+                     double gamma2, double mu1, double mu2, double ttl, 
+                     int maxMigration, int maxCouples, double length) {
+        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration, 
+              maxCouples, length);
+        //this.maxCouples = maxCouples;
+        this.calendar = new LinkedListCalendar();
     }
 
     public void initialise() {
-        System.out.println("Bench, length is " + length);
-        //        this.agent.waitBeforeMigration();
-        //        this.source.waitBeforeCommunication();
-        System.out.println("Creating source");
-        this.source = new Source(this, lambda);
-        System.out.println("Creating Forwarder Chain");
-        this.forwarderChain = new ForwarderChain(this);
-        this.agent = new Agent(this, nu, delta, maxMigration);
-        this.server = new Server(this);
-        this.forwarderChain.setSource(this.source);
-        this.forwarderChain.setAgent(this.agent);
-        this.agent.setForwarderChain(this.forwarderChain);
-        this.source.setForwarderChain(forwarderChain);
-        this.agent.setServer(this.server);
-        this.source.setServer(this.server);
-        this.server.setSource(this.source);
-        this.source.setLog(true);
-        this.forwarderChain.setLog(true);
-        this.server.setLog(true);
-        this.agent.setLog(true);
+        sourceArray = new Source[maxCouples];
+        agentArray = new Agent[maxCouples];
+        forwarderChainArray = new ForwarderChain[maxCouples];
+        System.out.println("initialise() for " + maxCouples + "  couples");
+        this.server = new MultiqueueServer(this, maxCouples);
+        this.server.setLog(false);
+        for (int i = 0; i < maxCouples; i++) {
+            this.sourceArray[i] = new Source(this, lambda, i);
+            this.forwarderChainArray[i] = new ForwarderChain(this);
+            //    System.out.println("nu is " + nu);
+            this.agentArray[i] = new Agent(this, nu, delta, maxMigration, i);
+            this.forwarderChainArray[i].setSource(this.sourceArray[i]);
+            this.forwarderChainArray[i].setAgent(this.agentArray[i]);
+            this.agentArray[i].setForwarderChain(this.forwarderChainArray[i]);
+            this.sourceArray[i].setForwarderChain(forwarderChainArray[i]);
+            this.agentArray[i].setServer(this.server);
+            this.sourceArray[i].setServer(this.server);
+            //            this.server.setSource(this.sourceArray[i]);
+        }
+        this.sourceArray[0].setLog(false);
+        this.agentArray[0].setLog(false);
+        this.forwarderChainArray[0].setLog(false);
+        ((MultiqueueServer)this.server).setSourceArray(sourceArray);
     }
 
     public double generateCommunicationTimeServer() {
@@ -83,7 +59,7 @@ public class Simulator {
             this.expoGamma2 = RandomNumberFactory.getGenerator("gamma2");
             this.expoGamma2.initialize(gamma2, 
                                        System.currentTimeMillis() + 276371);
-//                       this.expoGamma2.initialize(gamma2, 276371);
+//                        this.expoGamma2.initialize(gamma2, 276371);
         }
         return this.expoGamma2.next() * 1000;
     }
@@ -119,9 +95,9 @@ public class Simulator {
     public double generateMigrationTime() {
         if (this.expoDelta == null) {
             this.expoDelta = RandomNumberFactory.getGenerator("delta");
-//            this.expoDelta.initialize(delta, 
-//                                      System.currentTimeMillis() + 395672917);
-                        this.expoDelta.initialize(delta, System.currentTimeMillis() +  58373435);
+            this.expoDelta.initialize(delta, 
+                                      System.currentTimeMillis() + 395672917);
+//                        this.expoDelta.initialize(delta, 58373435);
         }
         return this.expoDelta.next() * 1000;
     }
@@ -129,7 +105,7 @@ public class Simulator {
     public double generateAgentWaitingTime() {
         if (this.expoNu == null) {
             this.expoNu = RandomNumberFactory.getGenerator("nu");
-                        this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
+            this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
 //            this.expoNu.initialize(nu, 39566417);
         }
         return expoNu.next() * 1000;
@@ -140,7 +116,7 @@ public class Simulator {
             this.expoLambda = RandomNumberFactory.getGenerator("lambda");
             this.expoLambda.initialize(lambda, 
                                        System.currentTimeMillis() + 8936917);
-//                        this.expoLambda.initialize(lambda, 8936917);
+//                       this.expoLambda.initialize(lambda, 8936917);
         }
         return expoLambda.next() * 1000;
     }
@@ -164,44 +140,39 @@ public class Simulator {
     }
 
     public void simulate() {
-double startTime = System.currentTimeMillis();
-        double lengthOfState = 0;
-        this.previousTime = 0;
 
+        double startTime = System.currentTimeMillis();
+        double lengthOfState = 0;
+        this.previousTime =0;
         int nextEcho = 5;
         while (this.currentTime < length) {
-            lengthOfState = this.updateTime();
-            if (this.previousTime == this.currentTime) {
-                this.sameTimeAsPrevious++;
-            } else {
-                this.previousTime = this.currentTime;
-                this.sameTimeAsPrevious = 0;
-            }
-            if (this.sameTimeAsPrevious > Simulator.MAX) {
-                System.out.println(" Simulation loop detected ");
-                this.displayState();
+//            System.out.println(">>>>>");
+//            System.out.println(this.calendar);
+
+            Event[] events = calendar.removeNextEvents();
+            if (events == null) {
+                System.err.println("No events to performs, stoping");
                 System.exit(-1);
             }
+            this.currentTime = events[0].getTime();
+            //            if (events[0].object.getClass().getName().equals("modelisation.simulator.mixed.mixedwithcalendar.Forwarder")) {
+            //               System.out.println(this.calendar);
+            //            }
+            for (int i = 0; i < events.length; i++) {
+                events[i].getObject().update(this.currentTime);
+            }
+//            System.out.println(this.calendar);
+//            System.out.println("<<<<<");
+//         
             if (this.currentTime > (length * nextEcho / 100)) {
                 System.err.println(
                         nextEcho + "% at time " + 
                         java.util.Calendar.getInstance().getTime());
                 nextEcho += 5;
-            }
-            //            System.out.println("length of state = " + lengthOfState);
-            //            System.out.println(
-            //                    "\n -------------- Time " + this.currentTime +
-            //                    " ----------------------");
-            //            System.out.println("*** states before update ***");
-            //            System.out.println("STATE: " + this.server + "" + this.source
-            //                               + "" + this.agent + " lasted " + lengthOfState);
-            //            this.displayState();
-            //            System.out.println("***********************");
-            this.updateElements(currentTime);
-            //                this.displayState();
-            //            System.out.println("--------------------------------------------------------------------");
+            }         
         }
         this.end();
+
         double endTime = System.currentTimeMillis();
         System.out.println("Total Execution Time " + (endTime - startTime));
         //        System.out.println("Simulator.simulate currentTime " + currentTime);
@@ -209,7 +180,18 @@ double startTime = System.currentTimeMillis();
     }
 
     public void end() {
-        this.source.end();
+        this.sourceArray[0].end();
+        this.agentArray[0].end();
+        this.forwarderChainArray[0].end();
+        this.server.end();
+    }
+
+    public void addEvent(Event e) {
+        this.calendar.addEvent(e);
+    }
+
+    public boolean removeEvent(Event event) {
+        return this.calendar.removeEvent(event);
     }
 
     public void displayState() {
@@ -219,42 +201,46 @@ double startTime = System.currentTimeMillis();
         System.out.println("Server: " + this.server);
     }
 
-    public double updateTime() {
-
-        double minTime = agent.getRemainingTime();
-        minTime = Math.min(minTime, source.getRemainingTime());
-        minTime = Math.min(minTime, forwarderChain.getRemainingTime());
-        minTime = Math.min(minTime, server.getRemainingTime());
-        this.decreaseTimeElements(minTime);
-        this.currentTime += minTime;
-        return minTime;
-    }
-
-    public void updateElements(double currentTime) {
-        this.agent.update(this.currentTime);
-        this.forwarderChain.update(this.currentTime);
-        this.source.update(this.currentTime);
-        this.server.update(this.currentTime);
-    }
-
-    public void decreaseTimeElements(double time) {
-        this.source.decreaseRemainingTime(time);
-        this.agent.decreaseRemainingTime(time);
-        this.forwarderChain.decreaseRemainingTime(time);
-        this.server.decreaseRemainingTime(time);
-    }
-
+    //    public double updateTime() {
+    //
+    //        double minTime = agent.getRemainingTime();
+    //        minTime = Math.min(minTime, source.getRemainingTime());
+    //        minTime = Math.min(minTime, forwarderChain.getRemainingTime());
+    //        minTime = Math.min(minTime, server.getRemainingTime());
+    //        this.decreaseTimeElements(minTime);
+    //        this.currentTime += minTime;
+    //        return minTime;
+    //    }
+    //
+    //    public void updateElements(double currentTime) {
+    //        this.agent.update(this.currentTime);
+    //        this.forwarderChain.update(this.currentTime);
+    //        this.source.update(this.currentTime);
+    //        this.server.update(this.currentTime);
+    //    }
+    //
+    //    public void decreaseTimeElements(double time) {
+    //        this.source.decreaseRemainingTime(time);
+    //        this.agent.decreaseRemainingTime(time);
+    //        this.forwarderChain.decreaseRemainingTime(time);
+    //        this.server.decreaseRemainingTime(time);
+    //    }
     public void log(String s) {
         System.out.println(s + "     time " + this.currentTime);
         //        System.out.println(s);
     }
 
     public static void main(String[] args) {
-        if (args.length < 10) {
+        //               Simulator s = new Simulator(1, 1, 10, 100, 100, 1000, 1000, 1000, 10, 1,
+        //                                        100000);
+        //              s.initialise();
+        //            s.simulate();
+        //           System.exit(0);
+        if (args.length < 11) {
             System.err.println(
                     "Usage: java " + Simulator.class.getName() + 
                     " <lambda> <nu> <delta> <gamma1> <gamma2> " + 
-                    " <mu1> <mu2>  <alpha> <migration> <length>");
+                    " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
             System.exit(-1);
         }
         System.out.println("Starting Simulator");
@@ -265,9 +251,10 @@ double startTime = System.currentTimeMillis();
         System.out.println("      gamma2 = " + args[4]);
         System.out.println("      mu1 = " + args[5]);
         System.out.println("      mu2 = " + args[6]);
-        System.out.println("      alpha = " + args[7]);
+        System.out.println("     ttl = " + args[7]);
         System.out.println("   max migrations = " + args[8]);
-        System.out.println("     length = " + args[9]);
+        System.out.println("     couples = " + args[9]);
+        System.out.println("     length = " + args[10]);
 
         Simulator simulator = new Simulator(Double.parseDouble(args[0]), 
                                             Double.parseDouble(args[1]), 
@@ -278,7 +265,8 @@ double startTime = System.currentTimeMillis();
                                             Double.parseDouble(args[6]), 
                                             Double.parseDouble(args[7]), 
                                             Integer.parseInt(args[8]), 
-                                            Double.parseDouble(args[9]));
+                                            Integer.parseInt(args[9]), 
+                                            Double.parseDouble(args[10]));
         simulator.initialise();
         simulator.simulate();
     }

@@ -1,12 +1,17 @@
 package modelisation.simulator.common;
 
 public abstract class SimulatorElement {
+
     protected int state;
     protected double remainingTime;
     protected int id;
     //indicates wether this object should report
     //messages to the simulator.
     protected boolean log = false;
+    protected double timeNextEvent;
+
+    public SimulatorElement() {
+    }
 
     /**
      * Get the value of state.
@@ -37,14 +42,24 @@ public abstract class SimulatorElement {
     public void update(double d) {
     }
 
-    /**
- * Sets the log.
- * @param log The log to set
- */
     public void setLog(boolean log) {
         this.log = log;
     }
 
     public void end() {
     }
+
+    public void setTimeNextEvent(double time) {
+        this.timeNextEvent = time;
+    }
+
+    public double getTimeNextEvent() {
+        return this.timeNextEvent;
+    }
+    
+    public String getName() {
+    return "SimulatorElement";	
+}
+   
+    
 }

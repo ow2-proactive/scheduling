@@ -8,6 +8,7 @@ import modelisation.simulator.mixed.Source;
 
 
 public class Simulator extends modelisation.simulator.mixed.Simulator {
+
     protected Source[] sourceArray;
     protected Agent[] agentArray;
     protected ForwarderChain[] forwarderChainArray;
@@ -24,9 +25,9 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
      * Constructor for Simulator.
      */
     public Simulator(double lambda, double nu, double delta, double gamma1, 
-                     double gamma2, double mu1, double mu2, double alpha, 
+                     double gamma2, double mu1, double mu2, double ttl, 
                      int maxMigration, int maxCouples, double length) {
-        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, alpha, maxMigration, 
+        super(lambda, nu, delta, gamma1, gamma2, mu1, mu2, ttl, maxMigration, 
               length);
         this.maxCouples = maxCouples;
     }
@@ -52,19 +53,25 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
      * @see modelisation.simulator.mixed.Simulator#updateTime()
      */
     public double updateTime() {
+
         double minTime = getMinTime(agentArray);
+        double tmp = getMinTime(sourceArray);
         if (minTime == 0) {
             return minTime;
         }
-        minTime = Math.min(minTime, getMinTime(sourceArray));
+        // minTime = Math.min(minTime, tmp);
+        minTime = (tmp <= minTime) ? tmp : minTime;
         if (minTime == 0) {
             return minTime;
         }
-        minTime = Math.min(minTime, getMinTime(forwarderChainArray));
+        tmp = getMinTime(forwarderChainArray);
+        // minTime = Math.min(minTime, tmp);
+        minTime = (tmp <= minTime) ? tmp : minTime;
         if (minTime == 0) {
             return minTime;
         }
-        minTime = Math.min(minTime, server.getRemainingTime());
+        tmp = server.getRemainingTime();
+        minTime = (tmp <= minTime) ? tmp : minTime; //Math.min(minTime,tmp );
         if (minTime == 0) {
             return minTime;
         }
@@ -90,9 +97,17 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
     }
 
     protected double getMinTime(SimulatorElement[] tablo) {
+
         double minTime = tablo[0].getRemainingTime();
+        double tmp;
         for (int i = 1; i < tablo.length; i++) {
-            minTime = Math.min(minTime, tablo[i].getRemainingTime());
+            tmp = tablo[i].getRemainingTime();
+            if (tmp == 0) {
+                return 0;
+            } else {
+                minTime = (tmp <= minTime) ? tmp : minTime;
+            }
+            // minTime = Math.min(minTime, tablo[i].getRemainingTime());
         }
         return minTime;
     }
@@ -123,10 +138,10 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
         forwarderChainArray = new ForwarderChain[maxCouples];
         System.out.println("initialise() for " + maxCouples + "  couples");
         this.server = new MultiqueueServer(this, maxCouples);
-        this.server.setLog(false);
         for (int i = 0; i < maxCouples; i++) {
             this.sourceArray[i] = new Source(this, lambda, i);
             this.forwarderChainArray[i] = new ForwarderChain(this);
+            //    System.out.println("nu is " + nu);
             this.agentArray[i] = new Agent(this, nu, delta, maxMigration, i);
             this.forwarderChainArray[i].setSource(this.sourceArray[i]);
             this.forwarderChainArray[i].setAgent(this.agentArray[i]);
@@ -134,13 +149,11 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
             this.sourceArray[i].setForwarderChain(forwarderChainArray[i]);
             this.agentArray[i].setServer(this.server);
             this.sourceArray[i].setServer(this.server);
-            if (i == 0) {
-                this.sourceArray[i].setLog(false);
-                this.agentArray[i].setLog(false);
-                this.forwarderChainArray[i].setLog(false);
-            }
-            //            this.server.setSource(this.sourceArray[i]);
         }
+        this.server.setLog(false);
+        this.sourceArray[0].setLog(false);
+        this.agentArray[0].setLog(false);
+        this.forwarderChainArray[0].setLog(false);
         ((MultiqueueServer)this.server).setSourceArray(sourceArray);
     }
 
@@ -167,10 +180,11 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
         System.out.println("      gamma2 = " + args[4]);
         System.out.println("      mu1 = " + args[5]);
         System.out.println("      mu2 = " + args[6]);
-        System.out.println("      alpha = " + args[7]);
+        System.out.println("     ttl = " + args[7]);
         System.out.println("   max migrations = " + args[8]);
         System.out.println("     couples = " + args[9]);
         System.out.println("     length = " + args[10]);
+
         Simulator simulator = new Simulator(Double.parseDouble(args[0]), 
                                             Double.parseDouble(args[1]), 
                                             Double.parseDouble(args[2]), 

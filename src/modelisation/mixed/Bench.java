@@ -1,11 +1,13 @@
-package modelisation.server;
+package modelisation.mixed;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 
 import java.util.Vector;
+
+import modelisation.server.AgentWithExponentialMigrationAndServer;
+import modelisation.server.TimedLocationServerMetaObjectFactory;
 
 import modelisation.statistics.ExponentialLaw;
 
@@ -14,6 +16,7 @@ import modelisation.util.NodeControler;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 
@@ -22,24 +25,28 @@ public class Bench implements org.objectweb.proactive.RunActive {
 
     protected static NodeControler auto;
 
-    public static AgentWithExponentialMigrationAndServer startExponentialAgent(double d, 
-                                                                               Node[] nodes, 
-                                                                               String nodeName, 
-                                                                               long   lifeTime) {
+    public Bench() {
+        super();
+    }
 
-        AgentWithExponentialMigrationAndServer agent = null;
+    public static AgentWithExponentialMigrationMixed startExponentialAgent(double d, 
+                                                                           Node[] nodes, 
+                                                                           String nodeName, 
+                                                                           long   lifeTime) {
+
+        AgentWithExponentialMigrationMixed agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
         args[1] = nodes;
         args[2] = new Long(lifeTime);
         System.out.println("NODES SIZE = " + nodes.length);
         try {
-            agent = (AgentWithExponentialMigrationAndServer)ProActive.newActive(AgentWithExponentialMigrationAndServer.class.getName(), 
-                                                                                args, 
-                                                                                NodeFactory.getNode(
-                                                                                        nodeName), 
-                                                                                null, 
-                                                                                TimedLocationServerMetaObjectFactory.newInstance());
+            agent = (AgentWithExponentialMigrationMixed)ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(), 
+                                                                            args, 
+                                                                            NodeFactory.getNode(
+                                                                                    nodeName), 
+                                                                            null, 
+                                                                            TimedMixedMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -90,14 +97,11 @@ public class Bench implements org.objectweb.proactive.RunActive {
     }
 
     //******** ACTIVE PART OF THE TEST -  UGLY BUT NECESSARY BECAUSE OF HALF-BODIES*** //
-    AgentWithExponentialMigrationAndServer agent;
+    AgentWithExponentialMigrationMixed agent;
     ExponentialLaw expo;
     long benchTime;
 
-    public Bench() {
-    }
-
-    public Bench(AgentWithExponentialMigrationAndServer a, ExponentialLaw e, 
+    public Bench(AgentWithExponentialMigrationMixed a, ExponentialLaw e, 
                  Long time) {
         this.agent = a;
         this.expo = e;
@@ -105,6 +109,7 @@ public class Bench implements org.objectweb.proactive.RunActive {
     }
 
     public void runActivity(Body b) {
+        System.out.println("Bench: runActivity <<<<<<<<<<<<<<<<<<<<");
 
         long startTimeSleep = 0;
         long endTimeSleep = 0;
@@ -126,7 +131,7 @@ public class Bench implements org.objectweb.proactive.RunActive {
                     "Bench: calling the agent after " + 
                     (endTimeSleep - startTimeSleep));
             try {
-                agent.echo();
+                agent.echoObject();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -142,82 +147,69 @@ public class Bench implements org.objectweb.proactive.RunActive {
     }
 
     public static void main(String[] args) {
-        if (args.length < 5) {
+        if (args.length < 7) {
             System.out.println(
-                    "Usage: java modelisation.Main  <lambda> <nu> <destinationFile> <creationNode> <benchLength>");
+                    "Usage: java modelisation.Main  <lambda> <nu> <ttl> <maxMigrations> <destinationFile> <creationNode> <benchLength>");
             System.exit(-1);
         }
 
+//try {
+//	NodeFactory.getNode(args[0]);
+//} catch (NodeException e) {
+//	e.printStackTrace();
+//}
+//  
+//        
+//        if (true) {
+//        System.exit(0);	
+//        }
         ExponentialLaw expo = new ExponentialLaw(Double.parseDouble(args[0]));
         LocationServer s = null;
         NodeControler auto = new NodeControler();
         System.out.println("Test: looking up for the server");
         System.out.println(
                 "Test: using lambda = " + args[0] + " nu = " + args[1]);
-        if (!auto.startAllNodes(auto.readDestinationFile(args[2]), "")) {
+        if (!auto.startAllNodes(auto.readDestinationFile(args[4]), "")) {
             auto.killAllProcess();
             System.err.println("Error creating nodes, aborting");
             System.exit(-1);
         }
         Bench.initialise(auto);
 
-        //   System.exit(-1);
-        //   System.out.println("Looking up location server");
-        //     try {
-        //       s = (LocationServer)ProActive.lookupActive("org.objectweb.proactive.core.util.Server", args[3]);
-        //     } catch (Exception e) {
-        //       e.printStackTrace();
-        //     }
-        //     System.out.println("Location server found");
-        //   System.out.println("Test: calling initialize on ObjectWithoutForwarder with parameter class " + s.getClass().getName());
         //Reading the destination file
-        Node[] nodes = Bench.readDestinationFile(args[2]);
+        Node[] nodes = Bench.readDestinationFile(args[4]);
         System.out.println("NODES IN MAIN = " + nodes.length);
 
-        //   System.exit(-1);
-        //   obj1.initialize(nodes);
-        //Bench.mesureRequestCost(obj1, 1000);
-        AgentWithExponentialMigrationAndServer agent = Bench.startExponentialAgent(Double.parseDouble(
-                                                                                           args[1]), 
-                                                                                   nodes, 
-                                                                                   args[3], 
-                                                                                   Long.parseLong(
-                                                                                           args[4]));
+        AgentWithExponentialMigrationMixed agent = Bench.startExponentialAgent(Double.parseDouble(
+                                                                                       args[1]), 
+                                                                               nodes, 
+                                                                               args[5], 
+                                                                               Long.parseLong(
+                                                                                       args[6]));
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("Calling agent.start()");
-        agent.start();
 
-        Long benchTime = Long.valueOf(args[4]);
+                agent.start();
+        Long benchTime = Long.valueOf(args[6]);
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        System.out.println("Creating Active Bench");
 
         Bench bench = null;
         Object[] param = new Object[] { agent, expo, benchTime };
         try {
             bench = (Bench)ProActive.newActive(Bench.class.getName(), param, 
                                                null, null, 
-                                               TimedLocationServerMetaObjectFactory.newInstance());
+                                               TimedMixedMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //     while ((System.currentTimeMillis() - startTime) < benchTime) {
-        //       try {
-        //         Thread.sleep((int)(expo.rand() * 1000));
-        //       } catch (Exception e) {
-        //         e.printStackTrace();
-        //       }
-        //       System.out.println("BenchXX: calling the agent ");
-        //       agent.echo();
-        //       System.gc();
-        //     }
-        //     auto.killAllProcess();
-        //     System.exit(0);
     }
 }

@@ -11,20 +11,20 @@ import java.util.Vector;
 public class NodeControler {
     private static final int MAXTRY = 3;
 
-    protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Xmx256m -Djava.compiler=NONE  -Dproactive.locationserver=modelisation.server.singlequeue.SelectiveServer -Dproactive.locationserver.rmi=//tuba/LocationServer ";
+    protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Dmodelisation.ttl=100 -Dmodelisation.maxMigrations=5 -Dproactive.locationserver.rmi=//satura.inria.fr:35690/LocationServer -Xmx256m -Djava.compiler=NONE  -Dproactive.locationserver=modelisation.server.singlequeue.SelectiveServer -Dproactive.locationserver.rmi=//tuba/LocationServer ";
     // protected static final String JAVA = "/usr/local/jdk1.3.1/bin/java  -Xmx256m  -Djava.compiler=NONE ";
     private static final String NODECLASS = " org.objectweb.proactive.StartNode ";
     private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:/u/tuba/0/oasis/fhuet/workProActive/ProActive/lib/bcel.jar:.";
     protected static final String USER = "fhuet";
 
-    protected static final String JAVA_NESSIE = " /u/dea_these/fhuet/java.sh ";
+    protected static final String JAVA_NESSIE = " /u/dea_these/fhuet/java.sh -Dmodelisation.ttl=100 -Dmodelisation.maxMigrations=5 -Dproactive.locationserver.rmi=//satura.inria.fr:35690/LocationServer ";
     protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/proactive-tmp:/u/dea_these/fhuet/java/classes:/u/dea_these/fhuet/java/lib/bcel.jar";
     protected static final String USER_NESSIE = "fhuet";
 
     protected static final String USER_POLYA = "salouf";
 
 
-    protected static final String JAVA_SATURA = "/u/satura/0/oasis/fhuet/java.sh";
+    protected static final String JAVA_SATURA = "/u/satura/0/oasis/fhuet/java.sh -Dmodelisation.ttl=100 -Dmodelisation.maxMigrations=5  -Dproactive.locationserver.rmi=//satura.inria.fr:35690/LocationServer ";
     protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/proactive-tmp:/u/satura/0/oasis/fhuet/java/classes:/u/satura/0/oasis/fhuet/java/lib/bcel.jar";
     protected static final String USER_SATURA = "fhuet";
 
@@ -155,6 +155,7 @@ public class NodeControler {
     public String readDestinationFile(String fileName) {
         FileReader f_in = null;
         StringBuffer total = new StringBuffer();
+        System.out.println("NodeControler: using destination file " + fileName);
         try {
             f_in = new FileReader(fileName);
         } catch (FileNotFoundException e) {

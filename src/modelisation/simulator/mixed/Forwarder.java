@@ -47,7 +47,12 @@ public class Forwarder extends Agent {
     }
 
     public void endLife() {
+	if ("INFINITE".equals(System.getProperty("forwarder.lifetime"))) {
+	    this.state= ACTIF;
+	    this.remainingTime= new Double(Double.MAX_VALUE).doubleValue();
+	}else {
         this.state = DEAD;
+	}
     }
 
     public void setLifeTime(double l) {
@@ -69,7 +74,7 @@ public class Forwarder extends Agent {
     }
 
     public void startCommunicationServer() {
-        //        System.out.println("Forwarder.startCommunicationServer");
+//              System.out.println("Forwarder.startCommunicationServer");
         this.state = UPDATING_SERVER;
         this.remainingTime = simulator.generateCommunicationTimeServer();
     }
@@ -99,7 +104,13 @@ public class Forwarder extends Agent {
                 case ACTIF:
                     //                    this.state = DEAD;
                     //                    this.remainingTime = 50000000;
-                    this.startCommunicationServer();
+                    if (!"NO".equals(System.getProperties().getProperty("forwarder.callserver"))) {
+                         this.startCommunicationServer();
+                    } else {
+                    	     this.state = DEAD;
+        this.remainingTime = 50000000;
+                    }
+                    
                     break;
                 case UPDATING_SERVER:
                     //                    this.state = DEAD;

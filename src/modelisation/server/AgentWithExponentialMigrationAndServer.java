@@ -79,7 +79,7 @@ public class AgentWithExponentialMigrationAndServer implements org.objectweb.pro
                 //FOR TEST
                 //  if (!migratedOnce)
                 // 	      {
-                //		System.out.println(System.currentTimeMillis() + " AgentWithExponentialMigrationAndServer: migrating to " + nodes[index - 1].getName());
+                		System.out.println(System.currentTimeMillis() + " AgentWithExponentialMigrationAndServer: migrating to " + nodes[index - 1].getNodeInformation());
                 //		  this.migratedOnce=true;
                 ProActive.migrateTo(nodes[index - 1]);
                 //	      }

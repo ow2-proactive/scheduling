@@ -1,4 +1,4 @@
-package modelisation.simulator.mixed;
+package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
@@ -20,6 +20,7 @@ public class Agent extends SimulatorElement {
     public static final boolean NO = false;
     public static final boolean YES = true;
     protected static boolean callServer;
+    protected Event currentEvent;
 
     static {
         Agent.callServer = !"NO".equals(System.getProperties().getProperty(
@@ -69,6 +70,17 @@ public class Agent extends SimulatorElement {
         }
         this.averagatorNu.add(this.remainingTime);
         this.remainingTime = this.waitTime();
+        this.notifyEvent("Wait");
+    }
+
+    public void notifyEvent(String description) {
+        if (this.currentEvent != null) {
+            this.simulator.removeEvent(this.currentEvent);
+        }
+        this.timeNextEvent = this.remainingTime + 
+                             this.simulator.getCurrentTime();
+        this.currentEvent = new Event(this.timeNextEvent, this, description);
+        this.simulator.addEvent(currentEvent);
     }
 
     public void setForwarderChain(ForwarderChain fc) {
@@ -80,7 +92,7 @@ public class Agent extends SimulatorElement {
     }
 
     public int receiveMessage() {
-        //        System.out.println("Agent.receiveMessage " + this);
+        //  System.out.println("Agent.receiveMessage " + this);
         if (this.state == WAITING) {
             return Agent.WAITING;
         } else
@@ -88,49 +100,46 @@ public class Agent extends SimulatorElement {
     }
 
     public void update(double time) {
-        if (this.remainingTime == 0) {
-            switch (this.state) {
-                case WAITING:
-                    this.startMigration(time);
-                    break;
-                case MIGRATING:
-                    this.endMigration(time);
-                    break;
-                case CALLING_SERVER:
-                    this.endOfCallServer(time);
-                    break;
-            }
+        //    if (this.remainingTime == 0) {
+        this.currentEvent = null;
+        switch (this.state) {
+            case WAITING:
+                this.startMigration(time);
+                break;
+            case MIGRATING:
+                this.endMigration(time);
+                break;
+            case CALLING_SERVER:
+                this.endOfCallServer(time);
+                break;
         }
+        //  }
     }
 
     public double generateMigrationTime() {
         //        if (this.expoDelta == null) {
-        //            System.out.println(
-        //                    "Agent " + this.id + " getting random generator");
+        //            System.out.println("Agent " + this.id +
+        //                               " getting random generator");
         //            this.expoDelta = RandomNumberFactory.getGenerator("delta");
         //            this.expoDelta.initialize(delta,
-        //                                      System.currentTimeMillis() +
-        //                                      395672917);
-        //            System.out.println("Agent " + this.id +
-        //                               " got  random generator");
-        //            //            this.expoDelta.initialize(delta, 58373435);
+        //                                      System.currentTimeMillis() + 395672917);
+        //            System.out.println("Agent " + this.id + " got  random generator");
         //        }
-        //        //        double tmp = expoDelta.next() * 1000;
-        //        //        System.out.println("Agent: migration started, will last " + tmp);
-        //        //        return tmp;
         //        return this.expoDelta.next() * 1000;
+        //    }
         return this.simulator.generateMigrationTime();
     }
 
     public double generateAgentWaitingTime() {
         //        if (this.expoNu == null) {
-        //                      System.out.println(
-        //                    "Agent " + this.id + " getting random generator for waitTime with parameter " + nu);
+        //            System.out.println(
+        //                    "Agent " + this.id +
+        //                    " getting random generator for waitTime with parameter " + nu);
         //            this.expoNu = RandomNumberFactory.getGenerator("nu");
         //            //            this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
         //            this.expoNu.initialize(nu, 39566417);
         //        }
-        //    //  System.out.println(expoNu.next() * 1000);
+        //        //  System.out.println(expoNu.next() * 1000);
         //        return expoNu.next() * 1000;
         return this.simulator.generateAgentWaitingTime();
     }
@@ -151,14 +160,15 @@ public class Agent extends SimulatorElement {
         this.startTime = currentTime;
         this.state = MIGRATING;
         this.remainingTime = this.migrationTime();
+        this.notifyEvent("Migration");
         if (log) {
-            this.simulator.log("Agent: Migration will last " + currentTime);
+            this.simulator.log("Agent: Migration started ");
         }
     }
 
     public void endMigration(double endTime) {
         if (log) {
-            this.simulator.log("Agent: Migration ended");
+            this.simulator.log("Agent: Migration ended ");
             this.simulator.log(
                     "Agent: length of the migration " + 
                     (endTime - startTime));
@@ -182,15 +192,16 @@ public class Agent extends SimulatorElement {
                                               this.server, this.simulator, 
                                               this.id));
         this.remainingTime = this.waitTime();
+        this.notifyEvent("Wait");
         if (log) {
             this.simulator.log(
-                    "Agent.endOfCallServer migrationCounter " + 
+                    "Agent._endOfMigration migrationCounter " + 
                     this.migrationCounter);
             this.simulator.log(
-                    "Agent.endOfCallServer total time " + 
+                    "Agent._endOfMigration total time " + 
                     (endTime - startTime));
             this.simulator.log(
-                    " AgentWithExponentialMigrationAndServer: waited " + 
+                    "Agent: waited " + 
                     this.remainingTime + " before migration");
         }
         this.averagatorNu.add(this.remainingTime);
@@ -206,12 +217,16 @@ public class Agent extends SimulatorElement {
             double tmp = this.generateCommunicationTimeServer();
             this.averagatorGamma2.add(tmp);
             this.remainingTime = tmp;
+            this.notifyEvent("Call server");
         } else {
             endOfCallServer(time);
         }
     }
 
     public void endOfCallServer(double time) {
+    	  if (log) {
+                this.simulator.log("Agent.endOfCallServer");
+            }
         this.server.receiveRequestFromAgent(migrationCounter +1, id);
         this._endOfMigration(time);
     }
@@ -219,17 +234,21 @@ public class Agent extends SimulatorElement {
     /**
      * Called by the ForwarderChain when a tensioning is initiated
      */
-    public void startTensioning(double time) {
+    public void startTensioning(double length) {
         //the agent can only be waiting when a tensioning is initiated
-        if (this.remainingTime < time) {
+        //  this.simulator.log("Tensioning requested length " + length + " next event " + this.currentEvent.getTime());
+        if (this.currentEvent.getTime() < (length + this.simulator.getCurrentTime())) {
+            //   System.out.println( "Simulator: agent wait end of tensioning " +
+            //               (length - this.remainingTime));
             if (log) {
                 this.simulator.log(
                         "Simulator: agent wait end of tensioning " + 
-                        (time - this.remainingTime));
+                        (length - this.remainingTime));
             }
             //this is because of a nasty assumption in the model
             //it should be      this.remainingTime = time;
-            this.remainingTime = time + this.waitTime();
+            this.remainingTime = length + this.waitTime();
+            this.notifyEvent("Waiting because of tensioning");
         }
     }
 
@@ -242,10 +261,12 @@ public class Agent extends SimulatorElement {
     }
 
     public void end() {
+    System.out.println("########## Agent ##################");
         System.out.println("* nu = " + 1000 / this.averagatorNu.average());
         System.out.println(
-                "* delta  = " + 1000 / this.averagatorDelta.average());
-        System.out.println("delta count " + this.averagatorDelta.getCount());
+                "* delta  = " + 1000 / this.averagatorDelta.average() + " " + 
+                this.averagatorDelta.getCount());
+        //        System.out.println("delta count " + t);
         System.out.println(
                 "gamma2 server = " + 1000 / this.averagatorGamma2.average());
         System.out.println(" gamma2 count " + 
@@ -267,9 +288,13 @@ public class Agent extends SimulatorElement {
         return "";
     }
 
+    public String getName() {
+        return "Agent" + this.id;
+    }
+
     public String toString() {
 
-        StringBuffer tmp = new StringBuffer();
+        StringBuffer tmp = new StringBuffer("Agent: ");
         switch (this.state) {
             case WAITING:
                 tmp.append("WAITING");
@@ -286,5 +311,16 @@ public class Agent extends SimulatorElement {
         }
         tmp.append(" remainingTime = ").append(remainingTime);
         return tmp.toString();
+    }
+
+    public double getRemainingTime() {
+        if (this.currentEvent != null) {
+        	System.out.println("current event is " + this.currentEvent.toString());
+            return this.currentEvent.getTime() - 
+                   this.simulator.getCurrentTime();
+        } else {
+            return Double.MAX_VALUE;
+        }
+        //super.getRemainingTime();
     }
 }

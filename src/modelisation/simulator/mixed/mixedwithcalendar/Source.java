@@ -1,4 +1,4 @@
-package modelisation.simulator.mixed;
+package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
@@ -33,8 +33,8 @@ public class Source extends SimulatorElement {
     protected Averagator averagatorGamma2;
     protected Averagator averagatorMu;
     protected Averagator averagatorCommunicationFailed;
-    protected RandomNumberGenerator expoLambda;
 
+    //   protected RandomNumberGenerator expoLambda;
     public Source() {
     }
 
@@ -68,6 +68,12 @@ public class Source extends SimulatorElement {
         this.server = s;
     }
 
+    public void notifyEvent(String description) {
+        this.timeNextEvent = this.remainingTime + 
+                             this.simulator.getCurrentTime();
+        this.simulator.addEvent(new Event(this.timeNextEvent, this, description));
+    }
+
     public double generateSourceWaitingTime() {
         //        if (this.expoLambda == null) {
         //            this.expoLambda = RandomNumberFactory.getGenerator("lambda");
@@ -81,7 +87,11 @@ public class Source extends SimulatorElement {
 
     public void waitBeforeCommunication() {
         this.remainingTime = simulator.generateSourceWaitingTime();
-        //       if (log)  {this.simulator.log(" Source: calling the agent after " + this.remainingTime); }
+        this.notifyEvent("Wait");
+        if (log) {
+            this.simulator.log(
+                    " Source: will call the agent in " + this.remainingTime);
+        }
         this.averagatorLambda.add(this.remainingTime);
     }
 
@@ -90,6 +100,7 @@ public class Source extends SimulatorElement {
             this.failedOnfirstTry++;
         }
         this.remainingTime = 0;
+        this.notifyEvent("Communication Failed");
         this.state = COMMUNICATION_FAILED;
         this.averagatorCommunicationFailed.add(1);
     }
@@ -101,54 +112,55 @@ public class Source extends SimulatorElement {
     }
 
     public void update(double time) {
-        if (this.remainingTime == 0) {
-            switch (this.state) {
-                case WAITING:
-                    this.startCommunication(time);
-                    break;
-                case COMMUNICATION:
-                    break;
-                case COMMUNICATION_FAILED:
-                    if (log) {
-                        this.simulator.log(
-                                "Communication failed after " + 
-                                (time - startTime));
-                    }
-                    this.communicationServerStartTime = time;
-                    this.callServer();
-                    break;
-                case WAITING_FOR_AGENT:
-                    break;
-                case CALLING_SERVER:
-                    this.state = WAITING_SERVER;
-                    this.remainingTime = 5000000;
-                    this.server.receiveRequestFromSource(this.id);
-                    this.processingServerStartTime = time;
-                    //this.forwarderChain.startCommunication(currentLocation);
-                    break;
-                case WAITING_SERVER:
-                    this.state = COMMUNICATION;
-                    this.remainingTime = 5000000;
-                    if (log) {
-                        this.simulator.log(
-                                "Source: reply from server total " + 
-                                (time - communicationServerStartTime));
-                        this.simulator.log(
-                                "Source: processing for server total " + 
-                                (time - processingServerStartTime));
-                    }
-                    //      System.out.println("Source: processing for server total " +
-                    //                                (time - processingServerStartTime));
-                    this.averagatorMu.add(time - processingServerStartTime);
-                    this.tries++;
-                    this.forwarderChain.startCommunication(currentLocation);
-                    break;
-            }
+        //    if (this.remainingTime == 0) {
+        switch (this.state) {
+            case WAITING:
+                this.startCommunication(time);
+                break;
+            case COMMUNICATION:
+                break;
+            case COMMUNICATION_FAILED:
+                if (log) {
+                    this.simulator.log(
+                            "Communication failed after " + 
+                            (time - startTime));
+                }
+                this.communicationServerStartTime = time;
+                this.callServer();
+                break;
+            case WAITING_FOR_AGENT:
+                break;
+            case CALLING_SERVER:
+                this.state = WAITING_SERVER;
+                // this.remainingTime = 5000000;
+                this.server.receiveRequestFromSource(this.id);
+                this.processingServerStartTime = time;
+                //this.forwarderChain.startCommunication(currentLocation);
+                break;
+            case WAITING_SERVER:
+                this.state = COMMUNICATION;
+                // this.remainingTime = 5000000;
+                if (log) {
+                    this.simulator.log(
+                            "Source: reply from server total " + 
+                            (time - communicationServerStartTime));
+                    this.simulator.log(
+                            "Source: processing for server total " + 
+                            (time - processingServerStartTime));
+                }
+                //      System.out.println("Source: processing for server total " +
+                //                                (time - processingServerStartTime));
+                this.averagatorMu.add(time - processingServerStartTime);
+                this.tries++;
+                this.forwarderChain.startCommunication(currentLocation);
+                break;
         }
+        // }
     }
 
     public void callServer() {
         this.remainingTime = simulator.generateCommunicationTimeServer();
+        this.notifyEvent("Call server");
         //        this.server.receiveRequestFromSource();
         //       if (log) this.simulator.log("Source: communication with server started will last  " +
         //                 this.remainingTime);
@@ -157,19 +169,24 @@ public class Source extends SimulatorElement {
     }
 
     public void receiveReplyFromServer(int location) {
-        //       if (log) this.simulator.log("Source.receiveReplyFromServer currentLocation " +
-        //                 location);
+               if (log) this.simulator.log("Source.receiveReplyFromServer currentLocation " +
+                         location);
         this.currentLocation = location;
         this.remainingTime = 0;
+        this.notifyEvent("Reply From Server");
     }
 
     public void startCommunication(double startTime) {
-        this.remainingTime = 5000000;
+        // this.remainingTime = Double.MAX_VALUE;
+        // this.notifyEvent();
         this.state = COMMUNICATION;
         this.forwarderChain.startCommunication(currentLocation);
         this.startTime = startTime;
         this.tries = 1;
-        //       if (log) this.simulator.log(">>>>> Source: communication started at time " + startTime);
+        if (log)
+            this.simulator.log(
+                    ">>>>> Source: communication started at time " + 
+                    startTime);
     }
 
     public void endCommunication(double endTime) {
@@ -178,9 +195,6 @@ public class Source extends SimulatorElement {
         this.endTime = endTime;
         //        this.remainingTime = simulator.getSourceWaitingTime();
         //       if (log) this.simulator.log("<<<<< Source: communication finished at time " + endTime);
-//        System.out.println(
-//                    "TimedProxyWithLocationServer:  .............. done after " + 
-//                    (endTime - startTime));
         if (log) {
             this.simulator.log(
                     "TimedProxyWithLocationServer:  .............. done after " + 
@@ -212,6 +226,7 @@ public class Source extends SimulatorElement {
     }
 
     public void end() {
+    	  System.out.println("########## Source ##################");
         System.out.println(
                 "* lambda = " + 1000 / this.averagatorLambda.average());
         System.out.println(
@@ -243,13 +258,13 @@ public class Source extends SimulatorElement {
                 " count " + this.averagatorMu.getCount());
     }
 
-    //
-    //   public void removeStar() {
-    //      this.start = false;
-    //   }
+    public String getName() {
+        return "Source" + this.id;
+    }
+
     public String toString() {
 
-        StringBuffer tmp = new StringBuffer();
+        StringBuffer tmp = new StringBuffer("Source: ");
         switch (this.state) {
             case WAITING:
                 tmp.append("WAITING");

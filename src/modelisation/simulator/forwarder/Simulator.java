@@ -54,7 +54,7 @@ public class Simulator {
 //        return this.rvGamma.rand() * 1000;
         if (this.rvGamma == null) {
                 this.rvGamma = RandomNumberFactory.getGenerator("gamma");
-                this.rvGamma.initialize(gamma, 372917);
+                this.rvGamma.initialize(gamma, System.currentTimeMillis());
             }
           double tmp = this.rvGamma.next()*1000;
         System.out.println("Gamma1 = " + tmp);
@@ -99,7 +99,7 @@ public class Simulator {
             return;
         }
         if (this.agent.getState() == agent.WAITING_FOR_TENSIONING) {
-//            agent.startMigration();
+//          agent.startMigration();
             agent.waitBeforeMigration();
             return;
         }
