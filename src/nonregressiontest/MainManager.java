@@ -10,7 +10,6 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.SimpleLayout;
 
 import testsuite.group.Group;
-import testsuite.manager.FunctionalTestManager;
 import testsuite.manager.ProActiveFuncTestManager;
 
 /**
@@ -48,15 +47,8 @@ public class MainManager extends ProActiveFuncTestManager
 	 */
 	public void initManager() throws Exception
 	{
-		Group testGroup = new Group("Unit test group","group of unit tests",new File("/net/home/rquilici/ProActive/classes/"),"nonregressiontest",null,false);
+		Group testGroup = new Group("Unit test group","group of unit tests",new File("/net/home/adicosta/workspace/ProActive/classes/"),"nonregressiontest",null,false);
 		add(testGroup);
-	}
-
-	/**
-	 * @see testsuite.manager.AbstractManager#endManager()
-	 */
-	public void endManager() throws Exception
-	{
 	}
 	
 	public static void main(String[] args){
@@ -65,7 +57,7 @@ public class MainManager extends ProActiveFuncTestManager
  		manager.setVerbatim(true);
  		try
 		{
-			manager.toHTML(new File("/net/home/rquilici/test.html"));
+			manager.toHTML(new File("/net/home/adicosta/test.html"));
 		}
 		catch (ParserConfigurationException e)
 		{

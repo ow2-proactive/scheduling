@@ -91,7 +91,6 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
             new RuntimeException(e3);
         }
 
-        ProActiveDescriptor pad = null;
         try {
             pad = ProActive.getProactiveDescriptor("file:" + xmlFileLocation);
         } catch (ProActiveException e) {
@@ -188,9 +187,6 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
      */
     public void endManager() throws Exception {
         if (pad != null) {
-            pad.killall();
-        } else {
-            pad = ProActive.getProactiveDescriptor(xmlFileLocation);
             pad.killall();
         }
         rshJVM.stopProcess();

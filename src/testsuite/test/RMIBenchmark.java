@@ -20,7 +20,7 @@ import java.rmi.Remote;
  *
  */
 public abstract class RMIBenchmark extends ProActiveBenchmark
-    implements Serializable, Remote {
+    implements Serializable {
     private String rmiObjectName = "RMIBenchmark";
 
     /**
@@ -76,7 +76,7 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
         Class c = getClass().getClassLoader().loadClass(getClass().getName());
         RMIBenchmark o = (RMIBenchmark) c.newInstance();
         Naming.rebind(getNode().getNodeInformation().getURL().replaceAll("Dispatcher.*",
-                "") + rmiObjectName, o);
+                "") + rmiObjectName, (Remote)o);
     }
 
     /**
