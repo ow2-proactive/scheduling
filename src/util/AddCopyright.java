@@ -7,7 +7,7 @@ public class AddCopyright {
         " * ProActive: The Java(TM) library for Parallel, Distributed, " +
         "\n" + " *            Concurrent computing with Security and Mobility" +
         "\n" + " * " + "\n" +
-        " * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis" +
+        " * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis" +
         "\n" + " * Contact: proactive-support@inria.fr" + "\n" + " * " + "\n" +
         " * This library is free software; you can redistribute it and/or" +
         "\n" + " * modify it under the terms of the GNU Lesser General Public" +
