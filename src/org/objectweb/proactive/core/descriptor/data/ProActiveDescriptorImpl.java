@@ -34,28 +34,23 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
-/**
- * <p>
- * A <code>ProactiveDescriptor</code> is an internal representation of XML
- * Descriptor. It offers a set of services to access/activate/desactivate
- * <code>VirtualNode</code>.
- * </p>
- *
- * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.4
- *
- */
 public class ProActiveDescriptorImpl implements ProActiveDescriptor
+
+
+
 {
 //
   //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
   //
-
+	protected static Logger logger = Logger.getLogger(ProActiveDescriptorImpl.class.getName());
+	
   /** map virtualNode name and objects */
   private java.util.HashMap virtualNodeMapping;
 
@@ -128,30 +123,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
     			vn = new VirtualNodeImpl(vnName);
     		}
       
-      //vn = new VirtualNodeStrategy(new VirtualNodeImpl(vnName));
-      //vn.setName(vnName);
       virtualNodeMapping.put(vnName, vn);
-      System.out.println("created VirtualNode name="+vnName);
+      logger.info("created VirtualNode name="+vnName);
+			
     }
     return vn;
   }
-  
-//  public VirtualNode createLookupVirtualNode(String vnName){
-//  	VirtualNode vn = getVirtualNode(vnName);
-////  	VirtualNodeLookup vnLookup = new VirtualNodeLookup(vnName);
-////  	vnLookup.setLookupInformations(lookupUrl,protocol);
-//  	if (vn == null) {
-//  		vn = new VirtualNodeLookup(vnName);
-////  	}else{
-////  		vn.changeImplementation(vnLookup);
-////  	}
-//  		virtualNodeMapping.put(vnName, vn);
-//  	}
-//  	
-//  	return vn;
-//  }
-  
-  
+ 
+   
   
   public VirtualMachine createVirtualMachine(String vmName) {
     VirtualMachine vm = getVirtualMachine(vmName);
@@ -159,7 +138,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
       vm = new VirtualMachineImpl();
       vm.setName(vmName);
       virtualMachineMapping.put(vmName, vm);
-      //System.out.println("created VirtualMachine name="+vmName);
     }
     return vm;
   }
@@ -190,13 +168,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   
   
   public void registerProcess(VirtualMachine virtualMachine, String processID) {
-    //System.out.println(processID);
+
     ExternalProcess process = getProcess(processID);
     if (process == null) {
       addPendingProcess(processID, virtualMachine);
-      //System.out.println("registered Process name="+processID+" for a virtualMachine="+virtualMachine.getName());
+
     } else {
-      //System.out.println("found existing process="+process+" for a virtualMachine="+virtualMachine.getName());
+
       virtualMachine.setProcess(process);
     }
   }
@@ -206,10 +184,10 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
     ExternalProcess process = getProcess(processID);
     if (process == null) {
       addPendingProcess(processID, compositeProcess);
-      //System.out.println("registered Process name="+processID+" for a compositeProcess");
+
     } else {
       compositeProcess.setTargetProcess(process);
-      //System.out.println("found existing process for compositeProcess="+compositeProcess);
+
     }
   }
   
@@ -229,6 +207,17 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   }
   
   
+  public void killall() throws ProActiveException{
+  	ProActiveRuntime proactiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
+  	ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
+  	for(int i = 0; i<runtimeArray.length; i++){
+  		try{
+  		runtimeArray[i].killRT();
+  		}catch(Exception e){
+				logger.info(" Virutal Machine "+runtimeArray[i].getVMInformation().getVMID()+" on host "+runtimeArray[i].getVMInformation().getInetAddress().getHostName() +" terminated!!!");	
+  		}
+  	}
+  }
 //  public void desactivateMapping(){
 //  	VirtualNode[] virtualNodeArray = getVirtualNodes();
 //			for (int i = 0; i < virtualNodeArray.length; i++)
@@ -263,7 +252,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   private void addExternalProcess(String processID, ExternalProcess process) {
     ProcessUpdater processUpdater = (ProcessUpdater) pendingProcessMapping.remove(processID);
     if (processUpdater != null) {
-      //System.out.println("Updating Process name="+processID);
+			if (logger.isDebugEnabled()) {
+      	logger.debug("Updating Process name="+processID);
+				}
       processUpdater.updateProcess(process);
     }
     processMapping.put(processID, process);
@@ -334,7 +325,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
       this.compositeExternalProcess = compositeExternalProcess;
     }
     public void updateProcess(ExternalProcess p) {
-      //System.out.println("Updating CompositeExternal Process");
+		if (logger.isDebugEnabled()) {
+      logger.debug("Updating CompositeExternal Process");
+		}
       compositeExternalProcess.setTargetProcess(p);
     }
   }
@@ -346,7 +339,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
       this.virtualMachine = virtualMachine;
     }
     public void updateProcess(ExternalProcess p) {
-      //System.out.println("Updating VirtualMachine Process");
+			if (logger.isDebugEnabled()) {
+      	logger.debug("Updating VirtualMachine Process");
+			}
       virtualMachine.setProcess(p);
     }
   }
