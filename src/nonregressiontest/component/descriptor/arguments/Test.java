@@ -17,6 +17,10 @@ import java.util.Map;
 
 
 /**
+ * This test instantiates a component from the "dummy.fractal" definition, which is parameterized
+ * with the "message" argument.
+ * The "message" argument is then used to set the "info" attribute in the dummy component.
+ * 
  * @author Matthieu Morel
  */
 public class Test extends ComponentTest {
