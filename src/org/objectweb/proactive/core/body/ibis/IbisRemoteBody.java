@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.body.request.Request;
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
- * @see ibi.rmi.Remote
+ * @see ibis.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
  */
 public interface IbisRemoteBody extends ibis.rmi.Remote {
