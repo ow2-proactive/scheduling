@@ -31,12 +31,18 @@
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.jini.JiniNodeFactory;
-import org.objectweb.proactive.core.node.rmi.RemoteNodeFactory;
+import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
+import org.objectweb.proactive.core.node.NodeException;
+//import org.objectweb.proactive.core.node.jini.JiniNodeFactory;
+//import org.objectweb.proactive.core.node.rmi.RemoteNodeFactory;
 
 /**
  * <p>
@@ -72,6 +78,9 @@ public class StartNode {
   protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
   protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
   protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
+  
+  private static final String FS = System.getProperty("file.separator");
+  private static final String XML_LOCATION = System.getProperty("user.dir")+FS+".."+FS+".."+FS+"descriptors"+FS+"RemoteGlobusSetup.xml";
   
   protected boolean noClassServer = false;
   protected boolean noRebind = false;
@@ -134,12 +143,26 @@ public class StartNode {
    *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
    */
   public static void main(String[] args) {
-    try {
-      new StartNode(args).run();    
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.out.println(e.toString());
-    }
+  	
+  	if (args[0].compareTo("-g")==0){
+    	try{
+    	//ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file://Z:/test/ProActive/classes/GlobusSetupWithRlogin.xml");
+    	ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:"+XML_LOCATION);
+			JVMProcess jvmProcess = (JVMProcess)pad.getProcess("linuxJVM");
+			jvmProcess.setParameters(args[1]);
+			pad.activateMappings();
+			//gp.startNodeWithGlobus(args[1]);
+    	}catch(ProActiveException e){
+    		e.printStackTrace();
+    	}
+    }else{
+    	try {
+      	new StartNode(args).run();    
+   		}catch (Exception e) {
+      	e.printStackTrace();
+      	System.out.println(e.toString());
+    	}	
+  	}
   }
   
 
@@ -199,6 +222,7 @@ public class StartNode {
         } else {
 	         node = NodeFactory.createNode(nodeURL, ! noRebind);
         }
+        //System.out.println("nodeurl "+node.getNodeInformation().getURL());
         System.out.println("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
 	      break;
       } catch (NodeException e) {
@@ -224,11 +248,12 @@ public class StartNode {
   protected void run() throws java.io.IOException, NodeException {
     setProperties();
     // set options on node factory
-    RemoteNodeFactory.setShouldCreateClassServer(!noClassServer);
-    RemoteNodeFactory.setShouldCreateRegistry(!noRegistry);
-    RemoteNodeFactory.setRegistryPortNumber(registryPortNumber);
-    if (NodeFactory.JINI_ENABLED) {
+    RemoteRuntimeFactory.setShouldCreateClassServer(!noClassServer);
+    RemoteRuntimeFactory.setShouldCreateRegistry(!noRegistry);
+    RemoteRuntimeFactory.setRegistryPortNumber(registryPortNumber);
+    if (RuntimeFactory.JINI_ENABLED) {
       JiniNodeFactory.setMulticastLocator(multicastLocator);
+     // System.out.println("jini not yet implemented");
     }
     // create node
     createNode(nodeURL, noRebind);
@@ -257,7 +282,7 @@ public class StartNode {
    * Extracts the port number from the node URL
    */
   protected static int getPort(String nodeURL, int defaultValue) {
-    int deb = nodeURL.indexOf(":");
+    int deb = nodeURL.lastIndexOf(":");
     if (deb > -1) {
       //there is a port number specified
        try {
