@@ -45,7 +45,7 @@ public interface ManagerDescriptorConstants {
     public static final String UNIT_TEST_TAG = "unitTest";
     public static final String PROPERTIES_TAG = "properties";
     public static final String PROP_TAG = "prop";
-    public static final String INTERLINKED_TESTS_TAG = "interLinkedTests";
+    public static final String INTERLINKED_TESTS_TAG = "interLinkedGroup";
     public static final String INTERLINKS_TAG = "interLinks";
     public static final String LINK_TAG = "link";
     public static final String ID_TEST_TAG = "idTest";
