@@ -376,6 +376,7 @@ public class ActiveObjectCommunicationRecorder {
         // draw a little black circle meaning : com point
         if (ySource > yDest) {
             //      g2.fillOval(xDest - 4 + destWidth, yDest + 9, 8, 8);
+        	// no longer a black circle but an outlined arrow
             drawArrowHead(xDest + destWidth + 100, yDest + 13,
                 xDest + destWidth, yDest + 13, g2, false, false);
         } else {
@@ -433,9 +434,10 @@ public class ActiveObjectCommunicationRecorder {
         int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
         //Shape changing...
     	int shape = Math.abs(ySource - yDest) / 3;
-    	  // ebe 13 sept 2004 AO can calls themselves -> jacobi examples
+    	  // ebe 13 sept 2004 AO can call themselves -> jacobi examples
     	if ((xSource == xDest) && (ySource == yDest)) {
-    		g2.drawOval(xSource - shape -24, ySource+7 , 20, 10);
+    		g2.drawOval(xSource - shape -25, ySource+7 , 22, 15);
+    	
 		}
     	else {
     	   
