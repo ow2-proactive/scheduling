@@ -10,9 +10,10 @@ import org.objectweb.proactive.Body;
   * @author Matthieu Morel
   */
 public interface ProActiveComponentFactory {
+	
     /** factory for ProActiveComponent
      * @param myBody a reference on the body of the active object
-     * @return
+     * @return a proactive component metaobject
      */
     public ProActiveComponent newProActiveComponent(Body myBody);
 }
