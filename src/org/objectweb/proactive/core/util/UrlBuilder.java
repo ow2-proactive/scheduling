@@ -189,6 +189,7 @@ public class UrlBuilder {
      * Returns the url without protocol
      */
     public static String removeProtocol(String url, String protocol) {
+        protocol = checkProtocol(protocol);
         if (url.startsWith(protocol)) {
             return url.substring(protocol.length());
         }
