@@ -35,7 +35,28 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 //import org.objectweb.proactive.core.group.ProActiveGroup;
 
 /**
- * This class gives to it implementors the ability to contact the other members of the group containting the object.
+ * <p>
+ * This class gives to it implementors the ability to contact the other members of the
+ * group containting the object. when build an SPMD group, the object to be incorporated
+ * into the group have to extends this class.
+ * </p>
+ * <p>Here are some examples of method manipulations on an object <code>obj</code>,
+ * member of the SPMD group <code>group</code>.
+ * First, send a message to all member of the group:</p> 
+ * <pre>
+ * obj.sendMessageTo(obj.getMyGroup());
+ * </pre><p>
+ * Second, <code>obj</code> sends a message to its next neighbor:</p>
+ * <pre>
+ * obj.sendMessageTo(
+ *                   ProActiveGroup.get(
+ *                                      obj.getMyGroup(),
+ *                                      obj.getMyRank()+1));
+ * </pre><p>
+ * Then, ask for all members of the group to send a message to <code>obj</code>:</p>
+ * <pre>
+ * obj.getMyGroup().sendMessageTo(obj);
+ * </pre>
  *  
  * @author Laurent Baduel
  */

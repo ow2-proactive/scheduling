@@ -40,6 +40,21 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 /**
+ * <p>
+ * This class provides a static method to build (an deploy) an 'SPMD' group of active objects
+ * with all references between them to communicate.
+ * </p><p>
+ * For instance, the following code builds objects of type <code>A</code> on nodes
+ * <code>node1,node2,...</code>, with parameters <code>param1,param2,...</code>
+ * and build for each object created its diffusion group to communicate with the others. 
+ * </p>
+ * <pre>
+ * Object[] params = {param1,param2,...};
+ * Node[] nodes = {node1,node2,...};
+ * 
+ * A group  =  (A) ProSPMD.newSPMDGroup("A", params, nodes);
+ * </pre>
+ *
  * @author Laurent Baduel
  */
 
