@@ -79,7 +79,7 @@
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rshProcess-AC">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="sea">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="nahuel">
 					<processReference refid="linuxJVM-AC"/>
 				</rshProcess>
 			</processDefinition>
