@@ -319,7 +319,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--jvmProcess element has three childs: classpath, javaPath, policyFile. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess. jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. This element has also one attribute: class which is required. This attribute can take only one value: org.objectweb.proactive.core.process.JVMNodeProcess. This element is used to create a local jvm-->
+	<!--jvmProcess element has five childs: classpath, javaPath, policyFile, log4jpropertiesFile, jvmParameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess.log4jpropertiesFilerepresents the location of the log4j properties file.  jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. This element has also one attribute: class which is required. This attribute can take only one value: org.objectweb.proactive.core.process.JVMNodeProcess. This element is used to create a local jvm-->
 	<xs:complexType name="JvmProcessType">
 		<xs:sequence>
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
