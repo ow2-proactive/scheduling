@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -125,17 +124,7 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
     public void setImmediateService(String methodName)
         throws java.io.IOException;
 
-    /**
-     * Returns a reference on the Fractal component metaobject
-     * @return a reference on the Fractal component metaobject
-     * @throws java.io.IOException if a communication problem occurs
-     */
-
-    // COMPONENTS
-    public ProActiveComponent getProActiveComponent()
-        throws java.io.IOException;
-
-	// SECURITY
+ 	// SECURITY
 	public void initiateSession(int type,UniversalBody body)
 		   throws java.io.IOException, CommunicationForbiddenException, 
 			   AuthenticationException, RenegotiateSessionException, 

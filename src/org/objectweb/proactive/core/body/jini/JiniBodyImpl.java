@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -133,16 +132,6 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
         logger.info("JiniBodyImpl: unreferenced()");
         System.gc();
     }
-
-    /**
-     * @see org.objectweb.proactive.core.body.jini.JiniBody#getProActiveComponent()
-     */
-    public ProActiveComponent getProActiveComponent()
-        throws java.io.IOException {
-        // COMPONENTS
-        return body.getProActiveComponent();
-    }
-
 
 	// SECURITY
 	public void initiateSession(int type,UniversalBody body)

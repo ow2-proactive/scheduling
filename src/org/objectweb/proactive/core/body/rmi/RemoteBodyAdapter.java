@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -217,21 +216,6 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         proxiedRemoteBody.setImmediateService(methodName);
-    }
-
-    /**
-      * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveComponent()
-      */
-    public ProActiveComponent getProActiveComponent() {
-        // COMPONENTS
-        try {
-            return proxiedRemoteBody.getProActiveComponent();
-        } catch (IOException ioe) {
-            logger.error(
-                "Cannot contact body to get Fractal component metaobject");
-            ioe.printStackTrace();
-            return null;
-        }
     }
 
 	// SECURITY
