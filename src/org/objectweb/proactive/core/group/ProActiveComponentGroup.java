@@ -4,13 +4,11 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 
-import org.objectweb.proactive.Active;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
@@ -19,10 +17,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 
 
 /**
@@ -84,12 +79,10 @@ public class ProActiveComponentGroup {
         InterfaceType interfaceType)
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
-            // PRIMITIVE parameter is given so that the calls are di
-            ComponentParameters component_parameters = new ComponentParameters(interfaceType.getFcItfName(),
-                    null,
-                    ProActiveTypeFactory.instance().createFcType(new InterfaceType[] {
+            ComponentParameters component_parameters = new ComponentParameters(ProActiveTypeFactory.instance()
+                                                                                                   .createFcType(new InterfaceType[] {
                             interfaceType
-                        }));
+                        }), new ControllerDescription(null, null));
 
             Object result = null;
 
@@ -103,8 +96,6 @@ public class ProActiveComponentGroup {
             return (ProActiveInterface) (ProActiveComponentRepresentativeFactory.instance()
                                                                                 .createComponentRepresentative(component_parameters,
                 proxy)).getFcInterface(interfaceType.getFcItfName());
-        } catch (ClassNotReifiableException e) {
-            logger.error("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
             logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
@@ -112,7 +103,10 @@ public class ProActiveComponentGroup {
         } catch (ConstructionOfReifiedObjectFailedException e) {
             logger.error("**** ConstructionOfReifiedObjectFailedException ****");
         } catch (NoSuchInterfaceException e) {
-            logger.error("**** ConstructionOfReifiedObjectFailedException ****");
+            logger.error("**** Interface not found **** " + e.getMessage());
+        } catch (InstantiationException e) {
+            logger.error("**** Cannot create component type **** " +
+                e.getMessage());
         }
         return null;
     }
@@ -120,24 +114,6 @@ public class ProActiveComponentGroup {
     /** Create an object representing a group and create members with params cycling on nodeList. */
 
     // ComponentBody Parameters is unique for all the group members (notably the name is the same)...
-    public static Object newActiveComponentGroup(String className,
-        Object[][] constructorParams, Node[] nodeList, Active[] activity,
-        MetaObjectFactory[] factory, ComponentParameters componentParameters)
-        throws ClassNotFoundException, ClassNotReifiableException, 
-            ActiveObjectCreationException, NodeException, MOPException {
-        // create a container using generic component parameters
-        Object result = newActiveComponentGroup(componentParameters);
-        Group g = ProActiveGroup.getGroup(result);
-
-        // add all the elements inside the group
-        for (int i = 0; i < constructorParams.length; i++) {
-            g.add(ProActive.newActiveComponent(className, constructorParams[i],
-                    nodeList[i % nodeList.length], activity[i], factory[i],
-                    componentParameters));
-        }
-        return result;
-    }
-
     //	/**
     // jem3D stuff - to be committed later.
     //	 * creates a group
