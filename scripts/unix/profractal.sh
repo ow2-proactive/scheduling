@@ -6,7 +6,7 @@ echo --- ProFractal ---------------------------------------------
 if [ ! $PROFRACTALIB ]
 then
 workingDir=`dirname $0`
-PROFRACTALIB=$workingDir/../.././src/org/objectweb/proactive/examples/profractal/lib
+PROFRACTALIB=$workingDir/../.././lib/examples
 fi
 
 workingDir=`dirname $0`

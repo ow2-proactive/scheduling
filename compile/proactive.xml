@@ -28,11 +28,11 @@
 	</path>
 	<path id="examples.classpath">
 		<path refid="project.classpath"/>
-		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/clibwrapper_jiio.jar"/>
-		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_codec.jar"/>
-		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_core.jar"/>
-		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/mlibwrapper_jai.jar"/>
-		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_imageio.jar"/>
+		<pathelement location="${base}/lib/examples/clibwrapper_jiio.jar"/>
+		<pathelement location="${base}/lib/examples/jai_codec.jar"/>
+		<pathelement location="${base}/lib/examples/jai_core.jar"/>
+		<pathelement location="${base}/lib/examples/mlibwrapper_jai.jar"/>
+		<pathelement location="${base}/lib/examples/jai_imageio.jar"/>
 	</path>
 	<!-- default target that displays usage -->
 	<target name="usage">
