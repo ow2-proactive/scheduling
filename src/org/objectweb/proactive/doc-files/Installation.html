@@ -324,6 +324,8 @@ java.policy as described in step 4.
     log4j:WARN Please initialize the log4j system properly
   </pre>
 </li>
+ <li class="textNormal"> <b>Examples and compilation do not work at all under Windows system:</b> Check if your java installation is not in a directory with spaces like C:\Program Files\java or C:\Documents and Settings\java. Indeed bat scripts do not run properly when JAVA_HOME is set to such directories. To get rid of those problems, the best thing is to install jdk in a directory whose name does not contain  spaces such as C:\java\j2sdk.... or D:\java\j2sdk... and then to set the JAVA_HOME environment variable accordingly: set JAVA_HOME=C:\java\j2sdk....
+</li>
 </ul>
    
 <p class="textNormal"> If you cannot solve the problem, feel free to email 
