@@ -8,7 +8,7 @@ public class StubGenerator
 {
     public static void main (String[] args)
     {
-
+	// This is the file into which we are about to write the bytecode for the stub
 	String fileName = null;
 
 	// Check number of arguments
@@ -18,35 +18,34 @@ public class StubGenerator
 	    }
 
 	// Name of the class
-	String classname = args[0];
-
-
+	String className = args[0];
+	String stubClassName;
 
 	try
 	    {	
 		// Generates the bytecode for the class
-		BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
+		BytecodeStubBuilder bsb = new BytecodeStubBuilder(className);
 		byte[] data = bsb.create();
-		classname = bsb.getStubClassFullName ();
+		stubClassName = bsb.getStubClassFullName ();
 
-	// Deals with directory name
-	String directoryName;
-	if (args.length == 2)
-	    {
-		directoryName = args [1];
-	    }
-	else
-	    {
-		directoryName = ".";
-	    }
-	// If the directory name does not end with a file separator, add one
-	if (!directoryName.endsWith (System.getProperty ("file.separator")))
-	    {
-		directoryName = directoryName + System.getProperty ("file.separator");		
-	    }
-	char sep = System.getProperty ("file.separator").toCharArray() [0];
-	fileName = directoryName + classname.replace ('.', sep) + ".class";
-
+		// Deals with directory name
+		String directoryName;
+		if (args.length == 2)
+		    {
+			directoryName = args [1];
+		    }
+		else
+		    {
+			directoryName = ".";
+		    }
+		// If the directory name does not end with a file separator, add one
+		if (!directoryName.endsWith (System.getProperty ("file.separator")))
+		    {
+			directoryName = directoryName + System.getProperty ("file.separator");		
+		    }
+		char sep = System.getProperty ("file.separator").toCharArray() [0];
+		fileName = directoryName + stubClassName.replace ('.', sep) + ".class";
+		
 		// And writes it to a file
 		new File (fileName.substring (0, fileName.lastIndexOf (sep))).mkdirs();
 		//	String fileName = directoryName + System.getProperty ("file.separator") + 
@@ -59,7 +58,7 @@ public class StubGenerator
 	    }
 	catch (ClassNotFoundException e)
 	    {
-		System.err.println ("Cannot find class "+classname);	
+		System.err.println ("Cannot find class "+className);	
 	    }
 	catch (Exception e)
 	    {
