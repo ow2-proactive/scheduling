@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
@@ -365,7 +366,12 @@ public class ProActive {
 	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
 	 */
-	public static Object turnActive(Object target, String nameOfTargetType, Node node, Active activity, MetaObjectFactory factory)
+	public static Object turnActive(
+		Object target,
+		String nameOfTargetType,
+		Node node,
+		Active activity,
+		MetaObjectFactory factory)
 		throws ActiveObjectCreationException, NodeException {
 		if (node == null) {
 			//using default proactive node
@@ -434,7 +440,8 @@ public class ProActive {
 	 *      or if the object found is not of type RemoteBody
 	 * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
 	 */
-	public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException, java.io.IOException {
+	public static Object lookupActive(String classname, String url)
+		throws ActiveObjectCreationException, java.io.IOException {
 		UniversalBody b = RemoteBodyAdapter.lookup(url);
 		try {
 			return createStubObject(classname, b);
@@ -452,6 +459,8 @@ public class ProActive {
 	 * asynchronous call. Usually the the wait by necessity model take care
 	 * of blocking the caller thread asking for a result not yet available.
 	 * This method allows to block before the result is first used.
+	 * This method is recursive, i.e. if result of future is a future too,
+	 * <CODE>waitFor</CODE> is called again on this result, and so on.
 	 */
 	public static void waitFor(Object future) {
 		// If the object is not reified, it cannot be a future
@@ -464,13 +473,69 @@ public class ProActive {
 				return;
 			} else {
 				((Future) theProxy).waitFor();
+				// if result is a future, wait again
+				waitFor(((Future) theProxy).getResult());
 			}
 		}
 	}
 
 
 	/**
+	 * Blocks the calling thread until one of the futures in the vector is available.
+	 * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+	 * @param futures vector of futures
+	 * @return index of the available future in the vector
+	 */
+	public static int waitForAny(java.util.Vector futures) {
+		FuturePool fp = getBodyOnThis().getFuturePool();
+		synchronized (fp) {
+			while (true) {
+				java.util.Iterator it = futures.iterator();
+				int index = 0;
+				while (it.hasNext()) {
+					Object current = it.next();
+					if (!(isAwaited(current))) {
+						return index;
+					}
+					index++;
+				}
+				fp.waitForReply();
+			}
+		}
+	}
+	
+	
+	/**
+	 * Blocks the calling thread until all futures in the vector are available.
+	 * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+	 * @param futures vector of futures
+	 */
+	public static void waitForAll(java.util.Vector futures){
+		FuturePool fp = getBodyOnThis().getFuturePool();
+		synchronized (fp) {
+			boolean oneIsMissing = true;
+			while (oneIsMissing) {
+				oneIsMissing = false;
+				java.util.Iterator it = futures.iterator();
+				while (it.hasNext()) {
+					Object current = it.next();
+					if (isAwaited(current)) {
+						oneIsMissing = true;
+					}
+				}
+				if (oneIsMissing) {
+					fp.waitForReply();
+				}
+			}	
+		}
+	
+	}
+
+
+	/**
 	 * Return false if the object <code>future</code> is available.
+	 * This method is recursive, i.e. if result of future is a future too,
+	 * <CODE>isAwaited</CODE> is called again on this result, and so on.
 	 */
 	public static boolean isAwaited(Object future) {
 		// If the object is not reified, it cannot be a future
@@ -482,35 +547,39 @@ public class ProActive {
 			if (!(theProxy instanceof Future)) {
 				return false;
 			} else {
-				return ((Future) theProxy).isAwaited();
+				if (((Future) theProxy).isAwaited()) {
+					return true;
+				} else {
+					return isAwaited(((Future)theProxy).getResult());
+				}
 			}
 		}
 	}
 
-	
-	
+
 	/**
 	 * Return the object contains by the future (ie its target).
 	 * If parameter is not a future, it is returned.
 	 * A wait-by-necessity occurs if future is not available. 
+	 * This method is recursive, i.e. if result of future is a future too,
+	 * <CODE>getFutureValue</CODE> is called again on this result, and so on.
 	 */
-	public static Object extractValue(Object future) {
+	public static Object getFutureValue(Object future) {
 		// If the object is not reified, it cannot be a future
 		if ((MOP.isReifiedObject(future)) == false) {
 			return future;
 		} else {
-		org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+			org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
 			// If it is reified but its proxy is not of type future, we cannot wait
 			if (!(theProxy instanceof Future)) {
 				return future;
 			} else {
-				return ((Future) theProxy).getResult();
+				Object o = ((Future) theProxy).getResult();
+				return getFutureValue(o);
 			}
 		}
-	}			
-		
-		
-	
+	}
+
 	/** 
 	 * Enable the automatic continuation mechanism for this active object.
 	 */
@@ -681,7 +750,8 @@ public class ProActive {
 		}
 		Object[] arguments = { node };
 		try {
-			BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class }, arguments, priority);
+			BodyRequest request =
+				new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class }, arguments, priority);
 			request.send(bodyToMigrate);
 		} catch (NoSuchMethodException e) {
 			throw new MigrationException(
@@ -722,7 +792,10 @@ public class ProActive {
 
 	private static StubObject getStubForBody(Body body) {
 		try {
-			return createStubObject(body.getReifiedObject(), new Object[] { body }, body.getReifiedObject().getClass().getName());
+			return createStubObject(
+				body.getReifiedObject(),
+				new Object[] { body },
+				body.getReifiedObject().getClass().getName());
 		} catch (MOPException e) {
 			throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
 		}
@@ -745,7 +818,11 @@ public class ProActive {
 	private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters)
 		throws MOPException {
 		try {
-			return MOP.newInstance(className, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+			return MOP.newInstance(
+				className,
+				constructorParameters,
+				Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+				proxyParameters);
 		} catch (ClassNotFoundException e) {
 			throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
 		}
@@ -764,7 +841,11 @@ public class ProActive {
 	private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType)
 		throws MOPException {
 		try {
-			return (StubObject) MOP.turnReified(nameOfTargetType, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
+			return (StubObject) MOP.turnReified(
+				nameOfTargetType,
+				Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+				proxyParameters,
+				object);
 		} catch (ClassNotFoundException e) {
 			throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
 		}
