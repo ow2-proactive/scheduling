@@ -47,10 +47,8 @@ import testsuite.test.ProActiveFunctionalTest;
  */
 public class Test extends ProActiveFunctionalTest {
     private static String FS = System.getProperty("file.separator");
-    private static String AGENT_XML_LOCATION_UNIX = System.getProperty(
-            "user.home") + FS + "ProActive" + FS + "descriptors" + FS +
-        "examples" + FS + "Agent.xml";
-    private static String AGENT_XML_LOCATION_WIN = "///Z:/ProActive/descriptors/examples/Agent.xml";
+    private static String AGENT_XML_LOCATION_UNIX ="Agent.xml";
+    
     A a;
 
     public Test() {
