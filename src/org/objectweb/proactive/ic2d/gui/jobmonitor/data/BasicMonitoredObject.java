@@ -15,6 +15,19 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 		this.key = key;
 		this.fullname = fullname;
 		this.prettyName = fullname;
+		this.deleted = false;
+	}
+	
+	public void copyInto(BasicMonitoredObject o) {
+		o.key = key;
+		o.prettyName = prettyName;
+		o.fullname = fullname;
+		o.deleted = deleted;
+	}
+	
+	public String toString() {
+		String del = deleted ? "deleted" : "not deleted";
+		return fullname + "(" + del + ")";
 	}
 	
 	public static BasicMonitoredObject create(int key, String fullname) {
@@ -73,6 +86,14 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 	
 	public int getKey() {
 		return key;
+	}
+	
+	public void setKey(int key) {
+		this.key = key;
+	}
+
+	public boolean isRoot() {
+		return fullname == null;
 	}
 }
 

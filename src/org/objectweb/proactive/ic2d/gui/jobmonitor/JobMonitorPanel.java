@@ -42,10 +42,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private Thread refresher;
     private volatile boolean refresh = true;
     private int ttr = 60;
-    private IC2DGUIController controller;
 
     public JobMonitorPanel(IC2DGUIController _controller) {
-    	this.controller = _controller;
         asso = new DataAssociation();
 
         views = new TreeView[] {
@@ -70,7 +68,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
-        explorator = new NodeExploration(asso, filteredJobs);
+        explorator = new NodeExploration(asso, filteredJobs, _controller);
 
         add(tabs);
 
@@ -165,10 +163,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
     public void setTtr(int _ttr) {
         ttr = _ttr;
-        if (refresh)
-        	refresher.interrupt();
-        else
-        	createRefresher();
+        if (refresh) {
+            refresher.interrupt();
+        } else {
+            createRefresher();
+        }
     }
 
     public void addMonitoredHost(String host) {
@@ -217,10 +216,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 //				System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
                 handleHost(host);
             }
-        }
 
-        for (int i = 0; i < views.length; i++)
-            views[i].getModel().rebuild();
+            for (int i = 0; i < views.length; i++)
+                views[i].getModel().rebuild();
+        }
     }
 
     public void updateHost(final DataTreeNode hostNode) {
@@ -250,15 +249,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             hostname = host.substring(0, pos);
         }
 
-        try {
-        	explorator.exploreHost(hostname, port);
-        } catch (RuntimeException e) {
-        	throw e;
-        } catch (Exception e) {
-        	controller.log(e);
-        	stopRefreshing();
-        }
-		
+        explorator.exploreHost(hostname, port);
     }
 
     private void dump(Object o) {

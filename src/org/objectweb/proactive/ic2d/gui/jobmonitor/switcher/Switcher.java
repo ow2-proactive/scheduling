@@ -55,6 +55,7 @@ public class Switcher extends JPanel implements JobMonitorConstants
 							boolean wantToHide = !b.isHidden();
 							performSwitch(treeModel, l, b.getKey(), !wantToHide);
 							hide.setSelected(wantToHide);
+							jtree.expandRow(0);
 							jtree.repaint();
 						}
 					});
@@ -118,6 +119,7 @@ public class Switcher extends JPanel implements JobMonitorConstants
 				JMenuItem menuItem = new JMenuItem(new AbstractAction(b.getName(), b.getIcon()) {
 					public void actionPerformed(ActionEvent e) {
 						exchange(treeModel, key, b.getKey());
+						jtree.expandRow(0);
 						jtree.repaint();
 					}
 				});

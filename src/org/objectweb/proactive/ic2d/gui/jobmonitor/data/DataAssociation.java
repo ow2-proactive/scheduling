@@ -53,82 +53,96 @@ class AssoKey implements Comparable {
 
 public class DataAssociation implements JobMonitorConstants {
 	private Map asso;
-	private Set[] sets;
+	private MonitoredObjectSet[] sets;
 	
 	public DataAssociation() {
-		clear();
+		asso = new TreeMap();
+		sets = new MonitoredObjectSet[NB_KEYS];
 	}
 	
-	private Set getSetForKey(int key) {
+	private MonitoredObjectSet getSetForKey(int key) {
 		int index = KEY2INDEX[key];
 		return sets[index];
 	}
 	
 	private void makeSet(int key) {
 		int index = KEY2INDEX[key];
-		sets[index] = new TreeSet();
+		sets[index] = new MonitoredObjectSet();
 	}
 	
-	private void addToSet(BasicMonitoredObject value) {
+	private BasicMonitoredObject addToSet(BasicMonitoredObject value) {
 		int key = value.getKey();
 		int index = KEY2INDEX[key];
 		if (getSetForKey(key) == null)
 			makeSet(key);
 		
-		getSetForKey(key).add(value);
+		MonitoredObjectSet set = getSetForKey(key);
+		BasicMonitoredObject orig = set.get(value); 
+		if (orig == null) {
+			set.add(value);
+			orig = value;
+		}
+		
+		return orig;
 	}
 	
 	private void addAsso(BasicMonitoredObject from, BasicMonitoredObject to) {
-		addToSet(to);
-		
 		AssoKey key = new AssoKey(from, to.getKey());
 		Object res = asso.get(key);
 		if (res == null) {
-			res = new TreeSet();
+			res = new MonitoredObjectSet();
 			asso.put(key, res);
 		}
 		
-		Set l = (Set) res;
+		MonitoredObjectSet l = (MonitoredObjectSet) res;
 		l.add(to);
 	}
 
 	public void addChild(BasicMonitoredObject from, BasicMonitoredObject to) {
+		from = addToSet(from);
+		to = addToSet(to);
+		
+		from.setDeleted(false);
+		to.setDeleted(false);
+		
 		addAsso(from, to);
 		addAsso(to, from);
 	}
 
-	private boolean isSpecialKey(int key) {
+	private static boolean isSpecialKey(int key) {
 		return key == VN || key == JOB;
 	}
 	
-	private Set getWritableAsso(BasicMonitoredObject from, int to) {
+	private MonitoredObjectSet getWritableAsso(BasicMonitoredObject from, int to) {
 		AssoKey key = new AssoKey(from, to);
 		Object res = asso.get(key);
 		if (res == null) {
-			res = new TreeSet();
+			res = new MonitoredObjectSet();
 			asso.put(key, res);
 		}
 		
-		return (Set) res;
+		return (MonitoredObjectSet) res;
 	}
 	
 	private boolean isValid(BasicMonitoredObject value, Set constraints) {
 		Iterator iter= constraints.iterator();
 		while (iter.hasNext()) {
 			BasicMonitoredObject testValue = (BasicMonitoredObject) iter.next();
-			Set test = getValues(value, testValue.getKey(), null);
-			if (!test.contains(testValue))
-				return false;
+			if (isSpecialKey(value.getKey()) || isSpecialKey(testValue.getKey())) { 
+				MonitoredObjectSet test = getValues(value, testValue.getKey(), null);
+				if (!test.contains(testValue))
+					return false;
+			}
 		}
 
 		return true;
 	}
 	
-	private Set filter(int key, Set set, Set constraints) {
+	private MonitoredObjectSet filter(MonitoredObjectSet set, Set constraints) {
 		if (constraints == null || constraints.isEmpty() || set.isEmpty())
 			return set;
 		
-		Set res = new TreeSet();
+		MonitoredObjectSet res = new MonitoredObjectSet();
 		Iterator iter = set.iterator();
 		while (iter.hasNext()) {
 			BasicMonitoredObject value= (BasicMonitoredObject) iter.next();
@@ -139,9 +153,9 @@ public class DataAssociation implements JobMonitorConstants {
 		return res;
 	}
 	
-	private Set getAsso(BasicMonitoredObject from, int to, Set constraints) {
-		Set res = getWritableAsso(from, to);
-		return filter(to, res, constraints);
+	private MonitoredObjectSet getAsso(BasicMonitoredObject from, int to, Set constraints) {
+		MonitoredObjectSet res = getWritableAsso(from, to);
+		return filter(res, constraints);
 	}
 	
 	private static boolean isPermutation(int a, int b, int aa, int bb) {
@@ -160,12 +174,12 @@ public class DataAssociation implements JobMonitorConstants {
 		return a == aa && b == bb;
 	}
 	
-	private Set handleSpecialPath(BasicMonitoredObject from, int to, Set constraints) {
+	private MonitoredObjectSet handleSpecialPath(BasicMonitoredObject from, int to, Set constraints) {
 		int key = from.getKey();
 		
 		if (isPermutation(key, to, JOB, HOST)) {
 			int[] steps = {JVM, NODE, VN, AO};
-			Set res = new TreeSet();
+			MonitoredObjectSet res = new MonitoredObjectSet();
 			for (int i = 0; i < steps.length; i++)
 				res.addAll(getValues(from, to, constraints, steps[i]));
 			return res;
@@ -177,16 +191,16 @@ public class DataAssociation implements JobMonitorConstants {
 		return getAsso(from, to, constraints);
 	}
 	
-	private Set getValues(BasicMonitoredObject from, int to, Set constraints, int step) {
-		Set stepSet = getValues(from, step, constraints);
+	private MonitoredObjectSet getValues(BasicMonitoredObject from, int to, Set constraints, int step) {
+		MonitoredObjectSet stepSet = getValues(from, step, constraints);
 		if (stepSet.isEmpty())
-			return new TreeSet();
+			return new MonitoredObjectSet();
 		
 		Iterator iter = stepSet.iterator();
-		Set res = new TreeSet();
+		MonitoredObjectSet res = new MonitoredObjectSet();
 		while (iter.hasNext()) {
-			BasicMonitoredObject stepValue= (BasicMonitoredObject) iter.next();
-			Set temp = getValues(stepValue, to, constraints);
+			BasicMonitoredObject stepValue = (BasicMonitoredObject) iter.next();
+			MonitoredObjectSet temp = getValues(stepValue, to, constraints);
 			res.addAll(temp);
 		}
 		
@@ -196,16 +210,16 @@ public class DataAssociation implements JobMonitorConstants {
 	/*
 	 * Exemple : getValues(VN, "myVN", AO) ==> {"Object1", "Object2"}
 	 */
-	public Set getValues(BasicMonitoredObject from, int to, Set constraints) {
+	public MonitoredObjectSet getValues(BasicMonitoredObject from, int to, Set constraints) {
 		int key = from.getKey();
 		
 		if (to == key) {
-			Set res = new TreeSet();
+			MonitoredObjectSet res = new MonitoredObjectSet();
 			res.add(from);
 			return res;
 		}
 
-		if (from.getFullName() == null)
+		if (from.isRoot())
 			return list(to, constraints);
 		
 		if (isSpecialKey(key) || isSpecialKey(to))
@@ -219,37 +233,42 @@ public class DataAssociation implements JobMonitorConstants {
 		return getValues(from, to, constraints, step);
 	}
 	
-	private Set list(int key, Set constraints) {
+	private MonitoredObjectSet list(int key, Set constraints) {
 		if (getSetForKey(key) == null)
 			makeSet(key);
 		
-		Set res = getSetForKey(key); 
-		res = filter(key, res, constraints);
+		MonitoredObjectSet res = getSetForKey(key); 
+		res = filter(res, constraints);
 		return res;
 	}
 	
-	/* TODO : marquer deleted */
 	public void clear() {
-		asso = new TreeMap();
-		sets = new Set[NB_KEYS];
+		for (int j = 0; j < sets.length; j++)
+			if (sets[j] != null)
+				for (Iterator iter = sets[j].iterator(); iter.hasNext();) {
+					BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+					object.setDeleted(true);
+				}
 	}
 	
 	private void removeChild(BasicMonitoredObject parent, String childName) {
-		Set res = getWritableAsso(parent, parent.getKey() + 1);
+/*		Set res = getWritableAsso(parent, parent.getKey() + 1);
 		res.remove(childName);
 		if (res.isEmpty())
 			removeItem(parent);
+			*/
 	}
 	
+	/* TODO : deleted = true */
 	public void removeItem(BasicMonitoredObject value) {
-		int key = value.getKey();
+/*		int key = value.getKey();
 		String name = value.getFullName();
 		
 		if (getSetForKey(key) == null || !getSetForKey(key).remove(name))
 			return;
 		
 		if  (isSpecialKey(key))
-			/* If we had a reference count : associatedNode.ref-- */
+			// If we had a reference count : associatedNode.ref--
 			return;
 		
 		Set desc = getValues(value, key + 1, null);
@@ -264,6 +283,6 @@ public class DataAssociation implements JobMonitorConstants {
 		while (iter.hasNext()) {
 			BasicMonitoredObject parentValue = (BasicMonitoredObject) iter.next();
 			removeChild(parentValue, name);
-		}
+		} */
 	}
 }

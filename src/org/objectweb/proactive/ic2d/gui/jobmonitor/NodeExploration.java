@@ -1,15 +1,29 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
-import java.util.*;
-
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.Vector;
 
 
 public class NodeExploration implements JobMonitorConstants {
@@ -20,13 +34,16 @@ public class NodeExploration implements JobMonitorConstants {
     private Map aos;
     private Set visitedVM;
     private Map runtimes;
+    private IC2DGUIController controller;
 
-    public NodeExploration(DataAssociation asso, Vector filteredJobs) {
+    public NodeExploration(DataAssociation asso, Vector filteredJobs,
+        IC2DGUIController controller) {
         this.maxDepth = 10;
         this.asso = asso;
         this.filteredJobs = filteredJobs;
         this.aos = new HashMap();
         this.runtimes = new HashMap();
+        this.controller = controller;
     }
 
     public int getMaxDepth() {
@@ -39,18 +56,27 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
-    /* url : "//host/object" */
-    private ProActiveRuntime resolveURL(String url) throws Exception {
-        StringTokenizer tokenizer = new StringTokenizer(url, "/");
-        String host = tokenizer.nextToken();
-        String name = tokenizer.nextToken();
-
-        Registry registry = LocateRegistry.getRegistry(host);
-        RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(name);
-        return new RemoteProActiveRuntimeAdapter(r);
+    private void log(Throwable e) {
+        controller.log(e, false);
     }
 
-    private ProActiveRuntime urlToRuntime(String url) throws Exception {
+    /* url : "//host/object" */
+    private ProActiveRuntime resolveURL(String url) {
+        try {
+            StringTokenizer tokenizer = new StringTokenizer(url, "/");
+            String host = tokenizer.nextToken();
+            String name = tokenizer.nextToken();
+
+            Registry registry = LocateRegistry.getRegistry(host);
+            RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(name);
+            return new RemoteProActiveRuntimeAdapter(r);
+        } catch (Exception e) {
+            log(e);
+            return null;
+        }
+    }
+
+    private ProActiveRuntime urlToRuntime(String url) {
         ProActiveRuntime rt = (ProActiveRuntime) runtimes.get(url);
         if (rt != null) {
             return rt;
@@ -64,14 +90,19 @@ public class NodeExploration implements JobMonitorConstants {
         return rt;
     }
 
-    private List getKnownRuntimes(ProActiveRuntime from)
-        throws Exception {
-        ProActiveRuntime[] registered;
+    private List getKnownRuntimes(ProActiveRuntime from) {
+        List known;
+        String[] parents;
 
-        registered = from.getProActiveRuntimes();
-        List known = new LinkedList(Arrays.asList(registered));
+        try {
+            ProActiveRuntime[] registered = from.getProActiveRuntimes();
+            known = new LinkedList(Arrays.asList(registered));
+            parents = from.getParents();
+        } catch (ProActiveException e) {
+            log(e);
+            return new LinkedList();
+        }
 
-        String[] parents = from.getParents();
         for (int i = 0; i < parents.length; i++) {
             ProActiveRuntime rt = urlToRuntime(parents[i]);
             if (rt != null) {
@@ -82,45 +113,51 @@ public class NodeExploration implements JobMonitorConstants {
         return known;
     }
 
-    public void exploreHost(String hostname, int port)
-        throws Exception {
+    public void exploreHost(String hostname, int port) {
+        Registry registry;
+        String[] list;
+
         try {
-            visitedVM = new TreeSet();
-            Registry registry = LocateRegistry.getRegistry(hostname, port);
-            String[] list = registry.list();
+            registry = LocateRegistry.getRegistry(hostname, port);
+            list = registry.list();
+        } catch (Exception e) {
+            log(e);
+            return;
+        }
 
-            for (int idx = 0; idx < list.length; ++idx) {
-                String id = list[idx];
-                if (id.indexOf(PA_JVM) != -1) {
+        visitedVM = new TreeSet();
+        for (int idx = 0; idx < list.length; ++idx) {
+            String id = list[idx];
+            if (id.indexOf(PA_JVM) != -1) {
+                ProActiveRuntime part;
+
+                try {
                     RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
-                    List x = new ArrayList();
-                    ProActiveRuntime part = new RemoteProActiveRuntimeAdapter(r);
-                    x.add(part);
-
-                    ProActiveRuntime[] runtimes = r.getProActiveRuntimes();
-                    x.addAll(Arrays.asList(runtimes));
-
-                    for (int i = 0, size = x.size(); i < size; ++i)
-                        handleProActiveRuntime((ProActiveRuntime) x.get(i), 1);
+                    part = new RemoteProActiveRuntimeAdapter(r);
+                    handleProActiveRuntime(part, 1);
+                } catch (Exception e) {
+                    log(e);
+                    continue;
                 }
             }
-        } catch (Exception e) {
-            throw e;
-        } finally {
-            visitedVM = null;
         }
+        visitedVM = null;
     }
 
     private void addChild(int fromKey, String fromName, int toKey, String toName) {
-    	asso.addChild(BasicMonitoredObject.create(fromKey, fromName),
-    			BasicMonitoredObject.create(toKey, toName));
+        asso.addChild(BasicMonitoredObject.create(fromKey, fromName),
+            BasicMonitoredObject.create(toKey, toName));
     }
-    
-    private void handleProActiveRuntime(ProActiveRuntime pr, int depth)
-        throws Exception {
+
+    private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
         if (pr instanceof RemoteProActiveRuntime &&
                 !(pr instanceof RemoteProActiveRuntimeAdapter)) {
-            pr = new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime) pr);
+            try {
+                pr = new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime) pr);
+            } catch (ProActiveException e) {
+                log(e);
+                return;
+            }
         }
 
         String vmName = pr.getVMInformation().getName();
@@ -138,27 +175,14 @@ public class NodeExploration implements JobMonitorConstants {
         addChild(HOST, hostname, JVM, vmName);
         addChild(JOB, pr.getJobID(), JVM, vmName);
 
-        String[] nodes = pr.getLocalNodeNames();
-
-        //		System.out.println ("Found " + nodes.length + " nodes on this runtime");
-        for (int i = 0; i < nodes.length; ++i) {
-            String nodeName = nodes[i];
-            String vnName = pr.getVNName(nodeName);
-
-            ArrayList activeObjects = null;
-            activeObjects = pr.getActiveObjects(nodeName);
-
-            addChild(JVM, vmName, NODE, nodeName);
-            addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE, nodeName);
-            if (vnName != null) {
-                addChild(VN, vnName, NODE, nodeName);
-                
-                // Currently broken in ProActiveRuntimeImpl
-                // asso.addChild(JOB, pr.getVirtualNode(vnName).getJobID(), VN, vnName);
+        try {
+            String[] nodes = pr.getLocalNodeNames();
+            for (int i = 0; i < nodes.length; ++i) {
+                String nodeName = nodes[i];
+                handleNode(pr, vmName, nodeName);
             }
-            if (activeObjects != null) {
-                handleActiveObjects(nodeName, activeObjects);
-            }
+        } catch (ProActiveException e) {
+            log(e);
         }
 
         if (depth < maxDepth) {
@@ -167,6 +191,33 @@ public class NodeExploration implements JobMonitorConstants {
             while (iter.hasNext())
                 handleProActiveRuntime((ProActiveRuntime) iter.next(), depth +
                     1);
+        }
+    }
+
+    private void handleNode(ProActiveRuntime pr, String vmName, String nodeName) {
+        String vnName;
+
+        addChild(JVM, vmName, NODE, nodeName);
+        try {
+            addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE,
+                nodeName);
+            vnName = pr.getVNName(nodeName);
+
+            ArrayList activeObjects = null;
+            activeObjects = pr.getActiveObjects(nodeName);
+
+            if (vnName != null) {
+                addChild(VN, vnName, NODE, nodeName);
+                VirtualNode vn = pr.getVirtualNode(vnName);
+                if (vn != null) {
+                    addChild(JOB, vn.getJobID(), VN, vnName);
+                }
+            }
+
+            handleActiveObjects(nodeName, activeObjects);
+        } catch (ProActiveException e) {
+            log(e);
+            return;
         }
     }
 
@@ -190,9 +241,9 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             addChild(NODE, nodeName, AO, aoName);
-            
+
             // The Body/Job modifications are not yet committed
-            // addChild(JOB, rba.getJobID(), AO, aoName);
+            //addChild(JOB, rba.getJobID(), AO, aoName);
         }
     }
 

@@ -26,7 +26,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	}
 	
 	public void rebuild(DataTreeNode node) {
-		node.setAllStates(DataTreeNode.STATE_REMOVED);
+		node.setAllRemovedStates();
 		node.rebuild(this, node.getObject(), node.makeConstraints());
 	}
 
