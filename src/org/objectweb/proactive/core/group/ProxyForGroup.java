@@ -220,12 +220,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			this.body = body;
 		}
 
-		public void run() {
+		public synchronized void run() {
 			try {
-				
-				LocalBodyStore.getInstance().setCurrentThreadBody(body);
-				
-				addToListOfResult(memberListOfResultGroup, ((StubObject) (memberList.get(index))).getProxy().reify(mc), index);
+					LocalBodyStore.getInstance().setCurrentThreadBody(body);
+					addToListOfResult(memberListOfResultGroup, ((StubObject) (memberList.get(index))).getProxy().reify(mc), index);
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
@@ -245,13 +243,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			this.body = body;
 		}
 
-		public void run() {
+		public synchronized void run() {
 			try {
-				
-				LocalBodyStore.getInstance().setCurrentThreadBody(body);
-				
-				((StubObject) (memberList.get(index))).getProxy().reify(mc);
-				decrementWaitedAndNotifyAll();
+					LocalBodyStore.getInstance().setCurrentThreadBody(body);
+					((StubObject) (memberList.get(index))).getProxy().reify(mc);
+					decrementWaitedAndNotifyAll();
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
