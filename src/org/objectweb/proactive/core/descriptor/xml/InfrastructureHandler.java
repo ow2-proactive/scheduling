@@ -31,9 +31,10 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
-
+import org.objectweb.proactive.core.xml.io.Attributes;
 /**
  * This class receives deployment events
  *
@@ -55,10 +56,11 @@ class InfrastructureHandler extends PassiveCompositeUnmarshaller implements ProA
   public InfrastructureHandler(ProActiveDescriptor proActiveDescriptor) {
     this.proActiveDescriptor = proActiveDescriptor;
     CollectionUnmarshaller ch = new CollectionUnmarshaller();
-    ch.addHandler(PROCESS_TAG, new ProcessHandler(proActiveDescriptor));
-    ch.addHandler(JVM_PROCESS_TAG, new JVMProcessHandler(proActiveDescriptor));
+    ch.addHandler(PROCESS_DEFINITION_TAG, new ProcessDefinitionHandler(proActiveDescriptor));
     this.addHandler(PROCESSES_TAG, ch);
   }
+  
+  
 
 
   //

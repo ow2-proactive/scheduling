@@ -61,11 +61,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
 
   public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
     this.proActiveDescriptor = proActiveDescriptor;
-//    {
-//    PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
-//    ch.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler());
-//    this.addHandler(VIRTUAL_NODES_TAG, ch);
-//    }
+
     {
     PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
     ch.addHandler(MAP_TAG, new MapHandler());
@@ -98,30 +94,6 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
   //
 
 
-//  /**
-//   * This class receives virtualNode events
-//   */
-//  private class VirtualNodeHandler extends BasicUnmarshaller {
-//    private VirtualNodeHandler() {
-//    }
-//    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
-//      // create and register a VirtualNode
-//      String vnName = attributes.getValue("name");
-//      if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
-//      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName);
-//      // cyclic
-//      String cyclic = attributes.getValue("cyclic");
-//      if (checkNonEmpty(cyclic)) {
-//        vn.setCyclic(cyclic.equals("true"));
-//      }
-//      // localbackup
-//      String localBackup = attributes.getValue("localBackup");
-//      if (checkNonEmpty(localBackup)) {
-//        vn.setLocalBackup(Boolean.getBoolean(localBackup));
-//      }
-//    }
-//  } // end inner class VirtualNodeHandler
-
 
   /**
    * This class receives map events
@@ -130,9 +102,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
   	
   	VirtualNode vn;
   	
+  	
     private MapHandler() {
     	CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-   		cu.addHandler(VMNAME_TAG, new SingleValueUnmarshaller());
+   		cu.addHandler(VMNAME_TAG, new VmNameHandler());
     	this.addHandler(JVMSET_TAG, cu);
     }
     
@@ -141,24 +114,13 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
       String vnName = attributes.getValue("virtualNode");
       if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("mapping defined without specifying virtual node");
       vn = proActiveDescriptor.createVirtualNode(vnName);
-      String vmName = attributes.getValue("jvm");
-      if (! checkNonEmpty(vmName) && !vn.getCyclic()) throw new org.xml.sax.SAXException("non cyclic virtualNode mapping defined without specifying jvm");
-      if ( checkNonEmpty(vmName) && vn.getCyclic()) throw new org.xml.sax.SAXException("for cyclic virtualNode, set of jvms must be specified in JVMSET_TAG");
-      if (checkNonEmpty(vmName) && !vn.getCyclic()){
-      	VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmName);
-      	vn.addVirtualMachine(vm);
-      	if (vm.getCreatorId() == null)
-      	{
-      		vm.setCreatorId(vn.getName());
-      	}
-      }
-			
+      
     }
     
     protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
     	if(name.equals(JVMSET_TAG)){
-    		if(!vn.getCyclic()) throw new org.xml.sax.SAXException("a set of virtual machine is defined for a virtualNode that is not cyclic"); 
-    		String [] vmNames = (String[]) activeHandler.getResultObject();
+    		String[] vmNames = (String[]) activeHandler.getResultObject();
+    		if(vmNames.length > 1 && vn.getProperty()!=null && vn.getProperty().equals("unique")) throw new org.xml.sax.SAXException("a set of virtual machine is defined for a virtualNode that is unique");
     		if (vmNames.length > 0) {
     			for (int i=0; i<vmNames.length; i++) {
     				VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmNames[i]);
@@ -166,9 +128,12 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
     				if (vm.getCreatorId() == null)
       			{
       				vm.setCreatorId(vn.getName());
+      		
       			}
     			}
+    			
     		}
+    		
     	}
   }
   
@@ -182,8 +147,23 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
       setResultObject(value);
     	} 	
   	} //end of inner class SingleValueUnmarshaller
+  	
+  	private class VmNameHandler extends BasicUnmarshaller{
+			
+			private VmNameHandler(){
+			}
+			
+			public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+				String vmName = attributes.getValue("value");
+				if (checkNonEmpty(vmName)) {
+      	setResultObject(vmName);
+   			}else throw new org.xml.sax.SAXException("The name of the Jvm cannot be set to an empty string");
+  		}
+		}	//end of inner class VmNameHandler
   } // end inner class MapHandler
-
+		
+		
+		
 
   /**
    * This class receives jvm events
@@ -199,14 +179,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
 
     public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
       // create and register a VirtualNode
-      //System.out.println("startContextElement name="+name);
+      
       String vmName = attributes.getValue("name");
       if (! checkNonEmpty(vmName)) throw new org.xml.sax.SAXException("VirtualMachine defined without name");
       currentVM = proActiveDescriptor.createVirtualMachine(vmName);
-      String cyclic = attributes.getValue("cyclic");
-      if (checkNonEmpty(cyclic)) {
-        currentVM.setCyclic(cyclic.equals("true"));
-      }
       String nodeNumber = attributes.getValue("nodeNumber");
       try{
       	if (checkNonEmpty(nodeNumber)) {
@@ -242,11 +218,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
      * This class receives acquisition events
      */
     private class CreationHandler extends PassiveCompositeUnmarshaller {
-      private Object result;
+      
 
       private CreationHandler() {
-        this.addHandler(PROCESS_TAG, new ProcessHandler(proActiveDescriptor));
-        this.addHandler(JVM_PROCESS_TAG, new JVMProcessHandler(proActiveDescriptor));
+					this.addHandler(PROCESS_REFERENCE_TAG,new ProcessReferenceHandler());
       }
 
       protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
@@ -255,11 +230,11 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
         if (o instanceof String) {
           // its an id
           proActiveDescriptor.registerProcess(currentVM, (String) o);
-        } else if (o instanceof ExternalProcess) {
-          // its a process
-          currentVM.setProcess((ExternalProcess) o);
         }
+
       }
+      
+      
     } // end inner class CreationHandler
 
   } // end inner class JVMHandler

@@ -76,7 +76,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
   public static void main(String[] args) throws java.io.IOException {
     InitialHandler h = new InitialHandler();
-    String uri = "file:///Z:/test/ProActive/descriptors/Runtime.xml";
+    String uri = "file:///Z:/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
     org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
     sr.read();
   }
@@ -138,7 +138,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
    * Receives deployment events
    */
   private static class InitialHandler extends AbstractUnmarshallerDecorator {
-    // line added to return a ProactiveDescriptorHandlr object
+    // line added to return a ProactiveDescriptorHandler object
     private ProActiveDescriptorHandler proActiveDescriptorHandler;
     private InitialHandler() {
       super();
@@ -165,16 +165,12 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       String vnName = attributes.getValue("name");
       if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
       VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName);
-      // cyclic
-      String cyclic = attributes.getValue("cyclic");
-      if (checkNonEmpty(cyclic)) {
-        vn.setCyclic(cyclic.equals("true"));
+      // property
+      String property = attributes.getValue("property");
+      if (checkNonEmpty(property)) {
+       vn.setProperty(property);
       }
-      // localbackup
-      String localBackup = attributes.getValue("localBackup");
-      if (checkNonEmpty(localBackup)) {
-        vn.setLocalBackup(Boolean.getBoolean(localBackup));
-      }
+
     }
   } // end inner class VirtualNodeHandler
 

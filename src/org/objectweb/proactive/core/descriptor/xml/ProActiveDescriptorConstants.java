@@ -55,9 +55,16 @@ public interface ProActiveDescriptorConstants  {
   public static final String ACQUISITION_TAG = "acquisition"; 
   public static final String CREATION_PROCESS_TAG = "creation"; 
   public static final String PROCESS_TAG = "process"; 
-  public static final String JVM_PROCESS_TAG = "jvmProcess"; 
-  public static final String PROCESSES_TAG = "processes"; 
+  public static final String PROCESS_DEFINITION_TAG = "processDefinition";
+  public static final String JVM_PROCESS_TAG = "jvmProcess";
+  public static final String RSH_PROCESS_TAG = "rshProcess";
+  public static final String SSH_PROCESS_TAG = "sshProcess";
+  public static final String RLOGIN_PROCESS_TAG = "rloginProcess";
+  public static final String BSUB_PROCESS_TAG = "bsubProcess";
+  public static final String GLOBUS_PROCESS_TAG = "globusProcess";    
   
+  public static final String PROCESSES_TAG = "processes"; 
+  public static final String PROCESS_REFERENCE_TAG = "processReference";
   public static final String ENVIRONMENT_TAG = "environment"; 
   public static final String HOST_LIST_TAG = "hostlist";
   public static final String BSUB_OPTIONS_TAG = "bsubOption";
@@ -75,7 +82,9 @@ public interface ProActiveDescriptorConstants  {
   public static final String CLASSNAME_TAG = "classname"; 
   public static final String PARAMETERS_TAG = "parameters"; 
   
-  public static final String PATH_TAG = "path"; 
+  
+  public static final String ABS_PATH_TAG = "absolutePath";
+  public static final String REL_PATH_TAG = "relativePath";  
   
   
 }
