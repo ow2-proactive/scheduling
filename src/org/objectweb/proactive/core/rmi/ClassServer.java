@@ -60,12 +60,6 @@ public abstract class ClassServer implements Runnable {
   protected String hostname;
 
 
-static {
-	System.out.println("ClassServer loaded by " + ClassServer.class.getClassLoader());
-	System.out.println("Context Class loader " + Thread.currentThread().getContextClassLoader());
-	
-}
-
   /**
    * Constructs a ClassServer that listens on a random port. The port number
    * used is the first one found free starting from a default base port.
