@@ -38,6 +38,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
@@ -124,8 +125,13 @@ public class MetaObjectInterfaceClassGenerator
             interfacesToImplement = new ArrayList();
 
             // add functional interface
-            interfacesToImplement.add(Class.forName(
-                    interfaceType.getFcItfSignature()));
+            // add functional interface
+            Class functional_itf = Class.forName(interfaceType.getFcItfSignature());
+            interfacesToImplement.add(functional_itf);
+            
+//            // add super-interfaces of the functional interface
+            interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
+            Utils.addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
 
             // add Serializable interface
             interfacesToImplement.add(Serializable.class);
@@ -170,10 +176,10 @@ public class MetaObjectInterfaceClassGenerator
             }
 
             ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
-            reference.setName(fcInterfaceName);
-            reference.setOwner(owner);
-            reference.setType(interfaceType);
-            reference.setIsInternal(isInternal);
+            reference.setFcItfName(fcInterfaceName);
+            reference.setFcOwner(owner);
+            reference.setFcType(interfaceType);
+            reference.setFcIsInternal(isInternal);
 
             return reference;
         } catch (ClassNotFoundException e) {

@@ -70,6 +70,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     protected String packageName;
     protected Method[] methods;
     protected List interfacesToImplement; // contains Class object corresponding to the interfaces
+    protected List interfacesToImplementAndSuperInterfaces; // for the Method.getDeclaringClass
     protected ClassWriter classGenerator;
 
     // The following fields have to do with

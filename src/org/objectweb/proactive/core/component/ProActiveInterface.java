@@ -79,42 +79,10 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	}
 
 	/**
-	 * Returns the isInternal.
-	 * @return boolean
-	 */
-	public boolean isInternal() {
-		return isInternal;
-	}
-
-	/**
-	 * Returns the name.
-	 * @return String
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Returns the owner.
-	 * @return Component
-	 */
-	public Component getOwner() {
-		return owner;
-	}
-
-	/**
-	 * Returns the type.
-	 * @return Type
-	 */
-	public Type getType() {
-		return type;
-	}
-
-	/**
 	 * Sets the isInternal.
 	 * @param isInternal The isInternal to set
 	 */
-	public void setIsInternal(boolean isInternal) {
+	public void setFcIsInternal(boolean isInternal) {
 		this.isInternal = isInternal;
 	}
 
@@ -122,7 +90,7 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	 * Sets the name.
 	 * @param name The name to set
 	 */
-	public void setName(String name) {
+	public void setFcItfName(String name) {
 		this.name = name;
 	}
 
@@ -130,7 +98,7 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	 * Sets the owner.
 	 * @param owner The owner to set
 	 */
-	public void setOwner(Component owner) {
+	public void setFcOwner(Component owner) {
 		this.owner = owner;
 	}
 
@@ -138,7 +106,7 @@ public abstract class ProActiveInterface implements Interface, java.io.Serializa
 	 * Sets the type.
 	 * @param type The type to set
 	 */
-	public void setType(Type type) {
+	public void setFcType(Type type) {
 		this.type = type;
 	}
 

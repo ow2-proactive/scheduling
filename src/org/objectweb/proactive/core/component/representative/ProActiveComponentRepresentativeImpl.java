@@ -279,9 +279,9 @@ public class ProActiveComponentRepresentativeImpl
                                                                                                    .newInstance();
 
                             // fill in data
-                            result.setName(interfaceReferences[i].getFcItfName());
-                            result.setOwner(interfaceReferences[i].getFcItfOwner());
-                            result.setType(interfaceReferences[i].getFcItfType());
+                            result.setFcItfName(interfaceReferences[i].getFcItfName());
+                            result.setFcOwner(interfaceReferences[i].getFcItfOwner());
+                            result.setFcType(interfaceReferences[i].getFcItfType());
                             // set proxy
                             ((StubObject) result).setProxy(stub_on_group_of_itfs.getProxy());
                             return result;

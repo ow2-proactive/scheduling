@@ -131,14 +131,20 @@ public class RepresentativeInterfaceClassGenerator
             interfacesToImplement = new ArrayList();
 
             // add functional interface
-            interfacesToImplement.add(Class.forName(
-                    interfaceType.getFcItfSignature()));
+            Class functional_itf = Class.forName(interfaceType.getFcItfSignature());
+            interfacesToImplement.add(functional_itf);
+            
+            // add super-interfaces of the functional interface
+            //Utils.addSuperInterfaces(functional_itf, interfacesToImplement);
 
             // add Serializable interface
             interfacesToImplement.add(Serializable.class);
 
             // add StubObject, so we can set the proxy
             interfacesToImplement.add(StubObject.class);
+            
+            interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
+            Utils.addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
 
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());
@@ -186,10 +192,10 @@ public class RepresentativeInterfaceClassGenerator
             }
 
             ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
-            reference.setName(fcInterfaceName);
-            reference.setOwner(owner);
-            reference.setType(interfaceType);
-            reference.setIsInternal(isInternal);
+            reference.setFcItfName(fcInterfaceName);
+            reference.setFcOwner(owner);
+            reference.setFcType(interfaceType);
+            reference.setFcIsInternal(isInternal);
 
             return reference;
         } catch (ClassNotFoundException e) {
@@ -357,7 +363,7 @@ public class RepresentativeInterfaceClassGenerator
             "methods", METHOD_ARRAY_TYPE);
 
         // Pushes on the stack the size of the array
-        pushInt(cv, interfacesToImplement.size());
+        pushInt(cv, interfacesToImplementAndSuperInterfaces.size());
 
         // Creates an array of class objects of that size
         cv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
@@ -366,7 +372,8 @@ public class RepresentativeInterfaceClassGenerator
         cv.visitVarInsn(ASTORE, 1);
 
         // Make as many calls to Class.forName as is needed to fill in the array
-        for (int i = 0; i < interfacesToImplement.size(); i++) {
+        //for (int i = 0; i < interfacesToImplement.size(); i++) {
+        for (int i = 0; i < interfacesToImplementAndSuperInterfaces.size(); i++) {
             // Load onto the stack a pointer to the array
             cv.visitVarInsn(ALOAD, 1);
 
@@ -374,7 +381,7 @@ public class RepresentativeInterfaceClassGenerator
             pushInt(cv, i);
 
             // Loads the generatedClassName of the class onto the stack
-            String s = ((Class) interfacesToImplement.get(i)).getName();
+            String s = ((Class) interfacesToImplementAndSuperInterfaces.get(i)).getName();
             cv.visitLdcInsn(s);
 
             // Performs the call to Class.forName
@@ -396,8 +403,19 @@ public class RepresentativeInterfaceClassGenerator
             pushInt(cv, i);
 
             // Now, we load onto the stack a pointer to the class that contains the method
-            int indexInClassArray = interfacesToImplement.indexOf(this.methods[i].getDeclaringClass());
+            int indexInClassArray = interfacesToImplementAndSuperInterfaces.indexOf(this.methods[i].getDeclaringClass());
             if (indexInClassArray == -1) {
+//                // declaring class is a super interface of the functional interface
+//                Class super_itf = this.methods[i].getDeclaringClass();
+//                Iterator iter = interfacesToImplement.iterator();
+//                while (iter.hasNext()) {
+//                    Class itf = (Class)iter.next();
+//                    if (super_itf.isAssignableFrom(itf)) {
+//                        indexInClassArray = interfacesToImplement.indexOf(itf);
+//                        System.out.println("indexInClassArray == -1");
+//                        break;
+//                    }
+//                }
             }
 
             // Load a pointer to the Class array (local variable number 1)
