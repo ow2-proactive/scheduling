@@ -1,11 +1,13 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implements JobMonitorConstants
@@ -19,7 +21,9 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implemen
 		Icon icon = Icons.getIconForKey(key);		
 		if (icon != null)
 			setIcon (icon);
-		
+
+		DataTreeModel model = (DataTreeModel) tree.getModel();
+		setForeground(model.isHighlighted(key) ? Color.RED : null);
 		return this;
 	}
 }

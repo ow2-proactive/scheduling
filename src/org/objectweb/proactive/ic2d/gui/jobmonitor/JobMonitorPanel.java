@@ -574,12 +574,6 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		//sp.setLeftComponent (left);
 		//sp.setRightComponent (right);
 			
-		Switcher s = new Switcher (model.getSwitcherModel());
-		JPanel switcher = new JPanel (new GridLayout (1, 1));
-		switcher.add (s);
-		switcher.setBorder (BorderFactory.createEtchedBorder());
-		left.add (switcher, BorderLayout.NORTH);
-		
 		final JTree j = new JTree (model);
 		j.getSelectionModel().setSelectionMode (TreeSelectionModel.SINGLE_TREE_SELECTION);
 		j.setCellRenderer (new JobMonitorTreeCellRenderer());
@@ -617,6 +611,12 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 
 		addButtons(left, j);
 		
+		Switcher s = new Switcher (model.getSwitcherModel(), j);
+		JPanel switcher = new JPanel (new GridLayout (1, 1));
+		switcher.add (s);
+		switcher.setBorder (BorderFactory.createEtchedBorder());
+		left.add (switcher, BorderLayout.NORTH);
+
 		return left;
 	}
 	

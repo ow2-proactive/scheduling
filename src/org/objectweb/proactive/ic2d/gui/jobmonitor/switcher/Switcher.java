@@ -2,6 +2,7 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.switcher;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -15,7 +16,7 @@ public class Switcher extends JPanel implements SwitchListener
 	private SwitcherModel model;
 	private JLabel [] labels;
 	
-	public Switcher (SwitcherModel _model)
+	public Switcher (SwitcherModel _model, final JTree jtree)
 	{
 		model = _model;
 		
@@ -46,14 +47,18 @@ public class Switcher extends JPanel implements SwitchListener
 						}
 					});
 					
-					popupmenu.add (new AbstractAction ("Highlight '" + l.getText() + "'")
-					{
+					final JCheckBoxMenuItem highlight = new JCheckBoxMenuItem("Highlight '" + l.getText() + "'");
+					highlight.setSelected(model.isHighlighted(l.getText()));
+					highlight.addActionListener(new ActionListener () {
 						public void actionPerformed (ActionEvent e)
 						{
-//							System.out.println ("highlight: " + e.getActionCommand());
+							model.toggleHighlighted(l.getText());
+							highlight.setSelected(model.isHighlighted(l.getText()));
+							jtree.repaint();
 						}
 					});
 					
+					popupmenu.add(highlight);
 			        popupmenu.show (l, e.getX(), e.getY());
 				}
 			});

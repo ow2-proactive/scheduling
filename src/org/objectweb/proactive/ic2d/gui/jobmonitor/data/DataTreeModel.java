@@ -13,6 +13,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	private DataModelTraversal traversal;
 	private SwitcherModel smodel;
 	private NodeHelper helper;
+	private boolean[] highlighted;
 	
 	public DataTreeModel (DataAssociation _asso, SwitcherModel _smodel, DataModelTraversal _traversal, NodeHelper _helper)
 	{
@@ -21,8 +22,10 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		traversal = _traversal;
 		smodel = _smodel;
 		helper = _helper;
+		highlighted = new boolean[NB_KEYS];
 		
 		smodel.addSwitchListener (this);
+		smodel.setTreeModel(this);
 	}
 	
 	public DataTreeNode root() {
@@ -54,5 +57,17 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	public SwitcherModel getSwitcherModel ()
 	{
 		return smodel;
+	}
+	
+	public void toggleHighlighted(int key) {
+		if (key != NO_KEY)
+			highlighted[key] = !highlighted[key];
+	}
+	
+	public boolean isHighlighted(int key) {
+		if (key != NO_KEY)
+			return highlighted[key];
+
+		return false;
 	}
 }

@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.Icons;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 
 public class SwitcherModel implements JobMonitorConstants
 {
@@ -15,6 +17,7 @@ public class SwitcherModel implements JobMonitorConstants
 	private boolean [] states;
 	
 	private Vector listeners;
+	private DataTreeModel treeModel;
 	
 	public SwitcherModel (int[] _keys)
 	{
@@ -149,5 +152,23 @@ public class SwitcherModel implements JobMonitorConstants
 		
 		int key = getSwitchKey(i);
 		return Icons.getIconForKey(key);
+	}
+	
+	public void setTreeModel(DataTreeModel treeModel) {
+		this.treeModel = treeModel;
+	}
+	
+	private int labelToKey(String label) {
+		return ((Integer) keys.get(labels.indexOf(label))).intValue();
+	}
+	
+	public void toggleHighlighted(String label) {
+		int key = labelToKey(label);
+		treeModel.toggleHighlighted(key);
+	}
+	
+	public boolean isHighlighted(String label) {
+		int key = labelToKey(label);
+		return treeModel.isHighlighted(key);
 	}
 }
