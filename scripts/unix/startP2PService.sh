@@ -11,7 +11,7 @@ do
    	
     # JVM Killed -9 or Crtl-C or wrong usage
     case $? in
-	69 | 9 | 130 ) exit 0
+	1 | 9 | 130 ) exit 0
     esac
     echo
 	echo ---------------------------------------------------------
