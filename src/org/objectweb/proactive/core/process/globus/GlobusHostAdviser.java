@@ -152,6 +152,17 @@ public class GlobusHostAdviser implements java.io.Serializable{
 //	String key = (String) keys.nextElement();
 //	System.out.println(key);
       }
+      
+      public String[] getGlobusHosts(){
+      	String[] globusHosts = new String[hostList.size()];
+      	int i = 0;
+      	for (Iterator iter = hostList.iterator(); iter.hasNext();)
+				{
+					globusHosts[i] = (String)iter.next();
+					i++;
+				}
+				return globusHosts;
+      }
 		
 		
 	//}
