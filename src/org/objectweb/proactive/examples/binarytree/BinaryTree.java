@@ -79,10 +79,11 @@ public class BinaryTree {
 
 
   public ObjectWrapper get(int key) {
+  	//System.out.println("Get of " + key + " in node " + this.key);
     if (this.isLeaf) {
       // We have reached a leaf of the tree and no key matching the parameter 'key'
       // has been found. This is a miss.
-      return null;
+      return new ObjectWrapper ("null");
     }
     if (key == this.key) {
       // We have found the node that contains the value we're looking for
@@ -90,10 +91,12 @@ public class BinaryTree {
     }
     if (key < this.key) {
       // The current key is greater than the search key, let's continue on the left
-      return new ObjectWrapper(this.leftTree.get(key));
+      ObjectWrapper res = this.leftTree.get(key);
+      return res;
     }
     // The current key is smaller than the search key, let's continue on the right
-    return new ObjectWrapper(this.rightTree.get(key));
+    ObjectWrapper res = this.rightTree.get(key);
+    return res;
   }
 
 
