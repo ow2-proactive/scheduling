@@ -33,6 +33,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
+import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.Body;
@@ -213,7 +214,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         //	Component ci_group =
         // ProActiveComponentGroup.newActiveComponentGroup(itfType);
         //	itf_ref.setFcItfImpl(ci_group);
-        ProActiveInterface itf_ref_group = ProActiveComponentGroup.newActiveComponentInterfaceGroup(itfType);
+        ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itfType);
         itf_ref.setFcItfImpl(itf_ref_group);
         return itf_ref;
     }
@@ -394,16 +395,13 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      */
     public Component getRepresentativeOnThis() {
         try {
-            ComponentParameters component_params = ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters();
+            
             return ProActiveComponentRepresentativeFactory.instance()
-                                                          .createComponentRepresentative(component_params,
+                                                          .createComponentRepresentative((ComponentType)getFcType(),
                 ((StubObject) MOP.turnReified(body.getReifiedObject().getClass()
                                                   .getName(),
                     org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
                     new Object[] { body }, body.getReifiedObject())).getProxy());
-        } catch (NoSuchInterfaceException e) {
-            throw new ProActiveRuntimeException("In this implementation, every component should have a component parameters controller and a super controller, but one of these was not found.",
-                e);
         } catch (ConstructionOfProxyObjectFailedException e) {
             throw new ProActiveRuntimeException("This component could not generate a reference on itself",
                 e);
