@@ -49,33 +49,20 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
 
  
 	/**
-	 * Method setCyclic.
-	 * @param b the value of cyclic attribute, the default value is false
+	 * Method setProperty.
+	 * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
 	 */
-  public void setCyclic(boolean b);
+  public void setProperty(String property);
   
   
 	/**
-	 * Returns the value of cyclic attribute.
-	 * @return boolean
+	 * Returns the value of property attribute.
+	 * @return String
 	 */
-  public boolean getCyclic();
+  public String getProperty();
 
-
-	/**
-	 * Method setLocalBackup.
-	 * @param b the value of localbackup attribute, the default value is false
-	 */
-  public void setLocalBackup(boolean b);
-  
-  
-	/**
-	 * Returns the value of localbackup attribute.
-	 * @return boolean
-	 */
-  public boolean getLocalBackup();
-
-
+ 
+ 
 	/**
 	 * Method setName.
 	 * @param s
