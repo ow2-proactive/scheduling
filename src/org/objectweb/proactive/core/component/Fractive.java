@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component;
 
 import org.apache.log4j.Logger;
@@ -47,6 +47,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
@@ -61,6 +62,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -194,17 +196,17 @@ public class Fractive implements GenericFactory, Component, Factory {
                 }
             }
 
-            // the following corresponds to the case when the component is created on the local vm or on a single node.
-            componentParameters.setStubOnReifiedObject(ao);
             // Find the proxy
             org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) ao).getProxy();
             if (myProxy == null) {
                 throw new ProActiveRuntimeException(
                     "Cannot find a Proxy on the stub object: " + ao);
             }
-            return ProActiveComponentRepresentativeFactory.instance()
-                                                          .createComponentRepresentative(componentParameters,
-                myProxy);
+            ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
+                                                                                                     .createComponentRepresentative(componentParameters,
+                    myProxy);
+            representative.setStubOnBaseObject((StubObject) ao);
+            return representative;
         } catch (ActiveObjectCreationException e) {
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
@@ -245,6 +247,27 @@ public class Fractive implements GenericFactory, Component, Factory {
             return newFcInstance(arg0, (ControllerDescription) arg1,
                 (ContentDescription) arg2);
         } catch (ClassCastException e) {
+            if ((arg0 == null) && (arg1 == null) && (arg2 instanceof Map)) {
+                // for compatibility with the new org.objectweb.fractal.util.Fractal class
+                return this;
+            }
+
+            // code compatibility with Julia
+            if ("composite".equals(arg1) && (arg2 == null)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.COMPOSITE), null);
+            }
+            if ("primitive".equals(arg1) && (arg2 instanceof String)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.PRIMITIVE),
+                    new ContentDescription((String) arg2));
+            }
+            if ("parallel".equals(arg1) && (arg2 == null)) {
+                return newFcInstance(arg0,
+                    new ControllerDescription(null, Constants.PARALLEL), null);
+            }
+
+            // any other case
             throw new InstantiationException(
                 "With this implementation, parameters must be of respective types : " +
                 Type.class.getName() + ',' +
