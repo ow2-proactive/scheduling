@@ -19,7 +19,7 @@ goto end
 :doit
 SETLOCAL
 call init.bat
-%JAVA_CMD%  org.objectweb.proactive.jini.StartNode %1 %2 %3 %4 %5 %6
+%JAVA_CMD%  org.objectweb.proactive.StartNode %1 %2 %3 %4 %5 %6
 ENDLOCAL
 
 :end

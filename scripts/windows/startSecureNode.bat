@@ -24,7 +24,7 @@ goto end
 :doit
 SETLOCAL
 call init.bat
-%JAVA_CMD% org.objectweb.proactive.rmi.StartSecureNode %1 %2 %3 %4 %5 %6 %7 %8 %9
+%JAVA_CMD% org.objectweb.proactive.StartSecureNode %1 %2 %3 %4 %5 %6 %7 %8 %9
 ENDLOCAL
 
 :end

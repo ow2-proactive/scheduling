@@ -28,7 +28,7 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.jini;
+package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.jini.JiniNodeFactory;
 import org.objectweb.proactive.core.node.rmi.RemoteNodeFactory;
-import java.net.InetAddress;
 
 /**
  * <p>
@@ -47,7 +46,7 @@ import java.net.InetAddress;
  * This class has a main method and can be used directly from the java command.
  * <br>
  * use<br>
- * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.jini.StartNode<br>
+ * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.StartNode<br>
  * to print the options from command line or see the java doc of the main method.
  * </p><p>
  * A node represents the minimum services ProActive needs to work with a remote JVM.
@@ -61,7 +60,7 @@ import java.net.InetAddress;
  * @since   ProActive 0.9
  *
  */
-public class StartNode {
+public class StartNode implements org.objectweb.proactive.core.Constants {
   
   public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
   
@@ -71,7 +70,7 @@ public class StartNode {
   protected static final String NO_REBIND_OPTION_NAME = "-noRebind";
   protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
   protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
-  protected static final String MULTICAST_LOCATOR = "-multicastLocator";
+  protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
   
   protected boolean noClassServer = false;
   protected boolean noRebind = false;
@@ -133,7 +132,7 @@ public class StartNode {
 
   /**
    * Starts a ProActive node on the localhost host
-   * usage: java org.objectweb.proactive.jini.StartNode &lt;node URL> [options]<br>
+   * usage: java org.objectweb.proactive.StartNode &lt;node URL> [options]<br>
    * where options are amongst<br>
    * <ul>
    * <li>noClassServer : indicates not to create a ClassServer for JINI.
@@ -143,8 +142,8 @@ public class StartNode {
    *                     node to the RMIRegistry. If a node of the same name
    *                     already exists, the creation of the new node will fail.</li>
    * </ul>
-   * for instance: java org.objectweb.proactive.jini.StartNode //localhost/node1<br>
-   *               java org.objectweb.proactive.jini.StartNode //localhost/node2 -noClassServer -noRebind<br>
+   * for instance: java org.objectweb.proactive.StartNode //localhost/node1<br>
+   *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
    */
   public static void main(String[] args) {
     try {
@@ -191,7 +190,10 @@ public class StartNode {
    * Associates the JINI node factory to the JINI protocol
    */
   protected void setNodeFactory() throws java.io.IOException, NodeException {
-    NodeFactory.setFactory(org.objectweb.proactive.core.Constants.JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
+    if (JINI_ENABLED) {
+      NodeFactory.setFactory(JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
+    }
+    NodeFactory.setFactory(RMI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory");
   }
   
   
@@ -217,12 +219,12 @@ public class StartNode {
       try {
         Node node = null;
         if (nodeURL == null) {
-	  node = NodeFactory.getDefaultNode();
+	        node = NodeFactory.getDefaultNode();
         } else {
-	   node = NodeFactory.createNode(nodeURL, ! noRebind);
+	         node = NodeFactory.createNode(nodeURL, ! noRebind);
         }
-       System.out.println("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
-	break;
+        System.out.println("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
+	      break;
       } catch (NodeException e) {
         exceptionCount++;
         if (exceptionCount == MAX_RETRY) {
@@ -231,10 +233,7 @@ public class StartNode {
           System.out.println("Error, retrying ("+exceptionCount+")");
           try {
             Thread.sleep(1000);
-          } catch (InterruptedException e2) {
-	    System.out.println("InterruptedException : "+e2.getMessage());
-	    e2.printStackTrace();
-	  }
+          } catch (InterruptedException e2) {}
         } // end if
       } // try
     } // end while
@@ -254,13 +253,13 @@ public class StartNode {
     RemoteNodeFactory.setRegistryPortNumber(registryPortNumber);
     if (JINI_ENABLED) {
       JiniNodeFactory.setMulticastLocator(multicastLocator);
-      // create factory
-      setNodeFactory();
     }
-    // cretae node
+    // create factory
+    setNodeFactory();
+    // create node
     createNode(nodeURL, noRebind);
   }
-  
+
 
   /**
    * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -273,7 +272,7 @@ public class StartNode {
       noClassServer = true;
     } else if (NO_REGISTRY_OPTION_NAME.equals(option)) {
       noRegistry = true;
-    } else if (MULTICAST_LOCATOR.equals(option)) {
+    } else if (MULTICAST_LOCATOR_NAME.equals(option)) {
       multicastLocator = true;
     }
   }
@@ -305,7 +304,7 @@ public class StartNode {
   private void printUsage() {
     String localhost = "localhost";
     try {
-      localhost = InetAddress.getLocalHost().getHostName();
+      localhost = java.net.InetAddress.getLocalHost().getHostName();
     } catch(java.net.UnknownHostException  e) {
       System.err.println("InetAddress failed: " + e.getMessage());
       e.printStackTrace();
@@ -322,10 +321,10 @@ public class StartNode {
     System.out.println("     "+NO_REBIND_OPTION_NAME+"      : indicates not to use rebind when registering the");
     System.out.println("                      node to the RMIRegistry. If a node of the same name");
     System.out.println("                      already exists, the creation of the new node will fail.");
-    System.out.println("  for instance: java "+StartNode.class.getName()+" rmi://"+localhost+"/node1");
-    System.out.println("                java "+StartNode.class.getName()+" rmi://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
-    System.out.println("                java "+StartNode.class.getName()+" jini://"+localhost+"/node3");
-    System.out.println("                java "+StartNode.class.getName()+" jini://"+localhost+"/node4 "+MULTICAST_LOCATOR);
+    System.out.println("  for instance: java "+StartNode.class.getName()+" "+RMI_PROTOCOL_IDENTIFIER+"//"+localhost+"/node1");
+    System.out.println("                java "+StartNode.class.getName()+" "+RMI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
+    System.out.println("                java "+StartNode.class.getName()+" "+JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
+    System.out.println("                java "+StartNode.class.getName()+" "+JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
   }
   
   

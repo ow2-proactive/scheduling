@@ -1,6 +1,4 @@
 org.objectweb.proactive
-org.objectweb.proactive.rmi
-org.objectweb.proactive.jini
 org.objectweb.proactive.core
 org.objectweb.proactive.core.body
 org.objectweb.proactive.core.body.future

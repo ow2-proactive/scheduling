@@ -16,7 +16,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/env.sh
-$JAVACMD org.objectweb.proactive.rmi.StartSecureNode $1 $2 $3 $4 $5 $6 $7 $8 $9
+$JAVACMD org.objectweb.proactive.StartSecureNode $1 $2 $3 $4 $5 $6 $7 $8 $9
 
 echo
 echo ---------------------------------------------------------

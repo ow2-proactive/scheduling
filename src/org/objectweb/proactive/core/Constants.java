@@ -89,6 +89,6 @@ public interface Constants  {
   public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
   
   /** default class for starting a node */
-  public static final String DEFAULT_START_NODE_CLASS = "org.objectweb.proactive.jini.StartNode";
+  public static final String DEFAULT_START_NODE_CLASS = "org.objectweb.proactive.StartNode";
   
 }

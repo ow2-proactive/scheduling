@@ -74,15 +74,11 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
   private static String implClass = RegistrarImpl.class.getName();
   private static String resourcename = "lookup";
 
-  private static String policy =
-    System.getProperty("user.home") + 
-    System.getProperty("file.separator") + 
-    ".java.policy";   
+  private static String policy = System.getProperty("user.home") + System.getProperty("file.separator") + ".java.policy";   
 
   private static String host = null;
 
-  static {
-  
+  static {  
     try {
       host = InetAddress.getLocalHost().getHostName();
     } catch(java.net.UnknownHostException  e) {
@@ -96,15 +92,7 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
 
   private static String grpName = "public";
 
-//    private static String tmpDir = 
-//      System.getProperty("user.home") + 
-//      System.getProperty("file.separator") + 
-//      "proactive-jini-log" +
-//      System.getProperty("file.separator") + 
-//      host;   
-
-  private static String tmpDir = null;
-
+  private static String tmpDir;
   static {
     try {
       File fTmp = File.createTempFile("proactive-","-"+host);
@@ -215,37 +203,29 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
       // For unicast on `host`
       System.out.println("Lookup : jini://"+host);
       try {
-
-	lookup = new LookupLocator("jini://"+host);
-
-	System.out.println("Lookup.getRegistrar() on "+host);
-	this.registrar = lookup.getRegistrar();
+	      lookup = new LookupLocator("jini://"+host);
+	      System.out.println("Lookup.getRegistrar() on "+host);
+	      this.registrar = lookup.getRegistrar();
       } catch(java.net.MalformedURLException e) {
-	System.err.println("Lookup failed: " + e.getMessage());
-	e.printStackTrace();
+	      System.err.println("Lookup failed: " + e.getMessage());
+	      e.printStackTrace();
       } catch (java.io.IOException e) {
-	System.err.println("Registrar search failed: " + e.getMessage());
-
-
-	if (MAX_RETRY-- > 0) {
-	  createServiceLocator();
-	  getOrCreateServiceLocator();
-	} else {
-	  System.out.println("\nCannot run a ServiceLocator : Do you have lauch RMID on "+host);
-	  System.exit(2);
-	}
+	      System.err.println("Registrar search failed: " + e.getMessage());
+	      if (MAX_RETRY-- > 0) {
+	        createServiceLocator();
+	        getOrCreateServiceLocator();
+	      } else {
+	        System.out.println("\nCannot run a ServiceLocator : Have you launched the rmid deamon on "+host);
+	        System.exit(2);
+	      }
       } catch (java.lang.ClassNotFoundException e) {
-	System.err.println("Registrar search failed: " + e.toString());
-	e.printStackTrace();
+	      System.err.println("Registrar search failed: " + e.toString());
+	      e.printStackTrace();
       }
-    
       System.out.println("Registrar found on "+host);
-
 
       // Just for test
       displayServices();
-
-    
     }  
   }
 
@@ -253,36 +233,14 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
      * Create a new Service Locator on the local host
      */
     private static void createServiceLocator() {
-
-
-
       System.out.println("No ServiceLocator founded ...  we lauch a ServiceLocator on "+host);
-      
       String reggieTmpDir = tmpDir + System.getProperty("file.separator") + "reggie_log";
-      
       delDirectory(new java.io.File(tmpDir));
-      
-
-//        try {
-//  	if (classServerHelper == null) {
-//  	  classServerHelper = new ClassServerHelper();
-//  	  classServerHelper.initializeClassServer();
-//  	}
-//        } catch (java.io.IOException e) {
-//  	System.err.println("problem with the classserver ("+e.toString()+")");
-//  	e.printStackTrace();
-//        }
-
       java.io.File directory = new java.io.File(tmpDir);
       directory.mkdirs();
-      
-
-      //String httpserver = "http://"+host+":"+classServerHelper.getClassServerPortNumber()+"/reggie-dl.jar";
    
       //System.out.println("We use the ClassServer : "+httpserver);
       System.out.println("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
-
-      
 
       //String[] args = { httpserver , policy , reggieTmpDir,};
       String[] args = { "" , policy , reggieTmpDir,};
@@ -296,40 +254,37 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
      */
     public void displayServices() {
       try {
+	      // the code takes separate routes from here for client or service
+	      System.out.println(">> >> found a service locator (registrar) : "+this.registrar);
+	      System.out.println(">> >> >> ServiceID : "+this.registrar.getServiceID());
 	
-	// the code takes separate routes from here for client or service
-	System.out.println(">> >> found a service locator (registrar) : "+this.registrar);
-	System.out.println(">> >> >> ServiceID : "+this.registrar.getServiceID());
+	      System.out.println(">> >> >> Groups : ");
+	      String[] groups = this.registrar.getGroups();
+	      for(int i =0 ; i < groups.length ; i++) {
+	        System.out.println(">> >> >> >> "+i+") "+groups[i]);  
+	      }
+	      System.out.println(">> >> >> Locator : "+this.registrar.getLocator());
+
+	      ServiceMatches matches  = null;
+	      Class [] classes = new Class[] {JiniNode.class};
+	      ServiceTemplate template = new ServiceTemplate(null,classes ,null);
 	
-	System.out.println(">> >> >> Groups : ");
-	String[] groups = this.registrar.getGroups();
-	for(int i =0 ; i < groups.length ; i++) {
-	  System.out.println(">> >> >> >> "+i+") "+groups[i]);  
-	}
-	System.out.println(">> >> >> Locator : "+this.registrar.getLocator());
-
-	ServiceMatches matches  = null;
-	Class [] classes = new Class[] {JiniNode.class};
-	ServiceTemplate template = new ServiceTemplate(null,classes ,null);
-	
-	matches =  this.registrar.lookup(template,Integer.MAX_VALUE);
-	System.out.println(">> >> >> "+matches.items.length+" required ");
-	System.out.println(">> >> >> "+matches.totalMatches+" founded ");
-	for(int i=0 ; i < matches.items.length ; i++) {
-	  System.out.println(">> >> >> >> Object ("+i+") found : ");
-	  System.out.println(">> >> >> >> >>        ID : "+matches.items[i].serviceID);
-	  System.out.println(">> >> >> >> >>   Service : "+matches.items[i].service);
-	  System.out.println(">> >> >> >> >> Attributs :");
-	  for(int j=0; j < matches.items[i].attributeSets.length ; j++) {
-	    System.out.println(">> >> >> >> >> >> Attr : "+matches.items[i].attributeSets[j]);
-	  }
-	  System.out.println("--------------------------------------------------------------------------------------");
-	}
-
-
+	      matches =  this.registrar.lookup(template,Integer.MAX_VALUE);
+	      System.out.println(">> >> >> "+matches.items.length+" required ");
+	      System.out.println(">> >> >> "+matches.totalMatches+" founded ");
+	      for(int i=0 ; i < matches.items.length ; i++) {
+	        System.out.println(">> >> >> >> Object ("+i+") found : ");
+	        System.out.println(">> >> >> >> >>        ID : "+matches.items[i].serviceID);
+	        System.out.println(">> >> >> >> >>   Service : "+matches.items[i].service);
+	        System.out.println(">> >> >> >> >> Attributs :");
+	        for(int j=0; j < matches.items[i].attributeSets.length ; j++) {
+	          System.out.println(">> >> >> >> >> >> Attr : "+matches.items[i].attributeSets[j]);
+	        }
+	        System.out.println("--------------------------------------------------------------------------------------");
+	      }
       } catch(java.rmi.RemoteException e) {
-	System.err.println(e.toString());
-	e.printStackTrace();
+	      System.err.println(e.toString());
+	      e.printStackTrace();
       }
     }
 
@@ -339,19 +294,17 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
      *@param dir The directory to clean
      */
     protected static void delDirectory(java.io.File dir) {
-    
-      java.io.File[] files = dir.listFiles();
-    
+      java.io.File[] files = dir.listFiles();    
       if (files != null) {
-	for(int i=0 ; i < files.length ; i++) {
-	  delDirectory(files[i]);
-	}
+	      for(int i=0 ; i < files.length ; i++) {
+	        delDirectory(files[i]);
+	      }
       }
       System.out.println("deleting "+dir.getPath()+" ...");
       dir.delete();
       if (dir.exists()) {
-	System.out.println("We cannot delete this file : "+dir.getPath());
-	System.out.println("... You should delete it before running a new ServiceLocator ...");
+	      System.out.println("We cannot delete this file : "+dir.getPath());
+	      System.out.println("... You should delete it before running a new ServiceLocator ...");
       }
     }
 

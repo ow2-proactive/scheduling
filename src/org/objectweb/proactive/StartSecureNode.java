@@ -28,7 +28,7 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.rmi;
+package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * This class has a main method and can be used directly from the java command.
  * <br>
  * use<br>
- * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.rmi.StartSecureNode<br>
+ * &nbsp;&nbsp;&nbsp;java org.objectweb.proactive.StartSecureNode<br>
  * to print the options from command line or see the java doc of the main method.
  * </p>
  *
@@ -96,8 +96,8 @@ public class StartSecureNode extends StartNode {
    *                     node to the RMIRegistry. If a node of the same name
    *                     already exists, the creation of the new node will fail.</li>
    * </ul>
-   * for instance: java org.objectweb.proactive.rmi.StartNode //localhost/node1<br>
-   *               java org.objectweb.proactive.rmi.StartNode //localhost/node2 -noClassServer -noRebind<br>
+   * for instance: java org.objectweb.proactive.StartNode //localhost/node1<br>
+   *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
    */
   public static void main(String[] args) {
     try {

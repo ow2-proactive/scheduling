@@ -41,7 +41,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System.getProperty("java.class.path"));
   public final static String DEFAULT_JAVAPATH = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"java";
   public final static String DEFAULT_POLICY_FILE = System.getProperty("user.dir")+FILE_SEPARATOR+POLICY_FILE;
-  public final static String DEFAULT_CLASSNAME ="org.objectweb.proactive.rmi.StartNode";
+  public final static String DEFAULT_CLASSNAME ="org.objectweb.proactive.StartNode";
 
   protected String classpath = DEFAULT_CLASSPATH;
   protected String javaPath = DEFAULT_JAVAPATH;
@@ -74,7 +74,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   public static void main(String[] args) {
     try {
       JVMProcessImpl rsh = new JVMProcessImpl(new StandardOutputMessageLogger());
-      rsh.setClassname("org.objectweb.proactive.rmi.StartNode");
+      rsh.setClassname("org.objectweb.proactive.StartNode");
       rsh.setParameters(args[0]);
       rsh.startProcess();
     } catch (Exception e) {

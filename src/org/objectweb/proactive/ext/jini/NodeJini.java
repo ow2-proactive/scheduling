@@ -28,7 +28,7 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.jini;
+package org.objectweb.proactive.ext.jini;
 
 import org.objectweb.proactive.core.node.rmi.RemoteNodeImpl;
 import net.jini.core.discovery.LookupLocator;

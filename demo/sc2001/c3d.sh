@@ -39,7 +39,7 @@ then
     targetNode=//${targetHost}/${targetHost}Node2
 else
     targetNode=///${HOSTNAME}Node
-    $JAVACMD org.objectweb.proactive.rmi.StartNode $targetNode &
+    $JAVACMD org.objectweb.proactive.StartNode $targetNode &
     sleep 5
 fi
 

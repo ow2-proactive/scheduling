@@ -28,7 +28,7 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.jini;
+package org.objectweb.proactive.ext.jini;
 
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.discovery.DiscoveryEvent;
@@ -90,4 +90,50 @@ public class NodeFinder implements DiscoveryListener {
 
   public void discarded(DiscoveryEvent evt) {
   }
+  
+  
+  
+  //
+  // -- INNER CLASSES -----------------------------------------------
+  //
+  
+  
+  public class NodeLookupThread extends Thread {
+
+    ServiceRegistrar registrar;
+
+
+    NodeLookupThread(ServiceRegistrar registrar) {
+      this.registrar = registrar;
+    }
+  
+
+    public void run() {
+      System.out.println("NodeLookupThread: now running");
+      RemoteNodeJiniInterface remoteIn = null;
+      try {
+        Class[] serveurClasse = new Class[1];
+        try {
+          serveurClasse[0] = Class.forName("org.objectweb.proactive.jini.RemoteNodeJiniInterface");
+        } catch (Exception e) {
+          System.out.println("Exception in NodeLookupThread: " + e);
+          e.printStackTrace();
+        }
+        net.jini.core.lookup.ServiceTemplate template = new net.jini.core.lookup.ServiceTemplate(null, serveurClasse, null);
+        System.out.println("NodeLookupThread: recherche un noeud " + serveurClasse[0]);
+        remoteIn = (RemoteNodeJiniInterface)registrar.lookup(template);
+        if (remoteIn != null) {
+          System.out.println("NodeLookupThread: On vient de trouver un noeud " + remoteIn);
+          NodeFinder.addInterface(remoteIn);
+        } else {
+          System.out.println("NodeLookupThread: No node found");
+        }
+      } catch (Exception e) {
+        System.out.println("Exception: " + e);
+        e.printStackTrace();
+      }
+
+    }
+  } // end inner class NodeLookupThread
+  
 }
