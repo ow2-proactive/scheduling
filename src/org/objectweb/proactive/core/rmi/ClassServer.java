@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.rmi;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import java.io.IOException;
+
 import java.net.UnknownHostException;
 
 
@@ -43,19 +45,15 @@ public class ClassServer implements Runnable {
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
     protected static int port;
-    protected String hostname;
 
     static {
-    	String newport = System.getProperty("proactive.http.port");
-  
-        if (newport != null) {
-        	DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
+        if (System.getProperty("proactive.communication.protocol").equals("http")) {
+            String newport = System.getProperty("proactive.http.port", "2222");
+            DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
         }
-        else
-        	DEFAULT_SERVER_BASE_PORT = 2222;
-        
     }
 
+    protected String hostname;
     private java.net.ServerSocket server = null;
     protected String paths;
 
@@ -69,7 +67,6 @@ public class ClassServer implements Runnable {
         this(0, null);
     }
 
-    
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
             port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
@@ -77,15 +74,15 @@ public class ClassServer implements Runnable {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
+
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         newListener();
-        
-//        if (logger.isInfoEnabled()) {
-//            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
-//        }
 
+        //        if (logger.isInfoEnabled()) {
+        //            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
+        //        }
     }
-    
+
     /**
      * Constructs a ClassServer that listens on <b>port</b> and
      * obtains a class's bytecodes using the method <b>getBytes</b>.
@@ -93,9 +90,9 @@ public class ClassServer implements Runnable {
      * @exception java.io.IOException if the ClassServer could not listen
      *            on <b>port</b>.
      */
-    protected ClassServer(int port_, String paths) throws java.io.IOException {        
-    	this(port_);
-    	this.paths = paths;
+    protected ClassServer(int port_, String paths) throws java.io.IOException {
+        this(port_);
+        this.paths = paths;
         printMessage();
     }
 
@@ -178,7 +175,7 @@ public class ClassServer implements Runnable {
      * if the class is not found or the response was malformed).
      */
     public void run() {
-        java.net.Socket socket = null;   
+        java.net.Socket socket = null;
 
         // accept a connection
         while (true) {
@@ -208,6 +205,14 @@ public class ClassServer implements Runnable {
 
                 return basePortNumber;
             } catch (java.io.IOException e) {
+                // If the protocol is HTTP and the port fixed, we are expected to use DEFAULT_SERVER_BASE_PORT, and no other port
+                if (System.getProperty("proactive.communication.protocol")
+                              .equals("http") &&
+                        System.getProperty("proactive.http.port") != null) {
+                    throw new IOException("Cannot listen on port " +
+                        DEFAULT_SERVER_BASE_PORT);
+                }
+
                 basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
             }
         }
