@@ -68,9 +68,14 @@ import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
+import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Serializable {
-
+	
+	
+	private MigrationStrategyManagerImpl myStrategyManager;
+	private boolean onMigration;
+	private String dispatcher_host;
   /**
    * Uses active objects if set to true
    */
@@ -84,19 +89,19 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
    * Status log, displays messages from other users concerning action
    * requests
    */
-  TextArea ta_log;
+   TextArea  ta_log;
   /**
    * SpyEvent log
    */
-  TextArea ta_mess;
+   TextArea ta_mess;
   /**
    * Name (number) of this user
    */
-  Label l_user;
+   Label l_user;
   /**
    * OS String of the C3Ddispatcher
    */
-  Label l_c3ddispatcher;
+   Label l_c3ddispatcher;
   /**
    * Height of the <code>Image</code> to be rendered
    */
@@ -109,7 +114,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
    * <code>MemoryImagesource</code> as pixel source for the 
    * <code>Image</code> to be rendered
    */
-  MemoryImageSource mis;
+   transient MemoryImageSource mis;
   /**
    * Destination array for the calculated pixels of the <code>Image</code>
    */
@@ -135,7 +140,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   /**
    * An AWT list allowing the User to select its locutors [??]
    */
-  private List li_users;
+  private transient List li_users;
   /**
    * The ID# of the selected locutor [-1=broadcast]
    */
@@ -161,7 +166,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
    * The number of rotations so far
    */
   public int nRotate = 0;
-  public UserFrame userframe;
+  public transient UserFrame userframe;
   boolean b_isApplet;
   boolean b_isBot;
   String botUrl;
@@ -177,6 +182,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     this.b_isApplet = b_isApplet.booleanValue();
     this.b_isBot = b_isBot.booleanValue();
     this.botUrl = url;
+    this.onMigration = false;
   }
 
 
@@ -186,15 +192,55 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     //userframe = new UserFrame(this);    
     userframe = new UserFrame(me);
     userframe.createWelcomePanel();
+    setOnMigration(true);
   }
 
-
+	public void rebuild(){
+		me = (C3DUser)org.objectweb.proactive.ProActive.getStubOnThis();
+		userframe = new UserFrame(me);
+		userframe.createPanelAfterMigration(dispatcher_host,s_username);
+	}
+	
+	public void clean(){
+		if (userframe != null){
+			userframe.dispose();
+			userframe = null;
+		}
+	}
+	
+	public void setOnMigration(boolean value){
+		this.onMigration = value;
+	}
+	
+	public boolean getOnMigration(){
+		return this.onMigration;
+	}
+	
   public void runActivity(org.objectweb.proactive.Body body) {
     System.out.println("Starting custom live in C3DUser");
+    //System.out.println("migration "+getOnMigration());
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
-    while (body.isActive()) {
-      service.blockingServeOldest();
-    }
+    myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
+    myStrategyManager.onDeparture("clean");
+    if(getOnMigration()) {
+    	//System.out.println("on migration");
+    	//System.out.println("width "+i_width);
+    	//System.out.println("height "+i_height);
+    	rebuild();
+    	
+      }
+    	
+    
+//    while (body.isActive()) {
+//      service.blockingServeOldest();
+//    }
+		service.fifoServing();
+		
+    
+    if(getOnMigration()) clean();
+    //if the activity is restarted it is a migration
+    //to be improve 
+   
   }
 
 
@@ -208,6 +254,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     }
     Object params[] = { new Boolean(false),new Boolean(false), ""};
     try {
+    	
       C3DUser c3duser = (C3DUser)org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DUser", params, nodeURL);
       c3duser.go();
     } catch (Exception e) {
@@ -431,6 +478,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
    */
 
   public Integer getWidth() {
+  	//System.out.println("Dispatcher asks for width ");
     return new Integer(i_width);
   }
 
@@ -529,13 +577,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
      * displays this frame and the GUI objects, creates the image object
      * to take the rendered picture.
      */
-    public UserFrame(C3DUser c) {
+    public UserFrame(C3DUser c3d) {
       super("Collaborative 3D Environment - User Window");
       setBackground(Color.lightGray);
       setLayout(gridbag);
       setFont(f_standard);
       addWindowListener(new MyWindowListener());
-      c3duser = c;
+      c3duser = c3d;
 
       s_localhost = "";
       try {
@@ -545,7 +593,22 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       }
     }
 
-
+		public UserFrame(C3DUser c3d, boolean value) {
+			super("Collaborative 3D Environment - User Window");
+      setBackground(Color.lightGray);
+      setLayout(gridbag);
+      setFont(f_standard);
+      addWindowListener(new MyWindowListener());
+      c3duser = c3d;
+      s_localhost = "";
+      try {
+        s_localhost = InetAddress.getLocalHost().getHostName();
+      } catch (UnknownHostException e) {
+        s_localhost = "unknown!";
+      }
+    
+		}
+		
     public Button getB_up() {
       return b_up;
     }
@@ -691,6 +754,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
        * and places it in a panel
        */     
       Panel p_image = new Panel(new GridLayout(1, 1));
+      //System.out.println("p image "+p_image.getSize().width);
 
       // PANEL CONSTRAINTS
       c.insets = new Insets(5, 5, 0, 5);
@@ -709,6 +773,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c.fill = c.BOTH; // components will fill their whole area
 
       gridbag.setConstraints(p_image, c);
+      //System.out.println("p image "+p_image.getSize().width);
       p_image.add(new MyImageContainer(createImage(mis), i_width, i_height, p_image));
       add(p_image);
 
@@ -949,6 +1014,304 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
         log("Error: C3DDispatcher not found, try to reconnect");
       }
     }
+    
+    public void createPanelAfterMigration(String s_host, String s_name){
+    	setVisible(false);
+      removeAll();
+
+      mb = new MenuBar();
+      Menu m_file = new Menu("File", false);
+      m_file.setFont(f_standard);
+      mi_exit = new MenuItem("Exit");
+      mi_clear = new MenuItem("Clear log");
+      mi_list = new MenuItem("List users");
+      mi_clear.setFont(f_standard);
+      mi_exit.setFont(f_standard);
+      mi_list.setFont(f_standard);
+      mi_exit.addActionListener(this);
+      mi_clear.addActionListener(this);
+      mi_list.addActionListener(this);
+      m_file.add(mi_list);
+      m_file.add(mi_clear);
+      m_file.addSeparator();
+      m_file.add(mi_exit);
+      mb.add(m_file);
+
+      Menu m_c3d = new Menu("C3D ProActive PDC", false);
+      mi_about = new MenuItem("About ProActive PDC");
+      mi_about.setFont(f_standard);
+      mi_about.addActionListener(this);
+      m_c3d.add(mi_about);
+
+      mb.setHelpMenu(m_c3d);
+      setMenuBar(mb);
+
+      /* Instanciates the destination pixel array */
+      pix = new int[i_width * i_height];
+   
+      /* Creates a MemoryImageSource as a pixel source for the image */
+      mis = new MemoryImageSource(i_width, i_height, pix, 0, i_width);
+
+      /* Accomodates the changing nature (rotation) of the image */
+      mis.setAnimated(true);
+
+      /* Creates an image component from the image from the 
+       * MemoryImageSource; avoids drawing issues in the user frame 
+       * and places it in a panel
+       */     
+      Panel p_image = new Panel(new GridLayout(1, 1));
+      //System.out.println("p image "+p_image.getSize().width);
+
+      // PANEL CONSTRAINTS
+      c.insets = new Insets(5, 5, 0, 5);
+      
+      // position 
+      c.gridx = 0;
+      c.gridy = 0;
+      c.weightx = 1;
+      c.weighty = 1;
+      
+      // size;
+      c.gridwidth = 1;
+      c.gridheight = 1;
+
+      //fill
+      c.fill = c.BOTH; // components will fill their whole area
+
+      gridbag.setConstraints(p_image, c);
+      //System.out.println("p image "+p_image.getSize().width);
+      p_image.add(new MyImageContainer(createImage(mis), i_width, i_height, p_image));
+      add(p_image);
+
+      /**
+       * The log and buttons area 
+       */
+      
+      // Creates the panel and places it in the main frame
+      Panel p_log = new Panel();
+      
+      // adds the panel
+      c.gridx = 1;
+      gridbag.setConstraints(p_log, c);
+      add(p_log);
+      
+      // Creates the panel's layout manager
+      GridBagLayout gb_panel = new GridBagLayout();
+      p_log.setLayout(gb_panel);
+      
+      // Label displaying the username
+      l_user = new Label("User " + s_name, Label.CENTER);
+      l_user.setFont(new Font("SansSerif", Font.ITALIC + Font.BOLD, 18));
+
+      GridBagConstraints pc = new GridBagConstraints();
+
+      pc.fill = pc.BOTH;
+      pc.insets = new Insets(5, 5, 0, 5);
+      pc.gridx = 0;
+      pc.gridy = 0;
+      pc.weightx = 1;
+      pc.weighty = 1;
+      pc.gridwidth = pc.REMAINDER;
+      gb_panel.setConstraints(l_user, pc);
+      p_log.add(l_user);
+      
+      // Label displaying local machine informations 
+      Label l_machine = new Label("Local host: " + s_localhost + " (" + System.getProperty("os.name") + " " + System.getProperty("os.version") + ")");
+
+      // Adds the label in the panel
+      pc.gridy = 1;
+      gb_panel.setConstraints(l_machine, pc);
+      p_log.add(l_machine);
+      
+      
+      // Label displaying C3DDispatcher informations
+      l_c3ddispatcher = new Label("C3DDispatcher host: " + s_host);
+      pc.gridy = 2;
+      gb_panel.setConstraints(l_c3ddispatcher, pc);
+      p_log.add(l_c3ddispatcher);
+      
+      // Mesage log
+      pc.gridy = 3;
+      pc.weighty = 2;
+      ta_log = new TextArea(5, 25);
+      ta_log.setEditable(false);
+      gb_panel.setConstraints(ta_log, pc);
+      p_log.add(ta_log);
+      
+
+      //--------------------------------------------------
+      //    INPUTS
+
+
+      // Panel containing the buttons
+      Panel p_input = new Panel();
+
+      GridBagLayout gb_input = new GridBagLayout();
+      p_input.setLayout(gb_input);
+
+      c.gridx = 0;
+      c.gridy = 1;
+      c.gridwidth = 1;
+
+      gridbag.setConstraints(p_input, c);
+      add(p_input);
+      
+      
+      //---------------- Buttons
+      // unclock
+      pc.gridy = 0;
+      pc.gridx = 0;
+      pc.gridwidth = 1;
+      pc.fill = pc.NONE;
+
+      gb_input.setConstraints(b_unclock, pc);
+      b_unclock.addActionListener(this);
+      p_input.add(b_unclock);
+
+
+      // Clock
+      pc.gridx = 2;
+      gb_input.setConstraints(b_clock, pc);
+      b_clock.addActionListener(this);
+      p_input.add(b_clock);
+      
+      // Up
+      pc.gridy = 0;
+      pc.gridx = 1;
+      gb_input.setConstraints(b_up, pc);
+      b_up.addActionListener(this);
+      p_input.add(b_up);
+
+
+      // Down
+      pc.gridx = 1;
+      pc.gridy = 2;
+      gb_input.setConstraints(b_down, pc);
+      b_down.addActionListener(this);
+      p_input.add(b_down);
+      
+      // Left
+      pc.gridx = 0;
+      pc.gridy = 1;
+      b_left.addActionListener(this);
+      gb_input.setConstraints(b_left, pc);
+      p_input.add(b_left);
+
+      // Right
+      pc.gridx = 2;
+      gb_input.setConstraints(b_right, pc);
+      b_right.addActionListener(this);
+      p_input.add(b_right);      
+
+
+      // Add
+      // This one is added in the main frame
+      //c.gridwidth = c.REMAINDER;
+      c.gridheight = 1;
+      c.gridx = 1;
+      c.fill = c.NONE;
+
+      gridbag.setConstraints(b_addSphere, c);
+      b_addSphere.addActionListener(this);
+      add(b_addSphere);      
+
+      // Reset
+      // This one is added in the main fram
+      c.gridx = 2;
+      c.gridy = 1;
+      c.fill = c.NONE;
+
+      gridbag.setConstraints(b_reset, c);
+      b_reset.addActionListener(this);
+      add(b_reset);      
+
+
+
+      //-----------------------------------------
+      // MESSAGES
+
+      Panel p_mess = new Panel();
+
+      c.insets = new Insets(10, 10, 10, 10);
+      c.gridx = 0;
+      c.gridy = 2;
+      c.gridwidth = c.REMAINDER;
+      c.fill = c.BOTH;
+      gridbag.setConstraints(p_mess, c);
+      add(p_mess);
+
+      GridBagLayout g_mess = new GridBagLayout();
+      p_mess.setLayout(g_mess);
+
+      // Users list
+      li_users = new List(5, false);
+      li_users.add("~BROADCAST~");
+      li_users.select(0);
+      li_users.addItemListener(this);
+
+      pc.insets = new Insets(5, 5, 5, 5);
+      //      pc.anchor=pc.WEST;
+      pc.gridx = 0;
+      pc.gridy = 0;
+      pc.fill = pc.BOTH;
+      pc.gridwidth = pc.RELATIVE;
+      g_mess.setConstraints(li_users, pc);
+      p_mess.add(li_users);
+
+      // Output
+      ta_mess = new TextArea(5, 30);
+      ta_mess.setEditable(false);
+      pc.gridwidth = pc.REMAINDER;
+      pc.gridx = 1;
+      g_mess.setConstraints(ta_mess, pc);
+      p_mess.add(ta_mess);
+
+      // INPUT:::
+
+      Panel p_msg = new Panel();
+      GridBagLayout g_msg = new GridBagLayout();
+      pc = new GridBagConstraints();
+      p_msg.setLayout(g_msg);
+      c.gridy = 3;
+      gridbag.setConstraints(p_msg, c);
+      add(p_msg);
+
+      // SpyEvent
+      pc.gridx = 0;
+      pc.gridy = 0;
+      pc.fill = pc.NONE;
+      Label l_mess = new Label("SpyEvent:");
+      g_msg.setConstraints(l_mess, pc);
+      p_msg.add(l_mess);
+  
+      // Input
+      tf_mess = new TextField();
+      tf_mess.addActionListener(this);
+      pc.weightx = 1.0;
+      pc.gridwidth = pc.RELATIVE;
+      pc.fill = pc.BOTH;
+      pc.gridx = 1;
+      g_msg.setConstraints(tf_mess, pc);
+      p_msg.add(tf_mess);
+      
+      // Send button
+      pc.weightx = 0.0;
+      pc.gridwidth = pc.REMAINDER;
+      b_send.addActionListener(this);
+      pc.fill = pc.NONE;
+      pc.gridx = 2;
+      g_msg.setConstraints(b_send, pc);
+      p_msg.add(b_send);
+
+      pack();
+      setVisible(true);
+      toFront();
+      
+      c3ddispatcher.registerMigratedUser(i_user);
+      //System.out.println("i am here");
+      l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" + c3ddispatcher.getOSString() + ")");
+      //System.out.println("i am there");
+    }
 
 
     /**
@@ -1026,6 +1389,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
           tf_host.setText("Enter dispatcher host");
         if ((s_name.length() > 0) && (s_host.length() > 0)) {
           s_username = s_name;
+          dispatcher_host = s_host;
           createFinalPanel(s_host, s_name);
         }
       } else if (source == mi_clear) {
@@ -1101,7 +1465,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     /**
      * AWT 1.1 event handling for window events
      */
-    class MyWindowListener extends WindowAdapter {
+    class MyWindowListener extends WindowAdapter implements java.io.Serializable {
 
       public void windowClosing(WindowEvent e) {
         setVisible(false);
@@ -1121,7 +1485,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   /**
    * The about box
    */
-  class MyDialog extends Dialog implements ActionListener, MouseListener {
+  class MyDialog extends Dialog implements ActionListener, MouseListener, java.io.Serializable {
 
     private Label d_title = new Label("ProActive PDC", Label.CENTER);
     private Label d_url = new Label("http://www.inria.fr/proactive/", Label.CENTER);
@@ -1213,7 +1577,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
  * <code>Container</code>. It integrates easily with other AWT components
  * and hides the drawing and scaling issues inherent to image displaying
  */
-class MyImageContainer extends Canvas {
+class MyImageContainer extends Canvas implements java.io.Serializable {
 
   private Image img, scaled_img;
   private int minwidth, minheight;
@@ -1227,6 +1591,7 @@ class MyImageContainer extends Canvas {
     this.minwidth = width;
     this.minheight = height;
     this.p = p;
+    //System.out.println("----------"+p.getSize().width);
     insets = p.getInsets();
   }
 
@@ -1250,9 +1615,13 @@ class MyImageContainer extends Canvas {
 
   public void validate() {
     insets = p.getInsets();
-
+		//System.out.println("----------"+p.getSize().width+"-----------"+insets.left+"-----"+insets.right);
     int width = p.getSize().width - insets.left - insets.right;
     int height = p.getSize().height - insets.top - insets.bottom;
+//    int width = 270 - insets.left - insets.right;
+//    int height = 270 - insets.top - insets.bottom;
+//    System.out.println("width "+width);
+//    System.out.println("height "+height);
 
     int size;
     if (width > height)
