@@ -1,12 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
 
 
 public class DataTreeNode extends DefaultMutableTreeNode
@@ -171,6 +171,10 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
 
         if (isRoot()) {
+            if (getKey() == NO_KEY) {
+                return "Empty";
+            }
+
             return NAMES[KEY2INDEX[getKey()]];
         }
 

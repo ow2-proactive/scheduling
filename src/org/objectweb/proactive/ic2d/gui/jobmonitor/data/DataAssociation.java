@@ -2,7 +2,13 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 
 class AssoKey implements Comparable {
@@ -57,12 +63,39 @@ class AssoKey implements Comparable {
 public class DataAssociation implements JobMonitorConstants {
     private Map asso;
     private MonitoredObjectSet[] sets;
+    private static final int[][] CHILDREN_KEYS = new int[NB_KEYS][];
 
     public DataAssociation() {
         asso = new TreeMap();
         sets = new MonitoredObjectSet[NB_KEYS];
         for (int i = 0; i < sets.length; i++)
             sets[i] = new MonitoredObjectSet();
+    }
+
+    private static int[] getChildrenKeys(int key) {
+        int index = KEY2INDEX[key];
+        if (CHILDREN_KEYS[index] != null) {
+            return CHILDREN_KEYS[index];
+        }
+
+        int[] keys;
+        switch (key) {
+        case AO:
+            keys = new int[] {  };
+            break;
+        case VN:
+            keys = new int[] { NODE };
+            break;
+        case JOB:
+            keys = new int[] { JVM, VN, NODE, AO };
+            break;
+        default:
+            keys = new int[] { key + 1 };
+            break;
+        }
+
+        CHILDREN_KEYS[index] = keys;
+        return keys;
     }
 
     private MonitoredObjectSet getSetForKey(int key) {
@@ -86,7 +119,7 @@ public class DataAssociation implements JobMonitorConstants {
         AssoKey key = new AssoKey(from, to.getKey());
         Object res = asso.get(key);
         if (res == null) {
-            res = new MonitoredObjectSet();
+            res = new MonitoredObjectSet(from);
             asso.put(key, res);
         }
 
@@ -113,7 +146,7 @@ public class DataAssociation implements JobMonitorConstants {
         AssoKey key = new AssoKey(from, to);
         Object res = asso.get(key);
         if (res == null) {
-            res = new MonitoredObjectSet();
+            res = new MonitoredObjectSet(from);
             asso.put(key, res);
         }
 
@@ -246,11 +279,11 @@ public class DataAssociation implements JobMonitorConstants {
         res = filter(res, constraints);
         return res;
     }
-    
+
     public MonitoredObjectSet getJVM() {
-    	return list(JVM, null);
+        return list(JVM, null);
     }
-    
+
     public void clear() {
         for (int j = 0; j < sets.length; j++)
             if (sets[j] != null) {
@@ -261,54 +294,95 @@ public class DataAssociation implements JobMonitorConstants {
             }
     }
 
-    /* Mark as deleted */
-    public void deleteItem(BasicMonitoredObject value) {
-        int key = value.getKey();
+    interface Traversal {
+        public void doSomething(BasicMonitoredObject child);
+    }
+
+    private void traverse(BasicMonitoredObject object, Traversal t) {
+        int key = object.getKey();
 
         MonitoredObjectSet set = getSetForKey(key);
-        if (!set.contains(value)) {
+        if (!set.contains(object)) {
             return;
         }
 
-        value.setDeleted(true);
+        t.doSomething(object);
 
-        if (isSpecialKey(key)) {
-            // If we had a reference count : associatedNode.ref--
-            return;
-        }
+        int[] childrenKeys = getChildrenKeys(key);
 
-        MonitoredObjectSet desc = getWritableAsso(value, key + 1);
-        Iterator iter = desc.iterator();
-        while (iter.hasNext()) {
-            BasicMonitoredObject childValue = (BasicMonitoredObject) iter.next();
-            deleteItem(childValue);
+        for (int i = 0; i < childrenKeys.length; i++) {
+            MonitoredObjectSet desc = getWritableAsso(object, childrenKeys[i]);
+            Iterator iter = desc.iterator();
+            while (iter.hasNext()) {
+                BasicMonitoredObject childObject = (BasicMonitoredObject) iter.next();
+                t.doSomething(childObject);
+            }
         }
     }
 
-    public void removeItem(BasicMonitoredObject value) {
-        int key = value.getKey();
+    /* Mark as deleted */
+    public void deleteItem(BasicMonitoredObject object) {
+        Traversal t = new Traversal() {
+                public void doSomething(BasicMonitoredObject child) {
+                    child.setDeleted(true);
+                }
+            };
 
-        MonitoredObjectSet set = getSetForKey(key);
-        if (!set.contains(value)) {
-            return;
+        traverse(object, t);
+    }
+
+    public void removeItem(BasicMonitoredObject object) {
+        final List assoKeysToRemove = new ArrayList();
+        final List childrenToRemove = new ArrayList();
+        Traversal t = new Traversal() {
+                public void doSomething(BasicMonitoredObject child) {
+                    childrenToRemove.add(child);
+                    int[] childrenKeys = getChildrenKeys(child.getKey());
+                    for (int i = 0; i < childrenKeys.length; i++) {
+                        AssoKey removeKey = new AssoKey(child, childrenKeys[i]);
+                        assoKeysToRemove.add(removeKey);
+                    }
+                }
+            };
+
+        traverse(object, t);
+
+        Iterator iter = assoKeysToRemove.iterator();
+        while (iter.hasNext()) {
+            AssoKey assoKey = (AssoKey) iter.next();
+            asso.remove(assoKey);
         }
 
-        set.remove(value);
-
-        if (isSpecialKey(key)) {
-            // If we had a reference count : associatedNode.ref--
-            return;
+        iter = childrenToRemove.iterator();
+        Set clearedSets = new HashSet();
+        while (iter.hasNext()) {
+            BasicMonitoredObject child = (BasicMonitoredObject) iter.next();
+            clearedSets.addAll(child.removeInReferences());
         }
 
-        int[] keys = new int[] { key + 1, key - 1, JOB, VN };
-        for (int i = 0; i < keys.length; i++) {
-            AssoKey removeKey = new AssoKey(value, keys[i]);
-            asso.remove(removeKey);
+        iter = clearedSets.iterator();
+nextCleared: 
+        while (iter.hasNext()) {
+            MonitoredObjectSet set = (MonitoredObjectSet) iter.next();
+            BasicMonitoredObject parent = set.getParent();
+            if (parent == null) {
+                continue;
+            }
+
+            int[] childrenKeys = getChildrenKeys(parent.getKey());
+            for (int i = 0; i < childrenKeys.length; i++) {
+                MonitoredObjectSet childrenSet = getWritableAsso(parent,
+                        childrenKeys[i]);
+                if (!childrenSet.isEmpty()) {
+                    continue nextCleared;
+                }
+            }
+            removeItem(parent);
         }
     }
 
     public void clearDeleted() {
-        List toDelete = new LinkedList();
+        List toDelete = new ArrayList();
 
         for (int i = 0; i < sets.length; i++) {
             Iterator iter = sets[i].iterator();
@@ -323,6 +397,16 @@ public class DataAssociation implements JobMonitorConstants {
         Iterator iter = toDelete.iterator();
         while (iter.hasNext()) {
             removeItem((BasicMonitoredObject) iter.next());
+        }
+    }
+
+    public void updateReallyDeleted() {
+        for (int i = 0; i < sets.length; i++) {
+            Iterator iter = sets[i].iterator();
+            while (iter.hasNext()) {
+                BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+                object.updateReallyDeleted();
+            }
         }
     }
 }

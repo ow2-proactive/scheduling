@@ -4,12 +4,12 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -50,45 +50,15 @@ class StatusCell extends JPanel implements JobMonitorConstants {
         return label;
     }
 
-    public void clear() {
-        setNameLabel(clearedNameLabel);
-        state.setText("No state");
-    }
-
     public void setNameLabel(String name) {
         this.name.setText(name);
     }
 
-    private static String timeDiff(Calendar d1, Calendar d2) {
-        long d1Sec = d1.getTimeInMillis() / 1000;
-        long d2Sec = d2.getTimeInMillis() / 1000;
-
-        long diff = d1Sec - d2Sec;
-        if (diff < 120) {
-            return diff + " seconds";
-        }
-
-        diff /= 60;
-        if (diff < 120) {
-            return diff + " minutes";
-        }
-
-        diff /= 60;
-        if (diff < 120) {
-            return diff + " hours";
-        }
-
-        diff /= 24;
-        return diff + " days";
-    }
-
-    public void updateDeleted(GregorianCalendar deletedSince) {
-        if (deletedSince == null) {
+    public void updateDeleted(String deletedTime) {
+        if (deletedTime == null) {
             state.setText("Alive");
         } else {
-            GregorianCalendar now = new GregorianCalendar();
-            String diff = timeDiff(now, deletedSince);
-            state.setText("Unresponding for " + diff);
+            state.setText("Unresponding for " + deletedTime);
         }
     }
 
@@ -104,25 +74,18 @@ class StatusCell extends JPanel implements JobMonitorConstants {
 }
 
 
-public class JobMonitorStatus extends JPanel implements JobMonitorConstants,
+public class JobMonitorStatus extends Box implements JobMonitorConstants,
     TreeSelectionListener {
     private JTree tree;
-    private StatusCell[] cells;
 
     public JobMonitorStatus(JTree tree) {
+        super(BoxLayout.Y_AXIS);
         this.tree = tree;
-        this.cells = new StatusCell[NB_KEYS];
-
         tree.addTreeSelectionListener(this);
-        setLayout(new GridLayout(cells.length, 1, 0, 20));
-        setBackground(Color.WHITE);
 
-        for (int i = 0; i < cells.length; i++) {
-            StatusCell cell = new StatusCell(KEYS[i]);
-            cells[i] = cell;
-            cell.clear();
-            add(cell);
-        }
+        JPanel blank = new JPanel();
+        blank.setBackground(Color.WHITE);
+        add(blank);
     }
 
     public void valueChanged(TreeSelectionEvent e) {
@@ -131,19 +94,30 @@ public class JobMonitorStatus extends JPanel implements JobMonitorConstants,
             return;
         }
 
-        for (int i = 0; i < cells.length; i++)
-            cells[i].clear();
+        removeAll();
 
         while (!node.isRoot()) {
-            int i = KEY2INDEX[node.getKey()];
-            StatusCell cell = cells[i];
             BasicMonitoredObject object = node.getObject();
+            StatusCell cell = new StatusCell(object.getKey());
             cell.setNameLabel(object.getFullName());
-            cell.updateDeleted(object.getDeletedSince());
+            cell.updateDeleted(object.getDeletedTime());
+
+            Dimension d = new Dimension(cell.getMaximumSize().width,
+                    cell.getMinimumSize().height);
+            cell.setMaximumSize(d);
+
+            d = new Dimension(cell.getPreferredSize().width,
+                    cell.getMinimumSize().height);
+            cell.setPreferredSize(d);
+
+            add(cell, 0);
             node = (DataTreeNode) node.getParent();
         }
 
-        for (int i = 0; i < cells.length; i++)
-            cells[i].repaint();
+        JPanel blank = new JPanel();
+        blank.setBackground(Color.WHITE);
+        add(blank);
+        revalidate();
+        repaint();
     }
 }

@@ -9,7 +9,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
 import java.awt.BorderLayout;
@@ -28,6 +27,8 @@ import java.awt.event.WindowEvent;
 import java.rmi.registry.Registry;
 
 import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -327,9 +328,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             DataTreeModel model = new DataTreeModel(asso, traversal);
 
             JPanel left = createContent(model, allowExchange);
+            JScrollPane right = new JScrollPane(status);
 
-            pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left,
-                    new JScrollPane(status));
+            pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, right);
             pane.setOneTouchExpandable(true);
         }
 
@@ -346,7 +347,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             menuItem.setEnabled(monitoredHosts.size() > 0);
             popupmenu.add(menuItem);
 
-            final MonitoredObjectSet objects = new MonitoredObjectSet();
+            final Set objects = new TreeSet();
             boolean hasHosts = false;
 
             if (selection != null) {
@@ -387,7 +388,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                             while (iter.hasNext()) {
                                 BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
                                 skippedObjects.addElement(object);
+                                asso.removeItem(object);
                             }
+                            rebuildAll();
+                            tree.repaint();
                         }
                     };
 

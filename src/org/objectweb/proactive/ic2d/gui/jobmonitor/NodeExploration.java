@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -103,11 +102,11 @@ public class NodeExploration implements JobMonitorConstants {
 
         try {
             ProActiveRuntime[] registered = from.getProActiveRuntimes();
-            known = new LinkedList(Arrays.asList(registered));
+            known = new ArrayList(Arrays.asList(registered));
             parents = from.getParents();
         } catch (ProActiveException e) {
             log(e);
-            return new LinkedList();
+            return new ArrayList();
         }
 
         for (int i = 0; i < parents.length; i++) {
@@ -286,7 +285,7 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             MonitoredAO aoObject = new MonitoredAO(aoName);
-            if (skippedObjects.contains(aoObject)) {
+            if (!skippedObjects.contains(aoObject)) {
                 asso.addChild(nodeObject, aoObject);
                 asso.addChild(jobObject, aoObject);
             }
@@ -297,20 +296,19 @@ public class NodeExploration implements JobMonitorConstants {
         Iterator iter = asso.getJVM().iterator();
         while (iter.hasNext()) {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
-            if (jvmObject.isDeleted())
-            	continue;
             ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());
             if (pr != null) {
                 handleProActiveRuntime(pr, jvmObject.getDepth());
             }
         }
     }
-    
+
     public void startExploration() {
-    	visitedVM = new TreeSet();
+        visitedVM = new TreeSet();
     }
-    
+
     public void endExploration() {
-    	visitedVM = null;
+        visitedVM = null;
+        asso.updateReallyDeleted();
     }
 }

@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
@@ -22,7 +23,24 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer
         }
 
         setFont(highlighted ? highlightedFont : null);
-        setForeground(deleted ? Color.LIGHT_GRAY : Color.BLACK);
+        setForeground(deleted ? Color.RED : Color.BLACK);
+    }
+
+    private void addDeletedTime(DataTreeNode node) {
+        BasicMonitoredObject object = node.getObject();
+        if (!object.isDeleted()) {
+            return;
+        }
+
+        DataTreeNode parent = (DataTreeNode) node.getParent();
+        BasicMonitoredObject parentObject = parent.getObject();
+
+        if (parentObject.isDeleted()) {
+            return;
+        }
+
+        setText(node.toString() + " (Unresponding for " +
+            object.getDeletedTime() + ")");
     }
 
     public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -44,6 +62,8 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer
 
         setAttributes(model.isHighlighted(key),
             currentNode.getObject().isDeleted());
+
+        addDeletedTime(currentNode);
         return this;
     }
 }
