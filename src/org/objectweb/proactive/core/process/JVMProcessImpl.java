@@ -221,7 +221,6 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
       javaCommand.append(" ");
       javaCommand.append(parameters);
     }
-    System.out.println(javaCommand.toString());
     return javaCommand.toString();
   }
 
