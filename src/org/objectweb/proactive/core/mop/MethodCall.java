@@ -245,6 +245,8 @@ public final class MethodCall implements java.io.Serializable {
                 // It is prefereable to do it here rather than at the moment
                 // the object is picked out of the pool, because it allows
                 // garbage-collecting the objects referenced in here
+				mc.fcFunctionalInterfaceName = null;
+				mc.tag = null;
                 mc.reifiedMethod = null;
                 mc.effectiveArguments = null;
                 mc.key = null;
