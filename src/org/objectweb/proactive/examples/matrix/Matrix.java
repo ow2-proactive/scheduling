@@ -1,43 +1,22 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
 package org.objectweb.proactive.examples.matrix;
 
+
+import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 
-public class Matrix implements java.io.Serializable {
+
+import org.objectweb.proactive.core.mop.*;
+import org.objectweb.proactive.core.body.future.*;
+
+
+public class Matrix implements Active, java.io.Serializable {
 
 
     private int width;
@@ -73,6 +52,7 @@ public class Matrix implements java.io.Serializable {
     public Matrix(Matrix mr, int w) {
 
 	int index = 0;
+	int width = 0;
 	Matrix result = null;
 
 	int size =  ProActiveGroup.size(mr) ;
@@ -82,13 +62,37 @@ public class Matrix implements java.io.Serializable {
 	}
     	System.out.println("nombre de matrices dans le groupe : " + size);
 */
+
+
 	this.width = w;
-	this.height = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
+	this.height = w;  // ((Matrix)((FutureProxy)ProActiveGroup.get(mr,0)).getResult()).getHeight();
+
+/*
+	startTime = System.currentTimeMillis();
+	FutureProxy fp = (FutureProxy)ProActiveGroup.get(mr,0);
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 1 : " + endTime + " millisecondes\n");
+
+	startTime = System.currentTimeMillis();
+	Matrix m = (Matrix)fp.getResult();
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 2 : " + endTime + " millisecondes\n");
+
+	startTime = System.currentTimeMillis();
+	this.height = m.getHeight();
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("         Initialisation de reconstruction 3 : " + endTime + " millisecondes\n");
+*/
 	
 	tab = new double[this.width][];
-	
+
 	for (int i=0 ; i < size ; i++) {
-	    result = ((Matrix)((FutureProxy)ProActiveGroup.get(mr,i)).getResult());
+	    result = ((Matrix)ProActiveGroup.get(mr,i));
+
+// 	    result = ((Matrix)
+// 		      ((FutureProxy)ProActiveGroup.get(mr,i))
+// 		      .getResult());
+
 	    int  widthTmp = result.getWidth();
 	    for (int j=0 ; j < widthTmp ; j++) {
 		// Recopie de la colonne "index"
@@ -331,7 +335,7 @@ public class Matrix implements java.io.Serializable {
 
 
 
-
+/* Debugging
 
  	    System.out.println("SubMatrix " + i + "  d.length = " + d.length);
  	    String s = new String("");
@@ -344,7 +348,7 @@ public class Matrix implements java.io.Serializable {
 	    }
 	    System.out.println(s);
 	    
-
+*/
 
 
 
@@ -364,8 +368,11 @@ public class Matrix implements java.io.Serializable {
     
 
     public Matrix localMultiplyForGroup (Matrix m) {
-	System.out.println(this);
-	System.out.println(m);
+	//long startTime;
+ 	//long endTime;
+	//startTime= System.currentTimeMillis();
+
+
 	Matrix res = new Matrix(getWidth(),m.getHeight());
 	int height=res.getHeight() ;
         int width = res.getWidth();
@@ -376,15 +383,21 @@ public class Matrix implements java.io.Serializable {
 		    {
 
 
-		    System.out.println("(" + m.getWH(index,line) + " * " + getWH(column,index) + ") + ");
+		    //System.out.println("(" + m.getWH(index,line) + " * " + getWH(column,index) + ") + ");
 
 
 		    val += m.getWH(index,line) * getWH(column,index);
 		    }
-		System.out.println(" == " + val + "\n");
+		//System.out.println(" == " + val + "\n");
 		res.setWH(column,line,val);
 	    }
 	}
+
+
+	//endTime = System.currentTimeMillis() - startTime;
+	//System.out.println(" Local multiply for group : " + endTime + " millisecondes\n\n");
+	
+	
 	return res;
     }
 
@@ -480,6 +493,29 @@ public class Matrix implements java.io.Serializable {
 	    return new Matrix(mr);
 	}
     }
+
+
+
+
+    // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
+  
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+	//long startTime;
+ 	//long endTime;
+	
+	//startTime = System.currentTimeMillis();
+	
+	out.defaultWriteObject();
+
+	//endTime = System.currentTimeMillis() - startTime;
+	//	System.out.println("     Serialization : " + endTime + " millisecondes\n");
+    }
+
+
+//     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+// 	in.defaultReadObject();
+//     }
+
 
 
 

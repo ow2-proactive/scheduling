@@ -1,33 +1,31 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * Launcher.java
+ *
+ * Copyright 1997 - 2001 INRIA Project Oasis. All Rights Reserved.
+ * 
+ * This software is the proprietary information of INRIA Sophia Antipolis.  
+ * 2004 route des lucioles, BP 93 , FR-06902 Sophia Antipolis 
+ * Use is subject to license terms.
+ * 
+ * @author  ProActive Team
+ * @version ProActive 0.7 (October 2001)
+ * 
+ * ===================================================================
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED.  IN NO EVENT SHALL INRIA, THE OASIS PROJECT OR
+ * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+ * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+ * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ * ===================================================================
+ * 
+ */
 package org.objectweb.proactive.examples.matrix;
 
 import org.objectweb.proactive.core.node.Node;
@@ -39,7 +37,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.group.*;
 
 
-public class Launcher {
+public class Launcher implements java.io.Serializable {
 
     Node[] nodesList;
 
@@ -54,20 +52,37 @@ public class Launcher {
 
 
     // MAIN !!!
-    public void start(Matrix m1, Matrix m2) {	
+    public void start(Matrix m1, Matrix m2, int i) {	
 	// DISTRIBUTED MULTIPLICATION      
 	int matrixSize=m1.getWidth();
 
-/*	Matrix m2group = distribute(m2);    */
 
-	System.out.println("Multiplication!!!!! ");
+	long startTime;
+ 	long endTime;
+	
+	startTime = System.currentTimeMillis();
+
+	//System.out.println("Multiplication!!!!! ");
 	Matrix groupResult =multiply(m1,m2/*group*/);
+
+	//endTime = System.currentTimeMillis() - startTime;
+	//System.out.println("     Distributed Multiplication : " + endTime + " millisecondes\n");
+	
+
+	//startTime = System.currentTimeMillis();
 	 
 	// RECONSTRUCTION
-	Matrix result = reconstruction(groupResult,matrixSize);
+	try {
+	    Matrix result = reconstruction(groupResult,matrixSize); }
+	catch (Exception e) {}
+	
 
-	System.out.println(result);
+	endTime = System.currentTimeMillis() - startTime;
+	System.out.println("\n       Result (" +i+ ") : Total time spent = " + endTime + " millisecondes");
+
+	//System.out.println(result);
     }
+
 
     public Matrix createMatrix(int size) {
 	Matrix m = new Matrix(size,size);
@@ -75,37 +90,32 @@ public class Launcher {
 	return m;
     }
 
+
     public Matrix distribute (Matrix m) {
 	Matrix verticalSubMatrixGroup = null;
 	verticalSubMatrixGroup = m.transformIntoActiveVerticalSubMatrixGroup(nodesList);
 
-/*	for (int i = 0 ; i < ProActiveGroup.size(verticalSubMatrixGroup) ; i++)
-	    System.out.println(ProActiveGroup.get(verticalSubMatrixGroup,i));
-*/
-
-
-	
-
 	return verticalSubMatrixGroup;
     }
+
 
     public Matrix multiply (Matrix m, Matrix group) {
 	Matrix ma = group.localMultiplyForGroup(m);
 	return ma;
     }
 
+
     public Matrix reconstruction (Matrix group, int size) {
-	System.out.println(((StubObject)group).getProxy().getClass());
 	Matrix result = null;
-	try {
-	    result = new Matrix(group,size);
-	} catch (Exception e ) {
-	    e.printStackTrace();
-	}
+
+	result = new Matrix(group,size);
+
 	return result;
     }
     
+
     public String getString(Matrix m) {
 	return m.toString();
     }
+
 }

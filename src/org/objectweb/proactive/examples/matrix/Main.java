@@ -1,33 +1,3 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
 package org.objectweb.proactive.examples.matrix;
 
 import org.objectweb.proactive.ProActive;
@@ -45,6 +15,12 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 
+
+
+import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.group.ProActiveGroup;
+
+
 public class Main {
 
     public static void main (String args[]) {
@@ -55,50 +31,55 @@ public class Main {
 	}
 	
 	String[] nodesList = readNodesList(args[0]);	
-	String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
+	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
 	Launcher l = null;
+
 	try {
-	    l = (Launcher) ProActive.newActive("org.objectweb.proactive.examples.matrix.Launcher", new Object[] {nodesList}, targetNode); 
-	} catch (Exception e) {e.printStackTrace();}
+	    l = (Launcher) ProActive.newActive("org.objectweb.proactive.examples.matrix.Launcher", new Object[] {nodesList});//,targetNode);
+	} catch (Exception e) {System.err.println("\nUnable to create the Launcher !!!!!\n"); e.printStackTrace();}
 
 	int matrixSize=Integer.parseInt(args[1]);
+
 	Matrix m1;
-	Matrix m2 = l.createMatrix(matrixSize);
+	Matrix m2 = new Matrix(matrixSize,matrixSize);
+	m2.initializeWithRandomValues();
 
  	long startTime;
  	long endTime;
 
 
 	// DISTRIBUTION 
-	printMessageAndWait("Ready for distribution");
+	printMessageAndWait("\n\n\n\nReady for distribution");
 	startTime= System.currentTimeMillis();
 
- 	Matrix m2group = l.distribute(m2);
+	Matrix m2group = null;
+	try {
+	    m2group = l.distribute(m2); }
+	catch (Exception e) { e.printStackTrace();}
 
 	endTime = System.currentTimeMillis() - startTime;
-	System.out.println("   Distribution : " + endTime + " millisecondes\n\n");
+	System.out.println("   Asynchronous Distribution : " + endTime + " millisecondes\n\n");
 
 
 	// MULTIPLICATION
+	int i=1;
 	while (true) {
-	    printMessageAndWait("Ready for distributed multiplication");
-	    startTime= System.currentTimeMillis();
-	    
-	    m1 = l.createMatrix(matrixSize);
+	    m1 = new Matrix(matrixSize,matrixSize);
+	    m1.initializeWithRandomValues();//l.createMatrix(matrixSize);
 
+	    printMessageAndWait("Ready for distributed multiplication (" +i+ ")");
+	    //startTime= System.currentTimeMillis();
 
+	    // System.out.println(m1);
+	    // System.out.println(m2);
 
+	    l.start(m1,m2group,i);
 
-	    System.out.println(m1);
-	    System.out.println(m2);
+	    System.out.println("   Operation ("+i+") launched\n");
 
-
-
-
-	    l.start(m1,m2group);
-
-	    endTime = System.currentTimeMillis() - startTime;
-	    System.out.println("   Distributed Multiplication : " + endTime + " millisecondes\n\n");
+	    //endTime = System.currentTimeMillis() - startTime;
+	    //System.out.println("Total Distributed Multiplication : " + endTime + " millisecondes\n\n");
+	    i++;
 	}
     } 
     
