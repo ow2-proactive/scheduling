@@ -62,8 +62,10 @@
 			</processDefinition>
 			<processDefinition id="linuxJVM-AC">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>-Dproactive.future.ac=enable</jvmParameters>
-					</jvmProcess>
+					<jvmParameters>
+						<parameter value="-Dproactive.future.ac=enable"/>
+					</jvmParameters>
+				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rshProcess">
 				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
