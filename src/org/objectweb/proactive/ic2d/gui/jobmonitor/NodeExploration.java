@@ -44,7 +44,7 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     /* url : "//host/object" */
-    private static ProActiveRuntime resolveURL(String url) {
+    private ProActiveRuntime resolveURL(String url) {
     	StringTokenizer tokenizer = new StringTokenizer(url, "/");
     	String host = null;
     	String name = null;
@@ -52,7 +52,7 @@ public class NodeExploration implements JobMonitorConstants {
     		host = tokenizer.nextToken();
     		name = tokenizer.nextToken();
     	} catch (NoSuchElementException nsee) {
-    		nsee.printStackTrace();
+    		controller.log(nsee);
     		return null;
     	}
     	
@@ -63,7 +63,7 @@ public class NodeExploration implements JobMonitorConstants {
     	} catch (RuntimeException e) { /* hehe */
     		throw e;
     	} catch (Exception e) {
-    		e.printStackTrace();
+    		controller.log(e);
     		return null;
     	}
     }
@@ -86,7 +86,7 @@ public class NodeExploration implements JobMonitorConstants {
     	try {
     		registered = from.getProActiveRuntimes();
     	} catch (ProActiveException pae) {
-    		pae.printStackTrace();
+    		controller.log(pae);;
     		registered = new ProActiveRuntime[0];
     	}
 
