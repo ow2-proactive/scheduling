@@ -4,20 +4,21 @@
   */
 package nonregressiontest.component;
 
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 
 /**
  * @author Matthieu Morel
  */
 public class PrimitiveComponentC implements I1, BindingController {
-    static Logger logger = Logger.getLogger(PrimitiveComponentC.class.getName());
-    public final static String MESSAGE = "-->PrimitiveComponentC";
+    private final static Logger logger = ProActiveLogger.getLogger("nonregressiontests.components"); 
+    public final static String MESSAGE = "-->c";
     public final static String I1_CLIENT_ITF_NAME = "i1-client";
     I1 i1Client;
 

@@ -1,11 +1,10 @@
 /*
  * Created on Oct 20, 2003
  * author : Matthieu Morel
-  */
+ */
 package nonregressiontest.component;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -14,14 +13,15 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 
 /**
  * @author Matthieu Morel
  */
 public class PrimitiveComponentD implements I1, BindingController {
-    static Logger logger = Logger.getLogger(PrimitiveComponentA.class.getName());
-    public final static String MESSAGE = "-->PrimitiveComponentD";
+    protected final static Logger logger = ProActiveLogger.getLogger("nonregressiontests.components");
+    public final static String MESSAGE = "-->d";
 
     //public final static Message MESSAGE = new Message("-->PrimitiveComponentD");
     public final static String I2_ITF_NAME = "i2";
@@ -29,6 +29,7 @@ public class PrimitiveComponentD implements I1, BindingController {
     // typed collective interface
     I2 i2 = (I2) Fractive.createCollectiveClientInterface(I2_ITF_NAME,
             I2.class.getName());
+
     // ref on the Group
     Group i2Group = ProActiveGroup.getGroup(i2);
 
@@ -81,8 +82,11 @@ public class PrimitiveComponentD implements I1, BindingController {
         if (clientItf.equals(I2_ITF_NAME)) {
             return i2;
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("cannot find " + I2_ITF_NAME + " interface");
+            if (logger
+                                   .isDebugEnabled()) {
+                logger
+                               .debug("cannot find " + I2_ITF_NAME +
+                    " interface");
             }
             return null;
         }
@@ -96,8 +100,10 @@ public class PrimitiveComponentD implements I1, BindingController {
             IllegalLifeCycleException {
         if (clientItf.equals(I2_ITF_NAME)) {
             i2Group.clear();
-            if (logger.isDebugEnabled()) {
-                logger.debug(I2_ITF_NAME + " interface unbound");
+            if (logger
+                                   .isDebugEnabled()) {
+                logger
+                               .debug(I2_ITF_NAME + " interface unbound");
             }
         } else {
             logger.error("client interface not found");
