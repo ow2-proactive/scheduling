@@ -33,14 +33,14 @@ package org.objectweb.proactive.core.body.migration;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 
 
-public class MigratableBody extends BodyImpl implements Migratable,
+public class MigratableBody extends ComponentBodyImpl implements Migratable,
     java.io.Serializable {
     protected static Logger logger = Logger.getLogger(MigratableBody.class.getName());
 
