@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="synchronization.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="dining_philosophers.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a> 
+    </td>
+  </tr>
+</table>
+<hr>
+<h2>The readers-writers</h2>
+<p>The readers and the writers want to access the same data. In order to allow 
+  concurrency while ensuring the consistency of the readings, accesses to the 
+  data have to be synchronized upon a specified policy. Thanks to ProActive, the 
+  accesses are guaranteed to be allowed sequentially.<br>
+</p>
+<p>The<a href="http://www-sop.inria.fr/oasis/ProActive/apps/readers.html"> implementation 
+  with ProActive</a> uses 3 active objects : Reader, Writer, and the controller 
+  class (ReaderWriter).</p>
+<p>&nbsp;</p>
+<h3>1. start the application</h3>
+<p>using the readers script</p>
+<p><img src="pics/screenshots/readers_console.jpg" width="668" height="331"></p>
+<p> <span class="legend">ProActive starts a node (i.e. a JVM) on the current machine, 
+  and creates 3 Writer, 3 Reader, a ReaderWriter (the controller of the application) 
+  and a ReaderDisplay, that are active objects</span>.</p>
+<p><img src="pics/screenshots/readers_app.jpg"> </p>
+<p><span class="legend">a GUI is started that illustrates the activities of the 
+  Reader and Writer objects.</span></p>
+  <p></p>
+<h3>2. look and check the effect of different policies : even, writer priority, 
+  reader priority</h3>
+<p>What happens when priority is set to &quot;reader priority&quot; ?</p>
+<p>&nbsp;</p>
+<h3>3. look at the code for programming such policies</h3>
+<p> in <code>org.objectweb.proactive.examples.readers.ReaderWriter.java</code></p>
+<p>More specifically, look at the routines in :</p>
+<p class="codeexample">public void evenPolicy(org.objectweb.proactive.Service 
+  service)</p>
+<p class="codeexample">public void readerPolicy(org.objectweb.proactive.Service 
+  service)</p>
+<p class="codeexample">public void writerPolicy(org.objectweb.proactive.Service 
+  service)</p>
+<p>Look at the inner class <code>MyRequestFilterm</code> that implements <code>org.objectweb.proactive.core.body.request.RequestFilter</code></p>
+<p>How does it work?</p>
+<p>&nbsp;</p>
+<h3>4. Introduce a bug in the Writer Priority policy</h3>
+<p>For instance, let several writers go through at the same time.</p>
+<p>- observe the Writer Policy policy before recompiling</p>
+<p>- recompile (using compile.sh readers or compile.bat readers)</p>
+<p>- observe that stub classes are regenerated and recompiled</p>
+<p>- observe the difference due to the new synchronization policy : what happens 
+  now?</p>
+<p>- correct the bug and recompile again ; check that everything is back to normal</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="parallel_processing.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="migration.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a> 
+    </td>
+  </tr>
+</table>
+<hr>
+<h2>C3D : a parallel, distributed and collaborative 3D renderer</h2>
+<p class="textNormal"><a href="http://www-sop.inria.fr/oasis/ProActive/apps/c3d.html">C3D</a> 
+  is a Java benchmark application that measures the performance of a 3D raytracer 
+  renderer distributed over several Java virtual machines using Java RMI. It showcases 
+  some of the benefits of ProActive, notably the ease of distributed programming, 
+  and the speedup through parallel calculation.</p>
+<p class="textNormal">Several users can collaboratively view and manipulate a 
+  3D scene. The image of the scene is calculated by a dynamic set of rendering 
+  engines using a raytracing algorithm, everything being controlled by a central 
+  dispatcher.</p>
+<p class="textNormal"><img src="pics/hello/c3d.gif" width="550" height="295"></p>
+<p class="legend">the active objects in the c3d application</p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">1. start C3D</h3>
+<p class="textNormal">using the script c3d_no_user</p>
+<p class="textNormal">A &quot;Dispatcher&quot; object is launched (ie a centralized 
+  server) as well as 4 &quot;Renderer&quot; objects, that are active objects to 
+  be used for parallel rendering.</p>
+<p class="textNormal"><img src="pics/screenshots/c3d_renderers_consoles.jpg" width="670" height="582"></p>
+<p class="textNormal"><span class="legend"> the 4 renderers are launched</span></p>
+<p class="textNormal"><img src="pics/screenshots/c3d_dispatcher_app.jpg" width="296" height="563"></p>
+<p class="textNormal"><span class="legend"> the dispatcher GUI is launched</span></p>
+<p class="textNormal">The bottom part of the window allows the addition and removal 
+  of renderers.</p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">2. start a user</h3>
+<p class="textNormal">using c3d_add_user</p>
+<p class="textNormal">- connect on the current host (proposed by default) by just 
+  giving your name</p>
+<p class="textNormal"><img src="pics/screenshots/c3d_user_alice.jpg" width="622" height="578"></p>
+<p class="textNormal"><span class="legend"> for example the user &quot;alice&quot;</span></p>
+<p class="textNormal">- spin the scene, add a random sphere, and observe how the 
+  action takes place immediately</p>
+<p class="textNormal">- add and remove renderers, and observe the effect on the 
+  &quot;speed up&quot; indication from the user window.</p>
+<p class="textNormal">Which configuration is the fastest for the rendering?</p>
+<p class="textNormal">Are you on a multi-processor machine?</p>
+<p class="textNormal"><em>* you might not perceive the difference of the performance. 
+  The difference is better seen with more distributed nodes and objects (for example 
+  on a cluster with 30+ renderers).</em></p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">3. start a user from another machine</h3>
+<p class="textNormal">using the c3d_add_user script, and <u>specifying the host</u> 
+  (NOT set by default)</p>
+<p class="textNormal"><img src="pics/screenshots/c3d_specify_host.jpg" width="395" height="248"></p>
+<p class="textNormal">If you use rlogin, make sure the DISPLAY is properly set.</p>
+<p class="textNormal">You must use the same version of ProActive on both machines!</p>
+<p class="textNormal">- test the collaborative behavior of the application when 
+  several users are connected.</p>
+<p class="textNormal">Notice that a collaborative consensus must be reached before 
+  starting some actions (or that a timeout occured).</p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">4. start IC2D to visualize the topology</h3>
+<p class="textNormal">- to visualize all Active objects, you need to acquire (&quot;monitoring&quot; 
+  menu) : </p>
+<blockquote> 
+  <blockquote> 
+    <p class="textNormal"> - the machine on which you started the &quot;Dispatcher&quot;</p>
+    <p class="textNormal">- the machine on which you started the second user</p>
+  </blockquote>
+</blockquote>
+<p class="textNormal"><img src="pics/screenshots/c3d_topology_with_new_user.jpg" width="1084" height="600"></p>
+<p class="textNormal">- add random spheres for instance, and observe messages 
+  (Requests) between Active Objects.</p>
+<p class="textNormal">- add and remove renderers, and check graphically whether 
+  the corresponding Active Objects are contacted or not, in order to achieve the 
+  rendering.</p>
+<p class="textNormal">- you can textually visualize this information activating 
+  &quot;add event timeline for this WorldObject&quot; on the World panelm with 
+  the right button, and then &quot;show the event list window&quot; on the top 
+  menu window</p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">5. drag-and-drop migration</h3>
+<p class="textNormal">- from IC2D, you can drag-and-drop active objects from one 
+  JVM to another. Click the right button on a C3DRenderingEngine, and drag and 
+  drop it in another JVM. Observe the migration taking place.</p>
+<p class="textNormal">- add a new sphere, using all rendering engines, and check 
+  that the messages are still sent to the active object that was asked to migrate.</p>
+<p class="textNormal">- as migration and communications are implemented in a fully 
+  compatible manner, you can even migrate with IC2D an active object while it 
+  is communicating (for instance when a rendering action is in progress). Give 
+  it a try!</p>
+<p><strong><em>Since version 1.0.1 of the C3D example, you can also migrate the client windows!</em></strong></p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">6. start a new JVM in a computation</h3>
+<p class="textNormal"> manually you can start a new JVM - a &quot;Node&quot; in 
+  the ProActive terminology - that will be used in a running system.</p>
+<p class="textNormal">- on a different machine, or by remote login on another 
+  host, start another Node, named for instance NodeZ :</p>
+<blockquote> 
+  <blockquote> 
+    <p><span class="textNormal">under linux : </span><code>startNode.sh rmi://mymachine/NodeZ 
+      &amp; (or startNode.bat rmi://mymachine/NodeZ)</code></p>
+  </blockquote>
+</blockquote>
+<p class="textNormal">The node should appear in IC2D when you request the monitoring 
+  of the new machine involved (Monitoring menu, then &quot;monitor new RMI host&quot;.</p>
+<p class="textNormal">- the node just started has no active object running in 
+  it. Drag and drop on of the renderers, and check that the node is now taking 
+  place in the computation :</p>
+<blockquote> 
+  <blockquote> 
+    <p class="textNormal">- spin the scene to trigger a new rendering</p>
+    <p class="textNormal">- see the topology</p>
+  </blockquote>
+</blockquote>
+<p class="textNormal"><em>* if you feel uncomfortable with the automatic layout, 
+  switch to manual using the &quot;manual layout&quot; option (right click on 
+  the World panel). You can then reorganize the layout of the machines.</em></p>
+<p class="textNormal">- to fully distribute the computation, start several nodes 
+  (you need 2 more) and drag-and drop renderers in them.</p>
+<p class="textNormal">Depending on the machines you have, the complexity of the 
+  image, look for the most efficient configuration.</p>
+<p class="textNormal">&nbsp;</p>
+<h3 class="textNormal">7. have a look at the source code for the main classes 
+  of this application :</h3>
+<p class="codeexample"><code>org.objectweb.proactive.examples.c3d.C3DUser.java</code></p>
+<p class="codeexample"><code>org.objectweb.proactive.examples.c3d.C3DRenderingEngine.java</code></p>
+<p class="codeexample"><code>org.objectweb.proactive.examples.c3d.C3DDispatcher.java</code></p>
+<blockquote> 
+  <p class="textNormal">look at the method public void processRotate(org.objectweb.proactive.Body 
+    body, String methodName, Request r) that handles election of the next action 
+    to undertake.</p>
+</blockquote>
+<p align="right" class="textNormal">&nbsp;</p>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="readers_writers.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="parallel_processing.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a> 
+    </td>
+  </tr>
+</table>
+<hr>
+<h2>The dining philosophers</h2>
+<p class="textNormal">The &quot;dining philosophers&quot; problem is a classical 
+  exercise in the teaching of concurrent programming. The goal is to avoid deadlocks. 
+</p>
+<p class="textNormal">We have provided <a href="http://www-sop.inria.fr/oasis/ProActive/apps/phil.html">an 
+  illustration of the solution</a> using ProActive, where all the philosophers 
+  are active objects, as well as the table (controller) and the dinner frame (user 
+  interface).</p>
+<p class="textNormal">&nbsp;</p>
+<h3>1. start the philosophers application</h3>
+<p>with philosophers.sh or philosophers.bat</p>
+<p><img src="pics/screenshots/philosophers_console.jpg" width="668" height="331"></p>
+<p><span class="legend"> ProActive creates a new node and instanciates the active 
+  objects of the application : DinnerLayout, Table, and Philosopher</span></p>
+<p><img src="pics/screenshots/philosophers_app.jpg" width="450" height="550"></p>
+<p><span class="legend"> the GUI is started.</span></p>
+<h3>2. understand the color codes</h3>
+<table width="75%" border="0">
+  <tr> 
+    <td rowspan="3"><div align="right"><strong>Philosophers</strong></div></td>
+    <td><div align="center"><strong><img src="pics/think.gif" width="30" height="30"></strong></div></td>
+    <td><strong>philosophing</strong></td>
+  </tr>
+  <tr> 
+    <td><div align="center"><strong><img src="pics/wait.gif" width="30" height="30"></strong></div></td>
+    <td><strong>hungry, wants the fork !</strong></td>
+  </tr>
+  <tr> 
+    <td><div align="center"><strong><img src="pics/eat.gif" width="30" height="30"></strong></div></td>
+    <td><strong>eating</strong></td>
+  </tr>
+  <tr> 
+    <td rowspan="2"><div align="right"><strong>Forks</strong></div></td>
+    <td><div align="center"><strong><img src="pics/fork1.gif" width="30" height="30"></strong></div></td>
+    <td><strong>taken</strong></td>
+  </tr>
+  <tr> 
+    <td><div align="center"><strong><img src="pics/fork0.gif" width="30" height="30"></strong></div></td>
+    <td><strong>free</strong></td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<h3>3. test the autopilot mode</h3>
+<p class="textNormal">The application runs by itself without encountering a deadlock.</p>
+<p class="textNormal">&nbsp;</p>
+<h3>4. test the manual mode</h3>
+<p class="textNormal">Click on the philosophers' heads to switch their modes</p>
+<p class="textNormal">Test that there are no deadlocks!</p>
+<p class="textNormal">Test that you can starve one of the philosophers (i.e. the 
+  others alternate eating and thinking while one never eats!)</p>
+<p class="textNormal">&nbsp;</p>
+<h3>5. start the IC2D application</h3>
+<p><a href="http://www-sop.inria.fr/oasis/ProActive/IC2D/index.html">IC2D</a> 
+  is a graphical environment for monitoring and steering of distributed and metacomputing 
+  applications.</p>
+<p class="textNormal">- being in the autopilot mode, start the IC2D visualization 
+  application (using ic2d.sh or ic2d.bat)</p>
+<p class="textNormal"><img src="pics/screenshots/ic2d_console.jpg" width="668" height="331"></p>
+<p class="textNormal">&nbsp;</p>
+<p class="textNormal"><img src="pics/screenshots/jc2d_main_panel.jpg"></p>
+<p class="textNormal"><img src="pics/screenshots/ic2d_evt_listener_panel.jpg"></p>
+<p class="textNormal"><span class="legend"> the ic2d GUI is started. It is composed 
+  of 2 panels : the main panel and the events list panel</span></p>
+<p class="textNormal">- acquire you current machine </p>
+<blockquote> 
+  <blockquote> 
+    <p class="textNormal"><em>menu monitoring - monitor new RMI host</em></p>
+    <p class="textNormal"><em><img src="pics/screenshots/monitor_new_rmi_host_menu.jpg" width="280" height="245"></em></p>
+  </blockquote>
+  <p class="textNormal">look at the active objects, and at the topology</p>
+  <p class="textNormal"><img src="pics/screenshots/ic2d_monitor_local_host.jpg" width="850" height="600"></p>
+</blockquote>
+<p class="textNormal">&nbsp;</p>
+<blockquote> 
+  <p class="textNormal">&nbsp;</p>
+  </blockquote>
+</body>
+</html>

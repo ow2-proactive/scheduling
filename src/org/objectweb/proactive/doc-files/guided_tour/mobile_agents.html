@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../ProActive.css">
+</head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="migration.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="conclusion.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a href="http://www-sop.inria.fr/oasis/ProActive/"><img src="../ProActiveLogo200x34.gif" width="200" height="34" border="0"/></a> 
+    </td>
+  </tr>
+</table>
+<hr>
+<h2>Mobile agents</h2>
+<p class="textNormal">This example shows a set of <a href="http://www-sop.inria.fr/oasis/ProActive/apps/penguin.html">mobile 
+  agents</a> moving around while still communicating with their base and with 
+  each other. It also features the capability to move a swing window between screens 
+  while moving an agent from one JVM to the other.</p>
+<h3 class="textNormal">1. start the penguin application</h3>
+<p class="textNormal">using the <code>penguin</code> script.</p>
+<h3 class="textNormal">2. start IC2D to see what is going on</h3>
+<p class="textNormal">using the <code>ic2d</code> script</p>
+<p class="textNormal"> acquire the machines you have started nodes on</p>
+<h3 class="textNormal">3. add an agent</h3>
+<p class="textNormal"> - on the Advanced Penguin Controller window : button &quot;add 
+  agent&quot;</p>
+<p class="textNormal"><img src="pics/screenshots/penguin.jpg" width="146" height="204"></p>
+<p class="textNormal"><span class="legend"> an agent is materialized by a picture 
+  in a java window.</span></p>
+<p class="textNormal">- select it, and press button &quot;start&quot;</p>
+<p class="textNormal"> - observe that the active object is moving between the 
+  machines, and that the penguin window disappears and reappears on the screen 
+  associated with the new JVM.</p>
+<h3 class="textNormal">4. add several agents</h3>
+<p class="textNormal">after selecting them, use the buttons to :</p>
+<blockquote> 
+  <p class="textNormal">- communicate with them (&quot;chained calls&quot;)</p>
+  <p class="textNormal">- start, stop, resume them</p>
+  <p class="textNormal">- trigger a communication between them (&quot;call another 
+    agent&quot;)</p>
+</blockquote>
+<h3 class="textNormal">5. move the control window to another user </h3>
+<p class="textNormal">- start a node on a different computer, using another screen 
+  and keyboard</p>
+<p class="textNormal">- monitor the corresponding JVM with IC2D</p>
+<p class="textNormal">- drag-and-drop the active object &quot;AdvancedPenguinController&quot; 
+  with IC2D into the newly created JVM : the control window will appear on the 
+  other computer and its user can now control the penguins application.</p>
+<p class="textNormal">- still with IC2D, doing a drag-and-drop back to the original 
+  JVM, you will be able to get back the window, and control yourself the application.</p>
+<p class="textNormal">&nbsp;</p>
+</body>
+</html>
