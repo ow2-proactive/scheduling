@@ -33,21 +33,28 @@
 
 package org.objectweb.proactive.core.process.globus;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.globus.gram.GramException;
+import org.globus.gram.GramJob;
+import org.globus.gram.GramJobListener;
+import org.globus.io.gass.server.GassServer;
+import org.globus.io.gass.server.JobOutputListener;
+import org.globus.io.gass.server.JobOutputStream;
+import org.globus.rsl.Binding;
+import org.globus.rsl.Bindings;
+import org.globus.rsl.NameOpValue;
+import org.globus.rsl.RSLParser;
+import org.globus.rsl.RslNode;
+import org.globus.rsl.Value;
+import org.globus.rsl.VarRef;
+import org.globus.security.GlobusProxy;
+import org.globus.security.GlobusProxyException;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
-import org.objectweb.proactive.core.process.AbstractUniversalProcess;
-import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.util.MessageLogger;
 import org.objectweb.proactive.core.util.UrlBuilder;
-import org.globus.gram.*;
-import org.globus.mds.*;
-import org.globus.security.*;
-import org.globus.io.gass.server.*;
-import org.globus.rsl.*;
-import org.globus.util.deactivator.*;
-import java.net.*;
-import java.util.*;
 
 
 /**
@@ -135,11 +142,12 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   	super();
     setCompositionType(GIVE_COMMAND_AS_PARAMETER);
     this.hostname = null;
-    try {
-      proxy = GlobusProxy.getDefaultUserProxy();
-    } catch (GlobusProxyException e){
-      System.out.println("Cannot get the proxy:"+e.getMessage());	
-    }
+//    try {
+//    	System.out.println("in constructor...");
+//     // proxy = GlobusProxySerializable.getDefaultUserProxy();
+//    } catch (GlobusProxyException e){
+//      System.out.println("Cannot get the proxy:"+e.getMessage());	
+//    }
     this.globusHostAdviser = new GlobusHostAdviser();
   }
   
@@ -148,11 +156,11 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   	super(process,GIVE_COMMAND_AS_PARAMETER);
   	this.jvmProcess = (JVMProcessImpl)targetProcess;
   	this.hostname = null;
-    try {
-      proxy = GlobusProxy.getDefaultUserProxy();
-    } catch (GlobusProxyException e){
-      System.out.println("Cannot get the proxy:"+e.getMessage());	
-    }
+//    try {
+//      //proxy = (GlobusProxySerializable) GlobusProxySerializable.getDefaultUserProxy();
+//    } catch (GlobusProxyException e){
+//      System.out.println("Cannot get the proxy:"+e.getMessage());	
+//    }
     this.globusHostAdviser = new GlobusHostAdviser();
   }
 
@@ -259,7 +267,8 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
 
   
   protected void internalStartProcess(String rslCommand) throws java.io.IOException{
-   	startGlobusProcess( rslCommand, this.hostname);
+   //	startGlobusProcess( rslCommand, this.hostname);
+   		startGlobusProcessWithoutOutput(rslCommand,this.hostname);
   }
 
 //  protected String buildCommand(){
@@ -407,15 +416,22 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   public void startGlobusProcess (String rslCommand,String aHost){
 
     MyJobListener jobListener = new MyJobListener();
+    
 
 //    String contact= aHost + ":" + globusHostAdviser.giveGramPort(aHost);
-		String contact= aHost + ":" + this.gramPort;
+	String contact= aHost + ":" + this.gramPort;
     String finalRSL;
 
     JobOutputStream jos;
+    try {
+      proxy = GlobusProxy.getDefaultUserProxy();
+    } catch (GlobusProxyException e){
+      System.out.println("Cannot get the proxy:"+e.getMessage());	
+    }
 
     try{
       rslTree= RSLParser.parse(rslCommand);
+     
       gassServer  = new GassServer(proxy,0);
       rslOutputSubst(rslTree, gassServer.getURL());
       gassServer.setOptions(GassServer.STDOUT_ENABLE|GassServer.STDERR_ENABLE);
