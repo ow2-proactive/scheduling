@@ -32,11 +32,21 @@ public class ProcessForAsyncCall implements Runnable {
 	}
 
 	public synchronized void run() {
-		try {
-				LocalBodyStore.getInstance().setCurrentThreadBody(body);
-				proxyGroup.addToListOfResult(memberListOfResultGroup, ((StubObject) (memberList.get(index))).getProxy().reify(mc), index);
-		} catch (Throwable e) {
-			e.printStackTrace();
+		Object object = this.memberList.get(this.index);
+		LocalBodyStore.getInstance().setCurrentThreadBody(body);
+		/* only do the communication (reify) if the object is not an error nor an exception */ 
+		if (!(object instanceof Throwable)) {
+			try {
+				/* add the return value into the result group */
+				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object).getProxy().reify(this.mc), this.index);
+			} catch (Throwable e) {
+				/* when an exception occurs, put it in the result group instead of the (unreturned) value */ 
+				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,e,this.index);
+			}
+		}
+		else {
+			/* when there is a Throwable instead of an Object, a methos call is impossible, add null to the result group */
+			this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,null,this.index);
 		}
 	}
 }

@@ -17,22 +17,27 @@ public class ProcessForOneWayCall implements Runnable {
 	private int index;
 	private MethodCall mc;
 	private Body body;
+	private ExceptionList exceptionList;
 
-	public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList, int index, MethodCall mc, Body body) {
+	public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList, int index, MethodCall mc, Body body, ExceptionList exceptionList) {
 		this.proxyGroup = proxyGroup;
 		this.memberList = memberList;
 		this.index = index;
 		this.mc = mc;
 		this.body = body;
+		this.exceptionList = exceptionList;
 	}
 
 	public synchronized void run() {
+		LocalBodyStore.getInstance().setCurrentThreadBody(body);
+		Object object = this.memberList.get(this.index);
 		try {
-				LocalBodyStore.getInstance().setCurrentThreadBody(body);
-				((StubObject) (memberList.get(index))).getProxy().reify(mc);
-				proxyGroup.decrementWaitedAndNotifyAll();
+			((StubObject) object).getProxy().reify(this.mc);
 		} catch (Throwable e) {
-			e.printStackTrace();
+			this.exceptionList.add(new ExceptionInGroup(object,e));
+		}
+		finally {
+			this.proxyGroup.decrementWaitedAndNotifyAll();			
 		}
 	}
 }

@@ -130,7 +130,6 @@ public interface Group extends java.util.Collection {
 	 */
 	public int waitOneAndGetIndex();
 
-
 	/**
 	 * Checks if all the members of the Group are awaited.
 	 * @return <code>true</code> if all the members of the Group are awaited.
@@ -142,5 +141,20 @@ public interface Group extends java.util.Collection {
 	 * @return <code>true</code> if all the members of the Group are arrived.
 	 */
 	public boolean allArrived();
+	
+	/**
+	 * Returns an ExceptionList containing all the throwables (exceptions and errors) occured
+	 * when this group was built
+	 * @return an ExceptionList
+	 */
+	public ExceptionList getExceptionList();
+
+	/**
+	 * Removes all exceptions and null references contained in the Group. 
+	 * Exceptions (and null references) appears with communication/program-level/runtime errors
+	 * and are stored in the Group.
+	 * (After this operation the size of the Group decreases)
+	 */
+	public void purgeExceptionAndNull ();
     
 }

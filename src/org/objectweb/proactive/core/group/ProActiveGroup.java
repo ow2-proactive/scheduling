@@ -90,7 +90,7 @@ public class ProActiveGroup {
      * @return the Group corresponding to <code>o</code>.
      */
     public static Group getGroup(Object o) {
-		return findProxyForGroup(o);
+		return ProActiveGroup.findProxyForGroup(o);
     }
     
     /**
@@ -100,7 +100,7 @@ public class ProActiveGroup {
      * @return the name class of the typed group 
      */
 	public static String getType (Object o) {
-		ProxyForGroup tmp = findProxyForGroup(o);
+		ProxyForGroup tmp = ProActiveGroup.findProxyForGroup(o);
 		if (tmp != null)
 			return tmp.getTypeName();
 		else
@@ -123,6 +123,10 @@ public class ProActiveGroup {
 	
 	try {
 	    result = MOP.newInstance (className, null, DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+
+		ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup)((StubObject)result).getProxy();
+		proxy.className = className;
+		proxy.stub = (StubObject)result;
  	}
  	catch (ClassNotReifiableException e) {
  		if (logger.isInfoEnabled()) logger.info("**** ClassNotReifiableException ****"); }
@@ -132,10 +136,6 @@ public class ProActiveGroup {
 		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfProxyObjectFailedException ****"); }
  	catch (ConstructionOfReifiedObjectFailedException e) {
 		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfReifiedObjectFailedException ****"); }
-
-	ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup)((StubObject)result).getProxy();
-	proxy.className = className;
-	proxy.stub = (StubObject)result;
 
 	return result;
     }
@@ -156,7 +156,7 @@ public class ProActiveGroup {
     public static Object newGroup(String className, Object[][] params, Node[] nodeList)
 	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
 
-	Object result = newGroup(className);
+	Object result = ProActiveGroup.newGroup(className);
 	Group g = ProActiveGroup.getGroup(result);
 
 	for (int i=0 ; i < params.length ; i++)
@@ -182,7 +182,7 @@ public class ProActiveGroup {
 		Node[] nodeList = new Node[nodeListString.length]; 
 		for (int i = 0 ; i < nodeListString.length ; i++)
 			nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-		return newGroup(className, params, nodeList);
+		return ProActiveGroup.newGroup(className, params, nodeList);
 	}
 
 
@@ -250,7 +250,7 @@ public class ProActiveGroup {
     public static Object newGroupBuildWithMultithreading(String className, Object[][] params, String[] nodeList)
 	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
 
-	Object result = newGroup(className);
+	Object result = ProActiveGroup.newGroup(className);
 	ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
 	proxy.initSize(params.length);
@@ -282,7 +282,7 @@ public class ProActiveGroup {
 		String[] nodeListString = new String[nodeList.length];
 		for (int i = 0 ; i < nodeList.length ; i++)
 			nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-	 	return newGroupBuildWithMultithreading(className, params, nodeListString);
+	 	return ProActiveGroup.newGroupBuildWithMultithreading(className, params, nodeListString);
 	 }
 
    
@@ -292,7 +292,7 @@ public class ProActiveGroup {
      */
     public static void waitAll(Object o) {
 		if (MOP.isReifiedObject (o)) {
-	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAll();
@@ -308,7 +308,7 @@ public class ProActiveGroup {
      */
     public static void waitOne(Object o) {
 		if (MOP.isReifiedObject (o)) {
-	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOne();
@@ -325,7 +325,7 @@ public class ProActiveGroup {
 	 */
     public static void waitN(Object o, int n) {
 		if (MOP.isReifiedObject (o)) {
-		    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+		    org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitN(n);
@@ -346,7 +346,7 @@ public class ProActiveGroup {
 		if (!(MOP.isReifiedObject (o)))
 		    return false;
 		else {
-	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 			return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allAwaited();
@@ -368,7 +368,7 @@ public class ProActiveGroup {
 		if (!(MOP.isReifiedObject (o)))
 		    return true;
 		else {
-	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allArrived();
@@ -386,7 +386,7 @@ public class ProActiveGroup {
      */
     public static Object waitAndGetOne (Object o) {
 		if (MOP.isReifiedObject (o)) {
-	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
 	    	if (theProxy != null)
 				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOne();
@@ -406,7 +406,7 @@ public class ProActiveGroup {
      */
     public static void waitTheNth (Object o, int n) {
 		if (MOP.isReifiedObject (o)) {
-		    org.objectweb.proactive.core.mop.Proxy theProxy  = findProxyForGroup(o);
+		    org.objectweb.proactive.core.mop.Proxy theProxy  = ProActiveGroup.findProxyForGroup(o);
 		    // If the object represents a group, we use the proxyForGroup's method
  	    	if (theProxy != null)
 				((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitTheNth(n);
@@ -423,7 +423,7 @@ public class ProActiveGroup {
      */
     public static Object waitAndGetTheNth (Object o, int n) {
 		if (MOP.isReifiedObject (o)) {
-			org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+			org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 	    	// If the object represents a group, we use the proxyForGroup's method
 	    	if (theProxy != null)
 				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetTheNth(n);
@@ -443,7 +443,7 @@ public class ProActiveGroup {
 	 */
 	public int waitOneAndGetIndex(Object o) {
 		if (MOP.isReifiedObject (o)) {
-			org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+			org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 			// If the object represents a group, we use the proxyForGroup's method
 			if (theProxy != null)
 				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOneAndGetIndex();
@@ -464,7 +464,7 @@ public class ProActiveGroup {
 	 * @return the number of member of the typed group <code>o</code>.
      */
     public static int size (Object o) {
-    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 		if (theProxy == null)
 		    throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
 		else
@@ -480,7 +480,7 @@ public class ProActiveGroup {
 	 * @return the member of the typed group at the rank <code>n</code>
      */
     public static Object get (Object o, int n) {
-    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 		if (theProxy == null)
 		    return null;
 		else 
@@ -502,7 +502,7 @@ public class ProActiveGroup {
      * @param <code>ogroup</code> the typed group who will change his semantic of communication.
      */
     public static void setScatterGroup(Object ogroup) {
-		Proxy proxytmp = findProxyForGroup(ogroup);
+		Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
 		if (proxytmp != null)
 			((ProxyForGroup)proxytmp).setDispatchingOn();
     }
@@ -512,7 +512,7 @@ public class ProActiveGroup {
      * @param <code>ogroup</code> the typed group who will change his semantic of communication.
      */
     public static void unsetScatterGroup(Object ogroup) {
- 		Proxy proxytmp = findProxyForGroup(ogroup);
+ 		Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
 		if (proxytmp != null)
 			((ProxyForGroup)proxytmp).setDispatchingOff();
    }
@@ -522,7 +522,7 @@ public class ProActiveGroup {
 	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
 	*/
    public static void setUniqueSerialization(Object ogroup) {
-	   Proxy proxytmp = findProxyForGroup(ogroup);
+	   Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
 	   if (proxytmp != null)
 		   ((ProxyForGroup)proxytmp).setUniqueSerializationOn();
    }
@@ -532,7 +532,7 @@ public class ProActiveGroup {
 	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
 	*/
    public static void unsetUniqueSerialization(Object ogroup) {
-	   Proxy proxytmp = findProxyForGroup(ogroup);
+	   Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
 	   if (proxytmp != null)
 		   ((ProxyForGroup)proxytmp).setUniqueSerializationOff();
   }
@@ -544,7 +544,7 @@ public class ProActiveGroup {
      * @return <code>true</code> if the "scatter option" is enabled for the typed group <code>ogroup</code>.
      */
     public static boolean isScatterGroupOn (Object ogroup) {
- 		Proxy proxytmp = findProxyForGroup(ogroup);
+ 		Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
 		if (proxytmp != null)
 			return ((ProxyForGroup)proxytmp).isDispatchingOn();
 		else return false;

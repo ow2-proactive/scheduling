@@ -278,7 +278,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 */
 	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object result, int index) {
 		memberListOfResultGroup.set(index, result);
-		decrementWaitedAndNotifyAll();
+		this.decrementWaitedAndNotifyAll();
 	}
 
 
@@ -289,14 +289,15 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @param <code>mc</code> the MethodCall to be applied on each member of the Group.
 	 */
 	protected synchronized void oneWayCallOnGroup(MethodCall mc) {
-		Body body = ProActive.getBodyOnThis();		
+		Body body = ProActive.getBodyOnThis();	
+		ExceptionList exceptionList = new ExceptionList();	
 		// Creating Threads
 
 		if (isDispatchingCall(mc) == false) {
 			if (uniqueSerialization)
 				mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
-				this.createThreadForOneWay(this.memberList, index, mc, body);
+				this.createThreadForOneWay(this.memberList, index, mc, body, exceptionList);
 		}
 		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
@@ -306,11 +307,15 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
-				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body);
+				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body, exceptionList);
 			}
 		}
 
 		LocalBodyStore.getInstance().setCurrentThreadBody(body);
+		
+		if (exceptionList.size() != 0) {
+			throw exceptionList;
+		}
 	}
 	
 	/**
@@ -320,8 +325,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @param <code>mc</code> the MethodCall object to transmit to the member
 	 * @param <code>body</code> the body who have initiate the call.
 	 */
-	private synchronized void createThreadForOneWay(Vector memberList, int index, MethodCall mc, Body body) {
-		new Thread(new ProcessForOneWayCall(this,memberList, index, mc, body)).start();
+	private synchronized void createThreadForOneWay(Vector memberList, int index, MethodCall mc, Body body, ExceptionList exceptionList) {
+		new Thread(new ProcessForOneWayCall(this,memberList, index, mc, body, exceptionList)).start();
 		this.waited++;
 	}
 
@@ -708,6 +713,19 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 	/**
+	 * Waits that at least one member is arrived and returns its index.
+	 * @return the index of a non-awaited member of the Group.
+	 */
+	public int waitOneAndGetIndex() {
+		int index = 0;
+		this.memberList.get(ProActive.waitForAny(this.memberList));
+		while (ProActive.isAwaited(this.memberList.get(index))) {
+			index++;
+		}
+		return index;
+	}
+
+	/**
 	 * Checks if all the members of the Group are awaited.
 	 * @return <code>true</code> if all the members of the Group are awaited.
 	 */
@@ -730,17 +748,30 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 	/**
-	 * Waits that at least one member is arrived and returns its index.
-	 * @return the index of a non-awaited member of the Group.
+	 * Returns an ExceptionList containing all the throwables (exceptions and errors) occured
+	 * when this group was built
+	 * @return an ExceptionList
 	 */
-	public int waitOneAndGetIndex() {
-		int index = 0;
-		this.memberList.get(ProActive.waitForAny(this.memberList));
-		while (ProActive.isAwaited(this.memberList.get(index))) {
-			index++;
-		}
-		return index;
+	public ExceptionList getExceptionList() {
+		ExceptionList exceptionList = new ExceptionList();
+		for (int i = 0 ; i < this.memberList.size() ; i++)
+			if (this.memberList.get(i) instanceof Throwable)
+				exceptionList.add(new ExceptionInGroup(null, (Throwable) this.memberList.get(i)));
+		return exceptionList;
 	}
+
+	/**
+	 * Removes all exceptions and null references contained in the Group. 
+	 * Exceptions (and null references) appears with communication/program-level/runtime errors
+	 * and are stored in the Group.
+	 * (After this operation the size of the Group decreases)
+	 */
+	public void purgeExceptionAndNull() {
+		for (int i = 0 ; i < this.memberList.size() ; i++)
+			if ((this.memberList.get(i) instanceof Throwable) || (this.memberList.get(i) == null))
+				this.memberList.remove(i);
+	}
+
 
 	/* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 

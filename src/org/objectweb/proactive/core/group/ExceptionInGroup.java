@@ -31,51 +31,42 @@
 package org.objectweb.proactive.core.group;
 
 /**
- * This class gives to it implementors the ability to contact the other members of the group containting the object.
- *  
+ * This class represents an throwable occured in a group communication.
+ * 
  * @author Laurent Baduel
  */
-public abstract class GroupMember implements java.io.Serializable {
+public class ExceptionInGroup extends RuntimeException {
 
-	/** the group of the object */
-	protected Object myGroup = null;
-	/** index of the object into the Group */
-	protected int myRank;
-
+	/** The Object who thrown the Throwable */
+	private Object object;
+	/** The Throwable thrown */
+	private Throwable throwable;
 	
 	/**
-	 * Returns the group of the object.
-	 * @return the group of the object
-	 * @throws Exception
+	 * Built an ThrowableInGroup
+	 * @param object - the object who thrown the throwable (use null if the object is unknown)
+	 * @param throwable - the throwable thrown
 	 */
-	public Object getMyGroup() throws UnreachableGroupException {
-		if (this.myGroup == null)
-			throw new UnreachableGroupException();
-		return this.myGroup;
+	public ExceptionInGroup (Object object, Throwable throwable) {
+		this.object = object;
+		this.throwable = throwable; 
 	}
 	
+
 	/**
-	 * Specifies the group of the object.
-	 * @param <code>o</code> - a typed group 
+	 * Returns the object who thrown the Throwable
+	 * @return the object who thrown the Throwable
 	 */
-	public void setMyGroup(Object o) {
-		this.myGroup = o;
+	public Object getObject() {
+		return this.object;
 	}
 
 	/**
-	 * Returns the rank (position) of the object in the Group
-	 * @return the index of the object
+	 * Returns the Throwable thrown
+	 * @return the Throwable thrown
 	 */
-	public int getMyRank() {
-		return myRank;
-	}
-
-	/**
-	 * Specifies the rank (position) of the object in the Group
-	 * @param <code>index</code> - the index of the object
-	 */
-	public void setMyRank(int index) {
-		this.myRank = index;
+	public Throwable getThrowable() {
+		return this.throwable;
 	}
 
 }

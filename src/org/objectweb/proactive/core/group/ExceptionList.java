@@ -30,52 +30,57 @@
 */ 
 package org.objectweb.proactive.core.group;
 
+import java.util.Iterator;
+import java.util.Vector;
+
+
 /**
- * This class gives to it implementors the ability to contact the other members of the group containting the object.
- *  
+ * A list of the ExceptionInGroup occured in a group.
+ * 
  * @author Laurent Baduel
  */
-public abstract class GroupMember implements java.io.Serializable {
+public class ExceptionList extends RuntimeException {
 
-	/** the group of the object */
-	protected Object myGroup = null;
-	/** index of the object into the Group */
-	protected int myRank;
-
+	/** A vector implements the list */
+	private Vector list;
 	
+
 	/**
-	 * Returns the group of the object.
-	 * @return the group of the object
-	 * @throws Exception
-	 */
-	public Object getMyGroup() throws UnreachableGroupException {
-		if (this.myGroup == null)
-			throw new UnreachableGroupException();
-		return this.myGroup;
+	 * Builds a new empty list of exception
+	 */ 
+	public ExceptionList () {
+		this.list = new Vector();
 	}
 	
+
 	/**
-	 * Specifies the group of the object.
-	 * @param <code>o</code> - a typed group 
+	 * Adds an exception into this list 
+	 * @param exception - the exception to add
 	 */
-	public void setMyGroup(Object o) {
-		this.myGroup = o;
+	public void add (ExceptionInGroup exception) {
+		this.add(exception);
+	}
+	
+	/**
+	 * Removes all of the exceptions from this list.
+	 */
+	public void clear () {
+		this.list.clear();
+	}
+	
+	/**
+	 * Returns an iterator over the exceptions in this list in proper sequence.
+	 */
+	public Iterator iterator () {
+		return this.list.iterator();
 	}
 
 	/**
-	 * Returns the rank (position) of the object in the Group
-	 * @return the index of the object
+	 * Returns the number of exceptions in this list.
+	 * @return the number of exceptions in this list.
 	 */
-	public int getMyRank() {
-		return myRank;
-	}
-
-	/**
-	 * Specifies the rank (position) of the object in the Group
-	 * @param <code>index</code> - the index of the object
-	 */
-	public void setMyRank(int index) {
-		this.myRank = index;
+	public int size () {
+		return this.list.size();
 	}
 
 }
