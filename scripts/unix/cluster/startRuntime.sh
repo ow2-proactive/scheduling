@@ -3,7 +3,15 @@
 HOSTS=`echo $LSB_HOSTS | /usr/bin/tr [:blank:] "\n" | /bin/sort -u -m`
 echo "Hosts = $HOSTS"
 echo $HOSTS > hostsList
-CMD=`echo $1 $2 $3 $4 $5 $6 $7 $8 $9`
+
+ARGS=""
+for i in $@
+do
+    ARGS="$ARGS $i"
+done
+
+CMD=$(echo ${ARGS})
+
 echo "command = $CMD"
 nodesList=""
 
