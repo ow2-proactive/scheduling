@@ -280,11 +280,6 @@ public class ProActiveComponentRepresentativeImpl
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
         if (isControllerInterface(interfaceName)) {
-            if (Constants.BINDING_CONTROLLER.equals(interfaceName) &&
-                    !hasBindingController()) {
-                throw new NoSuchInterfaceException(
-                    "there is no binding controller in this component");
-            }
             if (Constants.CONTENT_CONTROLLER.equals(interfaceName) &&
                     isPrimitive()) {
                 throw new NoSuchInterfaceException(
@@ -525,14 +520,6 @@ public class ProActiveComponentRepresentativeImpl
             }
         } else {
             return false;
-        }
-    }
-
-    private boolean hasBindingController() {
-        if (hasBindingController == null) {
-            return (hasBindingController = new Boolean(listFc().length > 0)).booleanValue();
-        } else {
-            return hasBindingController.booleanValue();
         }
     }
 
