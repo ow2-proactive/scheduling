@@ -56,6 +56,10 @@ if [ -f $PROACTIVE/lib/jini-ext.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-ext.jar
 fi
+if [ -f $PROACTIVE/lib/reggie.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
+fi
 if [ -f $PROACTIVE/lib/cog.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog.jar
