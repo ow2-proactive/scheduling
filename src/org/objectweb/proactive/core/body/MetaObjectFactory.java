@@ -35,7 +35,10 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
+
+import java.util.Hashtable;
 
 
 /**
@@ -98,4 +101,20 @@ public interface MetaObjectFactory {
      * @see ThreadStoreFactory
      */
     public ThreadStoreFactory newThreadStoreFactory();
+
+    /**
+     * creates a ProActiveComponentFactory
+     * @return a new ProActiveComponentFactory
+     */
+
+    // COMPONENTS
+    public ProActiveComponentFactory newComponentFactory();
+
+    /**
+     * accessor to the parameters of the factory (object-based configurations)
+     * @return the parameters of the factory
+     */
+
+    // COMPONENTS
+    public Hashtable getParameters();
 }
