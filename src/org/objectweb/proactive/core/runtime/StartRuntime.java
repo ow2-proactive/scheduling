@@ -118,7 +118,7 @@ public class StartRuntime {
         try {
 
             //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
-			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.protocol")+":");
+			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.communication.protocol")+":");
 			
 			proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 			
@@ -155,7 +155,7 @@ public class StartRuntime {
 			ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
 								UrlBuilder.getProtocol(DefaultRuntimeURL));
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID, System.getProperty("proactive.protocol")+":",vmName);
+                creatorID, System.getProperty("proactive.communication.protocol")+":",vmName);
             
         } catch (ProActiveException e) {
             e.printStackTrace();

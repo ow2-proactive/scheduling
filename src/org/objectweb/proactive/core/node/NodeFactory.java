@@ -79,7 +79,7 @@ public class NodeFactory {
         ProActiveConfiguration.load();
 
         String protocol = UrlBuilder.checkProtocol(System.getProperty(
-                    "proactive.protocol"));
+                    "proactive.communication.protocol"));
         String port = System.getProperty("proactive.rmi.port");
         if (port != null) {
             DEFAULT_NODE_NAME = UrlBuilder.buildUrl("localhost", "Node",
@@ -117,7 +117,7 @@ public class NodeFactory {
                 throw new NodeException("Cannot create the default Node", e);
             }
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    UrlBuilder.checkProtocol(System.getProperty("proactive.protocol")), jobID);
+                    UrlBuilder.checkProtocol(System.getProperty("proactive.communication.protocol")), jobID);
         }
         return defaultNode;
     }

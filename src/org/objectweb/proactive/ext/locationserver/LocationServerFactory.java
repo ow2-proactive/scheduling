@@ -35,7 +35,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
-
 public class LocationServerFactory {
     //
     // -- PUBLIC MEMBERS -----------------------------------------------

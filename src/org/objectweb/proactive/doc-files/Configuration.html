@@ -61,7 +61,7 @@ A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a
 <ul class="listWithSpace">
 	<li class="textNormal"><b>Required</b><br></br>
 		<ul class="listWithSpace">
-			<li class="textNormal"><b>proactive.protocol</b> represents the registration and lookup protocol.  At this stage two values are possible: <b>rmi, jini</b>. It means that once the JVM starts, nodes that will be created on this JVM, will register themselves in the RMIRegistry if the <b>proactive.protocol</b> property is <b>rmi</b>, in the JINI Lookup Service if it is <b>jini</b>. It replaces former acquisition method defined in Deployment Descriptor. Default value is <b>rmi</b></li>
+			<li class="textNormal"><b>proactive.communication.protocol</b> represents the registration and lookup protocol.  At this stage two values are possible: <b>rmi, jini</b>. It means that once the JVM starts, nodes that will be created on this JVM, will register themselves in the RMIRegistry if the <b>proactive.communication.protocol</b> property is <b>rmi</b>, in the JINI Lookup Service if it is <b>jini</b>. It replaces former acquisition method defined in Deployment Descriptor. Default value is <b>rmi</b></li>
 			<li class="textNormal"><b>schema.validation</b>. Two values are possible:<b>enable, disable</b>. If enable, all xml files will be validated against provided schema. Default is <b>disable</b></li>
 			<li class="textNormal"><b>proactive.future.ac</b>. Two values are possible:<b>enable, disable</b> If enable, <a href="AC.html">automatic continuations</a> are activated. Default is <b>enable</b></li>
 		</ul><br></br>
@@ -83,20 +83,20 @@ A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a
 <p class="textNormal">
 Configuration file must have following structure:
 <blockquote><pre>
-&lt;masterFile&gt;
+&lt;ProActiveUserProperties&gt;
 	&lt;properties&gt;
 		&lt;prop <b>key</b>="schema.validation"<b>value</b>="enable"/&gt;
 		&lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="disable"/&gt;
-		&lt;prop <b>key</b>="proactive.protocol" <b>value</b>="rmi"/&gt;
+		&lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;
 		&lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
 		&lt;prop <b>key</b>="proactive.locationserver" <b>value</b>="org.objectweb.proactive.ext.locationserver.LocationServer"/&gt;
 		&lt;prop <b>key</b>="proactive.locationserver.rmi" <b>value</b>="//localhost/LocationServer"/&gt;
 	&lt;/properties&gt;
-&lt;/masterFile&gt;
+&lt;/ProActiveUserProperties&gt;
 </pre></blockquote>
 </p>
 <p class="textNormal">
-Note that <b>masterFile</b>, <b>properties</b> tag and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
+Note that <b>ProActiveUserProperties</b>, <b>properties</b> tag and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
 </p>
 <!--
  Footer : start 

@@ -142,7 +142,7 @@ public abstract class RuntimeFactory {
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
             defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
-                        "proactive.protocol") + ":");
+                        "proactive.communication.protocol") + ":");
             if (logger.isDebugEnabled()) {
                 logger.debug("default runtime = " + defaultRuntime.getURL());
             }

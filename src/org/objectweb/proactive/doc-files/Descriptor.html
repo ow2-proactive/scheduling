@@ -298,7 +298,7 @@ In this example, <b>jvm1 </b>will be created using the process called <b>jvmProc
 	..........................
 		</pre></blockquote>
 Note that the <b>nodeNumber</b> attribute that is set to the number of Nodes associated to the <b>Jvm1</b><br></br>
-		<b><font color="#FF0000"><li class="textNormal">Former Acquisition Protocol section does no longer exist. Indeed the way to acquire nodes or jvms is no longer defined in deployment descriptor, but in the <a href="Configuration.html">configuration file</a> with the ProActive property: proactive.protocol.</font></b>
+		<b><font color="#FF0000"><li class="textNormal">Former Acquisition Protocol section does no longer exist. Indeed the way to acquire nodes or jvms is no longer defined in deployment descriptor, but in the <a href="Configuration.html">configuration file</a> with the ProActive property: proactive.communication.protocol.</font></b>
 	</ul>
 	</ul>
 <br></br>	
@@ -433,9 +433,9 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 					&lt;log4jpropertiesFile&gt;
 						&lt;relativePath origin="user.home" value="ProActive/scripts/unix/proactive-log4j"/&gt;
 					&lt;/log4jpropertiesFile&gt;
-					&lt;proActivePropertiesFile&gt;
+					&lt;ProActiveUserPropertiesFile&gt;
 						&lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
-					&lt;/proActivePropertiesFile&gt;
+					&lt;/ProActiveUserPropertiesFile&gt;
 					&lt;jvmParameters>
 						&lt;parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/&gt;
 						&lt;parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386"/&gt;
@@ -448,7 +448,7 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 		</pre></blockquote>
 		As shown in the example above, <b>ProActive </b>provides the ability to define or change the <b>classpath </b>environment variable, the <b>java path</b>, the <b>policy file path</b>, the <b>log4j properties file path</b>, the <b>ProActive properties file path </b>(see <a href="Configuration.html">configuration file</a> for more details) and also to pass <b>parameters</b> to the JVM to be created. <b><font color="#FF0000">Note that parameters to be passed here are related to the jvm in opposition to properties given in the  <a href="Configuration.html">configuration file</a>(more focused on ProActive or application behaviour). In fact parameters given here will be part of the java command to create other jvms, whereas properties given in the config file will be loaded once the jvm is created.</font></b><br>
  If not specified, there is a default value (except for the jvmParameters element) for each of these variable. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa.<br>
-As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;proActivePropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br>
+As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;ProActiveUserPropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br>
 Even if not shown in this example, a specific tag is provided for XbootClasspath option under the form<br>
 <blockquote><pre>
 &lt;bootclasspath>
@@ -570,7 +570,7 @@ These steps must be performed <b>before </b>running any ProActive application us
 	&lt;/processes&gt;
 		</pre></blockquote>
 		
-		In this example, the JVM called <b>Jvm2</b> will be created using <b>ssh</b> to log on the cluster front end. Then a <b>bsub</b> command will be generated thanks to the process defined by <b>bsubInriaCluster</b>. This <b>bsub</b> command will create Nodes on several cluster machines, since <b>bsubInriaCluster</b> references the <b>jvmProcess</b> defined process. All tags defined under &lt;<b>bsubOption</b>&gt; are not mandatory, but they can be very usefull. The &lt;hostlist&gt; tag defines possible candidate in the job attribution, if not set the job will be allocated among all cluster's machines. The &lt;processor&gt; tag defines the number of processor requested, if not set, one processor is requested. At last &lt;scriptPath&gt; defines the path on the cluster front end of the script startRuntime.sh which is necessary to run ProActive on a cluster. This script is located under Proactive/scripts/unix/cluster. If not set the default location is set as ~/Proactive/scripts/unix/cluster.<br></br> 
+		In this example, the JVM called <b>Jvm2</b> will be created using <b>ssh</b> to log on the cluster front end. Then a <b>bsub</b> command will be generated thanks to the process defined by <b>bsubInriaCluster</b>. This <b>bsub</b> command will create Nodes on several cluster machines, since <b>bsubInriaCluster</b> references the <b>jvmProcess</b> defined process. All tags defined under &lt;<b>bsubOption</b>&gt; are not mandatory, but they can be very usefull. The &lt;hostlist&gt; tag defines possible candidate in the job attribution, if not set the job will be allocated among all cluster's machines. The &lt;processor&gt; tag defines the number of processor requested, if not set, one processor is requested. The &lt;resourceRequirement&gt; tag defines the expected number of processors per machine. For instance &lt;resourceRequirement value="span[ptile=2]"/&gt; ensures that 2 processors per machines will be used, whereas value="span[ptile=1]" forces that LSF allocates only only one processor per machine. It represents the <b>-R</b> option of LSF. At last &lt;scriptPath&gt; defines the path on the cluster front end of the script startRuntime.sh which is necessary to run ProActive on a cluster. This script is located under Proactive/scripts/unix/cluster. If not set the default location is set as ~/Proactive/scripts/unix/cluster.<br></br> 
 It is exactly the same with <b>rlogin</b> instead of <b>ssh.</b><br></br>
 If you want to submit the job directly from the cluster entry point, define only the <b>bsubProcess</b>, like in the above example and skip the ssh definition.
 		<blockquote><pre>
@@ -592,6 +592,7 @@ If you want to submit the job directly from the cluster entry point, define only
 				&lt;bsubOption&gt;
 					&lt;hostlist&gt;cluster_machine1 cluster_machine2&lt;hostlist/&gt;
 					&lt;processor&gt;6&lt;/processor&gt;
+					&lt;resourceRequirement value="span[ptile=2]"/&gt;
 					&lt;scriptPath&gt;
 						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
 					&lt;/scriptPath&gt;
@@ -697,9 +698,9 @@ If you want to submit the job directly from the cluster entry point, define only
 					&lt;log4jpropertiesFile&gt;
 						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive-log4j"/&gt;
 					&lt;/log4jpropertiesFile&gt;
-					&lt;proActivePropertiesFile&gt;
+					&lt;ProActiveUserPropertiesFile&gt;
 						&lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
-					&lt;/proActivePropertiesFile&gt;
+					&lt;/ProActiveUserPropertiesFile&gt;
 				&lt;/jvmProcess&gt;
 			&lt;/processDefinition&gt;
 			&lt;processDefinition id="<b>bsubInriaCluster</b>"&gt;
@@ -708,6 +709,7 @@ If you want to submit the job directly from the cluster entry point, define only
 					&lt;bsubOption&gt;
 						&lt;hostlist&gt;cluster_machine1 cluster_machine2&lt;hostlist/&gt;
 						&lt;processor&gt;4&lt;/processor&gt;
+						&lt;resourceRequirement value="span[ptile=2]"/&gt;
 						&lt;scriptPath&gt;
 							&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
 						&lt;/scriptPath&gt;

@@ -684,7 +684,7 @@ public class ProActive {
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
-        if ("ibis".equals(System.getProperty("proactive.protocol"))) {
+        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
             b = IbisRemoteBodyAdapter.lookup(url);
         } else {
             b = RemoteBodyAdapter.lookup(url);
