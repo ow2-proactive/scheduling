@@ -144,7 +144,7 @@ public class Plan extends Line { // implements Topology2D {
      */
 	public Object down(Object o) {
 		int pos = this.indexOf(o);
-		if (pos > ((this.getWidth()-1)*this.getHeight())-1) {
+		if (pos > ((this.getHeight()-1)*this.getWidth())-1) {
 			return null;
 		} else {
 			return this.get(pos + this.getWidth());
