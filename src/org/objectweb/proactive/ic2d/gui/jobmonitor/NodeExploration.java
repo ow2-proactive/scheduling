@@ -21,6 +21,7 @@ public class NodeExploration implements JobMonitorConstants {
     private IC2DGUIController controller;
     private Map aos;
     private Set visitedVM;
+    private Map runtimes;
 
     public NodeExploration(DataAssociation asso, Vector filteredJobs,
         IC2DGUIController controller) {
@@ -29,6 +30,7 @@ public class NodeExploration implements JobMonitorConstants {
         this.filteredJobs = filteredJobs;
         this.controller = controller;
         this.aos = new HashMap();
+        this.runtimes = new HashMap();
     }
 
     public int getMaxDepth() {
@@ -41,6 +43,65 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
+    /* url : "//host/object" */
+    private static ProActiveRuntime resolveURL(String url) {
+    	StringTokenizer tokenizer = new StringTokenizer(url, "/");
+    	String host = null;
+    	String name = null;
+    	try {
+    		host = tokenizer.nextToken();
+    		name = tokenizer.nextToken();
+    	} catch (NoSuchElementException nsee) {
+    		nsee.printStackTrace();
+    		return null;
+    	}
+    	
+    	try {
+    		Registry registry = LocateRegistry.getRegistry(host);
+    		RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(name);
+    		return new RemoteProActiveRuntimeAdapter(r);
+    	} catch (RuntimeException e) { /* hehe */
+    		throw e;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
+    }
+    
+    private ProActiveRuntime urlToRuntime(String url) {
+    	ProActiveRuntime rt = (ProActiveRuntime) runtimes.get(url);
+    	if (rt != null)
+    		return rt;
+    	
+    	rt = resolveURL(url);
+    	if (rt != null)
+    		runtimes.put(url, rt);
+    	
+    	return rt;
+    }
+    
+    private List getKnownRuntimes(ProActiveRuntime from) {
+    	ProActiveRuntime[] registered;
+
+    	try {
+    		registered = from.getProActiveRuntimes();
+    	} catch (ProActiveException pae) {
+    		pae.printStackTrace();
+    		registered = new ProActiveRuntime[0];
+    	}
+
+    	List known = new LinkedList(Arrays.asList(registered));
+    	
+    	String[] parents = from.getParents();
+    	for (int i = 0; i < parents.length; i++) {
+    		ProActiveRuntime rt = urlToRuntime(parents[i]);
+    		if (rt != null)
+    			known.add(urlToRuntime(parents[i]));
+    	}
+
+    	return known;
+    }
+    
     public void exploreHost(String hostname, int port) {
         try {
             visitedVM = new TreeSet();
@@ -126,9 +187,10 @@ public class NodeExploration implements JobMonitorConstants {
         }
 
         if (depth < maxDepth) {
-        	ProActiveRuntime[] runtimes = pr.getProActiveRuntimes();
-            for (int i = 0; i < runtimes.length; ++i)
-                handleProActiveRuntime(runtimes[i], depth + 1);
+        	List known = getKnownRuntimes(pr);
+        	Iterator iter = known.iterator();
+            while (iter.hasNext())
+                handleProActiveRuntime((ProActiveRuntime) iter.next(), depth + 1);
         }
     }
 
