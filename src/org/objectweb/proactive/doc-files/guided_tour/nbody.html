@@ -58,8 +58,8 @@ step. You may find some <a
 information</a>, mainly on the
 design, on
 the
-web, on the <a href="http://www-sop.inria.fr/oasis/proactive/apps/">
-applications/example page </a><a>
+web page of the <a href="http://www-sop.inria.fr/oasis/proactive/apps/">
+applications/examples</a><a>
 of proactive. <br>
 </a></p>
 <p>
@@ -78,8 +78,8 @@ In short, one considers several bodies (sometimes called particles) in
 space, where the only force is due to gravity. When only two bodies are
 at hand, this is expressed as </p>
 <div style="text-align: center;">
-<table style="text-align: left; width: 1221px; height: 456px;"
- border="0" cellpadding="2" cellspacing="2">
+<table style="text-align: left; width: 100%; height: 456px;" border="0"
+ cellpadding="2" cellspacing="2">
   <tbody>
     <tr>
       <td>
@@ -309,7 +309,7 @@ the <code>Planet</code>
 to be a passive object, and it does nothing. It
 is a container for position, velocity and mass, as we've seen in the
 description given higher up. The real actors are the <code>Domains</code>,
-who do
+they do
 all the work. To every
 <code>Planet</code>
 in the universe, is associated a
@@ -368,7 +368,7 @@ catch
 ProActive.newActive</code> creates
 one new <code>Active Object</code>,
 a <code> Domain</code>,
-at each iteration in the loop. The parameter <code>nodes</code>
+at each iteration of the loop. The parameter <code>nodes</code>
 contains all the nodes on which an Active Object may be deployed. The
 <code>constructorParams</code>
 are the parameters that are to be passed to the constructor of
@@ -380,8 +380,7 @@ constructor - this explains the use of the class <code>Integer</code>).
 The <code>Domains</code>,
 once created, are initialized, and then they are
 synchronized by all pinging the maestro, with the notifyFinished
-call.&nbsp; are started
-by issuing the sendValueToNeighbours request. <br>
+call.&nbsp; <br>
 <code></code></p>
 <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 //
@@ -402,11 +401,55 @@ master) {<br>
 maestro.notifyFinished();
 &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; // say we're ready to start .<br>
+&nbsp;&nbsp;&nbsp; // say we're ready to start<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp; }</code><br>
-</p>
-<p>While in their execution, the <code>Domains</code>
+&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <br>
+</code></p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>public
+void notifyFinished() { <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;</code><code>&nbsp;
+this.nbFinished ++ ; <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;</code><code>&nbsp;
+if (this.nbFinished == this.domainArray.length) { <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp;</code><code>&nbsp;&nbsp;&nbsp;&nbsp;
+this.iter ++; <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>if
+(this.iter ==this.maxIter) <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp;&nbsp;</code><code>
+this.killsupport.quit(); <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>this.nbFinished
+= 0 ; <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>for
+(int i= 0 ; i &lt; domainArray.length ; i++) <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>this.domainArray[i].sendValueToNeighbours();
+<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>&nbsp;&nbsp;&nbsp;
+</code><code>}<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>}
+</code></p>
+<p>The synchronization is done by
+the <code>Maestro</code>,
+which counts the number of <code>Domains</code> that have finished,
+and then asks
+them to go on to the next iteration. While in their execution, the <code>Domains</code>
 gather information concerning the position of all
 the other bodies, which need to be known to move the local <code>Planet</code>,
 at every time step. This is done using a push schema : instead of
@@ -468,52 +511,7 @@ sends its
 information to all the other <code>Domains</code>,
 and then waits until it has received all the positions it is waiting
 for. The other <code>Domains</code>
-are stored as an array, and a Maestro is built
-to coordinate all the computation : to avoid having <code>Domains</code>
-computing
-iterations
-ahead of the others, explicit synchronization is achieved by
-the <code>Maestro</code>.
-It waits for all to notify it, before asking them to go on with the
-next iteration. </p>
-<p class="textNormal"><code>&nbsp;
-&nbsp; &nbsp;&nbsp; public
-void notifyFinished() {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;
-this.nbFinished ++ ;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
-if
-(this.nbFinished == this.domainArray.length)
-{<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
-this.iter ++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
-if
-(this.iter == this.maxIter)&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;
-this.killsupport.quit();<br>
-&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.nbFinished = 0 ;<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-for (int i = 0 ; i &lt; domainArray.length ; i++)<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.domainArray[i].<span style="color: rgb(0, 121, 0);">sendValueToNeighbours()</span>;<br>
-&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp;
-&nbsp;
-}<br>
-</code>
-</p>
-<p>You may find another view of
+are stored as an array. You may find another view of
 this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-simple.html">web
 page</a><a>.</a></p>
@@ -523,11 +521,11 @@ groupcom</a></h3>
 is a simple improvement,
 which allows to have faster
 communication. You may have noticed the Group capabilities of
-ProActive. They give us the ability to call on operation on an object
+ProActive. They give us the ability to call an operation on an object
 which is&nbsp; a Group, and have it sent to all the members of the
-Group. We can use them in this framework : first, create a Group,
-instead of having independant <code>Active
-Objects</code> : <br>
+Group. We can use them in this framework : first, create a Group
+(instead of having independant <code>Active
+Objects</code>) : <br>
 </a></p>
 <p><code><a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 Object
@@ -560,8 +558,8 @@ passed as arguments, <code>Domain
 nodes are the Nodes on which to display these Active Objects. Do notice
 the <code>try... catch</code>
 construction, which is needed, like around any
-creation of <code>Active Objects</code>,
-which may raise exceptions. In this
+creation of <code>Active Objects</code>, because it may raise
+exceptions. In this
 previous bit of&nbsp; code, a <code>Group</code>
 containing new <code>Active
 Objects</code>
@@ -575,17 +573,18 @@ be able to continue using the methods of the Domain class, the group is
 typed as <code>Domain</code>,
 and that's the reason why it's called a typed Group. <br>
 <code></code></a></p>
-<p><a>Now,
+<p><a>Then,
 this group is passed as
 parameter to all the members of the Group, in just one call:</a></p>
 <p><code><a>&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;
 domainGroup.init(domainGroup, displayer, maestro);
 </a></code></p>
-<p><a>SThis
+<p><a>This
 method sets the local
-field as a copy of the passed parameter, and as such is unique, we can
-play around with it without affecting the others, so let's remove the
+field as a copy of the passed parameter, and as such is unique, and we
+can
+play around with it without affecting the others. So let's remove the
 local <code>Domain<code>
 from the Group, to avoid having calls on self:<br>
 </code></code></a></p>
@@ -645,21 +644,18 @@ synchronization is centralized on one
 entity? I don't and it's the bottleneck of the application anyway :
 once a <code>Domain</code>
 has finished, it sends the notifyFinshed, and then sits
-idle. Well, a way of making this better is to remove it completly! You
-may have noticed that because a <code>Domain</code>
-needs to have all the
-information of all the <code>Domains</code>
-of the same iteration before going on
-with the next iteration, if you change the behaviour of the setValue
-method to treat early calls, it would work nice and smoothly. That's
-what we've done : <br>
+idle. Well, a way of making this better is to remove it completly! This
+is done by using an odd-even scheme : if a Domain sends information too
+early, this information is stored, and will get used at the next
+iteration. In the meantime, the local Domain does not change its
+iteration, because it is still waiting for more results.<br>
 <code></code></a></p>
 <p><code>&nbsp;&nbsp;&nbsp;
 public
 void setValue(Planet inf, int
 receivedIter) {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-if (this.iter == receivedIter) {<br>
+<span style="color: rgb(0, 121, 0);">if (this.iter == receivedIter) {</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <span style="color: rgb(0, 121, 0);">this.currentForce.add(info,
 inf);</span><br>
@@ -676,7 +672,7 @@ if (this.nbReceived == this.nbvalues) <br>
 moveBody();<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-else { <br>
+<span style="color: rgb(0, 121, 0);">else { </span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 if (this.iter &gt; receivedIter)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -737,7 +733,8 @@ neighbours.setValue(this.info, this.iter);<br>
 treatPremature() method
 simply treats the values
 that were early
-as if they had just arrived.<br>
+as if they had just arrived, by calling the setValue method with the
+parameters stored.<br>
 You
 may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">web
@@ -782,9 +779,9 @@ void sendValueToNeighbours() {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 this.neighbours.setValue(this.info,
 this.identification);<br>
+<span style="color: rgb(0, 121, 0);">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-ProSPMD.barrier("barrier" + this.iter);<br>
+ProSPMD.barrier("barrier" + this.iter);</span><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 this.iter++;<br>
@@ -901,7 +898,7 @@ cumbersomely shows how to get Active Objects deployed along a tree
 structure to communicate. Remember that there is
 </a><a href="http://www-sop.inria.fr/oasis/proactive/apps/nbody.html">another
 explaination</a> of all this on the
-web <br>
+web.<br>
 <br>
 </p>
 <br>
