@@ -142,7 +142,7 @@ public class StartNode {
    */
   public static void main(String[] args) {
   	
-  	if (args[0].compareTo("-g")==0){
+  	if( (args.length != 0 ) && (args[0].compareTo("-g")==0)){
     	try{
     	//ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file://Z:/test/ProActive/classes/GlobusSetupWithRlogin.xml");
     	ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:"+XML_LOCATION);
