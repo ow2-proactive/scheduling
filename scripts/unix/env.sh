@@ -205,9 +205,12 @@ if [ -f $PROACTIVE/lib/ws/mail.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/mail.jar
 fi
-
+if [ -f $PROACTIVE/lib/ws/xml-apis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/xml-apis.jar
+fi
  
-echo "CLASSPATH"=$CLASSPATH
+echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH
 
 
