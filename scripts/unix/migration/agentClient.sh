@@ -10,7 +10,7 @@ PROACTIVE=$workingDir/../../../.
 CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
-export XMLDESCRIPTOR=$workingDir/../../descriptors/MigratableAgent.xml
+export XMLDESCRIPTOR=$workingDir/../../../descriptors/MigratableAgent.xml
 $JAVACMD org.objectweb.proactive.examples.migration.AgentClient $XMLDESCRIPTOR
 
 echo

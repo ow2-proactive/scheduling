@@ -10,7 +10,7 @@ PROACTIVE=$workingDir/../../../.
 CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
-export XMLDESCRIPTOR=$workingDir/../../descriptors/Penguin.xml
+export XMLDESCRIPTOR=$workingDir/../../../descriptors/Penguin.xml
 $JAVACMD org.objectweb.proactive.examples.penguin.PenguinControler $XMLDESCRIPTOR
 
 echo
