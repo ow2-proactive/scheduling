@@ -154,6 +154,7 @@ public class Group {
                 } else {
                     continue;
                 }
+
             }
         } else {
             // Files package founded
@@ -165,6 +166,7 @@ public class Group {
                 for (int j = 0; j < params.length; j++)
                     parameterTypes[j] = params[j].getClass();
             }
+
 
             for (int i = 0; i < files.length; i++) {
                 File file = files[i];
@@ -185,6 +187,7 @@ public class Group {
                             test.setManager(manager);
                         } else {
                             test = (AbstractTest) c.newInstance();
+                            test.setManager(manager);
                         }
 
                         if (logger.isDebugEnabled()) {
