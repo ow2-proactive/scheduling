@@ -53,15 +53,15 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
  * @author Alexandre di Costanzo
  *
  */
-public class StartService {
+public class StartP2PService {
     private boolean noRegister = true;
-    static Logger logger = Logger.getLogger(StartService.class.getName());
+    static Logger logger = Logger.getLogger(StartP2PService.class.getName());
     protected String acquisitionMethod;
     protected String portNumber;
     protected Vector serverList;
-    protected P2PServiceImpl p2pRuntime;
+    protected P2PServiceImpl p2pService;
 
-    public StartService(String[] args) {
+    public StartP2PService(String[] args) {
         if (args.length == 3) {
             this.noRegister = false;
             this.serverList = parser(args[2]);
@@ -103,7 +103,7 @@ public class StartService {
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
         }
-        StartService toto = new StartService(args);
+        StartP2PService toto = new StartP2PService(args);
         toto.start();
         while (true) {
             ;
@@ -173,12 +173,12 @@ public class StartService {
             params[0] = this.acquisitionMethod;
             params[1] = this.portNumber;
             params[2] = paRuntime;
-            this.p2pRuntime = (P2PServiceImpl) ProActive.newActive(P2PServiceImpl.class.getName(),
+            this.p2pService = (P2PServiceImpl) ProActive.newActive(P2PServiceImpl.class.getName(),
                     params, url);
 
             // Record the ProActiveRuntime in other from Servers List File
             if (!this.noRegister) {
-                ((P2PServiceImpl) this.p2pRuntime).registerP2PServices(this.serverList);
+                ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
             }
         } catch (NodeException e) {
             logger.error(e);
@@ -215,9 +215,9 @@ public class StartService {
     }
 
     /**
-     * @return Returns the p2pRuntime.
+     * @return Returns the P2P Service.
      */
-    public P2PServiceImpl getP2PRuntime() {
-        return p2pRuntime;
+    public P2PServiceImpl getP2PService() {
+        return p2pService;
     }
 }
