@@ -51,8 +51,8 @@ public abstract class AbstractContainerComponentHandler extends ComponentHandler
         return enabled;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.component.xml.ContainerHandlerMarker#getContainerElementHierarchy()
+    /**
+     * see {@link org.objectweb.proactive.core.component.xml.ContainerHandlerMarker#getContainerElementHierarchy()}
      */
     public ContainerElementHierarchy getContainerElementHierarchy() {
         return containersHierarchy;

@@ -35,9 +35,6 @@ import org.objectweb.proactive.core.mop.StubObject;
 public class ProActiveComponentGroup {
     protected static Logger logger = Logger.getLogger(ProActiveComponentGroup.class.getName());
 
-    // hack for not displaying the javadoc. See mother class.
-    //private ProActiveComponentGroup(){}
-
     /** Create an object representing an empty group of components specifying the java class of the components. */
     public static Object newActiveComponentGroup(
         ComponentParameters componentParameters)
@@ -71,7 +68,7 @@ public class ProActiveComponentGroup {
      * creates a group proxy on a set of generated Interface objects.
      * These objects are generated according to the InterfaceType they get as a parameter
      * @param interfaceType the type of interface we need a group of Interface objects on
-     * @return
+     * @return a group of ProActiveInterface elements
      * @throws ClassNotFoundException
      * @throws ClassNotReifiableException
      */
@@ -111,7 +108,7 @@ public class ProActiveComponentGroup {
         return null;
     }
 
-    /** Create an object representing a group and create members with params cycling on nodeList. */
+    ///** Create an object representing a group and create members with params cycling on nodeList. */
 
     // ComponentBody Parameters is unique for all the group members (notably the name is the same)...
     //	/**
