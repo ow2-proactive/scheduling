@@ -30,6 +30,13 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -95,6 +102,33 @@ public final class MethodCall implements java.io.Serializable {
   private long methodCallID;
   
   private String key;
+
+
+  /**
+   * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
+   * in some case (such as group communication) or to create a stronger
+   * asynchronism (serialization of parameters then return to the thread of
+   * execution before the end of the rendez-vous).
+   */  
+  private byte[] serializedEffectiveArguments = null;
+
+
+  /**
+   * transform the effectiveArguments into a byte[]
+   * */
+  public void transformEffectiveArgumentsIntoByteArray () {
+	try {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+	    objectOutputStream.writeObject(effectiveArguments);
+	    objectOutputStream.flush();
+    	objectOutputStream.close();
+    	byteArrayOutputStream.close();
+	    serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+	}
+	catch (Exception e) { e.printStackTrace(); }
+	effectiveArguments = null;
+  }
   
 
   /**
@@ -330,6 +364,17 @@ public final class MethodCall implements java.io.Serializable {
       } catch (NoSuchMethodException e) {
         throw new InternalException("Lookup for method failed: " + e + ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
       }
+    }
+    if ((serializedEffectiveArguments != null) && (effectiveArguments == null)) {
+  		try {
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
+		    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+	    	effectiveArguments = (Object[])objectInputStream.readObject();
+    		objectInputStream.close();
+    		byteArrayInputStream.close();
+		}
+		catch (Exception e) { e.printStackTrace(); }
+		serializedEffectiveArguments = null;
     }
   }
 

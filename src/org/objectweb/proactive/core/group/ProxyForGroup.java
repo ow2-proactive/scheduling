@@ -23,6 +23,12 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  */
 public class ProxyForGroup extends AbstractProxy implements org.objectweb.proactive.core.mop.Proxy, Group, java.io.Serializable {
+
+		static long nbtour = 0;
+		static long total = 0;
+
+
+
 	/** The name of the Class : all members of the group are "className" assignable */
 	protected String className;
 	/** The list of member : it contains exclusively StubObjects connected to Proxies */
@@ -144,11 +150,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 
 		// Creating Threads
-		if (isDispatchingCall(mc) == false)
-
+		if (isDispatchingCall(mc) == false) {
+			mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
-				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);
-
+				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);			
+		}
 		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
 				Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
@@ -185,10 +191,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		Body body = ProActive.getBodyOnThis();		
 		// Creating Threads
 
-		if (isDispatchingCall(mc) == false)
+		if (isDispatchingCall(mc) == false) {
+			mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
 				this.createThreadForOneWay(this.memberList, index, mc, body);
-
+		}
 		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
 				Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
@@ -405,11 +412,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		this.proxyForGroupID = new UniqueID();
-	}
-
-
-	public void AfficheUniqueID () {
-		System.out.println(this.proxyForGroupID);
 	}
 
 }
