@@ -184,11 +184,10 @@ public class Group {
                         if (parameterTypes != null) {
                             Constructor constructor = c.getConstructor(parameterTypes);
                             test = (AbstractTest) constructor.newInstance(params);
-                            test.setManager(manager);
                         } else {
                             test = (AbstractTest) c.newInstance();
-                            test.setManager(manager);
                         }
+						test.setManager(manager);
 
                         if (logger.isDebugEnabled()) {
                             logger.debug(test.getName() + " added in group " +
