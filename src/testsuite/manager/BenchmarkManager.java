@@ -105,8 +105,7 @@ public abstract class BenchmarkManager extends AbstractManager {
             Iterator itTest = group.iterator();
             while (itTest.hasNext()) {
                 Benchmark test = (Benchmark) itTest.next();
-                long min = -1;
-                long sumTest = 0;
+                long[] set = new long[getNbRuns()];
                 for (int i = 0; i < getNbRuns(); i++) {
                     AbstractResult result = test.runTest();
 
@@ -114,10 +113,7 @@ public abstract class BenchmarkManager extends AbstractManager {
                         logger.warn("Bench " + test.getName() + " [FAILED]");
                         errors++;
                     } else {
-                        if ((min < 0) || (test.getResultTime() < min)) {
-                            min = test.getResultTime();
-                        }
-                        sumTest += test.getResultTime();
+                        set[i] = test.getResultTime();
                         if (logger.isInfoEnabled()) {
                             logger.info("Bench " + test.getName() +
                                 " runs with success in " +
@@ -127,14 +123,8 @@ public abstract class BenchmarkManager extends AbstractManager {
                         sum += test.getResultTime();
                     }
                 }
-                test.setResultTime(min);
                 resultsGroup.add(new BenchmarkResult(test,
-                        AbstractResult.GLOBAL_RESULT,
-                        "Moy=" + ((double) sumTest / getNbRuns())));
-                if (logger.isInfoEnabled()) {
-                    logger.info("Bench " + test.getName() +
-                        " runs with success in " + min + "ms");
-                }
+                        AbstractResult.GLOBAL_RESULT, "no message", set));
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
                 "Group : " + group.getName() + ", Moy in " +
