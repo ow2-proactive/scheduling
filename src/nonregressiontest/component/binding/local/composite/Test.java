@@ -36,131 +36,121 @@ import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 
 import org.objectweb.fractal.api.Component;
+
 import org.objectweb.proactive.core.component.Fractal;
 
 import testsuite.test.FunctionalTest;
+
 
 /**
  * @author Matthieu Morel
  *
  * Step 3 : bindings, life cycle start, interface method invocation
- * 
- * 		___________________________
- * 		|		__________________		|
- * 		|		|			______			|		|						________
- * 		|		|			|			|			|		|						|				|
- * 	i1-|-i1-|----i1	|(p1)	|i2----	|i2 --|-i2----------i2	|	(p2)		|
- * 		|		|			|_____|			|		|						|				|
- * 		|		|									|		|						|_______|
- * 		|		|_(c1)_____________|		|						
- * 		|													|
- * 		|__(c2)____________________|
- * 
- * 
+ *
+ *                 ___________________________
+ *                 |                __________________                |
+ *                 |                |                        ______                        |                |                                                ________
+ *                 |                |                        |                        |                        |                |                                                |                                |
+ *         i1-|-i1-|----i1        |(p1)        |i2----        |i2 --|-i2----------i2        |        (p2)                |
+ *                 |                |                        |_____|                        |                |                                                |                                |
+ *                 |                |                                                                        |                |                                                |_______|
+ *                 |                |_(c1)_____________|                |
+ *                 |                                                                                                        |
+ *                 |__(c2)____________________|
+ *
+ *
   */
 public class Test extends FunctionalTest {
-	public static String MESSAGE = "-->Main";
-	Component p1;
-	Component p2;
-	Component c1;
-	Component c2;
-	Message message;
-	Component[] c2SubComponents;
-	Component[] c1SubComponents;
+    public static String MESSAGE = "-->Main";
+    Component p1;
+    Component p2;
+    Component c1;
+    Component c2;
+    Message message;
+    Component[] c2SubComponents;
+    Component[] c1SubComponents;
 
-	public Test() {
-		super("Binding of components on the local default node", "Binding of components on the local default node");
-	}
+    public Test() {
+        super("Binding of components on the local default node",
+            "Binding of components on the local default node");
+    }
 
-	/**
-	 * @see testsuite.test.FunctionalTest#action()
-	 */
-	public void action() throws Exception {
-		throw new testsuite.exception.NotStandAloneException();
-	}
+    /**
+     * @see testsuite.test.FunctionalTest#action()
+     */
+    public void action() throws Exception {
+        throw new testsuite.exception.NotStandAloneException();
+    }
 
-	public Component[] action(Component[] components) throws Exception {
-		p1 = components[0];
-		p2 = components[1];
-		c1 = components[2];
-		c2 = components[3];
-		System.setProperty("proactive.future.ac", "enable");
-		// start a new thread so that automatic continuations are enabled for components
-		ACThread acthread = new ACThread();
-		acthread.start();
-		acthread.join();
-		System.setProperty("proactive.future.ac", "disable");
-		return (new Component[] { p1, p2, c1, c2 });
-	}
+    public Component[] action(Component[] components) throws Exception {
+        p1 = components[0];
+        p2 = components[1];
+        c1 = components[2];
+        c2 = components[3];
+        System.setProperty("proactive.future.ac", "enable");
+        // start a new thread so that automatic continuations are enabled for components
+        ACThread acthread = new ACThread();
+        acthread.start();
+        acthread.join();
+        System.setProperty("proactive.future.ac", "disable");
+        return (new Component[] { p1, p2, c1, c2 });
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
-	private class ACThread extends Thread {
+    private class ACThread extends Thread {
+        public void run() {
+            try {
+                // BINDING
+                Fractal.getBindingController(c2).bindFc("i1",
+                    c1.getFcInterface("i1"));
+                Fractal.getBindingController(c1).bindFc("i1",
+                    p1.getFcInterface("i1"));
+                Fractal.getBindingController(p1).bindFc("i2",
+                    c1.getFcInterface("i2"));
+                Fractal.getBindingController(c1).bindFc("i2",
+                    c2.getFcInterface("i2"));
+                Fractal.getBindingController(c2).bindFc("i2",
+                    p2.getFcInterface("i2"));
 
-		public void run() {
-			try {
-			// BINDING
-			Fractal.getBindingController(c2).bindFc(
-				"i1",
-				c1.getFcInterface("i1"));
-			Fractal.getBindingController(c1).bindFc(
-				"i1",
-				p1.getFcInterface("i1"));
-			Fractal.getBindingController(p1).bindFc(
-				"i2",
-				c1.getFcInterface("i2"));
-			Fractal.getBindingController(c1).bindFc(
-				"i2",
-				c2.getFcInterface("i2"));
-			Fractal.getBindingController(c2).bindFc(
-				"i2",
-				p2.getFcInterface("i2"));
+                // START LIFE CYCLE
+                Fractal.getLifeCycleController(c2).startFc();
+                Fractal.getLifeCycleController(p2).startFc();
 
-			// START LIFE CYCLE
-			
-			Fractal.getLifeCycleController(c2).startFc();
-			Fractal.getLifeCycleController(p2).startFc();
+                // INVOKE INTERFACE METHOD
+                I1 i1 = (I1) c2.getFcInterface("i1");
 
-			// INVOKE INTERFACE METHOD
-			I1 i1 = (I1) c2.getFcInterface("i1");
-			//I1 i1= (I1)p1.getFcInterface("i1");
-			message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+                //I1 i1= (I1)p1.getFcInterface("i1");
+                message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-		}
-	}
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#endTest()
-	 */
-	public void endTest() throws Exception {
-	}
+    public boolean postConditions() throws Exception {
+        return (message.toString().equals(Test.MESSAGE +
+            PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
+            PrimitiveComponentA.MESSAGE + Test.MESSAGE));
+    }
 
-	public boolean postConditions() throws Exception {
-
-		return (
-			message.toString().equals(
-				Test.MESSAGE
-					+ PrimitiveComponentA.MESSAGE
-					+ PrimitiveComponentB.MESSAGE
-					+ PrimitiveComponentA.MESSAGE
-					+ Test.MESSAGE));
-
-	}
-
-	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			test.action();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }
