@@ -98,4 +98,29 @@ public class ProSPMD {
 	
 		return result;
   }
+
+  public static Object newSPMDGroup(String className, Object[][] params, String[] nodeList)
+	  throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+
+//	  if (!((MOP.forName(className)).isAssignableFrom(org.objectweb.proactive.core.group.spmd.SPMDMember.class))) {
+//		  System.out.println("Impossible to build a Group with this class : " + className);
+//		  return null;
+//	  }
+		
+	  Object result = ProActiveGroup.newGroup(className);
+	  Group g = ProActiveGroup.getGroup(result);
+
+	  for (int i=0 ; i < params.length ; i++)
+		  g.add(ProActive.newActive(className, params[i], nodeList[i % nodeList.length]));
+
+	  for (int i=0 ; i < g.size() ; i++) {
+		  ((SPMDMember)g.get(i)).setMyGroup(result);
+	  }
+		
+	  ProActiveGroup.setScatterGroup(result);
+	
+	  return result;
+}
+
+
 }

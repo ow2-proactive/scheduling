@@ -649,6 +649,148 @@ public class ProxyForGroup extends AbstractProxy
     //  }
     //  An other way is to "store" the stub and return it when asked
 
+	/**
+	 * Creates a new group with all members of the group and all the members of the group <code>g</code>
+	 * @param g - a group
+	 * @return a group that contain all the members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group union (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				// add the members of this
+				Iterator it = this.iterator();
+				while (it.hasNext()) {
+					result.add(it.next()); 
+				}
+				// add the members of g
+				it = g.iterator();
+				while (it.hasNext()) {
+					result.add(it.next()); 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
+
+	/**
+	 * Creates a new group with all members that belong to the group and to the group <code>g</code>.
+	 * @param g - a group
+	 * @return a group that contain the common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group intersection (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				// add the members of the group that belong to g
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) > -1) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
+
+	/**
+	 * Creates a new group with the members that belong to the group, but not to the group <code>g</code>.
+	 * @param g - a group
+	 * @return a group that contain the members of the group without the member <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group exclude (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
+
+	/**
+	 * Creates a new group with all members that belong to the group or to the group <code>g</code>, but not to both.
+	 * @param g - a group
+	 * @return a group that contain the non-common members of the group and <code>g</code>. <code>null<code> if the class of the group is incompatible.
+	 */
+	public Group difference (Group g) {
+		try {
+			if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
+				ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+				Object member;
+				Iterator it = this.iterator();
+				// add the members of the group that do not belong to g
+				while (it.hasNext()) {
+					member = it.next();
+					if (g.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				it = g.iterator();
+				// add the members of g that do not belong to the group
+				while (it.hasNext()) {
+					member = it.next();
+					if (this.indexOf(member) < 0) {
+						result.add(member);
+					} 
+				}
+				return result; 
+			} }
+		catch (ClassNotFoundException e) { e.printStackTrace();	}
+		catch (ConstructionOfReifiedObjectFailedException e) { e.printStackTrace(); }
+		// the group are incompatible (i.e. they have not members of the the same class)
+		return null;
+	}
+
+	/**
+	 * Creates a new group with the members of the group begining at the index <code>begin</code> and ending at the index <code>end</code>.
+	 * @param begin - the begining index
+	 * @param end - the ending index
+	 * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
+	 */
+	public Group range (int begin, int end) {
+		// bag arguments => return null
+		if (begin > end) {
+			return null;
+		}
+		if (begin < 0) {
+			begin = 0;
+		}
+		if (end > this.size()) {
+			end = this.size();
+		}
+		try {
+			ProxyForGroup result = new ProxyForGroup(this.getTypeName());
+			for (int i = begin ; i <= end ; i++) {
+				result.add(this.get(i));
+			}
+			return result;
+		}
+		catch (ConstructionOfReifiedObjectFailedException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
     /**
      * To debug, display the size of the Group and all its members with there position
      */
@@ -831,4 +973,5 @@ public class ProxyForGroup extends AbstractProxy
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
     }
+
 }
