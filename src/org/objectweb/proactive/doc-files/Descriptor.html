@@ -448,7 +448,16 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 		</pre></blockquote>
 		As shown in the example above, <b>ProActive </b>provides the ability to define or change the <b>classpath </b>environment variable, the <b>java path</b>, the <b>policy file path</b>, the <b>log4j properties file path</b>, the <b>ProActive properties file path </b>(see <a href="Configuration.html">configuration file</a> for more details) and also to pass <b>parameters</b> to the JVM to be created. <b><font color="#FF0000">Note that parameters to be passed here are related to the jvm in opposition to properties given in the  <a href="Configuration.html">configuration file</a>(more focused on ProActive or application behaviour). In fact parameters given here will be part of the java command to create other jvms, whereas properties given in the config file will be loaded once the jvm is created.</font></b><br>
  If not specified, there is a default value (except for the jvmParameters element) for each of these variable. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa.<br>
-As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;proActivePropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br></br>
+As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;proActivePropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br>
+Even if not shown in this example, a specific tag is provided for XbootClasspath option under the form<br>
+<blockquote><pre>
+&lt;bootclasspath>
+	&lt;absolutePath value="/home1/fabrice/IOFAb/Ibis/"/&gt;
+	&lt;absolutePath value="/home1/fabrice/IOFAb/classlibs/jdk"/&gt;
+&lt;/bootclasspath>
+</pre></blockquote>
+
+<br></br>
 		<li class="textNormal">Remote JVMs<br></br>
 		<ul type="circle" class="listWithSpace">
 			With XML Deployment Descriptor, <b>ProActive</b> provides the ability to create remote Nodes (remote JVMs). You can specify in the descriptor if you want to access the remote host with <b>rsh</b>, <b>rlogin</b>, <b>ssh</b>, <b>lsf</b>, <b>globus</b>. How to use these protocols is explained in the following examples. Just remind that you can combine these protocols, and you will notice that there is at least one combination for each remote protocol, indeed each remote protocol <b>must </b>have a pointer on a process that will create a local JVM(discussed previoulsy). The principe is fairly simple, you can imagine that once log on the remote host with the chosen protocol, you have to create a local JVM.<br></br>

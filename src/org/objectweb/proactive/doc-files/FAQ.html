@@ -82,6 +82,7 @@ custom activity of an active object ?</a></li>
     <b>live()</b> method and <b>Active</b> interface ?</a></li>
  <li class="textNormal"><a href="#JiniUse">How can I use <b>Jini </b> in ProActive ?</a></li>
 <li class="textNormal"><a href="#JiniPb">Why do I get an exception when using <b>Jini </b>?</a></li>
+<li class="textNormal"><a href="#config">What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</a></li>
 
 </ol>
        
@@ -738,6 +739,19 @@ remains in the directory, in that case if you restart the application it will no
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
 [<a href="#answers">Answers</a>]</tt></p>
+
+<li class="textNormal"><a
+ name="config">
+<h3>What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</h3>
+</a>
+<p class="textNormal"></p>Parameters defined in Deployment Descriptor should be only jvm related, whereas properties set in the Configuration file are ProActive properties or user-defined properties. They are used with a different approach: parameters given in descriptors are part of the java command that will create other jvms, whereas properties will be loaded once jvms are created</p>
+ </li>
+<p></p>
+
+ <!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
    <!--
  Footer : start 
 ~~~ --> <br>
