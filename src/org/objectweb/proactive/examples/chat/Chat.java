@@ -34,6 +34,8 @@ public class Chat implements java.io.Serializable, RunActive {
 	private transient ChatGUI frame;
 	/** The migration strategy manager */
 	private MigrationStrategyManagerImpl migrationStrategy = null;
+	/** The list of users */
+	private String listOfName = ""; 
 
 	/**
 	 * Constructor : The default constructor requiered to build Active Objects
@@ -191,6 +193,7 @@ public class Chat implements java.io.Serializable, RunActive {
 	 * Destroys the graphic interface
 	 */
 	public void disposeFrame() {
+		this.listOfName = this.frame.list.getText();
 		if (this.frame != null) {
 			this.frame.dispose();
 			this.frame = null;
@@ -202,6 +205,7 @@ public class Chat implements java.io.Serializable, RunActive {
 	 */
 	public void rebuildFrame() {
 	  this.frame = new ChatGUI((Chat)ProActive.getStubOnThis(),name);
+	  this.frame.list.setText(this.listOfName);
 	}
 	
 	/**
@@ -258,7 +262,7 @@ public class Chat implements java.io.Serializable, RunActive {
 	 * @param userName - the name to remove
 	 */
 	public void removeUserFromTheList (String userName) {
-		this.frame.list.setText(this.frame.list.getText().replaceAll(userName+"\n",""));
+		this.frame.list.setText(this.frame.list.getText().replaceAll("\n"+userName+"\n","\n"));
 	}
 
 	public static void main (String[] args) {
