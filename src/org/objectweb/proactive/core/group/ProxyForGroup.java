@@ -17,6 +17,10 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 
+
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.Body;
+
 /**
  * This proxy class manages the semantic of group communication and implements the Group Interface.
  *
@@ -78,16 +82,20 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
 
+		Body body = ProActive.getBodyOnThis();		
+
 		/* if OneWay : do not construct result */
 		if (AbstractProxy.isOneWayCall(mc))
-			oneWayCallOnGroup(mc);
+			oneWayCallOnGroup(mc,body);
 
 		/* if the call is asynchronous the group of result will be a group a future */
 		else // with group : SYNC == ASYNC !!!!
-			result = asynchronousCallOnGroup(mc);
+			result = asynchronousCallOnGroup(mc,body);
 
 		/* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
 		this.waitForAllCallsDone();
+
+		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 
 		return result;
 	}
@@ -115,7 +123,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Create and initialize (and return) the group of result, then launch threads for asynchronous call of each member
 	 */
-	protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
+	protected synchronized Object asynchronousCallOnGroup(MethodCall mc, Body body) {
 		Object result;
 		int size = memberList.size();
 		// Creates a stub + ProxyForGroup for representing the result
@@ -136,7 +144,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		// Creating Threads
 		if (dispatching == false)
 			for (int index = 0; index < memberList.size(); index++)
-				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc);
+				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);
 
 		else { // dispatching == true
 			for (int index = 0; index < memberList.size(); index++) {
@@ -146,15 +154,15 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
-				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments));
+				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body);
 			}
 		}
 
 		return result;
 	}
 
-	private synchronized void createThreadForAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc) {
-		new Thread(new MyProcessForGroupAsync(memberList, memberListOfResultGroup, index, mc)).start();
+	private synchronized void createThreadForAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
+		new Thread(new MyProcessForGroupAsync(memberList, memberListOfResultGroup, index, mc, body)).start();
 		this.waited++;
 	}
 
@@ -168,12 +176,12 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Launch threads for OneWay call of each member
 	 */
-	protected void oneWayCallOnGroup(MethodCall mc) {
+	protected void oneWayCallOnGroup(MethodCall mc, Body body) {
 		// Creating Threads
 
 		if (dispatching == false)
 			for (int index = 0; index < memberList.size(); index++)
-				this.createThreadForOneWay(this.memberList, index, mc);
+				this.createThreadForOneWay(this.memberList, index, mc, body);
 
 		else { // dispatching == true
 			for (int index = 0; index < memberList.size(); index++) {
@@ -183,13 +191,13 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
-				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments));
+				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body);
 			}
 		}
 	}
 
-	private synchronized void createThreadForOneWay(Vector memberListStubOfThis, int index, MethodCall mc) {
-		new Thread(new MyProcessForGroupOneWay(memberListStubOfThis, index, mc)).start();
+	private synchronized void createThreadForOneWay(Vector memberListStubOfThis, int index, MethodCall mc, Body body) {
+		new Thread(new MyProcessForGroupOneWay(memberListStubOfThis, index, mc, body)).start();
 		this.waited++;
 	}
 
@@ -199,16 +207,21 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		private Vector memberListOfResultGroup;
 		private int index;
 		private MethodCall mc;
+		private Body body;
 
-		MyProcessForGroupAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc) {
+		MyProcessForGroupAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
 			this.memberList = memberList;
 			this.memberListOfResultGroup = memberListOfResultGroup;
 			this.index = index;
 			this.mc = mc;
+			this.body = body;
 		}
 
 		public void run() {
 			try {
+				
+				LocalBodyStore.getInstance().setCurrentThreadBody(body);
+				
 				addToListOfResult(memberListOfResultGroup, ((StubObject) (memberList.get(index))).getProxy().reify(mc), index);
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -220,15 +233,20 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		private Vector memberList;
 		private int index;
 		private MethodCall mc;
+		private Body body;
 
-		MyProcessForGroupOneWay(Vector memberList, int index, MethodCall mc) {
+		MyProcessForGroupOneWay(Vector memberList, int index, MethodCall mc, Body body) {
 			this.memberList = memberList;
 			this.index = index;
 			this.mc = mc;
+			this.body = body;
 		}
 
 		public void run() {
 			try {
+				
+				LocalBodyStore.getInstance().setCurrentThreadBody(body);
+				
 				((StubObject) (memberList.get(index))).getProxy().reify(mc);
 				decrementWaitedAndNotifyAll();
 			} catch (Throwable e) {
