@@ -10,7 +10,7 @@
 		dir="../classes" 
 		packageName="nonregressiontest" >
 			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
-			<unitTest class="nonregressiontest.node.nodefactory.Test" />
+			<unitTest class="nonregressiontest.node.nodefactory.Test" /> 
 			<!-- the next test create 3 nodes, accessible by 3 static methods -->
 			<unitTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
 			<unitTest class="nonregressiontest.stub.stubgeneration.Test" />
@@ -30,8 +30,7 @@
 			<unitTest class="nonregressiontest.activeobject.migration.strategy.Test" />
 			<unitTest class="nonregressiontest.activeobject.locationserver.Test" />
 			<unitTest class="nonregressiontest.activeobject.loopmixedlocation.Test" />
-			<unitTest class="nonregressiontest.activeobject.acontinuation.Test" />
-			<unitTest class="nonregressiontest.descriptor.Test" />
+			<unitTest class="nonregressiontest.activeobject.acontinuation.Test" /> 
 			<unitTest class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest class="nonregressiontest.group.creation.Test" />
 			<unitTest class="nonregressiontest.group.onewaycall.Test" />
@@ -42,25 +41,73 @@
 			<unitTest class="nonregressiontest.group.exception.Test" />
 			<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
+			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
+			<unitTest class="nonregressiontest.component.descriptor.Test"/>
 	</packageGroup>
 	
-    <interLinkedGroup name="components interlinked tests" description="creation, assembly, binding, local and remote">
+    <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
+    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
 		<idTest class="nonregressiontest.component.creation.local.newactive.composite.Test" id="1" />
-		<idTest class="nonregressiontest.component.assembly.local.Test" id="2" />
-		<idTest class="nonregressiontest.component.binding.local.Test" id="3" />
+		<idTest class="nonregressiontest.component.assembly.local.composite.Test" id="2" />
+		<idTest class="nonregressiontest.component.binding.local.composite.Test" id="3" /> 
+
+		<idTest class="nonregressiontest.component.creation.remote.newactive.composite.Test" id="4" />
+		<idTest class="nonregressiontest.component.assembly.remote.composite.Test" id="5" />
+		<idTest class="nonregressiontest.component.binding.remote.composite.Test" id="6" /> 
 		<interLinks>
-			<!-- local tests -->
+			<!-- deployment  of virtual nodes-->
+			<link id="1">
+				<parent id="0" />
+			</link>
+			<!-- local tests - composite-->
 			<link id="2">
 				<parent id="1" />
 			</link>
 			<link id="3">
 				<parent id="2" />
+			</link>-->
+			<!-- remote tests - composite-->
+			<link id="5">
+				<parent id="4" />
+			</link>
+			<link id="6">
+				<parent id="5" />
 			</link>
 		</interLinks>
+	</interLinkedGroup> 
+	
+    <interLinkedGroup name="parallel components interlinked tests" description="creation, assembly, binding, local and remote of parallel components ">
+    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+		<idTest class="nonregressiontest.component.creation.local.newactive.parallel.Test" id="7" />
+		<idTest class="nonregressiontest.component.assembly.local.parallel.Test" id="8" />
+		<idTest class="nonregressiontest.component.binding.local.parallel.Test" id="9" />
+
+		<idTest class="nonregressiontest.component.creation.remote.newactive.parallel.Test" id="10" />
+		<idTest class="nonregressiontest.component.assembly.remote.parallel.Test" id="11" />
+		<idTest class="nonregressiontest.component.binding.remote.parallel.Test" id="12" /> 
+
+		<interLinks>
+			<!-- deployment  of virtual nodes-->
+			<link id="7">
+				<parent id="0" />
+			</link>
+			<!-- local tests - parallel-->
+			<link id="8">
+				<parent id="7" />
+			</link>
+			<link id="9">
+				<parent id="8" />
+			</link>
+			<!-- remote tests - parallel-->
+			<link id="11">
+				<parent id="10" />
+			</link>
+			<link id="12">
+				<parent id="11" />
+			</link> 
+		</interLinks>
 	</interLinkedGroup>
-	
-	
-	
+		
 	<!--<log4j>../compile/proactive-log4j</log4j>-->
 	
 	<result type="html" file="../test.html" />
