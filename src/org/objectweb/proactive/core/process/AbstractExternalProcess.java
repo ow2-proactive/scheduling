@@ -151,7 +151,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
 
   protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
     try {
-      if (inputMessageLogger != null) inputMessageLogger.log("Command is "+commandToExecute);
+      //if (inputMessageLogger != null) inputMessageLogger.log("Command is "+commandToExecute);
       externalProcess = Runtime.getRuntime().exec(commandToExecute);
       java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(externalProcess.getInputStream()));
       java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(externalProcess.getErrorStream()));
@@ -195,6 +195,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
 
   protected void handleOutput(java.io.BufferedWriter out) {
     if (outputMessageSink == null) return;
+    //System.out.println("my output sink :"+outputMessageSink.toString());
     Runnable r = new ProcessOutputHandler(out, outputMessageSink);
     Thread t = new Thread(r,"OUT -> "+getShortName(getCommand(), 20));
     t.start();
@@ -224,7 +225,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   //
   
   
-  private static class ThreadActivityMonitor {
+  private static class ThreadActivityMonitor implements java.io.Serializable {
     private boolean isActive;
     public boolean isActive() {
       return isActive;
@@ -238,7 +239,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   /**
    * Implementation of a MessageLogger that output all messages to the standard output
    */  
-  public static class StandardOutputMessageLogger implements MessageLogger {
+  public static class StandardOutputMessageLogger implements MessageLogger,java.io.Serializable {
   
     public StandardOutputMessageLogger() {
     }
@@ -263,7 +264,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   /**
    * Implementation of a MessageLogger that discard all output
    */  
-  public static class NullMessageLogger implements MessageLogger {
+  public static class NullMessageLogger implements MessageLogger,java.io.Serializable {
     public NullMessageLogger() {}    
     public void log(String message) {}    
     public void log(Throwable t) {}    
@@ -275,7 +276,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   /**
    * Implementation of a MessageSink that can receive one message at a time
    */  
-  public static class SimpleMessageSink implements MessageSink {
+  public static class SimpleMessageSink implements MessageSink,java.io.Serializable {
 
     private String message;
     private boolean isActive = true;
@@ -336,7 +337,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
     }
     
     public void run() {
-      logger.log("Process started Thread="+Thread.currentThread().getName());
+      //logger.log("Process started Thread="+Thread.currentThread().getName());
       try {
         while (true) {
           threadMonitor.setActive(false);
