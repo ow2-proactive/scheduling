@@ -39,15 +39,10 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
-/**
- *
- * Receives SAX event and pass them on
- *
- * @author       Lionel Mestre
- * @version      0.91
- *
- */
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator implements ProActiveDescriptorConstants {
+
+
+
 
   private ProActiveDescriptor proActiveDescriptor;
 
@@ -56,7 +51,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
   //
 
   public ProActiveDescriptorHandler() {
-    super();
+    super(false);
     proActiveDescriptor = new ProActiveDescriptorImpl();
     addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
     addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
@@ -81,7 +76,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
   public static void main(String[] args) throws java.io.IOException {
     InitialHandler h = new InitialHandler();
-    String uri = "file:///Z:/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
+    String uri = "Z:\\ProActive\\descriptors\\C3D_Dispatcher_Renderer.xml";
+    //String uri = "file:/net/home/rquilici/ProActive/descriptors/C3D_Dispatcher_Renderer.xml";
+    
     org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
     sr.read();
   }
@@ -102,7 +99,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       }
         catch (org.xml.sax.SAXException e){
         e.printStackTrace();
-        System.out.println("a problem occurs when getting the ProActiveDescriptorHandler");
+        logger.fatal("a problem occurs when getting the ProActiveDescriptorHandler");
         throw e;
       }
     }
@@ -174,6 +171,10 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       String property = attributes.getValue("property");
       if (checkNonEmpty(property)) {
        vn.setProperty(property);
+      }
+      String timeout = attributes.getValue("timeout");
+      if (checkNonEmpty(timeout)) {
+       vn.setTimeout(timeout);
       }
 
     }

@@ -52,6 +52,7 @@ class InfrastructureHandler extends PassiveCompositeUnmarshaller implements ProA
   //
 
   public InfrastructureHandler(ProActiveDescriptor proActiveDescriptor) {
+  	super(false);
     this.proActiveDescriptor = proActiveDescriptor;
     CollectionUnmarshaller ch = new CollectionUnmarshaller();
     ch.addHandler(PROCESS_DEFINITION_TAG, new ProcessDefinitionHandler(proActiveDescriptor));

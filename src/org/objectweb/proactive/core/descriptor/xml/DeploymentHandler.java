@@ -62,6 +62,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
   //
 
   public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
+  	super(false);
     this.proActiveDescriptor = proActiveDescriptor;
 		this.addHandler(REGISTER_TAG,new RegisterHandler());
 		this.addHandler(LOOKUP_TAG, new LookupHandler());
