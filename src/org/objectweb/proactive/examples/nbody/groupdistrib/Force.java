@@ -1,4 +1,4 @@
-package org.objectweb.proactive.examples.nbody.groupcom;
+package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package org.objectweb.proactive.examples.nbody.groupcom;
+package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
@@ -15,17 +15,17 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 public class Start {
-
+    
     private static ProActiveDescriptor staticPad; // is set as static so that Maestro can call quit() which calls killall
-   
+    
     public static void main(String[] args) {
         
         boolean display = false; 
         int totalNbBodies = 4;
         int maxIter = 1000;   
         String xmlFileName = "";
-                
-        System.out.println("RUNNING groupcom VERSION");
+        
+        System.out.println("RUNNING groupdistrib VERSION");
         // Set arguments as read on command line
         switch (args.length){
         case 3 : 
@@ -44,11 +44,11 @@ public class Start {
             // else : don't break, which means go to the default case
         default :
             String options = "[-display] totalNbBodies maxIter";
-            System.err.println("Usage : nbody.[bat|sh] " + options);
-        	 System.err.println("from the command line, it would be   java Start xmlFile " + options);
-        	 System.exit(1);
+        System.err.println("Usage : nbody.[bat|sh] " + options);
+        System.err.println("from the command line, it would be   java Start xmlFile " + options);
+        System.exit(1);
         }
-	
+        
         Displayer displayer = null;
         if (display) {
             try {
@@ -61,7 +61,7 @@ public class Start {
             }
         }
         try {
-			
+            
             // Init deployment-related variables: pad & nodes
             staticPad = null;
             VirtualNode vnode;
@@ -73,44 +73,36 @@ public class Start {
             try { nodes = vnode.getNodes(); }
             catch (NodeException e) { abort(e); }
             
-            			
-			int root = (int) Math.sqrt(totalNbBodies);
-			int STEP_X = 200 / root , STEP_Y = 200 / root;
-			Object [][] params = new Object [totalNbBodies][2] ;
-    	    for (int  i = 0 ; i < totalNbBodies ; i++) {
-  		      params[i][0] = new Integer(i);		      
-  		      params[i][1] = new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y);
-		    }
+            
+            int root = (int) Math.sqrt(totalNbBodies);
+            int STEP_X = 200 / root , STEP_Y = 200 / root;
+            Object [][] params = new Object [totalNbBodies][2] ;
+            
+            for (int  i = 0 ; i < totalNbBodies ; i++) {
+                params[i][0] = new Integer(i);		      
+                params[i][1] = new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y);
+            }
             Domain  domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
-               
-			System.out.println("[NBODY] " + totalNbBodies + " Planets are deployed");
-		
-			Maestro maestro = null;
-			try {
- 		       maestro = (Maestro) ProActive.newActive(
- 		               Maestro.class.getName(), new Object[] {domainGroup, new Integer(maxIter)});
-			    } 
- 		    catch (ActiveObjectCreationException e) { e.printStackTrace();   }
-			catch(NodeException ex){  	ex.printStackTrace();    }
-		
-			
-			// init workers
-		    if (display)
-		        domainGroup.init(domainGroup, displayer, maestro);
-		    else
-		        domainGroup.init(domainGroup,maestro);
-        
-		    // launch computation
-		    domainGroup.sendValueToNeighbours();
-		    
+            
+            System.out.println("[NBODY] " + totalNbBodies + " Planets are deployed");
+            
+            // init workers
+            if (display)
+                domainGroup.init(domainGroup, displayer, maxIter);
+            else
+                domainGroup.init(domainGroup, maxIter);
+            
+            // launch computation
+            domainGroup.sendValueToNeighbours();
+            
         }
-			
+        
         catch (NodeException e) { e.printStackTrace(); } 
         catch (ActiveObjectCreationException e) { e.printStackTrace(); } 
         catch (ClassNotReifiableException e1) { e1.printStackTrace(); }
         catch (ClassNotFoundException e1) { e1.printStackTrace(); }
     }
-
+    
     /**
      * Stop with an error.
      * @param e the Exception which triggered the abrupt end of the program
@@ -119,7 +111,7 @@ public class Start {
         e.printStackTrace();
         System.exit(-1);
     }
-
+    
     /**
      * End the program, removing extra JVM that have been created with the deployment of the Domains
      */    
@@ -130,5 +122,5 @@ public class Start {
         } catch (ProActiveException e) { e.printStackTrace(); }
         System.exit(0);
     }
-
+    
 }

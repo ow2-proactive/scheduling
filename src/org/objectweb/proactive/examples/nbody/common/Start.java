@@ -25,14 +25,14 @@ public class Start {
          
          int input = 0; 
          
-         System.out.print("Choose which version you want to run [123] : ");
+         System.out.print("Choose which version you want to run [1234] : ");
          try {
              while ( true ) {
                // Read a character from keyboard
                input  = System.in.read();
                // 1 byte character is returned in int.
                // So cast to char
-               if (input == 49 ||input == 50 ||input == 51 ||input == -1)
+               if (input == 49 ||input == 50 ||input == 51 ||input == 52 ||input == -1)
                    break; 
                }
            } catch (IOException ioe) {
@@ -41,8 +41,9 @@ public class Start {
            System.out.println ("Thank you!");
            switch (input) {
             case 49 :  org.objectweb.proactive.examples.nbody.groupcom.Start.main(args); break;
-          	case 50 :  org.objectweb.proactive.examples.nbody.barneshut.Start.main(args); break;
-           	case 51 :  org.objectweb.proactive.examples.nbody.oospmd.Start.main(args); break;
+           	case 50 :  org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(args); break;
+          	case 51 :  org.objectweb.proactive.examples.nbody.barneshut.Start.main(args); break;
+           	case 52 :  org.objectweb.proactive.examples.nbody.oospmd.Start.main(args); break;
            }
 
      }

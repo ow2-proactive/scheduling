@@ -48,6 +48,7 @@ public class Start {
         int maxIter = 1000;   
         String xmlFileName = "";
         
+        System.out.println("RUNNING Barnes-Hut VERSION");
         // Set arguments as read on command line
         switch (args.length){
         case 3 : 
