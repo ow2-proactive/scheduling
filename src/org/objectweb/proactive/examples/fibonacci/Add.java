@@ -56,7 +56,7 @@ private BigInteger fibN_2;
 
 	public void initActivity(Body body) {
 		Service service = new Service(body);
-        service.blockingServeOldest("setCons1"); // synchro avec le set de cons1
+        service.blockingServeOldest("setCons1");
 	}
 	
 	
@@ -79,9 +79,7 @@ public void setFibN_1(BigInteger fibN_1) {
 public void setFibN_2(BigInteger fibN_2) {
 	this.fibN_2 = fibN_2;
 }
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-	 */
+
 	public void runActivity(Body body) {
 		Service service = new Service(body);
 	      while (body.isActive()) {

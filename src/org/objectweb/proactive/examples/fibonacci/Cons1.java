@@ -76,13 +76,11 @@ public class Cons1 implements Serializable, InitActive, RunActive {
 	 */
 	public void initActivity(Body body) {
 		Service service = new Service(body);
-        service.blockingServeOldest("setAdd"); // synchro with "add"setting
-        service.blockingServeOldest("setCons2"); // synchro with "add" setting		
+        service.blockingServeOldest("setAdd"); 
+        service.blockingServeOldest("setCons2"); 
 	}
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-	 */
+	
 	public void runActivity(Body body) {
 		Service service = new Service(body);
 		add.setFibN_1(BigInteger.ONE); // starting with 1 

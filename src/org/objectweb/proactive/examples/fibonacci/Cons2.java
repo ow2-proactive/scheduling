@@ -30,7 +30,6 @@
 */
 package org.objectweb.proactive.examples.fibonacci;
 
-import java.io.Serializable;
 import java.math.BigInteger;
 
 import org.objectweb.proactive.Body;
@@ -42,7 +41,7 @@ import org.objectweb.proactive.Service;
  * @author manu
  *
  */
-public class Cons2 implements Serializable, InitActive, RunActive{
+public class Cons2 implements InitActive, RunActive{
 
 	private Add add;
 	private BigInteger fibN_1;
@@ -60,17 +59,11 @@ public class Cons2 implements Serializable, InitActive, RunActive{
 	public void setAdd(Add add) {
 		this.add = add;
 	}
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
-	 */
+	
 	public void initActivity(Body body) {
 		Service service = new Service(body);
-        service.blockingServeOldest("setAdd"); // synchro avec le set de add
-	}
+        service.blockingServeOldest("setAdd"); }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-	 */
 	public void runActivity(Body body) {
 		int k=0;
 		Service service = new Service(body);
