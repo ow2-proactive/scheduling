@@ -1,0 +1,135 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/ 
+package org.objectweb.proactive.ext.util;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.BodyMap;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.ext.locationserver.LocationServer;
+
+
+
+/**
+ * An implementation of a Location Server
+ */
+public class SimpleLocationServer implements LocationServer {
+
+  private BodyMap table;
+  private String url;
+
+ 
+  public SimpleLocationServer() {
+
+  }
+
+
+  public SimpleLocationServer(String url) {
+    this.url = normalizeURL(url);
+    this.table = new BodyMap();
+  }
+
+
+  /**
+   * Update the location for the mobile object s
+   * with id 
+   */
+  public void updateLocation(UniqueID i, UniversalBody s) {
+      // System.out.println("Server: updateLocation() " + i + " object = " + s);
+    table.putBody(i, s);
+  }
+
+
+  /**
+   * Return a reference to the remote body if available.
+   * Return null otherwise
+   */
+  public UniversalBody searchObject(UniqueID id) {
+    return (UniversalBody) table.getBody(id);
+  }
+
+
+  /**
+   * First register with the specified url
+   * Then wait for request
+   */
+  public void live(org.objectweb.proactive.Body body) {
+    this.register();
+    body.fifoPolicy();
+  }
+
+
+  protected String normalizeURL(String url) {
+    String tmp = url;
+    //if it starts with rmi we remove it
+    if (url.startsWith("rmi:")) {
+      tmp = url.substring(4);
+    }
+
+    if (!tmp.startsWith("//")) {
+      tmp = "//" + tmp;
+    }
+    return tmp;
+  }
+
+
+  protected void register() {
+    try {
+      System.err.println("Attempt at binding : " + url);
+      ProActive.register(ProActive.getStubOnThis(), url);
+      System.err.println("Location Server bound in registry : " + url);
+    } catch (Exception e) {
+      System.err.println("Cannot bind in registry - aborting " + url);
+      e.printStackTrace();
+      return;
+    }
+  }
+
+
+  public static void main(String args[]) {
+    if (args.length < 1) {
+      System.out.println("usage: java org.objectweb.proactive.ext.util.SimpleLocationServer <server url> [node]");
+      System.exit(-1);
+    }
+    Object arg[] = new Object[1];
+    arg[0] = args[0];
+    SimpleLocationServer server = null;
+    try {
+      if (args.length == 2)
+        server = (SimpleLocationServer)ProActive.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer", arg, NodeFactory.getNode(args[1]));
+      else
+        server = (SimpleLocationServer)ProActive.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer", arg);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+}

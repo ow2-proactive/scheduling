@@ -1,0 +1,334 @@
+<html>
+<head>
+<title>ProActive Installation</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Principles.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="HelloWorld.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>ProActive Installation</h1>
+
+<p class="textNormal">
+ProActive is made available for download to both non-profit organizations (such as universities and research institutions) and
+commercial companies for evaluation purpose. Please note that the base license does not cover the commercial use of the product for which
+any interested person or organization is asked to contact the authors : <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>.
+</p><p class="textNormal">
+Installing ProActive is easy, provided the following steps are followed:
+</p>
+
+<h2>Step 1: Check system requirements</h2>
+<p class="textNormal">
+ProActive requires Java 2 (commonly known as JDK 1.3) to be installed on your computer. If you do not yet have it, you can
+download the JDK 1.3 bundle from <a href="http://java.sun.com/j2se/1.3/">Sun's web site</a>.
+</p><p class="textNormal">
+Please note that ProActive will NOT run with any version prior 1.2 since some features introduced in JDK 1.2 are essential to
+ProActive. ProActive \emph{should} work with any version of Java to come <b>after</b> JDK 1.3. To check which version of Java your
+computer is running, simply type the following command line at your command prompt:
+</p>
+
+<blockquote><pre>
+> java -version
+java version "1.3.0"
+Java(TM) 2 Runtime Environment, Standard Edition (build 1.3.0)
+Java HotSpot(TM) Client VM (build 1.3.0, mixed mode)
+</pre></blockquote>
+
+<p class="textNormal">
+The output may vary with the operating system or the implementation of Java you're running, but it should always
+mention <code>1.3</code> somewhere, like in the example above.
+</p><p class="textNormal">
+As ProActive is implemented using Java RMI, you also need to check that
+your machine supports the TCP/IP network protocol, even if you do not plan to
+run distributed applications. TCP/IP is always installed by default on Unix
+machines but may not be installed at all on some Windows machines.
+</p>
+
+<h2>Step 2: Download the archive</h2>
+You can download the archive file (a standard <b>zip</b> file) containing ProActive from the <a href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download section</a> of the ProActive home page. You will be asked to accept the licence agreement and provide a few personal details including your email address. You will then within a few minutes receive an email explaining how to download the archive file.
+
+<h2>Step 3: Expand the archive</h2>
+<p class="textNormal">
+ProActive comes as a ZIP archive file, which should make it easily expandable under Windows or Unix or any other operating system. Unzip
+the archive using your favorite ZIP program, such as <a href="http://www.winzip.com/">Winzip</a> under Windows or the <a href="http://www.info-zip.org/pub/infozip/">unzip</a> command-line utility on most Unix systems. Unzipping the archive creates a <b>ProActive</b> directory and all the files contained in the archive go into this directory and its
+subdirectories.
+</p>
+<p class="textNormal">
+Here is a quick overview of the directory structure of the archive:
+</p>
+<table cellpadding="4" cellspacing="0" border="1" align="center" width="70%">
+    <tr>
+        <th class="navyCell">Directory or File</th>
+        <th class="navyCell">Description</th>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>ProActive.jar</code></td>
+        <td class="whiteCell">ProActive bytecode that you need to include in the CLASSPATH in order to use ProActive</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>ProActive_examples.jar</code></td>
+        <td class="whiteCell">The bytecode and resources of all examples included with ProActive. This jar file needs to be included in the CLASSPATH only when trying to run the examples. All examples rely on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH as well. This is done automatically by the scripts driving the examples. The source code is also included in the src directory (see below)</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>ic2d.jar</code></td>
+        <td class="whiteCell">The bytecode and resources of IC2D. This jar file needs to be included in the CLASSPATH only when trying to run the application IC2D. IC2D relies on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH. This is done automatically by the scripts launching the application. The source code is also included in the src directory (see below)</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>src</code></td>
+        <td class="whiteCell">Root directory for the source (.java) files of all examples included with ProActive and of the application IC2D</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>doc</code></td>
+        <td class="whiteCell">ProActive documentation including the full api doc</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>scripts/unix</code></td>
+        <td class="whiteCell">Unix <i>sh</i> scripts for running the examples</td>
+    </tr>
+    <tr>
+        <td class="navyCell"><code>scripts/windows</code></td>
+        <td class="whiteCell">Windows <i>.bat</i> batch files for running the examples</td>
+    </tr>
+</table>
+
+
+<h2>Step 4 (optional): Update your CLASSPATH</h2>
+<p class="textNormal">
+<i>If you use the scripts provided with the distribution to run the examples you do not need to update your classpath</i>
+</p>
+<p class="textNormal">
+When running java code using ProActive, you need to
+make sure that the CLASSPATH includes two new entries. The first
+entry is the JAR file containing ProActive. The second entry is
+the directory where ProActive outputs the stub classes it
+generates on-the-fly.
+</p><p class="textNormal">
+A small utility is provided to output the value of those two
+entries. It is called <code>install</code> and can be found in the
+scripts directory located in ProActive. It comes in both flavors:
+<code>install.sh</code> for Unix systems and <code>install.bat</code> for
+Windows.
+</p>
+<blockquote><pre>
+On a Unix system, the output looks as follows:
+
+bash-2.05$ ./install.sh
+
+----------------------------------------------------------
+
+JVM version: 1.3.0
+
+The two entries you need to add to your CLASSPATH are:
+
+/usr/home/bob/ProActive/ProActive.jar
+/usr/home/bob/proactive-tmp
+
+
+----------------------------------------------------------
+</pre></blockquote>
+<p class="textNormal">
+On a Windows system, the output looks as follows:
+</p>
+<blockquote><pre>
+C:\bob\ProActive\scripts>install.bat
+
+----------------------------------------------------------
+
+JVM version: 1.3.1-rc1
+
+The two entries you need to add to your CLASSPATH are:
+
+C:\bob\ProActive\ProActive.jar
+C:\WINNT\Profiles\bob\proactive-tmp
+
+
+----------------------------------------------------------
+
+Press a key to continue . . .
+</pre></blockquote>
+<p class="textNormal">
+Of course, the output will look something different on your
+system. In the example above, the user's home directory is
+<code>/usr/home/bob</code> and the archive containing ProActive was
+unzipped directly inside. Note that the directory
+<code>/usr/home/bob/proactive-tmp</code> was automatically created in
+order to hold the stub files generated by ProActive.
+</p><p class="textNormal">
+You do not need to modify your CLASSPATH permanently as long as
+you include the two entries above using a Java IDE or a shell
+script. The examples bundled with ProActive set-up
+the CLASSPATH automatically in order to include those two entries
+as well as the JAR file containing the examples code. As long as
+you run the examples from the directory they are located you do
+not need to change anything.
+<br></br>
+If not you need to update the environment file that specifies
+where is the ProActive install directory and the proactive-tmp
+directory. On Unix systems, the file is called \texttt{env.sh} and
+is located in <code>ProActive/scripts/unix</code>. On Windows systems,
+the file is called <code>env.bat</code> and is located in
+<code>ProActive/scripts/windows</code>.
+</p>
+<p class="textNormal">
+On Unix systems the file <code>ProActive/scripts/unix/env.sh</code>
+contains the following values by default :
+</p>
+<blockquote><pre>
+    PROACTIVE=../../.
+    PROACTIVE_TEMP=$HOME/proactive-tmp
+</pre></blockquote>
+
+<p class="textNormal">
+On Windows systems the file <code>ProActive/scripts/windows/env.bat</code>
+contains the following values by default :
+</p>
+<blockquote><pre>
+    set PROACTIVE=..\..\.
+    set PROACTIVE_TEMP=%USERPROFILE%\proactive-tmp
+</pre></blockquote>
+
+<p class="textNormal">
+By default, the <code>proactive-tmp</code> directory is located inside your home directory. Note that on Windows NT, the home directory is <code>C:\WINNT\Profiles\yourWindowsLoginName</code> and that on Windows 2000 and Windows XP, the home directory is <code>C:\Documents and Settings\yourWindowsLoginName</code>
+</p>
+
+<h2>Step 5 (optional): Create a java.policy file to set permissions</h2>
+<p class="textNormal">
+<i>If you use the scripts provided with the distribution to run the examples an existing policy file will be used by default</i>
+</p>
+<p class="textNormal">
+See <a href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions in the JavaTM 2 SDK</a> to learn more about Java permissions.
+As a first approximation to run your code you can create a simple policy file granted all for everything :
+</p>
+<blockquote><pre>
+grant {
+    permission java.security.AllPermission;
+};
+</pre></blockquote>
+
+
+<h2>Run a few examples for testing</h2>
+You are now ready to run the test applications provided with ProActive. Each example comes with a script for launching
+the application. Depending on you operating system, the script you need to launch is located either in <code>ProActive/scripts/unix</code>
+<code>ProActive/scripts/windows</code>.
+The source code of all examples can be found in the directory <code>ProActive/src/org/objectweb/proactive/examples</code>.
+
+<h3>Local Example 1: Hello world !</h3>
+<p class="textNormal">
+A simple example.
+<ul class="listWithSpace">
+    <li class="textNormal">script : <code>hello.sh</code> or <code>hello.bat</code></li>
+    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/hello</code></li>
+</ul>
+</p>
+
+<h3>Local Example 2: Reader/Writer</h3>
+<p class="textNormal">
+This example is the ProActive version of the Readers/Writers canonical problem. To illustrate the ease-of-use of the
+ProActive model, different synchronization policies can be applied
+without even stopping the application. This example is based on a easy to use Swing GUI.
+<ul class="listWithSpace">
+    <li class="textNormal">script : <code>readers.sh</code> or <code>readers.bat</code></li>
+    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/readers</code></li>
+</ul>
+</p>
+
+<h3>Local Example 3: The Dining Philosophers</h3>
+<p class="textNormal">
+This example is one possible implementation of the well-known <i>Dining Philosophers</i> synchronization problem.
+This example is based on a easy to use Swing GUI.
+<ul class="listWithSpace">
+    <li class="textNormal">script : <code>philosophers.sh</code> or <code>philosophers.bat</code></li>
+    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/philosophers</code></li>
+</ul>
+</p>
+
+
+<h2>Troubleshooting and support</h2>
+If you encounter any problem with installing ProActive and running the
+examples, please make sure you correctly followed all the steps
+described above. If it doesn't help, here is a list of the most common
+mistakes:
+
+<ul class="listWithSpace">
+
+<li class="textNormal">
+<b>Java complains about not being able to find ProActive's classes.</b>
+Your <code>CLASSPATH</code> environment variable does not contain the entry for the directory where ProActive's classes are located. The path to this directory is given to you by the
+<code>install</code> utility, as described in step 3.
+</li>
+
+<li class="textNormal">
+<b>ProActive complains about not being able to load stub classes.</b>
+Your <code>CLASSPATH</code> environment variable does not contain the entry for the directory where ProActive's classes are located. The path to this directory is given to you by the
+<code>install</code> utility, as described in step 3.
+Your <code>CLASSPATH</code> environment variable does not contain an entry for the directory where ProActive outputs the stubs classes (<code>proactive-tmp</code> directory). The path to this directory is given to you by the <code>install</code> utility, as described in step 3.
+</li>
+
+<li class="textNormal">
+<b>ProActive complains about not being to bind to the rmiregistry.</b>
+The <code>RMIRegistry</code> has not been launched.
+</li>
+
+<li class="textNormal">
+<b>Java complains about denial of access.</b>
+If you get the following exceptions, you probably didn't change the file java.policy as described in step 4.
+<blockquote><pre>
+org.objectweb.proactive.NodeException:
+java.security.AccessControlException: access denied
+(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
+                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init>(RmiNode.java:17)
+                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode (RmiNodeFactory.java, Compiled Code)
+                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
+                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
+                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
+                ...
+
+Exception in thread "main" java.lang.ExceptionInInitializerError:
+java.security.AccessControlException: access denied
+(java.util.PropertyPermission user.home re ad)
+                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
+                at java.security.AccessController.checkPermission(AccessController.java:403)
+                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
+                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
+                at java.lang.System.getProperty(System.java:539)
+                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
+                ...
+</pre></blockquote>
+</li>
+
+</ul>
+<p class="textNormal">
+If you cannot solve the problem, feel free to email us for support at: <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>.
+Make sure you include a precise description of your problem along with a full copy of the error message you get.
+</p>
+
+
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

@@ -1,0 +1,123 @@
+<html>
+<head>
+<title>ProActive Basis, Active Object definition</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+	<table cellpadding="2" cellspacing="0" border="1">
+	<tr>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="HelloWorld.html">prev</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="ActiveObjectCreation.html">next</a>&nbsp;&nbsp;</td>
+	</tr>
+	</table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>ProActive Basis, Active Object definition</h1>
+
+<h2>Active objects basis</h2>
+<p class="textNormal">
+Active objects are the basic units of activity and
+distribution used for building concurrent applications using
+ProActive. An active object owns its own thread. This thread
+only executes the methods invoked on this active object by other
+active objects and those of the passive objects of the subsystem
+that belongs to this active object. With ProActive PDC, the
+programmer does not have to explicitly manipulate Thread
+objects, unlike in standard Java.
+</p>
+<p class="textNormal">
+Active objects can be created on any of the hosts involved in the
+computation. Once an active object is created, its activity (the
+fact that it owns its own thread) and its location (local or
+remote) are perfectly transparent. As a matter of fact, any active
+object can be manipulated just like if it were a passive instance
+of the same class.
+</p><p class="textNormal">
+ProActive is a library designed for developing applications in
+a model introduced by the Eiffel// language. 
+Its main features are :
+<ul class="listWithSpace">
+<li class="textNormal">The application is structured in subsystems. There is one active object (and therefore one thread) for each subsystem and one subsystem for each active object (or thread). Each subsystem is thus composed of one active object and any number of passive objects (possibly zero). The thread of one subsystem only executes methods in the objects of this subsystem.</li>
+<li class="textNormal">There are no shared passive objects between subsystems.</li>
+</ul>
+</p>
+<br><div align="center">
+<img src="images/proActiveModel.gif"/>
+<br><b class="legend">
+The Model
+</b><br></div>
+
+<p class="textNormal">
+These two main features have a lot of important consequences on the topology of the application:
+<ul class="listWithSpace">
+	<li class="textNormal">Of all the objects that make up a subsystem (the active object and the passive objects), only the active object is known to objects outside of the subsystem.</li>
+	<li class="textNormal">All objects (both active and passive) may have references onto active objects.</li>
+	<li class="textNormal">If an object o1 has a reference onto a passive object o2, then o1 and o2 are part of the same subsystem.</li>
+</ul>
+</p><p class="textNormal">
+This has also consequences on the semantics of message-passing between subsystems.
+<ul class="listWithSpace">
+	<li class="textNormal">When an object in a subsystem calls a method on an active object, the parameters of the call may be references on passive objects of the subsystem, which would lead to shared passive objects. This is why passive objects passed as parameters of calls on active objects are always passed by <i>deep-copy</i>. Active objects, on the other hand, are always passed by reference. Symmetrically, this also applies to objects returned from methods called on active objects.</li>
+<li class="textNormal">When a method is called on an active object, it returns immediately (as the thread cannot execute methods in the other subsystem). A <i>future object</i>, which is a placeholder for the result of the methods invocation, is returned. From the point of view of the caller subsystem, no difference can be made between the future object and the object that would have been returned if the same call had been issued onto a passive object. Then, the calling thread can continue executing its code just like if the call had been effectively performed. The role of the future object is to block this thread if it invokes a method on the future object and the result has not yet been set (i.e. the thread of the subsystem on which the call was received has not yet performed the call and placed the result into the future object): this inter-object synchronization policy is known as {\it wait-by-necessity}.</li>
+</ul>
+</p>
+
+<br><div align="center">
+<img src="images/activeObjectMethodCall.gif"/>
+<br><b class="legend">
+A call onto an active object as opposed to a call onto passive one
+</b><br></div>
+
+<h2>What is an active object</h2>
+<p class="textNormal">
+The active object is actually the composition of two objects: a
+<i>body</i> and a standard Java object. The body is not visible
+from the outside of the active object, then everything looks like
+if the standard object was active.
+</p><p class="textNormal">
+The body is responsible for receiving calls on the active object,
+storing these calls in a queue of pending calls (we also call <i>requests</i>.
+It also executes these calls in an order specified by
+a specific synchronization policy. If no specific synchronization
+policy is provided, calls are managed in a FIFO manner (first
+come, first served).
+</p><p class="textNormal">
+Then, the thread of an active object alternatively chooses a
+method in the queue of pending requests and executes it. It is
+important to note that no parallelism is provided inside an active
+object. This is an important decision in the design of ProActive
+PDC which enables the use of pre-post conditions and class
+invariants.
+</p><p class="textNormal">
+On the side of the subsystem which send a call to an active
+object, this active object is represented by a <i>proxy</i>, whose
+main responsibility is to generate future objects for representing
+future values, transform calls into Request objects (in terms of
+metaobject, this is a reification) and perform deep-copy of
+passive objects passed as parameters.
+</p>
+
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

@@ -1,0 +1,97 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/ 
+package org.objectweb.proactive.ext.locationserver;
+
+import org.objectweb.proactive.ext.locationserver.LocationServer;
+import org.objectweb.proactive.core.util.ProActiveProperties;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
+
+
+public class LocationServerFactory {
+
+
+  //
+  // -- PUBLIC MEMBERS -----------------------------------------------
+  //
+  
+  
+  //
+  // -- CONSTRUCTORS -----------------------------------------------
+  //
+
+    public LocationServerFactory() {
+
+    }
+
+ 
+  //
+  // -- PUBLIC METHOD -----------------------------------------------
+  //
+  
+
+   //  public static String getLocationServerClassName() {
+//       return  ProActiveProperties.getLocationServerClass();
+//     }
+ 
+//     public static String getLocationServerClassName(UniqueID id) {
+//       return  LocationServerFactory.getLocationServerClassName();
+//     }
+
+//     public static String getLocationServerName() {
+// 	return ProActiveProperties.getLocationServerRmi();
+//     }
+    
+//     public static String getLocationServerName(UniqueID unique) {
+// 	return LocationServerFactory.getLocationServerName();
+//     }
+
+    public static LocationServer getLocationServer() {
+	LocationServer server = null;
+	try {
+	    server = (LocationServer)ProActive.lookupActive(ProActiveProperties.getLocationServerClass(),
+							    ProActiveProperties.getLocationServerRmi());
+	} catch (Exception e) {
+	    e.printStackTrace();
+	}       	
+	return server;
+    }
+
+    /**
+     * Return the location server associated with the 
+     * <code>id</code>
+     * 
+     */
+    public static LocationServer getLocationServer(UniqueID id) {
+	return LocationServerFactory.getLocationServer();
+    }
+
+}

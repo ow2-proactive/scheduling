@@ -1,0 +1,188 @@
+<html>
+<head>
+<title>MOP : Metaobject Protocol</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+	<table cellpadding="2" cellspacing="0" border="1">
+	<tr>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Migration.html">prev</a>&nbsp;&nbsp;</td>
+	</tr>
+	</table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>MOP : Metaobject Protocol</h1>
+
+<h2>Implementation: a Meta-Object Protocol</h2>
+<p class="textNormal">
+ProActive is built on top of a metaobject protocol (MOP) that permits
+reification of method invocation and constructor call. As this MOP is not limited to
+the implementation of our transparent remote objects library, it also provides an
+open framework for implementing powerful libraries for the Java language.
+</p><p class="textNormal">
+As for any other element of ProActive, this MOP is entirely written in Java and does
+not require any modification or extension to the Java Virtual Machine, as opposed to
+other metaobject protocols for Java \cite{Kleinoeder96}. It makes extensive use of
+the Java Reflection API, thus requiring JDK 1.1 or higher. JDK 1.2 is required in
+order to suppress default Java language access control checks when executing reified
+non-public method or constructor calls.
+</p>
+
+<h2>Principles</h2>
+<p class="textNormal">
+If the programmer wants to implement a new metabehavior using our metaobject protocol,
+he or she has to write both a concrete (as opposed to abstract) class and an interface.
+The concrete class provides an implementation for the metabehavior he or she wants to
+achieve while the interface contains its declarative part.<br>
+The concrete class implements interface {\tt Proxy} and provides an implementation for
+the given behavior through the method {\tt reify}:
+</p>
+
+<blockquote><pre>
+  public Object reify (MethodCall c) throws InvocationTargetException, IllegalAccessException;
+</pre></blockquote>
+
+<p class="textNormal">
+This method takes a reified call as a parameter and returns the value returned by the
+execution of this reified call. Automatic wrapping and unwrapping of primitive types
+is provided. If the execution of the call completes abruptly by throwing an exception,
+it is propagated to the calling method, just as if the call had not been reified.
+</p>
+<p class="textNormal">
+The interface that holds the declarative part of the metabehavior has to be a
+subinterface of <code>Reflect</code> (the root interface for all metabehaviors implemented
+using ProActive). The purpose of this interface is to declare the name of the proxy
+class that implements the given behavior. Then, any instance of a class implementing
+this interface will be automatically created with a proxy that implements this
+behavior, provided that this instance is not created using the standard <code>new</code>
+keyword but through a special static method:
+<code>MOP.newInstance</code>. This is the only required modification to the application code.
+Another static method, <code>MOP.newWrapper</code>, adds a proxy to an already-existing
+object; the <code>turnActive</code> function of ProActive, for example, is implemented
+through this feature.
+</p>
+
+<h2>Example of a different metabehavior: EchoProxy</h2>
+<p class="textNormal">
+Here's the implementation of a very simple yet useful metabehavior : for each reified
+call, the name of the invoked method is printed out on the standard output stream and
+the call is then executed. This may be a starting point for building debugging or
+profiling environments.
+</p>
+<blockquote><pre>
+class EchoProxy extends Object implements Proxy {
+  // here are constructor and variables declaration
+  // [...]
+  public Object reify (MethodCall c) throws InvocationTargetException, IllegalAccessException {
+      System.out.println (c.getMethodName());
+      return c.execute (targetObject);
+  }
+}
+
+interface Echo extends Reflect {
+  public String PROXY_CLASS= "EchoProxy";
+}
+</pre></blockquote>
+
+
+<h3>Instantiating with the metabehavior</h3>
+<p class="textNormal">
+Instantiating an object of any class with this metabehavior can be
+done in three different ways: instantiation-based, class-based or
+object-based. Let's say we want to instantiate a <code>Vector</code>
+object with an <code>Echo</code> behavior.
+</p>
+<ul class="listWithSpace">
+
+<li class="textNormal">Standard Java code would be : 
+<pre>
+  Vector v = new Vector(3);
+</pre></li>
+
+<li class="textNormal">ProActive code, with instantiation-based declaration of the metabehavior (the last parameter is <code>null</code> because we do not have any additional parameter to pass
+to the proxy) : 
+<pre>
+  Object[] params = {new Integer (3)};
+  Vector v = (Vector) MOP.newInstance("Vector", params, "EchoProxy", null);
+</pre>
+</li>
+
+<li class="textNormal">with class-based declaration : 
+<pre>
+  public class MyVector extends Vector implements Echo {}
+  Object[] params = {new Integer (3)} ;
+  Vector v = (Vector) MOP.newInstance("Vector", params, null);
+</pre></li>
+
+<li class="textNormal">with object-based declaration : 
+<pre>
+  Vector v = new Vector (3);
+  v=(Vector) MOP.newWrapper("EchoProxy",v);
+</pre>
+This is the only way to give a metabehavior to an object that is created in a place
+where we cannot edit source code. A typical example could be an object returned by a
+method that is part of an API distributed as a JAR file, without source code. Please
+note that, when using <code>newWrapper</code>, the invocation of the constructor of the
+class <code>Vector</code> is not reified.
+</li>
+</ul>
+
+
+<h2>The Reflect interface</h2>
+
+<p class="textNormal">
+All the interfaces used for declaring <i>metabehaviors</i> inherit directly or
+indirectly from <code>Reflect</code>. This leads to a hierarchy of metabehaviors such as
+shown in the figure below.
+</p>
+
+<br><div align="center">
+<img src="images/reflectInterfaceDiagram.gif"/>
+<br><b class="legend">
+Reflect Interface and sub-interfaces diagram
+</b><br></div>
+
+<p class="textNormal">
+Note that <code>ImplicitActive</code> inherits from <code>Active</code> to highlight the fact that
+implicit synchronization somewhere always relies on some hidden explicit mechanism.
+Interfaces inheriting from <code>Reflect</code> can thus be logically grouped and assembled
+using multiple inheritance in order to build new metabehaviors out of existing ones.
+</p>
+
+<h2>Limitations</h2>
+<p class="textNormal">
+Due to its commitment to be a 100\% Java library, the MOP has a few limitations:
+<ul class="listWithSpace">
+	<li class="textNormal">Calls sent to instances of {\tt final} classes (which includes all arrays)
+cannot be reified.</li>
+	<li class="textNormal">Primitive types cannot be reified because they are not instance of a
+standard class.</li>
+	<li class="textNormal">Final classes (which includes all arrays) cannot be reified because they
+cannot be subclassed.</li>
+</ul>
+</p>
+
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

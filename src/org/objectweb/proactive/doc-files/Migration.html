@@ -1,0 +1,163 @@
+<html>
+<head>
+<title>Active Object Migration</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FutureObjectCreation.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>Active Object Migration</h1>
+
+<h2>Migration Primitive</h2>
+<p class="textNormal">
+The migration of an active object can be triggered by the active object itself, or by an external agent. In both cases 
+a single primitive will eventually get called to perform the migration. It is the method 
+<code><a href="../core/body/migration/AbstractMigratableBody.html#migrateTo(org.objectweb.proactive.core.node.Node)">migrateTo</a></code>
+accessible from a migratable body (a body that inherits from <code><a href="../core/body/migration/AbstractMigratableBody.html">AbstractMigratableBody</a></code>).
+</p><p class="textNormal">
+In order to ease the use of the migration, we provide 2 set of static methods on the <code><a href="../ProActive.html">ProActive</a></code> class. The first 
+set is aimed at the migration triggered from the active object that wants to migrate. The methods rely of the fact that the calling thread <b>is</b> the 
+active thread of the active object :
+<ul class="listWithSpace">
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(java.lang.Object)">migrateTo(Object o)</a></code> : migrate to the same location as an existing active object</li>
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(java.lang.String)">migrateTo(String nodeURL)</a></code> : migrate to the location given by the URL of the node</li>
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(org.objectweb.proactive.core.node.Node)">migrateTo(Node node)</a></code> : migrate to the location of the given node</li>
+</ul>
+</p><p class="textNormal">
+The second set is aimed at the migration triggered from another agent than the target active object. In this case the external agent must have a reference to the 
+Body of the active object it wants to migrate.
+<ul class="listWithSpace">
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(org.objectweb.proactive.Body, java.lang.Object, boolean)">migrateTo(Body body, Object o, boolean priority)</a></code> : migrate to the same location as an existing active object</li>
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(org.objectweb.proactive.Body, java.lang.String, boolean)">migrateTo(Body body, String nodeURL, boolean priority)</a></code> : migrate to the location given by the URL of the node</li>
+<li class="textNormal"><code><a href="../ProActive.html#migrateTo(org.objectweb.proactive.Body, org.objectweb.proactive.core.node.Node, boolean)">migrateTo(Body body, Node node, boolean priority)</a></code> : migrate to the location of the given node</li>
+</ul>
+</p>
+
+<h2>Using migration</h2>
+<p class="textNormal">
+Any active object has the ability to migrate. If it references some passive objects, they will also migrate to the new location.
+Since we rely on the serialization to send the object on the network, <b>the active object must implements the serializable interface</b>.
+To migrate, an active object must have a method which contains a call to the migration primitive. This call must be the last one in the
+method, i.e the method must returns immediately after. Here an example of a method in an active object :
+</p>
+<blockquote><pre>
+   public void moveTo(String t) {
+     try {
+       ProActive.migrateTo(t);
+     } catch (Exception e) {
+       e.printStackTrace();
+     }
+   }
+</pre></blockquote>
+<p class="textNormal">
+We don't provide any test to check if the call to migrateTo is the last one in the method, hence if this rule is not enforced, it can lead to unexpected behavior.
+Now to make this object move, you just have to call its <code>moveTo()</code> method.
+</p>
+
+<h2>Complete example</h2>
+
+<blockquote><pre>
+  import org.objectweb.proactive.ProActive;
+  public class SimpleAgent implements Serializable {
+
+    public SimpleAgent() {
+    }
+
+    public void moveTo(String t) {
+      try {
+        ProActive.migrateTo(t);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    public String whereAreYou() {
+      try {
+        return InetAddress.getLocalHost().getHostName();
+      } catch (Exception e) {
+        return "Localhost lookup failed";
+      }
+    }
+
+    public static void main (String[] args) {
+      if (!(args.length>0)) {
+        System.out.println("Usage: java migration.test.TestSimple hostname/NodeName ");
+        System.exit(-1);
+      }
+      SimpleAgent t = null;
+      try {
+        // create the SimpleAgent in this JVM
+        t = (SimpleAgent) ProActive.newActive("migration.test.SimpleAgent",null);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      // migrate the SimpleAgent to the location identified by the given node URL
+      // we assume here that the node does already exist
+      t.moveTo(args[0]);
+      System.out.println("The Active Object is now on host " + t.whereAreYou());
+    }
+  }
+</pre></blockquote>
+<p class="textNormal">
+The class SimpleAgent implements <code>Serializable</code> so the objects created will be able to migrate.
+We need to provide an empty constructor to avoid side effects during the creation of active objects.
+This object has two methods, <code>moveTo()</code> which makes it migrate to the specified location, 
+and <code>whereAreYou()</code> which return the hostname of the new location of the agent.
+</p>
+In the main method, we first need to create an active object, which is done through
+the call to <code>newActive()</code>. Once this is done, we can call
+methods on it as on any object. We call its <code>moveTo</code> method which
+will make it migrates to the node specified as parameter and then we ask it what is its current
+location.
+
+<h2>Dealing with non-serializable attributes</h2>
+<p class="textNormal">
+The migration of an active object uses the serialization.
+Unfortunately, not all the objects in the Java language are
+serializable. We are going to see a simple method to deal with
+such attributes in the case their value does not need to be saved.
+For more complex cases, the reader can have a look to the Java RMI
+specifications.
+</p><p class="textNormal">
+When a <code>NotSerializable</code> exception is thrown, the first step
+to solve the problem is to identify the variable responsible, i.e
+the one which is not serializable... In front of the declaration
+of this variable, put the keyword <code>transient</code>. This indicates
+that the value of this variable should not be serialized. After the first migration, this field will be set to null
+since it has not been saved. So we have to rebuild it upon arrival of the active object 
+on its new location. This can easily be done by providing in the active object the standard method 
+<blockquote><pre>
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException;
+</pre></blockquote>
+See the <code>Serializable</code> interface in the standard JavaDoc to learn more.
+
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

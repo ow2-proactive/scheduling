@@ -1,0 +1,290 @@
+<html>
+<head>
+<title>Asynchronous calls and futures</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+	<table cellpadding="2" cellspacing="0" border="1">
+	<tr>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="ActiveObjectCreation.html">prev</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Migration.html">next</a>&nbsp;&nbsp;</td>
+	</tr>
+	</table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Header : end -->
+
+<h1>Asynchronous calls and futures</h1>
+
+<h2>Creation of a Future Object</h2>
+<p class="textNormal">
+Whenever possible a method call on an active object is reified as an asynchronous 
+request. If not possible the call is synchronous and blocks until the reply is received.
+In case the request is asynchronous, it immediately returns a future object. 
+</p><p class="textNormal">
+This object acts as a placeholder for the result of the
+not-yet-performed method invocation. As a consequence, the calling
+thread can go on with executing its code, as long as it doesn't need
+to invoke methods on the returned object, in which case the calling
+thread is automatically blocked if the result of the method invocation
+is not yet available. Below are shown the different cases that can lead 
+to an asynchronous call.
+</p>
+<table border="1" cellpadding="4" cellspacing="0">
+	<tr align="center" class="navyCell">
+		<th>Return type</th>
+		<th>Can throw checked exception</th>
+		<th>Creation of a future</th>
+		<th>Asynchronous</th>
+	</tr>
+	<tr align="center">
+		<td class="navyCell">void</td>
+		<td class="whiteCell">-</td>
+		<td class="whiteCell">No</td>
+		<td class="whiteCell">Yes</td>
+	</tr>
+	<tr align="center">
+		<td class="navyCell">Non Reifiable Object</td>
+		<td class="whiteCell">-</td>
+		<td class="whiteCell">No</td>
+		<td class="whiteCell">No</td>
+	</tr>
+	<tr align="center">
+		<td class="navyCell">Reifiable Object</td>
+		<td class="whiteCell">Yes</td>
+		<td class="whiteCell">No</td>
+		<td class="whiteCell">No</td>
+	</tr>
+	<tr align="center">
+		<td class="navyCell">Reifiable Object</td>
+		<td class="whiteCell">No</td>
+		<td class="whiteCell">Yes</td>
+		<td class="whiteCell">Yes</td>
+	</tr>
+</table>
+<p class="textNormal">
+As we can see, the creation of a future depends not only on the
+caller type, but also on the return object type. Creating a future
+is only possible if the object is reifiable. Note although having a quite similar
+structure as an active object, a future object is not active. It
+only has a Stub and a Proxy as shown in figure below :
+</p>
+
+<br><div align="center">
+<img src="images/futureObject.gif"/>
+<br><b class="legend">
+A future object
+</b><br></div>
+
+<p class="textNormal">
+During its lifetime, an active object can create many future
+objects. There are all automatically kept in a FuturePool.
+</p><p class="textNormal">
+Each time a future is created, it is inserted in the future pool
+of the corresponding active object. When the result becomes
+available, the future object is removed from the pool. Although
+most of the methods of the FuturePool are for internal use
+only and are directly called by the proactive library we provide a
+method to wait until a result becomes available. Instead of
+blocking until a specific future is available, the call to
+<code>waitForReply()</code> blocks until any of
+the current futures become available. An application can be found
+in the FutureList class.
+</p>
+
+<h3>HashCode and equals</h3>
+<p class="textNormal">
+Any call to a future object is reified in order to be blocked if the
+future is not yet available and later executed on the result
+object. However, two methods don't follow this scheme: equals and
+hashCode. They are often called by other methods
+from the Java library, like <code>HashTable.add()</code> and so are most of
+the time out of control from the user. This can lead very easily to
+deadlocks if they are called on a not yet available object.
+</p>
+<h4>hashCode()</h4>
+Instead of returning the hashcode of the object, it returns the
+hashcode of its proxy. Since there is only one proxy per future
+object, there is a unique equivalence between them.
+
+<h4>equals()</h4>
+<p class="textNormal">
+The default implementation of <code>equals()</code> in the Object class is
+to compare the references of two objects. In ProActive it is redefined
+to compare the hashcode of two proxies. As a consequence it is only
+possible to compare two future object, and not a future object with a
+normal object.
+</p>
+<p class="textNormal">
+There are some drawbacks with this technic, the main one being the
+impossibility to have a user override the default <code>HashTable</code> and
+<code>equals()</code> methods.
+</p>
+
+<h3>toString()</h3>
+<p class="textNormal">
+The <code>toString()</code> method is most of the time called with
+<code>System.out.println()</code> to turn an object into a printable string. 
+In the current implementation, a call to this method will block on a future
+object like any other call, thus, one has to be careful when using
+it. As an example, trying to print a future object for debugging
+purpose will most of the time lead to a deadlock. Instead of
+displaying the corresponding string of a future object, you might
+consider displaying its hashCode.
+</p>
+
+
+<h2>Asynchronous calls in details</h2>
+<h3>The setup</h3>
+<p class="textNormal">
+First, let's introduce the example we'll use throughout this
+section. Let us say that some piece of code in an instance of class
+<code>A</code> calls method <code>foo</code> on an active instance of class
+<code>B</code>. This call is asynchronous and returns a future object of class
+<code>V</code>. Then, possibly after having executed some other code, the
+same thread that issued the call calls method <code>bar</code> on the future
+object returned by the call to <code>foo</code>.
+</p>
+
+<h3>What would have happened in a sequential world</h3>
+<p class="textNormal">
+In a sequential, single-threaded version of the same application, the
+thread would have executed the code of the calling method in class
+<code>A</code> up to the call of <code>foo</code>, then the code of <code>foo</code> in
+class <code>B</code>, then back to the code of the calling method in class
+<code>A</code> up to the call to <code>bar</code>, then the code of <code>bar</code> in
+class <code>V</code>, and finally back to the code of the calling method in
+class <code>A</code> until its end. The sequence diagram below
+summarizes this execution. You can notice how the
+single thread successively executes code of different methods in
+different classes.
+</p>
+
+<br><div align="center">
+<img src="images/sequentialCallUMLDiagram.gif"/>
+<br><b class="legend">
+Sequence Diagram - single-threaded version of the program
+</b><br><br></div>
+
+<h3>Visualizing the graph of objects</h3>
+Let us first get an idea of what the graph of objects at execution
+(the objects with their references to each other) looks like at three
+different moments of the execution:
+<ul class="listWithSpace">
+<li class="textNormal">Before calling <code>foo</code>, we have exactly the same setup as
+after the creation of the active instance of <code>B</code> and summarized 
+in the figure below : an
+instance of class <code>A</code> and an active instance of class <code>B</code>. As
+all active objects, the instance of class <code>B</code> is composed of a
+stub (an instance of class <code>Stub_B</code>, which actually inherits
+directly from <code>B</code>), a <code>BodyProxy</code>, a <code>Body</code> and the
+actual instance of <code>B</code>.
+<br><div align="center">
+<img src="images/activeObjectComponents.gif"/>
+<br><b class="legend">
+The components of an active object
+</b><br><br></div>
+
+</li>
+<li class="textNormal">After the asynchronous call to <code>foo</code> has returned, <code>A</code>
+now holds a reference onto a future object representing the
+not-yet-available result of the call. It is actually composed of a
+<code>Stub_V</code> and a <code>FutureProxy</code> as shown on the figure below.
+<br><div align="center">
+<img src="images/futureObjectComponents.gif"/>
+<br><b class="legend">
+The components of a future object before the result is set
+</b><br><br></div>
+</li>
+
+<li class="textNormal">Right after having executed <code>foo</code> on the instance of <code>B</code>, 
+the thread of the <code>Body</code> sets the result in the future, which
+results in the <code>FutureProxy</code> having a reference onto a <code>V</code>
+(see figure below).
+<br><div align="center">
+<img src="images/futureObjectAllComponents.gif"/>
+<br><b class="legend">
+All components of a future object
+</b><br></div>
+</li>
+</ul>
+
+<h3>Sequence Diagram</h3>
+<p class="textNormal">
+Let us now concentrate on how and when and by which thread the different methods are called.
+We have two threads: the thread that belongs to the subsystem <code>A</code> is part of (let's
+call it the <i>first thread</i>), and the thread that belongs to
+the subsystem <code>B</code> is part of (the <i>second thread</i>).
+</p><p class="textNormal">
+The first thread invokes <code>foo</code> on an instance of <code>Stub_B</code>, 
+which builds a <code>MethodCall</code> object and passes it to
+the <code>BodyProxy</code> as a parameter of the call to <code>reify</code>.
+The proxy then checks the return type of the call (in this case <code>V</code>) and
+generates a future object of type <code>V</code> for representing the
+result of the method invocation. The future object is actually
+composed of a <code>Stub_V</code> and a <code>FutureProxy</code>. A
+reference onto this future object is set in the <code>MethodCall</code>
+object, which will prove useful once the call is executed. Now
+that the <code>MethodCall</code> object is ready, it is passed as a Request to the
+<code>Body</code> of the Active Object as a parameter. The body 
+simply appends this request to the queue of pending requests and returns
+immediately. The call to <code>foo</code> that an <code>A</code> issued now
+returns a future object of type <code>Stub_V</code>, that is a
+subclass of <code>V</code>.
+</p><p class="textNormal">
+At some point, possibly after having served some other requests, the <i>second thread</i> (the active thread) picks up
+the request issued by the <i>first thread</i> some time ago. It then
+executes the embedded call by calling <code>foo</code> on the instance of <code>B</code>
+with the actual parameters stored in the <code>MethodCall</code> object.
+As specified in its signature, this call returns an object of type
+<code>V</code>. The <i>second thread</i> is then responsible for setting this
+object in the future object (which is the reason why <code>MethodCall</code> 
+objects hold a reference on the future object created
+by the <code>FutureProxy</code>). The execution of the call is now
+over, and the <i>second thread</i> can select another request to serve in
+the queue and execute it.
+</p><p class="textNormal">
+In the meantime, the <i>first thread</i> has continued executing the code of the calling method in
+class <code>A</code>. At some point, it calls <code>bar</code> on the object of
+type <code>Stub_V</code> that was returned by the call to <code>foo</code>. This call
+is reified thanks to the <code>Stub_V</code> and processed by the <code>FutureProxy</code>. 
+If the object the future represents is available (the <i>second thread</i> has already set it in the future object, which
+is described in figure below, the call is executed on it and returns a value to the calling code in <code>A</code>.
+</p>
+<br><div align="center">
+<img src="images/usingFutureAfterGettingResultDiagram.gif"/>
+<br><b class="legend">
+Sequence Diagram
+</b><br></div>
+
+<p class="textNormal">
+If it is not yet available, the first thread is suspended in <code>FutureProxy</code> until the second thread sets the result in the
+future object (see figure below).
+</p>
+<br><div align="center">
+<img src="images/usingFutureBeforeGettingResultDiagram.gif"/>
+<br><b class="legend">
+Sequence Diagram
+</b><br></div>
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

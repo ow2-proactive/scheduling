@@ -1,0 +1,124 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>-->
+<Book>
+	<!-- General book file  -->
+	<!-- A subbook should include the master book at this point
+    <IncludeBook> masterbook.xml </Book> -->
+	
+	<Options>
+		<!-- BOOK OPTIONS -->
+		<BookFilename>api.book</BookFilename>
+		<!--<Batch>D:\java\dzbatcher\bin\dzbatcher</Batch>-->
+		<BatchFilePaths>absolute</BatchFilePaths>
+		<NoExecuteBatch enabled="false"/>
+		<Destination>..\docs</Destination>
+		<!--<ImportFormats>template.mif</ImportFormats>-->
+		<Print>pdf</Print>
+		<StylemapFile>stylemap.properties</StylemapFile>
+		<Verbose enabled="false"/>
+		<!-- FRONT MATTER OPTIONS -->
+		<BookTitle>"ProActive PDC"</BookTitle>
+		<BookSubTitle>"The ProActive Java Library for Parallel, Distributed, and Concurrent Computing"</BookSubTitle>
+		<BookAuthor>"ProActive Team"</BookAuthor>
+		<BookVersion>"Version 0.9"</BookVersion>
+		<BookCopyright>"Copyright \xa9 2002 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
+		<BookPublisher>"INRIA Sophia Antipolis"</BookPublisher>
+		<!-- CHAPTER OPTIONS -->
+		<Author enabled="false"/>
+		<ChapterNumbering enabled="true"/>
+		<ChapterString>\rChapter</ChapterString>
+		<ColumnWidth>480pt</ColumnWidth>
+		<CombineOverloads enabled="false"/>
+		<DeclarationHead>class</DeclarationHead>
+		<DescriptionHead>overview package class</DescriptionHead>
+		<ExcludeClasses/>
+		<!--<ImageResolution>150dpi</ImageResolution>-->
+		<MemberHead>args</MemberHead>
+		<MemberSummary>compact</MemberSummary>
+		<NoClassPreHead enabled="false"/>
+		<NoClassTree enabled="false"/>
+		<NoDeprecated enabled="false"/>
+		<NoInheritedSummary enabled="false"/>
+		<NoOverview enabled="false"/>
+		<NoPackageSummary enabled="false"/>
+		<NoSince enabled="false"/>
+		<OverviewTitle>Overview</OverviewTitle>
+		<OverviewTree enabled="true"/>
+		<SortMembers>group</SortMembers>
+		<Split>package</Split>
+		<SummaryTableFirstColumn>default</SummaryTableFirstColumn>
+		<SetUserVariable>name value</SetUserVariable>
+		<Version enabled="false"/>
+		<!-- BACK MATTER OPTIONS -->
+		<IndexStyle>hier</IndexStyle>
+		<IndexOneColumn enabled="false"/>
+	</Options>
+	<FrontMatter>
+		<TitleFile>ProActive_titlepage.mif</TitleFile>
+		<ContentsFile>contents.mif</ContentsFile>
+		<SectionFile>..\src\org\objectweb\proactive\doc-files\_index.html</SectionFile>
+	</FrontMatter>
+	<Chapters>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_Principles.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_Installation.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_HelloWorld.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_ProActiveBasis.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_ActiveObjectCreation.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_FutureObjectCreation.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_Migration.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_MOP.html</SectionFile>
+		</Chapter>
+		<InsertAPIDoc>packages classes</InsertAPIDoc>
+		<!--
+        <Chapter>
+<SectionFile> ./doc-files/package-intro.html          </SectionFile>
+<Package> com.package1                                    </Package>
+<Class> com.package1.Class1                             </Class>
+<Class> com.package1.SubClass1                          </Class>
+<Class> com.package1.Interface1                         </Class>
+<Class> com.package1.SubInterface1                      </Class>
+<Class> com.package1.Interface1.NestedInterface1        </Class>
+<Class> com.package1.Interface2                         </Class>
+<Class> com.package1.Class1.NestedClass1                </Class>
+<Class> com.package1.Class1.NestedStaticClass1          </Class>
+<Class> com.package1.Class1.NestedProtectedClass1       </Class>
+<Class> com.package1.Class1.NestedStaticProtectedClass1 </Class>
+<Class> com.package1.SubClassOfNestedClass              </Class>
+<Class> com.package1.ClassMIFStyles                     </Class>
+<Class> com.package1.DeprecatedClass                    </Class>
+<Class> com.package1.SerializableClass                  </Class>
+</Chapter>
+
+<Chapter>
+<Package> com.package2                                    </Package>
+<Class> com.package2.ClassInPackage2                    </Class>
+<Class> com.package2.CrossPackageSubClass               </Class>
+<Class> com.package2.Clutter                            </Class>
+</Chapter>
+-->
+		<Chapter>
+			<AlmanacFile>almanac.mif</AlmanacFile>
+		</Chapter>
+	</Chapters>
+	<BackMatter>
+	<!--
+		<SectionFile> ./test/sample-src/doc-files/appendix.html </SectionFile>
+		<SectionFile> ./test/sample-src/doc-files/colophon.html </SectionFile>
+		-->
+		<IndexFile>index.mif</IndexFile>
+	</BackMatter>
+</Book>

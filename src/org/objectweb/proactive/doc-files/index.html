@@ -1,0 +1,118 @@
+<html>
+   <head>
+		<title>ProActive Documentation Index</title>
+		<link rel="stylesheet" href="ProActive.css">
+   </head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+	<table cellpadding="2" cellspacing="0" border="1">
+	<tr>
+	<td class="smallLink1" nowrap>&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+	<td class="smallLink2" nowrap>&nbsp;&nbsp;<a class="smallLink2" href="Principles.html">next</a>&nbsp;&nbsp;</td>
+	</tr>
+	</table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Header : end -->
+<img src="images/ProActiveLogo.gif"/>
+<h3>version 0.9 (November 2001)</h3>
+<p class="textNormal">
+ProActive is a Java library for Parallel, Distributed, and Concurrent computing. In the framework of an
+active object model (an actor like model but with full control over the granularity of parallelism), from a reduced set of rather
+simple primitives, a comprehensive and versatile library is proposed for parallel, distributed, and concurrent programming,
+including mobility of computations.
+</p><p class="textNormal">
+In the absence of any syntactical extension, ProActive programmers write
+standard code. The library is itself extensible by the programmers, making the
+system open for adaptations and optimizations.
+</p><p class="textNormal">
+ProActive is only made of standard Java classes, and requires no changes to the Java Virtual Machine, no preprocessing or compiler modification. It is based on the RMI Java standard library (for the sake of portability), but offers many added features:
+</p>
+<ul class="listWithSpace">
+	<li class="textNormal">Active objects, Asynchronous calls, Messages (Request and Reply)</li>
+	<li class="textNormal">Migration, Mobile Agents</li>
+	<li class="textNormal">Seamless sequential, multi-threaded, and distributed programming (no need to derive from a library class to implement remotely accessible objects)</li>
+	<li class="textNormal">Reuse: polymorphism between standard object and Active objects</li>
+	<li class="textNormal">Automatic future-based synchronization (wait-by-necessity)</li>
+	<li class="textNormal">Libraries for sophisticated synchronization, and collaborative applications</li>
+	<li class="textNormal">Interfaced with RMI registry, and Jini</li>
+	<li class="textNormal">Compatible with Swing and AWT</li>
+</ul>
+<p class="textNormal">
+Moreover, the library features several optimizations
+improving performances. For instance, whenever two active objects
+are located within the same virtual machine, a direct
+communication is always achieved, without going through the
+network stack. Furthermore, this optimization is ensured even when
+the co-location occurs after a migration of one or both of the active objects.
+<br></br>
+Studies have shown that using ProActive can save in the range of 30% of code.
+<br></br>
+The library comes with a large set of examples in full source to help the newcomer to quickly take advantage of the software.
+<br></br>
+Please send us comments, suggestions, bug reports at <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
+Your input will be greatly appreciated.
+</p>
+
+<!--
+ Table of Contents : start 
+~~~ -->
+<table cellpadding="4" cellspacing="0" border="0" align="center">
+<tbody>
+	<tr>
+		<th class="navyCell" colspan="2">Content</th>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;0.&nbsp;</td>
+		<td class="whiteCell"><a href="Principles.html">ProActive Principles</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;1.&nbsp;</td>
+		<td class="whiteCell"><a href="Installation.html">ProActive Installation</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;2.&nbsp;</td>
+		<td class="whiteCell"><a href="HelloWorld.html">Hello World ! Example</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;3.&nbsp;</td>
+		<td class="whiteCell"><a href="ProActiveBasis.html">ProActive Basis</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;4.&nbsp;</td>
+		<td class="whiteCell"><a href="ActiveObjectCreation.html">Active objects creation</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;5.&nbsp;</td>
+		<td class="whiteCell"><a href="FutureObjectCreation.html">Asynchronous calls and future objects</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;6.&nbsp;</td>
+		<td class="whiteCell"><a href="Migration.html">Migration of active objects</a></td>
+	</tr>
+	<tr>
+		<td class="navyCell">&nbsp;7.&nbsp;</td>
+		<td class="whiteCell"><a href="MOP.html">MOP : Metaobject protocol</a></td>
+	</tr>
+</tbody>
+</table>
+<!-- Table of Contents : end -->
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

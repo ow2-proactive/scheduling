@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ProActive" default="usage" basedir=".">
+	<property name="base" value=".."/>
+	<property name="src.dir" value="${base}/src"/>
+	<property name="proactive.dir" value="org/objectweb/proactive"/>
+	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
+	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
+	<property name="classes.dir" value="${base}/classes"/>
+	<property name="basedist.dir" value="${base}/dist"/>
+	<property name="dist.dir" value="${basedist.dir}/ProActive"/>
+	<property name="docs.dir" value="${dist.dir}/docs"/>
+	<property name="javadocs.dir" value="${dist.dir}/docs/api"/>
+	<property name="name" value="ProActive"/>
+        <property name="debug" value="on"/>
+	<!-- define the classpath -->
+	<path id="project.classpath">
+		<pathelement path="${classpath}"/>
+			<fileset dir="${base}/lib">
+				<include name="*.jar"/>
+			</fileset>
+		<pathelement location="${base}/classes"/>
+	</path>
+	<!-- default target that displays usage -->
+	<target name="usage">
+		<echo message=""/>
+		<echo message="================- ${name} =============="/>
+		<echo message=""/>
+		<echo message="Available targets are :"/>
+		<echo message="  ------------------------------"/>
+		<echo message="    General source file builds"/>
+		<echo message="  ------------------------------"/>
+		<echo message="  core     : ProActive core"/>
+		<echo message="  ext      : ProActive ext"/>
+		<echo message="  ic2d     : All IC2D"/>
+		<echo message="  examples : All examples"/>
+		<echo message="  all      : means all of the above"/>
+		<echo message=""/>
+		<echo message="  ------------------------------"/>
+		<echo message="         Utility builds"/>
+		<echo message="  ------------------------------"/>
+		<echo message="  clean    : removes all build generated files"/>
+		<echo message="  dist     : creates the distribution directory and files"/>
+		<echo message="  javadoc  : creates the javadoc in the dist directory"/>
+		<echo message=""/>
+		<echo message="  ------------------------------"/>
+		<echo message="    Special source file builds"/>
+		<echo message="  ------------------------------"/>
+		<echo message="  test"/>
+		<echo message="  essai"/>
+		<echo message="  migration"/>
+		<echo message="  modelisation"/>
+		<echo message="  util"/>
+		<echo message="  alljunk  : means all of the above"/>
+		<echo message=""/>
+		<echo message="=========================================="/>
+	</target>
+
+	<!--
+	   ================================================================
+	   ==
+      ==  Initialisation
+      ==
+      ================================================================
+	-->
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp/>
+		<!-- Create the build directory structure used by compile -->
+		<mkdir dir="${classes.dir}"/>
+                <echo message="--- Debugging is ${debug} ---"/>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile All
+      ==
+      ================================================================
+	-->
+	<target name="all" depends="ic2d, examples"/>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile ProActive Core
+      ==
+      ================================================================
+	-->
+	<target name="core" depends="init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+			<classpath refid="project.classpath"/>
+			<include name="*.java"/>
+			<include name="${proactive.dir}/*.java"/>
+			<include name="${proactive.dir}/jini/*.java"/>
+			<include name="${proactive.dir}/rmi/*.java"/>
+			<include name="${proactive.core.dir}/**/*.java"/>
+		</javac>
+		<rmic classname="org.objectweb.proactive.core.body.jini.JiniBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
+		<rmic classname="org.objectweb.proactive.core.node.jini.JiniNodeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
+		<rmic classname="org.objectweb.proactive.core.body.rmi.RemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
+		<rmic classname="org.objectweb.proactive.core.node.rmi.RemoteNodeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+			<classpath refid="project.classpath"/>
+		</rmic>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile Extensions
+      ==
+      ================================================================
+	-->
+	<target name="ext" depends="core">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+			<classpath refid="project.classpath"/>
+			<include name="${proactive.ext.dir}/**/*.java"/>
+		</javac>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile ic2d
+      ==
+      ================================================================
+	-->
+	<target name="ic2d" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on" debug="${debug}">
+		<classpath refid="project.classpath"/>
+		</javac>
+		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/images" includeEmptyDirs="no">
+			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/images"/>
+		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile Examples
+      ==
+      ================================================================
+	-->
+	<target name="examples" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" excludes="${proactive.dir}/examples/diva/**" deprecation="on" debug="${debug}"/>
+		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
+			<fileset dir="${src.dir}/${proactive.dir}/examples">
+				<exclude name="**/*.java"/>
+				<exclude name="diva/**"/>
+			</fileset>
+		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile test
+      ==
+      ================================================================
+	-->
+	<target name="test" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="test/**" deprecation="on" debug="${debug}"/>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile essai
+      ==
+      ================================================================
+	-->
+	<target name="essai" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on" debug="${debug}"/>
+		<copy todir="${classes.dir}/essai" includeEmptyDirs="no">
+			<fileset dir="${src.dir}/essai">
+				<exclude name="**/*.java"/>
+			</fileset>
+		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile migration
+      ==
+      ================================================================
+	-->
+	<target name="migration" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on" debug="${debug}"/>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile modelisation
+      ==
+      ================================================================
+	-->
+
+	<target name="modelisation" depends="ext, util">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="modelisation/**" deprecation="on" debug="${debug}">
+        	<classpath refid="project.classpath"/>
+        </javac>
+
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile util
+      ==
+      ================================================================
+	-->
+	<target name="util" depends="">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on" debug="${debug}"/>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile alljunk
+      ==
+      ================================================================
+	-->
+	<target name="alljunk" depends="all, migration, modelisation, essai, test"/>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile timer
+      ==
+      ================================================================
+	-->
+	<target name="timer">
+		<mkdir dir="${src.dir}/util/timer/linux"/>
+		<mkdir dir="${src.dir}/util/timer/solaris"/>
+		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/local/bin/gcc" os="Linux" output="output.txt">
+			<arg line=" -shared -I/usr/local/jdk1.3/include/ -I/usr/local/jdk1.3/include/linux -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc" />
+		</exec>
+		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/bin/ld" os="Linux" output="output2.txt">
+			<arg line="  -G Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so" />
+		</exec>
+
+		<exec dir="${src.dir}/util/timer/solaris" executable="/usr/local/bin/gcc" os="SunOS" output="output.txt">
+			<arg line="-G -I/usr/local/jdk1.3/include -I/usr/local/jdk1.3/include/solaris -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc" />
+		</exec>
+		<exec dir="${src.dir}/util/timer/solaris" executable="/usr/ccs/bin/ld" os="SunOS" output="output.txt">
+			<arg line="  -G  Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so" />
+		</exec>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile All
+      ==
+      ================================================================
+	-->
+	<target name="clean">
+		<delete dir="${classes.dir}"/>
+		<delete dir="${basedist.dir}"/>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Create distribution
+      ==
+      ================================================================
+	-->
+	<target name="dist" depends="all">
+		<!-- Create the distribution directory -->
+		<mkdir dir="${basedist.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+		<!-- Delete stuff in the distribution -->
+		<delete>
+			<fileset dir="${dist.dir}" includes="*.jar"/>
+		</delete>
+		<delete dir="${dist.dir}/scripts"/>
+		<delete dir="${dist.dir}/src"/>
+		<!-- Put everything in ${classes} into the ProActive-${DSTAMP}.jar file -->
+		<jar jarfile="${dist.dir}/ProActive.jar">
+			<fileset dir="${classes.dir}">
+				<include name="${proactive.dir}/**"/>
+				<exclude name="${proactive.dir}/examples/**"/>
+				<exclude name="${proactive.dir}/ic2d/**"/>
+			</fileset>
+		</jar>
+		<jar jarfile="${dist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**"/>
+		<jar jarfile="${dist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**"/>
+		<!-- copy scripts -->
+		<copy todir="${dist.dir}" includeEmptyDirs="no">
+			<fileset dir="${base}">
+				<include name="scripts/**"/>
+			</fileset>
+		</copy>
+		<!-- copy Install class -->
+		<copy todir="${dist.dir}/scripts">
+			<fileset dir="${classes.dir}">
+				<include name="*.class"/>
+			</fileset>
+		</copy>
+		<!-- copy examples src -->
+		<copy todir="${dist.dir}" includeEmptyDirs="no">
+			<fileset dir="${base}">
+				<include name="src/${proactive.dir}/examples/**"/>
+				<include name="src/${proactive.dir}/ic2d/**"/>
+			</fileset>
+		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Export all source
+      ==
+      ================================================================
+	-->
+	<target name="export">
+		<!-- Delete stuff in the export -->
+		<delete dir="${base}/../OW_ProActive"/>
+		<!-- Create the export directory -->
+		<mkdir dir="${base}/../OW_ProActive"/>
+		<!-- copy examples src -->
+		<copy todir="${base}/../OW_ProActive" includeEmptyDirs="no">
+			<fileset dir="${base}"/>
+		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Create javadoc
+      ==
+      ================================================================
+	-->
+	<target name="javadoc">
+		<!-- Create the javadoc directory -->
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${docs.dir}"/>
+		<delete dir="${javadocs.dir}"/>
+		<mkdir dir="${javadocs.dir}"/>
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.rmi,org.objectweb.proactive.ic2d.*,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${javadocs.dir}" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 0.91&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
+			<classpath refid="project.classpath"/>
+			<group title="ProActive packages for end user" packages="org.objectweb.proactive:org.objectweb.proactive.rmi"/>
+			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
+			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
+			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
+			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
+			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
+		</javadoc>
+	</target>
+</project>

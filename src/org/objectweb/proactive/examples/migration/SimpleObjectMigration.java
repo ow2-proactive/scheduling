@@ -1,0 +1,367 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/ 
+package org.objectweb.proactive.examples.migration;
+
+import org.objectweb.proactive.core.node.NodeException;
+import java.net.UnknownHostException;
+import org.objectweb.proactive.ActiveObjectCreationException;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.node.Node;
+import java.net.InetAddress;
+import java.io.Serializable;
+
+/**
+ * Our 'hello' server without IHM
+ * This Active Object can migrate
+ * There is a lot of "trace" to locate the object
+ *
+ * @author ProActive trainee Team
+ * @version ProActive 1.0 (March 2002)
+ */
+public class SimpleObjectMigration implements Serializable {
+
+  private static final int SLEEP_TIME = 9000; 
+
+  private static final String RMI_CLASS = 
+    "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory";
+  private static final String JINI_CLASS = 
+    "org.objectweb.proactive.core.node.jini.JiniNodeFactory";
+  
+  private String name;		// The name of the instance
+  private String hi = " say hello from "; // The 'hello' sentence
+  
+  
+  /**
+   * Creates a new <code>SimpleObjectMigration</code> instance.
+   *
+   */
+  public SimpleObjectMigration() {
+    System.out.println("SimpleObjectMigration> Empty constructor");
+  }
+
+
+  /**
+   * Creates a new <code>SimpleObjectMigration</code> instance.
+   *
+   * @param name a <code>String</code> value who represents the name 
+   of the instance
+  */
+  public SimpleObjectMigration(String name) {
+    System.out.println("SimpleObjectMigration> Constructor with a parameter : "
+		       + name);
+    this.name = name;
+  }
+
+
+  /**
+   * Describe <code>sayHello</code> method here.
+   *
+   * @return a <code>String</code> value who is the 'hello' sentence
+   */
+  public String sayHello() {
+    System.out.println("SimpleObjectMigration> sayHello()");
+    String localhost = null;
+    try {
+      localhost = InetAddress.getLocalHost().toString();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    String sentence = name + hi + localhost;
+    System.out.println("SimpleObjectMigration> sayHello() --> "
+		       + sentence);
+    return sentence;
+  } 
+
+  
+  /**
+   * Describe <code>moveTo</code> method here.
+   * This methods is used to migrate the instance
+   *
+   * @param t The url of the destination node
+   */
+  public void moveTo(String t) {
+    try {
+      
+      System.out.println("SimpleObjectMigration> moveTo("+t+") " 
+			 + "% start migration");
+      ProActive.migrateTo(t);
+      System.out.println("SimpleObjectMigration> moveTo("+t+") "
+			 + "% stop migration");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * Describe <code>main</code> method here.
+   * It migrate a simple object from node1 to node2
+   *
+   *<ul>
+   * <li>param1 : The source node url 
+   (like <code>jini://host1/JiniNode1</code>)<li>
+   * <li>param2 : The destination node url
+   (like <code>rmi://host2/RmiNode2</code>)<li>
+   *</ul>
+   * @param args the 2 parameters in an array
+   */
+  public static void main(String[] args) {
+   
+    // set the class to use ...
+    try {
+      
+      // .. for the RMI protocol
+      NodeFactory.setFactory(Constants.RMI_PROTOCOL_IDENTIFIER, RMI_CLASS);
+      
+      // .. for the JINI protocol
+      NodeFactory.setFactory(Constants.JINI_PROTOCOL_IDENTIFIER, JINI_CLASS);
+      
+    } catch (NodeException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the setting of "
+			 +" the protocol class to use ("+e.getMessage()+")");
+      e.printStackTrace();
+    }
+
+    // The source node
+    String urlSourceNode = "";	
+    Node sourceNode = null;
+
+    // The destination node
+    String urlDestinationNode = ""; 
+    Node destinationNode = null;
+    
+    // we need 2 args to migrate
+    if (args.length == 2) {
+      urlSourceNode = args[0];
+      urlDestinationNode = args[1];
+    } else {
+      System.out.println("USAGE   : java SimpleObjectMigration "
+			 + "urlSourceNode        urlDestinationNode ");
+      System.out.println("Example : java SimpleObjectMigration "
+			 + "rmi://host1/Mynode1  jini://host2/MyNode2 ");
+      System.exit(1);
+    }
+ 
+    
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "We are going to try to migrate a simple object from "
+		       + urlSourceNode + " to "+urlDestinationNode); 
+    
+    try {
+
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "we try to get the source node : "
+			 + urlSourceNode);
+ 
+      sourceNode = NodeFactory.getNode(urlSourceNode); 
+
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "we obtain the source node : " 
+			 + urlSourceNode); 
+
+    } catch (NodeException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the getting of "
+			 + " the source node "+urlSourceNode
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    }
+    
+    try {
+
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "we try to get the destination node : "
+			 + urlDestinationNode);
+ 
+      destinationNode = NodeFactory.getNode(urlDestinationNode); 
+
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "we obtain the destination node : "
+			 + urlDestinationNode); 
+
+    } catch (NodeException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the getting of "
+			 +" the destination node "+urlDestinationNode
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    }
+    
+
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "We shows the state before" 
+		       +" to create the Active Object");
+    // We show the two nodes states
+    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
+
+
+
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "We try to create an simple active object");
+    
+    // The active obect
+    SimpleObjectMigration activeHello = null;
+    try {
+      String className = SimpleObjectMigration.class.getName();
+      Object[] params = new Object[]{"Created by "
+				     + InetAddress.getLocalHost().toString()};
+      
+      activeHello = (SimpleObjectMigration)ProActive.newActive(className,
+							       params,
+							       sourceNode);
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "We created an simple active object");
+
+      
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "The simple active object want to say hello ;)");
+
+      
+      String helloAnswer = activeHello.sayHello();
+
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "The simple active object said '"+helloAnswer+"'");
+
+
+  
+    } catch (UnknownHostException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the creation of the active object"
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    } catch (ActiveObjectCreationException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the creation of the active object"
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    } catch (NodeException e) {
+      System.out.println("SimpleObjectMigration> main() > "
+			 + "Exception during the creation of the active object"
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    }
+
+
+
+
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "We show the state before" 
+		       +" the migration of the Active Object");
+    // We show the two nodes states
+    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
+
+
+    try {
+      System.out.println("SimpleObjectMigration> main() > "
+			 +"begin sleep "+SLEEP_TIME+" ...");
+      Thread.sleep(SLEEP_TIME);
+      System.out.println("SimpleObjectMigration> main() > "
+			 +"... end of sleep "+SLEEP_TIME);
+	
+    } catch (InterruptedException e2) {}
+
+    System.out.println("SimpleObjectMigration> main() > "
+		       +"migrate active object to "+urlDestinationNode);
+
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "We show the state after" 
+		       +" the migration of the Active Object");
+
+    System.out.println("");
+
+     // We migrate the Active Object
+    activeHello.moveTo(urlDestinationNode);
+
+    System.out.println("");
+
+    try {
+      System.out.println("SimpleObjectMigration> main() > "
+			 +"begin sleep "+SLEEP_TIME+" ...");
+      Thread.sleep(SLEEP_TIME);
+      System.out.println("SimpleObjectMigration> main() > "
+			 +"... end of sleep "+SLEEP_TIME);
+	
+    } catch (InterruptedException e2) {}
+
+    // We show the two nodes states
+    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
+
+  
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "The simple active object want to say hello ;)");
+      
+    String helloAnswer = activeHello.sayHello();
+      
+    System.out.println("SimpleObjectMigration> main() > "
+		       + "The simple active object said '"+helloAnswer+"'");
+      
+
+      
+    System.out.println("SimpleObjectMigration> main() > end of test");
+    
+  }
+
+
+  protected static void showIds(String urlSourceNode, 
+				Node sourceNode,
+				String urlDestinationNode, 
+				Node destinationNode) {
+    try {
+      System.out.println("");
+      System.out.println("SimpleObjectMigration> showIds() > ");
+      System.out.println("-------- Ids on "+urlSourceNode+" ------");
+      UniqueID[] ids = sourceNode.getActiveObjectIDs();
+      for(int j=0;j<ids.length;j++) {
+	System.out.println("\t id"+j+" = "+ids[j]);
+      }
+      System.out.println("-----------------------------------------------");
+
+      System.out.println("");
+
+      System.out.println("-------- Ids on "+urlDestinationNode+" ------");
+      ids = destinationNode.getActiveObjectIDs();
+      for(int j=0;j<ids.length;j++) {
+	System.out.println("\t id"+j+" = "+ids[j]);
+      }
+      System.out.println("-----------------------------------------------");
+      
+    } catch (NodeException e) {
+      System.out.println("SimpleObjectMigration> showIds() > "
+			 + "Exception during the of the node's state"
+			 + " ("+e.getMessage()+")");
+      e.printStackTrace();
+    }
+  }
+}

@@ -1,0 +1,412 @@
+<html>
+<head>
+<title>Active Objects : creation and advanced concepts</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="ProActiveBasis.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FutureObjectCreation.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>Active Objects : creation and advanced concepts</h1>
+
+<h2>Active Object creation</h2>
+<p class="textNormal">
+Active objects are created on a per-object basis: an application can
+contain active as well as passive instances of a given class. We will
+see later an example of a binary tree where all nodes are instances of
+the same class, although some of them have been made active in order
+to transparently parallelize the search for a given element.
+</p><p class="textNormal">
+In the remaining part of this section, we will consider that we want
+to create an active instance of class <code>example.A</code>. There
+unfortunately exist some restrictions which prevent some classes from
+giving birth to active objects. This will be discussed in details
+later.
+</p><p class="textNormal">
+The code for creating a passive instance of <code>A</code>
+could be :
+</p>
+<blockquote><pre>
+    A a ;
+    a = new A(26, "astring");
+</pre></blockquote>
+<p class="textNormal">
+ProActive PDC provides <b>three</b> methods for creating active objects:
+</p>
+<h3>Instantiation-Based Creation</h3>
+<blockquote><pre>
+    A a;
+    Object[] params = new Object[] { new Integer (26), "astring" };
+    try {
+      a = (A) ProActive.newActive("example.A", params);
+    } catch (ActiveObjectCreationException e) {
+      // creation of ActiveObject failed
+      e.printStackTrace();
+    }
+</pre></blockquote>
+<p class="textNormal">
+This code creates an active object of class <code>A</code> with a default
+proxy and a default body. If the invocation of the constructor of class
+<code>A</code> throws an exception, it is placed inside an exception of type
+<code>ActiveObjectCreationException</code>.
+<p class="textNormal">
+The first parameter of newActive is a string containing the
+fully-qualified name of the class we want to make active. Parameters
+to the constructor have to be passed as an array of Object. Then,
+according to the type of the elements of this array, the ProActive
+runtime determines which constructor of class A to call. Nevertheless,
+there is still room for some ambiguity in resolving the constructor
+because :
+<ul class="listWithSpace">
+<li class="textNormal">As the arguments of the constructor are stored in an array of
+type <code>Object[]</code>, primitive types have to be represented by their
+wrappers object type. In the example above, we use an <code>Integer</code> object to wrap
+the <code>int</code> value 26. An ambiguity then arises if two constructor of
+the same class only differ by converting a primitive type to its
+corresponding wrapper class. In the example below, an ambiguity exists
+between the first and the second constructors.</li>
+<li class="textNormal">If one argument is null, the runtime can obviously not determine
+its type. This is the second source of ambiguity. In the example
+below, an ambiguity exists between the third and the fourth
+constructors if the second element of the array is <code>null</code>.</li>
+</ul>
+</p>
+<blockquote><pre>
+    public A (int i) {
+        //
+    }
+
+    public A (Integer i) {
+        //
+    }
+
+    public A (int i, String s) {
+        //
+    }
+
+    public A (int i, Vector v) {
+        //
+    }
+</pre></blockquote>
+<p class="textNormal">
+When the call to <code>newActive</code> returns, the active object has been
+created and its thread is started.
+</p>
+
+<h4>Using a Node</h4>
+<p class="textNormal">
+It is possible to pass a third parameter to the call to <code>newActive</code> in order 
+to create the new active object on a specific JVM, possibly remote. The JVM is identified 
+using a <code><a href="../core/node/Node.html">Node</a></code> object that offer the minimum 
+services ProActive needs on a given JVM to communicate with this JVM. If that parameter is not given,
+the active object is created in the current JVM and is attached to a default Node.
+</p>
+<p class="textNormal">
+A node is identified by a node URL which is formed using the hostname hosting the JVM where is the node located
+and the name of the node. The <code><a href="../core/node/NodeFactory.html">NodeFactory</a></code> allows to create
+or lookup nodes. The method <code>newActive</code> can take in parameter a nodeURL as a <code>String</code> or a Node
+object that points to an existing node. Here an example :
+</p>
+<blockquote><pre>
+      a = (A) ProActive.newActive("example.A", params, "//pluto.inria.fr/aNode");
+  or
+      Node node = NodeFactory.getNode("//pluto.inria.fr/aNode");
+      a = (A) ProActive.newActive("example.A", params, node);
+</pre></blockquote>
+
+<h3>Class-based creation</h3>
+<p class="textNormal">
+Class-based creation is at the core of ProActive PDC because it allows
+the user to specify which proxy and which body to use for this active
+object.
+</p><p class="textNormal">
+The user has first to write a new class that inherits from <code>A</code> and 
+possibly implements <code><a href="../Active.html">Active</a></code> or any subinterfaces
+of <code>Active</code>. This interface does not declare any methods but
+declares the type of proxy and body to use. <code>Active</code> declares the
+default proxy and the default body.
+
+<blockquote><pre>
+public class AA extends A implements Active {}
+</pre></blockquote>
+
+Instantiation code itself is as follows:
+
+<blockquote><pre>
+    A a;
+    Object[] params = new Object[] {new Integer (26), "astring"};
+    try {
+      a = (A) ProActive.newActive("example.AA", params);
+    } catch (Exception e) {
+      e.printStackTrace() ;
+    }
+</pre></blockquote>
+
+<p class="textNormal">
+The only difference with instantiation-based code is that we ask for an active instance of class <code>pA</code> instead of <code>A</code>, so
+that we can choose specific proxy and body classes. As <code>Active</code> actually declares the default proxy and body, the code
+above does exactly the same thing as instantiation-based code. Nevertheless, class-based creation will show its full
+strength when we describe how to fine-tune the synchronization of method invocations on an active object.
+</p>
+
+<h3>Object-Based Creation</h3>
+<p class="textNormal">
+Object-based creation is much of a convenience used for turning a
+passive object into an active one. Care must be taken in using this
+technique since it may break the model. It has been introduced in
+ProActive PDC as an answer to the following problem. Consider, for
+example, that an instance of class A is created inside a library and
+returned as the result of a method call. As a consequence, we do not
+have access to the source code where the object is created, which
+prevents us for modifying it for creating an active instance of
+A. Even if it were possible, it may not be likely since we do not want
+to get an active instance of A for every call on this method.
+</p><p class="textNormal">
+Code for object-based creation looks like this :
+</p>
+<blockquote><pre>
+    A a = new A (26, "astring");
+    a = (A) ProActive.turnActive(a);
+</pre></blockquote>
+
+<p class="textNormal">
+The second parameter if the location of the active object to be
+created. Null means that the active object is created on the current
+node.
+</p><p class="textNormal">
+When using this method, the programmer has to make
+sure that no other reference on the passive object a exist after the
+call to turnActive. If such references were used for calling methods
+directly on the passive A (without going through its body), the model
+would no more be consistent and specialization of synchronization
+could no more be guaranteed.
+</p><p class="textNormal">
+
+<h2>Restrictions on reifiable objects</h2>
+<p class="textNormal">
+Unfortunately, not all classes can give birth to active objects. There
+exist some restrictions, most of them caused by our choice to be 100%
+Java, which forbids modifying the Java Virtual Machine or compiler.
+</p><p class="textNormal">
+Some of these restrictions work at class-level :
+<ul class="listWithSpace">
+    <li class="textNormal">Final classes cannot give birth to active object</li>
+    <li class="textNormal">Same thing for non-public classes</li>
+    <li class="textNormal">Classes without a no-argument constructor cannot be
+reified. This restriction will be softened in a latter release of
+ProActive</li>
+</ul>
+</p><p class="textNormal">
+Some other happen at the level of a method in a specific class:
+<ul class="listWithSpace">
+    <li class="textNormal">Final methods cannot be used at all. Calling a final method on
+an active object leads to inconsistent behavior.</li>
+    <li class="textNormal">Calling a non-public method on an active object raises an
+exception. This restriction disappeared with JDK 1.2.</li>
+</ul>
+</p>
+<h2>Using the Factory Method Design Pattern</h2>
+<p class="textNormal">
+You may have noticed that creating an active object using ProActive is
+a little bit cumbersome and requires a lot more lines of code that
+for creating a passive object. There exist is nice solution to
+this problem through the use of the <b>factory method</b> pattern. This mainly applies to
+class-based creation. It consists in adding a static method to
+class <code>pA</code> that takes care of instantiating the active object
+and returns it. The code is :
+</p>
+<blockquote><pre>
+public class pA extends A implements Active {
+    public static A createActiveA (int i, String s, NodeLocator nl) {
+        A result;
+        Object[] params = new Object[] {new Integer (i), s};
+        try {
+            result = (A) ProActive.newActive("example.pA", params, nl);
+        } catch (Exception e) {
+            System.err.println ("The creation of an active instance of A raised an exception: "+e);
+            result = null;
+        }
+        return result;
+    }
+}
+</pre></blockquote>
+<p class="textNormal">
+It is up to the programmer to decide whether this method has to
+throw exceptions or not. We recommend that this method only throws
+exceptions that appear in the signature of the reified constructor
+(none here as the constructor of A that we call doesn't throw any
+exception).
+</p>
+
+
+<h2>Advanced : Using custom Proxy or Body</h2>
+<h3>Motivations</h3>
+There are many cases where the user may want to use proxy and body
+classes different from the default ones. Using a different proxy
+would, for example, the user could extend the library so as to
+generate debug messages whenever a call is sent through the proxy.
+
+<h3>How to do it</h3>
+<p class="textNormal">Active objects created using class-based or object-based instantiation can have proxies and bodies different from the default ones.
+You may have noticed that, when using class-based creation that classes aimed to create active object can implements the interface 
+<code><a href="../Active.html">Active</a></code>. This interface defines two constants that are used to find out the body and the proxy 
+to use for the active object :
+</p>
+<blockquote><pre>
+    public static String PROXY_CLASS_NAME;
+    public static String BODY_CLASS_NAME;
+</pre></blockquote>
+<p class="textNormal">
+If not specified, the default proxy is <code><a href="../core/body/proxy/UniversalProxyBody.html">UniversalProxyBody</a></code> and the 
+default body is <code><a href="../core/body/BodyImpl.html">UniversalProxyBody</a></code>.
+If the class defines those contants, either directly or by implementing an interface defining different values than the ones in <code>Active</code>, 
+then the proxy and the body of the resulting object will be the ones defined in the new constant.
+Using special classes for proxy and body using an interface can be done in two steps :
+<ul class="listWithSpace">
+<li class="textNormal">Write an interface that inherits directly or indirectly from
+<code>Active</code> and override only one or both constants in order to
+declare the name of the classes to use as proxy and body.</li>
+<li class="textNormal">Make the class from which we want to instantiate active objects
+implement this interface</li>
+</ul>
+</p>
+<p class="textNormal">
+In case of object-based instantiation, it is possible to specify the body and the proxy classes to use by using this specific <code><a href="../ProActive.html#turnActive(java.lang.Object, org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String)">turnActive</a></code> method from 
+<code><a href="../ProActive.html">ProActive</a></code>.
+</p>
+
+<h2>Advanced : The role of the components of an active object</h2>
+<p class="textNormal">
+In this section, we'll have a very close look at what happens when an active object is created. This section aims at
+providing a better understanding of how the library works and where the restrictions of Proactive come from.
+<br></br>
+Consider that some code in an instance of class <code>A</code> creates an active object of
+class <code>B</code> using a piece of code like this :
+</p>
+<blockquote><pre>
+    B b;
+    Object[] params = {<some parameters for the constructor>};
+    try {
+      // We create an active instance of B on the current node
+      b = (B) ProActive.newActive("B", params);
+    } catch (Exception e) {
+      e.printStackTrace () ;
+    }
+</pre></blockquote>
+<p class="textNormal">
+If the creation of the active instance of B is successful, the graph of objects is as described in figure below (with arrows denoting references).
+</p>
+
+<br><div align="center">
+<img src="images/activeObjectComponents.gif"/>
+<br><b class="legend">
+The components of an active object
+</b><br></div>
+
+The active instance of B is actually composed of 4 objects :
+<ul class="listWithSpace">
+    <li class="textNormal">a stub (<code>Stub_B</code>)</li>
+    <li class="textNormal">a proxy (<code>BodyProxy</code>)</li>
+    <li class="textNormal">a body (<code>Body</code>)</li>
+    <li class="textNormal">an instance of <code>B</code></li>
+</ul>
+
+<h3>Role of the stub</h3>
+<p class="textNormal">
+The role of the class <code>Stub_B</code> is to reify all method calls that can be performed through a reference of type <code>B</code>, and only
+these as calling a method declared in a subclass of <code>B</code> through downcasting would result in a runtime error). Reifying a
+call simply means constructing an object (in our case, all reified calls are instance of class <code><a href="../core/mop/MethodCall.html">MethodCall</a></code>) that
+represents the call, so that it can be manipulated as any other object. This reified call is then processed by the other
+components of the active object in order to achieve the behavior we expect from an active object.
+</p>
+The idea of using a standard object for representing elements of the language that are not normally objects (such as method calls,
+constructor calls, references, types,...) is what <i>metaobject programming</i> is all about. The metaobject protocol (MOP) ProActive is built on 
+is described <a href="MOP.html">here</a> but it is not a prerequisite for understanding and using ProActive.
+</p><p class="textNormal">
+As one of our objectives is to provide transparent active objects, references to active objects of class <code>B</code> need to
+be of the same type as references to passive instances of <code>B</code> (this feature is called <i>polymorphism</i> between passive and active
+instances of the same class). This is why, by construction, <code>Stub_B</code> is a subclass of class <code>B</code>, therefore allowing instances
+of class <code>Stub_B</code> to be assigned to variables of type <code>B</code>.
+</p><p class="textNormal">
+Class <code>Stub_B</code> redefines each of the methods inherited from its superclasses. The code of each method of class <code>Stub_B</code>
+actually builds an instance of class <code>MethodCall</code> in order to represent the call to this method. This object is then passed to the
+<code>BodyProxy</code>, which returns an object that is returned as the result of the method call. From the caller's point of view, everything
+looks like if the call had been performed on an instance of <code>B</code>.
+</p><p class="textNormal">
+Now that we know how stubs work, we can understand some of the limitations of ProActive :
+<ul class="listWithSpace">
+<li class="textNormal">Obviously, <code>Stub_B</code> cannot redefine <code>final</code> methods
+inherited from class <code>B</code>. Therefore, calls to these methods are not reified but are executed on the stub, which may lead to
+unexplainable behavior if the programmer does not carefully avoid calling <code>final</code> methods on active objects.
+<br>
+As there are 6 final methods in the base class <Code>Object</Code>, one may wonder how to live without them. In fact, 5 out of this 6 methods deal with thread
+synchronization (<code>notify()</code>, <code>notifyAll()</code> and the 3 versions of <code>wait()</code>). Those method should not be used since 
+an active object provides thread synchronization. Indeed, using the standard thread synchronization mechanism and
+ProActive thread synchronization mechanism at the same time might conflict and result in an absolute debugger's nightmare.
+<br>
+The last final method in the class <code>Object</code> is <code>getClass()</code>. When invoked on an active object, <code>getClass()</code> is not
+reified and therefore performed on the stub object, which returns an object of class <code>Class</code> that represents the class of the
+stub (<code>Stub_B</code> in our example) and not the class of the active object itself (<code>B</code> in our example). However, this method is seldom
+used in standard applications and it doesn't prevent the operator <code>instanceof</code> to work thanks to its polymorphic behavior. Therefore the
+expression <code>(foo instanceof B)</code> has the same value whether B is active or not.
+</li>
+<li class="textNormal">
+Getting or setting instance variables directly (not through a getter or a setter) must be avoided in the case of active objects because it results in getting or
+setting the value on the stub object and not on the instance of the class <code>B</code>. This problem is usually worked around by using get/set
+methods for setting or reading attributes. This rule of strict encapsulation may also be found in JavaBeans or in most distributed object systems like RMI or CORBA.
+</li>
+</ul>
+
+<h3>Role of the proxy</h3>
+<p class="textNormal">
+The role of the proxy is to handle asynchronism in calls to active object. More specifically, it creates future
+objects if possible and needed, forwards calls to bodies and returns future objects to the stubs. As this class
+operates on <code>MethodCall</code> objects, it is absolutely generic and does not depend at all on the type of 
+the stub that feeds calls in through its <code>reify</code> method.
+</p>
+
+<h3>Role of the body</h3>
+<p class="textNormal">
+The <code>body</code> is responsible for storing calls (actually, <code><a href="../core/body/request/Request.html">Request</a></code> objects) in a queue of pending requests
+and processing these request according to a given synchronization policy, whose default behavior is FIFO. The Body has its own thread, which alternatively chooses a request 
+in the queue of pending ones and executes the associated call.
+</p>
+
+<h3>Role of the instance of class B</h3>
+<p class="textNormal">
+This is a standard instance of class <code>B</code>. It may contain some synchronized information in its <code>live</code> method, if any. As the
+body executes calls one by one, there cannot be any concurrent execution of two portions of code of this object by two different threads. 
+This enables the use of pre- and post-conditions and class invariants. As a consequence, the use of the keyword <code>synchronized</code> in class
+<code>B</code> should not be necessary. Any synchronization scheme that can be expressed through monitors and <code>synchronized</code> statements 
+can be expressed using ProActive's high-level synchronization mechanism in a much more natural and user-friendly way.
+</p>
+
+
+<!--
+ Footer : start
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>
