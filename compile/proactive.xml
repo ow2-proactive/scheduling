@@ -564,6 +564,7 @@
 	</target>
 	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar">
 		<delete file="${base}/compile/tests.log"/>
+		<delete dir="${base}/compile/log"/>
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
