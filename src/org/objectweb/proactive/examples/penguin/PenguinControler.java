@@ -32,6 +32,8 @@ package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
@@ -104,30 +106,57 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
   }
 
 
-
-
+//<<<<<<< PenguinControler.java
   public static void main(String args[]) {
-      //args modification to replace relative name of nodes to them absolute name
-      try {
-	  java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
-	  for (int i=0; i<args.length; i++) {
-	      if (args[i].startsWith("//localhost")) {
-		  String nodeName;
-		  int index = args[i].lastIndexOf('/');
-		  if (index > 0 &&  index < args[i].length() - 1) {
-		      nodeName = args[i].substring(index + 1);
-		      args[i] = "//" + localhost.getHostName() + "/" + nodeName;
-		  }
-	      }
-	  }
-      } catch (java.net.UnknownHostException e) {
-	  e.printStackTrace();
-      }
-      try {
-	  // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
-	  new PenguinControler(args);
-      } catch (Exception e) {
-	  e.printStackTrace();
-      }
+  	// Version without descriptor
+//    try {
+//      // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
+//      new PenguinControler(args);
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//    }
+
+		// Version with descriptor
+		ProActiveDescriptor proActiveDescriptor=null;
+		try{
+     	proActiveDescriptor=ProActive.getProactiveDescriptor("file:"+args[0]);
+     	proActiveDescriptor.activateMappings(); 
+   		VirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
+    	//Thread.sleep(15000);
+			String[] nodes = vn1.getNodesURL();
+			new PenguinControler(nodes);
+    }catch(Exception e){
+    e.printStackTrace();
+    System.out.println("Pb in main");
+    }
+    
   }
+//=======
+
+
+//  public static void main(String args[]) {
+//      //args modification to replace relative name of nodes to them absolute name
+//      try {
+//	  java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
+//	  for (int i=0; i<args.length; i++) {
+//	      if (args[i].startsWith("//localhost")) {
+//		  String nodeName;
+//		  int index = args[i].lastIndexOf('/');
+//		  if (index > 0 &&  index < args[i].length() - 1) {
+//		      nodeName = args[i].substring(index + 1);
+//		      args[i] = "//" + localhost.getHostName() + "/" + nodeName;
+//		  }
+//	      }
+//	  }
+//      } catch (java.net.UnknownHostException e) {
+//	  e.printStackTrace();
+//      }
+//      try {
+//	  // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
+//	  new PenguinControler(args);
+//      } catch (Exception e) {
+//	  e.printStackTrace();
+//      }
+//  }
+//>>>>>>> 1.6
 }
