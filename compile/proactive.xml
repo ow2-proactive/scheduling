@@ -590,4 +590,39 @@
 			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro"/>
 		</java>
 	</target>
+	<!--
+	================================================================
+	==
+        ==  Compile ProActiveMPI
+        ==
+        ================================================================
+	javac ../src/mpi/ProActiveMPI.java
+	javah -jni ../src/mpi/ProActiveMPI
+	javap -s -p ../src/ProActiveMPI > ../src/mpi/ProActiveMPI.sgn
+	mv ../src/mpi/ProActiveMPI.class ../bin/mpi
+	javac ../src/mpi/example/MPI_C_Interface_sample.java
+	mv ../src/mpi/example/MPI_C_Interface_sample.class ../bin/mpi
+	mpicc -DProActiveMPI_java -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c -o ../bin/mpi/libMPI_C_Interface_sample.so -shared
+	mpicc ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c  -o ../bin/mpi/MPI_C_Interface_sample
+	-->
+	<target name="ProActiveMPI" depends="core">
+		<javac srcdir="${src.dir}/mpi" destdir="${classes.dir}/mpi" includes="" deprecation="on"  source="${source}">
+			<classpath refid="test.classpath"/>
+		</javac>
+		<exec dir="${src.dir}/mpi" executable="javah" os="Linux" >
+			<arg line=" -jni ../src/mpi/ProActiveMPI"/>
+		</exec>
+		<exec dir="${src.dir}/mpi" executable="javap" os="Linux" >
+			<arg line=" -s -p ../src/ProActiveMPI > ../src/mpi/ProActiveMPI.sgn"/>
+		</exec>
+		<exec dir="${src.dir}/mpi" executable="mpicc" os="Linux" >
+			<arg line=" -DProActiveMPI_java -I/usr/local/jdk1.4.0/include -I/usr/local/jdk1.4.0/include/linux ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c -o ../bin/mpi/libMPI_C_Interface_sample.so -shared"/>
+		</exec>
+		<exec dir="${src.dir}/mpi" executable="mpicc" os="Linux" >
+			<arg line=" ../src/mpi/MPI_C_Interface.c ../src/mpi/example/MPI_C_Interface_sample.c  -o ../bin/mpi/MPI_C_Interface_sample"/>
+		</exec>
+		<javac srcdir="${src.dir}/mpi/example" destdir="${classes.dir}/mpi/example" includes="" deprecation="on"  source="${source}">
+			<classpath refid="test.classpath"/>
+		</javac>
+	</target>
 </project>
