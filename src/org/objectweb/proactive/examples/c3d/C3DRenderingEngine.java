@@ -115,6 +115,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
   public C3DRenderingEngine(C3DDispatcher c3ddispatcher) {
     model = ColorModel.getRGBdefault();
     this.c3ddispatcher = c3ddispatcher;
+    //System.out.println("Rendering id "+org.objectweb.proactive.ProActive.getBodyOnThis().getID());
   }
 
 
