@@ -48,6 +48,10 @@ public class RegistryHelper {
     // -- Constructors -----------------------------------------------
     //
     public RegistryHelper() {
+        String port = System.getProperty("proactive.rmi.port");
+        if (port != null) {
+            setRegistryPortNumber(new Integer(port).intValue());
+        }
     }
 
     //
