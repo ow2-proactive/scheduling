@@ -35,7 +35,6 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.event.DeploymentPropertiesEventProducerImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 
