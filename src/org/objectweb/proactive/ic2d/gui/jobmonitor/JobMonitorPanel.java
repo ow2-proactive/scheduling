@@ -26,6 +26,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 {
 	private static final String PA_JVM = "PA_JVM";
+	
 	private static final String VN_VIEW_LABEL = "Job view / Virtual Nodes";
 	private static final String JOB_VIEW_LABEL = "Job view / Hosts";
 	private static final String HOST_VIEW_LABEL = "Host view";
@@ -47,7 +48,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private Vector filteredJobs;
 	
 	public JobMonitorPanel ()
-	{
+	{		
 		setLayout (new GridLayout (1, 1));
 		
 		aos = new HashMap();
@@ -126,7 +127,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	{
 		if (! monitoredHosts.contains (host))
 			monitoredHosts.add (host);
-		System.out.println ("There are now " + monitoredHosts.size() + " hosts");
+		System.out.println ("There are now " + monitoredHosts.size() + " monitored hosts");
 	}
 
 	public void updateHosts ()
@@ -250,13 +251,13 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 					}
 					catch (ProActiveException e)
 					{
-//						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance: " + e);
-//						e.printStackTrace();
+						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance: " + e);
+						e.printStackTrace();
 					}
 					catch (RemoteException e)
 					{
-//						System.out.println ("Unexpected exception caught while getting proactive runtimes: " + e);
-//						e.printStackTrace();
+						System.out.println ("Unexpected remote exception caught while getting proactive runtimes: " + e);
+						e.printStackTrace();
 					}
 				}
 			}
