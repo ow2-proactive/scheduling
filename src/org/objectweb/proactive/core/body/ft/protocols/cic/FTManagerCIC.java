@@ -174,7 +174,6 @@ public class FTManagerCIC
         try {
             this.hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
@@ -488,7 +487,6 @@ public class FTManagerCIC
             //debug
             this.hostname = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
@@ -628,7 +626,6 @@ public class FTManagerCIC
 
             this.historyIndex = to;
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -667,7 +664,6 @@ public class FTManagerCIC
                         loggedRequest.getSequenceNumber());
                 this.sendRequest(r, destination);
             } catch (RenegotiateSessionException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -786,7 +782,6 @@ public class FTManagerCIC
             // store the serialized form
             return baos.toByteArray().length;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return 0;
         }

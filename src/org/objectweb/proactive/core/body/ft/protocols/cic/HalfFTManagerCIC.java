@@ -1,8 +1,6 @@
 /*
  * Created on Feb 2, 2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.objectweb.proactive.core.body.ft.protocols.cic;
 
@@ -76,7 +74,6 @@ public class HalfFTManagerCIC extends FTManager {
                 int rdvValueBis = sendRequest(request, destination);
                 return this.onSendRequestAfter(request, rdvValueBis, destination);
             } catch (RenegotiateSessionException e1) {
-                // TODO Auto-generated catch block
                 throw e1;
             } catch (InterruptedException e) {
                 e.printStackTrace();

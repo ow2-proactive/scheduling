@@ -816,9 +816,7 @@ public class Daemon {
                             Socket client = server.accept();
 
                             /*
-                             * TODO:
-                             * When the experimenting phase is done we
-                             * should allow connections only from localhost
+                             * TODO: When the experimenting phase is done we should allow connections only from localhost
                              */
                             InputStream stream = client.getInputStream();
                             InputStreamReader ireader = new InputStreamReader(stream);

@@ -42,7 +42,6 @@ public class ProtocolErrorException extends RuntimeException {
      */
     public ProtocolErrorException() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -50,7 +49,6 @@ public class ProtocolErrorException extends RuntimeException {
      */
     public ProtocolErrorException(String message) {
         super(message);
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -58,7 +56,6 @@ public class ProtocolErrorException extends RuntimeException {
      */
     public ProtocolErrorException(Throwable cause) {
         super(cause);
-        // TODO Auto-generated constructor stub
     }
 
     /**
@@ -67,7 +64,6 @@ public class ProtocolErrorException extends RuntimeException {
      */
     public ProtocolErrorException(String message, Throwable cause) {
         super(message, cause);
-        // TODO Auto-generated constructor stub
     }
 
 }

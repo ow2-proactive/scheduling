@@ -687,14 +687,12 @@ public class GlobalFTServer extends UnicastRemoteObject implements
      * @see
      */
     public void suspendFailureDetector() throws RemoteException {
-        // TODO Auto-generated method stub       
     }
 
     /**
      * @see
      */
     public void stopFailureDetector() throws RemoteException {
-        // TODO Auto-generated method stub     
     }
 
     /**

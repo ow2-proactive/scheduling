@@ -63,7 +63,6 @@ public class SpyListenerImpl implements SpyListener {
             try {
                 body.terminate();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

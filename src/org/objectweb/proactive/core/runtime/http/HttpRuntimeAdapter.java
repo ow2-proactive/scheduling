@@ -440,7 +440,6 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      */
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException {
-        // TODO Auto-generated method stub
         return null;
     }
 }
