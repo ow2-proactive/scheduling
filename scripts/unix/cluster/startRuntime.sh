@@ -10,7 +10,7 @@ nodesList=""
 # node1
 for i in $HOSTS
 do
-  lsgrun -p -m "$i" $CMD &
+  /usr/local/lsf/bin/lsgrun -p -m "$i" $CMD &
   nodesList="${nodesList} //$i/${i}Node1"
 done
 echo $nodesList > nodesList
@@ -20,7 +20,7 @@ sleep 5
 # node2
 for i in $HOSTS
 do
-  lsgrun -p -m "$i" $CMD &
+  /usr/local/lsf/bin/lsgrun -p -m "$i" $CMD &
 done
 
 # echo Copying files 
