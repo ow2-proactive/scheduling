@@ -120,6 +120,30 @@ if [ -f $PROACTIVE/lib/ow_deployment_scheduling.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ow_deployment_scheduling.jar
 fi
+if [ -f $PROACTIVE/lib/components/fractal-gui.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-gui.jar
+fi
+if [ -f $PROACTIVE/lib/components/fractal-swing.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-swing.jar
+fi
+if [ -f $PROACTIVE/lib/components/julia-runtime.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-runtime.jar
+fi
+if [ -f $PROACTIVE/lib/components/julia-asm.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-asm.jar
+fi
+if [ -f $PROACTIVE/lib/components/julia-mixins.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-mixins.jar
+fi
+if [ -f $PROACTIVE/lib/components/SVGGraphics.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/SVGGraphics.jar
+fi
 if [ -f $PROACTIVE/lib/jsch.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
