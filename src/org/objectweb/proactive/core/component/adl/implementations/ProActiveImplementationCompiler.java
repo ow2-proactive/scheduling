@@ -172,6 +172,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         tasks.addTask("create", container, createTask);
     }
 
+    // TODO change visibility of this inner class in ImplementationCompiler 
     static class CreateTask extends AbstractInstanceProviderTask {
         ProActiveImplementationBuilder builder;
         String name;
