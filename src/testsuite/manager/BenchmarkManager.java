@@ -81,6 +81,7 @@ public abstract class BenchmarkManager extends AbstractManager {
     public BenchmarkManager(File xmlDescriptor)
         throws IOException, SAXException {
         super(xmlDescriptor);
+        this.loadAttributes(getProperties());
     }
 
     /**

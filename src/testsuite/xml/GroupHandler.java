@@ -36,11 +36,17 @@ import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
+import org.xml.sax.SAXException;
+
+import testsuite.exception.BrowsePackageException;
+
 import testsuite.group.Group;
 
 import testsuite.manager.AbstractManager;
 
 import testsuite.test.AbstractTest;
+
+import java.io.File;
 
 
 /**
@@ -87,6 +93,71 @@ public class GroupHandler {
     }
 
     //-----------------------------------------------------------------------------------------------------------
+    public static class PackageGroupHandler
+        extends AbstractUnmarshallerDecorator
+        implements ManagerDescriptorConstants {
+        private Group group = null;
+        private AbstractManager manager = null;
+
+        PackageGroupHandler(AbstractManager manager) {
+            super();
+            this.manager = manager;
+            addHandler(UNIT_TEST_TAG, new UnitTestHandler(manager));
+        }
+
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return group;
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String dir = attributes.getValue("dir");
+            String packageName = attributes.getValue("packageName");
+            if (!checkNonEmpty(dir) && !checkNonEmpty(packageName)) {
+                throw new SAXException(
+                    "dir and packageName attributes must be fixed in packageGroup node");
+            }
+            File dirFile = new File(dir);
+            try {
+                group = new Group(dirFile, packageName, null, false,
+                        this.manager);
+            } catch (BrowsePackageException e) {
+                logger.warn("Can't create a package group");
+                new SAXException("Can't create a package group", e);
+            }
+            String groupName = attributes.getValue("name");
+            if (checkNonEmpty(groupName)) {
+                group.setName(groupName);
+            }
+            String description = attributes.getValue("description");
+            if (checkNonEmpty(description)) {
+                group.setDescription(description);
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("Group " + group.getName() + " added");
+            }
+            manager.add(group);
+        }
+
+        private int indexGlobal = 0;
+
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
+                AbstractTest test = (AbstractTest) activeHandler.getResultObject();
+                int index = group.indexOf(test);
+                if (index < group.size()-1) {
+                    group.remove(index);
+                    group.add(index, group.get(this.indexGlobal));
+                    group.remove(this.indexGlobal);
+                    group.add(this.indexGlobal, test);
+                    this.indexGlobal++;
+                }
+            }
+        }
+    }
+
+    //-----------------------------------------------------------------------------------------------------------
     private static class UnitTestHandler extends AbstractUnmarshallerDecorator {
         private AbstractTest test = null;
         private AbstractManager manager = null;
@@ -108,6 +179,7 @@ public class GroupHandler {
                 try {
                     Class c = this.getClass().getClassLoader().loadClass(className);
                     test = (AbstractTest) c.newInstance();
+                    test.setManager(this.manager);
                 } catch (ClassNotFoundException e) {
                     logger.fatal("Can't found " + className, e);
                 } catch (InstantiationException e) {

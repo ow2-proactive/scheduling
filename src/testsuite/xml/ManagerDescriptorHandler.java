@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
 
 import testsuite.manager.AbstractManager;
+import testsuite.manager.FunctionalTestManager;
 
 import java.util.Properties;
 
@@ -63,6 +64,10 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
         addHandler(MANAGER_NB_RUNS_TAG, new SingleValueUnmarshaller());
         addHandler(SIMPLE_GROUP_TAG,
             new GroupHandler.SimpleGroupHandler(manager));
+        addHandler(PACKAGE_GROUP_TAG,
+            new GroupHandler.PackageGroupHandler(manager));
+        addHandler(INTERLINKED_TESTS_TAG,
+            new InterLinkedHandler((FunctionalTestManager) manager));
         addHandler(PROPERTIES_TAG, new PropertiesHandler());
     }
 
@@ -97,7 +102,7 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
             manager.setNbRuns(Integer.parseInt(
                     (String) activeHandler.getResultObject()));
         } else if (name.equalsIgnoreCase(PROPERTIES_TAG)) {
-            manager.loadAttributes((Properties) activeHandler.getResultObject());
+            manager.setProperties((Properties) activeHandler.getResultObject());
         }
     }
 

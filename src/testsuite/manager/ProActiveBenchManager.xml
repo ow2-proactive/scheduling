@@ -32,7 +32,7 @@
     <infrastructure>
         <processes>
             <processDefinition id="linuxJVM">
-                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess" />
             </processDefinition>
         </processes>
     </infrastructure>

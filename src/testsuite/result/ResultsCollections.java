@@ -57,7 +57,7 @@ import javax.xml.transform.TransformerException;
  */
 public class ResultsCollections implements ResultsExporter {
     private ArrayList results = null;
-    private boolean verbatim = false;
+    private boolean verbatim = true;
 
     public ResultsCollections() {
         results = new ArrayList();

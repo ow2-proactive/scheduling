@@ -30,6 +30,11 @@
 */
 package testsuite.manager;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -39,19 +44,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
-
 import org.xml.sax.SAXException;
 
 import testsuite.exception.BadTypeException;
-
 import testsuite.result.AbstractResult;
 import testsuite.result.ResultsCollections;
-
-import java.io.File;
-import java.io.IOException;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 
 /**
@@ -74,8 +71,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     private RSHJVMProcess rshJVM = null;
 
     /**
- *
- */
+     *
+     */
     public ProActiveBenchManager() {
         super("Remote Benchmark Manager",
             "Help you to manage your remote benchmarks.");
@@ -88,9 +85,9 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
- * @param name
- * @param description
- */
+     * @param name
+     * @param description
+     */
     public ProActiveBenchManager(String name, String description) {
         super(name, description);
         try {
@@ -102,8 +99,10 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     public ProActiveBenchManager(File xmlDescriptor)
-        throws IOException, SAXException {
+        throws IOException, SAXException, ClassNotFoundException, 
+            InstantiationException, IllegalAccessException {
         super(xmlDescriptor);
+        this.loadAttributes(getProperties());
         initNodes();
     }
 
@@ -156,8 +155,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
- * @see testsuite.manager.AbstractManager#execute()
- */
+     * @see testsuite.manager.AbstractManager#execute()
+     */
     public void execute(boolean useAttributesFile) {
         ResultsCollections results = getResults();
 
@@ -186,8 +185,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
- * @see testsuite.manager.AbstractManager#endManager()
- */
+     * @see testsuite.manager.AbstractManager#endManager()
+     */
     public void endManager() throws Exception {
         if (pad != null) {
             pad.killall();
@@ -196,29 +195,29 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
- * @return
- */
+     * @return
+     */
     public Node getLocalVMNode() {
         return localVMNode;
     }
 
     /**
- * @return
- */
+     * @return
+     */
     public Node getRemoteVMNode() {
         return remoteVMNode;
     }
 
     /**
- * @return
- */
+     * @return
+     */
     public Node getSameVMNode() {
         return sameVMNode;
     }
 
     /**
- * @return
- */
+     * @return
+     */
     public VirtualNode[] getVirtualNodes() {
         return virtualNodes;
     }
@@ -228,8 +227,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
- * @return
- */
+     * @return
+     */
     public String getRemoteHostname() {
         return remoteHostname;
     }
@@ -239,15 +238,15 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-         * @return
-         */
+             * @return
+             */
     public String getXmlFileLocation() {
         return xmlFileLocation;
     }
 
     /**
- * @param xmlFileLocation
- */
+     * @param xmlFileLocation
+     */
     public void setXmlFileLocation(String xmlFileLocation) {
         this.xmlFileLocation = xmlFileLocation;
     }

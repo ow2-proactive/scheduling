@@ -42,6 +42,7 @@ import testsuite.test.FunctionalTest;
 import java.io.File;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 
@@ -70,6 +71,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
     public FunctionalTestManager(File xmlDescriptor)
         throws IOException, SAXException {
         super(xmlDescriptor);
+        this.loadAttributes(getProperties());
     }
 
     /**
@@ -264,5 +266,106 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+    }
+
+    public void executeInterLinkedTest() {
+        if (logger.isInfoEnabled()) {
+            logger.info("Starting ...");
+        }
+        ResultsCollections results = getResults();
+
+        results.add(AbstractResult.IMP_MSG, "Starting ...");
+        try {
+            initManager();
+        } catch (Exception e) {
+            logger.fatal("Can't init the manager", e);
+            results.add(AbstractResult.ERROR, "Can't init the manager", e);
+            return;
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("Init Manager with success");
+        }
+        results.add(AbstractResult.IMP_MSG, "Init Manager with success");
+
+        Iterator itGroup = this.interLinkedGroups.iterator();
+        while (itGroup.hasNext()) {
+            Group group = (Group) itGroup.next();
+
+            ResultsCollections resultsGroup = group.getResults();
+
+            try {
+                group.initGroup();
+            } catch (Exception e) {
+                logger.warn("Can't init group : " + group.getName(), e);
+                resultsGroup.add(AbstractResult.ERROR,
+                    "Can't init group : " + group.getName(), e);
+                continue;
+            }
+
+            int runs = 0;
+            int errors = 0;
+            for (int i = 0; i < getNbRuns(); i++) {
+                Iterator itTest = group.iterator();
+                while (itTest.hasNext()) {
+                    FunctionalTest test = (FunctionalTest) itTest.next();
+                    AbstractResult result = test.runTestCascading();
+                    resultsGroup.add(result);
+                    if (test.isFailed()) {
+                        logger.warn("Test " + test.getName() + " [FAILED]");
+                        errors++;
+                    } else {
+                        if (logger.isInfoEnabled()) {
+                            logger.info("Test " + test.getName() +
+                                " runs with [SUCCESS]");
+                        }
+                        runs++;
+                    }
+                }
+            }
+            resultsGroup.add(AbstractResult.GLOBAL_RESULT,
+                "Group : " + group.getName() + " Runs : " + runs +
+                " Errors : " + errors);
+
+            try {
+                group.endGroup();
+            } catch (Exception e) {
+                logger.warn("Can't ending group : " + group.getName(), e);
+                resultsGroup.add(AbstractResult.ERROR,
+                    "Can't ending group : " + group.getName(), e);
+                continue;
+            }
+            results.addAll(resultsGroup);
+        }
+
+        try {
+            endManager();
+        } catch (Exception e) {
+            logger.fatal("Can't ending the manager", e);
+            results.add(AbstractResult.ERROR, "Can't ending the manager", e);
+            return;
+        }
+
+        results.add(AbstractResult.IMP_MSG, "... Finish");
+        if (logger.isInfoEnabled()) {
+            logger.info("... Finish");
+        }
+    }
+
+    public void addInterLinkedGroup(Group group) {
+        this.interLinkedGroups.add(group);
+    }
+
+    /**
+         * @return
+         */
+    public ArrayList getInterLinkedGroups() {
+        return this.interLinkedGroups;
+    }
+
+    /**
+ * @param list
+ */
+    public void setInterLinkedGroups(ArrayList list) {
+        this.interLinkedGroups = list;
     }
 }

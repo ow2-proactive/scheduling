@@ -122,6 +122,15 @@ public class Group {
             manager);
     }
 
+	public Group(File directory,
+		String packageName, Object[] params, boolean useInitFile,
+		AbstractManager manager) throws BrowsePackageException {
+		logger = Logger.getLogger(getClass().getName());
+
+		addTests(directory, packageName, packageName, params, useInitFile,
+			manager);
+	}
+	
     private static FileFilter dirFilter = new FileFilter() {
             public boolean accept(File pathname) {
                 if (pathname.isDirectory()) {

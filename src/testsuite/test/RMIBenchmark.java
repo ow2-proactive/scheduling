@@ -49,7 +49,8 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
     implements Serializable, Remote {
     private String rmiObjectName = "RMIBenchmark"+System.currentTimeMillis();
     private RMIBenchmark rmiObject = null;
-
+	private RMIBenchmark remoteObject = null;
+	
     /**
      *
      */
@@ -100,7 +101,10 @@ public abstract class RMIBenchmark extends ProActiveBenchmark
     }
 
     public void bind() throws Exception {
-        Naming.rebind("//localhost/" + getRmiObjectName(), this);
+    	ClassLoader cl = getClass().getClassLoader();
+    	Class c = cl.loadClass(getClass().getName());
+    	remoteObject = (RMIBenchmark) c.newInstance();
+        Naming.rebind("//localhost/" + getRmiObjectName(), remoteObject);
     }
 
     public void unbind() throws Exception {

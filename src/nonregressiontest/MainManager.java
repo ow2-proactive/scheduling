@@ -38,8 +38,8 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.SimpleLayout;
+import org.xml.sax.SAXException;
 
-import testsuite.group.Group;
 import testsuite.manager.ProActiveFuncTestManager;
 
 
@@ -74,21 +74,27 @@ public class MainManager extends ProActiveFuncTestManager {
     }
 
     /**
-     * @see testsuite.manager.AbstractManager#initManager()
+     * Constructor for MainManager.
+     * @param xmlFile
      */
-    public void initManager() throws Exception {
-        String thisName = "/" + getClass().getName().replace('.', '/') +
-            ".class";
-        String thisPath = getClass().getResource(thisName).getPath();
-        String classesPath = thisPath.replaceAll("nonregressiontest.*", "");
-        File classes = new File(classesPath);
-        Group testGroup = new Group("Unit test group", "group of unit tests",
-                classes, "nonregressiontest", null, false, this);
-        add(testGroup);
+    public MainManager(File xmlFile)
+        throws IOException, SAXException, ClassNotFoundException, 
+            InstantiationException, IllegalAccessException {
+        super(xmlFile);
+		logger.addAppender(new ConsoleAppender(new SimpleLayout()));
     }
 
     public static void main(String[] args) {
-        MainManager manager = new MainManager();
+        MainManager manager = null;
+        String path = MainManager.class
+                             .getResource("/nonregressiontest/MainManager.xml")
+                             .getPath();
+        File xml = new File(path);
+        try {
+            manager = new MainManager(xml);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         manager.execute(false);
         manager.setVerbatim(true);
         try {
