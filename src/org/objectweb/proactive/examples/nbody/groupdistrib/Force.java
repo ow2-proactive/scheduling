@@ -1,14 +1,20 @@
+/*
+ * Created on Jan 22, 1005
+ */
 package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import java.io.Serializable;
 
+/**
+ * @author irosenbe
+ */
 public class Force implements Serializable {
-    
+
     double x=0,y=0;    
     final double G=9.81, RMIN = 1;
-    
+
     public Force () {}
-    
+
     /**
      * From 2 interacting bodies 1 & 2, adds the force resulting from their interaction.
      * The force is the force that applies on 1, caused by 2  
@@ -28,5 +34,5 @@ public class Force implements Serializable {
             y += coeff * b;
         }
     }
-    
+
 }

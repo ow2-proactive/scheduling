@@ -26,11 +26,9 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-/**
- * @author cdelbe
- */
-public class NBodyFrame extends JFrame implements Serializable, ActionListener, ChangeListener, MouseListener {
 
+public class NBodyFrame extends JFrame implements Serializable, ActionListener, ChangeListener, MouseListener {
+    
     public final static int SIZE=800;
     public final static int MAX_HISTO_SIZE=100;
     
@@ -61,7 +59,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
      * @param title
      * @throws java.awt.HeadlessException
      */
-    public NBodyFrame(String title, int nb) throws HeadlessException {
+    public NBodyFrame(String title, int nb, boolean displayft) throws HeadlessException {
         super(title);
         setSize(SIZE+11, SIZE+90);
         setLocation(10, 10);
@@ -76,7 +74,6 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             names.add(i," ");
             bodyname[i] = "";
         }
-
         
         this.nbBodies = nb;
         ClassLoader cl = this.getClass().getClassLoader();
@@ -109,7 +106,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
                         }
                     }
                 }
-   
+                
                 g.setFont(g.getFont().deriveFont(Font.ITALIC,12));
                 for (int i=0;i<nbBodies;i++){
                     g.setColor(getColor(i));
@@ -128,9 +125,9 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
                 }   
             }
         };
-       this.anim.setBorder(BorderFactory.createLineBorder(Color.BLACK,3));
-       this.anim.addMouseListener(this);
-       
+        this.anim.setBorder(BorderFactory.createLineBorder(Color.BLACK,3));
+        this.anim.addMouseListener(this);
+        
         
         // GUI panel
         this.gui = new JPanel(new GridLayout(1,2));
@@ -148,9 +145,9 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         killingPanel.add(kill);
         killingPanel.setBorder(BorderFactory.createTitledBorder("Execution control"));
         
-       
         
-       
+        
+        
         JPanel drawPanel = new JPanel(new FlowLayout());
         this.queue = new JCheckBox("Show trace", false);
         this.queue.addActionListener(this);
@@ -166,7 +163,8 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         drawPanel.add(this.queue);
         drawPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
         
-        this.gui.add(killingPanel);
+        if (displayft)
+            this.gui.add(killingPanel);
         this.gui.add(drawPanel);
         //this.gui.setBorder(BorderFactory.createTitledBorder("Controls"));
         
@@ -177,11 +175,11 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         setContentPane(main);       
         setVisible(true);
     }
-
+    
     
     
     /// EVENT HANDLING
-
+    
     public void actionPerformed(ActionEvent e) {
         if (e.getSource()==this.queue){
             this.showTrace = !showTrace;
@@ -194,7 +192,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         }
     }
     
-
+    
     public void stateChanged(ChangeEvent e) {
         if (e.getSource()==this.zoom){
             if (this.zoom.getValue()!=this.zoomValue){
@@ -210,7 +208,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             }
         }
     }
-
+    
     
     public void mouseClicked(MouseEvent e) {        
         int xRef=0, yRef=0;
@@ -223,19 +221,19 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         this.clearTrace();
         
     }
-
+    
     public void mouseEntered(MouseEvent e) {       
     }
-
+    
     public void mouseExited(MouseEvent e) {
     }
-
+    
     public void mousePressed(MouseEvent e) { 
     }
-
+    
     public void mouseReleased(MouseEvent e) {
     }
-  
+    
     
     
     
@@ -255,7 +253,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             if (!names.contains(name)){
                 this.names.remove(id);
                 this.names.add(id,name);
-                	this.listVMs.addItem(name);
+                this.listVMs.addItem(name);
             }
         }
         repaint();
@@ -266,16 +264,16 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         //return x/zoomValue + (SIZE/2-xCenter) + SIZE/2/this.zoomValue;
         return x/zoomValue;
     }
-
     
-
+    
+    
     private void clearTrace(){
         historics = new CircularPostionList[this.nbBodies];
         for (int i=0;i<this.nbBodies;i++){
             historics[i]=new CircularPostionList(MAX_HISTO_SIZE);
         }
     }
-
+    
     
     private Color getColor(int sel){
         switch (sel) {
@@ -301,7 +299,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
             return getColor(sel-8);
         }
     }
-
+    
     
     private class CircularPostionList {
         
@@ -350,6 +348,6 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         }
         
     }
-
-
+    
+    
 }

@@ -1,8 +1,9 @@
-/*
- * Created on Jan 14, 2005
- */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
+//import java.io.DataInputStream;
+//import java.io.FileInputStream;
+//import java.io.FileNotFoundException;
+//import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 
@@ -10,15 +11,14 @@ import org.objectweb.proactive.examples.nbody.common.Point2D;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 /**
- * @author irosenbe
  * @see also http://www.reed.edu/~jimfix/MSRI/quadtree/Quadtree.java
  */
 public class QuadTree implements Serializable {
     
-    private final int MAX_BODIES_IN_DOMAIN = 3;
+    private final int MAX_BODIES_IN_DOMAIN = 1;
     
     public int label;
-    Info info;
+    private Info info;
     QuadTree Q[];
     
     public QuadTree() {}
@@ -31,10 +31,52 @@ public class QuadTree implements Serializable {
         Rectangle R = new Rectangle (-100,-100,200,200);
         Vector v = new Vector ();	// of type vector of planets
         for (int i = 0 ; i < nbPlanets ; i++ )
-            v.add (new Planet(R,i));
+            v.add (new Planet(R, i));
         myConstructor(R, v);
-        label();
+        label(0);
     }
+    
+    
+    /**
+     * Construct a QuadTree with structure all set up, including labels, from the file given.
+     * @param fileName, the file where to find the information on the Planets 
+     */
+    //	public QuadTree(String fileName) {
+    //		Rectangle R = new Rectangle (-100,-100,200,200);
+    //		Vector v = new Vector ();	// of type vector of planets
+    //		DataInputStream in;
+    //		try {
+    //			in = new DataInputStream(new FileInputStream(fileName));
+    //		} catch (FileNotFoundException e) {
+    //			e.printStackTrace();
+    //			throw new NullPointerException("File " + fileName + " not found.");
+    //		}
+    //		try {
+    //			while (true) {
+    //				double x = in.readDouble();
+    //				in.readChar();       //throws out the tab
+    //				double y = in.readDouble();
+    //				in.readChar();       //throws out the tab
+    //				double vx = in.readDouble();
+    //				in.readChar();       //throws out the tab
+    //				double vy = in.readDouble();
+    //				in.readChar();       //throws out the tab
+    //				double mass = in.readDouble();
+    //				in.readLine();
+    //				Planet p = new Planet(x,y,vx,vy,mass);
+    //				System.out.println("Planet : " + p);
+    //				v.add (p);
+    //			}    
+    //		} catch (IOException e) { }
+    //		try {
+    //			in.close();
+    //		} catch (IOException e) {
+    //			e.printStackTrace();
+    //			throw new NullPointerException("File " + fileName + " couldn't be closed.");
+    //		}
+    //		myConstructor(R, v);
+    //		label(0);
+    //	}
     
     
     /**
@@ -42,7 +84,7 @@ public class QuadTree implements Serializable {
      * @param bodies (type Vector of Planet) all the bodies in the QuadTree
      * @param R the bounding rectangle, which contains all the bodies
      */
-    public QuadTree(Rectangle R, Vector bodies) {
+    private QuadTree(Rectangle R, Vector bodies) {
         myConstructor(R,bodies);
     }
     
@@ -54,15 +96,15 @@ public class QuadTree implements Serializable {
     private void myConstructor(Rectangle R, Vector bodies) {
         info = new Info(bodies,R);
         
-        if (info.numPlanets >  MAX_BODIES_IN_DOMAIN)	{ 	    // Split into sub-trees
+        if (bodies.size() >  MAX_BODIES_IN_DOMAIN)	{ 	    // Split into sub-trees
             
             Point2D middle = average(bodies);
             
             Vector [] subtree = new Vector [4]; // list of bodies in each subtree, type is Vector of Info
             for (int i = 0 ; i < 4 ; i++)  
                 subtree[i] = new Vector();
-            for (int i = 0 ; i < info.numPlanets ; i++) {
-                Info body = (Info) bodies.get(i);
+            for (int i = 0 ; i < bodies.size() ; i++) {
+                Planet body = (Planet) bodies.get(i);
                 int index = (body.x < middle.x ? 0 : 1)  + ( body.y < middle.y ? 0 : 2) ;
                 subtree[index].add(body);
             }
@@ -97,53 +139,33 @@ public class QuadTree implements Serializable {
      */
     private Point2D average(Vector bodies) {
         Point2D average = new Point2D() ;
-        for (int i = 0 ; i < info.numPlanets ; i++) {
+        for (int i = 0 ; i < bodies.size() ; i++) {
             Info body = (Info) bodies.get(i);
             average.x += body.x;
             average.y += body.y;
         }
-        average.x /= info.numPlanets;
-        average.y /= info.numPlanets;
+        average.x /= bodies.size();
+        average.y /= bodies.size();
         return average;
     }
     
     
     //Adds a body to this quadtree
     //void insert(Info body) {throw new NullPointerException("Method not written");}
- 
+    
     
     //Removes a body from this quadtree
     //void remove(Info body)  {throw new NullPointerException("Method not written");}
- 
+    
     
     /*
      * Helper methods
      */
     
-    /**
-     * The size of the QuadTree.
-     * @return the number of nodes in the tree
-     */
-    public int size () {
-        if (Q != null) {
-            int res = 1;
-            for (int i = 0 ; i < Q.length ; i++)
-                res += Q[i].size() ;
-            return res; 
-        }
-        else 
-            return 1;     
-    }
-    
-    /**
-     * Gives a unique label to every node on this quadTree
-     * To work effectively, this node must be the root of the quadTree considered 
-     */
-    public void label(){
-        label(0);
-    }
     
     /*
+     * Gives a unique label to every node on this quadTree
+     * To work effectively, start by root.label(0)
      * Tech detail : works the following way  
      * 1) label first node with index.
      * 2) increment index. 
@@ -152,6 +174,7 @@ public class QuadTree implements Serializable {
      */
     private int label(int index){
         this.label = index;
+        info.identification = label;
         index++;
         if (Q != null) {
             for (int i = 0 ; i < Q.length ; i++)
@@ -160,23 +183,6 @@ public class QuadTree implements Serializable {
         return index;
     }
     
-    /**
-     * A stripped down visual view of the object.
-     */
-    public String toString() {
-        return toString("");
-    }
-    
-    private String toString(String add) {
-        String res = "";
-        if (Q != null) {
-            for (int i = 0 ; i < Q.length ; i++)
-                res = Q[i].toString(add + " ") + "\n" + res ;
-            return add + "i=" + label + " M="+info.mass + " nb=" + info.numPlanets + " sons=" + "\n" + res;
-        }
-        else 
-            return add + "i=" + label +" M="+info.mass + " nb=" + info.numPlanets;
-    }
     
     /**
      * When you're looking for a node in the tree, and know it's label, get the node through this method.
@@ -209,58 +215,58 @@ public class QuadTree implements Serializable {
         }
     }
     
-    
     /**
-     * Sets the physics of this node, with id given as the second parameter
-     * @param inf the new value of Info  
-     * @param id the node number
+     * Returns a Vector of all the infos contained in the Tree, with index the node label.
+     * It also "cleans" the tree, removing the Info from the Nodes.
+     * To get the labels right, this node must be the root of the quadTree considered 
      */
-    public void setNodeInfo(Info inf) {
-        QuadTree t = getNode (inf.identification);
-        t.info = inf;
+    public Vector getInfo(){
+        Vector v = new Vector ();
+        info.clean(Q==null); // DEBUG : this causes trouble
+        v.add(info);
+        if (Q!=null) {
+            for (int i = 0 ; i < Q.length ; i++) 
+                v.addAll(Q[i].getInfo());
+            info.setNbSons(Q.length);
+        }
+        info = null;	 // make the tree as light as possible
+        return v;
     }
     
     /**
-     * Cleans up all the Info stored in this tree, replacing them by null
+     * The size of the QuadTree.
+     * @return the number of nodes in the tree
      */
-    /*
-     public void removeInfo() {
-     Vector nodes = new Vector();
-     QuadTree t = this;
-     while ( !nodes.isEmpty() ){
-     t = (QuadTree) nodes.remove(0);
-     t.info = null;
-     if (t.Q != null) {
-     for (int i = 0 ; i < t.Q.length ; i++ )
-     nodes.add(t.Q[ i ]);
-     }
-     }
-     }*/
-    
-    /**
-     * Given a Node, computes its coordinates and mass from underlying planets.
-     * This may be called only once all its sons have been updated
-     */
-    public void recomputeCenterOfMass() {
-        
-        Info [] planets;
-        
-        if (Q==null) {  // If no other nodes, make the array the list of planets
-            Vector dummy = info.getPlanets(); 
-            planets = new Planet[dummy.size()];
-            for (int i = 0 ; i < planets.length ; i++ )
-                planets[i]=(Planet) dummy.get(i);
+    public int size () {
+        if (Q != null) {
+            int res = 1;
+            for (int i = 0 ; i < Q.length ; i++)
+                res += Q[i].size() ;
+            return res; 
         }
-        
-        else { // if this node has sons, sum up the values of these subnodes
-            planets = new Info[Q.length];
-            for (int i = 0 ; i < Q.length ; i++ )
-                planets[i] = Q[i].info;
-        }
-        
-        // make the average, store it in info
-        info.setCenterOfMass(planets);
+        else 
+            return 1;     
     }
     
+    /**
+     * A stripped down visual view of the object.
+     */
+    public String toString() {
+        return toString("");
+    }
+    
+    private String toString(String add) {
+        String res = "";
+        if (Q != null) {
+            for (int i = 0 ; i < Q.length ; i++)
+                res = Q[i].toString(add + " ") + "\n" + res ;
+            //			return add + "i=" + label + " M="+info.mass + " nb=" + info.planets.length + " sons=" + "\n" + res;
+            return add + "i=" + label + " sons=" + "\n" + res;
+        }
+        else 
+            //			return add + "i=" + label +" M="+info.mass + " nb=" + info.planets.length;
+            return add + "i=" + label ;
+    }
     
 }
+

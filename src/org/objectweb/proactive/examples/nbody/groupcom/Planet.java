@@ -5,15 +5,15 @@ import java.io.Serializable;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Planet implements Serializable{
-
-    final double dt = 0.0002;
+    
+    final double dt = 0.002;
     double mass;
     double x,y;
     double vx,vy;
     double diameter;
     
     public Planet(){};
-
+    
     /**
      * Builds one Planet within the given frame.
      * @param limits the bounds which contain the Planet
@@ -29,7 +29,7 @@ public class Planet implements Serializable{
         
         diameter = mass/2000+3; ;              
     }
-
+    
     /**
      * 	Move the given Planet with the Force given as parameter. 
      *  @param force
@@ -42,6 +42,6 @@ public class Planet implements Serializable{
         // v' = a = sum F / mass:
         vx += dt * force.x ;  // removed /mass because * p1.mass removed as well  
         vy += dt * force.y ; 
-
+        
     }
 }

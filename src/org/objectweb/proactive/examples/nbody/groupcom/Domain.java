@@ -15,6 +15,7 @@ public class Domain implements Serializable{
     
     private int identification;
     private Domain neighbours;
+    private String hostName = "unknown";
     
     private Maestro maestro;
     private Displayer display;
@@ -24,7 +25,6 @@ public class Domain implements Serializable{
     private Planet [] values; // list of all the bodies within all the other domains
     private int nbvalues, nbReceived=0;
     
-    private String hostName;
     
     public Domain (){}
     
@@ -92,7 +92,18 @@ public class Domain implements Serializable{
         }
         else 
             display.drawBody((int)info.x, (int)info.y, (int)info.vx, (int)info.vy, 
-                    (int)info.mass, (int)info.diameter, this.identification, hostName);
+                    (int)info.mass, (int)info.diameter, this.identification, this.hostName);
     }
     
+    private void readObject(java.io.ObjectInputStream in) 
+    throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostName="unknown";
+            e.printStackTrace();
+        }
+        
+    }
 }

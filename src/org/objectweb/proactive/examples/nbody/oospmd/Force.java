@@ -1,15 +1,10 @@
-/*
- * Created on Jan 22, 1005
- */
 package org.objectweb.proactive.examples.nbody.oospmd;
 
 import java.io.Serializable;
 
 import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
-/**
- * @author irosenbe
- */
+
 public class Force implements Serializable {
     
     double x=0,y=0;    
@@ -37,7 +32,7 @@ public class Force implements Serializable {
         x = coeff * (p2.x - p1.x);
         y = coeff * (p2.y - p1.y);
     } 
-
+    
     /**
      * From 2 interacting Planets 1 & 2, adds the force resulting from their interaction.
      * The force considered is the force that applies on 1, caused by 2.  
@@ -55,7 +50,7 @@ public class Force implements Serializable {
         x = coeff * (p2.x - p1.x);
         y = coeff * (p2.y - p1.y);
     } 
-
+    
     /**
      * Adds up the force of the parameter force to this. 
      * @param f, the force to be added to this
@@ -64,7 +59,7 @@ public class Force implements Serializable {
         x += f.x;
         y += f.y;
     }
-
+    
     public String toString(){
         return "<" + (int) x + " " + (int) y + ">";
     }

@@ -1,26 +1,20 @@
-/*
- * Created on Jan 14, 2005
- */
 package org.objectweb.proactive.examples.nbody.common;
 
 import java.io.Serializable;
 
-/**
- * @author irosenbe
- */
 public class Rectangle implements Serializable{
-
+    
     public double x, y, width, height;
     
     public Rectangle (){}
-
+    
     public Rectangle (double x, double y , double width, double height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
     }
-
+    
     /**
      * A rectangle spanning between the two given points
      */
@@ -30,7 +24,7 @@ public class Rectangle implements Serializable{
         this.width = q.x - p.x;
         this.height = q.y - p.y;
     }
-
+    
     public String toString () {
         return "x="+x+" y=" +y+" width="+width+" height="+height;
     }

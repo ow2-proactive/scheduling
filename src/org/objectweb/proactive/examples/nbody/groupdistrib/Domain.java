@@ -1,39 +1,46 @@
 package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 
-import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Vector;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
-import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
-public class Domain implements RunActive{
+public class Domain implements Serializable{
+    
+    private class Carrier {
+        Planet planet;
+        int iter;
+        
+        Carrier (Planet plan, int iter) {
+            this.planet = plan;
+            this.iter = iter;
+        }
+    }
     
     private Displayer display;
-    
     private int identification;
+    private String hostName = "unknown";
     private Domain neighbours;
     private Planet info;
     private Force currentForce ;
     
     private int nbvalues, nbReceived=0;
     private int iter, maxIter;
+    private Vector prematureValues;
     
-    private String hostName;
-
     public Domain (){}
     
     public Domain (Integer i, Rectangle r) {
-        identification = i.intValue();
-        info = new Planet(r);
+        this.identification = i.intValue();
+        this.prematureValues = new Vector(); 
+        this.info = new Planet(r);
         try {
             this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
@@ -43,7 +50,7 @@ public class Domain implements RunActive{
     
     public void init(Domain domainG, Displayer dp, int maxIter) {
         init(domainG, maxIter);
-        display=dp;
+        this.display=dp;
     }
     
     /**
@@ -54,87 +61,87 @@ public class Domain implements RunActive{
     
     public void init(Domain domainGroup, int maxIter) {
         this.maxIter = maxIter;
-        neighbours = domainGroup;
+        this.neighbours = domainGroup;
         Group g = ProActiveGroup.getGroup(neighbours);
         g.remove(ProActive.getStubOnThis()); // no need to send information to self
-        nbvalues = g.size();
+        this.nbvalues = g.size();
         reset();
     }
     
+    
     public void computeNewValue() {
-        info.moveWithForce(currentForce);    
+        this.info.moveWithForce(currentForce);    
         sendValueToNeighbours();
     }
     
-    /**
-     * Update the value of a distant Domain.
-     * @param inf The new value to take into account.
-     * @param receivedIter The iteration of the distant Domain, to avoid desynchronization.
-     */
     public void setValue(Planet inf, int receivedIter) {
-        if (iter == receivedIter) {
-            currentForce.add(info, inf);
-            nbReceived ++ ;
-            if (nbReceived > nbvalues)  // This is a bad sign!
-                System.err.println("Domain " + identification + " received too many answers");
-            if (nbReceived == nbvalues) 
+        if (this.iter == receivedIter) {
+            this.currentForce.add(info, inf);
+            this.nbReceived ++ ;
+            if (this.nbReceived > this.nbvalues)
+                System.err.println(identification +  " : Too many answers " + this.nbReceived + "/" + this.nbvalues);
+            if (this.nbReceived == this.nbvalues) 
                 computeNewValue();
         }
-        else 
-            System.err.println("This should never happen, different iteration (on Domain" + identification +")");
+        else { 
+            if (this.iter > receivedIter)
+                throw new NullPointerException("Value arrives too late!");
+            this.prematureValues.add(new Carrier (inf, receivedIter));
+        }
     }
     
     
-    /**
-     * Broadcast the local planet to all neighbours.
-     */
     public void sendValueToNeighbours() {
         reset();
-        iter++;
-        if (iter < maxIter) {	  
-            neighbours.setValue(info, iter);
-            if (display == null) {// if no display, only the first Domain outputs message to say recompute is going on
-                if (identification==0) 
-                    System.out.println("Compute movement." + iter);
+        this.iter++;
+        if (this.iter < this.maxIter) {	  
+            neighbours.setValue(this.info, this.iter);
+            if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
+                if (this.identification==0 && this.iter % 50 == 0 ) 
+                    System.out.println("Compute movement." + this.iter);
             }
             else 
-                display.drawBody((int)info.x, (int)info.y, (int)info.vx, (int)info.vy, 
-                        (int)info.mass, (int)info.diameter, identification, hostName);
+                this.display.drawBody((int)this.info.x, (int)this.info.y, (int)this.info.vx, (int)this.info.vy, 
+                        (int)this.info.mass, (int)this.info.diameter, this.identification, this.hostName);
+            treatPremature();
         }
         else
-            if (identification==0) // only need one quit signal man!
-                Start.quit();
+            if (this.identification==0) // only need one quit signal man!
+                org.objectweb.proactive.examples.nbody.common.Start.quit();
             
     }    
     
     /**
-     * Once a movement has been computed, clean up the variables related to an iteration.
+     * Resends the premature information, which is probably up-to-date now
      */
-    private void reset() {
-        nbReceived = 0 ;
-        currentForce = new Force();
+    private void treatPremature() {
+        int size = this.prematureValues.size() ;
+        for (int i = 0 ; i < size ; i++) {
+            Carrier c = (Carrier) this.prematureValues.remove(0);
+            setValue(c.planet , c.iter); // works even if c.iter > iter
+        }
     }
     
     /**
-     * Redefining this method allows us to reject requests that come in too early.
-     * When incoming request has receivedIter > iter, the request is pushed to the end of the queue. 
+     * Empties iteration-specific variables.
+     *
      */
-    public void runActivity(Body body) {
-        org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
-        while (body.isActive()) {
-            Request r = service.blockingRemoveOldest();
-            if (r.getMethodName().equals("setValue")) {
-                int receivedIter = ((Integer)r.getParameter(1)).intValue();
-                if (receivedIter != iter) {
-                    try {
-                        r.send(body);
-                    } catch (IOException e) {e.printStackTrace(); }
-                    catch (RenegotiateSessionException e) {e.printStackTrace();}
-                    continue;	// don't serve the request, it's been put at the end of the queue!
-                }
-            }
-            service.serve(r);
+    private void reset() {
+        this.nbReceived = 0 ;
+        this.currentForce = new Force();
+    }
+    
+    
+    private void readObject(java.io.ObjectInputStream in) 
+    throws java.io.IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostName="unknown";
+            e.printStackTrace();
         }
+        
     }
     
 }
