@@ -109,7 +109,7 @@ public class MOPClassLoader extends URLClassLoader {
     return this.loadClass(name, false);
   }
 
-  protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+  protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
     if (this.getParent() != null) {
       try {
         return this.getParent().loadClass(name);
