@@ -51,7 +51,7 @@ public class ProActiveComponentBuilder implements ComponentBuilder {
         throws Exception {
         Fractal.getContentController((Component) superComponent)
                .addFcSubComponent((Component) subComponent);
-        // contrary to the standard fractal implementation, we do not set
+        // as opposed  to the standard fractal implementation, we do not set
         // the name of the component here because :
         // 1. it is already name at instantiation time
         // 2. it could be a group of components, and we do not want to give the 
@@ -64,13 +64,5 @@ public class ProActiveComponentBuilder implements ComponentBuilder {
 
     public void startComponent(final Object component, final Object context)
         throws Exception {
-
-        /*
-           try {
-             Fractal.getLifeCycleController((Component)component).startFc();
-           } catch (NoSuchInterfaceException ignored) {
-           } catch (NullPointerException ignored) {
-           }
-         */
     }
 }
