@@ -1,5 +1,13 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
@@ -11,40 +19,23 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.rmi.registry.Registry;
+
 import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.tree.*;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
-
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
-    private static final String VN_VIEW_LABEL = "Job view / Virtual Nodes";
-    private static final String JOB_VIEW_LABEL = "Job view / Hosts";
-    private static final String HOST_VIEW_LABEL = "Host view";
-    private static final String CUSTOM_VIEW_LABEL = "Custom view";
+    private final TreeView[] views;
     private static final int DEFAULT_RMI_PORT = Registry.REGISTRY_PORT;
     private static final String EXTRACT_MENU_LABEL = "Extract view to a new window";
-    private static final int[] JOB_VIEW_KEYS = { JOB, HOST, JVM, VN, NODE, AO };
-    private static final int[] HOST_VIEW_KEYS = { HOST, JOB, JVM, VN, NODE, AO };
-    private static final int[] VN_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
-    private static final int[] CUSTOM_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
     private JTabbedPane tabs;
     private Vector frames;
     private DataAssociation asso;
     private NodeExploration explorator;
-    private DataTreeModel jobViewModel;
-    private DataTreeModel vnViewModel;
-    private DataTreeModel hostViewModel;
-    private DataTreeModel customViewModel;
     private Vector monitoredHosts;
     private Vector filteredJobs;
     private JPopupMenu popupmenu;
@@ -53,8 +44,19 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private int ttr = 60;
 
     public JobMonitorPanel(IC2DGUIController _controller) {
-    	asso = new DataAssociation();
-    	
+        asso = new DataAssociation();
+
+        views = new TreeView[] {
+                new TreeView("Job view / Virtual Nodes",
+                    new int[] { JOB, VN, HOST, JVM, NODE, AO }, false),
+                new TreeView("Job view / Hosts",
+                    new int[] { JOB, HOST, JVM, VN, NODE, AO }, false),
+                new TreeView("Host view",
+                    new int[] { HOST, JOB, JVM, VN, NODE, AO }, false),
+                new TreeView("Custom view",
+                    new int[] { JOB, VN, HOST, JVM, NODE, AO }, true)
+            };
+
         setLayout(new GridLayout(1, 1));
 
         createRefresher();
@@ -66,8 +68,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
-    	explorator = new NodeExploration(asso, filteredJobs, _controller);
-        
+        explorator = new NodeExploration(asso, filteredJobs, _controller);
+
         add(tabs);
 
         final JPopupMenu extractMenu = new JPopupMenu();
@@ -98,11 +100,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         extractMenu.add(extract);
 
-        tabs.addTab(JOB_VIEW_LABEL, createJobView());
-        tabs.addTab(VN_VIEW_LABEL, createVNView());
-        tabs.addTab(HOST_VIEW_LABEL, createHostView());
-        tabs.addTab(CUSTOM_VIEW_LABEL, createCustomView());
-        
+        for (int i = 0; i < views.length; i++)
+            tabs.addTab(views[i].getLabel(), views[i].getPanel());
+
         tabs.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     if (e.isPopupTrigger()) {
@@ -212,10 +212,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             }
         }
 
-        vnViewModel.rebuild();
-        jobViewModel.rebuild();
-        hostViewModel.rebuild();
-        customViewModel.rebuild();
+        for (int i = 0; i < views.length; i++)
+            views[i].getModel().rebuild();
     }
 
     public void updateHost(final DataTreeNode hostNode) {
@@ -224,10 +222,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                     asso.removeItem(HOST, hostNode.getName());
                     handleHost(hostNode.getName());
 
-                    vnViewModel.rebuild(hostNode);
-                    jobViewModel.rebuild(hostNode);
-                    hostViewModel.rebuild(hostNode);
-                    customViewModel.rebuild(hostNode);
+                    for (int i = 0; i < views.length; i++)
+                        views[i].getModel().rebuild(hostNode);
                 }
             }).start();
     }
@@ -268,177 +264,165 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         }
     }
 
-    private boolean constructPopupMenu(final DataTreeNode node) {
-        boolean showMenu = false;
+    public NodeExploration getNodeExploration() {
+        return explorator;
+    }
 
-        if (popupmenu == null) {
-            popupmenu = new JPopupMenu();
+    class TreeView {
+        private String label;
+        private JTree tree;
+        private JPanel panel;
+        private JPopupMenu popupmenu;
+
+        public TreeView(String label, int[] keys, boolean allowExchange) {
+        	this.label = label;
+            DataModelTraversal traversal = new DataModelTraversal(keys);
+            DataTreeModel model = new DataTreeModel(asso, traversal);
+
+            panel = new JPanel(new GridLayout(1, 1));
+            panel.add(createContent(model, allowExchange));
         }
 
-        popupmenu.removeAll();
+        private boolean constructPopupMenu(final DataTreeNode node) {
+            boolean showMenu = false;
 
-        if (node == null) {
-            AbstractAction a = new AbstractAction("Refresh monitoring tree") {
-                    public void actionPerformed(ActionEvent e) {
-                        //	    			System.out.println("Asking for a global refresh");
-                        updateHosts();
-                    }
-                };
+            popupmenu = new JPopupMenu();
+            if (node == null) {
+                AbstractAction a = new AbstractAction("Refresh monitoring tree") {
+                        public void actionPerformed(ActionEvent e) {
+                            //	    			System.out.println("Asking for a global refresh");
+                            updateHosts();
+                        }
+                    };
 
-            JMenuItem treeMenu = new JMenuItem(a);
-            treeMenu.setEnabled(monitoredHosts.size() > 0);
-            popupmenu.add(treeMenu);
-
-            showMenu = true;
-        } else {
-            int key = node.getKey();
-
-            AbstractAction a = null;
-            if (key == HOST) {
-                a = new AbstractAction("Refresh host") {
-                            public void actionPerformed(ActionEvent e) {
-                                //						System.out.println ("Asking for a host refresh: " + node.getName());
-                                updateHost(node);
-                            }
-                        };
-            } else if (key == JOB) {
-                a = new AbstractAction("Stop monitoring this job") {
-                            public void actionPerformed(ActionEvent e) {
-                                String job = node.getName();
-
-                                //						System.out.println ("Asking for a job to be added to the filtered jobs list: " + job);
-                                filteredJobs.add(job);
-
-                                // remove job from tree
-                            }
-                        };
-            }
-
-            if (a != null) {
-                JMenuItem nodeMenu = new JMenuItem(a);
-                popupmenu.add(nodeMenu);
+                JMenuItem treeMenu = new JMenuItem(a);
+                treeMenu.setEnabled(monitoredHosts.size() > 0);
+                popupmenu.add(treeMenu);
 
                 showMenu = true;
+            } else {
+                int key = node.getKey();
+
+                AbstractAction a = null;
+                if (key == HOST) {
+                    a = new AbstractAction("Refresh host") {
+                                public void actionPerformed(ActionEvent e) {
+                                    //						System.out.println ("Asking for a host refresh: " + node.getName());
+                                    updateHost(node);
+                                }
+                            };
+                } else if (key == JOB) {
+                    a = new AbstractAction("Stop monitoring this job") {
+                                public void actionPerformed(ActionEvent e) {
+                                    String job = node.getName();
+                                    filteredJobs.add(job);
+
+                                    // remove job from tree
+                                }
+                            };
+                }
+
+                if (a != null) {
+                    JMenuItem nodeMenu = new JMenuItem(a);
+                    popupmenu.add(nodeMenu);
+
+                    showMenu = true;
+                }
             }
+
+            return showMenu;
         }
 
-        return showMenu;
-    }
+        private void addButtons(JPanel panel, final JTree tree) {
+            JPanel buttons = new JPanel();
+            buttons.setLayout(new FlowLayout());
+            panel.add(buttons, BorderLayout.SOUTH);
+            JButton expand = new JButton("Expand all");
+            expand.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        for (int row = 0; row < tree.getRowCount(); row++)
+                            tree.expandRow(row);
+                    }
+                });
+            buttons.add(expand);
 
-    private static void addButtons(JPanel panel, final JTree tree) {
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new FlowLayout());
-        panel.add(buttons, BorderLayout.SOUTH);
-        JButton expand = new JButton("Expand all");
-        expand.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    for (int row = 0; row < tree.getRowCount(); row++)
-                        tree.expandRow(row);
-                }
-            });
-        buttons.add(expand);
+            JButton collapse = new JButton("Collapse all");
+            collapse.addActionListener(new ActionListener() {
+                    public void actionPerformed(ActionEvent ae) {
+                        for (int row = tree.getRowCount() - 1; row >= 0;
+                                row--)
+                            tree.collapseRow(row);
+                    }
+                });
+            buttons.add(collapse);
+        }
 
-        JButton collapse = new JButton("Collapse all");
-        collapse.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent ae) {
-                    for (int row = tree.getRowCount() - 1; row >= 0; row--)
-                        tree.collapseRow(row);
-                }
-            });
-        buttons.add(collapse);
-    }
+        private Container createContent(DataTreeModel model, boolean allowExpand) {
+            //JSplitPane sp = new JSplitPane ();
+            //sp.setOneTouchExpandable (true);
+            JPanel left = new JPanel(new BorderLayout());
 
-    private Container createContent(DataTreeModel model, boolean allowExpand) {
-        //JSplitPane sp = new JSplitPane ();
-        //sp.setOneTouchExpandable (true);
-        JPanel left = new JPanel(new BorderLayout());
+            //JPanel right = new JPanel ();
+            //sp.setLeftComponent (left);
+            //sp.setRightComponent (right);
+            tree = new JTree(model);
+            tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+            tree.setCellRenderer(new JobMonitorTreeCellRenderer());
 
-        //JPanel right = new JPanel ();
-        //sp.setLeftComponent (left);
-        //sp.setRightComponent (right);
-        final JTree j = new JTree(model);
-        j.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        j.setCellRenderer(new JobMonitorTreeCellRenderer());
+            JScrollPane pane = new JScrollPane(tree);
+            left.add(pane, BorderLayout.CENTER);
 
-        JScrollPane pane = new JScrollPane(j);
-        left.add(pane, BorderLayout.CENTER);
+            tree.addMouseListener(new MouseAdapter() {
+                    public void mousePressed(MouseEvent e) {
+                        if (e.isPopupTrigger()) {
+                            TreePath selPath = tree.getPathForLocation(e.getX(),
+                                    e.getY());
+                            DataTreeNode node = null;
 
-        j.addMouseListener(new MouseAdapter() {
-                public void mousePressed(MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        TreePath selPath = j.getPathForLocation(e.getX(),
-                                e.getY());
-                        DataTreeNode node = null;
+                            if (selPath != null) {
+                                node = (DataTreeNode) selPath.getLastPathComponent();
 
-                        if (selPath != null) {
-                            node = (DataTreeNode) selPath.getLastPathComponent();
+                                if (node == null) {
+                                    return;
+                                }
 
-                            if (node == null) {
-                                return;
+                                for (int i = 0; i < views.length; i++)
+                                    if (node == views[i].getModel().root()) {
+                                        node = null;
+                                        break;
+                                    }
+
+                                tree.setSelectionPath(selPath);
                             }
 
-                            if ((node == vnViewModel.getRoot()) ||
-                                    (node == jobViewModel.getRoot()) ||
-                                    (node == hostViewModel.getRoot())) {
-                                node = null;
+                            if (constructPopupMenu(node)) {
+                                popupmenu.show(tree, e.getX(), e.getY());
                             }
-
-                            j.setSelectionPath(selPath);
-                        }
-
-                        if (constructPopupMenu(node)) {
-                            popupmenu.show(j, e.getX(), e.getY());
                         }
                     }
-                }
-            });
+                });
 
-        addButtons(left, j);
+            addButtons(left, tree);
 
-        Switcher s = new Switcher(j, allowExpand);
-        JPanel switcher = new JPanel(new GridLayout(1, 1));
-        switcher.add(s);
-        switcher.setBorder(BorderFactory.createEtchedBorder());
-        left.add(switcher, BorderLayout.NORTH);
+            Switcher s = new Switcher(tree, allowExpand);
+            JPanel switcher = new JPanel(new GridLayout(1, 1));
+            switcher.add(s);
+            switcher.setBorder(BorderFactory.createEtchedBorder());
+            left.add(switcher, BorderLayout.NORTH);
 
-        return left;
-    }
+            return left;
+        }
 
-    private JPanel createPanel(DataTreeModel model, boolean allowExpand) {
-        JPanel p = new JPanel(new GridLayout(1, 1));
-        p.add(createContent(model, allowExpand));
-        return p;
-    }
+        public String getLabel() {
+            return label;
+        }
 
-    private JPanel createJobView() {
-        DataModelTraversal traversal = new DataModelTraversal(JOB_VIEW_KEYS);
-        jobViewModel = new DataTreeModel(asso, traversal);
+        public JPanel getPanel() {
+            return panel;
+        }
 
-        return createPanel(jobViewModel, false);
-    }
-
-    private JPanel createHostView() {
-        DataModelTraversal traversal = new DataModelTraversal(HOST_VIEW_KEYS);
-        hostViewModel = new DataTreeModel(asso, traversal);
-
-        return createPanel(hostViewModel, false);
-    }
-
-    private JPanel createVNView() {
-        DataModelTraversal traversal = new DataModelTraversal(VN_VIEW_KEYS);
-        vnViewModel = new DataTreeModel(asso, traversal);
-
-        return createPanel(vnViewModel, false);
-    }
-    
-    private JPanel createCustomView() {
-        DataModelTraversal traversal = new DataModelTraversal(CUSTOM_VIEW_KEYS);
-        customViewModel = new DataTreeModel(asso, traversal);
-
-        return createPanel(customViewModel, true);
-    }
-    
-    public NodeExploration getNodeExploration() {
-    	return explorator;
+        public DataTreeModel getModel() {
+            return (DataTreeModel) tree.getModel();
+        }
     }
 }

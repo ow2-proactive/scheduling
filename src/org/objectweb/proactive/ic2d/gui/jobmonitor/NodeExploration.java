@@ -25,7 +25,7 @@ public class NodeExploration implements JobMonitorConstants {
 
     public NodeExploration(DataAssociation asso, Vector filteredJobs,
         IC2DGUIController controller) {
-        this.maxDepth = 4;
+        this.maxDepth = 10;
         this.asso = asso;
         this.filteredJobs = filteredJobs;
         this.controller = controller;
@@ -124,20 +124,16 @@ public class NodeExploration implements JobMonitorConstants {
                             handleProActiveRuntime((ProActiveRuntime) x.get(i), 1);
                         }
                     } catch (ProActiveException e) {
-                        //						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance - The RMI reference might be dead: " + e);
-                        //						e.printStackTrace();
+                    	controller.log("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance - The RMI reference might be dead: ", e);
                     } catch (RemoteException e) {
-                        //						System.out.println ("Unexpected remote exception caught while getting proactive runtimes: " + e);
-                        //						e.printStackTrace();
+                        controller.log("Unexpected remote exception caught while getting proactive runtimes: ", e);
                     }
                 }
             }
         } catch (RemoteException e) {
-            //			System.out.println("Unexpected exception caught while getting registry reference: " + e);
-            //			e.printStackTrace();
+        	controller.log("Unexpected exception caught while getting registry reference: ", e);
         } catch (NotBoundException e) {
-            //			System.out.println("Unexpected not bound exception caught while looking up object reference: " + e);
-            //			e.printStackTrace();
+        	controller.log("Unexpected not bound exception caught while looking up object reference: ", e);
         } finally {
             visitedVM = null;
         }
