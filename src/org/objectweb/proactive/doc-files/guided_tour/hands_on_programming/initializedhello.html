@@ -5,17 +5,15 @@
 <link rel="stylesheet" href="../../ProActive.css">
   </head>
   <body bgcolor="#ffffff">
-  <!--
- Header : start 
-~~~ -->
 <table width="100%">
   <tr> 
     <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" 
 border="1">
         <tr> 
-          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" 
-href="../index.html">back 
-to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../index.html">back to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back 
+to guided tour index</a>&nbsp;&nbsp;</td>
           <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
 href="clientserver.html">prev</a>&nbsp;&nbsp;</td>
           <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
@@ -28,7 +26,7 @@ src="../../ProActiveLogo200x34.gif" width="200" height="34"
 border="0"/></a> </td>
   </tr>
 </table>
-<hr><!-- Link to index : end -->
+<hr>
 
 <h1>1.2. Initialization of the activity</h1>
 
@@ -48,65 +46,45 @@ reason why we have written a terminate method in the following example.</p>
 
 
 <h2>Design of the application</h2>
-<p>The InitializedHello class extends the Hello class, and implements the interfaces InitActive and EndActive.</p>
+<p>The InitializedHello class extends the Hello class, and implements the interfaces InitActive and EndActive.It acts a a server
+for the InitializedHelloClient class.</p><p>The main method is overriden so that it can instantiate the InitializedHello class</p>
 <img src="../pics/hello/initializedhello.gif"> 
 <h2>Programming</h2>
 <h3>InitializedHello</h3>
+<p>The source code of the InitializedHello class is <a href="code/InitializedHello.java.html">here</a>.</p>
 <p>initActivity and endActivity here just log messages onto the console, so you can see when they are called.</p>
 <p>initActivity is called at the creation of the active object, while endActive is called after the activity has terminated 
 (thanks to the method terminate).</p>
+</p>
+<p>Here is the initActivity method :</p>
+<pre class="snippet">
+public void initActivity(Body body) {
+	System.out.println("I am about to start my activity");
+}
+</pre>
+<p>Here is the endActivity method :</p>
+<pre class="snippet">
+public void endActivity(Body body) {
+	System.out.println("I have finished my activity");
+}
+</pre>
+<p>The following code shows how to terminate the activity of the active object :</p>
+<pre class="snippet">
+public void terminate() {
+	// the termination of the activity is done through a call on the
+	// terminate method of the body associated to the current active object
+	ProActive.getBodyOnThis().terminate();
+}
+</pre>
 
 
-<pre><code>
-public class InitializedHello extends Hello implements InitActive, EndActive{
-
-	/**
-	 * Constructor for InitializedHello.
-	 */
-	public InitializedHello() {
-	}
-
-	/**
-	 * Constructor for InitializedHello.
-	 * @param name
-	 */
-	public InitializedHello(String name) {
-		super(name);
-	}
-	/**
-	 * @see org.objectweb.proactive.InitActive#initActivity(Body)
-	 * This is the place where to make initialization before the object
-	 * starts its activity
-	 */
-	public void initActivity(Body body) {
-		System.out.println("I am about to start my activity");
-	}
-
-	/**
-	 * @see org.objectweb.proactive.EndActive#endActivity(Body)
-	 * This is the place where to clean up or terminate things after the
-	 * object has finished its activity
-	 */
-	public void endActivity(Body body) {
-		System.out.println("I have finished my activity");
-	}
-	
-
-	/**
-	 * this method will end the activity of the active object
-	 */
-	public void terminate() {
-		// the termination of the activity is done through a call on the
-		// terminate method of the body associated to the current active object
-		ProActive.getBodyOnThis().terminate();
-	}
-	
-
-}</code></pre>
+<h3>InitializedHelloClient</h3>
+<p>Code is <a href="code/InitializedHelloClient.java.html">here</a>.</p>
+<p>The only differences from the HelloClient of the previous example is the class instantiated, which is now InitializedHello (and not Hello), and you will add a call to hello.terminate(). The source code is <a href="code/InitializedHelloClient.java">here</a>.
+</p>
 
 <h2>Execution</h2>
-<p>Execution is similar to the previous example. <br>
-In order to see the end of the activity, you will of course need to add a call to hello.terminate() !</p>
+<p>Execution is similar to the previous example; just use the InitializedHelloClient client class.<br>
 
 </body>
 </html>
