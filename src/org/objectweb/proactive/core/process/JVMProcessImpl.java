@@ -30,9 +30,11 @@
 */ 
 package org.objectweb.proactive.core.process;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.util.MessageLogger;
 
-public class JVMProcessImpl extends AbstractExternalProcess implements JVMProcess {
+public class JVMProcessImpl extends AbstractExternalProcess implements JVMProcess,Serializable {
   
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
   private final static String POLICY_FILE = "proactive.java.policy";
