@@ -31,9 +31,11 @@
 package org.objectweb.proactive.core.group;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 /**
  * @author Laurent Baduel
@@ -46,23 +48,6 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 		return null;
 	}
 
-	/**
-	 * ControlCall for group never are asynchronous
-	 * @return <code>false</code>  
-	 * @see org.objectweb.proactive.core.mop.MethodCall#isAsynchronousWayCall()
-	 */
-	public boolean isAsynchronousWayCall() {
-		return false;
-	}
-
-	/**
-	 * ControlCall for group always are oneway
-	 * @return <code>true</code>  
-	 * @see org.objectweb.proactive.core.mop.MethodCall#isOneWayCall()
-	 */
-	public boolean isOneWayCall() {
-		return true;
-	}
 
 	/**
 	 * Returns the number of parmeters
@@ -83,7 +68,6 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 	protected void writeTheObject(java.io.ObjectOutputStream out)
 		throws java.io.IOException {
 		out.defaultWriteObject();
-		//System.out.println("L'appel de control est serialise");
 	}
 
 
@@ -96,11 +80,35 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 	protected void readTheObject(java.io.ObjectInputStream in)
 		throws IOException, ClassNotFoundException {
 		in.defaultReadObject();
-		//System.out.println("L'appel de control est de-serialise");
 	}
 
 	// Overloaded to avoid this MethodCallControlForGroup object
 	// go inside the recycling pool of MethodCall.
 	protected void finalize () { }
+
+	// return null
+	public Object execute(Object targetObject)
+		throws InvocationTargetException, MethodCallExecutionFailedException {
+		return null;
+	}
+	
+	/**
+	 * ControlCall for group never are asynchronous
+	 * @return <code>false</code>  
+	 * @see org.objectweb.proactive.core.mop.MethodCall#isAsynchronousWayCall()
+	 */
+	public boolean isAsynchronousWayCall() {
+		return false;
+	}
+
+	/**
+	 * ControlCall for group always are oneway
+	 * @return <code>true</code>  
+	 * @see org.objectweb.proactive.core.mop.MethodCall#isOneWayCall()
+	 */
+	public boolean isOneWayCall() {
+		return true;
+	}
+
 
 }

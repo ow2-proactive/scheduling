@@ -195,11 +195,6 @@ public interface Group extends Collection {
      */
     public Group range(int begin, int end);
     
-	/**
-	 * Strongly synchronizes all the members of the group
-	 */
-    public void barrier ();
-
 
 	// Map class style methods
 	/**

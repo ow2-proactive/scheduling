@@ -34,6 +34,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
     }
 
     public synchronized void run() {
+    	
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
         Object object = this.memberList.get(this.index);
         boolean objectIsLocal = false;
@@ -48,12 +49,16 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                 if (lastProxy == null) {
                     // means we are dealing with a non-reified object (a standard Java Object)
                     this.mc.execute(object);
-                } else if (!objectIsLocal) {
-                    ((StubObject) object).getProxy().reify(this.mc);
-                } else {
-                    ((StubObject) object).getProxy().reify(new MethodCall(
-                            this.mc));
-                }
+				} else if (objectIsLocal) {
+					if (!(mc instanceof MethodCallControlForGroup)) {
+						((StubObject) object).getProxy().reify(new MethodCall(this.mc));
+					}
+					else {
+						((StubObject) object).getProxy().reify(this.mc);
+					}
+				} else {
+					((StubObject) object).getProxy().reify(this.mc);
+				}
             } catch (Throwable e) {
                 this.exceptionList.add(new ExceptionInGroup(object, e));
             }

@@ -39,7 +39,14 @@ import org.objectweb.proactive.core.group.MethodCallControlForGroup;
  */
 public class MethodCallBarrier extends MethodCallControlForGroup {
 
-    public MethodCallBarrier() {
+	private String IDName;
+
+	/**
+	 * Constructor
+	 * @param name - the id name of the barrier 
+	 */
+    public MethodCallBarrier(String idname) {
+    	this.IDName = idname;
     }
 
     /**
@@ -48,6 +55,14 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      */
     public String getName() {
         return "MethodCallBarrier";
+    }
+    
+    /**
+     * Returns the ID name of the barrier
+     * @return the ID name of the barrier
+     */
+    public String getIDName() {
+    	return this.IDName;
     }
 
     /**
@@ -58,4 +73,23 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     public int getNumberOfParameter() {
         return 0;
     }
+    
+//	/**
+//	 * BarrierControlCall for group never are oneway
+//	 * @return <code>true</code>  
+//	 * @see org.objectweb.proactive.core.mop.MethodCall#isOneWayCall()
+//	 */
+//	public boolean isOneWayCall() {
+//		return false;
+//	}
+//
+//	/**
+//	 * BarrierControlCall for group never are asynchronous
+//	 * @return <code>false</code>  
+//	 * @see org.objectweb.proactive.core.mop.MethodCall#isAsynchronousWayCall()
+//	 */
+//	public boolean isAsynchronousWayCall() {
+//		return false;
+//	}
+
 }

@@ -307,7 +307,6 @@ public class MethodCall implements java.io.Serializable {
             if (mc.effectiveArguments == null) {
                 effectiveArguments = null;
             } else {
-                // je crois que c'est bon ...
                 effectiveArguments = (Object[]) Utils.makeDeepCopy(mc.effectiveArguments);
             }
             this.key = MethodCall.buildKey(mc.getReifiedMethod());

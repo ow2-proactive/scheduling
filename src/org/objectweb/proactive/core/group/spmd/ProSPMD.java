@@ -115,14 +115,14 @@ public class ProSPMD {
         return result;
     }
 
-    /**
-     * Set the SPMD group for this
-     * @param o - the new SPMD group
-     */
-    public static void setSPMDGroupOnThis(Object o) {
-        AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
-        body.setSPMDGroup(o);
-    }
+//    /**
+//     * Set the SPMD group for this
+//     * @param o - the new SPMD group
+//     */
+//    public static void setSPMDGroupOnThis(Object o) {
+//        AbstractBody body = (AbstractBody) ProActive.getBodyOnThis();
+//        body.setSPMDGroup(o);
+//    }
 
 	/**
 	 * Returns the SPMD group of this
@@ -137,7 +137,7 @@ public class ProSPMD {
 	 * Returns the size of the SPMD group of this 
 	 * @return a size (int)
 	 */
-	public int getMySPMDGroupSize() {
+	public static int getMySPMDGroupSize() {
 		return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup()).size();
 	}
 	
@@ -145,8 +145,17 @@ public class ProSPMD {
 	 * Returns the rank (position) of the object in the Group
 	 * @return the index of the object
 	 */
-	public int getMyRank() {
+	public static int getMyRank() {
 		return ProActiveGroup.getGroup(ProSPMD.getSPMDGroup()).indexOf(ProActive.getStubOnThis());
 	}
+
+	/**
+	 * Strongly synchronizes all the members of the spmd group
+	 * @param barrierName the name of the barrier (used as  unique identifier)
+	 */
+	public static void barrier (String barrierName) {
+		((AbstractBody) ProActive.getBodyOnThis()).sendSPMDGroupCall(new MethodCallBarrier(barrierName));
+	}
+
 
 }

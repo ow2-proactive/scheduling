@@ -30,8 +30,15 @@
 */
 package org.objectweb.proactive.core.body;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -42,7 +49,10 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.group.MethodCallControlForGroup;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.ProActiveGroupManager;
+import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.ext.security.Communication;
@@ -58,15 +68,6 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 
 /**
@@ -922,9 +923,26 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.pgm.getSPMDGroup();
     }
 
-    public void test() {
-        this.pgm.test();
-    }
+	/**
+	 * Returns the size of of the SPMD group
+	 * @return the size of of the SPMD group
+	 */
+	public int getSPMDGroupSize() {
+		return ProActiveGroup.size(this.getSPMDGroup());
+	}
+	
+	/**
+	 * Send a call to all member of the SPMD group
+	 * @param gmc the control method call for group
+	 */
+	public void sendSPMDGroupCall (MethodCallControlForGroup gmc) {
+		try {
+			((ProxyForGroup) ProActiveGroup.getGroup(this.pgm.getSPMDGroup())).reify(gmc);
+		} catch (InvocationTargetException e) {
+			System.err.println("Unable to invoke a method call to control groups");
+			e.printStackTrace();
+		}
+	}
 
     //
     // -- SERIALIZATION METHODS -----------------------------------------------
@@ -939,4 +957,5 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         in.defaultReadObject();
         logger = Logger.getLogger("AbstractBody");
     }
+
 }

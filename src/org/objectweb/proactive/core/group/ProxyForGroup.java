@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -179,7 +178,7 @@ public class ProxyForGroup extends AbstractProxy
      */
     public Object reify(MethodCall mc) throws InvocationTargetException {
 
-		//System.out.println("A method is called : " + mc.getName());
+		//System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
 
         /* if the method called is toString, apply it to the proxy, not to the members */
         if ("toString".equals(mc.getName())) {
@@ -307,9 +306,10 @@ public class ProxyForGroup extends AbstractProxy
             if (uniqueSerialization) {
                 mc.transformEffectiveArgumentsIntoByteArray();
             }
-            for (int index = 0; index < this.memberList.size(); index++)
+            for (int index = 0; index < this.memberList.size(); index++) {
                 this.threadpool.addAJob(new ProcessForOneWayCall(this,
                         this.memberList, index, mc, body, exceptionList));
+	        }
         } else { // isDispatchingCall == true
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
@@ -795,18 +795,6 @@ public class ProxyForGroup extends AbstractProxy
 		catch (ConstructionOfReifiedObjectFailedException e) {
 			e.printStackTrace();
 			return null;
-		}
-	}
-
-	/**
-	 * Strongly synchronizes all the members of the group
-	 */
-	public void barrier () {
-		try {
-			this.reify(new MethodCallBarrier()); }
-		catch (InvocationTargetException e) {
-			logger.info("Unable to invoke the \"barrier\" method");
-			e.printStackTrace();
 		}
 	}
 
