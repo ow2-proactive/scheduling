@@ -406,6 +406,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="oarProcess" type="oarProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
 			<xs:element name="prunProcess" type="prunProcessType"/>
+			<xs:element name="gridEngineProcess" type="sgeProcessType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -627,6 +628,17 @@ The following element ProActiveDescriptor defines the root of the schema
 			</xs:extension>  -->
 		</xs:complexContent>
 	</xs:complexType>
+	<!--sge process -->
+	<xs:complexType name="sgeProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element name="gridEngineOption" type="OarOptionType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess"/>
+		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
+	</xs:complexType>
+	
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
 	<xs:simpleType name="ListType">
 		<xs:list itemType="xs:string"/>
