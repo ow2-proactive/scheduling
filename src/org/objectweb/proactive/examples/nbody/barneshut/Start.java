@@ -94,8 +94,6 @@ public class Start {
         try { nodes = vnode.getNodes(); }
         catch (NodeException e) { abort(e); }
         
-        sleep (2);
-        
         // Create all the Domains, based on the tree structure
         QuadTree tree = new QuadTree(totalNbBodies);
         System.err.println(tree);
@@ -131,31 +129,14 @@ public class Start {
             domainArray[i] = dom; 
         }
         if (displayer != null)
-            domainGroup.init(domainGroup, domainArray, displayer, maestro, tree);
+            domainGroup.init( domainArray, displayer, maestro, tree);
         else
-            domainGroup.init(domainGroup, domainArray,maestro,tree);
+            domainGroup.init( domainArray,maestro,tree);
         
-        sleep(4);
         // launch computation
         maestro.start(maxIter);
         
         
-    }
-    
-    /**
-     * Waits for te given time, before continuing the code.
-     * May be useful for debug, synchronization should use barriers.
-     * @param time the number of seconds to wait
-     */
-    public static void sleep(int time) {
-        /*
-        try {
-            for (int i=0; i < time ; i++) {
-                Thread.sleep(1000);
-                System.out.print("SLEEP. ");
-            }
-        } catch (InterruptedException e) { abort (e); }
-        */
     }
     
     /**

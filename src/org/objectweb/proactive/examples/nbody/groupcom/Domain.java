@@ -1,19 +1,21 @@
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 
-import org.objectweb.proactive.examples.nbody.common.Displayer;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
-
+    
     private int identification;
     private Domain neighbours;
-
+    
     private Maestro maestro;
     private Displayer display;
     
@@ -22,6 +24,7 @@ public class Domain implements Serializable{
     private Planet [] values; // list of all the bodies within all the other domains
     private int nbvalues, nbReceived=0;
     
+    private String hostName;
     
     public Domain (){}
     
@@ -29,13 +32,18 @@ public class Domain implements Serializable{
         identification = i.intValue();
         limits = r;
         info = new Planet(r);
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
-
+    
     public void init(Domain domainG, Displayer dp, Maestro master) {
         init(domainG,master);
         display=dp;
     }
-
+    
     public void init(Domain domainGroup, Maestro master) {
         maestro = master;
         neighbours = domainGroup;
@@ -44,7 +52,7 @@ public class Domain implements Serializable{
         nbvalues = g.size();
         values = new Planet [nbvalues + 1] ; // leave empty slot for self
     }
-
+    
     public void clearValues(){
         nbReceived = 0 ;
     } 
@@ -56,14 +64,14 @@ public class Domain implements Serializable{
             force.add(info, values[i]); // adds the interaction of the distant body 
         }
         info.moveWithForce(force);
-      
+        
         clearValues();
     }
-
+    
     public Planet getValue() {
         return info;
     }
-
+    
     public void setValue(Planet inf, int id) {
         values [id] = inf;
         nbReceived ++ ;
@@ -72,9 +80,9 @@ public class Domain implements Serializable{
         if (nbReceived == nbvalues) {
             maestro.notifyFinished();
             computeNewValue();
-            }
+        }
     }
-
+    
     public void sendValueToNeighbours() {
         //System.out.println(identification + " sends value to its neighbours");
         neighbours.setValue(info,identification);
@@ -84,7 +92,7 @@ public class Domain implements Serializable{
         }
         else 
             display.drawBody((int)info.x, (int)info.y, (int)info.vx, (int)info.vy, 
-                    (int)info.mass, (int)info.diameter, this.identification);
+                    (int)info.mass, (int)info.diameter, this.identification, hostName);
     }
-
+    
 }

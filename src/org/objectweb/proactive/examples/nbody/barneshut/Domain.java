@@ -4,6 +4,8 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
@@ -36,6 +38,8 @@ public class Domain implements Serializable{
     
     private Vector listPositions ;
     
+    private String hostName; 
+    
     public Domain (){}
     
     /**
@@ -49,6 +53,11 @@ public class Domain implements Serializable{
         }
         catch (ClassNotReifiableException e) { Start.abort(e); }
         catch (ClassNotFoundException e) { Start.abort(e); }
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -58,8 +67,8 @@ public class Domain implements Serializable{
      * @param master The Master of every Domain, which synchronizes them 
      * @param tree The tree structure giving the relation between all the Domains  
      */
-    public void init(Domain domainGroup, Domain [] domainArray, Displayer dp, Maestro master, QuadTree tree) {
-        init(domainGroup, domainArray, master,tree);
+    public void init(Domain [] domainArray, Displayer dp, Maestro master, QuadTree tree) {
+        init(domainArray, master,tree);
         display=dp;
     }
     
@@ -69,7 +78,7 @@ public class Domain implements Serializable{
      * @param master the Maestro to notify when computation is finished
      * @param tree the QuadTree which allows to find more Infos when needed
      */
-    public void init(Domain domainGroup, Domain [] domainArray, Maestro master, QuadTree tree) {
+    public void init(Domain [] domainArray, Maestro master, QuadTree tree) {
         maestro = master;
         quadTree = tree;
         treeNode = quadTree.getNode (identification); 
@@ -269,7 +278,7 @@ public class Domain implements Serializable{
                 for (int i = 0 ; i < v.size() ; i ++) {
                     Planet p = (Planet) v.get(i);
                     display.drawBody((int)p.x, (int)p.y, (int)p.vx, (int)p.vy, 
-                            (int)p.mass, (int)p.diameter, p.identification);
+                            (int)p.mass, (int)p.diameter, p.identification, hostName);
                 }
             }
         }

@@ -4,6 +4,8 @@
 package org.objectweb.proactive.examples.nbody.oospmd;
 
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
@@ -38,6 +40,8 @@ public class Domain implements Serializable{
     
     private Vector listPositions ;
     
+    private String hostName;
+    
     public Domain (){}
     
     /**
@@ -51,6 +55,11 @@ public class Domain implements Serializable{
         }
         catch (ClassNotReifiableException e) { Start.abort(e); }
         catch (ClassNotFoundException e) { Start.abort(e); }
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -276,7 +285,7 @@ public class Domain implements Serializable{
                 for (int i = 0 ; i < v.size() ; i ++) {
                     Planet p = (Planet) v.get(i);
                     display.drawBody((int)p.x, (int)p.y, (int)p.vx, (int)p.vy, 
-                            (int)p.mass, (int)p.diameter, p.identification);
+                            (int)p.mass, (int)p.diameter, p.identification, hostName);
                 }
             }
         }

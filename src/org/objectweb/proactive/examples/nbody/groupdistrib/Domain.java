@@ -2,6 +2,8 @@ package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -25,11 +27,18 @@ public class Domain implements RunActive{
     private int nbvalues, nbReceived=0;
     private int iter, maxIter;
     
+    private String hostName;
+
     public Domain (){}
     
     public Domain (Integer i, Rectangle r) {
         identification = i.intValue();
         info = new Planet(r);
+        try {
+            this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
     
     public void init(Domain domainG, Displayer dp, int maxIter) {
@@ -90,7 +99,7 @@ public class Domain implements RunActive{
             }
             else 
                 display.drawBody((int)info.x, (int)info.y, (int)info.vx, (int)info.vy, 
-                        (int)info.mass, (int)info.diameter, identification);
+                        (int)info.mass, (int)info.diameter, identification, hostName);
         }
         else
             if (identification==0) // only need one quit signal man!
@@ -115,7 +124,7 @@ public class Domain implements RunActive{
         while (body.isActive()) {
             Request r = service.blockingRemoveOldest();
             if (r.getMethodName().equals("setValue")) {
-                int receivedIter = ((Integer)r.getParameter(2)).intValue();
+                int receivedIter = ((Integer)r.getParameter(1)).intValue();
                 if (receivedIter != iter) {
                     try {
                         r.send(body);

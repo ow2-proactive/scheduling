@@ -14,7 +14,7 @@ public class Planet extends Info{
     double vx,vy;
     double diameter;
     
-    private final double dt = 0.002;
+    private final double dt =  0.0002;
     
     public Planet(){}
     
