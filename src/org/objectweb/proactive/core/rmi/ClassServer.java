@@ -32,15 +32,12 @@ package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.IOException;
-
 import java.net.UnknownHostException;
 
 
 public class ClassServer implements Runnable {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
-    public static int DEFAULT_SERVER_BASE_PORT = 2001;
+    public static int DEFAULT_SERVER_BASE_PORT = 2222;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 20;
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
@@ -48,7 +45,7 @@ public class ClassServer implements Runnable {
 
     static {
         if (System.getProperty("proactive.communication.protocol").equals("http")) {
-            String newport = System.getProperty("proactive.http.port", "2222");
+            String newport = System.getProperty("proactive.http.port", DEFAULT_SERVER_BASE_PORT + "");
             DEFAULT_SERVER_BASE_PORT = Integer.valueOf(newport).intValue();
         }
     }
@@ -69,7 +66,7 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
-            port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
+            port = boundServerSocket(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
@@ -197,7 +194,7 @@ public class ClassServer implements Runnable {
         (new Thread(this, "ClassServer-" + hostname + ":" + port)).start();
     }
 
-    private int boundServerSockect(int basePortNumber, int numberOfTry)
+    private int boundServerSocket(int basePortNumber, int numberOfTry)
         throws java.io.IOException {
         for (int i = 0; i < numberOfTry; i++) {
             try {
@@ -205,14 +202,6 @@ public class ClassServer implements Runnable {
 
                 return basePortNumber;
             } catch (java.io.IOException e) {
-                // If the protocol is HTTP and the port fixed, we are expected to use DEFAULT_SERVER_BASE_PORT, and no other port
-                if (System.getProperty("proactive.communication.protocol")
-                              .equals("http") &&
-                        System.getProperty("proactive.http.port") != null) {
-                    throw new IOException("Cannot listen on port " +
-                        DEFAULT_SERVER_BASE_PORT);
-                }
-
                 basePortNumber += random.nextInt(DEFAULT_SERVER_PORT_INCREMENT);
             }
         }
