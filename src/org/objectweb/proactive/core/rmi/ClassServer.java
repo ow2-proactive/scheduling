@@ -79,9 +79,9 @@ public class ClassServer implements Runnable {
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         newListener();
         
-        if (logger.isInfoEnabled()) {
-            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
-        }
+//        if (logger.isInfoEnabled()) {
+//            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
+//        }
 
     }
     
