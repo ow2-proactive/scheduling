@@ -121,7 +121,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 			try {
 			  //System.out.println("JiniNodeListener: on gere le host");
 			  if (host != null){
-			    System.out.println("host pas nul: "+host+"  "+info.getInetAddress().getHostName());
+			    //System.out.println("host non null: "+host+"  "+info.getInetAddress().getHostName());
 			    if (info.getInetAddress().getHostName().equals(host)){
 			      //System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
 			      nodes.add(new JiniNodeAdapter(node));

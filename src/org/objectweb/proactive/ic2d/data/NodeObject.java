@@ -113,7 +113,7 @@ public class NodeObject extends AbstractDataObject {
   //
   
   public String getURL() {
-    System.out.println(node.getNodeInformation().getProtocol()+":"+node.getNodeInformation().getURL());
+    //System.out.println(node.getNodeInformation().getProtocol()+":"+node.getNodeInformation().getURL());
     return node.getNodeInformation().getProtocol()+":"+node.getNodeInformation().getURL();
   }
 
