@@ -153,6 +153,16 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 */
 	public Object reify(MethodCall mc) throws InvocationTargetException {
 
+		/* if the method called is toString, apply it to the proxy, not to the members */
+		if ("toString".equals(mc.getName())) {
+			return this.toString();
+		}
+
+		/* if the method called is hashCode, apply it to the proxy, not to the members */
+		if ("hashCode".equals(mc.getName())) {
+			return new Integer (this.hashCode());
+		}
+		
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
 
