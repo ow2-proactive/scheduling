@@ -39,6 +39,8 @@ IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis
 IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
 IF EXIST %PROACTIVE%\lib\fractal.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\fractal.jar
 IF EXIST %PROACTIVE%\lib\fractal-adl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\fractal-adl.jar
+IF EXIST %PROACTIVE%\lib\dtdparser.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\dtdparser.jar
+IF EXIST %PROACTIVE%\lib\ow_deployment_scheduling.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ow_deployment_scheduling.jar
 IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 echo CLASSPATH=%CLASSPATH%
 
