@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor>
+	<virtualNodes>
+		<virtualNode name="Node1"/>
+		<virtualNode name="Node2"/>
+	</virtualNodes>
+	<deployment>
+		<mapping>
+			<map virtualNode="Node1" jvm="currentJvm"/>
+			<map virtualNode="Node2" jvm="Jvm2"/>
+		</mapping>
+		<jvms>
+			<jvm name="currentJvm">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="rshProcess"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMProcessImpl">
+				<policyFile>
+					<path type="absolute" value="/ProActive/classes/proactive.java.policy"/>
+				</policyFile>
+				<classname>org.objectweb.proactive.rmi.StartNode</classname>
+				<parameters>///bob</parameters>
+			</jvmProcess>
+			<process id="rshProcess" class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea.inria.fr">
+				<jvmProcess refid="linuxJVM"/>
+			</process>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
