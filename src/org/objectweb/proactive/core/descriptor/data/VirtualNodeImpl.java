@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -874,6 +875,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         LSFBSubProcess bsub = null;
         PrunSubProcess prun = null;
         GlobusProcess globus = null;
+        PBSSubProcess pbs = null;
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
@@ -900,7 +902,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNodeCount((new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
+                increaseNodeCount((new Integer(prun.getProcessorPerNodeNumber()).intValue())*(new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
+            }
+             if (processImpl instanceof PBSSubProcess) {
+                //if the process is prun we have to increase the node count by the number of processors            
+                pbs = (PBSSubProcess) processImpl;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+                        prun.getHostsNumber());
+                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+                        prun.getProcessorPerNodeNumber());
+                    logger.debug("VM " + vm);
+                }
+
+                increaseNodeCount((new Integer(pbs.getProcessorPerNodeNumber()).intValue())*(new Integer(pbs.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof GlobusProcess) {
                 //if the process is globus we have to increase the node count by the number of processors
@@ -922,7 +937,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null) && (prun == null) && (globus == null)) {
+            if ((bsub == null) && (prun == null) && (globus == null) && (pbs == null)){
                 //if bsub and prun and globus are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
