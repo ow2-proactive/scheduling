@@ -1845,7 +1845,7 @@ public class ProActive {
     
     /**
      *  Deploy a component as a webservice. Each interface of the component will be accessible by
-     * the urn <componentName>_<interfaceName> in order to identify the component an interface belongs to.
+     * the urn [componentName]_[interfaceName]in order to identify the component an interface belongs to.
      * All the interfaces public  methods will be exposed.
      * @param componentName The name of the component
      * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"

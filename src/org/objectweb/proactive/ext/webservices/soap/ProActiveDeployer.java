@@ -30,30 +30,26 @@
  */
 package org.objectweb.proactive.ext.webservices.soap;
 
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
 import org.apache.soap.SOAPException;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.ServiceManagerClient;
 import org.apache.soap.server.TypeMapping;
 import org.apache.soap.util.xml.QName;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.LifeCycleController;
-
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.ext.webservices.WSConstants;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
-
-import java.lang.reflect.Method;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
 
 
 /**
@@ -190,6 +186,19 @@ public class ProActiveDeployer extends WSConstants {
 
         if (methods != null) {
             dd.setMethods(methods);
+        } else {
+            Method[]  ms = o.getClass().getDeclaredMethods();
+            Vector mv = new Vector ();
+            for (int i=0; i< ms.length ; i++)
+                if(!disallowedMethods.contains(ms[i].getName()))
+                    mv.addElement(ms[i].getName());
+                methods = new String[mv.size()];
+                Enumeration e = mv.elements();	
+                int j=0;
+                while (e.hasMoreElements())
+                    methods[j++] = (String)e.nextElement();
+                
+                dd.setMethods(methods);
         }
 
         dd.setProviderClass(o.getClass().getName());
@@ -231,25 +240,51 @@ public class ProActiveDeployer extends WSConstants {
         Vector tms = new Vector();
         Vector sMethods = new Vector();
 
-        for (int i = 0; i < methods.length; i++) {
-            sMethods.addElement(methods[i]);
-        }
+        if (methods != null) {
+            for (int i = 0; i < methods.length; i++) {
+                sMethods.addElement(methods[i]);
+            }
 
-        Vector mMethods = new Vector();
-        Method[] ms = c.getDeclaredMethods();
+            Vector mMethods = new Vector();
+            Method[] ms = c.getDeclaredMethods();
 
-        for (int i = 0; i < ms.length; i++) {
-            mMethods.addElement(ms[i]);
-        }
+            for (int i = 0; i < ms.length; i++) {
+                mMethods.addElement(ms[i]);
+            }
 
-        Enumeration e = mMethods.elements();
+            Enumeration e = mMethods.elements();
 
-        while (e.hasMoreElements()) {
-            Method m = (Method) e.nextElement();
+            while (e.hasMoreElements()) {
+                Method m = (Method) e.nextElement();
 
-            if (sMethods.contains(m.getName())) {
-                Class[] parameters = m.getParameterTypes();
+                if (sMethods.contains(m.getName())) {
+                    Class[] parameters = m.getParameterTypes();
 
+                    for (int j = 0; j < parameters.length; j++) {
+                        if (!supportedTypes.contains(parameters[j])) {
+                            String pname = extractName(parameters[j]);
+
+                            TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
+                                    new QName("http://" + pname,
+                                        getSimpleName(parameters[j])),
+                                    parameters[j].getName(),
+                                    "org.apache.soap.encoding.soapenc.BeanSerializer",
+                                    "org.apache.soap.encoding.soapenc.BeanSerializer");
+
+                            tms.addElement(tm);
+                        }
+                    }
+                }
+            }
+        } else { // methods == null
+            
+            Method [] ms = c.getDeclaredMethods();
+            
+            for (int i=0 ; i< ms.length; i++) {
+                
+                if (!disallowedMethods.contains(ms[i].getName())){
+            
+                    Class[] parameters = ms[i].getParameterTypes();
                 for (int j = 0; j < parameters.length; j++) {
                     if (!supportedTypes.contains(parameters[j])) {
                         String pname = extractName(parameters[j]);
@@ -260,21 +295,24 @@ public class ProActiveDeployer extends WSConstants {
                                 parameters[j].getName(),
                                 "org.apache.soap.encoding.soapenc.BeanSerializer",
                                 "org.apache.soap.encoding.soapenc.BeanSerializer");
-                        System.out.println(tm);
+
                         tms.addElement(tm);
+                    }
                     }
                 }
             }
         }
 
         TypeMapping[] tmsArray = new TypeMapping[tms.size()];
-        e = tms.elements();
+        Enumeration e = tms.elements();
 
         int i = 0;
 
         while (e.hasMoreElements()) {
             tmsArray[i++] = (TypeMapping) e.nextElement();
         }
+        
+        
 
         return tmsArray;
     }

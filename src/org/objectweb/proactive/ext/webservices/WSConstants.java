@@ -30,13 +30,16 @@
  */
 package org.objectweb.proactive.ext.webservices;
 
-import org.apache.soap.util.xml.QName;
-
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
-
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
+
+import org.apache.soap.util.xml.QName;
 
 
 /**
@@ -101,5 +104,16 @@ public class WSConstants {
         supportedTypes.addElement(GregorianCalendar.class);
         supportedTypes.addElement(Date.class);
         supportedTypes.addElement(QName.class);
+        supportedTypes.addElement(Array.newInstance(Byte.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Boolean.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Double.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Long.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Float.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Integer.TYPE,0).getClass());
+        supportedTypes.addElement(Array.newInstance(Object.class,0).getClass());
+        supportedTypes.addElement(Vector.class);
+        supportedTypes.addElement(Hashtable.class);
+        supportedTypes.addElement(Map.class);
+        supportedTypes.addElement(Enumeration.class);
     }
 }
