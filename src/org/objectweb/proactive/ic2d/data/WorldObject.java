@@ -32,8 +32,8 @@ package org.objectweb.proactive.ic2d.data;
 
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
-import org.objectweb.proactive.ic2d.util.CreateJiniNodeTask;
-import org.objectweb.proactive.ic2d.util.RunnableProcessor;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 
 
 /**
@@ -64,14 +64,14 @@ public class WorldObject extends AbstractDataObject {
     //
     // Host related methods
     //
-    public HostObject addHostObject(String hostname, String protocol)
+    public HostObject addHostObject(BasicMonitoredObject monitoredHost, DataAssociation asso)
         throws java.rmi.RemoteException {
-        return addHostObject(hostname, null, protocol);
+        return addHostObject(monitoredHost, asso, null);
     }
 
-    public HostObject addHostObject(String hostname, String nodeName,
-        String protocol) throws java.rmi.RemoteException {
+    public HostObject addHostObject(BasicMonitoredObject monitoredHost, DataAssociation asso, String nodeName) throws java.rmi.RemoteException {
         String shortHostname = null;
+        String hostname = monitoredHost.getFullName();
         try {
             shortHostname = UrlBuilder.getHostNameorIP(java.net.InetAddress.getByName(
                         UrlBuilder.removePortFromHost(hostname)));
@@ -82,7 +82,7 @@ public class WorldObject extends AbstractDataObject {
         }
         HostObject host = getHostObject(hostname);
         if (host == null) {
-            host = new HostObject(this, hostname, protocol);
+            host = new HostObject(this, monitoredHost, asso);
             putChild(hostname, host);
             if (listener != null) {
                 listener.hostObjectAdded(host);
@@ -91,23 +91,24 @@ public class WorldObject extends AbstractDataObject {
             controller.log("Hostname " + hostname +
                 " already monitored, check for new nodes.");
         }
-        if (nodeName == null) {
-            host.createAllNodes();
-        } else {
-            host.createOneNode(nodeName);
-        }
+        host.createAllNodes();
+//        if (nodeName == null) {
+//            host.createAllNodes();
+//        } else {
+//            host.createOneNode(nodeName);
+//        }
         return host;
     }
 
-    public void addHosts() {
-        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
-            new CreateJiniNodeTask(this), controller);
-    }
+//    public void addHosts() {
+//        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
+//            new CreateJiniNodeTask(this), controller);
+//    }
 
-    public void addHosts(String host) {
-        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
-            new CreateJiniNodeTask(this, host), controller);
-    }
+//    public void addHosts(String host) {
+//        RunnableProcessor.getInstance().processRunnable("Create Jini nodes",
+//            new CreateJiniNodeTask(this, host), controller);
+//    }
 
     public void addHostsObject(HostObject host) {
         if (listener != null) {

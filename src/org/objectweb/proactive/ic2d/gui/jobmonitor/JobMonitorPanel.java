@@ -84,7 +84,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
-        explorator = new NodeExploration(asso, skippedObjects, _controller);
+        explorator = new NodeExploration(asso, skippedObjects, _controller, "rmi:");
 
         add(tabs);
 

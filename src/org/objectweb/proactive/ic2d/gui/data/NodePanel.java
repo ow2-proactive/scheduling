@@ -64,9 +64,15 @@ public class NodePanel extends AbstractDataObjectPanel
 
     public NodePanel(AbstractDataObjectPanel parentDataObjectPanel,
         NodeObject targetNodeObject, java.awt.Color c) {
-        super(parentDataObjectPanel, targetNodeObject.getName(), "NodeObject");
-        if (targetNodeObject.getProtocol().equals("jini")) {
+        super(parentDataObjectPanel, targetNodeObject.getURL(), "NodeObject");
+        if (targetNodeObject.getProtocol().equals("jini:")) {
             c = java.awt.Color.cyan;
+        }
+        if (targetNodeObject.getProtocol().equals("http:")) {
+            c = java.awt.Color.orange;
+        }
+        if (targetNodeObject.getProtocol().equals("rmissh:")) {
+            c = java.awt.Color.white;
         }
         nodeObject = targetNodeObject;
         // dnd stuff
@@ -144,7 +150,7 @@ public class NodePanel extends AbstractDataObjectPanel
 
     protected Object[][] getDataObjectInfo() {
         return new Object[][] {
-            { "Name", name },
+            { "Url", name },
             { "Active objects", new Integer(nodeObject.getChildObjectsCount()) }
         };
     }

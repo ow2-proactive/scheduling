@@ -30,9 +30,32 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.http.HttpRuntimeAdapter;
+import org.objectweb.proactive.core.util.UrlBuilder;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
 
 
-public interface AllNodeFinder extends NodeFinder {
-    public Node[] findNodes() throws java.io.IOException;
+
+public class HttpHostRTFinder implements HostRTFinder {
+    private IC2DMessageLogger logger;
+
+    public HttpHostRTFinder(IC2DMessageLogger logger) {
+        this.logger = logger;
+    }
+
+    /**
+     * @see org.objectweb.proactive.ic2d.util.HostRTFinder#findPARuntimes(java.lang.String, int)
+     */
+    public ArrayList findPARuntimes(String host, int port)
+        throws IOException {
+        logger.log("Exploring " + host + " with HTTP on port " + port);
+        ArrayList runtimeArray = new ArrayList();
+        HttpRuntimeAdapter adapter = new HttpRuntimeAdapter(UrlBuilder.buildUrl(
+                    host, "", "http:", port));
+        runtimeArray.add(adapter);
+        return runtimeArray;
+    }
 }

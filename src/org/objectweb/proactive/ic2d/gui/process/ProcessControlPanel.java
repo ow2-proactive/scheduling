@@ -281,7 +281,7 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                 e1.printStackTrace();
             }
             parametersField = new javax.swing.JTextField("ic2d " +
-                    localRuntimeUrl + " rmi: 1 jvm");
+                    localRuntimeUrl + " 1 jvm ic2d");
             // defines fields in the north panel 
             {
                 javax.swing.JPanel northPanel = new javax.swing.JPanel(new java.awt.BorderLayout());

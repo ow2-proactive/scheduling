@@ -30,9 +30,9 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-import org.objectweb.proactive.core.node.Node;
+import java.util.ArrayList;
 
 
-public interface NodeFinder extends HostNodeFinder {
-    public Node[] findNodes() throws java.io.IOException;
+public interface HostRTFinder {
+    public ArrayList findPARuntimes (String host, int port) throws java.io.IOException;
 }

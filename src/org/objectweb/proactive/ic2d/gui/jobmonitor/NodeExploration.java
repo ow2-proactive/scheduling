@@ -1,12 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
@@ -17,10 +17,16 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredVN;
+import org.objectweb.proactive.ic2d.util.HostRTFinder;
+import org.objectweb.proactive.ic2d.util.HttpHostRTFinder;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
+import org.objectweb.proactive.ic2d.util.IbisHostRTFinder;
+import org.objectweb.proactive.ic2d.util.JiniHostRTFinder;
+import org.objectweb.proactive.ic2d.util.RMIHostRTFinder;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.io.IOException;
+
+import java.net.UnknownHostException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +43,6 @@ import javax.swing.DefaultListModel;
 
 
 public class NodeExploration implements JobMonitorConstants {
-    private static final String PA_JVM = "PA_JVM";
     private int maxDepth;
     private DataAssociation asso;
     private DefaultListModel skippedObjects;
@@ -45,15 +50,19 @@ public class NodeExploration implements JobMonitorConstants {
     private Set visitedVM;
     private Map runtimes;
     private IC2DMessageLogger controller;
+    private String protocol;
+    private HostRTFinder runtimeFinder;
 
     public NodeExploration(DataAssociation asso,
-        DefaultListModel skippedObjects, IC2DMessageLogger controller) {
-        this.maxDepth = 10;
+        DefaultListModel skippedObjects, IC2DMessageLogger controller,
+        String protocol) {
+        this.maxDepth = 3;
         this.asso = asso;
         this.skippedObjects = skippedObjects;
         this.aos = new HashMap();
         this.runtimes = new HashMap();
         this.controller = controller;
+        this.runtimeFinder = initiateFinder(protocol);
     }
 
     public int getMaxDepth() {
@@ -90,16 +99,7 @@ public class NodeExploration implements JobMonitorConstants {
         String object = m.group(4);
 
         try {
-            Registry registry;
-            if (!port.equals("")) {
-                int portNumber = Integer.parseInt(port);
-                registry = LocateRegistry.getRegistry(host, portNumber);
-            } else {
-                registry = LocateRegistry.getRegistry(host);
-            }
-
-            RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(object);
-            return new RemoteProActiveRuntimeAdapter(r);
+            return RuntimeFactory.getRuntime(url, UrlBuilder.getProtocol(url));
         } catch (Exception e) {
             log(e);
             return null;
@@ -144,50 +144,47 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     public void exploreHost(String hostname, int port) {
-        Registry registry;
-        String[] list;
+        //Registry registry;
+        //String[] list;
         MonitoredHost hostObject = new MonitoredHost(hostname, port);
-
         if (skippedObjects.contains(hostObject)) {
             return;
         }
-
+        ArrayList foundRuntimes = null;
         try {
-            registry = LocateRegistry.getRegistry(hostname, port);
-            list = registry.list();
-        } catch (Exception e) {
+            foundRuntimes = runtimeFinder.findPARuntimes(hostname, port);
+        } catch (IOException e) {
             log(e);
-            return;
         }
-
-        for (int idx = 0; idx < list.length; ++idx) {
-            String id = list[idx];
-            if (id.indexOf(PA_JVM) != -1) {
-                ProActiveRuntime part;
-
-                try {
-                    RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
-                    part = new RemoteProActiveRuntimeAdapter(r);
-                    handleProActiveRuntime(part, 1);
-                } catch (Exception e) {
-                    log(e);
-                    continue;
-                }
+        if (foundRuntimes != null) {
+            for (int idx = 0; idx < foundRuntimes.size(); ++idx) {
+                ProActiveRuntime part = (ProActiveRuntime) foundRuntimes.get(idx);
+                handleProActiveRuntime(part, 1);
             }
         }
     }
 
-    private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
-        if (pr instanceof RemoteProActiveRuntime &&
-                !(pr instanceof RemoteProActiveRuntimeAdapter)) {
-            try {
-                pr = new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime) pr);
-            } catch (ProActiveException e) {
-                log(e);
-                return;
-            }
+    public void exploreNode(String nodeUrl, String protocol) {
+        try {
+            ProActiveRuntime part = RuntimeFactory.getRuntime(nodeUrl, protocol);
+            handleProActiveRuntime(part, 1);
+        } catch (ProActiveException e) {
+            log(e);
         }
+    }
 
+    private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
+        //should never occur since if pr is a RemoteProActiveRuntime
+        // a classCastException should be thrown
+        //        if (pr instanceof RemoteProActiveRuntime &&
+        //                !(pr instanceof RemoteProActiveRuntimeAdapter)) {
+        //            try {
+        //                pr = new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime) pr);
+        //            } catch (ProActiveException e) {
+        //                log(e);
+        //                return;
+        //            }
+        //        }
         VMInformation infos = pr.getVMInformation();
         String vmName = infos.getName();
 
@@ -212,18 +209,27 @@ public class NodeExploration implements JobMonitorConstants {
 
         String hostname = UrlBuilder.getHostNameorIP(infos.getInetAddress());
 
-        MonitoredHost hostObject = new MonitoredHost(hostname, jvmObject.getPort());
+        MonitoredHost hostObject = new MonitoredHost(hostname,
+                jvmObject.getPort());
         if (skippedObjects.contains(hostObject)) {
             return;
         }
 
+        //        try {
+        //            System.out.println("OK for "+ pr.getURL()+ " " +vmName );
+        //        } catch (ProActiveException e1) {
+        //            // TODO Auto-generated catch block
+        //            e1.printStackTrace();
+        //        }
         visitedVM.add(vmName);
 
         try {
             String[] nodes = pr.getLocalNodeNames();
             for (int i = 0; i < nodes.length; ++i) {
                 String nodeName = nodes[i];
-                handleNode(pr, jvmObject, vmName, nodeName);
+                if (nodeName.indexOf("SpyListenerNode") == -1) {
+                    handleNode(pr, jvmObject, vmName, nodeName);
+                }
             }
         } catch (ProActiveException e) {
             log(e);
@@ -245,7 +251,22 @@ public class NodeExploration implements JobMonitorConstants {
     private void handleNode(ProActiveRuntime pr, MonitoredJVM jvmObject,
         String vmName, String nodeName) {
         try {
-            MonitoredNode nodeObject = new MonitoredNode(nodeName, jvmObject.getFullName());
+            String runtimeUrl = pr.getURL();
+            String protocol = UrlBuilder.getProtocol(runtimeUrl);
+            String host = null;
+            try {
+                host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
+            } catch (UnknownHostException e1) {
+                // TODO Auto-generated catch block
+                log(e1);
+                e1.printStackTrace();
+            }
+            int port = UrlBuilder.getPortFromUrl(runtimeUrl);
+            String nodeUrl = UrlBuilder.buildUrl(host, nodeName, protocol, port);
+            Node node = new NodeImpl(pr, nodeUrl,
+                    UrlBuilder.getProtocol(nodeUrl), pr.getJobID(nodeUrl));
+            MonitoredNode nodeObject = new MonitoredNode(node,
+                    jvmObject.getFullName());
             if (skippedObjects.contains(nodeObject)) {
                 return;
             }
@@ -257,6 +278,8 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             String vnName = pr.getVNName(nodeName);
+
+            //String vnName = node.getVnName();
             MonitoredJob vnJobIDObject = null;
             if (vnName != null) {
                 MonitoredVN vnObject = new MonitoredVN(vnName);
@@ -264,16 +287,19 @@ public class NodeExploration implements JobMonitorConstants {
                     return;
                 }
 
-                VirtualNode vn = pr.getVirtualNode(vnName);
-                if (vn != null) {
-                    vnJobIDObject = new MonitoredJob(vn.getJobID());
-                    if (skippedObjects.contains(vnJobIDObject)) {
-                        return;
-                    }
-
-                    asso.addChild(vnJobIDObject, vnObject);
+                //VirtualNode vn = pr.getVirtualNode(vnName);
+                //if (vn != null) {
+                //here we guess that the VirtualNode has the same jobID
+                //than the node. This assumption is pertinent since the node is 
+                //bult with the jobID of the vn.
+                vnJobIDObject = new MonitoredJob(node.getNodeInformation()
+                                                     .getJobID());
+                if (skippedObjects.contains(vnJobIDObject)) {
+                    return;
                 }
 
+                asso.addChild(vnJobIDObject, vnObject);
+                //}
                 asso.addChild(vnObject, nodeObject);
             }
 
@@ -292,7 +318,7 @@ public class NodeExploration implements JobMonitorConstants {
         ArrayList activeObjects) {
         for (int i = 0, size = activeObjects.size(); i < size; ++i) {
             ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
-            RemoteBodyAdapter rba = (RemoteBodyAdapter) aoWrapper.get(0);
+            UniversalBody rba = (UniversalBody) aoWrapper.get(0);
 
             String className = (String) aoWrapper.get(1);
             if (className.equalsIgnoreCase(
@@ -315,10 +341,11 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     public void exploreKnownJVM() {
-    	/*
-    	 * We clone the set to avoid ConcurrentModificationException because we modify
-    	 * it when traversing the network.
-    	 */
+
+        /*
+         * We clone the set to avoid ConcurrentModificationException because we modify
+         * it when traversing the network.
+         */
         Iterator iter = ((MonitoredObjectSet) asso.getJVM().clone()).iterator();
         while (iter.hasNext()) {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
@@ -370,5 +397,22 @@ public class NodeExploration implements JobMonitorConstants {
     public void endExploration() {
         visitedVM = null;
         asso.updateReallyDeleted();
+    }
+
+    /**
+     * @param protocol
+     * @return
+     */
+    private HostRTFinder initiateFinder(String protocol) {
+        if (protocol.equals("rmi:")) {
+            return new RMIHostRTFinder(controller);
+        } else if (protocol.equals("http:")) {
+            return new HttpHostRTFinder(controller);
+        } else if (protocol.equals("jini:")) {
+            return new JiniHostRTFinder(controller);
+        } else if (protocol.equals("ibis:")) {
+            return new IbisHostRTFinder(controller);
+        }
+        return null;
     }
 }

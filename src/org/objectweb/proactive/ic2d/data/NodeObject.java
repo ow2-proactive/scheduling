@@ -60,7 +60,7 @@ public class NodeObject extends AbstractDataObject {
     // -- PUBLIC METHOD -----------------------------------------------
     //
     public String toString() {
-        return "Name=" + node.getNodeInformation().getURL() + "\n" +
+        return "Url= " + node.getNodeInformation().getURL() + "\n" +
         super.toString();
     }
 
@@ -106,8 +106,7 @@ public class NodeObject extends AbstractDataObject {
     //
     public String getURL() {
         //System.out.println(node.getNodeInformation().getProtocol()+":"+node.getNodeInformation().getURL());
-        return node.getNodeInformation().getProtocol() + ":" +
-        node.getNodeInformation().getURL();
+        return node.getNodeInformation().getURL();
     }
 
     public String getName() {

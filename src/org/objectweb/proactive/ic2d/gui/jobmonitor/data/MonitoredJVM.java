@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
+
 
 public class MonitoredJVM extends BasicMonitoredObject {
     static protected int lastID = 0;
@@ -39,7 +41,8 @@ public class MonitoredJVM extends BasicMonitoredObject {
     public MonitoredJVM(String url, int depth) {
         super(JVM, "JVM",  url);
         this.depth = depth;
-        extractPort();
+        //extractPort();
+        this.port = UrlBuilder.getPortFromUrl(url);
     }
 
     public void copyInto(BasicMonitoredObject o) {

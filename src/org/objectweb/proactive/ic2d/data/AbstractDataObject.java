@@ -82,7 +82,6 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     // -- PUBLICS METHODS -----------------------------------------------
     //
     public String toString() {
-    	System.out.println("xcgfxg");
         return "DataObject " + abstractDataObjectName + "\n" +
         childs.toString();
     }
@@ -240,7 +239,6 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
             return false;
         }
 
-        //System.out.println("AbstractDataObject destroy "+abstractDataObjectName);
         isDestroyed = true;
         destroyCollection(childsIterator());
         childs.clear();

@@ -33,8 +33,12 @@ package org.objectweb.proactive.ic2d.gui;
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
 
 import org.objectweb.fractal.gui.FractalGUI;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -47,13 +51,12 @@ import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorFrame;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
+import org.objectweb.proactive.ic2d.gui.util.HostDialog;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
-import org.objectweb.proactive.ic2d.gui.util.RMIHostDialog;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-
-import java.rmi.RemoteException;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
@@ -119,6 +122,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
         addWindowListener(new java.awt.event.WindowAdapter() {
                 public void windowClosing(java.awt.event.WindowEvent e) {
+                    ic2dObject.getWorldObject().destroyObject();
                     System.exit(0);
                 }
             });
@@ -155,16 +159,33 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         String protocol;
         String host;
-
+        int port = 0;
+        String nodeName = null;
+        String url = null;
         protocol = event.getProtocol();
         proActiveRuntimeRegistered = event.getRegisteredRuntime();
         host = UrlBuilder.getHostNameorIP(proActiveRuntimeRegistered.getVMInformation()
                                                                     .getInetAddress());
         try {
-            ic2dObject.getWorldObject().addHostObject(host, protocol);
-        } catch (RemoteException e) {
-            logger.log("Cannot create the RMI Host " + host, e);
+            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+        } catch (ProActiveException e) {
+            logger.warn("port unknown: " + port);
         }
+        nodeName = "IC2DNode-" +
+            Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt());
+        if (port != 0) {
+            url = UrlBuilder.buildUrl(host, nodeName, protocol, port);
+        } else {
+            url = UrlBuilder.buildUrl(host, nodeName, protocol);
+        }
+        try {
+            proActiveRuntimeRegistered.createLocalNode(url, false, null,
+                this.getName(), ProActive.getJobId());
+        } catch (NodeException e1) {
+            logger.log(e1, false);
+        }
+        new MonitorThread(protocol, host, "1", ic2dObject.getWorldObject(),
+            logger).start();
     }
 
     //
@@ -301,18 +322,17 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             monitoringMenu.add(b);
         }
         // Add new RMI Node
-        {
-            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Monitor a new RMI Node");
-            b.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent e) {
-                        DialogUtils.openNewNodeDialog(IC2DFrame.this,
-                            ic2dObject.getWorldObject(), logger);
-                    }
-                });
-            monitoringMenu.add(b);
-        }
-
+        //        {
+        //            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+        //                    "Monitor a new RMI Node");
+        //            b.addActionListener(new java.awt.event.ActionListener() {
+        //                    public void actionPerformed(java.awt.event.ActionEvent e) {
+        //                        DialogUtils.openNewNodeDialog(IC2DFrame.this,
+        //                            ic2dObject.getWorldObject(), logger);
+        //                    }
+        //                });
+        //            monitoringMenu.add(b);
+        //        }
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
                     "Monitor a new Ibis host");
@@ -330,7 +350,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                     "Monitor all JINI Hosts");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
-                        ic2dObject.getWorldObject().addHosts();
+                        DialogUtils.openNewJINIHostsDialog(IC2DFrame.this,
+                            ic2dObject.getWorldObject(), controller);
                     }
                 });
             monitoringMenu.add(b);
@@ -338,7 +359,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         {
             javax.swing.JMenuItem b = new javax.swing.JMenuItem(
-                    "Monitor a new JINI Hosts");
+                    "Monitor a new JINI Host");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         DialogUtils.openNewJINIHostDialog(IC2DFrame.this,
@@ -404,6 +425,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             javax.swing.JMenuItem b = new javax.swing.JMenuItem("Quit");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
+                        ic2dObject.getWorldObject().destroyObject();
                         System.exit(0);
                     }
                 });
@@ -433,7 +455,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                     "Set depth Control...");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
-                        RMIHostDialog.openSetDepthControlDialog(IC2DFrame.this);
+                        HostDialog.openSetDepthControlDialog(IC2DFrame.this);
                     }
                 });
             controlMenu.add(b);
@@ -480,7 +502,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         if (eventListsFrame.isVisible()) {
                             eventListsFrame.setVisible(false);
-
                         } else {
                             eventListsFrame.setVisible(true);
                         }
@@ -558,7 +579,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         //	globusMenu.add(b);
         //    }
         menuBar.add(globusMenu);
-        
+
         //*******************************************************
         // Components gui
         //*******************************************************
@@ -568,17 +589,19 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                     "Start the components GUI");
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
-                            try {
-                                System.setProperty(
-                                        "fractal.provider", "org.objectweb.fractal.julia.Julia");
-                                      System.setProperty(
-                                        "julia.loader", "org.objectweb.fractal.julia.loader.DynamicLoader");
-                                      System.setProperty(
-                                        "julia.config", "org/objectweb/fractal/gui/julia.cfg");
-                                FractalGUI.main(new String[] {"org.objectweb.proactive.ic2d.gui.components.ProActiveGUI"});
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
-                            }
+                        try {
+                            System.setProperty("fractal.provider",
+                                "org.objectweb.fractal.julia.Julia");
+                            System.setProperty("julia.loader",
+                                "org.objectweb.fractal.julia.loader.DynamicLoader");
+                            System.setProperty("julia.config",
+                                "org/objectweb/fractal/gui/julia.cfg");
+                            FractalGUI.main(new String[] {
+                                    "org.objectweb.proactive.ic2d.gui.components.ProActiveGUI"
+                                });
+                        } catch (Exception e1) {
+                            e1.printStackTrace();
+                        }
                     }
                 });
             componentsMenu.add(b);
@@ -586,7 +609,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         menuBar.add(componentsMenu);
         //*******************************************************
-
         return menuBar;
     }
 

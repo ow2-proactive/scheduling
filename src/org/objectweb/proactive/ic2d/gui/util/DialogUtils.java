@@ -34,19 +34,9 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.NodeExploration;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-
-import java.awt.Component;
-
-import java.rmi.RemoteException;
-
-import java.util.Iterator;
-
-import javax.swing.DefaultListModel;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class DialogUtils {
@@ -63,7 +53,7 @@ public class DialogUtils {
         }
 
         //	calling dlg for host or ip and depth control
-        RMIHostDialog rmihostdialog = RMIHostDialog.showRMIHostDialog((javax.swing.JFrame) parentComponent,
+        HostDialog rmihostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
                 initialHostValue);
 
         if (!rmihostdialog.isButtonOK()) {
@@ -71,31 +61,9 @@ public class DialogUtils {
         }
         rmihostdialog.setButtonOK(false);
         String host = rmihostdialog.getJTextFieldHostIp();
-        try {
-            // ebe associated host listed
-            DataAssociation asso = new DataAssociation();
 
-            DefaultListModel skippedObjects = new DefaultListModel();
-
-            NodeExploration explorator = new NodeExploration(asso,
-                    skippedObjects, logger);
-            explorator.setMaxDepth(rmihostdialog.getJTextFielddepth());
-            explorator.startExploration();
-
-            explorator.exploreHost(UrlBuilder.removePortFromHost(host),
-                UrlBuilder.getPortFromUrl(host));
-            explorator.endExploration();
-            Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
-            while (it.hasNext()) {
-                MonitoredHost Monitoredhost = (MonitoredHost) it.next();
-
-                String tmphost = Monitoredhost.getFullName();
-                System.out.println(tmphost);
-                worldObject.addHostObject(tmphost, "rmi");
-            }
-        } catch (java.rmi.RemoteException e) {
-            logger.log("Cannot create the RMI Host " + host, e);
-        }
+        new MonitorThread("rmi:", host, rmihostdialog.getJTextFielddepth(),
+            worldObject, logger).start();
     }
 
     public static void openNewHTTPHostDialog(
@@ -105,25 +73,39 @@ public class DialogUtils {
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
+            logger.log(e.getMessage());
         }
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the name or the IP of the host to monitor :", // Object message,
-                "Adding a host to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                initialHostValue // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
+        HostDialog httphostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
+                initialHostValue);
+
+        if (!httphostdialog.isButtonOK()) {
             return;
         }
-        String host = (String) result;
-        System.out.println("host " + host);
-        try {
-            worldObject.addHostObject(host, "http");
-        } catch (RemoteException e1) {
-            e1.printStackTrace();
-        }
+
+        httphostdialog.setButtonOK(false);
+        String host = httphostdialog.getJTextFieldHostIp();
+
+        new MonitorThread("http:", host, httphostdialog.getJTextFielddepth(),
+            worldObject, logger).start();
+        //        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
+        //                "Please enter the name or the IP of the host to monitor :", // Object message,
+        //                "Adding a host to monitor", // String title,
+        //                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+        //                null, // Icon icon,
+        //                null, // Object[] selectionValues,
+        //                initialHostValue // Object initialSelectionValue)
+        //            );
+        //        if ((result == null) || (!(result instanceof String))) {
+        //            return;
+        //        }
+        //        String host = (String) result;
+        //        System.out.println("host " + host);
+        //        try {
+        //            worldObject.addHostObject(host, asso);
+        //        } catch (RemoteException e1) {
+        //            // TODO Auto-generated catch block
+        //            e1.printStackTrace();
+        //        }
     }
 
     public static void openNewIbisHostDialog(
@@ -133,35 +115,21 @@ public class DialogUtils {
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
+            logger.log(e.getMessage());
         }
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the name or the IP of the host to monitor :", // Object message,
-                "Adding a host to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                initialHostValue // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
+        HostDialog ibishostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
+                initialHostValue);
+
+        if (!ibishostdialog.isButtonOK()) {
             return;
         }
-        String host = (String) result;
-        try {
-            worldObject.addHostObject(host, "ibis");
-        } catch (java.rmi.RemoteException e) {
-            logger.log("Cannot create the Ibis Host " + host, e);
-        }
+        ibishostdialog.setButtonOK(false);
+        String host = ibishostdialog.getJTextFieldHostIp();
+
+        new MonitorThread("ibis:", host, ibishostdialog.getJTextFielddepth(),
+            worldObject, logger).start();
     }
 
-    /*
-       public static void openNewGlobusHostDialog(java.awt.Frame parent, WorldObject worldObject, IC2DMessageLogger logger) {
-         org.objectweb.proactive.ic2d.gui.dialog.NewGlobusHostDialog diag = new org.objectweb.proactive.ic2d.gui.dialog.NewGlobusHostDialog(parent, true);
-         diag.setVisible(true);
-         if (diag.success)
-           worldObject.createNewRemoteHostGlobus(diag.host, diag.port);
-         diag = null;
-       }
-     */
     public static void openNewJINIHostDialog(
         java.awt.Component parentComponent, WorldObject worldObject,
         IC2DMessageLogger logger) {
@@ -169,52 +137,65 @@ public class DialogUtils {
         try {
             initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
+            logger.log(e.getMessage());
         }
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the name or the IP of the host to monitor :", // Object message,
-                "Adding a host to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                initialHostValue // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
+        HostDialog jinihostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
+                initialHostValue);
+
+        if (!jinihostdialog.isButtonOK()) {
             return;
         }
-        String host = (String) result;
-        System.out.println("host " + host);
-        worldObject.addHosts(host);
+        jinihostdialog.setButtonOK(false);
+        String host = jinihostdialog.getJTextFieldHostIp();
+
+        new MonitorThread("jini:", host, jinihostdialog.getJTextFielddepth(),
+            worldObject, logger).start();
     }
 
-    public static void openNewNodeDialog(java.awt.Component parentComponent,
-        WorldObject worldObject, IC2DMessageLogger logger) {
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the URL of the node in the form //hostname/nodename :", // Object message,
-                "Adding a JVM to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                "//hostname/nodename" // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
-            return;
-        }
-        String url = (String) result;
-        int n1 = url.indexOf("//");
-        int n2 = url.lastIndexOf("/");
-        if ((n1 == -1) || (n2 == -1) || (n2 <= (n1 + 1))) {
-            logger.warn(url + " isn't an proper node url !");
-            return;
-        }
-        String host = url.substring(n1 + 2, n2);
-        String nodeName = url.substring(n2 + 1);
-        try {
-            worldObject.addHostObject(host, nodeName);
-        } catch (java.rmi.RemoteException e) {
-            logger.log("Cannot create the RMI Host " + host, e);
-        }
+    public static void openNewJINIHostsDialog(
+        java.awt.Component parentComponent, WorldObject worldObject,
+        IC2DMessageLogger logger) {
+        //            String initialHostValue = "localhost";
+        //            try {
+        //                initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+        //            } catch (java.net.UnknownHostException e) {
+        //                logger.log(e.getMessage());
+        //            }
+        //            HostDialog jinihostdialog = HostDialog.showHostDialog((javax.swing.JFrame) parentComponent,
+        //                    initialHostValue);
+        //
+        //            if (!jinihostdialog.isButtonOK()) {
+        //                return;
+        //            }
+        //            jinihostdialog.setButtonOK(false);
+        //            String host = jinihostdialog.getJTextFieldHostIp();
+        new MonitorThread("jini:", null, "3", worldObject, logger).start();
     }
 
+    //    public static void openNewNodeDialog(java.awt.Component parentComponent,
+    //        WorldObject worldObject, IC2DMessageLogger logger) {
+    //        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
+    //                "Please enter the URL of the node in the form //hostname/nodename :", // Object message,
+    //                "Adding a JVM to monitor with ", // String title,
+    //                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+    //                null, // Icon icon,
+    //                null, // Object[] selectionValues,
+    //                "//hostname/nodename" // Object initialSelectionValue)
+    //            );
+    //        if ((result == null) || (!(result instanceof String))) {
+    //            return;
+    //        }
+    //        String url = (String) result;
+    //        
+    //        String host = UrlBuilder.getHostNameFromUrl()
+    //        String nodeName = url.substring(n2 + 1);
+    //
+    //        //        try {
+    //        //            worldObject.addHostObject(host, null, nodeName);
+    //        //        } catch (java.rmi.RemoteException e) {
+    //        //            logger.log("Cannot create the RMI Host " + host, e);
+    //        //        }
+    //    }
     public static void displayMessageDialog(
         java.awt.Component parentComponent, Object message) {
         javax.swing.JOptionPane.showMessageDialog(parentComponent, // Component parentComponent,
@@ -250,43 +231,6 @@ public class DialogUtils {
         }
         if (panel.updateFilter(filter)) {
             ic2dPanel.updateFilteredClasses();
-        }
-    }
-
-    //  public static void openNewGlobusHostDialog(java.awt.Component parentComponent, IC2DPanel ic2dPanel, ActiveObjectFilter filter) {
-    //  }
-
-    /**
-     * Method openNewGlobusHostDialog.
-     * @param parentComponent
-     * @param worldObject
-     * @param logger
-     */
-    public static void openNewGlobusHostDialog(Component parentComponent,
-        WorldObject worldObject, IC2DMessageLogger logger) {
-        String initialHostValue = "localhost";
-        try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
-        } catch (java.net.UnknownHostException e) {
-            e.printStackTrace();
-        }
-        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                "Please enter the name or the IP of the Globus host to monitor :", // Object message,
-                "Adding a host to monitor", // String title,
-                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                null, // Icon icon,
-                null, // Object[] selectionValues,
-                initialHostValue // Object initialSelectionValue)
-            );
-        if ((result == null) || (!(result instanceof String))) {
-            return;
-        }
-        String host = (String) result;
-        try {
-            worldObject.addHostObject(host, "rmi");
-            worldObject.addHosts(host);
-        } catch (java.rmi.RemoteException e) {
-            logger.log("Cannot create the Globus Host " + host, e);
         }
     }
 }

@@ -263,8 +263,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
      */
     protected synchronized void addChild(AbstractDataObject key,
         AbstractDataObjectPanel child) {
-        //System.out.println("AbstractDataObjectPanel addChild
-        // name="+child.name+" type="+child.type);
         putChild(key, child);
         add(child);
         revalidate();
@@ -278,8 +276,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         AbstractDataObject key) {
         AbstractDataObjectPanel panel = (AbstractDataObjectPanel) childs.remove(key);
         if (panel != null) {
-            //System.out.println("AbstractDataObjectPanel removeChild
-            // name="+panel.name+" type="+panel.type);
             panel.destroy();
             remove(panel);
             revalidate();

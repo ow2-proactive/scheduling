@@ -312,6 +312,15 @@ public class DataAssociation implements JobMonitorConstants {
         return list(HOST, null);
     }
     
+    public MonitoredObjectSet getNodes() {
+        return list(NODE, null);
+    }
+    
+    public MonitoredObjectSet getAOs() {
+        return list(AO, null);
+    }
+    
+    
     /*
      * Main entry point to extract data.
      */

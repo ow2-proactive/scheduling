@@ -67,19 +67,20 @@ public class WorldPanel extends AbstractDataObjectPanel
                         controller);
                 }
             });
-        popup.add(new javax.swing.AbstractAction("Monitor a new RMI Node", null) {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    DialogUtils.openNewNodeDialog(parentFrame, worldObject,
-                        controller);
-                }
-            });
+//        popup.add(new javax.swing.AbstractAction("Monitor a new RMI Node", null) {
+//                public void actionPerformed(java.awt.event.ActionEvent e) {
+//                    DialogUtils.openNewNodeDialog(parentFrame, worldObject,
+//                        controller);
+//                }
+//            });
         popup.add(new javax.swing.AbstractAction("Monitor all JINI Hosts", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    worldObject.addHosts();
+                    DialogUtils.openNewJINIHostsDialog(parentFrame, worldObject,
+                            controller);
                 }
             });
 
-        popup.add(new javax.swing.AbstractAction("Monitor a new JINI Hosts",
+        popup.add(new javax.swing.AbstractAction("Monitor a new JINI Host",
                 null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     DialogUtils.openNewJINIHostDialog(parentFrame, worldObject,

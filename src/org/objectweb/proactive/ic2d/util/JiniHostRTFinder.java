@@ -30,60 +30,49 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
+import java.io.IOException;
+
+import java.util.ArrayList;
+
+
+//import org.objectweb.proactive.core.node.jini.JiniNode;
 
 /**
- *
+ * This class talks to ProActive nodes
  */
-public class RunnableProcessor {
-    private static RunnableProcessor singletonInstance = new RunnableProcessor();
+public class JiniHostRTFinder implements HostRTFinder {
     private IC2DMessageLogger logger;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private RunnableProcessor() {
+    public JiniHostRTFinder(IC2DMessageLogger logger) {
+        this.logger = logger;
     }
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public static RunnableProcessor getInstance() {
-        return singletonInstance;
-    }
 
-    public void processRunnable(Runnable task, IC2DMessageLogger logger) {
-        processRunnable("Unamed Task", task, logger);
+    /**
+     * @see org.objectweb.proactive.ic2d.util.HostRTFinder#findPARuntimes(java.lang.String, int)
+     */
+    public ArrayList findPARuntimes(String host, int port)
+        throws IOException {
+        //we guess here that the port is fixed in Jini implementation
+        JiniRTListener RTlist = new JiniRTListener(host, logger);
+        try {
+//          stay around long enough to receice replies
+            Thread.sleep(10000L);
+        } catch (java.lang.InterruptedException e) {
+            // do nothing
+        }
+        return RTlist.getRuntimes();
     }
-
-    public void processRunnable(String taskName, Runnable task,
-        IC2DMessageLogger logger) {
-        RunnerThread t = new RunnerThread(taskName, task);
-        this.logger = logger;
-        t.start();
-        //System.out.println("Started runnable : "+taskName);
-    }
-
+    //
+    // -- implements NodeFinder -----------------------------------------------
+    //
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    //
-    // -- INNER CLASSES -----------------------------------------------
-    //
-    private class RunnerThread extends Thread {
-        private Runnable task;
-
-        public RunnerThread(String name, Runnable task) {
-            super(name);
-            this.task = task;
-        }
-
-        public void run() {
-            try {
-                task.run();
-            } catch (Exception e) {
-                logger.log("The task " + getName() +
-                    " failed to execute to term", e);
-            }
-        }
-    }
 }

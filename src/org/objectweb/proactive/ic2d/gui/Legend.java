@@ -253,6 +253,35 @@ public class Legend extends JFrame {
                 nodePanel.add(comp);
                 nodePanel.add(new JLabel("RMI Node"));
             }
+            
+            {
+                JComponent comp = new JPanel() {
+                        public void paintComponent(Graphics g) {
+                            Dimension dim = getSize();
+                            int w = dim.width;
+                            int h = dim.height;
+
+                            g.setColor(java.awt.Color.orange);
+                            g.fillRect(w / 4, 0, w / 2, h);
+                        }
+                    };
+                nodePanel.add(comp);
+                nodePanel.add(new JLabel("HTTP Node"));
+            }
+            {
+                JComponent comp = new JPanel() {
+                        public void paintComponent(Graphics g) {
+                            Dimension dim = getSize();
+                            int w = dim.width;
+                            int h = dim.height;
+
+                            g.setColor(java.awt.Color.white);
+                            g.fillRect(w / 4, 0, w / 2, h);
+                        }
+                    };
+                nodePanel.add(comp);
+                nodePanel.add(new JLabel("RMI/SSH Node"));
+            }
 
             {
                 JComponent comp = new JPanel() {
@@ -266,7 +295,7 @@ public class Legend extends JFrame {
                         }
                     };
                 nodePanel.add(comp);
-                nodePanel.add(new JLabel("Jini Node"));
+                nodePanel.add(new JLabel("JINI Node"));
             }
 
             JPanel jvmPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
@@ -308,7 +337,7 @@ public class Legend extends JFrame {
                         }
                     };
                 jvmPanel.add(comp);
-                jvmPanel.add(new JLabel("Globus Jvm"));
+                jvmPanel.add(new JLabel("Jvm started with Globus"));
             }
 
             JPanel hostPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
