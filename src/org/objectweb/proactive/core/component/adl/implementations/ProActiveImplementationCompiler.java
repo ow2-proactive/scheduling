@@ -117,7 +117,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
 					}
 					createTask = newCreateTask(path, container, name, definition, templateController, new Object[] { controller, implementation }, context);
 				} else {
-					//					PROACTIVE. This is a primitive component
+					// This is a primitive component
 					createTask =
 						newCreateTask(path, 
 							container,

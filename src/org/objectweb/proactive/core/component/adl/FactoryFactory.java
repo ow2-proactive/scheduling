@@ -16,6 +16,7 @@ public class FactoryFactory {
 	
 
 		public final static String PROACTIVE_BACKEND =   "org.objectweb.proactive.core.component.adl.ProActiveBackend";
+		public final static String PROACTIVE_FACTORY = "org.objectweb.proactive.core.component.adl.ProActiveFactory";
 
 		  private FactoryFactory()
 		  {
@@ -29,6 +30,6 @@ public class FactoryFactory {
 		   */
 		  public static Factory getFactory() throws ADLException
 		  {
-		    return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_BACKEND, new HashMap());
+		    return org.objectweb.fractal.adl.FactoryFactory.getFactory(PROACTIVE_FACTORY, PROACTIVE_BACKEND, new HashMap());
 		  }
 }
