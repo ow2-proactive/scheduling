@@ -32,7 +32,9 @@ package testsuite.bean;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.util.Properties;
+
 
 /** <p>To initialize some parameters of a class from a properties file.</p>
  * <p>Example :</p>
@@ -59,11 +61,24 @@ import java.util.Properties;
  * @author Alexandre di Costanzo
  */
 public interface Beanable {
-	
-	public void loadAttributes() throws IOException;
-	
-	public void loadAttributes(File propsFile) throws IOException;
 
-	public void loadAttributes(Properties properties);
-	
+    /**
+     * To load attributes from a default properties file.
+     * @throws IOException Signals that an I/O exception of some sort has occurred.
+     */
+    public void loadAttributes() throws IOException;
+
+    /**
+     * To load attributes from a specified properties file.
+     * @param propsFile the properties file.
+     * @throws IOException Signals that an I/O exception of some sort has occurred.
+     */
+    public void loadAttributes(File propsFile) throws IOException;
+
+    /**
+     * To load attrobutes from Java properties.
+     * @see java.util.Properties
+     * @param properties Java properties.
+     */
+    public void loadAttributes(Properties properties);
 }
