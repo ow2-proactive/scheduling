@@ -76,9 +76,9 @@ public class RuntimeRegistrationEventProducerImpl
   //
 	//-------------------PROTECTED METHODS------------------
 	//
-  protected void notifyListeners(ProActiveRuntime proActiveRuntime,int type,String registeredRuntimeName, String creatorID, String protocol,String vmName){
+  protected void notifyListeners(ProActiveRuntime proActiveRuntime,int type,ProActiveRuntime registeredRuntime, String creatorID, String protocol,String vmName){
   	if (hasListeners()){
-      notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntimeName, creatorID, protocol,vmName));
+      notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntime, creatorID, protocol,vmName));
   	}
 
   	else {

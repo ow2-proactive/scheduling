@@ -47,8 +47,10 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
 
     /** constant for the registration */
     public static final int RUNTIME_REGISTERED = 10;
+    public static final int RUNTIME_ACQUIRED = 20;
+    
     protected String creatorID;
-    protected String registeredRuntimeName;
+    protected ProActiveRuntime registeredRuntimeName;
     protected String protocol;
     protected String vmName;
 
@@ -61,7 +63,7 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
      * @param protocol The protocol used to register the registered ProActiveRuntime when created
      */
     public RuntimeRegistrationEvent(ProActiveRuntime proActiveRuntime,
-        int messageType, String registeredRuntimeName, String creatorID,
+        int messageType, ProActiveRuntime registeredRuntimeName, String creatorID,
         String protocol, String vmName) {
         super(proActiveRuntime, messageType);
         this.creatorID = creatorID;
@@ -74,7 +76,7 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
         return creatorID;
     }
 
-    public String getRegisteredRuntimeName() {
+    public ProActiveRuntime getRegisteredRuntime() {
         return registeredRuntimeName;
     }
 
