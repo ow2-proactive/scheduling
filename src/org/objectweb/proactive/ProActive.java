@@ -82,6 +82,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
+ 
 
 import java.io.IOException;
 
@@ -675,6 +677,7 @@ public class ProActive {
                 body.getClass().getName());
         }
 
+
         if (logger.isInfoEnabled()) {
             logger.info("Success at binding url " + url);
         }
@@ -712,12 +715,14 @@ public class ProActive {
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
 
+
         // First step towards Body factory, will be introduced after the release
         if (UrlBuilder.getProtocol(url).equals("ibis:")) {
             b = IbisRemoteBodyAdapter.lookup(url);
         } else if (UrlBuilder.getProtocol(url).equals("http:")) {
             b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
         } else {
+
             b = RemoteBodyAdapter.lookup(url);
         }
 
@@ -1783,6 +1788,27 @@ public class ProActive {
         return handler;
     }
 
+    
+    /**
+     *  Expose an active object as a web service
+     * @param o The object to expose as a web service
+     * @param url The url of the host where the object will be seployed  (typically http://localhost:8080)
+     * @param urn The name of the object
+     * @param methods The methods that will be exposed as web services functionnalities
+     */
+    public static  void exposeAsWebService (Object o, String url, String urn, String [] methods ) {
+    	ProActiveDeployer.deploy(urn, url, o, methods);
+    }
+    
+    /**
+     * Delete the service on a web server
+     * @param urn The name of the object
+     * @param url The url of the web server
+     */
+    public static void unExposeAsWebService (String urn, String url) {
+    	ProActiveDeployer.undeploy(urn,url);
+    }
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
