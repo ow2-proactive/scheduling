@@ -348,7 +348,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       gassServer.registerJobOutputStream("out",jos);
       finalRSL=rslTree.toRSL(true);
     } catch(Exception e) {
-      System.err.println("Unable to load user credentials");
+      System.err.println("Unable to load user credentials"+e.getMessage());
       return;
     } 
   	
@@ -442,7 +442,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   
   private String buildRSLCommand (){
   	String rslCommand = "&(executable=" + ((JVMProcess)targetProcess).getJavaPath()+")" + 
-  											"(arguments="+((JVMProcess)targetProcess).getClassname() + " " + ((JVMProcess)targetProcess).getParameters() +")"+
+  											"(arguments='-Djava.security.policy='"+((JVMProcess)targetProcess).getPolicyFile()+" "+((JVMProcess)targetProcess).getClassname() + " " + ((JVMProcess)targetProcess).getParameters() +")"+
   											"(environment=(CLASSPATH "+((JVMProcess)targetProcess).getClasspath()+")"+buildEnvironmentCommand()+")";
 		return rslCommand;
   }
