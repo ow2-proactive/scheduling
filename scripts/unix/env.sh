@@ -22,7 +22,7 @@ fi
 
 # ----
 # Set up the classpath using classes dir or jar files
-# 
+#
 CLASSPATH=.
 if [ -d $PROACTIVE/classes ]
 then
@@ -35,6 +35,10 @@ fi
 if [ -f $PROACTIVE/lib/bcel.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+fi
+if [ -f $PROACTIVE/lib/asm.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 fi
 if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
@@ -56,6 +60,9 @@ if [ -f $PROACTIVE/lib/reggie.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
 fi
+
+
+CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
