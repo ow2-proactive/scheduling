@@ -110,7 +110,7 @@ public abstract class ClassServer implements Runnable {
         try {
             socket = server.accept();
         } catch (java.io.IOException e) {
-            System.out.println("Class Server died: " + e.getMessage());
+            logger.error("Class Server died: " + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -136,7 +136,7 @@ public abstract class ClassServer implements Runnable {
                     out.writeBytes("Content-Type: application/java\r\n\r\n");
                     out.write(bytecodes);
                     out.flush();
-                    System.out.println("ClassServer sent class " + info.path +
+                    logger.info("ClassServer sent class " + info.path +
                         " successfully");
                 } catch (java.io.IOException ie) {
                     return;
@@ -144,7 +144,7 @@ public abstract class ClassServer implements Runnable {
             } catch (Exception e) {
                 // write out error response
                 e.printStackTrace();
-                System.out.println("!!! ClassServer failed to load class " +
+                logger.error("!!! ClassServer failed to load class " +
                     info.path);
                 out.writeBytes("HTTP/1.0 400 " + e.getMessage() + "\r\n");
                 out.writeBytes("Content-Type: text/html\r\n\r\n");
