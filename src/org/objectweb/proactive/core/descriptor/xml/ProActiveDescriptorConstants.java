@@ -61,6 +61,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String ENVIRONMENT_TAG = "environment"; 
   public static final String HOST_LIST_TAG = "hostlist";
   public static final String BSUB_OPTIONS_TAG = "bsubOption";
+  public static final String SCRIPT_PATH_TAG = "scriptPath";
   public static final String GLOBUS_OPTIONS_TAG = "globusOption";
   public static final String GLOBUS_HOST_TAG = "globusHost";
   public static final String GLOBUS_HOST_LIST_TAG = "globusHostList";
