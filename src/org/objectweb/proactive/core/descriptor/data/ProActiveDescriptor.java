@@ -167,7 +167,7 @@ public interface ProActiveDescriptor extends java.io.Serializable{
 //  
 //  
 //  /**
-//   * Kills all Nodes mapped to the specified VirutalNode in the XML Descriptor
+//   * Kills all Nodes mapped to the specified VirtualNode in the XML Descriptor
 //   * @param vitualNodeName name of the virtualNode to be desactivated
 //   */
 //  public void desactivateMapping(String virtualNodeName);

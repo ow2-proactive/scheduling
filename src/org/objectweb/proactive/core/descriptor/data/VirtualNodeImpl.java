@@ -442,7 +442,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     } catch (ProActiveException e1) {
                         e1.printStackTrace();
                     } catch (Exception e) {
-                        logger.info(" Virutal Machine " +
+                        logger.info(" Virtual Machine " +
                             part.getVMInformation().getVMID() + " on host " +
                             part.getVMInformation().getInetAddress()
                                 .getCanonicalHostName() + " terminated!!!");
