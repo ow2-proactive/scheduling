@@ -30,6 +30,15 @@ public class Test extends FunctionalTest {
     }
 
     public void action() throws Exception {
+        this.resultTypedGroup = this.typedGroup.asynchronousCall();
+    }
+
+    public void endTest() throws Exception {
+        // nothing to do
+    }
+
+
+	public boolean preConditions() throws Exception {
 		Object[][] params = {
 			{ "Agent0" },
 			{ "Agent1" },
@@ -42,12 +51,11 @@ public class Test extends FunctionalTest {
 		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
 				params, nodes);
 
-        this.resultTypedGroup = this.typedGroup.asynchronousCall();
-    }
+		ProActiveGroup.getGroup(this.typedGroup).setRatioNemberToThread(1);
+		
+		return (this.typedGroup != null);
+	}
 
-    public void endTest() throws Exception {
-        // nothing to do
-    }
 
     public boolean postConditions() throws Exception {
         // was the result group created ?
@@ -73,6 +81,7 @@ public class Test extends FunctionalTest {
         return rightRankingOfResults;
     }
 
-	public void initTest() throws Exception {
-	}
+    public void initTest() throws Exception {
+		// nothing to do : ProActive methods can not be used here
+    }
 }
