@@ -103,8 +103,9 @@ public class ProActiveConfiguration {
         Iterator it = loadedProperties.keySet().iterator();
         while (it.hasNext()) {
             String name = (String) it.next();
-            System.out.println("Name = " + name);
-            System.out.println("Value = " + this.loadedProperties.get(name));
+
+            //            System.out.println("Name = " + name);
+            //            System.out.println("Value = " + this.loadedProperties.get(name));
         }
     }
 
@@ -116,8 +117,9 @@ public class ProActiveConfiguration {
         Iterator it = addedProperties.keySet().iterator();
         while (it.hasNext()) {
             String name = (String) it.next();
-            System.out.println("Name = " + name);
-            System.out.println("Value = " + this.addedProperties.get(name));
+
+            //            System.out.println("Name = " + name);
+            //            System.out.println("Value = " + this.addedProperties.get(name));
         }
     }
 }
