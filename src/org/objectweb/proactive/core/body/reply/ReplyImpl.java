@@ -31,9 +31,11 @@
 package org.objectweb.proactive.core.body.reply;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.mop.Utils;
 
 
 public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializable {
@@ -54,6 +56,12 @@ public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializabl
   }
     
   public void send(UniversalBody destinationBody) throws java.io.IOException {
+  	// if destination body is on the same VM that the sender, we must perform 
+  	// a deep copy of result in order to preserve ProActive model.
+  	boolean isLocal = LocalBodyStore.getInstance().getLocalBody(destinationBody.getID()) != null;
+  	if (isLocal) {
+  		result = Utils.makeDeepCopy(result);
+  	}
     destinationBody.receiveReply(this);
   }
 }
