@@ -45,6 +45,7 @@ import net.jini.discovery.LookupDiscovery;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**
@@ -84,7 +85,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
 
     static {
         try {
-            host = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+            host = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
             String policyLocation = System.getProperty("java.security.policy");
             if(policyLocation != null) policy = getAbsolutePath(policyLocation);
             else policy = DEFAULT_POLICY;

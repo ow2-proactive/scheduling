@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.dialog;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
@@ -115,8 +117,8 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
         // Textfields
         // 	tfHost=new JTextField("localhost");
         try {
-            tfHost = new JTextField(InetAddress.getLocalHost()
-                                               .getCanonicalHostName());
+            tfHost = new JTextField(UrlBuilder.getHostNameorIP(
+                        InetAddress.getLocalHost()));
         } catch (Exception e) {
             tfHost = new JTextField("localhost");
         }

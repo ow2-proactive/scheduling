@@ -34,6 +34,7 @@ package org.objectweb.proactive.examples.hello;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class SimpleAgent implements java.io.Serializable {
 	
@@ -54,7 +55,7 @@ public class SimpleAgent implements java.io.Serializable {
 
   public String whereAreYou() {
     try {
-      return java.net.InetAddress.getLocalHost().getCanonicalHostName();
+      return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
     } catch (Exception e) {
       return "Localhost lookup failed";
     }

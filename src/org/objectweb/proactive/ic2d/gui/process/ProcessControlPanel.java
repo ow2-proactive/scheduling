@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.process.rsh.RSHProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 
 import java.net.InetAddress;
@@ -385,7 +386,8 @@ public class ProcessControlPanel extends javax.swing.JPanel {
             process.setClassname(classname);
             process.setParameters(parameters);
             try {
-                if (!hostname.equals(InetAddress.getLocalHost().getHostName())) {
+                if (!hostname.equals(UrlBuilder.getHostNameorIP(
+                                InetAddress.getLocalHost()))) {
                     RSHProcess rshProcess = new RSHProcess(process);
                     rshProcess.setHostname(hostname);
                     rshProcess.setUsername(username);

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.util;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.*;
 
 
@@ -62,8 +63,8 @@ public class CreateJiniNodeTask implements Runnable {
         for (int i = 0; i < nodes.length; i++) {
             Node node = nodes[i];
             String nodeName = node.getNodeInformation().getName();
-            String hostname = node.getNodeInformation().getInetAddress()
-                                  .getCanonicalHostName();
+            String hostname = UrlBuilder.getHostNameorIP(node.getNodeInformation()
+                                                             .getInetAddress());
             HostObject hostObject = worldObject.getHostObject(hostname);
 
             //System.out.println("hostObject: "+hostObject.getHostName());

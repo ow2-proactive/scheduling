@@ -73,8 +73,8 @@ public class WorldObject extends AbstractDataObject {
         String protocol) throws java.rmi.RemoteException {
         String shortHostname = null;
         try {
-            shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(
-                        hostname)).getHostName();
+            shortHostname = UrlBuilder.getHostNameorIP(java.net.InetAddress.getByName(
+                        UrlBuilder.removePortFromHost(hostname)));
         } catch (java.net.UnknownHostException e) {
             controller.warn("Hostname " + shortHostname +
                 " failed reverse lookup.");

@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
@@ -308,7 +309,7 @@ public class StartNode {
     private void printUsage() {
         String localhost = "localhost";
         try {
-            localhost = java.net.InetAddress.getLocalHost().getCanonicalHostName();
+            localhost = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();

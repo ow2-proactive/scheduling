@@ -7,6 +7,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
@@ -209,7 +210,7 @@ public class NodeExploration implements JobMonitorConstants {
             return;
         }
 
-        String hostname = infos.getInetAddress().getCanonicalHostName();
+        String hostname = UrlBuilder.getHostNameorIP(infos.getInetAddress());
 
         MonitoredHost hostObject = new MonitoredHost(hostname, jvmObject.getPort());
         if (skippedObjects.contains(hostObject)) {

@@ -55,14 +55,14 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @param url
      */
     public HttpRuntimeAdapter(String newurl) {
-    	this.url = newurl;
-    	createURL();
+        this.url = newurl;
+        createURL();
         runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this, newurl);
         this.vmInformation = runtimestrategyadapter.getVMInformation();
     }
 
-    
     public void createURL() {
+
         /* !!! */
         if (!url.startsWith("http:")) {
             url = "http:" + url;
@@ -73,15 +73,12 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         }
 
         try {
-            url = "http://" +
-                UrlBuilder.getHostNameAndPortFromUrl(url);
+            url = "http://" + UrlBuilder.getHostNameAndPortFromUrl(url);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
     }
 
-    
-    
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
@@ -176,12 +173,12 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
             replacePreviousBinding);
 
         String url;
-		try {
-			url = buildNodeURL(virtualNodeName);
-		} catch (UnknownHostException e) {
-			throw new ProActiveException(e);
-		}
-		logger.info(virtualNodeName + " successfully registered at " + url);
+        try {
+            url = buildNodeURL(virtualNodeName);
+        } catch (UnknownHostException e) {
+            throw new ProActiveException(e);
+        }
+        logger.info(virtualNodeName + " successfully registered at " + url);
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
@@ -322,10 +319,10 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     /*
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
-        out.defaultWriteObject();
-    }*/
+       private void writeObject(java.io.ObjectOutputStream out)
+           throws IOException {
+           out.defaultWriteObject();
+       }*/
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -339,8 +336,8 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress()
-                              .getCanonicalHostName();
+            String host = UrlBuilder.getHostNameorIP(getVMInformation()
+                                                         .getInetAddress());
 
             return UrlBuilder.buildUrl(host, url, "http:", port);
         } else {

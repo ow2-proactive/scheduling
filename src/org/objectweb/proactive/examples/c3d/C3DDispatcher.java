@@ -67,6 +67,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
@@ -193,6 +194,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	 */
 	public C3DDispatcher()
 	{
+	    
 	}
 
 	/**
@@ -1531,7 +1533,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			String s_localhost = "";
 			try
 			{
-				s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
+				s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost());
 			}
 			catch (UnknownHostException e)
 			{

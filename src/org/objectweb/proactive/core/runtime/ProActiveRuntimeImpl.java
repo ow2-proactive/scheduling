@@ -388,7 +388,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     public String getURL() {
-        return "//" + vmInformation.getInetAddress().getCanonicalHostName() +
+        return "//" + UrlBuilder.getHostNameorIP(vmInformation.getInetAddress()) +
         "/" + vmInformation.getName();
     }
 
@@ -665,7 +665,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
             hostInetAddress = java.net.InetAddress.getLocalHost();
-            String hostName = hostInetAddress.getCanonicalHostName();
+            String hostName = UrlBuilder.getHostNameorIP(hostInetAddress);
             this.processCreatorId = "jvm";
 
             //            this.name = "PA_JVM" +

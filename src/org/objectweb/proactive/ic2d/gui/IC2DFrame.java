@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.IC2D;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
@@ -156,8 +157,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
 
         protocol = event.getProtocol();
         proActiveRuntimeRegistered = event.getRegisteredRuntime();
-        host = proActiveRuntimeRegistered.getVMInformation().getInetAddress()
-                                         .getCanonicalHostName();
+        host = UrlBuilder.getHostNameorIP(proActiveRuntimeRegistered.getVMInformation()
+                                                                    .getInetAddress());
         try {
             ic2dObject.getWorldObject().addHostObject(host, protocol);
         } catch (RemoteException e) {

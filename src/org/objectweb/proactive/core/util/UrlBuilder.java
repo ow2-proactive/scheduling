@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.util;
 
 import org.objectweb.proactive.core.Constants;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 
@@ -93,10 +94,10 @@ public class UrlBuilder {
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
         String protocol = System.getProperty("proactive.communication.protocol");
-        if(protocol.equals("rmi") || protocol.equals("ibis")){
+        if (protocol.equals("rmi") || protocol.equals("ibis")) {
             port = System.getProperty("proactive.rmi.port");
         }
-        if(protocol.equals("http")){
+        if (protocol.equals("http")) {
             port = System.getProperty("proactive.http.port");
         }
         if (checkProtocol(protocol).equals("jini:") || (port == null)) {
@@ -236,6 +237,14 @@ public class UrlBuilder {
             return DEFAULT_REGISTRY_PORT;
         }
     }
+    
+    public static String getHostNameorIP(InetAddress address) {
+        if ((System.getProperty("proactive.useIPaddress") != null) && (System.getProperty("proactive.useIPaddress").equals("true"))) {
+            return address.getHostAddress();
+        } else {
+            return address.getCanonicalHostName();
+        }
+    }
 
     //
     //-----------------Private Static Methods-----------------------------
@@ -274,22 +283,22 @@ public class UrlBuilder {
                 String name = urlToRead.substring(LOCAL_URLS[i].length());
                 if (name.startsWith("/")) {
                     //there is no port and the name starts with /
-                    return buildUrl(hostInetAddress.getCanonicalHostName(),
+                    return buildUrl(UrlBuilder.getHostNameorIP(hostInetAddress),
                         name.substring(1), protocol);
                 } else {
                     //there is no port and only the name 
                     if (name.indexOf(":") < 0) {
-                        return buildUrl(hostInetAddress.getCanonicalHostName(),
-                            name, protocol);
+                        return buildUrl(UrlBuilder.getHostNameorIP(
+                                hostInetAddress), name, protocol);
                     } else if (name.indexOf("/") < 0) {
                         // there is a port and no name, it is a host url
                         return buildHostUrl("//" +
-                            hostInetAddress.getCanonicalHostName() + name,
+                            UrlBuilder.getHostNameorIP(hostInetAddress) + name,
                             protocol);
                     }
 
                     //port is define, extract port and build url
-                    return buildUrl(hostInetAddress.getCanonicalHostName(),
+                    return buildUrl(UrlBuilder.getHostNameorIP(hostInetAddress),
                         name.substring(name.lastIndexOf("/") + 1, name.length()),
                         protocol,
                         new Integer(name.substring(1, name.lastIndexOf("/"))).intValue());
@@ -320,8 +329,8 @@ public class UrlBuilder {
 
         String name = urlToRead.substring(n + 1);
 
-        return buildUrl(hostInetAddress.getCanonicalHostName(), name, protocol,
-            portNumber);
+        return buildUrl(UrlBuilder.getHostNameorIP(hostInetAddress), name,
+            protocol, portNumber);
     }
 
     /**
@@ -335,7 +344,8 @@ public class UrlBuilder {
         String urlTemp;
         String hostname = getHostFromUrl(urlToRead.substring(2,
                     urlToRead.length()));
-        java.net.InetAddress hostInetAddress = java.net.InetAddress.getByName(hostname);
+
+        //java.net.InetAddress hostInetAddress = java.net.InetAddress.getByName(hostname);
         int portNumber = getPortNumber(urlToRead.substring(2, urlToRead.length()));
         if (portNumber == DEFAULT_REGISTRY_PORT) {
             urlTemp = "//" + hostname;
@@ -389,4 +399,6 @@ public class UrlBuilder {
         }
         return url;
     }
+
+    
 }

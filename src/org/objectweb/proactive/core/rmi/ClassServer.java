@@ -31,7 +31,9 @@
 package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.UrlBuilder;
+
 import java.net.UnknownHostException;
 
 
@@ -46,14 +48,13 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-            if(System.getProperty("proactive.http.port") != null){
-                newport = System.getProperty("proactive.http.port");
-            } else {
-                newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-                System.setProperty("proactive.http.port", newport);
-            }
+        if (System.getProperty("proactive.http.port") != null) {
+            newport = System.getProperty("proactive.http.port");
+        } else {
+            newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
+            System.setProperty("proactive.http.port", newport);
         }
-    
+    }
 
     protected String hostname;
     private java.net.ServerSocket server = null;
@@ -71,7 +72,8 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port == 0) {
-            port = boundServerSocket(Integer.parseInt(System.getProperty("proactive.http.port")), MAX_RETRY);
+            port = boundServerSocket(Integer.parseInt(System.getProperty(
+                            "proactive.http.port")), MAX_RETRY);
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
@@ -161,7 +163,8 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            return UrlBuilder.buildUrl(java.net.InetAddress.getLocalHost().getCanonicalHostName(), "", "http:", port);
+            return UrlBuilder.buildUrl(UrlBuilder.getHostNameorIP(
+                    java.net.InetAddress.getLocalHost()), "", "http:", port);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -184,7 +187,8 @@ public class ClassServer implements Runnable {
             try {
                 socket = server.accept();
 
-                HTTPRequestHandler service = (new HTTPRequestHandler(socket, paths));
+                HTTPRequestHandler service = (new HTTPRequestHandler(socket,
+                        paths));
                 service.start();
             } catch (java.io.IOException e) {
                 System.out.println("Class Server died: " + e.getMessage());

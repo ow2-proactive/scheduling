@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
+
 public abstract class AbstractUniversalProcess implements UniversalProcess {
 
   protected static final String LOCALHOST = getLocalHost();
@@ -222,7 +224,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
 
   private static String getLocalHost() {
     try {
-      return java.net.InetAddress.getLocalHost().getCanonicalHostName();
+      return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
     } catch (java.net.UnknownHostException e) {
       return "localhost";
     }

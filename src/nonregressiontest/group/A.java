@@ -6,6 +6,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 public class A implements InitActive, RunActive, EndActive,
@@ -48,8 +49,8 @@ public class A implements InitActive, RunActive, EndActive,
 
     public String getHostName() {
         try { //return the name of the Host 
-            return java.net.InetAddress.getLocalHost().getHostName()
-                                       .toUpperCase();
+            return UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())
+                             .toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getName failed";
@@ -95,9 +96,8 @@ public class A implements InitActive, RunActive, EndActive,
     public A asynchronousCallException() throws Exception {
         throw new Exception();
     }
-    
-	public void invokeBarrier() {
-		ProSPMD.barrier("MyBarrier");
-	}
 
+    public void invokeBarrier() {
+        ProSPMD.barrier("MyBarrier");
+    }
 }

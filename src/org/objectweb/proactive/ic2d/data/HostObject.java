@@ -46,6 +46,7 @@ import org.objectweb.proactive.ic2d.util.RunnableProcessor;
  * Holder class for the host data representation
  */
 public class HostObject extends AbstractDataObject {
+
     /** Name of this Host  */
     protected String hostname;
 
@@ -62,8 +63,8 @@ public class HostObject extends AbstractDataObject {
 
         //	Test if there is port defined, then remove it to see if hostname exists
         try {
-            String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(
-                        hostname)).getHostName();
+            String shortHostname = UrlBuilder.getHostNameorIP(java.net.InetAddress.getByName(
+                        UrlBuilder.removePortFromHost(hostname)));
 
             this.hostname = hostname;
 

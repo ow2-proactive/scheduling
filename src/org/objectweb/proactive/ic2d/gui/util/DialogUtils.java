@@ -43,6 +43,7 @@ import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import java.awt.Component;
 
 import java.rmi.RemoteException;
+
 import java.util.Iterator;
 
 import javax.swing.DefaultListModel;
@@ -57,8 +58,7 @@ public class DialogUtils {
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = java.net.InetAddress.getLocalHost()
-                                                   .getCanonicalHostName();
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
         }
 
@@ -81,8 +81,9 @@ public class DialogUtils {
                     skippedObjects, logger);
             explorator.setMaxDepth(rmihostdialog.getJTextFielddepth());
             explorator.startExploration();
-            			
-            explorator.exploreHost(UrlBuilder.removePortFromHost(host), UrlBuilder.getPortFromUrl(host));
+
+            explorator.exploreHost(UrlBuilder.removePortFromHost(host),
+                UrlBuilder.getPortFromUrl(host));
             explorator.endExploration();
             Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
             while (it.hasNext()) {
@@ -97,44 +98,41 @@ public class DialogUtils {
         }
     }
 
-    
     public static void openNewHTTPHostDialog(
-            java.awt.Component parentComponent, WorldObject worldObject,
-            IC2DMessageLogger logger) {
-            String initialHostValue = "localhost";
-            try {
-                initialHostValue = java.net.InetAddress.getLocalHost()
-                                                       .getCanonicalHostName();
-            } catch (java.net.UnknownHostException e) {
-            }
-            Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
-                    "Please enter the name or the IP of the host to monitor :", // Object message,
-                    "Adding a host to monitor", // String title,
-                    javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
-                    null, // Icon icon,
-                    null, // Object[] selectionValues,
-                    initialHostValue // Object initialSelectionValue)
-                );
-            if ((result == null) || (!(result instanceof String))) {
-                return;
-            }
-            String host = (String) result;
-            System.out.println("host " + host);
-            try {
-				worldObject.addHostObject(host, "http");
-			} catch (RemoteException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+        java.awt.Component parentComponent, WorldObject worldObject,
+        IC2DMessageLogger logger) {
+        String initialHostValue = "localhost";
+        try {
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+        } catch (java.net.UnknownHostException e) {
         }
-    
+        Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
+                "Please enter the name or the IP of the host to monitor :", // Object message,
+                "Adding a host to monitor", // String title,
+                javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+                null, // Icon icon,
+                null, // Object[] selectionValues,
+                initialHostValue // Object initialSelectionValue)
+            );
+        if ((result == null) || (!(result instanceof String))) {
+            return;
+        }
+        String host = (String) result;
+        System.out.println("host " + host);
+        try {
+            worldObject.addHostObject(host, "http");
+        } catch (RemoteException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
+
     public static void openNewIbisHostDialog(
         java.awt.Component parentComponent, WorldObject worldObject,
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = java.net.InetAddress.getLocalHost()
-                                                   .getCanonicalHostName();
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
         }
         Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -170,8 +168,7 @@ public class DialogUtils {
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = java.net.InetAddress.getLocalHost()
-                                                   .getCanonicalHostName();
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
         }
         Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
@@ -270,8 +267,7 @@ public class DialogUtils {
         WorldObject worldObject, IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = java.net.InetAddress.getLocalHost()
-                                                   .getCanonicalHostName();
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
         }

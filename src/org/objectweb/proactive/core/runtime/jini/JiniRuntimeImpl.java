@@ -135,8 +135,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     // -- Implements JiniRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname, String jobId)
-        throws java.rmi.RemoteException, NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vnname,
+        String jobId) throws java.rmi.RemoteException, NodeException {
         //counter used to check that the node has been registered at 
         //least once as jini service
         //int counter = 0;
@@ -214,13 +214,13 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void addParent(String proActiveRuntimeName) {
-    	proActiveRuntime.addParent(proActiveRuntimeName);
+        proActiveRuntime.addParent(proActiveRuntimeName);
     }
 
     public String[] getParents() {
-    	return proActiveRuntime.getParents();
+        return proActiveRuntime.getParents();
     }
-    
+
     public void killRT(boolean softly) throws java.rmi.RemoteException {
         killAllNodes();
         unregisterAllVirtualNodes();
@@ -471,20 +471,21 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntime.getEntities();
     }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-	 */
-	public SecurityContext getPolicy(SecurityContext sc) throws SecurityNotAvailableException {
-		return proActiveRuntime.getPolicy(sc);
-	}
-	
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws SecurityNotAvailableException {
+        return proActiveRuntime.getPolicy(sc);
+    }
+
     /**
      * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl) throws RemoteException {
         return proActiveRuntime.getJobID(nodeUrl);
     }
-	
+
     //
     // ---PRIVATE METHODS--------------------------------------
     //
@@ -525,7 +526,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     private String buildRuntimeURL() {
-        String host = getVMInformation().getInetAddress().getCanonicalHostName();
+        String host = UrlBuilder.getHostNameorIP(getVMInformation()
+                                                     .getInetAddress());
         String name = getVMInformation().getName();
         return UrlBuilder.buildUrl(host, name, "jini:");
     }
@@ -535,7 +537,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         int i = url.indexOf('/');
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress().getCanonicalHostName();
+            String host = UrlBuilder.getHostNameorIP(getVMInformation()
+                                                         .getInetAddress());
             return UrlBuilder.buildUrl(host, url, "jini:");
         } else {
             return UrlBuilder.checkUrl(url);
@@ -603,6 +606,4 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             }
         }
     }
-
-
 }

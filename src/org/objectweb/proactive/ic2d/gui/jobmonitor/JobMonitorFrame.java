@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
 import java.awt.Container;
@@ -43,8 +44,7 @@ public class JobMonitorFrame extends JFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     String initialHostValue = "localhost";
                     try {
-                        initialHostValue = java.net.InetAddress.getLocalHost()
-                                                               .getCanonicalHostName();
+                        initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
                     } catch (java.net.UnknownHostException exc) {
                     }
                     Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,

@@ -439,8 +439,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     } catch (Exception e) {
                         logger.info(" Virtual Machine " +
                             part.getVMInformation().getVMID() + " on host " +
-                            part.getVMInformation().getInetAddress()
-                                .getCanonicalHostName() + " terminated!!!");
+                            UrlBuilder.getHostNameorIP(
+                                part.getVMInformation().getInetAddress()) +
+                            " terminated!!!");
                     }
                 } else {
                     try {
@@ -549,9 +550,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
 
             // get the host of nodes
-            nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                 .getInetAddress()
-                                                 .getCanonicalHostName();
+            nodeHost = UrlBuilder.getHostNameorIP(proActiveRuntimeRegistered.getVMInformation()
+                                                                            .getInetAddress());
 
             try {
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
@@ -592,9 +592,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             //gets the registered runtime
             proActiveRuntimeRegistered = event.getRegisteredRuntime();
             // get the host for the node to be created
-            nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                 .getInetAddress()
-                                                 .getCanonicalHostName();
+            nodeHost = UrlBuilder.getHostNameorIP(proActiveRuntimeRegistered.getVMInformation()
+                                                                            .getInetAddress());
             protocol = event.getProtocol();
             try {
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
@@ -708,12 +707,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public void setPolicyFile(String file) {
         policyServerFile = file;
     }
-    
+
     /**
      * see {@link VirtualNode#isMultiple()}
      */
     public boolean isMultiple() {
-    	return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
+        return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
     }
 
     //
@@ -902,20 +901,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNodeCount((new Integer(prun.getProcessorPerNodeNumber()).intValue())*(new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
+                increaseNodeCount((new Integer(prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                        prun.getHostsNumber()).intValue()) * nodeNumber);
             }
-             if (processImpl instanceof PBSSubProcess) {
+            if (processImpl instanceof PBSSubProcess) {
                 //if the process is prun we have to increase the node count by the number of processors            
                 pbs = (PBSSubProcess) processImpl;
                 if (logger.isDebugEnabled()) {
                     logger.debug("VirtualNodeImpl getHostsNumber() " +
-                        prun.getHostsNumber());
+                        pbs.getHostsNumber());
                     logger.debug("VirtualNodeImpl getnodeNumber() " +
-                        prun.getProcessorPerNodeNumber());
+                        pbs.getProcessorPerNodeNumber());
                     logger.debug("VM " + vm);
                 }
 
-                increaseNodeCount((new Integer(pbs.getProcessorPerNodeNumber()).intValue())*(new Integer(pbs.getHostsNumber()).intValue()) * nodeNumber);
+                increaseNodeCount((new Integer(pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                        pbs.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof GlobusProcess) {
                 //if the process is globus we have to increase the node count by the number of processors
@@ -937,7 +938,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null) && (prun == null) && (globus == null) && (pbs == null)){
+            if ((bsub == null) && (prun == null) && (globus == null) &&
+                    (pbs == null)) {
                 //if bsub and prun and globus are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
@@ -1106,6 +1108,4 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
-    
-
 }

@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -133,7 +134,7 @@ public class StartP2PService {
 
         try {
             logger.info("**** Starting jvm on " +
-                java.net.InetAddress.getLocalHost().getHostName());
+                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
             if (logger.isDebugEnabled()) {
                 logger.debug("**** Starting jvm with classpath " +
                     System.getProperty("java.class.path"));
@@ -185,18 +186,20 @@ public class StartP2PService {
     }
 
     private void addDefaults() {
-    	int nbUrls = serverList.size();
-    	for (int i = 0; i < nbUrls; i++) {
-    		String url = (String) serverList.get(i);
-    		if (url.indexOf("//") < 0)
-    			url = DEFAULT_ACQUISITION_METHOD + "//" + url;
-    		if (!url.matches(".*:[0-9]+$"))
-    			url += ":" + DEFAULT_PORT_NUMBER;
-    		
-    		serverList.set(i, url);
-    	}
+        int nbUrls = serverList.size();
+        for (int i = 0; i < nbUrls; i++) {
+            String url = (String) serverList.get(i);
+            if (url.indexOf("//") < 0) {
+                url = DEFAULT_ACQUISITION_METHOD + "//" + url;
+            }
+            if (!url.matches(".*:[0-9]+$")) {
+                url += (":" + DEFAULT_PORT_NUMBER);
+            }
+
+            serverList.set(i, url);
+        }
     }
-    
+
     /**
      * <p>
      * Start the P2P service.
@@ -235,7 +238,7 @@ public class StartP2PService {
 
             // Record the ProActiveRuntime in other from Servers List File
             if (!serverList.isEmpty()) {
-            	addDefaults();
+                addDefaults();
                 ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
             }
         } catch (NodeException e) {

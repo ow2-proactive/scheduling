@@ -108,7 +108,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             this.portNumber = portNumber;
 
             // URL
-            String url = InetAddress.getLocalHost().getCanonicalHostName();
+            String url = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost());
             this.peerHostname = url;
             
 
