@@ -94,11 +94,11 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        pad.killall(false);
-        System.setProperty("proactive.rmi.port", this.defaultPort);
     }
 
     public boolean postConditions() throws Exception {
+        pad.killall(false);
+        System.setProperty("proactive.rmi.port", this.defaultPort);
         return nodeTab.length == 3;
     }
 
