@@ -1,40 +1,34 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component.asmgen;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-
-import java.util.Vector;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.CodeVisitor;
@@ -43,12 +37,19 @@ import org.objectweb.asm.Type;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
-/** 
+import java.util.List;
+import java.util.Vector;
+
+
+/**
  * Abstract parent class for Interface implementation generation.
  * It defines a skeleton for the classes generation, and provides a set of utility
  * methods that will be used by derived classes.
- * 
+ *
  * @author Matthieu Morel
  */
 public abstract class AbstractInterfaceClassGenerator implements Constants {
@@ -68,7 +69,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     protected String className;
     protected String packageName;
     protected Method[] methods;
-    protected Vector interfacesToImplement; // contains Class object corresponding to the interfaces
+    protected List interfacesToImplement; // contains Class object corresponding to the interfaces
     protected ClassWriter classGenerator;
 
     // The following fields have to do with
@@ -79,7 +80,8 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     /**
      * Method createStaticInitializer.
      */
-    protected abstract void createStaticInitializer() throws ClassNotFoundException;
+    protected abstract void createStaticInitializer()
+        throws ClassNotFoundException;
 
     /**
      * Method createFields.
@@ -187,28 +189,25 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         // Creates the class generator
         this.classGenerator = this.createClassGenerator();
 
-
         // Add a public no-arg constructor
         this.createConstructor();
 
         // Creates all the methods in the class
         for (int i = 0; i < this.methods.length; i++) {
             // walkaround (NOT CLEAN) to avoid generating reified calls for the proxy methods
-            if (!(methods[i].getName().equals("getProxy") || methods[i].getName().equals("setProxy"))) {
+            if (!(methods[i].getName().equals("getProxy") ||
+                    methods[i].getName().equals("setProxy"))) {
                 CodeVisitor mg = this.createMethod(i, this.methods[i]);
             }
         }
 
         this.createDefaultMethods();
 
-
         // Creates the fields of the class
         this.createFields();
 
-
         // Create the static fields
         this.createStaticVariables();
-
 
         // Creates the static initializer
         this.createStaticInitializer();
@@ -222,21 +221,22 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     protected ClassWriter createClassGenerator() {
         String[] interfaces = new String[interfacesToImplement.size()];
         for (int i = 0; i < interfacesToImplement.size(); i++) {
-            interfaces[i] = ((Class) interfacesToImplement.get(i)).getName().replace('.', '/');
+            interfaces[i] = ((Class) interfacesToImplement.get(i)).getName()
+                             .replace('.', '/');
         }
 
         ClassWriter cw = new ClassWriter(true);
         cw.visit(Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
-                 
-        this.stubClassFullName, SUPER_CLASS_NAME, // Superclass
-                 interfaces, // declared interfaces
-                 "<generated>");
+            this.stubClassFullName, SUPER_CLASS_NAME, // Superclass
+            interfaces, // declared interfaces
+            "<generated>");
         return cw;
     }
 
     protected void createConstructor() {
         // Actually creates the method generator (ASM : uses the visitor)
-        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>",
+                "()V", null, null);
 
         //Calls the constructor of the super class
         cv.visitVarInsn(ALOAD, 0);
@@ -246,7 +246,6 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
         // And returns from the constructor
         cv.visitInsn(RETURN);
-
 
         // Needed stack size
         // Needed locals
@@ -259,7 +258,6 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         // Extracts modifiers
         int flags = convertJavaModifierToASM(m.getModifiers());
 
-
         // Modifies the modifiers in order to remove 'native' and 'abstract'
         flags = removeNativeAndAbstractModifiers(flags);
 
@@ -268,10 +266,10 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
         // Actually creates the method generator
         CodeVisitor cv = this.classGenerator.visitMethod(flags, // access flags
-                                                         m.getName(), // Method generatedClassName
-                                                         mDesc, // return and argument types
-                                                         null, // exceptions
-                                                         null); // Attributes
+                m.getName(), // Method generatedClassName
+                mDesc, // return and argument types
+                null, // exceptions
+                null); // Attributes
         return cv;
     }
 
@@ -313,8 +311,8 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
                 type = "java/lang/Character";
                 meth = "charValue";
                 desc = "C";
-            } else/*if (result == Short.TYPE)*/
-            {
+            } else /*if (result == Short.TYPE)*/
+             {
                 type = "java/lang/Short";
                 meth = "shortValue";
                 desc = "S";
@@ -349,16 +347,16 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     }
 
     /**
-    * Returns the offset which must be added to some opcodes to get an opcode of
-    * the given type. More precisely, returns the offset which must be added to
-    * an opc_iXXXX opcode to get the opc_YXXXX opcode corresponding to the given
-    * type. For example, if the given type is double the result is 3, which
-    * means that opc_dload, opc_dstore, opc_dreturn... opcodes are equal to
-    * opc_iload+3, opc_istore+3, opc_ireturn+3...
-    *
-    * @param type a Java class representing a Java type (primitive or not).
-    * @return the opcode offset of the corresponding to the given type.
-    */
+     * Returns the offset which must be added to some opcodes to get an opcode of
+     * the given type. More precisely, returns the offset which must be added to
+     * an opc_iXXXX opcode to get the opc_YXXXX opcode corresponding to the given
+     * type. For example, if the given type is double the result is 3, which
+     * means that opc_dload, opc_dstore, opc_dreturn... opcodes are equal to
+     * opc_iload+3, opc_istore+3, opc_ireturn+3...
+     *
+     * @param type a Java class representing a Java type (primitive or not).
+     * @return the opcode offset of the corresponding to the given type.
+     */
     protected int getOpcodeOffset(final Class type) {
         if (type == Double.TYPE) {
             return 3;
@@ -402,7 +400,9 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
             effectiveArguments[2] = new Integer(0);
             effectiveArguments[3] = new Integer(bytes.length);
 
-            return (Class) method.invoke(Thread.currentThread().getContextClassLoader(), effectiveArguments);
+            return (Class) method.invoke(Thread.currentThread()
+                                               .getContextClassLoader(),
+                effectiveArguments);
         } catch (ClassNotFoundException cnfe) {
             cnfe.printStackTrace();
 
@@ -422,14 +422,15 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         }
     }
 
-    protected Class loadClass(final String className) throws ClassNotFoundException {
+    protected Class loadClass(final String className)
+        throws ClassNotFoundException {
         // try to fetch the class from the default class loader
         return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
     /**
-    * This method is called by the constructor
-    */
+     * This method is called by the constructor
+     */
     protected void setInfos() throws ClassNotFoundException {
         // This Vector keeps track of all the methods accessible from this class
         Vector tempVector = new Vector();
@@ -438,7 +439,6 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
         // If the target type is an interface, the only thing we have to do is to
         // get the list of all its public methods.
-        
         for (int j = 0; j < interfacesToImplement.size(); j++) {
             //Class interface_class = Class.forName((String) interfacesToImplement.get(j));
             Class interface_class = (Class) interfacesToImplement.get(j);
@@ -459,7 +459,8 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         int initialNumberOfMethods = this.methods.length;
 
         for (int i = 0; i < initialNumberOfMethods; i++) {
-            if (org.objectweb.proactive.core.mop.Utils.checkMethod(this.methods[i])) {
+            if (org.objectweb.proactive.core.mop.Utils.checkMethod(
+                        this.methods[i])) {
                 v.addElement(this.methods[i]);
             }
         }
@@ -467,10 +468,8 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         Method[] validMethods = new Method[v.size()];
         v.copyInto(validMethods);
 
-
         // Installs the list of valid methods as an instance variable of this object
         this.methods = validMethods;
-
 
         this.packageName = null;
         this.stubClassSimpleName = org.objectweb.proactive.core.mop.Utils.getSimpleName(this.stubClassFullName);
