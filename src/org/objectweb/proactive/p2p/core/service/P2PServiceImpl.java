@@ -280,7 +280,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             KnownTableElement element = (KnownTableElement) iterator[i];
             if (((String) element.getKey()).compareTo(parent) != 0) {
                 allServices.put(element.getKey(), element.getP2PService());
-                if (element.getLoad() == 0) {
+                if (element.getLoad() > 0) {
                     try {
                         res.put(this.getRemoteProActiveRuntime(
                                 (String) element.getKey()).getVMInformation()
