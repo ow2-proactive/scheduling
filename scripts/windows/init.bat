@@ -40,6 +40,7 @@ IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis
 IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
 IF EXIST %PROACTIVE%\lib\xml-apis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xml-apis.jar
 IF EXIST %PROACTIVE%\lib\fractal.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\fractal.jar
+IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=proactive-log4j
