@@ -30,11 +30,18 @@
 */
 package org.objectweb.proactive.core.body.proxy;
 //add comments 
+import java.util.HashMap;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 
 public abstract class AbstractProxy implements Proxy, java.io.Serializable {
 
+	// table of handlers associated to proxy
+	private HashMap proxyLevel;
+	
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -71,5 +78,47 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
   protected static boolean isOneWayCall(MethodCall mc) {
     return mc.isOneWayCall();
   }
+
+  /** Give a reference to a local map of handlers
+  * @return A reference to a map of handlers
+  */
+ public HashMap getHandlersLevel() throws ProActiveException {
+   return proxyLevel;
+ }
+  
+ /** Set a new handler within the table of the Handlerizable Object
+  * @param handler A class of handler associated with a class of non functional exception.
+  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+  */
+ public void setExceptionHandler(Class handler, Class exception) throws ProActiveException {
+  	  	
+   // add handler to proxy level
+   if (proxyLevel == null) {
+	proxyLevel = new HashMap();	
+   }
+   proxyLevel.put(exception, handler);
+ }
+	
+ /** Remove a handler from the table of the Handlerizable Object
+  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+  * @return The removed handler or null
+  */
+ public Handler unsetExceptionHandler(Class exception) throws ProActiveException { 
+
+   // add handler to proxy level
+   if (proxyLevel  !=  null) {
+	   Class handlerClass = (Class) proxyLevel.remove(exception);
+	   try  {
+		   Handler handler = (Handler) handlerClass.newInstance();
+		   return handler;
+	   } catch (IllegalAccessException e) {
+		   System.out.println("*** ERROR : " + e);
+	   } catch (InstantiationException e) {
+		   System.out.println("*** INSTANTIATION ERROR : " + e);
+	   }
+	   return null;	
+   }
+   return null;
+ }
 
 }

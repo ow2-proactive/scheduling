@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -340,6 +342,28 @@ proxiedRemoteBody.terminateSession(sessionID)		;
 		return proxiedRemoteBody.getEntities();
 	}
 
+	/** Give a reference to a local map of handlers
+	 * @return A reference to a map of handlers
+	 */
+	public HashMap getHandlersLevel() {
+		return null;
+	}
+  
+	/** Set a new handler within the table of the Handlerizable Object
+	 * @param handler A class of handler associated with a class of non functional exception.
+	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+	 */
+	public void setExceptionHandler(Class handler, Class exception) {
+	}
+	
+	/** Remove a handler from the table of the Handlerizable Object
+	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+	 * @return The removed handler or null
+	 */
+	public Handler unsetExceptionHandler(Class exception) { 
+		return null;
+	}
+	
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

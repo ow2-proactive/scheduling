@@ -30,19 +30,14 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RMIServerSocketFactory;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -53,6 +48,18 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+
+import java.io.IOException;
+
+import java.rmi.RemoteException;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -139,6 +146,50 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         body.setImmediateService(methodName);
+    }
+
+    // implements Handlerizable
+
+    /** Give a reference to a local map of handlers
+     * @return A reference to a map of handlers
+     */
+    public HashMap getHandlersLevel() throws java.io.IOException {
+        try {
+            HashMap map = body.getHandlersLevel();
+            return map;
+        } catch (ProActiveException e) {
+            throw new java.io.IOException();
+        }
+    }
+
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     */
+    public void setExceptionHandler(Class handler, Class exception)
+        throws java.io.IOException {
+        try {
+            //System.out.println("TAAAAAAAAAA");
+            body.setExceptionHandler(handler, exception);
+        } catch (ProActiveException e) {
+            throw new java.io.IOException(
+                "Error in setExceptionHandler for Remote Body");
+        }
+    }
+
+    /** Remove a handler from the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
+    public Handler unsetExceptionHandler(Class exception)
+        throws java.io.IOException {
+        try {
+            Handler handler = body.unsetExceptionHandler(exception);
+            return handler;
+        } catch (ProActiveException e) {
+            throw new java.io.IOException(
+                "Error in unsetExceptionHandler for Remote Body");
+        }
     }
 
     // SECURITY
