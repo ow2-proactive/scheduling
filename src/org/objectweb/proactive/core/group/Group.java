@@ -72,8 +72,9 @@ public interface Group extends Collection {
 
     /**
      * Removes the object at the specified index.
+     * @return the object that has been removed
      */
-    public void remove(int index);
+    public Object remove(int index);
 
     /**
      * Returns the index in the group of the first occurence of the specified element, -1 if the list does not contain this element.
@@ -242,7 +243,18 @@ public interface Group extends Collection {
  	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
  	 * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
 	 */
-	public Object get(String key);
+	public Object getNamedElement(String key);
+	
+	/**
+	 * Removes the mapping for this key from the group if it is present. 
+	 * More formally, if this group contains a mapping from key k to value v such that (key==null ? k==null : key.equals(k)), 
+	 * that mapping is removed. (The map can contain at most one such mapping.)
+	 * Returns the value to which the group previously associated the key, or null if the group contained no mapping for this key. 
+	 * The group will not contain a mapping for the specified key once the call returns. 
+	 * @param key the name of the element
+	 * @return the named element
+	 */
+	public Object removeNamedElement(String key);
 
 	/**
 	 * Associates the specified value with the specified key in this Group (optional operation).
@@ -256,7 +268,7 @@ public interface Group extends Collection {
 	 * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
 	 * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
 	 */
-	public void put(String key, Object value);
+	public void addNamedElement(String key, Object value);
 
 
 	/**
