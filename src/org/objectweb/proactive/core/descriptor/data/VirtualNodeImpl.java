@@ -274,7 +274,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     // will register.
                     if (!vmAlreadyAssigned) {
                         setParameters(process, vm);
-                        process.setSecurityFile(policyServerFile);
                         // It is this virtual Node that originates the creation of the vm
                         try {
                             proActiveRuntimeImpl.createVM(process);
@@ -754,12 +753,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     //  SECURITY
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
-     */
-    public X509Certificate getCreatorCertificate() {
-        return creatorCertificate;
-    }
+   
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()

@@ -148,30 +148,6 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
         return sb.toString();
     }
 
-    // SECURITY
-    public void setCertificateLocation(String file) {
-        certificateLocation = file;
-    }
-
-    public String getCertificateLocation() {
-        return certificateLocation;
-    }
-
-    public void setPrivateKeyLocation(String privatekey) {
-        privateKeyLocation = privatekey;
-    }
-
-    public String getPrivateKeyLocation() {
-        return privateKeyLocation;
-    }
-
-    public void setSecurityFile(String securityFile) {
-        this.securityFile = securityFile;
-    }
-
-    public String getSecurityFile() {
-        return securityFile;
-    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------

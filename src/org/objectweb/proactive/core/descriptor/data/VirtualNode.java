@@ -30,9 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.security.cert.X509Certificate;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -96,18 +95,17 @@ public interface VirtualNode extends java.io.Serializable, Job {
     public int getNodeCount();
 
     /**
-     * Returns the number of Nodes already created (at the time of the reception of method call) among the Nodes mapped to this VirtualNode 
+     * Returns the number of Nodes already created (at the time of the reception of method call) among the Nodes mapped to this VirtualNode
      * in the XML Descriptor
      * @return int the number of nodes created at  the time of the method call
      */
     public int getNumberOfCurrentlyCreatedNodes();
-    
+
     /**
      * Returns the number of Nodes that could successfully be created at the end of the deployment
      *  @return int the number of nodes effectively created
      */
     public int getNumberOfCreatedNodesAfterDeployment();
-
 
     /**
      * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor
@@ -204,8 +202,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
-    
-    
+
     /**
      * Returns the minimum number of nodes needed for this VirtualNode.
      * This number represents the minimum number of nodes,  this VirtualNode needs in order to be
@@ -215,11 +212,6 @@ public interface VirtualNode extends java.io.Serializable, Job {
     public int getMinNumberOfNodes();
 
     // SECURITY
-
-    /**
-     *@return creator certificate
-     */
-    public X509Certificate getCreatorCertificate() throws ProActiveException;
 
     /**
      * @return policy server

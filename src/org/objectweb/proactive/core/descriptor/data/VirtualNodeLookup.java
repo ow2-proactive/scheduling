@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.security.cert.X509Certificate;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -287,7 +285,6 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         this.portForLookup = port;
     }
 
-
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
      */
@@ -296,13 +293,6 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     //  SECURITY
-
-    /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
-     */
-    public X509Certificate getCreatorCertificate() throws ProActiveException {
-        return virtualNode.getCreatorCertificate();
-    }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
