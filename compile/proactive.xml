@@ -26,6 +26,14 @@
 		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar"/>
 		<pathelement location="${base}/dev/lib/jmf.jar"/>
 	</path>
+	<path id="examples.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/clibwrapper_jiio.jar"/>
+		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_codec.jar"/>
+		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_core.jar"/>
+		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/mlibwrapper_jai.jar"/>
+		<pathelement location="${base}/src/org/objectweb/proactive/examples/profractal/lib/jai_imageio.jar"/>
+	</path>
 	<!-- default target that displays usage -->
 	<target name="usage">
 		<echo message=""/>
@@ -178,7 +186,7 @@
 	-->
 	<target name="examples" depends="ext">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
-			<classpath refid="project.classpath"/>
+			<classpath refid="examples.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/examples">
