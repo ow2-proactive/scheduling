@@ -198,6 +198,10 @@ public class ProxyForGroup extends AbstractProxy
         if ("hashCode".equals(mc.getName())) {
             return new Integer(this.hashCode());
         }
+        
+        if ("equals".equals(mc.getName()) && (mc.getNumberOfParameter() == 1)) {
+            return new Boolean(this.equals(mc.getParameter(0)));
+        }
 
         /* result will be a stub on a proxy for group representing the group of results */
         Object result = null;
@@ -219,7 +223,7 @@ public class ProxyForGroup extends AbstractProxy
         }
 
         /* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
-        this.threadpool.complete();
+        	this.threadpool.complete();
 
         return result;
     }
@@ -458,8 +462,10 @@ public class ProxyForGroup extends AbstractProxy
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
     public boolean equals(Object o) {
-        if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
-        	return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
+        ProxyForGroup p = ProActiveGroup.findProxyForGroup(o);
+        if (p !=null) {
+            // comparing with another group
+        	return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) p).memberList);
         } else {
             return false;
         }
