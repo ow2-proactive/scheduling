@@ -20,7 +20,7 @@
 	</path>
 	<path id="test.classpath">
 		<path refid="project.classpath"/>
-		<pathelement location="${base}/dev/lib/xm-apis.jar"/>
+		<pathelement location="${base}/dev/lib/xml-apis.jar"/>
 		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar"/>
 		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar"/>
 	</path>
