@@ -184,12 +184,13 @@ public class ASMBytecodeStubBuilder implements Constants {
 
 		// Extracts return and arguments types
 		String mDesc = Type.getMethodDescriptor(m);
-
+	
 		// Actually creates the method generator
 			CodeVisitor cv = this.classGenerator.visitMethod(flags, // access flags
 		m.getName(), // Method name
 		mDesc, // return and argument types
-	null); // exceptions
+	null, // exceptions
+	null); // Attributes
 		return cv;
 	}
 
@@ -492,15 +493,15 @@ public class ASMBytecodeStubBuilder implements Constants {
 		// This is only necessary if we are generating a stub for
 		// a type that is not an interface
 		if (!this.cl.isInterface()) {
-			this.classGenerator.visitField(ACC_PROTECTED, "outsideConstructor", "Z", null);
+			this.classGenerator.visitField(ACC_PROTECTED, "outsideConstructor", "Z", null, null);
 		}
 		// Creates the field that points to the handler inside the MOP
-		this.classGenerator.visitField(ACC_PROTECTED, PROXY_FIELD_NAME, PROXY_TYPE, null);
+		this.classGenerator.visitField(ACC_PROTECTED, PROXY_FIELD_NAME, PROXY_TYPE, null, null);
 	}
 
 	protected void createConstructor() {
 		// Actually creates the method generator (ASM : uses the visitor)
-		CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>", "()V", null);
+		CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 
 		if (!this.cl.isInterface()) {
 			// Calls the constructor of the super class
@@ -531,13 +532,13 @@ public class ASMBytecodeStubBuilder implements Constants {
 	protected void createStaticVariables() {
 		// Creates fields that contains the array of Method objects
 		// that represent the reified methods of this class
-		this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods", METHOD_ARRAY_TYPE, null);
+		this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods", METHOD_ARRAY_TYPE, null, null);
 		return;
 	}
 
 	protected void createStaticInitializer() {
 		// Creates the class initializer method itself
-		CodeVisitor cv = this.classGenerator.visitMethod(ACC_STATIC, "<clinit>", "()V", null);
+		CodeVisitor cv = this.classGenerator.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
 
 		// Creates an array of Method objects that we will store into the static
 		// variable 'methods' of type 'Method[]'
@@ -669,7 +670,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 
 	protected void createGetAndSetProxyMethods() {
 		// Do the getProxy method first
-		CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "getProxy", "()" + PROXY_TYPE, null);
+		CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "getProxy", "()" + PROXY_TYPE, null, null);
 
 		// Now, fills in the instruction list
 		cv.visitVarInsn(ALOAD, 0);
@@ -681,7 +682,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 		cv.visitMaxs(0, 0);
 
 		// Now, do the setProxy method
-		cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setProxy", "(" + PROXY_TYPE + ")V", null);
+		cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setProxy", "(" + PROXY_TYPE + ")V", null, null);
 
 		// Now, fills in the instruction list
 		cv.visitVarInsn(ALOAD, 0);
