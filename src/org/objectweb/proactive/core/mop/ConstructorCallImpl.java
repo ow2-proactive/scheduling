@@ -186,13 +186,12 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
         try {
             this.effectiveArguments = (Object[]) in.readObject();
         } catch (IOException e) {
-          //  System.out.println("Stream is  " + in.getClass().getName());
-        //    e.printStackTrace();
+            //  System.out.println("Stream is  " + in.getClass().getName());
+            //    e.printStackTrace();
             throw e;
         }
-// Object test =
-// System.out.println("----- ConstructorCallImpl.readObject() class " + test.getClass().getName() + " loaded by " + test.getClass().getClassLoader());
-        declaringClass = (Class)  in.readObject();
+
+        declaringClass = (Class) in.readObject();
         parameters = (Class[]) in.readObject();
 
         try {

@@ -73,6 +73,10 @@ public class MOPClassLoader extends URLClassLoader {
         return MOPClassLoader.mopCl;
     }
 
+  public MOPClassLoader(){
+  	super(new URL[] {});
+  }
+    
     /**
      * Get the bytecode of a stub given its name. If the stub can not be found
      * the cache, the MOPClassLoader tries to generate it.
