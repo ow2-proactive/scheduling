@@ -38,20 +38,25 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Interface;
 
 
-/** Stores a binding between a client interface and a server interface.
+/** 
+ * Stores a binding between a client interface and a server interface.
+ * Only composite components have their bindings stored in such manner.
+ * Primitive component handle their bindings themselves.
  * @author Matthieu Morel
  */
 public class Binding implements Serializable {
     protected static Logger logger = Logger.getLogger(Binding.class.getName());
     private final Interface clientInterface;
     private final Interface serverInterface;
+    private final String clientInterfaceName;
 
     /**
      * @param clientInterface a reference on a client interface
      * @param serverInterface a reference on a server interface
      */    
-    public Binding(final Interface clientInterface, final Interface serverInterface) {
+    public Binding(final Interface clientInterface, String clientItfName, final Interface serverInterface) {
         this.clientInterface = clientInterface;
+		this.clientInterfaceName = clientItfName;
         this.serverInterface = serverInterface;
     }
 
@@ -72,4 +77,13 @@ public class Binding implements Serializable {
         }
         return serverInterface;
     }
+	/**
+	 * In the case of a collective interface, the names
+	 * of each member of the collection can be different. 
+	 * @return the actual name of the client interface, within this collection
+	 */
+	public String getClientInterfaceName() {
+		return clientInterfaceName;
+	}
+
 }
