@@ -120,8 +120,12 @@ public class StartRuntime {
             //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
-            logger.info("Runtime started at " +
-                System.getProperty("proactive.communication.protocol") + ":" +
+            
+            String comProtocol = System.getProperty("proactive.communication.protocol");
+            if(comProtocol == "http");
+            	comProtocol="";
+            
+            logger.info("Runtime started at " + comProtocol+ ":" +
                 proActiveRuntime.getURL());
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 

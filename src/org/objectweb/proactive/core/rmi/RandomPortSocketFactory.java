@@ -53,7 +53,6 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory,
     static Logger logger = Logger.getLogger(RandomPortSocketFactory.class.getName());
     static protected final int MAX = 5;
     static protected Random random = new Random();
-
     protected int basePort = 35000;
     protected int range = 5000;
 
@@ -74,7 +73,7 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory,
             " requested");
         while (true) {
             try {
-                int offset = random.nextInt(range);    
+                int offset = random.nextInt(range);
                 ServerSocket socket = new ServerSocket(basePort + offset);
                 logger.debug("RandomPortSocketFactory: success for port " +
                     (basePort + offset));

@@ -57,8 +57,9 @@ public class Test extends FunctionalTest {
      */
     public void action() throws Exception {
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" });
-        ProActive.setImmediateService(a, "getObject");
+        ProActive.setImmediateService(a, "getObject");  
         dum = a.getObject();
+
     }
 
     /**

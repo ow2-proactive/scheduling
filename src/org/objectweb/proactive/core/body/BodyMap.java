@@ -38,6 +38,8 @@ import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
 
+import java.util.Hashtable;
+
 
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
@@ -61,35 +63,37 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     // -- PRIVATE MEMBER -----------------------------------------------
     //
-    private java.util.HashMap idToBodyMap;
+    private Hashtable idToBodyMap;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public BodyMap() {
-        idToBodyMap = new java.util.HashMap();
+        idToBodyMap = new Hashtable();
     }
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
-    //
+    // 
 
     /**
      * add the set (id, node) in the idToBodyMap
      * block if it already exists until it is removed
      */
     public synchronized void putBody(UniqueID id, UniversalBody b) {
-        while (idToBodyMap.get(id) != null) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+    	while (idToBodyMap.get(id) != null) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        idToBodyMap.put(id, b);
-        if (hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-        }
+    	idToBodyMap.put(id, b);
+
+    	if (hasListeners()) {
+                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+            }
+    
     }
 
     /**
@@ -97,46 +101,64 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * erase any previous entry
      */
     public synchronized void updateBody(UniqueID id, UniversalBody b) {
-        idToBodyMap.put(id, b);
-        if (hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-        }
+               idToBodyMap.put(id, b);
+
+            if (hasListeners()) {
+                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+            }
+   
     }
 
     public synchronized void removeBody(UniqueID id) {
-        UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
-        notifyAll();
-        if ((b != null) && hasListeners()) {
-            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
-        }
+
+            UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
+            notifyAll();
+
+            if ((b != null) && hasListeners()) {
+                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
+            }
+
     }
 
     public synchronized int size() {
-        return idToBodyMap.size();
+        int val = idToBodyMap.size();
+
+        return val;
     }
 
     public synchronized UniversalBody getBody(UniqueID id) {
-        return (UniversalBody) idToBodyMap.get(id);
+        Object o = null;
+        if(id != null)
+
+        		o = idToBodyMap.get(id);
+
+
+        return (UniversalBody) o;
     }
 
     public synchronized boolean containsBody(UniqueID id) {
         return idToBodyMap.containsKey(id);
     }
-
+ 
     public java.util.Iterator bodiesIterator() {
         return idToBodyMap.values().iterator();
-    }
+    }  
 
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(" -- BodyMap ------- \n");
-        java.util.Set entrySet = idToBodyMap.entrySet();
-        java.util.Iterator iterator = entrySet.iterator();
-        while (iterator.hasNext()) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-            sb.append(entry.getKey()).append("  body = ")
-              .append(entry.getValue()).append("\n");
-        }
+
+            sb.append(" -- BodyMap ------- \n");
+
+            java.util.Set entrySet = idToBodyMap.entrySet();
+            java.util.Iterator iterator = entrySet.iterator();
+ 
+            while (iterator.hasNext()) {
+                java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+                sb.append(entry.getKey()).append("  body = ")
+                  .append(entry.getValue()).append("\n");
+            }
+        
+
         return sb.toString();
     }
 
@@ -145,7 +167,8 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     //
     public Object clone() {
         BodyMap newLocationTable = new BodyMap();
-        newLocationTable.idToBodyMap = (java.util.HashMap) idToBodyMap.clone();
+        newLocationTable.idToBodyMap = (java.util.Hashtable) idToBodyMap.clone();
+
         return newLocationTable;
     }
 
@@ -170,12 +193,14 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void readExternal(java.io.ObjectInput in)
         throws java.io.IOException, ClassNotFoundException {
-        int size = in.readInt();
-        for (int i = 0; i < size; i++) {
-            UniqueID id = (UniqueID) in.readObject();
-            UniversalBody remoteBody = (UniversalBody) in.readObject();
-            idToBodyMap.put(id, remoteBody);
-        }
+            int size = in.readInt();
+
+            for (int i = 0; i < size; i++) {
+                UniqueID id = (UniqueID) in.readObject();
+                UniversalBody remoteBody = (UniversalBody) in.readObject();
+                idToBodyMap.put(id, remoteBody);
+            }
+
     }
 
     /**
@@ -185,20 +210,25 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void writeExternal(java.io.ObjectOutput out)
         throws java.io.IOException {
-        int size = idToBodyMap.size();
-        out.writeInt(size);
-        java.util.Set entrySet = idToBodyMap.entrySet();
-        java.util.Iterator iterator = entrySet.iterator();
-        while (iterator.hasNext()) {
-            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-            out.writeObject(entry.getKey());
-            Object value = entry.getValue();
-            if (value instanceof Body) {
-                out.writeObject(((Body) value).getRemoteAdapter());
-            } else {
-                out.writeObject(value);
+            int size = idToBodyMap.size();
+            out.writeInt(size);
+
+            java.util.Set entrySet = idToBodyMap.entrySet();
+            java.util.Iterator iterator = entrySet.iterator();
+
+            while (iterator.hasNext()) {
+                java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+                out.writeObject(entry.getKey());
+
+                Object value = entry.getValue();
+
+                if (value instanceof Body) {
+                    out.writeObject(((Body) value).getRemoteAdapter());
+                } else {
+                    out.writeObject(value);
+                }
             }
-        }
+
     }
 
     //
@@ -207,12 +237,16 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     protected void notifyOneListener(ProActiveListener listener,
         ProActiveEvent event) {
         BodyEvent bodyEvent = (BodyEvent) event;
+
         switch (bodyEvent.getType()) {
         case BodyEvent.BODY_CREATED:
             ((BodyEventListener) listener).bodyCreated(bodyEvent);
+
             break;
+
         case BodyEvent.BODY_DESTROYED:
             ((BodyEventListener) listener).bodyDestroyed(bodyEvent);
+
             break;
         }
     }

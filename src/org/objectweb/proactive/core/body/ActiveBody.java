@@ -193,7 +193,7 @@ public class ActiveBody extends MigratableBody implements Runnable,
         runActive = null;
     }
 
-    //
+    // 
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String shortClassName(String fqn) {

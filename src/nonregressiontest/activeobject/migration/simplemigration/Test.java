@@ -62,6 +62,11 @@ public class Test extends FunctionalTest
 	public void action() throws Exception
 	{
 		sameVmNode = TestNodes.getSameVMNode();
+		if(sameVmNode == null){
+			new TestNodes().action();	
+			sameVmNode = TestNodes.getSameVMNode();
+		}
+		
 		localVmNode = TestNodes.getLocalVMNode();
 		a = (A)ProActive.newActive(A.class.getName(), new Object[]{"toto"},sameVmNode);
 		a.moveTo(localVmNode);

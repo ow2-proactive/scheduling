@@ -80,12 +80,14 @@ public abstract class RuntimeFactory {
     //private static RuntimeFactory defaultRuntimeFactory;
     public static boolean JINI_ENABLED;
     public static boolean IBIS_ENABLED;
+    public static boolean XMLHTTP_ENABLED;
 
     static {
         ProActiveConfiguration.load();
         createClassServer();
         JINI_ENABLED = isJiniEnabled();
         IBIS_ENABLED = isIbisEnabled();
+        XMLHTTP_ENABLED = isXmlHttpEnabled();
         registerProtocolFactories();
         //getLocalRuntime();
     }
@@ -141,7 +143,8 @@ public abstract class RuntimeFactory {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-            defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
+            
+        	defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
             if (logger.isDebugEnabled()) {
                 logger.debug("default runtime = " + defaultRuntime.getURL());
@@ -167,6 +170,7 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getProtocolSpecificRuntime(String protocol)
         throws ProActiveException {
+
         RuntimeFactory factory = getFactory(protocol);
         ProActiveRuntime proActiveRuntime = factory.getProtocolSpecificRuntimeImpl();
         if (proActiveRuntime == null) {
@@ -186,9 +190,9 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getRuntime(String proActiveRuntimeURL,
         String protocol) throws ProActiveException {
-            logger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
-                protocol);
-        
+        logger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
+            protocol);
+
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         RuntimeFactory factory = getFactory(protocol);
@@ -243,6 +247,9 @@ public abstract class RuntimeFactory {
                 "org.objectweb.proactive.core.runtime.ibis.RemoteRuntimeFactory");
         }
 
+        setFactory(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
+            "org.objectweb.proactive.core.runtime.http.RemoteRuntimeFactory");
+
         setFactory(Constants.RMI_PROTOCOL_IDENTIFIER,
             "org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory");
     }
@@ -277,6 +284,10 @@ public abstract class RuntimeFactory {
             }
             return false;
         }
+    }
+
+    private static boolean isXmlHttpEnabled() {
+        return true;
     }
 
     private static RuntimeFactory createRuntimeFactory(Class factoryClass,

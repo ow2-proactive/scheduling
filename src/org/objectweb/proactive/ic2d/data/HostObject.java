@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.HostNodeFinder;
+import org.objectweb.proactive.ic2d.util.HttpHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.IbisHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RMIHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RunnableProcessor;
@@ -45,7 +46,6 @@ import org.objectweb.proactive.ic2d.util.RunnableProcessor;
  * Holder class for the host data representation
  */
 public class HostObject extends AbstractDataObject {
-
     /** Name of this Host  */
     protected String hostname;
 
@@ -59,6 +59,7 @@ public class HostObject extends AbstractDataObject {
     //
     public HostObject(WorldObject parent, String hostname, String protocol) {
         super(parent);
+
         //	Test if there is port defined, then remove it to see if hostname exists
         try {
             String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(
@@ -71,8 +72,11 @@ public class HostObject extends AbstractDataObject {
             this.hostname = hostname;
             controller.warn("Hostname " + hostname + " failed reverse lookup.");
         }
+
         if ("ibis".equals(protocol)) {
             this.nodeFinder = new IbisHostNodeFinder(controller);
+        } else if ("http".equals(protocol)) {
+            this.nodeFinder = new HttpHostNodeFinder(controller);
         } else {
             this.nodeFinder = new RMIHostNodeFinder(controller);
         }
@@ -129,43 +133,55 @@ public class HostObject extends AbstractDataObject {
         java.rmi.dgc.VMID vmid = node.getNodeInformation().getVMID();
         String protocolId = node.getNodeInformation().getCreationProtocolID();
         VMObject vmObject = getVMObject(vmid);
+
         if (vmObject != null) {
             controller.log("The node " + node.getNodeInformation().getURL() +
                 " belongs to an already existing vm id=" + vmid);
+
             // add the node to the existing vm in case it doesn't exist
             vmObject.addNodeObject(node);
+
             // refresh ActiveObject for this vm
             vmObject.sendEventsForAllActiveObjects();
+
             return vmObject;
         }
+
         try {
             vmObject = new VMObject(this, vmid, node, protocolId);
             putChild(vmid, vmObject);
             controller.log("The node " + node.getNodeInformation().getURL() +
                 " has been found on vm id=" + vmid);
+
             if (listener != null) {
                 listener.vmObjectAdded(vmObject);
             }
+
             if (os == null) {
                 os = vmObject.getSystemProperty("os.name");
+
                 if (listener != null) {
                     listener.operatingSystemFound(os);
                 }
             }
+
             return vmObject;
         } catch (ActiveObjectCreationException e) {
             controller.log("Cannot create the spy on host " + hostname +
                 " on node " + node.getNodeInformation().getURL(), e);
+
             return null;
         } catch (NodeException e) {
             controller.log("Problem with the node " +
                 node.getNodeInformation().getURL(), e);
+
             return null;
         }
     }
 
     public void removeVMObject(java.rmi.dgc.VMID id) {
         VMObject vmObject = (VMObject) removeChild(id);
+
         if ((vmObject != null) && (listener != null)) {
             listener.vmObjectRemoved(vmObject);
         }
@@ -183,15 +199,20 @@ public class HostObject extends AbstractDataObject {
         if (getChildObjectsCount() == 0) {
             return null;
         }
+
         java.util.Iterator iterator = childsIterator();
+
         while (iterator.hasNext()) {
             VMObject vmObject = (VMObject) iterator.next();
+
             if (vmObject.getNodeObject(nodeName) != null) {
                 controller.log("Found that vm id=" + vmObject.getID() +
                     " own the node " + nodeName);
+
                 return vmObject;
             }
         }
+
         return null;
     }
 
@@ -208,6 +229,7 @@ public class HostObject extends AbstractDataObject {
             // remove ref on other object
             listener = null;
             nodeFinder = null;
+
             return true;
         } else {
             return false;
@@ -229,25 +251,32 @@ public class HostObject extends AbstractDataObject {
 
         public void run() {
             Node[] nodes;
+
             try {
                 nodes = nodeFinder.findNodes(hostname);
+
                 //  System.out.println("XXXXXXX");
             } catch (java.io.IOException e) {
                 controller.log("There is no RMI Registry on host " + hostname, e);
+
                 return;
             }
+
             if (nodes.length == 0) {
                 controller.warn("A RMIRegistry has been found on host " +
                     hostname + " but no Node object are bound !");
             }
+
             for (int i = 0; i < nodes.length; i++) {
                 Node node = nodes[i];
 
                 //System.out.println("nodeURL "+node.getNodeInformation().getURL());
                 String nodeName = node.getNodeInformation().getName();
+
                 if ((targetNodeName == null) ||
                         targetNodeName.equals(nodeName)) {
                     VMObject vmObject = findVMObjectHavingExistingNode(nodeName);
+
                     if (vmObject == null) {
                         // new NodeObject
                         addVMObject(node);
@@ -259,6 +288,7 @@ public class HostObject extends AbstractDataObject {
                     }
                 }
             }
+
             if ((targetNodeName != null) &&
                     (findVMObjectHavingExistingNode(targetNodeName) == null)) {
                 controller.warn("The node " + targetNodeName +

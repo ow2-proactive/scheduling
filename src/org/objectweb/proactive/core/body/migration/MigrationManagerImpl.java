@@ -68,7 +68,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
     //
     public Node checkNode(Node node) throws MigrationException {
         if (node == null) {
-            throw new MigrationException(
+            throw new MigrationException( 
                 "The RemoteNodeImpl could not be found");
         }
 

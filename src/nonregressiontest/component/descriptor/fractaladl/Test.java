@@ -63,7 +63,7 @@ public class Test extends FunctionalTest {
 
 				Component c = Registry.instance().getComponent("parallel");
 
-				// invoke method on composite
+				// invoke method on composite 
 				I1 i1 = (I1) c.getFcInterface("i1");
 
 				//I1 i1= (I1)p1.getFcInterface("i1");
@@ -122,7 +122,7 @@ public class Test extends FunctionalTest {
 			buffer.append(message.getMessage());
 		}
 	}
-
+ 
 	public static void main(String[] args) {
 		Test test = new Test();
 		try {

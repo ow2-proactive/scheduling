@@ -79,13 +79,13 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeException; 
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
+ 
 
 public class ProActive {
     protected static Logger logger = Logger.getLogger(ProActive.class.getName());
@@ -108,7 +108,7 @@ public class ProActive {
     static public HashMap VMLevel = null;
 
     /**
-     * Code level is used for temporary handlers
+     * Code level is used for temporary handlers 
      */
     static public HashMap codeLevel = null;
 
@@ -635,42 +635,45 @@ public class ProActive {
      * @exception java.io.IOException if the remote body cannot be registered
      */
     public static void register(Object obj, String url)
-        throws java.io.IOException {
-        // Check if obj is really a reified object
-        if (!(MOP.isReifiedObject(obj))) {
-            throw new java.io.IOException("The given object " + obj +
-                " is not a reified object");
-        }
-
-        // Find the appropriate remoteBody
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-
-        if (myProxy == null) {
-            throw new java.io.IOException(
-                "Cannot find a Proxy on the stub object: " + obj);
-        }
-
-        BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
-
-        if (body instanceof RemoteBodyAdapter) {
-            RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
-            if (logger.isInfoEnabled()) {
-                logger.info("Success at binding url " + url);
-            }
-        } else {
-            if (body instanceof IbisRemoteBodyAdapter) {
-                IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Success at binding url " + url);
-                }
-            } else {
-                throw new java.io.IOException(
-                    "Cannot reconize the type of this UniversalBody: " +
-                    body.getClass().getName());
-            }
-        }
+    throws java.io.IOException {
+    // Check if obj is really a reified object
+    if (!(MOP.isReifiedObject(obj))) {
+        throw new java.io.IOException("The given object " + obj +
+            " is not a reified object");
     }
+
+    // Find the appropriate remoteBody
+    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+
+    if (myProxy == null) {
+        throw new java.io.IOException(
+            "Cannot find a Proxy on the stub object: " + obj);
+    }
+
+    BodyProxy myBodyProxy = (BodyProxy) myProxy;
+    UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+
+    if (body instanceof RemoteBodyAdapter) {
+        RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
+    } 
+    else if (body instanceof IbisRemoteBodyAdapter) {
+    	IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
+    }	
+    else if (body instanceof org.objectweb.proactive.core.body.http.RemoteBodyAdapter) {
+    	org.objectweb.proactive.core.body.http.RemoteBodyAdapter.register(
+    			(org.objectweb.proactive.core.body.http.RemoteBodyAdapter) body, url);
+    } 
+    else {
+    	throw new java.io.IOException(
+    			"Cannot reconize the type of this UniversalBody: " +
+				body.getClass().getName());
+    }
+
+    if (logger.isInfoEnabled()) {
+        logger.info("Success at binding url " + url);
+    }
+
+}
 
     /**
      * Unregisters an active object previously registered into a RMI registry.
@@ -701,8 +704,12 @@ public class ProActive {
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
         if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
-            b = IbisRemoteBodyAdapter.lookup(url);
-        } else {
+            b = IbisRemoteBodyAdapter.lookup(url); 
+        }
+        else if ("http".equals(System.getProperty("proactive.communication.protocol"))) {
+        	b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
+        } 	
+        else {
             b = RemoteBodyAdapter.lookup(url);
         }
 

@@ -3,7 +3,7 @@
  * author : Matthieu Morel
   */
 package nonregressiontest.component;
-
+ 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;

@@ -231,7 +231,9 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
+					<xs:enumeration value="http"/>
 					<xs:enumeration value="jini"/>
+					<xs:enumeration value="http"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -276,6 +278,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
 					<xs:enumeration value="jini"/>
+					<xs:enumeration value="http"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

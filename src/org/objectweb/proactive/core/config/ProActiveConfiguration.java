@@ -4,12 +4,12 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis 
  * Contact: proactive-support@inria.fr
  *
- * This library is free software; you can redistribute it and/or
+ * This library is free software; you can redistribute it and/or  
  * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
+ * License as published by the Free Software Foundation; either 
  * version 2.1 of the License, or any later version.
  *
  * This library is distributed in the hope that it will be useful,
@@ -93,7 +93,7 @@ public class ProActiveConfiguration {
             ProActiveConfiguration.getConfiguration().addProperties();
             isLoaded = true;
         }
-    }
+    } 
 
     public synchronized static ProActiveConfiguration getConfiguration() {
         if (ProActiveConfiguration.singleton == null) {
@@ -220,6 +220,7 @@ public class ProActiveConfiguration {
         if (System.getProperty(name) == null) {
             System.setProperty(name, value);
             this.addedProperties.put(name, value);
-        }
+        } 
     }
 }
+ 

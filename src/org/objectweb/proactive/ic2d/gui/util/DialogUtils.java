@@ -30,18 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ic2d.data.WorldObject;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.data.AbstractDataObjectPanel;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
-import org.objectweb.proactive.ic2d.gui.data.WorldPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.NodeExploration;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 

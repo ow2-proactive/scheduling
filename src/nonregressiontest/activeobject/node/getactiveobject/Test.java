@@ -59,8 +59,12 @@ public class Test extends FunctionalTest {
      */
     public void action() throws Exception {
         node = TestNodes.getLocalVMNode();
+        if(node == null){
+        	new TestNodes().action();
+        	node = TestNodes.getLocalVMNode();
+        }
         ProActive.newActive(A.class.getName(), new Object[] { "toto" }, node);
-        Thread.sleep(3000);
+        Thread.sleep(3000); 
         a = (A) node.getActiveObjects(A.class.getName())[0];
     }
 

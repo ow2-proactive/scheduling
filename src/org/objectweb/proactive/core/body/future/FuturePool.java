@@ -47,7 +47,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 public class FuturePool extends Object implements java.io.Serializable {
     protected boolean newState;
-
+ 
     // table of future and ACs
     private FutureMap futures;
 

@@ -43,7 +43,7 @@ import testsuite.test.FunctionalTest;
 
 /**
  * @author ProActiveTeam
- * @version 1.0 6 août 2004
+ * @version 1.0 6 ao?t 2004
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
@@ -77,8 +77,8 @@ public class Test extends FunctionalTest {
         Thread.sleep(5000);
         process.startProcess();
         Thread.sleep(7000);
-         pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);
-        pad.activateMappings();
+         pad = ProActive.getProactiveDescriptor(P2P_XML_LOCATION_UNIX);	
+         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("p2pvn");
         nodeTab = vn.getNodes();
     }

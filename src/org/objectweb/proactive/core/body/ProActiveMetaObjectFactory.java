@@ -1,35 +1,62 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body;
 
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationManager;
+import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
+import org.objectweb.proactive.core.body.reply.ReplyReceiver;
+import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestQueueFactory;
+import org.objectweb.proactive.core.body.request.RequestReceiver;
+import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
+import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
+import org.objectweb.proactive.core.group.ProActiveGroupManager;
+import org.objectweb.proactive.core.group.ProActiveGroupManagerFactory;
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.ThreadStore;
+import org.objectweb.proactive.core.util.ThreadStoreFactory;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 /**
  * THIS JAVADOC SHOULD BE REWRITTEN
@@ -71,33 +98,6 @@ package org.objectweb.proactive.core.body;
  */
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.migration.MigrationManager;
-import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestQueueFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
-import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
-import org.objectweb.proactive.core.group.ProActiveGroupManager;
-import org.objectweb.proactive.core.group.ProActiveGroupManagerFactory;
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.util.ThreadStore;
-import org.objectweb.proactive.core.util.ThreadStoreFactory;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-
 
 public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     java.io.Serializable {
@@ -121,9 +121,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected MigrationManagerFactory migrationManagerFactoryInstance;
     protected RemoteBodyFactory remoteBodyFactoryInstance;
     protected ThreadStoreFactory threadStoreFactoryInstance;
-	protected ProActiveGroupManagerFactory proActiveGroupManagerFactoryInstance;
+    protected ProActiveGroupManagerFactory proActiveGroupManagerFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
-	protected ProActiveSecurityManager proActiveSecurityManager;
+    protected ProActiveSecurityManager proActiveSecurityManager;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -136,7 +136,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
         remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
         threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-		proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
+        proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
     }
 
     /**
@@ -156,7 +156,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
             remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
             threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-			proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
+            proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
         }
     }
 
@@ -210,9 +210,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return threadStoreFactoryInstance;
     }
 
-	public ProActiveGroupManagerFactory newProActiveGroupManagerFactory() {
-		return proActiveGroupManagerFactoryInstance;
-	}    
+    public ProActiveGroupManagerFactory newProActiveGroupManagerFactory() {
+        return proActiveGroupManagerFactoryInstance;
+    }
 
     public ProActiveComponentFactory newComponentFactory() {
         return componentFactoryInstance;
@@ -249,9 +249,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return new ThreadStoreFactoryImpl();
     }
 
-	protected ProActiveGroupManagerFactory newProActiveGroupManagerFactorySingleton() {
-		return new ProActiveGroupManagerFactoryImpl();
-	}    
+    protected ProActiveGroupManagerFactory newProActiveGroupManagerFactorySingleton() {
+        return new ProActiveGroupManagerFactoryImpl();
+    }
 
     protected ProActiveComponentFactory newComponentFactorySingleton(
         ComponentParameters initialComponentParameters) {
@@ -275,24 +275,24 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             //}
         }
     }
-    // end inner class RequestFactoryImpl
 
+    // end inner class RequestFactoryImpl
     protected static class ReplyReceiverFactoryImpl
         implements ReplyReceiverFactory, java.io.Serializable {
         public ReplyReceiver newReplyReceiver() {
             return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
         }
     }
-    // end inner class ReplyReceiverFactoryImpl
 
+    // end inner class ReplyReceiverFactoryImpl
     protected static class RequestReceiverFactoryImpl
         implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
         }
     }
-    // end inner class RequestReceiverFactoryImpl
 
+    // end inner class RequestReceiverFactoryImpl
     protected class RequestQueueFactoryImpl implements RequestQueueFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
@@ -305,8 +305,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             }
         }
     }
-    // end inner class RequestQueueFactoryImpl
 
+    // end inner class RequestQueueFactoryImpl
     protected static class MigrationManagerFactoryImpl
         implements MigrationManagerFactory, java.io.Serializable {
         public MigrationManager newMigrationManager() {
@@ -318,17 +318,25 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             //}
         }
     }
-    // end inner class MigrationManagerFactoryImpl
 
+    // end inner class MigrationManagerFactoryImpl
     protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory,
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
-                if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
+                if ("ibis".equals(System.getProperty(
+                                "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is ibis");
                     }
                     return new org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter(body);
+                } else if ("http".equals(System.getProperty(
+                                "proactive.communication.protocol"))) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Factory is http");
+                    }
+
+                    return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmi");
@@ -341,24 +349,24 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             }
         }
     }
-    // end inner class RemoteBodyFactoryImpl
 
+    // end inner class RemoteBodyFactoryImpl
     protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory,
         java.io.Serializable {
         public ThreadStore newThreadStore() {
             return new org.objectweb.proactive.core.util.ThreadStoreImpl();
         }
     }
+
     // end inner class ThreadStoreFactoryImpl
+    protected static class ProActiveGroupManagerFactoryImpl
+        implements ProActiveGroupManagerFactory, java.io.Serializable {
+        public ProActiveGroupManager newProActiveGroupManager() {
+            return new ProActiveGroupManager();
+        }
+    }
 
-	protected static class ProActiveGroupManagerFactoryImpl implements ProActiveGroupManagerFactory,
-		java.io.Serializable {
-			public ProActiveGroupManager newProActiveGroupManager() {
-				return new ProActiveGroupManager();
-		}
-	}
-	// end inner class ProActiveGroupManagerFactoryImpl
-
+    // end inner class ProActiveGroupManagerFactoryImpl
     protected class ProActiveComponentFactoryImpl
         implements ProActiveComponentFactory, java.io.Serializable {
         // COMPONENTS
@@ -373,14 +381,13 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             return new ProActiveComponentImpl(componentParameters, myBody);
         }
     }
-    
+
     // SECURITY
-	public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
-		this.proActiveSecurityManager = psm;
-	}
+    public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
+        this.proActiveSecurityManager = psm;
+    }
 
-	public ProActiveSecurityManager getProActiveSecurityManager() {
-		return proActiveSecurityManager;
-	}
-
+    public ProActiveSecurityManager getProActiveSecurityManager() {
+        return proActiveSecurityManager;
+    }
 }

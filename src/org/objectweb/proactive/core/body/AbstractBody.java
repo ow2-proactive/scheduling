@@ -1,4 +1,4 @@
-/*
+/* 
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -12,7 +12,7 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful, 
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
@@ -918,7 +918,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected abstract void internalReceiveReply(Reply reply)
-        throws java.io.IOException;
+        throws java.io.IOException;   
 
     protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
         localBodyStrategy = localBody;
