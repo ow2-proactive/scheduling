@@ -1,0 +1,23 @@
+#!/bin/sh
+
+compteur=0
+limite=`expr $1 - 1`
+while [ $compteur -le $limite ]; 
+do
+filename=$(echo "handlerLarge"$compteur".java")
+echo "" > $filename
+echo "package benchmark.nfe;" >> $filename
+echo "import org.objectweb.proactive.core.exceptions.handler.HandlerCommunicationException;" >> $filename
+echo "public class handlerLarge"$compteur" extends HandlerCommunicationException {" >> $filename
+echo "double a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q;" >> $filename
+echo "public int foo;" >> $filename
+echo "public int bar;" >> $filename
+echo "public boolean truth;" >> $filename
+echo "public char option;" >> $filename
+echo "public int[] toto;" >> $filename
+echo "public handlerLarge"$compteur"() {" >> $filename
+echo " toto = new int[1000];" >> $filename
+echo "}" >> $filename
+echo "}" >> $filename
+compteur=`expr $compteur + 1` 
+done;

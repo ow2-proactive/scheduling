@@ -1,0 +1,18 @@
+#!/bin/sh
+
+compteur=0
+limite=`expr $1 - 1`
+while [ $compteur -le $limite ]; 
+do
+filename=$(echo "handlerMedium"$compteur".java")
+echo "" > $filename
+echo "package benchmark.nfe;" >> $filename
+echo "import org.objectweb.proactive.core.exceptions.handler.HandlerCommunicationException;" >> $filename
+echo "public class handlerMedium"$compteur" extends HandlerCommunicationException {" >> $filename
+echo "public int foo;" >> $filename
+echo "public int bar;" >> $filename
+echo "public boolean truth;" >> $filename
+echo "public char option;" >> $filename
+echo "}" >> $filename
+compteur=`expr $compteur + 1` 
+done;

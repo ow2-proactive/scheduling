@@ -38,6 +38,8 @@ import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
 import testsuite.manager.ProActiveBenchManager;
+import benchmark.nfe.BenchMigrationHandlerizable;
+import benchmark.nfe.BenchSettingNFE;
 import benchmark.objectcreation.newactive.BenchNewActive;
 import benchmark.objectcreation.turnactive.BenchTurnActive;
 
@@ -254,6 +256,84 @@ public class BenchCenter extends ProActiveBenchManager {
         test2.setName(test2.getName() + " -- Remote VM");
         objectCreation.add(test2);
         add(objectCreation);
+ 
+		// NFE 
+		  Group nfe = new Group("NFE", "Non Functional Exception Mechanism");
+        
+		  // Test handler setting
+		  BenchSettingNFE benchNFEsameVM;
+		  benchNFEsameVM = new BenchSettingNFE(getSameVMNode(), 0);
+		  benchNFEsameVM.setName(benchNFEsameVM.getName() + " on same VM with 0 handler");
+		  nfe.add(benchNFEsameVM);
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+			  benchNFEsameVM = new BenchSettingNFE(getSameVMNode(), nb_handler);
+			  benchNFEsameVM.setName(benchNFEsameVM.getName() + " on same VM with " + nb_handler + " handlers");
+			  nfe.add(benchNFEsameVM);
+		  }
+		  BenchSettingNFE benchNFElocalVM;
+		  benchNFElocalVM = new BenchSettingNFE(getLocalVMNode(), 0);
+		  benchNFElocalVM.setName(benchNFElocalVM.getName() + " on local VM with 0 handler");
+		  nfe.add(benchNFElocalVM);
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+			  benchNFElocalVM = new BenchSettingNFE(getLocalVMNode(), nb_handler);
+			  benchNFElocalVM.setName(benchNFElocalVM.getName() + " on local VM with " + nb_handler + " handlers");
+			  nfe.add(benchNFElocalVM);
+		  }
+		  BenchSettingNFE benchNFEremoteVM;
+		  benchNFEremoteVM = new BenchSettingNFE(getRemoteVMNode(), 0);
+		  benchNFEremoteVM.setName(benchNFEremoteVM.getName() + " on remote VM with 0 handler");
+		  nfe.add(benchNFEremoteVM);
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+			  benchNFEremoteVM = new BenchSettingNFE(getRemoteVMNode(), nb_handler);
+			  benchNFEremoteVM.setName(benchNFEremoteVM.getName() + " on remote VM with " + nb_handler + " handlers");
+			  nfe.add(benchNFEremoteVM);
+		  }
+
+		  // Test NFE mechanism in action (i.e. migration)		
+		  BenchMigrationHandlerizable benchMigNFE;
+		  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), 0, "handler");
+		  benchMigNFE.setName(benchMigNFE.getName() + " with 0 standard handler on a Local VM");
+		  nfe.add(benchMigNFE);		
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+				  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), nb_handler, "handler");
+				  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " standard handler on a Local VM");
+				  nfe.add(benchMigNFE);
+		  }
+
+		  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), 0, "handler");
+		  benchMigNFE.setName(benchMigNFE.getName() + " with 0 standard handler on a Remote VM");
+		  nfe.add(benchMigNFE);
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+				  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), nb_handler, "handler");
+				  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " standard handler on a Remote VM");
+				  nfe.add(benchMigNFE);
+		  }
+		
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+					  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), nb_handler, "handlerMedium");
+					  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " medium-sized handler on a Local VM");
+					  nfe.add(benchMigNFE);
+		  }
+		
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+					  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), nb_handler, "handlerMedium");
+					  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " medium-sized handler on a Remote VM");
+					  nfe.add(benchMigNFE);
+		  }
+		
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+					  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getLocalVMNode(), nb_handler, "handlerLarge");
+					  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " large-sized handler on a Local VM");
+					  nfe.add(benchMigNFE);
+		  }
+		
+		  for (int nb_handler=1; nb_handler<=1024; nb_handler*=2) {
+					  benchMigNFE = new BenchMigrationHandlerizable(getSameVMNode(), getRemoteVMNode(), nb_handler, "handlerLarge");
+					  benchMigNFE.setName(benchMigNFE.getName() + " with " + nb_handler + " large-sized handler on a Remote VM");
+					  nfe.add(benchMigNFE);
+		  }
+		
+		  add(nfe); 
     }
 
     public static void main(String[] args) {
