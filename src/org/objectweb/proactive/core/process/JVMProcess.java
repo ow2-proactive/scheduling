@@ -87,6 +87,18 @@ public interface JVMProcess extends ExternalProcess {
   public void setPolicyFile(String policyFilePath);
   
   
+	/**
+	 * Returns the location of the log4j property file.
+	 * @return String the location of the log4j property file
+	 */ 
+  public String getLog4jFile();
+  
+  
+	/**
+	 * Sets the location of the log4j property file.
+	 * @param The value of the path to the log4j property file
+	 */
+  public void setLog4jFile(String log4fFilePath);
   
 	/**
 	 * Returns the class name that this process is about to start
