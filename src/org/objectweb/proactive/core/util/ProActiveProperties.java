@@ -64,9 +64,9 @@ public final class ProActiveProperties {
     }
 
     protected static void loadDefaultProperties() {
-        defaultProperties.setProperty(PROACTIVE_DEFAULT_SCHEMA_VALIDATION,
-            "disable");
-        ProActiveProperties.addPropertiesToSystem(defaultProperties);
+//        defaultProperties.setProperty(PROACTIVE_DEFAULT_SCHEMA_VALIDATION,
+//            "enable");
+        //ProActiveProperties.addPropertiesToSystem(defaultProperties);
     }
 
     /**
