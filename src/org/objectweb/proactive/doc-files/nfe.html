@@ -1,0 +1,705 @@
+<html>
+<head>
+<title>Exception Handling Pattern: Non-Functional Exceptions</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FAQ.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<H1>Exception Handling Pattern: Handling Non-Functional Exceptions in ProActive Applications</h1>
+
+<p class="textNormal">
+<A HREF=#chapter1>1. What are Non-Functional Exceptions ?</A><BR>
+<A HREF=#chapter2>2. The Handlers Mechanism</A><BR>
+<A HREF=#chapter3>3. Users API</A><BR>
+<A HREF=#chapter4>4. Creating a Handling Strategy : A Disconnected Mode for PDA Applications</A><BR>
+<A HREF=#chapter5>5. Performances</A><BR>
+<A HREF=#chapter6>6. Dealing with Non-Functional Exceptions in ProActive Contributions</A><BR>
+<A HREF=#chapter7>7. Architecture and Implementation</A><BR>
+
+<BR>
+
+<A NAME="chapter1">
+<h2>&nbsp;What are Non-Functional Exceptions ?</h2>
+<p class="textNormal">
+A few years ago, <b>Aspect-oriented Programming</b> defined <b>non-functional properties</b> (security, persistence, transaction...)
+to allow the separation of concerns (for instance, see <a href="http://aspectj.org">AspectJ website</a>). Distribution can be considered 
+as a non-functional property especially in ProActive where distributed mechanisms are oftenly transparents. Unfortunately, exceptions related to 
+distribution, raised from <B>non-functional properties</B> (i.e. network, Java RMI or JVM), are still propagated to application code (functional level). 
+<b>Non-functional exceptions</b> signal the various failures of non-functional properties, i.e. failures related to distribution in ProActive. 
+Handlers of non-functional exceptions allow both middleware or application handling strategies. Nevertheless, exception are handled firstly in non-functional
+property whenever it's possible. This mechanism is the result of intensive work and has been presented at  EHOOS'03 (ECOOP Workshop) (article <a href="ECOOP2003w.pdf">here</a>).
+</p>
+
+<p class="textNormal">
+As we know, <b>non-functional exceptions (NFE)</b> signal abnormal behaviour of non-functional properties (ie. distribution) and replace the "useless"
+java.io.IOException. By the way, NFEs encapsulate RMI exceptions and add both context (i.e. JVM) and exception informations. For simplicity, they are 
+gathered into a <b>hierarchy</b> based on inheritance. This classification is also used by the handling mechanism (see below).
+</p>
+
+<BR>
+
+<div align="center"><img src="Exceptions.gif"/>
+<p class="textNormal"><b>Figure 1 : Hierarchy of Non-Functional Exceptions for Distribution</b></p>
+</div>
+
+<BR>
+
+<p class="textNormal">
+Some failures are well-known in the RMI world. All of them have been transformed into NFEs to be relevant with the handlers mechanism. Note that java RMI 
+offer a larger panel of RMI exceptions than before, but unfortunately, still too limited for advanced handling strategies. The following list is not 
+exhaustive and should be seen as an example for any future extension to the mechanism.
+</p> 
+<menu>
+<li class="textNormal"><B>java.io.IOException</B> raised from <B>sendRequest</B> methods are always transformed into <B>sendRequestCommunicationException</B>
+<li class="textNormal"><B>ProActiveException</B> raised during <B>migration</B> are tranformed into <B>serializationMigrationException</B>
+<li class="textNormal"><B>java.io.IOException</B> raised during the <B>creation of any active object</B> are transformed into <B>activeObjectCreationException</B>
+</menu>
+
+<BR>
+
+<p class="textNormal">
+All of the distributed exceptions can be found in the following packages. Creation of new NFEs is also possible, see the "ProActive Contribution" chapter.
+</p>
+<menu>
+<li class="textNormal"><b>Communication exceptions</b> : org.objectweb.proactive.core.exceptions.communication</li>
+<li class="textNormal"><b>Creation exceptions</b> : org.objectweb.proactive.core.exceptions.creation</li>
+<li class="textNormal"><b>Group exceptions</b> : org.objectweb.proactive.core.exceptions.group</li>
+<li class="textNormal"><b>Migration exceptions</b> : org.objectweb.proactive.core.exceptions.migration</li>
+<li class="textNormal"><b>Security exceptions</b> : org.objectweb.proactive.core.exceptions.security</li>
+<li class="textNormal"><b>Service exceptions</b> : org.objectweb.proactive.core.exceptions.service</li>
+</menu>
+
+<A NAME="chapter2">
+<h2>&nbsp;The Handlers Mechanism</h2>
+<p class="textNormal">
+<b>Handlers</b> are <b>exception managers</b> dedicated to non-functional exceptions. Every handler implements the
+following interface.
+<blockquote><pre>
+public Interface Handler implements java.io.Serializable {
+     <b>// Is the exception managed by the current handler ?</b>
+  public boolean isHandling(NonFunctionalException e);
+
+     <b>// Provide a treatment for handled exception(s)</b>
+  public void handle(NonFunctionalException e);
+}
+</pre></blockquote>
+
+<p class="textNormal">
+Then, handlers are gathered into static and dynamic structures to provide prioritized levels of handling. Research of handlers starts in the highest, most specific level 
+and continues in lower, more generic ones as long as no handler is found. Code is the most specific level while default is the most generic.
+</p>
+<menu>
+<li class="textNormal"><b>1. Default</b> : This static level is initialized in the core code and provides a basic handling behaviour to every distributed exception.</li>
+<li class="textNormal"><b>2. Virtual Machine</b> : This dynamic level is used to configure a general handling behaviour in every JVM.</li>
+<li class="textNormal"><b>3. Active Object or Proxy or Future</b> : The different components of active object can be protected with specific handlers.</li>
+<li class="textNormal"><b>4. Code</b> : Handlers can be set temporarily from functional or non functional code and refer to the try/catch mechanism.</li>
+</menu>
+<p class="textNormal">
+We claim that every single NFE must be handled in a strategy defined at default level, whatever this strategy is. This recommandation offer security for 
+the application (no more exception lost in the code !) and avoid intensive use of dynamic levels. We recommand also that the default level provide a
+middleware-oriented strategies according to the specificity of the middleware (for instance Peer to Peer, Client/Server or Desktop/Mobile applications) while
+higher levels (VM, AO, proxy, future or temporarily code) use dynamic handlers (created at runtime) to improve or specialize the basic strategy.
+Dynamic handlers, created or modified according to the context of the environment, offer flexibility to the strategy.
+</p>
+
+<A NAME="chapter3">
+<h2>&nbsp;Users API</h2>
+<H3>Specifications :</H3>
+<p class="textNormal">
+The API consists of only two static methods and is easy to learn for ProActive users. Methods can be call from functional or non functional code of the distributed applications.
+</p>
+
+<blockquote><pre>
+  public static void <b>setExceptionHandler</b>(HandlerClass, ExceptionClass, level, HandlerizableObject);
+</pre></blockquote>
+<p class="textNormal">
+This method binds a class of handler with a class of exception in the level specified in the parameters.
+
+<blockquote><pre>
+  public static Handler <b>unsetExceptionHandler</b>(ExceptionClass, level, HandlerizableObject);
+</pre></blockquote>
+<p class="textNormal">
+This method removes the class of handler associated to the given class of exception in the level specified in the parameters.
+Both methods require an additional parameter call HandlerizableObject as handler of the third level (Active Object or Proxy or Future)
+are associated to single object. This parameter shoudl be set to null when level is not the third one.
+
+<p class="textNormal">
+<H3>Example, protect an Active Object using active object level :</H3>
+</p>
+<p class="textNormal">
+The code shows how to associate handlers to any handlerizable objects. In this case, the mobile entity is protected during migration.
+Until now, it is necessary to specify the body of the handlerizable object instead of the object itself but this is
+subject to change in the near future.
+
+<blockquote><pre>
+     <b>// Creation of an active object</b>
+  RO remote = (RO) org.objectweb.proactive.ProActive.newActive("RO"*, null, remoteNode); // * or RO.getClass().getName()
+
+     <b>// Get the remote body associated to the object (body is a meta-object representing the active object, see MOP documentation)</b>
+  UniversalBody ro_body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remote).getProxy()).getBody();
+
+     <b>// If the configuration is made by the remote object itself, reference to the body must be obtained with</b>
+  UniversalBody ro_body = ProActive.getBodyOnThis();
+
+     <b>// Set exception handler to the active object (i.e. to the body) </b>
+     <b>// Remote object migrates now safely</b>
+  ProActive.setExceptionHandler(HandlerMigrationException.class, MigrationException.class, Handler.AO_LEVEL, ro_body);
+  remote.moveTo(destinationNode);
+ 
+     <b>// The handler is not useful anymore</b>
+  ProActive.unsetExceptionHandler(MigrationException.class, Handler.AO_LEVEL, ro_body);
+</blockquote></pre>
+
+<p class="textNormal">
+<H3>Level identifiers :</H3>
+</p>
+<p class="textNormal">
+This is the list of the constant used by the API to identify the different level of handling :
+<menu>
+<li class="textNormal"><B>Handler.DEFAULT_LEVEL</B> for <B>default level</B>
+<li class="textNormal"><B>Handler.JVM_LEVEL</B> for <B>VM level</B>
+<li class="textNormal"><B>Handler.AO_LEVEL</B> for <B>Active Object level</B>
+<li class="textNormal"><B>Handler.PROXY_LEVEL</B> for <B>proxy level</B>
+<li class="textNormal"><B>Handler.FUTURE_LEVEL</B> for <B>future level</B>
+<li class="textNormal"><B>Handler.CODE_LEVEL</B> for <B>code level</B>
+</menu>
+
+<p class="textNormal">
+<h3>How to customize handlers mechanism ?</H3>
+<p class="textNormal">
+You can overwrite NFEs and handlers of NFE. Thus, you can bind new informations to exceptions and create new handling behaviour for handlers of exceptions
+(just overwrite the method <i>public void handle(NonFunctionalException e)</i>). If you want to change or modify the hierarchy, you should 
+have a look to the technical documentation (see the last part of this documentation).
+
+<A NAME="chapter4">
+<h2>&nbsp;Creating a Handling Strategy : A Disconnected Mode for PDA Applications</h2>
+<p class="textNormal">
+Distributed applications for Personal Digital Assistants need an unconnected mode to handle errors of communication. As PDAs are mobile connections is often broken.
+The main requirement is to create a specific strategy to handle communication exceptions. We create then a dedicated handler who stores requests sent to unreachable PDAs 
+in a queue. Time by time, a thread checks if the connection is restored in order to deliver pending requests. Here is the (simplified) code for such a handler :
+<blockquote><pre>
+Class PDAHandler_CommunicationException implements Handler { 
+    
+    public boolean isHandling(NonFunctionalException e) { 
+        return (e instanceOf CommunicationException); 
+    } 
+
+    public void handle(NonFunctinalException e) { 
+
+        // A thread testing connectivity is created
+        // The thread is also in charge to deliver pending request
+        if (firstUse) { 
+            connectivityThread = new ConnectivityThread(); 
+        } 
+
+        // Then reified method calls are stored in the queue and exceptions are not propagated anymore 
+        queue.store(e.getReifiedMethodCall()); 
+    } 
+}
+</pre></blockquote>
+
+<p class="textNormal">
+Imagine a mobile object able to migrate on some wireless PDA. We just add the handler described above with the method of the API.
+The mobile object is now protected and the remote method call are safe from loss of connectivity : activity of the object is stored
+in the queue of pending requests and serve when the object is available again.
+<blockquote><pre>
+// Creation of a remote object containing  handlers 
+RO ro = (RO) ProActive.newActive("RO", "//io.inria.fr/VM1"); 
+
+// The PDA handler for communication exception is associated dynamically to the remote object
+setExceptionHandler(PDAHandler_CommunicationException.class, CommunicationException.class, Handler.AO_LEVEL, ro); 
+
+// Remote method calls become sound
+ro.foo();
+</pre></blockquote>
+
+<A NAME="chapter5">
+<h2>&nbsp;Performances</h2>
+<p class="textNormal">
+We did several tests showing interesting performance for the distributed applications. Overall performance remains even good with hundred handlers 
+despite this is a huge number of handlers for one single handlerizable object ! Handlerizable object should not have more than a few dozen especially
+the mobile object. Migration performance depends greatly of the serialization time. This is why strategy attached to mobile entity should carry on 
+a limited set of handlers.
+
+<BR>
+<BR>
+
+<TABLE ALIGN="center" WIDTH=100%>
+<TR>
+<TD align="center"><img src="bench0-use.jpg"></TD>
+<TD align="center"><img src="bench2-localmigration.jpg"></TD>
+<TD align="center"><img src="bench4-evolution.jpg"></TD>
+</TR>
+<TR>
+<TD align="center"><p class="textNormal"><b>Figure 1: Comparison Between try-catch-finally and NFE Mechanism</b></TD>
+<TD align="center"><p class="textNormal"><b>Figure 3: Performances of Protected Local Migration</b></TD>
+<TD align="center"><p class="textNormal"><b>Figure 5: Evolution of Migration Speed, iteration after iteration</b></TD>
+</TR>
+<TR>
+<TD align="center"><img src="bench1-setting.jpg"></TD>
+<TD align="center"><img src="bench3-remotemigration.jpg"></TD>
+<TD align="center"><img src="bench5-firstmigration.jpg"></TD>
+</TR>
+<TR>
+<TD align="center"><p class="textNormal"><b>Figure 2: NFE Configuration</b></TD>
+<TD align="center"><p class="textNormal"><b>Figure 4: Performances of Protected Remote Migration</b></TD>
+<TD align="center"><p class="textNormal"><b>Figure 6: First Migration According to Number of Handlers</b></TD>
+</TR>
+</TABLE>
+
+
+<A NAME="chapter6">
+<h2>&nbsp;Dealing with Non-Functional Exceptions in ProActive Contributions</h2>
+<p class="textNormal">
+Default handlers are statically created during ProActive initialization. They must not be removed nor overloaded at runtime because they are essential to the safety of distributed applications. 
+Nevertheless, the standard middleware-strategy is easily customizable before compilation. Just edit <i>ProActive.java</i> in org.objectweb.proactive and have a look to initialization code.
+Add new handlers after default level creation.
+<blockquote><pre>
+     <b>// Declaration of levels of exception handling</b>
+  static public HashMap defaultLevel = null;
+  static public HashMap VMLevel = null;
+  static public HashMap codeLevel = null;
+
+ 
+     <b>// Static initialization of ProActive</b>
+  static {
+	
+       <b>// Creation of the default level</b>
+    defaultLevel = new HashMap();	
+	
+       <b>// Setting default handlers used at default level</b>
+       <b>// VM and higher level are still set to null as long as they are empty</b>
+    setExceptionHandler(HandlerNonFunctionalException.class, NonFunctionalException.class, Handler.DEFAULT_LEVEL, null);
+    setExceptionHandler(HandlerCommunicationException.class, CommunicationException.class, Handler.DEFAULT_LEVEL, null);
+
+    // Other initializations follow...
+  }
+</blockquote></pre>
+
+<p class="textNormal">
+Programming new (re-programming old ?) features in ProActive requires an adaptation of the code to the mechanism. When you need new NFEs, you have to 
+adapt the try/catch mechanism as presented in the example below. A new method is available allowing the research for a handler of NFEs : searchExceptionHandler.
+<blockquote><pre>
+      <b>// Search a handler of NFEs according to the prioritized level</b>
+  public static Handler <b>searchExceptionHandler</b>(NonFunctionalException, HandlerizableObject);
+</pre></blockquote>
+
+<p class="textNormal">
+We can summarize the code adaptation to the following points :
+<menu>
+<li class="textNormal">1. Define a Distributed Exception within the hierarchy of non-functional exceptions.</li>
+<li class="textNormal">2. Create a handler from scratch or use an existing one matching the new defined exception.</li>
+<li class="textNormal">3. Adapt try/catch mechanism : encapsulate exceptions with NFEs and use <b>searchExceptionHandler</b>.</li>
+<li class="textNormal">4. Register handler during initialization or execution using <b>setExceptionHandler</b>.</li>
+</menu>
+
+<p class="textNormal">
+This example shows how to customize the handlers mechanism within a proactive application. The searchExceptionHandler method search the right 
+handler for a given exception. Keep in mind that the <b>research starts from higher priority levels</b>.
+<blockquote><pre>
+  try {
+ 
+     <b>// Reified method call as founded in the core of ProActive </b>
+     sendRequest(methodCall, null);
+
+  catch (ProActiveException e) {
+
+       <b>// Create a non functional exception encapsulating the network exception</b>
+    Context context = new ContextOfExecution();
+    NonFunctionalException nfe = new CommunicationException(e, context);
+
+       <b>// Research of the right handler for the given exception</b>
+       <b>// Give reference to any active object structure to use active object levels</b>
+    Handler handler = searchExceptionHandler(nfe, null);
+    handler.handle(nfe);
+  }
+</pre></blockquote>
+
+<A NAME="chapter7">
+<h2>&nbsp;Architecture and Implementation</h2>
+<p class="textNormal">
+The full mechanism is part of the package <i>org.objectweb.proactive.core.exception</i>
+
+<menu>
+<li class="textNormal"><b>Communication exceptions</b> : org.objectweb.proactive.core.exceptions.communication</li>
+<li class="textNormal"><b>Creation exceptions</b> : org.objectweb.proactive.core.exceptions.creation</li>
+<li class="textNormal"><b>Group exceptions</b> : org.objectweb.proactive.core.exceptions.group</li>
+<li class="textNormal"><b>Migration exceptions</b> : org.objectweb.proactive.core.exceptions.migration</li>
+<li class="textNormal"><b>Security exceptions</b> : org.objectweb.proactive.core.exceptions.security</li>
+<li class="textNormal"><b>Service exceptions</b> : org.objectweb.proactive.core.exceptions.service</li>
+<li class="textNormal"><b>Handlers of NFEs</b> : org.objectweb.proactive.core.exceptions.handler</li>
+</menu>
+
+<p class="textNormal">
+The NFEs inherit from the class <i>NonFunctionalException.java (package org.objectweb.proactive.core.exceptions).</i>
+This class inherits itself from <i>ProActiveException.java</i>.<BR>
+Handlers of NFEs inherits from <i>Handler.java (package org.objectweb.proactive.core.exceptions.handler)</i>
+
+<p class="textNormal">
+Here is the code of the three main functions of the API
+
+<H3>Users API : setExceptionHandler()</H3>
+<blockquote><pre>
+   /**
+     * Add one handler of Non Functional Exception (nfe) to a specific level.
+     * Similar handlers are overwritten except those at default level.
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param levelID An identificator for the level where the handler is added.
+     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
+     */
+    public static void setExceptionHandler(Class handler, Class exception,
+        int levelID, Object target) {
+
+     // Information
+        if (logger.isDebugEnabled()) {
+            logger.debug("*** SETTING " + handler.getName() + " FOR " +
+                exception.getName() + " AT " + levelID + "  LEVEL");
+        }
+
+        // To minimize overall cost, level are created during the association of the first handler
+        switch (levelID) {
+        case (Handler.ID_Default):
+            if (defaultLevel.get(exception) == null) {
+                defaultLevel.put(exception, handler);
+            }
+            break;
+        case (Handler.ID_VM):
+            if (VMLevel == null) {
+                VMLevel = new HashMap();
+            }
+            VMLevel.put(exception, handler);
+            break;
+        case (Handler.ID_Body):
+            // The target object must be a body
+            if (target != null) {
+                //	Get the body of the target object
+                UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                try {
+                    if (body instanceof ActiveBody) {
+                        // Local body
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("*** SET " + handler.getName() +
+                                " IN LOCAL BODY");
+                        }
+                        body.setExceptionHandler(handler, exception);
+                    } else if (body instanceof RemoteBodyAdapter) {
+                        // Remote body
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("*** SET " + handler.getName() +
+                                " HANDLER IN REMOTE BODY");
+                        }
+                        body.getRemoteAdapter().setExceptionHandler(handler,
+                            exception);
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while SETTING handler " +
+                            handler.getName() + " in BODY LEVEL");
+                    }
+                }
+            }
+            break;
+        case (Handler.ID_Proxy):
+            // The target object must be a proxy
+            if (((target != null) && target instanceof AbstractProxy)) {
+                try {
+                    ((AbstractProxy) target).setExceptionHandler(handler,
+                        exception);
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while SETTNG handler " +
+                            handler.getName() + " in PROXY LEVEL");
+                    }
+                }
+            }
+            break;
+        case (Handler.ID_Future):
+            break;
+        case (Handler.ID_Code):
+            if (codeLevel == null) {
+                codeLevel = new HashMap();
+            }
+            codeLevel.put(exception, handler);
+            break;
+        }
+    }
+</blockquote></pre>
+
+
+<H3>Users API : unsetExceptionHandler()</H3>
+<blockquote><pre>
+   /**
+     * Remove a handler associated to a class of non functional exceptions.
+     * @param exception A class of non functional exception which does not require the given handler anymore.
+     * @param levelID An identificator for the level where the handler is removed.
+     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
+     */
+    public static Handler unsetExceptionHandler(Class exception, int levelID,
+        Object target) {
+        
+        // We keep a trace of the removed handler
+        Class handlerClass = null;
+        Handler handler = null;
+
+        // The correct level is identified
+        HashMap level = null;
+        switch (levelID) {
+        // Default level must not be modified !
+        case (Handler.ID_Default):
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "*** ERROR : CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+            }
+            return null;
+        case (Handler.ID_VM):
+            if (VMLevel != null) {
+                handlerClass = (Class) level.remove(exception);
+            }
+            break;
+        case (Handler.ID_Body):
+            // The target object must be a body
+            if (((target != null) && target instanceof UniversalBody)) {
+                //	Get the body of the target object
+                UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                try {
+                    if (body instanceof ActiveBody) {
+                        // Local body
+                        body.unsetExceptionHandler(exception);
+                    } else if (body instanceof RemoteBodyAdapter) {
+                        // Remote body
+                        body.getRemoteAdapter().unsetExceptionHandler(exception);
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while UNSETTING handler for " +
+                            exception.getName() + " in BODY LEVEL");
+                    }
+                }
+            }
+            break;
+        case (Handler.ID_Proxy):
+            // The target object must be a proxy
+            if (((target != null) && target instanceof AbstractProxy)) {
+                // Create a request to associate handler to the distant body
+                try {
+                    handler = ((AbstractProxy) target).unsetExceptionHandler(exception);
+                    return handler;
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while UNSETTING handler for " +
+                            exception.getName() + " in PROXY LEVEL");
+                    }
+                }
+            }
+            break;
+        case (Handler.ID_Future):
+            break;
+        case (Handler.ID_Code):
+            if (codeLevel != null) {
+                handlerClass = (Class) level.remove(exception);
+            }
+        }
+
+        // Instantiation of the removed handler
+        if (handlerClass != null) {
+            try {
+                handler = (Handler) handlerClass.newInstance();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** REMOVE [" + handler.getClass().getName() +
+                        "] FOR [" + exception.getName() + "] AT LEVEL " +
+                        levelID);
+                }
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** ERROR during class [" +
+                        handlerClass.getName() + "] instantiation");
+                }
+            }
+        }
+        return handler;
+    }
+</blockquote></pre>
+
+
+<H3>Developers API : searchExceptionHandler()</H3>
+<blockquote><pre>
+
+     /**
+       * Search an appropriate handler for a given non functional exception.
+       * The search starts in the highest level and continue in lower levels. When no
+       * handler is available in one level, the search steps down into the hierarchy.
+       * @param ex Exception for which we search a handler.
+       * @param target An object which contains its own level.
+       * @return A reliable handler or null if no handler is available
+       */
+    public static Handler searchExceptionHandler(NonFunctionalException ex,
+        Object target) {
+
+        // Try to get an handler from code level
+        Handler handler = null;
+        if ((handler = searchExceptionHandler(ex.getClass(), codeLevel,
+                        Handler.ID_Code)) != null) {
+            return handler;
+        }
+
+        // Try to get a handler from object level (active object = body or proxy)
+        if (target != null) {
+            //	Get the body of the target object
+            UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+
+            // target is local body (i.e. active object level) ?			
+            if (target instanceof ActiveBody) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCH HANDLER IN LOCAL BODY");
+                }
+                try {
+                    HashMap map = ((UniversalBody) body).getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Body)) != null) {
+                        return handler;
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
+
+            // target is remote body (i.e. active object level) ?
+            if (target instanceof RemoteBodyAdapter) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCH HANDLER IN REMOTE BODY");
+                }
+                try {
+                    HashMap map = ((UniversalBody) body).getRemoteAdapter()
+                                   .getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Body)) != null) {
+                        return handler;
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
+
+            //	target is a proxy (i.e. a ref. to a body) ?			
+            if (target instanceof AbstractProxy) {
+                try {
+                    HashMap map = ((AbstractProxy) target).getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Proxy)) != null) {
+                        return handler;
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
+        }   
+
+        // Try to get an handler from VM level
+        if ((handler = searchExceptionHandler(ex.getClass(), VMLevel,
+                        Handler.ID_VM)) != null) {
+            return handler;
+        }
+
+        // At the end, get an handler from default level or return null
+        return searchExceptionHandler(ex.getClass(), defaultLevel,
+            Handler.ID_Default);
+    }
+
+
+   /**
+     * Search an appropriate handler for a given non functional exception.
+     * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
+     * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
+     * @param NFEClass Class of the non-functional exception for which a handler is searched.
+     * @param level The level where handlers are searched
+     * @param levelID Identificator of the level
+     * @return A reliable handler or null if no handler is available
+     */
+    public static Handler searchExceptionHandler(Class NFEClass, HashMap level,
+        int levelID) {
+
+        // Test level capacity
+        if ((level == null) || level.isEmpty()) {
+            return null;
+        }
+
+        // Retrieve an handler in the given level
+        Handler handler = null;
+        while ((handler == null) &&
+                (NFEClass.getName().compareTo(ProActiveException.class.getName()) != 0)) {
+            // Information
+            if (logger.isDebugEnabled()) {
+                logger.debug("*** SEARCHING HANDLER FOR " + NFEClass.getName() +
+                    " IN LEVEL " + levelID);
+            }
+
+            // Research algorithm
+            if (level.containsKey(NFEClass)) {
+                try {
+                    handler = (Handler) Class.forName(((Class) level.get(
+                                NFEClass)).getName()).newInstance();
+                } catch (Exception e) {
+                    if (e instanceof ClassNotFoundException) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("*** HANDLER FOR " +
+                                NFEClass.getName() + " IS INVALID");
+                        }
+                        break;
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            } else {
+                NFEClass = NFEClass.getSuperclass();
+            }
+        }
+
+        // We return the handler
+        return handler;
+    }
+</blockquote></pre>
+
+
+<H2>Contacts</H2>
+<p class="textNormal">
+Any questions, comments, remarks ? Feel free to contact me <A HREF=mailto:Alexandre.Genoud@sophia.inria.fr>here</A>
+
+<BR>
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2002 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>
