@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>ProActive guided tour</title>
+  <link rel="stylesheet" href="../../ProActive.css">
+</head>
+<body style="background-color: rgb(255, 255, 255);">
+<table width="100%">
+  <tbody> 
+  <tr> 
+    <td align="left" valign="middle"> 
+      <table cellpadding="2" cellspacing="0" border="1">
+        <tbody> 
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="migratablehello-execution.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="../synchronization.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+        </tbody> 
+      </table>
+    </td>
+    <td align="right" valign="top"> <a
+ href="http://www-sop.inria.fr/oasis/ProActive/"><img
+ src="../../ProActiveLogo200x34.gif" width="200" height="34"
+ border="0"></a> </td>
+  </tr>
+  </tbody> 
+</table>
+<hr>
+<h1>migration of graphical interfaces</h1>
+<p>Graphical interfaces are not serializable, yet it is possible to migrate them 
+  with ProActive.<br>
+  The idea is to associate the graphical object to an active object. The active 
+  object will control the activation and desactivation of this graphical entity 
+  during migrations. </p>
+<p>Of course, this is a very basic example, but you can later build more sophisticated 
+  frames. </p>
+<h2>Design of the application</h2>
+<p>We will write a new active object class, that extends MigratableHello. The 
+  sayHello method will create a window containing the hello message. This window 
+  is defined in the class HelloFrame</p>
+<img src="../pics/hello/hellogui.gif"> 
+<h2>Programming</h2>
+<h3>HelloFrameController</h3>
+<p>This class extends MigratableHello, and adds an activity and a migration strategy 
+  manager to the object .<br>
+  It creates a graphical frame upon call of the sayHello method.</p>
+<p>Here we have a more complex migration process than with the previous example. 
+  We need to make the graphical window disappear before and reappear in a new 
+  location after the migration (in this example though, we wait for a call to 
+  sayHello). The migration of the frame is actually controlled by a MigrationStrategyManager, 
+  that will be attached to the body of the active object.. An ideal location for 
+  this operation is the initActivity method (from InitActive interface), that 
+  we override.</p>
+<p>The MigrationStrategyManager defines methods such as "onDeparture", that can 
+  be configured in the application. For example here, the method "clean" will 
+  be called before the migration, conveniently killing the frame.</p>
+<p>The activity of an active object is </p>
+<pre><code>
+/**
+ *
+ * This class allows the "migration" of a graphical interface. A gui object is attached
+ * to the current class, and the gui is removed before migration, thanks to the use 
+ * of a MigrationStrategyManager
+ */
+public class HelloFrameController extends MigratableHello {
+
+	HelloFrame helloFrame;
+	MigrationStrategyManager migrationStrategyManager;
+
+	/**required empty constructor */
+	public HelloFrameController() {
+	}
+
+	/**constructor */
+	public HelloFrameController(String name) {
+		super(name);
+	}
+
+	/**
+	 * This method attaches a migration strategy manager to the current active object.
+	 * The migration strategy manager will help to define which actions to take before
+	 * and after migrating
+	 */
+	public void initActivity(Body body) {
+		// add a migration strategy manager on the current active object
+		migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) ProActive.getBodyOnThis());
+		// specify what to do when the active object is about to migrate
+		// the specified method is then invoked by reflection
+		migrationStrategyManager.onDeparture("clean");
+	}
+
+	/** factory for locally creating the active object
+	* @param name the name of the agent
+	* @return an instance of a ProActive active object of type HelloFrameController
+	*
+	*/
+	public static HelloFrameController createHelloFrameController(String name) {
+		try {
+			// creates (and initialize) the active object
+			HelloFrameController obj =
+				(HelloFrameController) ProActive.newActive(HelloFrameController.class.getName(), new Object[] { name });
+			return obj;
+		} catch (ActiveObjectCreationException aoce) {
+			System.out.println("creation of the active object failed");
+			aoce.printStackTrace();
+			return null;
+		} catch (NodeException ne) {
+			System.out.println("creation of default node failed");
+			ne.printStackTrace();
+			return null;
+		}
+	}
+
+	public void sayHello() {
+		if (helloFrame == null) {
+			helloFrame = new HelloFrame("Hello from " + getCurrentNodeName());
+			helloFrame.show();
+		}
+	}
+	
+	public String toString() {
+		return "fsdfsa";
+	}
+
+	public void clean() {
+		System.out.println("killing frame");
+		helloFrame.dispose();
+		helloFrame = null;
+		System.out.println("frame is killed");
+	}
+
+}
+
+
+</code></pre>
+<hr align="left">
+<h3>HelloFrame</h3>
+<p>This is an example of a graphical class that could be associated with the active 
+  object</p>
+<pre><code>
+/**
+ * This class allows the creation of a graphical window 
+ * with a text field
+ * 
+ */
+public class HelloFrame extends javax.swing.JFrame {
+
+	private javax.swing.JLabel jLabel1;
+
+	/** Creates new form HelloFrame */
+	public HelloFrame(String text) {
+		initComponents();
+		setText(text);
+	}
+
+	/** This method is called from within the constructor to
+	 * initialize the form.
+	 *	It will perform the initialization of the frame
+	 */
+	private void initComponents() {
+		jLabel1 = new javax.swing.JLabel();
+		addWindowListener(new java.awt.event.WindowAdapter() {
+			public void windowClosing(java.awt.event.WindowEvent evt) {
+				exitForm(evt);
+			}
+		});
+
+		jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+		getContentPane().add(jLabel1, java.awt.BorderLayout.CENTER);
+
+		pack();
+	}
+
+	/** Kill the frame */
+	private void exitForm(java.awt.event.WindowEvent evt) {
+		//        System.exit(0); would kill the VM !
+		dispose(); // this way, the active object agentFrameController stays alive
+	}
+
+	/**
+	 * sets the text of the label inside the frame
+	 */
+	private void setText(String text) {
+		jLabel1.setText(text);
+	}
+}
+</code></pre>
+<h2>Execution</h2>
+<p>
+<li>Similarly to the simple migration example, you will start remote nodes and 
+  specify a migration path.</li>
+<li>don't forget to set the security permissions</li>
+<li>you have 2 ways for handling the display of the graphical objects :</li>
+<ul>
+  <ul>
+    <li> look on the display screens of the machines<br>
+    </li>
+  </ul>
+</ul>
+<ul>
+  <ul>
+    <li>export the displays : in startNode.sh, you should add the following lines 
+      before the java command : 
+      <blockquote> 
+        <blockquote>
+          <p><code>DISPLAY=myhost:0<br>
+            export DISPLAY </code> </p>
+          <p>&nbsp;</p>
+        </blockquote>
+      </blockquote>
+    </li>
+  </ul>
+</ul>
+<br>
+<img src="../pics/hello/hellogui-snapshot.png" width=374 height=62 border=0><br>
+<span class="legend">The displayed window : it just contains a text label with 
+the location of the active object.</span> 
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" 
+border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" 
+href="../index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="migratablehello-requisites.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="migratablehello-programming_2.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a 
+href="http://www-sop.inria.fr/oasis/ProActive/"><img 
+src="../../ProActiveLogo200x34.gif" width="200" height="34" 
+border="0"/></a> </td>
+  </tr>
+</table>
+<hr>
+<h2>3. Programming</h2>
+<h3>3.1. the Hello class</h3>
+<p>You just have to reuse the Hello class from the previous example</p>
+<h3>3.2 write the migratable object : MigratableHello</h3>
+<p>MigratableHello being the active object itself, it has to :</p>
+<p>- implement the Serializable interface</p>
+<p>- provide a no-arg constructor</p>
+<p>- provide an implementation for using ProActive's migration mechanism.</p>
+<p>A new method getCurrentNodeLocation is added for the object to tell the node
+where it resides..</p>
+<p>A factory static method is added for ease of creation.</p>
+<blockquote> 
+  <p>Here is the code for this class :</p>
+  <pre><code>// the object that will be migrated active has to be Serializable
+public class MigratableHello extends InitializedHello implements Serializable {
+	/**
+	* Creates a new MigratableHello object.
+	*/
+	public MigratableHello() {
+	}
+	/**
+	* Creates a new MigratableHello object.
+	* 
+	* @param name the name of the agent
+	*/
+	// ProActive requires the active object to explicitely define (or redefine)
+	// the constructors, so that they can be reified
+	public MigratableHello(String name) {
+		super(name);
+	}
+
+	/** factory for locally creating the active object
+	* @param name the name of the agent
+	* @return an instance of a ProActive active object of type MigratableHello
+	*
+	*/
+	public static MigratableHello createMigratableHello(String name) {
+		try {
+			return (MigratableHello) ProActive.newActive(MigratableHello.class.getName(), new Object[] { name });
+		} catch (ActiveObjectCreationException aoce) {
+			System.out.println("creation of the active object failed");
+			aoce.printStackTrace();
+			return null;
+		} catch (NodeException ne) {
+			System.out.println("creation of default node failed");
+			ne.printStackTrace();
+			return null;
+		}
+	}
+	/** overriding the locator method so that we can add the ProActive node name
+	* @return the name of the host currently containing the object
+	*/
+	protected String getCurrentNodeName() {
+			return getLocalHostName() + "/" + ProActive.getBodyOnThis().getNodeURL();
+	}
+	/** method for migrating
+	* @param destination_node destination node
+	*/
+	public void moveTo(String destination_node) {
+		System.out.println("\n-----------------------------");
+		System.out.println("starting migration to node : " + destination_node);
+		System.out.println("...");
+		try {
+			// THIS MUST BE THE LAST CALL OF THE METHOD
+			ProActive.migrateTo(destination_node);
+		} catch (MigrationException me) {
+			System.out.println("migration failed : " + me.toString());
+		}
+	}
+}</code>
+</pre>
+  <p>Note that the call to the ProActive primitive is the last one of the method 
+    moveTo. See the <a href="../../Migration.html">manual</a> for more information.</p>
+<h4>&nbsp;</h4>
+</blockquote></body>
+</html>

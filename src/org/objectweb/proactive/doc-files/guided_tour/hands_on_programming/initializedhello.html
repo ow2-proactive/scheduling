@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" 
+border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" 
+href="../index.html">back 
+to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="clientserver.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="migratablehello-intro.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a 
+href="http://www-sop.inria.fr/oasis/ProActive/"><img 
+src="../../ProActiveLogo200x34.gif" width="200" height="34" 
+border="0"/></a> </td>
+  </tr>
+</table>
+<hr>
+
+<h1>Initialization of the activity</h1>
+
+<p>Active objects, as indicates their name, have an activity of their own (an internal thread).<br>
+It is possible to add pre and post processing to this activity, just by implementing the interfaces
+InitActive and EndActive, that define the methods initActivity and endActivity.</p>
+
+<p>The following example will help you to understand how and when you can initialize and clean the 
+activity.</p>
+
+<p>When instanciated, the activity of an object is automatically started, but it will first do what is written in
+the initActivity method.</p>
+
+<p>Ending the activity can only be done from inside the active object (i.e. from a call to its own body). This is the 
+reason why we have written a terminate method in the following example.</p>
+
+
+
+<h2>Design of the application</h2>
+<p>The InitializedHello class extends the Hello class, and implements the interfaces InitActive and EndActive.</p>
+<img src="../pics/hello/initializedhello.gif"> 
+<h2>Programming</h2>
+<h3>InitializedHello</h3>
+<p>initActivity and endActivity here just log messages onto the console, so you can see when they are called.</p>
+<p>initActivity is called at the creation of the active object, while endActive is called after the activity has terminated 
+(thanks to the method terminate).</p>
+
+
+<pre><code>
+public class InitializedHello extends Hello implements InitActive, EndActive{
+
+	/**
+	 * Constructor for InitializedHello.
+	 */
+	public InitializedHello() {
+	}
+
+	/**
+	 * Constructor for InitializedHello.
+	 * @param name
+	 */
+	public InitializedHello(String name) {
+		super(name);
+	}
+	/**
+	 * @see org.objectweb.proactive.InitActive#initActivity(Body)
+	 * This is the place where to make initialization before the object
+	 * starts its activity
+	 */
+	public void initActivity(Body body) {
+		System.out.println("I am about to start my activity");
+	}
+
+	/**
+	 * @see org.objectweb.proactive.EndActive#endActivity(Body)
+	 * This is the place where to clean up or terminate things after the
+	 * object has finished its activity
+	 */
+	public void endActivity(Body body) {
+		System.out.println("I have finished my activity");
+	}
+	
+
+	/**
+	 * this method will end the activity of the active object
+	 */
+	public void terminate() {
+		// the termination of the activity is done through a call on the
+		// terminate method of the body associated to the current active object
+		ProActive.getBodyOnThis().terminate();
+	}
+	
+
+}</code></pre>
+
+<h2>Execution</h2>
+<p>Execution is similar to the previous example. <br>
+In order to see the end of the activity, you will of course need to add a call to hello.terminate() !</p>
+
+</body>
+</html>

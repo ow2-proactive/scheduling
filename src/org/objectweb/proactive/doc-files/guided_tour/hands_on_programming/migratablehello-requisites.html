@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//Dtd HTML//EN">
+<html>
+  <head>
+    <title>ProActive guided tour</title>
+<link rel="stylesheet" href="../../ProActive.css">
+  </head>
+  <body bgcolor="#ffffff">
+<table width="100%">
+  <tr> 
+    <td align="left" valign="middle"> <table cellpadding="2" cellspacing="0" 
+border="1">
+        <tr> 
+          <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" 
+href="../index.html">back to index</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="migratablehello-design.html">prev</a>&nbsp;&nbsp;</td>
+          <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
+href="migratablehello-programming_1.html">next</a>&nbsp;&nbsp;</td>
+        </tr>
+      </table></td>
+    <td  align="right" valign="top"> <a 
+href="http://www-sop.inria.fr/oasis/ProActive/"><img 
+src="../../ProActiveLogo200x34.gif" width="200" height="34" 
+border="0"/></a> </td>
+  </tr>
+</table>
+<hr>
+<h2>2. Required conditions</h2>
+<p>The conditions for MigratableHello to be a migratable active object are : </p>
+<p>- it must have a constructor without parameters : this is a result of a 
+ProActive 
+  restriction : the active object having to implement a no-arg constructor. </
+p>
+<p>- implement the Serializable interface (as it will be transferred through the 
+  network).</>
+  
+<p></p>
+  <p>Hello, the superclass, must be able to be serialized, in order to be transferred remotely. It 
+  does not have to implement directly java.io.Serializable, but its attributes 
+  should be serializable - or transient. For more information on this topic, 
+check 
+  the <a 
+href="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Migration.html">manual</a>.</p><p></p>
+</body>
+</html>
