@@ -216,6 +216,7 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     /**
     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveComponent()
     */
+    // COMPONENTS
     public ProActiveComponent getProActiveComponent()
         throws java.io.IOException {
         return proxiedRemoteBody.getProActiveComponent();
