@@ -42,7 +42,7 @@ public class ClassServer implements Runnable {
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
     protected static int port;
-    protected static String hostname;
+    protected String hostname;
 
     static {
         String newport = System.getProperty("proactive.http.port");
@@ -67,6 +67,18 @@ public class ClassServer implements Runnable {
         this(0, null);
     }
 
+    
+    protected ClassServer(int port_) throws java.io.IOException {
+        if (port == 0) {
+            port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
+        } else {
+            port = port_;
+            server = new java.net.ServerSocket(port);
+        }
+        hostname = java.net.InetAddress.getLocalHost().getHostAddress();
+        newListener();
+    }
+    
     /**
      * Constructs a ClassServer that listens on <b>port</b> and
      * obtains a class's bytecodes using the method <b>getBytes</b>.
@@ -80,7 +92,7 @@ public class ClassServer implements Runnable {
         if (port_ == 0) {
             port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
         } else {
-            port = port_;
+        	port = port_;
             server = new java.net.ServerSocket(port);
         }
 
