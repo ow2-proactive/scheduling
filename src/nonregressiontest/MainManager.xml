@@ -40,7 +40,26 @@
 			<unitTest class="nonregressiontest.group.scatter.Test" />
 			<unitTest class="nonregressiontest.group.oneserialization.Test" />
 			<unitTest class="nonregressiontest.group.exception.Test" />
+			<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
+			<unitTest class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
 	</packageGroup>
+	
+    <interLinkedGroup name="components interlinked tests" description="creation, assembly, binding, local and remote">
+		<idTest class="nonregressiontest.component.creation.local.newactive.composite.Test" id="1" />
+		<idTest class="nonregressiontest.component.assembly.local.Test" id="2" />
+		<idTest class="nonregressiontest.component.binding.local.Test" id="3" />
+		<interLinks>
+			<!-- local tests -->
+			<link id="2">
+				<parent id="1" />
+			</link>
+			<link id="3">
+				<parent id="2" />
+			</link>
+		</interLinks>
+	</interLinkedGroup>
+	
+	
 	
 	<!--<log4j>../compile/proactive-log4j</log4j>-->
 	
