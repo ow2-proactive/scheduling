@@ -43,12 +43,13 @@ PATH=$JAVA_HOME/bin:$PATH
 cd ../../src 
 
 PROACTIVE=../.
+export PROACTIVE
 
 # ----
 # Set up the classpath using classes dir or jar files
 # 
-workingDir=`dirname $0`
-. $workingDir/env.sh
+#workingDir=`dirname $0`
+. $PROACTIVE/scripts/unix/env.sh
 
 echo "compiling java files in org/objectweb/proactive/examples/$1/"
 javac -d ../classes org/objectweb/proactive/examples/$1/*.java

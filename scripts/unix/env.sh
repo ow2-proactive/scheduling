@@ -4,8 +4,12 @@
 # This variable should be set to the directory where is installed ProActive
 #
 
+if [ ! $PROACTIVE ]
+then
 workingDir=`dirname $0`
 PROACTIVE=$workingDir/../../.
+fi
+
 
 # ----------------------------------------------------------------------------
 
