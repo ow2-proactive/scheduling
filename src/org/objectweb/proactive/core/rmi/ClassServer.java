@@ -192,7 +192,6 @@ public class ClassServer implements Runnable {
                 e.printStackTrace();
 
                 return;
-            } finally {
             }
         }
     }
