@@ -14,7 +14,7 @@ public class NodeControler {
     protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Xmx256m -Djava.compiler=NONE ";
     // protected static final String JAVA = "/usr/local/jdk1.3.1/bin/java  -Xmx256m  -Djava.compiler=NONE ";
     private static final String NODECLASS = " org.objectweb.proactive.rmi.StartNode ";
-    private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:/u/tuba/0/oasis/fhuet/proactive-tmp:.";
+    private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:.";
     protected static final String USER = "fhuet";
 
     protected static final String JAVA_NESSIE = " /u/dea_these/fhuet/java.sh ";

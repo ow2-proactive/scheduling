@@ -31,47 +31,30 @@
 <h1>ProActive Installation</h1>
 
 <p class="textNormal">
-ProActive is made available for download to both non-profit organizations (such as universities and research institutions) and
-commercial companies for evaluation purpose. Please note that the base license does not cover the commercial use of the product for which
-any interested person or organization is asked to contact the authors : <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>.
+ProActive is made available for download under a <a href="http://www.gnu.org/copyleft/lesser.txt">LGPL license</a>.
 </p><p class="textNormal">
 Installing ProActive is easy, provided the following steps are followed:
 </p>
 
-<h2>Step 1: Check system requirements</h2>
+<h2>Check system requirements</h2>
 <p class="textNormal">
-ProActive requires Java 2 (commonly known as JDK 1.3) to be installed on your computer. If you do not yet have it, you can
+ProActive requires JDK 1.3 or later to be installed on your computer. If you do not yet have it, you can
 download the JDK 1.3 bundle from <a href="http://java.sun.com/j2se/1.3/">Sun's web site</a>.
 </p><p class="textNormal">
 Please note that ProActive will NOT run with any version prior 1.2 since some features introduced in JDK 1.2 are essential to
-ProActive. ProActive \emph{should} work with any version of Java to come <b>after</b> JDK 1.3. To check which version of Java your
-computer is running, simply type the following command line at your command prompt:
-</p>
-
-<blockquote><pre>
-> java -version
-java version "1.3.0"
-Java(TM) 2 Runtime Environment, Standard Edition (build 1.3.0)
-Java HotSpot(TM) Client VM (build 1.3.0, mixed mode)
-</pre></blockquote>
-
-<p class="textNormal">
-The output may vary with the operating system or the implementation of Java you're running, but it should always
-mention <code>1.3</code> somewhere, like in the example above.
-</p><p class="textNormal">
+ProActive.
 As ProActive is implemented using Java RMI, you also need to check that
 your machine supports the TCP/IP network protocol, even if you do not plan to
 run distributed applications. TCP/IP is always installed by default on Unix
 machines but may not be installed at all on some Windows machines.
 </p>
 
-<h2>Step 2: Download the archive</h2>
-You can download the archive file (a standard <b>zip</b> file) containing ProActive from the <a href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download section</a> of the ProActive home page. You will be asked to accept the licence agreement and provide a few personal details including your email address. You will then within a few minutes receive an email explaining how to download the archive file.
-
-<h2>Step 3: Expand the archive</h2>
+<h2>Download and expand the archive</h2>
 <p class="textNormal">
-ProActive comes as a ZIP archive file, which should make it easily expandable under Windows or Unix or any other operating system. Unzip
-the archive using your favorite ZIP program, such as <a href="http://www.winzip.com/">Winzip</a> under Windows or the <a href="http://www.info-zip.org/pub/infozip/">unzip</a> command-line utility on most Unix systems. Unzipping the archive creates a <b>ProActive</b> directory and all the files contained in the archive go into this directory and its
+You can download the archive file (a standard <b>zip</b> file) containing ProActive from the <a href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download section</a> of the ProActive home page. You will be asked to accept the licence agreement and provide a few personal details including your email address. You will then within a few minutes receive an email. 
+</p>
+<p class="textNormal">
+Unzip the archive using your favorite ZIP program, such as <a href="http://www.winzip.com/">Winzip</a> under Windows or the <a href="http://www.info-zip.org/pub/infozip/">unzip</a> command-line utility on most Unix systems. Unzipping the archive creates a <b>ProActive</b> directory and all the files contained in the archive go into this directory and its
 subdirectories.
 </p>
 <p class="textNormal">
@@ -83,152 +66,46 @@ Here is a quick overview of the directory structure of the archive:
         <th class="navyCell">Description</th>
     </tr>
     <tr>
-        <td class="navyCell"><code>ProActive.jar</code></td>
+        <td class="whiteCell"><b><code>ProActive.jar</code></b></td>
         <td class="whiteCell">ProActive bytecode that you need to include in the CLASSPATH in order to use ProActive</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>ProActive_examples.jar</code></td>
+        <td class="whiteCell"><b><code>ProActive_examples.jar</code></td>
         <td class="whiteCell">The bytecode and resources of all examples included with ProActive. This jar file needs to be included in the CLASSPATH only when trying to run the examples. All examples rely on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH as well. This is done automatically by the scripts driving the examples. The source code is also included in the src directory (see below)</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>ic2d.jar</code></td>
+        <td class="whiteCell"><b><code>ic2d.jar</code></b></td>
         <td class="whiteCell">The bytecode and resources of IC2D. This jar file needs to be included in the CLASSPATH only when trying to run the application IC2D. IC2D relies on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH. This is done automatically by the scripts launching the application. The source code is also included in the src directory (see below)</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>src</code></td>
-        <td class="whiteCell">Root directory for the source (.java) files of all examples included with ProActive and of the application IC2D</td>
+        <td class="whiteCell"><b><code>lib</code></b></td>
+        <td class="whiteCell">The external libraries used by ProActive</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>doc</code></td>
+        <td class="whiteCell"><b><code>docs</code></b></td>
         <td class="whiteCell">ProActive documentation including the full api doc</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>scripts/unix</code></td>
+        <td class="whiteCell"><b><code>scripts/unix</code></b></td>
         <td class="whiteCell">Unix <i>sh</i> scripts for running the examples</td>
     </tr>
     <tr>
-        <td class="navyCell"><code>scripts/windows</code></td>
+        <td class="whiteCell"><b><code>scripts/windows</code></b></td>
         <td class="whiteCell">Windows <i>.bat</i> batch files for running the examples</td>
+    </tr>
+    <tr>
+        <td class="whiteCell"><b><code>src</code></b></td>
+        <td class="whiteCell">For source version only, the full source code of ProActive</td>
+    </tr>
+    <tr>
+        <td class="whiteCell"><b><code>compile</code></b></td>
+        <td class="whiteCell">For source version only, the scripts to compile ProActive using Ant.</td>
     </tr>
 </table>
 
 
-<h2>Step 4 (optional): Update your CLASSPATH</h2>
-<p class="textNormal">
-<i>If you use the scripts provided with the distribution to run the examples you do not need to update your classpath</i>
-</p>
-<p class="textNormal">
-When running java code using ProActive, you need to
-make sure that the CLASSPATH includes two new entries. The first
-entry is the JAR file containing ProActive. The second entry is
-the directory where ProActive outputs the stub classes it
-generates on-the-fly.
-</p><p class="textNormal">
-A small utility is provided to output the value of those two
-entries. It is called <code>install</code> and can be found in the
-scripts directory located in ProActive. It comes in both flavors:
-<code>install.sh</code> for Unix systems and <code>install.bat</code> for
-Windows.
-</p>
-<blockquote><pre>
-On a Unix system, the output looks as follows:
-
-bash-2.05$ ./install.sh
-
-----------------------------------------------------------
-
-JVM version: 1.3.0
-
-The two entries you need to add to your CLASSPATH are:
-
-/usr/home/bob/ProActive/ProActive.jar
-/usr/home/bob/proactive-tmp
-
-
-----------------------------------------------------------
-</pre></blockquote>
-<p class="textNormal">
-On a Windows system, the output looks as follows:
-</p>
-<blockquote><pre>
-C:\bob\ProActive\scripts>install.bat
-
-----------------------------------------------------------
-
-JVM version: 1.3.1-rc1
-
-The two entries you need to add to your CLASSPATH are:
-
-C:\bob\ProActive\ProActive.jar
-C:\WINNT\Profiles\bob\proactive-tmp
-
-
-----------------------------------------------------------
-
-Press a key to continue . . .
-</pre></blockquote>
-<p class="textNormal">
-Of course, the output will look something different on your
-system. In the example above, the user's home directory is
-<code>/usr/home/bob</code> and the archive containing ProActive was
-unzipped directly inside. Note that the directory
-<code>/usr/home/bob/proactive-tmp</code> was automatically created in
-order to hold the stub files generated by ProActive.
-</p><p class="textNormal">
-You do not need to modify your CLASSPATH permanently as long as
-you include the two entries above using a Java IDE or a shell
-script. The examples bundled with ProActive set-up
-the CLASSPATH automatically in order to include those two entries
-as well as the JAR file containing the examples code. As long as
-you run the examples from the directory they are located you do
-not need to change anything.
-<br></br>
-If not you need to update the environment file that specifies
-where is the ProActive install directory and the proactive-tmp
-directory. On Unix systems, the file is called \texttt{env.sh} and
-is located in <code>ProActive/scripts/unix</code>. On Windows systems,
-the file is called <code>env.bat</code> and is located in
-<code>ProActive/scripts/windows</code>.
-</p>
-<p class="textNormal">
-On Unix systems the file <code>ProActive/scripts/unix/env.sh</code>
-contains the following values by default :
-</p>
-<blockquote><pre>
-    PROACTIVE=../../.
-    PROACTIVE_TEMP=$HOME/proactive-tmp
-</pre></blockquote>
-
-<p class="textNormal">
-On Windows systems the file <code>ProActive/scripts/windows/env.bat</code>
-contains the following values by default :
-</p>
-<blockquote><pre>
-    set PROACTIVE=..\..\.
-    set PROACTIVE_TEMP=%USERPROFILE%\proactive-tmp
-</pre></blockquote>
-
-<p class="textNormal">
-By default, the <code>proactive-tmp</code> directory is located inside your home directory. Note that on Windows NT, the home directory is <code>C:\WINNT\Profiles\yourWindowsLoginName</code> and that on Windows 2000 and Windows XP, the home directory is <code>C:\Documents and Settings\yourWindowsLoginName</code>
-</p>
-
-<h2>Step 5 (optional): Create a java.policy file to set permissions</h2>
-<p class="textNormal">
-<i>If you use the scripts provided with the distribution to run the examples an existing policy file will be used by default</i>
-</p>
-<p class="textNormal">
-See <a href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions in the JavaTM 2 SDK</a> to learn more about Java permissions.
-As a first approximation to run your code you can create a simple policy file granted all for everything :
-</p>
-<blockquote><pre>
-grant {
-    permission java.security.AllPermission;
-};
-</pre></blockquote>
-
-
 <h2>Run a few examples for testing</h2>
-You are now ready to run the test applications provided with ProActive. Each example comes with a script for launching
+You can try to run the test applications provided with ProActive. Each example comes with a script for launching
 the application. Depending on you operating system, the script you need to launch is located either in <code>ProActive/scripts/unix</code>
 <code>ProActive/scripts/windows</code>.
 The source code of all examples can be found in the directory <code>ProActive/src/org/objectweb/proactive/examples</code>.
@@ -263,6 +140,43 @@ This example is based on a easy to use Swing GUI.
 </ul>
 </p>
 
+<h2>CLASSPATH to set when writing application using ProActive</h2>
+<i>Note that if you use the scripts provided with the distribution to run the examples you do not need to update your classpath.</i>
+<p class="textNormal">
+In order to use <b>ProActive</b> in your application you need to place in your <code>CLASSPATH</code> the following jars files :
+<ol>
+	<li><code><b>ProActive.jar</b></code> : the library itself</li>
+	<li><code><b>bcel.jar</b></code> in <code>lib</code> directory : the Byte Code Engineering Library is used to dynamically generate the java bytecode of the Stubs</li>
+</ol>
+</p>
+<p class="textNormal">
+You do not need to modify your CLASSPATH permanently as long as you include the two entries above using a Java IDE or a shell script.
+</p>
+<p class="textNormal">
+In addition to the two jar files above you may want to add the following jar files. None of them are used directly by the core functionnalities of ProActive but only in part of the library. Their are needed to compile all the code but they are not needed at runtime if those specific functionnalities are not used. 
+<ol>
+	<li><code>bouncycastle.jar, javaxCrypto.jar</code> : used in the security</li>
+	<li><code>crimson.jar</code> : parser XML used in the descriptor</li>
+	<li><code>jaxp.jar</code> : Java API for XML parsing used in the descriptor. Note that this API is included with JDK 1.4</li>
+	<li><code>jini-core.jar, jini-ext.jar, reggie.jar, sun-util.jar</code> : used to interface with Jini</li>
+	<li><code>globus.jar</code> : used to interface with Globus</li>
+</ol>
+</p>
+
+<h2>Create a java.policy file to set permissions</h2>
+<p class="textNormal">
+<i>If you use the scripts provided with the distribution to run the examples an existing policy file will be used by default</i>
+</p>
+<p class="textNormal">
+See <a href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions in the JavaTM 2 SDK</a> to learn more about Java permissions.
+As a first approximation to run your code you can create a simple policy file granted all for everything :
+</p>
+<blockquote><pre>
+grant {
+    permission java.security.AllPermission;
+};
+</pre></blockquote>
+
 
 <h2>Troubleshooting and support</h2>
 If you encounter any problem with installing ProActive and running the
@@ -274,20 +188,7 @@ mistakes:
 
 <li class="textNormal">
 <b>Java complains about not being able to find ProActive's classes.</b>
-Your <code>CLASSPATH</code> environment variable does not contain the entry for the directory where ProActive's classes are located. The path to this directory is given to you by the
-<code>install</code> utility, as described in step 3.
-</li>
-
-<li class="textNormal">
-<b>ProActive complains about not being able to load stub classes.</b>
-Your <code>CLASSPATH</code> environment variable does not contain the entry for the directory where ProActive's classes are located. The path to this directory is given to you by the
-<code>install</code> utility, as described in step 3.
-Your <code>CLASSPATH</code> environment variable does not contain an entry for the directory where ProActive outputs the stubs classes (<code>proactive-tmp</code> directory). The path to this directory is given to you by the <code>install</code> utility, as described in step 3.
-</li>
-
-<li class="textNormal">
-<b>ProActive complains about not being to bind to the rmiregistry.</b>
-The <code>RMIRegistry</code> has not been launched.
+Your <code>CLASSPATH</code> environment variable does not contain the entry for the ProActive's or BCEL's classes. <code>ProActive.jar</code> and <code>BCEL.jar</code> must be in your <code>CLASSPATH</code>.
 </li>
 
 <li class="textNormal">

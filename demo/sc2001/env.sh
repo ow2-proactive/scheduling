@@ -9,17 +9,6 @@ PROACTIVE=$workingDir/../../.
 
 # ----------------------------------------------------------------------------
 
-
-
-# ----------------------------------------------------------------------------
-#
-# This variable should be set to the directory where is installed ProActive
-#
-
-PROACTIVE_TEMP=$HOME/proactive-tmp
-
-# ----------------------------------------------------------------------------
-
 JAVA_HOME=${JAVA_HOME-NULL};
 if [ "$JAVA_HOME" = "NULL" ]
 then
@@ -32,30 +21,9 @@ exit 127
 fi
 
 # ----
-# Try to set proactive-tmp to the right place
-# 
-# -- try to set proactive-tmp at the same level as ProActive directory
-if [ ! -d $PROACTIVE_TEMP ]
-then
-    PROACTIVE_TEMP=$workingDir/../../../proactive-tmp
-fi
-# -- try to set proactive-tmp one level above ProActive directory
-if [ ! -d $PROACTIVE_TEMP ]
-then
-    PROACTIVE_TEMP=$workingDir/../../../../proactive-tmp
-fi
-# -- proactive-tmp not created yet : back up to user directory
-if [ ! -d $PROACTIVE_TEMP ]
-then
-    PROACTIVE_TEMP=$HOME/proactive-tmp
-fi
-
-echo "PROACTIVE_TEMP="$PROACTIVE_TEMP
-
-# ----
 # Set up the classpath using classes dir or jar files
 # 
-CLASSPATH=.:$PROACTIVE_TEMP
+CLASSPATH=.
 if [ -d $PROACTIVE/classes ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes
@@ -68,11 +36,29 @@ if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
 fi
+if [ -f $PROACTIVE/ic2d.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
+fi
+if [ -f $PROACTIVE/lib/jini-core.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-core.jar
+fi
+if [ -f $PROACTIVE/lib/jini-ext.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-ext.jar
+fi
+if [ -f $PROACTIVE/lib/reggie.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
+fi
+if [ -f $PROACTIVE/lib/bcel.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+fi
 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
 JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy"
 export JAVACMD
-
-#$workingDir/copyFiles.sh

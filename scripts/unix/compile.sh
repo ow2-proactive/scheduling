@@ -13,7 +13,6 @@ if [ $# -ne 1 ]; then
       + algebra
       + binarytree
       + boundedbuffer
-      + collaborative
       + cruisecontrol
       + cs (client - server)
       + doctor

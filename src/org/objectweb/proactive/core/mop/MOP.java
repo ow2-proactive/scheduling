@@ -52,66 +52,39 @@ public abstract class MOP {
 
   protected static String ROOT_INTERFACE_NAME = "org.objectweb.proactive.core.mop.Reflect";
   protected static Class ROOT_INTERFACE;
-  /**
-   * If file is locked; time between retries
-   */
 
-  protected static long TIME_BETWEEN_RETRIES = 1000;
   /**
    * Class array representing no parameters
    */
-
-  protected static final Class[] EMPTY_CLASS_ARRAY;
+  protected static final Class[] EMPTY_CLASS_ARRAY = new Class[0];
+  
   /**
    * Empty object array
    */
-
-  protected static final Object[] EMPTY_OBJECT_ARRAY;
+  protected static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+  
   /**
    * Class array representing (Constructor Call, Object[])
    */
-
-  protected static Class[] PROXY_CONSTRUCTOR_PARAMETERS_TYPES_ARRAY;
+  protected static Class[] PROXY_CONSTRUCTOR_PARAMETERS_TYPES_ARRAY = new Class[2];
+  
   /**
    * A Hashtable to cache (reified class, stub class constructor) couples.
    */
-
-  protected static java.util.Hashtable stubTable;
+  protected static java.util.Hashtable stubTable = new java.util.Hashtable();
   /**
    * A Hashtable to cache (proxy class, proxy class constructor) couples
    */
 
-  protected static java.util.Hashtable proxyTable;
+  protected static java.util.Hashtable proxyTable = new java.util.Hashtable();
   /**
    * A Hashtable to cache (Class name, proxy class name) couples
    * this is meant for class-based reification
    */
 
-  protected static java.util.Hashtable secondProxyTable;
+  protected static java.util.Hashtable secondProxyTable = new java.util.Hashtable();;
 
-  /**
-   * A hashtable for caching (target object/its local stub reference)
-   */
-
-  //    protected static Hashtable proxyOnThisTable;
-
-  /**
-   * We need to know all CLASSPATh entries in order to locate the bytecode
-   * file for a given class because at some point we want to know the date
-   * of creation of this file
-   */
-
-  protected static java.io.File[] classPathEntries;
-  /**
-   * For performance and convenience purposes, we keep this value at hand
-   */
-
-  static String fileSeparator;
-  /**
-   * The compiler
-   */
-
-  private static Compiler comp;
+  protected static MOPClassLoader singleton = MOPClassLoader.createMOPClassLoader();
 
   /**
    *	As this class is center to the API, its static initializer is
@@ -119,18 +92,6 @@ public abstract class MOP {
    */
 
   static {
-    // Simply initializes these
-    stubTable = new java.util.Hashtable();
-    proxyTable = new java.util.Hashtable();
-    secondProxyTable = new java.util.Hashtable();
-    //        proxyOnThisTable = new Hashtable();
-
-    // Initializes various constants
-    EMPTY_CLASS_ARRAY = new Class[0];
-    EMPTY_OBJECT_ARRAY = new Object[0];
-
-    PROXY_CONSTRUCTOR_PARAMETERS_TYPES_ARRAY = new Class[2];
-
     try {
       PROXY_CONSTRUCTOR_PARAMETERS_TYPES_ARRAY[0] = forName("org.objectweb.proactive.core.mop.ConstructorCall");
     } catch (ClassNotFoundException e) {
@@ -151,59 +112,6 @@ public abstract class MOP {
       throw new CannotFindClassException(ROOT_INTERFACE_NAME);
     }
 
-    // Initializes classPathEntries
-    String classPath;
-    String pathSeparator;
-    String pathElement;
-    java.io.File pathFile;
-    java.util.Vector classPathElements;
-    java.util.Vector classPathFiles;
-    java.util.Enumeration en;
-    int index0, index1;
-    boolean endReached;
-
-    classPath = System.getProperty("java.class.path");
-    pathSeparator = System.getProperty("path.separator");
-    fileSeparator = System.getProperty("file.separator");
-    classPathElements = new java.util.Vector();
-    classPathFiles = new java.util.Vector();
-    index0 = 0;
-    index1 = classPath.indexOf(pathSeparator);
-    endReached = false;
-    while (!(endReached)) {
-      if (index1 != -1) {
-        pathElement = classPath.substring(index0, index1);
-      } else {
-        pathElement = classPath.substring(index0);
-        endReached = true;
-      }
-      classPathElements.addElement(pathElement);
-      index0 = index1 + pathSeparator.length();
-      index1 = classPath.indexOf(pathSeparator, index1 + pathSeparator.length());
-    }
-
-    en = classPathElements.elements();
-    while (en.hasMoreElements()) {
-      pathElement = (String)en.nextElement();
-      pathFile = new java.io.File(pathElement);
-      if (pathFile != null) {
-        if (pathFile.exists()) {
-          classPathFiles.addElement(pathFile);
-        }
-      } else {
-      }
-    }
-
-    classPathEntries = new java.io.File[classPathFiles.size()];
-
-    en = classPathFiles.elements();
-    java.io.File currentFile;
-    java.io.File targetFile;
-    int index = 0;
-    while (en.hasMoreElements()) {
-      currentFile = (java.io.File)en.nextElement();
-      classPathEntries[index++] = currentFile;
-    }
   }
 
 
@@ -214,28 +122,6 @@ public abstract class MOP {
    */
   public static Class forName(String s) throws java.lang.ClassNotFoundException {
     return Class.forName(s);
-  }
-
-
-  /**
-   *	This method is here to perform a lazy instanciation of the compiler
-   */
-  static Compiler getCompiler() {
-    if (comp == null)
-      comp = new JDKCompiler();
-    return comp;
-  }
-
-
-  /**
-   * Generates a stub class
-   * @param nameOfClass The name of the class needing stubs
-   */
-  public static void generateStubClass(String nameOfClass) throws ClassNotFoundException, ClassNotReifiableException {
-    Class targetClass;
-    targetClass = forName(nameOfClass);
-    checkClassIsReifiable(targetClass);
-    findStubConstructor(targetClass);
   }
 
 
@@ -442,188 +328,13 @@ public abstract class MOP {
     
     
     protected static Class createStubClass(String nameOfClass) {
-	if (MOPProperties.getGenerateBytecode ())
-	    {
-		return createStubClassBytecodeVersion (nameOfClass);
-	    }
-	else
-	    {
-		return createStubClassSourceVersion (nameOfClass);	
-	    }
-    }
-
-    protected static MOPClassLoader singleton;
-
-  protected static Class createStubClassBytecodeVersion(String nameOfClass) {
-      // We simply install a specific classloader that will create the stub
-      // class if it does not already exist
-      if (singleton==null)
-	  {
-	      singleton = MOPClassLoader.createMOPClassLoader ();
-	  }
-
-      try
-	  {
-	      Class cl = Class.forName(Utils.convertClassNameToStubClassName(nameOfClass), true, singleton);
-	      return cl;
-	  }
-      catch (ClassNotFoundException e)
-	  {
-	      return null;
-	  }
-  }
-            
-    protected static Class createStubClassSourceVersion(String nameOfClass) {
-	// Find the directory where to write the stub source file
-	// If it does not exist, let's create it
-    String stubName = Utils.convertClassNameToStubClassName(nameOfClass);
-    String directoryName = MOPProperties.getStubsOutputDirectory() + Utils.getRelativePath(stubName);
-    String sourceFileName = Utils.getSimpleName(stubName) + ".java";
-    String logFileName = Utils.getSimpleName(stubName) + ".log";
-    String lockFileName = Utils.getSimpleName(stubName) + ".lock";
-    java.io.File sourceDirectory = new java.io.File(directoryName);
-    boolean lockDeleteAllowed = false;
-    java.io.File lockFile = null;
-    
-    if (!(sourceDirectory.exists()))
-      sourceDirectory.mkdirs();
-
-    // Determines if we have sufficient privileges to delete the lock file
-    if (MOPProperties.getUseLockFiles()) {
-      try {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null)
-          sm.checkDelete(lockFileName);
-        lockDeleteAllowed = true;
-      } catch (java.lang.SecurityException e) {
-        lockDeleteAllowed = false;
-      }
-
-      // Creates a File object to represent the lock file
-      // this does not imply that the file is automatically created
-      // if it does not exist
-      lockFile = new java.io.File(sourceDirectory, lockFileName);
-
-      // does lock already exist ?
-      if (lockFile.exists()) {
-        System.err.println("Lock file exits. Waiting for compile to finish");
-        System.err.println("If it lasts too long, try removing file " + lockFile + " by hand");
-        while (lockFile.exists()) {
-          System.err.print(".");
-          try {
-            Thread.sleep(TIME_BETWEEN_RETRIES);
-          } catch (InterruptedException e) {
-          }
-        }
-        System.err.println("");
-
-        // Lock no more exists
-        // Checks whether the class has been succesfully compiled
-        // (by someone else), or if it does not yet exits (if lock has been
-        // manually removes)
-        Class test;
-        try {
-          test = forName(stubName);
-          // If the class is found, it means someone else has done the job
-          // for us, then there's no need to continue
-          return test;
-        } catch (ClassNotFoundException e) {
-          // Try it again
-          return createStubClass(nameOfClass);
-        }
-      } else {
-        // Creates the lock file before starting compiling
-        // Don't create it if we cannot remove it latter
-        if (lockDeleteAllowed) {
-          try {
-            java.io.FileOutputStream lockfos = new java.io.FileOutputStream(lockFile);
-            // If we do not close the stream, we may never be able to delete the file
-            lockfos.close();
-          } catch (java.io.IOException e) {
-            System.err.println("Cannot create lock file " + lockFile + ". Proceeding anyway.");
-          }
-        }
-      }
-    }// End of condition 'if we use lock files'
- 
-
-    java.io.File sourceFile = null;
-    java.io.File logFile = null;
-    java.io.Writer sourceWriter = null;
-    java.io.Writer logWriter = null;
-    // Creates the source code and the related log file
-    //long t1 = System.currentTimeMillis();
     try {
-      sourceFile = new java.io.File(directoryName, sourceFileName);
-      logFile = new java.io.File(directoryName, logFileName);
-      sourceWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(sourceFile)));
-      logWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(logFile)));
-      ReifiedClassModel target;
-      try {
-        target = new ReifiedClassModel(nameOfClass, sourceWriter, logWriter);
-      } catch (ClassNotFoundException e) {
-        throw new GenerationOfStubClassFailedException("Cannot find class " + nameOfClass);
-      }
-      target.create();
-
-      sourceWriter.flush();
-      logWriter.flush();
-    } catch (java.io.IOException e) {
-      throw new GenerationOfStubClassFailedException("File error with writing source file or log file:" + e);
-    } finally {
-      try {
-	if (sourceWriter != null)
-	    sourceWriter.close();
- 	if (logWriter != null)
-	    logWriter.close();
-      } catch (java.io.IOException e) {}
-    }
-    //long t2 = System.currentTimeMillis();
-    //System.out.println("Generated in "+(t2-t1));
-    // Calling the compiler
-    boolean compilationresult = false;
-
-    System.err.print("Now compiling " + sourceFile.getName() + "... ");
-    
-    try {
-      getCompiler().compile(sourceFile);
-    } catch (java.io.IOException e) {
-      throw new GenerationOfStubClassFailedException("Compilation of class " + stubName + " failed.", e);
-    }
-    
-    if (MOPProperties.getUseLockFiles()) {
-      // Deletes the lock
-      if (lockDeleteAllowed) {
-        if (! lockFile.delete()) {
-          //System.err.println("\nCannot delete lock file " + lockFile + "\n");
-        }
-      }
-    }
-
-    // Whatever is the result of the compilation, we have to delete the
-    // source file of the stub
-    if (!(MOPProperties.getKeepSource())) {
-      if (! sourceFile.delete()) {
-        //System.err.println("Cannot delete source file " + sourceFile);
-      }
-    }
-
-    System.out.println("OK");
-    int tryCount = 0;
-    while (true) {
-      try {
-        return forName(stubName);
-      } catch (ClassNotFoundException e) {
-        throw new GenerationOfStubClassFailedException("Cannot find stub class " + stubName + ", even though its compilation succeeded. Check CLASSPATH settings.");
-      } catch (java.lang.ClassFormatError e) {
-        // infamous error that may append randomly : we try again to load
-        tryCount++;
-        //System.out.println(" eh eh !!!!!!!!!!!!!!!!");
-        if (tryCount >= 2)
-          throw new GenerationOfStubClassFailedException("Error in the format of the generated class for " + stubName + ".");
-      }
-    }
+      Class cl = Class.forName(Utils.convertClassNameToStubClassName(nameOfClass), true, singleton);
+      return cl;
+  } catch (ClassNotFoundException e) {
+      return null;
   }
+    }
 
 
   /**
@@ -642,7 +353,7 @@ public abstract class MOP {
    * @param targetClass the representation of the class
    * @return The Constructor object.
    */
-  static Constructor findStubConstructor(Class targetClass) {
+  private static Constructor findStubConstructor(Class targetClass) {
     Constructor stubConstructor;
     String nameOfClass = targetClass.getName();
 
@@ -653,19 +364,9 @@ public abstract class MOP {
     if (stubConstructor == null) {
       Class stubClass;
       try {
-        // Checks if the stub is newer than the class
-        // If so, regenarate and recompile it
-        if (shouldRegenerateStub(nameOfClass)) {
-          System.out.println("MOP: Stub class does not exist or is older than class " + nameOfClass + ". Regenerating stub class");
-          stubClass = createStubClass(nameOfClass);
-        } else {
-          // completes normally if the stub class exists and has not
-          // already been loaded
           stubClass = forName(Utils.convertClassNameToStubClassName(nameOfClass));
-        }
-      }
+      } catch (ClassNotFoundException e) {
         // No stub class can be found, let's create it from scratch
-      catch (ClassNotFoundException e) {
         stubClass = createStubClass(nameOfClass);
       }
 
@@ -687,7 +388,7 @@ public abstract class MOP {
    * @return the Constructor
    * @throws InvalidProxyClassException If the class is not a valid Proxy
    */
-  static Constructor findProxyConstructor(Class proxyClass) throws InvalidProxyClassException {
+  private static Constructor findProxyConstructor(Class proxyClass) throws InvalidProxyClassException {
     Constructor proxyConstructor;
 
     // Localizes the proxy class constructor
@@ -707,7 +408,7 @@ public abstract class MOP {
   }
 
 
-  protected static StubObject instanciateStubObject(Constructor stubConstructor) throws ConstructionOfStubObjectFailedException {
+  private static StubObject instanciateStubObject(Constructor stubConstructor) throws ConstructionOfStubObjectFailedException {
     try {
 	Object o =  stubConstructor.newInstance(EMPTY_OBJECT_ARRAY);
       return (StubObject) o;
@@ -814,7 +515,7 @@ public abstract class MOP {
    * @return the name of the proxy class
    * @throws CannotGuessProxyNameException If the MOP cannot guess the name of the proxy
    */
-  protected static String guessProxyName(Class targetClass) throws CannotGuessProxyNameException {
+  private static String guessProxyName(Class targetClass) throws CannotGuessProxyNameException {
     int i;
     Class cl;
     Class myInterface = null;
@@ -876,7 +577,7 @@ public abstract class MOP {
    * @param targetConstructorArgs The arguments which will determine wich constructor is to be used
    * @return The corresponding Constructor
    */
-  protected static Constructor investigateAmbiguity(Class targetClass, Class[] targetConstructorArgs) {
+  private static Constructor investigateAmbiguity(Class targetClass, Class[] targetConstructorArgs) {
     // Find the number of possible constructors ambiguities
     int n = 1;
     for (int i = 0; i < targetConstructorArgs.length; i++) {
@@ -901,7 +602,7 @@ public abstract class MOP {
    * @param the effective arguments
    * @return The constructor
    */
-  static Constructor findReifiedConstructor(Class targetClass, Class[] targetConstructorArgs) {
+  private static Constructor findReifiedConstructor(Class targetClass, Class[] targetConstructorArgs) {
     Constructor[] publicConstructors;
     Constructor currentConstructor;
     Class[] currentConstructorParameterTypes;
@@ -932,87 +633,13 @@ public abstract class MOP {
 
 
   /**
-   *   Locates the file that contains the bytecode representation of the class
-   *   whose name is <code>classname</code>. If the .class file is included as part
-   *   of a jar or zip file, this method returns a File object that represents
-   *   the archive file.
-   */
-
-  protected static java.io.File locateClassFile(String className) {
-    java.io.File currentFile;
-    java.io.File targetFile;
-
-    // For each valid entry in the classpath
-    for (int i = 0; i < classPathEntries.length; i++) {
-      currentFile = classPathEntries[i];
-
-
-      // If this File is a directory
-      if (currentFile.isDirectory()) {
-        // Creates class file's supposed filename
-        String supposedFileName = currentFile.getAbsolutePath();
-        supposedFileName = supposedFileName + Utils.getRelativePath(className);
-        supposedFileName = supposedFileName + fileSeparator + Utils.getSimpleName(className) + ".class";
-
-        targetFile = new java.io.File(supposedFileName);
-        if (targetFile.exists())
-          return targetFile;
-      }
-    }
-
-    return null;
-  }
-
-
-  /**
-   * Checks whether a file is a zip file
-   * @param f the file
-   * @return true if file is a zip
-   */
-  protected static boolean isZIPFile(java.io.File f) {
-    try {
-      java.util.zip.ZipFile zipFile = new java.util.zip.ZipFile(f);
-    } catch (java.util.zip.ZipException e) {
-      return false;
-    } catch (java.io.IOException e) {
-      return false;
-    }
-    return true;
-  }
-
-
-  /**
-   * Checks whether the Stub should be re generated 
-   * @param className the name of the source class
-   * @return true if it should be generated
-   */
-  protected static boolean shouldRegenerateStub(String className) {
-    // If date checking is turned off, simply return false
-    if (! MOPProperties.getCheckStubDate()) return false;
-    // Locates the file that contains the class
-    java.io.File classFile = locateClassFile(className);
-
-    // Locates the stub class
-    String stubClassName = Utils.getPackageName(className) + ".Stub_" + Utils.getSimpleName(className);
-    java.io.File stubClassFile = locateClassFile(stubClassName);
-
-    // If we succeeded at locating both classes, check date difference
-    if ((classFile != null) && (stubClassFile != null)) {
-      return (stubClassFile.lastModified() - classFile.lastModified()) <= 0;
-    }
-    // By default, return false (which means don't regenerate stub class)
-    return false;
-  }
-
-
-  /**
    * Dynamic cast
    * @param sourceObject The source object
    * @param targetTypeName the destination class
    * @return The resulting object
    * @throws ReifiedCastException if the class cast is invalid
    */
-  public static Object castInto(Object sourceObject, String targetTypeName) throws ReifiedCastException {
+  private static Object castInto(Object sourceObject, String targetTypeName) throws ReifiedCastException {
     try {
       Class cl = forName(targetTypeName);
       return castInto(sourceObject, cl);
@@ -1030,7 +657,7 @@ public abstract class MOP {
    * @return The resulting object
    * @throws ReifiedCastException if the class cast is invalid
    */
-  public static Object castInto(Object sourceObject, Class targetType) throws ReifiedCastException {
+  private static Object castInto(Object sourceObject, Class targetType) throws ReifiedCastException {
     // First, check if sourceObject is a reified object
     if (!(isReifiedObject(sourceObject))) {
       throw new ReifiedCastException("Cannot perform a reified cast on an object that is not reified");

@@ -98,7 +98,7 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
   private static String tmpDir = 
     System.getProperty("user.home") + 
     System.getProperty("file.separator") + 
-    "proactive-tmp" +
+    "proactive-jini-log" +
     System.getProperty("file.separator") + 
     host;   
   

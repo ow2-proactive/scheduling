@@ -42,7 +42,6 @@ abstract class Utils extends Object {
   /**
    * Static variables
    */
-
   public static final Class JAVA_LANG_NUMBER = silentForName("java.lang.Number");
   public static final Class JAVA_LANG_CHARACTER = silentForName("java.lang.Character");
   public static final Class JAVA_LANG_BOOLEAN = silentForName("java.lang.Boolean");
@@ -119,33 +118,12 @@ abstract class Utils extends Object {
 
     // Final methods cannot be reified since we cannot redefine them
     // in a subclass
-    if (Modifier.isFinal(modifiers))
-      return false;
-
-
+    if (Modifier.isFinal(modifiers)) return false;
     // Static methods cannot be reified since they are not 'virtual'
-    if (Modifier.isStatic(modifiers))
-      return false;
-
-    // We choose not to reify private methods, because it doen not match
-    // the semantics of the 'private' keyword: a private method is never
-    // called from the outside of an object
-    if (MOPProperties.getReifyNonPublicMethods()) {
-      if (Modifier.isPrivate(modifiers))
-        return false;
-      else
-        return true;
-    } else {
-      if (!(Modifier.isPublic(modifiers)))
-        return false;
-    }
-
-
-
+    if (Modifier.isStatic(modifiers)) return false;
+    if (!(Modifier.isPublic(modifiers))) return false;
     // If method is finalize (), don't reify it
-    if ((met.getName().equals("finalize")) && (met.getParameterTypes().length == 0))
-      return false;
-
+    if ((met.getName().equals("finalize")) && (met.getParameterTypes().length == 0)) return false;
     return true;
   }
 

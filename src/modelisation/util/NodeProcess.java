@@ -22,9 +22,9 @@ public class NodeProcess {
     protected BufferedReader d_error;
     // protected BufferedReader d_standard;
     protected static final String JAVA_NESSIE = "/u/dea_these/fhuet/solaris/j2re1_3_0_02/bin/java  -Xmx256m ";
-    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/proactive-tmp:/u/dea_these/fhuet/java/classes";
+    protected static final String CLASSPATH_NESSIE = "/u/dea_these/fhuet/java/classes";
     protected static final String JAVA_SATURA = " /u/satura/0/oasis/fhuet/linux/bin/jdk1.3.0_02/bin/java";
-    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/proactive-tmp:/u/satura/0/oasis/fhuet/java/classes";
+    protected static final String CLASSPATH_SATURA = "/u/satura/0/oasis/fhuet/java/classes";
 
 
     // public NodeProcess(String className, String javaPath, String classPath, String nodeName, String hostName, String file) {

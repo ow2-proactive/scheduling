@@ -20,7 +20,6 @@ echo List of examples :
 echo   + algebra
 echo   + binarytree
 echo   + boundedbuffer
-echo   + collaborative
 echo   + cruisecontrol
 echo   + cs (client - server)
 echo   + doctor

@@ -9,7 +9,7 @@ $JAVACMD org.objectweb.proactive.rmi.StartNode //localhost/one &
 $JAVACMD org.objectweb.proactive.rmi.StartNode //localhost/two &
 sleep 3
 
-$JAVACMD org.objectweb.proactive.examples.penguin.Penguin //localhost/one //localhost/two
+$JAVACMD org.objectweb.proactive.examples.penguin.AdvancedPenguinControler //localhost/one //localhost/two
 
 killall java
 
