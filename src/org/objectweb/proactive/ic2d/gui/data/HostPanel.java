@@ -41,7 +41,8 @@ public class HostPanel extends AbstractDataObjectPanel
     private HostObject hostObject;
     protected java.awt.Dimension minimumSize = new java.awt.Dimension(150, 80);
     protected PanelPopupMenu popup;
-    private String alignLayout; //keep state of layout H or V
+    public String alignLayout; //keep state of layout H or V
+    public javax.swing.ButtonGroup group;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -57,11 +58,13 @@ public class HostPanel extends AbstractDataObjectPanel
         //else 
         setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
         createBorder(hostObject.getOperatingSystem());
-        WorldPanel parent =(WorldPanel) getParentDataObjectPanel(); // get parent
+        WorldPanel parent = (WorldPanel) getParentDataObjectPanel(); // get parent
+
         alignLayout(parent.getAlignLayout()); //the host default alignement is the worldpanel alignement
         // Popup menu
         popup = new PanelPopupMenu("Host " + name + " OS " +
                 hostObject.getOperatingSystem());
+        popup.addGenericMenu();
         popup.add(new javax.swing.AbstractAction("Look for new nodes", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     hostObject.createAllNodes();
@@ -76,10 +79,10 @@ public class HostPanel extends AbstractDataObjectPanel
             });
 
         /*** ebe 17/06/2004 adding layout menu item rb H V *************/
-        javax.swing.JMenu jvmLayoutJmenu = new javax.swing.JMenu("JVMLayout");
+        javax.swing.JMenu jvmLayoutJmenu = new javax.swing.JMenu("VM Layout");
         popup.add(jvmLayoutJmenu);
         //menu rb Horiz
-        javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+        group = new javax.swing.ButtonGroup();
         javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemHoriz = new javax.swing.JRadioButtonMenuItem(
                 "Horizontal");
         JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
@@ -97,11 +100,14 @@ public class HostPanel extends AbstractDataObjectPanel
                 }
             });
 
-        JRadioButtonMenuItemHoriz.setSelected(true);
+        if (alignLayout == "H") {
+            JRadioButtonMenuItemHoriz.setSelected(true);
+        } else {
+            JRadioButtonMenuItemVertic.setSelected(true);
+        }
+
         group.add(JRadioButtonMenuItemHoriz);
-        popup.add(JRadioButtonMenuItemHoriz);
         group.add(JRadioButtonMenuItemVertic);
-        popup.add(JRadioButtonMenuItemVertic);
 
         jvmLayoutJmenu.add(JRadioButtonMenuItemHoriz);
         jvmLayoutJmenu.add(JRadioButtonMenuItemVertic);
@@ -133,7 +139,7 @@ public class HostPanel extends AbstractDataObjectPanel
     // ebe 06/2004
     // set VM horiz or vertic layout for that host
     public void alignLayout(String align) {
-    	alignLayout=align;
+        alignLayout = align;
         setPreferredSize(null);
         if (align == "H") {
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
@@ -141,6 +147,7 @@ public class HostPanel extends AbstractDataObjectPanel
             setLayout(new javax.swing.BoxLayout(HostPanel.this,
                     javax.swing.BoxLayout.Y_AXIS));
         }
+
         this.alignLayoutChild(align); // 
         revalidate();
         repaint();
@@ -151,6 +158,18 @@ public class HostPanel extends AbstractDataObjectPanel
         java.util.Iterator iterator = childsIterator();
         while (iterator.hasNext()) {
             ((VMPanel) iterator.next()).alignLayout(align);
+        }
+    }
+
+    // switch rb for cohence called by worldpanel
+    public void switchAlignRb() {
+        java.util.Enumeration e = group.getElements();
+        javax.swing.JRadioButtonMenuItem rb1 = (javax.swing.JRadioButtonMenuItem) e.nextElement();
+        javax.swing.JRadioButtonMenuItem rb2 = (javax.swing.JRadioButtonMenuItem) e.nextElement();
+        if (rb1.isSelected()) {
+            rb2.setSelected(true);
+        } else {
+            rb1.setSelected(true);
         }
     }
 
@@ -225,10 +244,11 @@ public class HostPanel extends AbstractDataObjectPanel
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, defaultFont));
     }
-	/**
-	 * @return Returns the alignLayout.
-	 */
-	public String getAlignLayout() {
-		return alignLayout;
-	}
+
+    /**
+     * @return Returns the alignLayout.
+     */
+    public String getAlignLayout() {
+        return alignLayout;
+    }
 }
