@@ -141,8 +141,8 @@ public class SubMatrix {
 		b = this.old[index-1];
 		n = this.old[index];
 		a = this.old[index+1];
-		for (int y = 1 ; y < this.height-2 ; y++) {
-			for (int x = 1 ; x < this.width-2 ; x++) {
+		for (int y = 1 ; y < this.height-1 ; y++) {
+			for (int x = 1 ; x < this.width-1 ; x++) {
 				current = (b + a + this.old[index-this.width] + this.old[index+this.width])/4;
 				this.current[index] = current;
 				diff = Math.abs(current - n);
@@ -283,7 +283,7 @@ public class SubMatrix {
 	}
 
 	/**
-	 * Connects this submatrix with its neighbors
+	 * Connects this submatrix with its neighbors and send them its borders
 	 */
 	public void buildNeighborhood () {
 		this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
