@@ -66,6 +66,7 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -265,6 +266,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   	
   	ProActiveDescriptor proActiveDescriptor = null;
 	
+	ProActiveConfiguration.load();
 		try
 		{
 			proActiveDescriptor =

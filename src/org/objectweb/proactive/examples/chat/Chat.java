@@ -12,6 +12,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -273,6 +274,7 @@ public class Chat implements java.io.Serializable, RunActive {
 		String userName;
 		String neighbourHost = null;
 		String neighbourName = null;
+		ProActiveConfiguration.load();
 
 		if ((args.length != 1) && (args.length != 3)) {
 			logger.info("usage : chat.[sh|bat] UserName [ServerHost ServerName]");

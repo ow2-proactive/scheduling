@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.boundedbuffer;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 /**
  * <p>
  * A classical bounded buffer composed of cells. The buffer is shared by a
@@ -62,6 +64,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
 
 
   public static void main(String args[]) {
+	ProActiveConfiguration.load();
     new AppletBuffer("Bounded Buffer", 500, 300);
   }
 

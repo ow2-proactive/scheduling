@@ -30,15 +30,15 @@
 */
 package nonregressiontest;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.SimpleLayout;
-
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.xml.sax.SAXException;
 
 import testsuite.manager.ProActiveFuncTestManager;
-
-import java.io.File;
-import java.io.IOException;
 
 
 /**
@@ -79,6 +79,8 @@ public class MainManager extends ProActiveFuncTestManager {
         String path = MainManager.class.getResource(
                 "/nonregressiontest/MainManager.xml").getPath();
         File xml = new File(path);
+		ProActiveConfiguration.load();
+        
         try {
             manager = new MainManager(xml);
         } catch (Exception e) {

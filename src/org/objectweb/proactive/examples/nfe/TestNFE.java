@@ -32,8 +32,10 @@
 package org.objectweb.proactive.examples.nfe;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.*;
+import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
+import org.objectweb.proactive.core.exceptions.communication.SendRequestCommunicationException;
 import org.objectweb.proactive.core.exceptions.handler.HandlerNonFunctionalException;
 import org.objectweb.proactive.core.exceptions.handler.IHandler;
 
@@ -69,6 +71,7 @@ public class TestNFE {
 	// Main program
 	public static void main(String[] args) {
 	
+		ProActiveConfiguration.load();
 		// We need one arg : the name of a class of non functional exception
 		if (args.length != 1) {
 			System.out.println("Usage : java org.objectweb.proactive.examples.nfeCreation NFE");

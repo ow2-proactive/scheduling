@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.examples.philosophers;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
 
   //  private javax.swing.JButton bStart;
@@ -42,6 +44,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
   }
 
   public static void main(String args[]) {
+	ProActiveConfiguration.load();
     AppletPhil phil = new AppletPhil("Philosophers", 450, 300);
     phil.receiveMessage("Applet running...");
     if (args.length == 1) {
@@ -52,7 +55,7 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
 
   private void go() {
     try {
-      /* le Layout est necessairement actif, puisqu'il est referencé par tous les autres objets.
+      /* le Layout est necessairement actif, puisqu'il est referenc? par tous les autres objets.
        */
       theLayout = (DinnerLayout) org.objectweb.proactive.ProActive.turnActive(theLayout);
       if (url != null)

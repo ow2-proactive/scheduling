@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.binarytree;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 public class Main {
 	
@@ -39,6 +40,7 @@ public class Main {
     public static void main(String[] args) {
         Main theMainActiveObject = null;
         // Creates an active instance of this class
+		ProActiveConfiguration.load();
         try {
             theMainActiveObject = (Main)org.objectweb.proactive.ProActive.newActive(Main.class.getName(), 
                                                                                     null);

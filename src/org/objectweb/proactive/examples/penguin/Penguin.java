@@ -33,6 +33,7 @@ package org.objectweb.proactive.examples.penguin;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
@@ -232,6 +233,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
 
 
   public static void main(String[] args) {
+  	ProActiveConfiguration.load();
     if (!(args.length > 1)) {
      System.out.println("Usage: java org.objectweb.proactive.examples.penguin.Penguin hostname1/NodeName1 hostname2/NodeName2 ");
       System.exit(-1);

@@ -66,6 +66,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
       // Lookups the server object
       nodeURL = args[0];
     }
+	ProActiveConfiguration.load();
     new HelloApplet("Hello applet", 300, 200, nodeURL);
   }
 

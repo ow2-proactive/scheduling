@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.garden;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
 /**
@@ -78,6 +79,7 @@ public class Flower {
 
 
   public static void main(String[] args) {
+	ProActiveConfiguration.load();
     try {
       // It's springtime ! Let's create flowers everywhere !
       String nodeName1 = "///vm1";

@@ -2,6 +2,7 @@ package org.objectweb.proactive.examples.matrix;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -17,6 +18,8 @@ public class Main {
 	   logger.error("missing argument : <MatrixSize>");
 	    System.exit(0);
 	}
+	ProActiveConfiguration.load();
+	
 //	
 //	String[] nodesList = readNodesList(args[0]);	
 //	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";

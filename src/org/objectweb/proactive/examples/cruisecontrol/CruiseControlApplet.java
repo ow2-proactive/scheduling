@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.cruisecontrol;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 /** The Applet : CruiseControlApplet
  * models a car and a speed controller,
  * and implements the primitives of the ProActive package.
@@ -64,6 +66,7 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
 
 
   public static void main(String arg[]) {
+	ProActiveConfiguration.load();
     new CruiseControlApplet("Cruise Control", 840, 420);
   }
 

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.cs;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 /**
  * <p>
@@ -104,6 +105,7 @@ public class Server {
 
 
   public static void main(String[] args) {
+	ProActiveConfiguration.load();
     try {
       // Creates an active object for the server
       Server theServer = (Server)org.objectweb.proactive.ProActive.newActive(Server.class.getName(), new Object[]{"This is the first message"});

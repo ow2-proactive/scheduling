@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.migration;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -47,6 +48,7 @@ public class AgentClient {
     Agent myServer;
     String nodeName, hostName;
     ProActiveDescriptor proActiveDescriptor;
+	ProActiveConfiguration.load();
     try {
     	
 		  proActiveDescriptor = ProActive.getProactiveDescriptor("file:"+args[0]);

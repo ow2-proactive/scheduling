@@ -30,7 +30,21 @@
 */
 package org.objectweb.proactive.examples.c3d;
 
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Panel;
+import java.awt.TextArea;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -48,13 +62,11 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-//import org.objectweb.proactive.examples.c3d.C3DRenderingEngine;
-//import org.objectweb.proactive.examples.c3d.Interval;
-//import org.objectweb.proactive.examples.c3d.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
@@ -1064,6 +1076,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	public static void main(String argv[]) throws NodeException
 	{
 		ProActiveDescriptor proActiveDescriptor = null;
+		ProActiveConfiguration.load();
 		//if (argv.length < 1)
 		//{
 			//System.err.println(

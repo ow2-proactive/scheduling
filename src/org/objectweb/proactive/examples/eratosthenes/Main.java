@@ -44,6 +44,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -210,6 +211,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   	  	if (args.length > 1) xmlDescriptor = args[1];
   	  } else xmlDescriptor = args[0];
   	}
+	ProActiveConfiguration.load();
   	Main main = (Main)ProActive.newActive(Main.class.getName(), 
   	  new Object[] {xmlDescriptor, new Boolean(gui)});
   }

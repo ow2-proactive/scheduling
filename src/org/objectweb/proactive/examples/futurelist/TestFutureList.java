@@ -47,6 +47,7 @@ public class TestFutureList {
       System.err.println("Usage: TestFutureList hostName1/nodeName1 hostName2/nodeName2");
       System.exit(-1);
     }
+	ProActiveConfiguration.load();
 
     System.out.println("This is designed to test the use of the future list");
 

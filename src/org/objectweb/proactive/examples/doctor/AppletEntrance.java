@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.doctor;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 
 /**
  * <p>
@@ -52,6 +54,7 @@ public class AppletEntrance extends org.objectweb.proactive.examples.StandardFra
 
 
   public static void main(String arg[]) {
+	ProActiveConfiguration.load();
     new AppletEntrance("The salishan problems", 600, 300);
   }
 
