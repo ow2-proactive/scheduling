@@ -327,7 +327,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
             proActiveRuntimeName, creatorID, creationProtocol, vmName);
-        proActiveRuntimeDist.addParent(getURL());
+        
     }
 
     /**
