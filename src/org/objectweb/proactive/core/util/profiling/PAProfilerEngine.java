@@ -26,9 +26,9 @@ public class PAProfilerEngine implements Runnable {
      * Create a profiler of default type
      * @return an AverageTimeProfiler
      */
-    public static Timer createProfiler() {
+    public static Timer createTimer() {
     	Timer tmp = new AverageMicroTimer();
-    	registerProfiler(tmp);
+    	registerTimer(tmp);
         return tmp;
     }
 
@@ -36,7 +36,7 @@ public class PAProfilerEngine implements Runnable {
      * Add profilers to be managed by this profiler engine
      * @param papr
      */
-    public static void registerProfiler(Timer papr) {
+    public static void registerTimer(Timer papr) {
         synchronized (engine.profilerList) {
             engine.profilerList.add(papr);
         }
@@ -48,7 +48,7 @@ public class PAProfilerEngine implements Runnable {
      * @param papr
      * @return
      */
-    public static boolean removeProfiler(Timer papr) {
+    public static boolean removeTimer(Timer papr) {
         synchronized (engine.profilerList) {
             return engine.profilerList.remove(papr);
         }
@@ -76,10 +76,10 @@ public class PAProfilerEngine implements Runnable {
 
 	public static void main(String[] args) {
 		System.out.println("Creating a profiler and registering it");
-		PAProfilerEngine.createProfiler();
+		PAProfilerEngine.createTimer();
 		System.out.println("Creating an AverageTimeProfiler and registering it");
 		Timer avg = new AverageMicroTimer();
-		PAProfilerEngine.registerProfiler(avg);
+		PAProfilerEngine.registerTimer(avg);
 	
 		for (int i=0; i< 10;i++) {
 			avg.start();
