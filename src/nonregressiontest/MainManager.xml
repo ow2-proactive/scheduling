@@ -31,7 +31,9 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.locationserver.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
+			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.services.p2p.Test" />
 			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />

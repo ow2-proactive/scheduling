@@ -48,13 +48,14 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     A a;
     A b;
+    A lastA;
     Id idPrincipal;
     Id idDeleguate;
     boolean futureByResult;
 
     public Test() {
         super("Automatic Continuations",
-            "Test automatic continuations by results and parameteres");
+            "Test automatic continuations by results and parameters");
     }
 
     /**
@@ -87,7 +88,7 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         return (futureByResult && a.isSuccessful() &&
-        a.getFinalResult().equals("dummy"));
+        a.getFinalResult().equals("dummy") && lastA.getIdName().equals("e"));
     }
     
     private class ACThread extends Thread {
@@ -96,6 +97,7 @@ public class Test extends FunctionalTest {
     		try{
     		a = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "principal" });
+    	//test future by result
         a.initFirstDeleguate();
         idDeleguate = a.getId("deleguate2");
         idPrincipal = a.getId("principal");
@@ -107,13 +109,36 @@ public class Test extends FunctionalTest {
         } else {
             futureByResult = true;
         }
+        //test future passed as parameter
         b = (A) ProActive.newActive(A.class.getName(), new Object[] { "dummy" });
         idPrincipal = b.getIdforFuture();
         a.forwardID(idPrincipal);
+        //Test non-blocking when future passed as parameter
+        A c = (A) ProActive.newActive(A.class.getName(), new Object[] { "c" });
+        A d = (A) ProActive.newActive(A.class.getName(), new Object[] { "d" });
+        A e = (A) ProActive.newActive(A.class.getName(), new Object[] { "e" });
+        
+        A de = d.getA(e);
+        A cde = c.getA(de);
+        lastA = e.getA(cde);
+        
     		}catch (Exception e){
     			e.printStackTrace();
     		}
     		
     	}
+    }
+    
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+            System.out.println(test.postConditions());
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            
+        }
+        
     }
 }
