@@ -4,7 +4,6 @@
   */
 package org.objectweb.proactive.core.component.adl;
 
-import org.apache.log4j.Logger;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 

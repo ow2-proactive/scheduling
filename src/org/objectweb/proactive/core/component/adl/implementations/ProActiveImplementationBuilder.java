@@ -6,16 +6,14 @@ package org.objectweb.proactive.core.component.adl.implementations;
 
 import java.util.Map;
 
-import org.objectweb.proactive.core.component.adl.RegistryManager;
 import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.adl.RegistryManager;
 
 /**
  * @author Matthieu Morel
