@@ -52,8 +52,9 @@ import testsuite.result.ResultsCollections;
 
 import testsuite.test.Benchmark;
 
-import testsuite.timer.MsTimer;
 import testsuite.timer.Timeable;
+
+import testsuite.timer.ms.MsTimer;
 
 import java.io.File;
 import java.io.IOException;
@@ -244,8 +245,8 @@ public abstract class BenchmarkManager extends AbstractManager {
                 }
             }
             JFreeChart chart = ChartFactory.createBarChart3D(group.getName(),
-                    "Benchmarks", "ms", dataset, PlotOrientation.VERTICAL,
-                    true, true, false);
+                    "Benchmarks", this.timer.getUnit(), dataset,
+                    PlotOrientation.VERTICAL, true, true, false);
             ChartUtilities.saveChartAsPNG(new File(graphDir.getPath() +
                     File.separator + "Group" + numGroup + ".png"), chart, 800,
                 600);
@@ -287,15 +288,14 @@ public abstract class BenchmarkManager extends AbstractManager {
                 }
                 TableXYDataset table = new TableXYDataset(series);
                 XYPlot plot = new XYPlot(table, new NumberAxis("Nb Runs"),
-                        new NumberAxis("Time in ms"),
+                        new NumberAxis("Time in " + this.timer.getUnit()),
                         new StandardXYItemRenderer(
                             StandardXYItemRenderer.SHAPES_AND_LINES));
                 JFreeChart chart = new JFreeChart(result.getTest().getName(),
                         plot);
                 ChartUtilities.saveChartAsPNG(new File(graphDir.getPath() +
-                        File.separator + "Bench" +
-                        ((numBench == 0) ? "" : (numBench + "")) + ".png"),
-                    chart, 800, 600);
+                        File.separator + "Bench" + numBench + ".png"), chart,
+                    800, 600);
                 numBench++;
                 if (logger.isInfoEnabled()) {
                     logger.info("Chart " + graphDir.getPath() + File.separator +
