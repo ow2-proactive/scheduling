@@ -27,12 +27,12 @@ IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\
 IF EXIST %PROACTIVE%\lib\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\reggie.jar
 
 rem Globus jar files
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-jglobus.jar
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-ogce.jar
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix.jar
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix32.jar
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix-asn1.jar
-IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\puretls.jar
+IF EXIST %PROACTIVE%\lib\cog-jglobus.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-jglobus.jar
+IF EXIST %PROACTIVE%\lib\cog-ogce.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog-ogce.jar
+IF EXIST %PROACTIVE%\lib\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix.jar
+IF EXIST %PROACTIVE%\lib\cryptix32.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix32.jar
+IF EXIST %PROACTIVE%\lib\cryptix-asn1.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix-asn1.jar
+IF EXIST %PROACTIVE%\lib\puretls.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\puretls.jar
 
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar
 IF EXIST %PROACTIVE%\lib\javaxCrypto.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javaxCrypto.jar
@@ -43,7 +43,7 @@ IF EXIST %PROACTIVE%\lib\fractal.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\f
 IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 echo CLASSPATH=%CLASSPATH%
 
-set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=proactive-log4j
+set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j
 set PATH=%JAVA_HOME%\bin;%PATH%
 goto end
 
