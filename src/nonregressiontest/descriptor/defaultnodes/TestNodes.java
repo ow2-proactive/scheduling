@@ -45,6 +45,8 @@ import testsuite.test.FunctionalTest;
  */
 public class TestNodes extends FunctionalTest {
 	
+	
+	private static String XML_LOCATION;
 	static {
 		String value = System.getProperty("nonregressiontest.descriptor.defaultnodes.file");
 		if (value != null) {
@@ -57,7 +59,6 @@ public class TestNodes extends FunctionalTest {
 	}
 	
     private static String FS = System.getProperty("file.separator");
-    private static String XML_LOCATION;
     private static ProActiveDescriptor proActiveDescriptor = null;
     private static VirtualNode[] virtualNodes = null;
     private static Node sameVMNode = null;
