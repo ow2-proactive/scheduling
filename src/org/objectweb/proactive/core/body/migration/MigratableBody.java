@@ -61,8 +61,8 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
     }
 
     public MigratableBody(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory) {
-        super(reifiedObject, nodeURL, factory);
+        MetaObjectFactory factory, String jobID) {
+        super(reifiedObject, nodeURL, factory, jobID);
         this.migrationManager = factory.newMigrationManagerFactory()
                                        .newMigrationManager();
     }

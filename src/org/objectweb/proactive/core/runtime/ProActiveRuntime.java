@@ -30,11 +30,10 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -44,6 +43,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -70,7 +73,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
  * @since   ProActive 0.91
  *
  */
-public interface ProActiveRuntime {
+public interface ProActiveRuntime extends Job {
     static Logger runtimeLogger = Logger.getLogger(ProActiveRuntime.class.getName());
 
     /**
@@ -81,7 +84,8 @@ public interface ProActiveRuntime {
      * @exception NodeException if the new node cannot be created
      */
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding,PolicyServer policyServer, String vnName) throws NodeException;
+        boolean replacePreviousBinding, PolicyServer policyServer, String vnName, String jobId)
+        throws NodeException;
 
     /**
      * <i><font size="-1" color="#FF0000">**Under development** </font></i>
@@ -170,7 +174,8 @@ public interface ProActiveRuntime {
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName);
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName);
 
     /**
      * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM
@@ -191,9 +196,9 @@ public interface ProActiveRuntime {
     /**
      * Kills this ProActiveRuntime and this VM
      * @param softly if false, this Runtime is killed abruptely
-	 * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
-	 * dying. To be more precise a thread is created to ask periodically the registry if objects are still
-	 * registered.
+     * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
+     * dying. To be more precise a thread is created to ask periodically the registry if objects are still
+     * registered.
      */
     public void killRT(boolean softly) throws Exception;
 
@@ -252,6 +257,13 @@ public interface ProActiveRuntime {
     public void unregisterAllVirtualNodes() throws ProActiveException;
 
     /**
+     * @param nodeName
+     * @return the jobId of the node with the given name
+     * @throws ProActiveException
+     */
+    public String getJobID(String nodeUrl) throws ProActiveException;
+
+    /**
      * <p>
      * This method is the basis for creating remote active objects.
      * It receives a <code>ConstructorCall</code> that is the constructor call of the body
@@ -290,68 +302,65 @@ public interface ProActiveRuntime {
      */
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException;
-        
-	// SECURITY
-	/**
-	* @return creator's certificate if exists
-	*/
-	public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	/**
-	 * @return
-	 */
-	public PolicyServer getPolicyServer() throws ProActiveException;
+    // SECURITY
 
-	public void setProActiveSecurityManager(ProActiveSecurityManager ps) throws ProActiveException;
+    /**
+     * @return creator's certificate if exists
+     */
+    public X509Certificate getCreatorCertificate() throws ProActiveException;
 
-	public String getVNName(String Nodename) throws ProActiveException;
+    /**
+     * @return
+     */
+    public PolicyServer getPolicyServer() throws ProActiveException;
 
-	public void setDefaultNodeVirtualNodeName(String s)
-		throws ProActiveException;
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws ProActiveException;
 
-	public void listVirtualNodes() throws ProActiveException;
-    
-	public PolicyServer getNodePolicyServer(String nodeName)throws ProActiveException;
+    public String getVNName(String Nodename) throws ProActiveException;
 
+    public void setDefaultNodeVirtualNodeName(String s)
+        throws ProActiveException;
 
-	/**
-	 *  sets all needed modifications to enable security components
-	 * MUST be called when the descriptor is ready 
-	 */
-	public void enableSecurityIfNeeded()throws ProActiveException ;
+    public void listVirtualNodes() throws ProActiveException;
 
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws ProActiveException;
 
-	/**
-	 * @param nodeName
-	 * @return return certificate associated to the node designed by nodeName
-	 */
-	public X509Certificate getNodeCertificate(String nodeName) throws ProActiveException;
+    /**
+     *  sets all needed modifications to enable security components
+     * MUST be called when the descriptor is ready
+     */
+    public void enableSecurityIfNeeded() throws ProActiveException;
 
+    /**
+     * @param nodeName
+     * @return return certificate associated to the node designed by nodeName
+     */
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws ProActiveException;
 
-	
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(String nodeName)throws ProActiveException;
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws ProActiveException;
 
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(UniversalBody uBody)throws ProActiveException;
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException;
 
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws ProActiveException;
 
+    /**
+     * @param PART
+     */
 
-	/**
-	 * @return returns all entities associated to this runtime
-	 */
-	public ArrayList getEntities() throws ProActiveException;
-
-
-	/**
-	 * @param PART
-	 */
-	//public void setUpSecurityForRemoteLauch(ProActiveRuntime PART)throws ProActiveException;
-
+    //public void setUpSecurityForRemoteLauch(ProActiveRuntime PART)throws ProActiveException;
 }

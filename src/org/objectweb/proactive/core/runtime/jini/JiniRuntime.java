@@ -61,7 +61,7 @@ public interface JiniRuntime extends java.rmi.Remote
   static Logger logger = Logger.getLogger(JiniRuntime.class.getName());
   
   
-  public String createLocalNode(String nodeName,boolean replacePreviousBinding, PolicyServer ps, String vnname) throws java.rmi.RemoteException, NodeException;
+  public String createLocalNode(String nodeName,boolean replacePreviousBinding, PolicyServer ps, String vnname, String jobId) throws java.rmi.RemoteException, NodeException;
   
   
   
@@ -135,6 +135,8 @@ public interface JiniRuntime extends java.rmi.Remote
   public void unregisterVirtualNode(String virtualNodeName)throws java.rmi.RemoteException;
   
   public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
+  
+  public String getJobID(String nodeUrl) throws java.rmi.RemoteException;
   
   
   public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall,boolean isNodeLocal) throws java.rmi.RemoteException,

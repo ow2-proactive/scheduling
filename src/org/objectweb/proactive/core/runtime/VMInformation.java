@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import org.objectweb.proactive.Job;
+
 
 /**
  * <p>
@@ -41,7 +43,7 @@ package org.objectweb.proactive.core.runtime;
  * @since   ProActive 0.9
  *
  */
-public interface VMInformation extends java.io.Serializable {
+public interface VMInformation extends java.io.Serializable, Job {
 
     /**
      * Returns the VMID of the VM the node belongs to

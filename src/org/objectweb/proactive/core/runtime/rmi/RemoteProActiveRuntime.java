@@ -58,7 +58,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
 
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String VNname)
+        boolean replacePreviousBinding, PolicyServer ps, String VNname, String jobId)
         throws java.rmi.RemoteException, NodeException;
 
     public void killAllNodes() throws java.rmi.RemoteException;
@@ -107,7 +107,8 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
 
-
+	public String getJobID(String nodeUrl) throws java.rmi.RemoteException;
+	
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
         throws java.rmi.RemoteException, 

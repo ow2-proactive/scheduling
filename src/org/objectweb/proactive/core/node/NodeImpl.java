@@ -76,9 +76,9 @@ public class NodeImpl implements Node, Serializable {
     }
 
     public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
-        String protocol) {
+        String protocol, String jobID) {
         this.proActiveRuntime = proActiveRuntime;
-        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol);
+        this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
     }
 
     //
@@ -201,16 +201,18 @@ public class NodeImpl implements Node, Serializable {
         private String nodeName;
         private String nodeURL;
         private String protocol;
+        private String jobID;
         private java.net.InetAddress hostInetAddress;
         private java.rmi.dgc.VMID hostVMID;
 
-        public NodeInformationImpl(String url, String protocol) {
+        public NodeInformationImpl(String url, String protocol, String jobID) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
                                                    .getInetAddress();
             this.protocol = protocol;
             this.nodeName = extractNameFromUrl(url);
+            this.jobID = jobID;
         }
 
         /**
@@ -270,6 +272,13 @@ public class NodeImpl implements Node, Serializable {
             String name = url.substring(n + 1);
             return name;
         }
+
+		/**
+		 * @see org.objectweb.proactive.Job#getJobId()
+		 */
+		public String getJobID() {
+			return jobID;
+		}
     }
     
     // SECURITY

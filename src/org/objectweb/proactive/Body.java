@@ -63,7 +63,7 @@ import org.objectweb.proactive.core.body.message.MessageEventProducer;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
-public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer {
+public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer, Job {
 
   /**
    * Terminate the body. After this call the body is no more alive and no more active

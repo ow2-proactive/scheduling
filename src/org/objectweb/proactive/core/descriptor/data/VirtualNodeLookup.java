@@ -238,6 +238,13 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     public boolean isActivated() {
         return isActivated;
     }
+    
+//
+	//-------------------IMPLEMENTS Job-----------------------------------
+	//
+	public String getJobID(){
+		return virtualNode.getJobID();
+	}
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)

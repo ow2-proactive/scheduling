@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -104,18 +105,19 @@ public class NodeFactory {
     public static synchronized Node getDefaultNode() throws NodeException {
         String nodeURL;
         ProActiveRuntime defaultRuntime;
+        String jobID = ProActive.getJobId();
         if (defaultNode == null) {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
-                        false,defaultRuntime.getPolicyServer(), "currentJVM");
+                        false,defaultRuntime.getPolicyServer(), "currentJVM",jobID );
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    UrlBuilder.checkProtocol(System.getProperty("proactive.rmi")));
+                    UrlBuilder.checkProtocol(System.getProperty("proactive.rmi")), jobID);
         }
         return defaultNode;
     }
@@ -165,6 +167,7 @@ public class NodeFactory {
         throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
+        String jobID = ProActive.getJobId();
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: createNode(" + url + ")");
@@ -178,11 +181,11 @@ public class NodeFactory {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
             nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding,ps,vnname);
+                    replacePreviousBinding,ps,vnname, jobID);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }
-        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol);
+        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol, jobID);
         return node;
     }
 
@@ -196,6 +199,8 @@ public class NodeFactory {
     public static Node getNode(String nodeURL) throws NodeException {
         ProActiveRuntime proActiveRuntime;
         String url;
+        String nodeName;
+        String jobID;
 
         if (logger.isDebugEnabled()) {
             logger.debug("NodeFactory: getNode() for " + nodeURL);
@@ -208,12 +213,13 @@ public class NodeFactory {
         try {
             url = UrlBuilder.checkUrl(nodeURL);
             proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
+            jobID = proActiveRuntime.getJobID(url);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         } catch (UnknownHostException e) {
             throw new NodeException("Cannot get the node based on " + nodeURL, e);
         }
-        Node node = new NodeImpl(proActiveRuntime, url, protocol);
+        Node node = new NodeImpl(proActiveRuntime, url, protocol, jobID);
         return node;
     }
 

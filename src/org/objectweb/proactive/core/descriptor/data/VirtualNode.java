@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -49,7 +50,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @see ProActiveDescriptor
  * @see VirtualMachine
  */
-public interface VirtualNode extends java.io.Serializable {
+public interface VirtualNode extends java.io.Serializable, Job {
     static Logger logger = Logger.getLogger(VirtualNode.class.getName());
 
     /**

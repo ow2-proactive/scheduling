@@ -63,7 +63,7 @@ public class CreateJiniNodeTask implements Runnable {
             Node node = nodes[i];
             String nodeName = node.getNodeInformation().getName();
             String hostname = node.getNodeInformation().getInetAddress()
-                                  .getHostName();
+                                  .getCanonicalHostName();
             HostObject hostObject = worldObject.getHostObject(hostname);
 
             //System.out.println("hostObject: "+hostObject.getHostName());

@@ -43,8 +43,8 @@ public class ComponentBodyImpl extends BodyImpl implements ComponentBody {
      * @param factory factory for the corresponding metaobjects
      */
     public ComponentBodyImpl(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory) {
-        super(reifiedObject, nodeURL, factory);
+        MetaObjectFactory factory, String jobID) {
+        super(reifiedObject, nodeURL, factory, jobID);
 
         // create the component metaobject if necessary
         // --> check the value of the "parameters" field

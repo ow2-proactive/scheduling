@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -99,6 +99,7 @@ public abstract class BodyImpl extends AbstractBody
     /** The component in charge of receiving request */
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
+    protected String JobID;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -119,8 +120,9 @@ public abstract class BodyImpl extends AbstractBody
      *                needed by this body
      */
     public BodyImpl(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory) {
+        MetaObjectFactory factory, String jobID) {
         super(reifiedObject, nodeURL, factory);
+        this.JobID = jobID;
         this.requestReceiver = factory.newRequestReceiverFactory()
                                       .newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
@@ -134,6 +136,10 @@ public abstract class BodyImpl extends AbstractBody
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
+    public String getJobID() {
+        return this.JobID;
+    }
+
     //
     // -- implements MessageEventProducer -----------------------------------------------
     //
@@ -297,10 +303,12 @@ public abstract class BodyImpl extends AbstractBody
         }
 
         public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException {
+            UniversalBody destinationBody)
+            throws java.io.IOException, RenegotiateSessionException {
             long sequenceID = getNextSequenceID();
             Request request = internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);
+
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getTag() != null) {
                 if (methodCall.getTag().equals(MethodCall.COMPONENT_TAG)) {
@@ -321,9 +329,9 @@ public abstract class BodyImpl extends AbstractBody
         //
 
         /**
-        * Returns a unique identifier that can be used to tag a future, a request
-        * @return a unique identifier that can be used to tag a future, a request.
-        */
+         * Returns a unique identifier that can be used to tag a future, a request
+         * @return a unique identifier that can be used to tag a future, a request.
+         */
         private synchronized long getNextSequenceID() {
             return ++absoluteSequenceID;
         }

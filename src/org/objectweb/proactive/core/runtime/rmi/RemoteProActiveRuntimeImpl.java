@@ -1,15 +1,5 @@
 package org.objectweb.proactive.core.runtime.rmi;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
-import java.rmi.AccessException;
-import java.rmi.ConnectException;
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -24,6 +14,21 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.net.UnknownHostException;
+
+import java.rmi.AccessException;
+import java.rmi.ConnectException;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -65,7 +70,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding,PolicyServer ps, String VNname)
+        boolean replacePreviousBinding, PolicyServer ps, String VNname, String jobId)
         throws java.rmi.RemoteException, NodeException {
         String nodeURL = null;
 
@@ -79,7 +84,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             //register the url in rmi registry
             register(nodeURL, replacePreviousBinding);
 
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,VNname);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding, ps,
+                VNname, jobId);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -143,9 +149,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) {
         proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeName,
-            creatorID, creationProtocol,vmName);
+            creatorID, creationProtocol, vmName);
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() {
@@ -245,94 +252,99 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
-	// SECURITY
-	
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
-	 */
-	public X509Certificate getCreatorCertificate()
-		throws java.rmi.RemoteException {
-		return proActiveRuntime.getCreatorCertificate();
-	}
+    // SECURITY
 
-	/**
-	 * @return
-	 */
-	public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
-		return proActiveRuntime.getPolicyServer();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
+     */
+    public X509Certificate getCreatorCertificate()
+        throws java.rmi.RemoteException {
+        return proActiveRuntime.getCreatorCertificate();
+    }
 
-	public String getVNName(String nodename) throws java.rmi.RemoteException {
-		return proActiveRuntime.getVNName(nodename);
-	}
+    /**
+     * @return
+     */
+    public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
+        return proActiveRuntime.getPolicyServer();
+    }
 
-	public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-		throws java.rmi.RemoteException {
-		proActiveRuntime.setProActiveSecurityManager(ps);
-	}
+    public String getVNName(String nodename) throws java.rmi.RemoteException {
+        return proActiveRuntime.getVNName(nodename);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
-	 */
-	public void setDefaultNodeVirtualNodeNAme(String s)
-		throws RemoteException {
-		proActiveRuntime.setDefaultNodeVirtualNodeName(s);
-	}
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws java.rmi.RemoteException {
+        proActiveRuntime.setProActiveSecurityManager(ps);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
-	 */
-	public void updateLocalNodeVirtualName() throws RemoteException {
-		proActiveRuntime.listVirtualNodes();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
+     */
+    public void setDefaultNodeVirtualNodeNAme(String s)
+        throws RemoteException {
+        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
-	 */
-	public PolicyServer getNodePolicyServer(String nodeName) throws RemoteException {
-		return proActiveRuntime.getNodePolicyServer(nodeName);
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
+     */
+    public void updateLocalNodeVirtualName() throws RemoteException {
+        proActiveRuntime.listVirtualNodes();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#enableSecurityIfNeeded()
-	 */
-	public void enableSecurityIfNeeded() throws RemoteException {
-		proActiveRuntime.enableSecurityIfNeeded();
-		
-	}
-	/* (non-Javadoc)
-		 * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
-		 */
-	public X509Certificate getNodeCertificate(String nodeName) throws RemoteException {
-		return proActiveRuntime.getNodeCertificate(nodeName);
-	}
-	
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(String nodeName)throws RemoteException {
-		return proActiveRuntime.getEntities(nodeName);
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
+     */
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws RemoteException {
+        return proActiveRuntime.getNodePolicyServer(nodeName);
+    }
 
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
-		return proActiveRuntime.getEntities(uBody);
-	}
- 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#enableSecurityIfNeeded()
+     */
+    public void enableSecurityIfNeeded() throws RemoteException {
+        proActiveRuntime.enableSecurityIfNeeded();
+    }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
+     */
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws RemoteException {
+        return proActiveRuntime.getNodeCertificate(nodeName);
+    }
 
-	/**
-	 * @return returns all entities associated to this runtime
-	 */
-	public ArrayList getEntities() throws RemoteException {
-		return proActiveRuntime.getEntities();
-	}
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws RemoteException {
+        return proActiveRuntime.getEntities(nodeName);
+    }
 
-	
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
+        return proActiveRuntime.getEntities(uBody);
+    }
+
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws RemoteException {
+        return proActiveRuntime.getEntities();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getJobID(java.lang.String)
+     */
+    public String getJobID(String nodeUrl) throws RemoteException {
+		return proActiveRuntime.getJobID(nodeUrl);
+    }
 
     //
     // ---PRIVATE METHODS--------------------------------------
@@ -372,7 +384,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                     e.getCause().getMessage().equals("Connection refused"))) {
                 if (url.indexOf("PA_RT") < 0) {
                     logger.info("RMIRegistry unreachable on host " +
-                        getVMInformation().getInetAddress().getHostName() +
+                        getVMInformation().getInetAddress().getCanonicalHostName() +
                         " to unregister " + url + ". Killed anyway !!!");
                 }
             }
@@ -388,7 +400,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     private String buildRuntimeURL() {
         int port = RemoteRuntimeFactory.getRegistryHelper()
                                        .getRegistryPortNumber();
-        String host = getVMInformation().getInetAddress().getHostName();
+        String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
         return UrlBuilder.buildUrl(host, name, "rmi:", port);
     }
@@ -398,7 +410,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         int i = url.indexOf('/');
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress().getHostName();
+            String host = getVMInformation().getInetAddress().getCanonicalHostName();
 
             int port = RemoteRuntimeFactory.getRegistryHelper()
                                            .getRegistryPortNumber();
@@ -418,7 +430,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         public void run() {
             try {
                 while (RegistryHelper.getRegistry().list().length > 0) {
-                	// the thread sleeps for 10 minutes
+                    // the thread sleeps for 10 minutes
                     Thread.sleep(600000);
                 }
 

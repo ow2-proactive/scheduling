@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.core.util.IbisProperties;
@@ -134,7 +135,9 @@ static {
         log("  -> Found remote node " + list[i]);
         //Node realNode = NodeFactory.getNode(fullName);
         try {
-          nodes.add(new NodeImpl(new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj),"//"+host+"/"+list[i],"rmi"));
+        	ProActiveRuntime part = new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj);
+        	String url = "//"+host+"/"+list[i];
+          nodes.add(new NodeImpl(part,url,"rmi", url));
         } catch (ProActiveException e) {
           log("Error while trying to create a RuntimeAdapter for "+list[i]+", check the version of ProActive or jdk");
         }

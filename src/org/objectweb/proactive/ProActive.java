@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive;
 
 import org.apache.log4j.Logger;
@@ -83,6 +83,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
 import java.net.UnknownHostException;
 
 import java.util.HashMap;
@@ -274,32 +275,33 @@ public class ProActive {
     public static Object[] newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        	return ProActive.newActive(classname, constructorParameters, virtualnode, null, null);
+        return ProActive.newActive(classname, constructorParameters,
+            virtualnode, null, null);
     }
 
-    
-	/**
-	 * Creates a new ActiveObject based on classname attached to the given virtualnode.
-	 * @param classname classname the name of the class to instanciate as active
-	 * @param constructorParameters constructorParameters the parameters of the constructor.
-	 * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-	 * on each node mapped to the given virtualnode in XML deployment descriptor.
+    /**
+     * Creates a new ActiveObject based on classname attached to the given virtualnode.
+     * @param classname classname the name of the class to instanciate as active
+     * @param constructorParameters constructorParameters the parameters of the constructor.
+     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
+     * on each node mapped to the given virtualnode in XML deployment descriptor.
      * @param activity the possibly null activity object defining the different step in the activity of the object.
      *               see the definition of the activity in the javadoc of this classe for more information.
      * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
      *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-	 * @return Object[] an array of references (possibly remote) on  Stub of newly created active objects
-	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-	 * @throws NodeException if the virtualnode was null
-	 * 
-	 */
+     * @return Object[] an array of references (possibly remote) on  Stub of newly created active objects
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws NodeException if the virtualnode was null
+     *
+     */
     public static Object[] newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
-        
         if (virtualnode != null) {
-        	if(! virtualnode.isActivated()) virtualnode.activate();
+            if (!virtualnode.isActivated()) {
+                virtualnode.activate();
+            }
             Node[] nodeTab = virtualnode.getNodes();
             Object[] aoTab = new Object[nodeTab.length];
 
@@ -686,9 +688,9 @@ public class ProActive {
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
         if ("ibis".equals(System.getProperty("proactive.rmi"))) {
-			b = IbisRemoteBodyAdapter.lookup(url);
+            b = IbisRemoteBodyAdapter.lookup(url);
         } else {
-			b = RemoteBodyAdapter.lookup(url);
+            b = RemoteBodyAdapter.lookup(url);
         }
 
         try {
@@ -1208,12 +1210,19 @@ public class ProActive {
     }
 
     /**
-       * Search an appropriate handler for a given non functional exception.
-       * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
-       * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
-       * @param ex Exception for which we search a handler.
-       * @return A reliable handler or null if no handler is available
-       */
+     * @return the jobId associated with the object calling this method
+     */
+    public static String getJobId() {
+        return ProActive.getBodyOnThis().getJobID();
+    }
+
+    /**
+     * Search an appropriate handler for a given non functional exception.
+     * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
+     * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
+     * @param ex Exception for which we search a handler.
+     * @return A reliable handler or null if no handler is available
+     */
     public static IHandler searchExceptionHandler(NonFunctionalException ex) {
         // an handler
         IHandler handler = null;
@@ -1446,7 +1455,7 @@ public class ProActive {
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory) throws MOPException {
         return createStubObject(className, constructorParameters,
-            new Object[] { node, activity, factory });
+            new Object[] { node, activity, factory, ProActive.getJobId() });
     }
 
     private static Object createStubObject(String className,
@@ -1465,7 +1474,8 @@ public class ProActive {
         String nameOfTargetType, Node node, Active activity,
         MetaObjectFactory factory) throws MOPException {
         return createStubObject(target,
-            new Object[] { node, activity, factory }, nameOfTargetType);
+            new Object[] { node, activity, factory, ProActive.getJobId() },
+            nameOfTargetType);
     }
 
     private static StubObject createStubObject(Object object,

@@ -33,12 +33,6 @@ package org.objectweb.proactive.core.runtime.ibis;
 import ibis.rmi.AlreadyBoundException;
 import ibis.rmi.RemoteException;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -51,6 +45,15 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -115,10 +118,11 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vname) throws NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vname, String jobId)
+        throws NodeException {
         try {
             return remoteProActiveRuntime.createLocalNode(nodeName,
-                replacePreviousBinding,ps,vname);
+                replacePreviousBinding, ps, vname, jobId);
         } catch (RemoteException e) {
             throw new NodeException(e);
         }
@@ -210,11 +214,12 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) {
         try {
             //System.out.println("register in adapter"+remoteProActiveRuntime.getURL());
             remoteProActiveRuntime.register(proActiveRuntimeDist,
-                proActiveRuntimeName, creatorID, creationProtocol,vmName);
+                proActiveRuntimeName, creatorID, creationProtocol, vmName);
         } catch (RemoteException re) {
             re.printStackTrace();
             // behavior to be defined
@@ -332,30 +337,29 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    // SECURITY
 
-	// SECURITY
-	
-		/**
-			  * @return
-			  */
-	 public PolicyServer getPolicyServer() throws ProActiveException {
-		 try {
-			 return remoteProActiveRuntime.getPolicyServer();
-		 } catch (RemoteException re) {
-			 throw new ProActiveException(re);
-		 }
-	 }
+    /**
+     * @return
+     */
+    public PolicyServer getPolicyServer() throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getPolicyServer();
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	 public void setProActiveSecurityManager(ProActiveSecurityManager ps) throws ProActiveException {
-		 try {
-			 remoteProActiveRuntime.setProActiveSecurityManager(ps);
-		 } catch (RemoteException re) {
-			 throw new ProActiveException(re);
-		 }
-	 }	
-	
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws ProActiveException {
+        try {
+            remoteProActiveRuntime.setProActiveSecurityManager(ps);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	    /* (non-Javadoc)
+    /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
      */
     public X509Certificate getCreatorCertificate() throws ProActiveException {
@@ -397,91 +401,103 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#listVirtualNodes()
+     */
+    public void listVirtualNodes() throws ProActiveException {
+        try {
+            remoteProActiveRuntime.listVirtualNodes();
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#listVirtualNodes()
-	 */
-	public void listVirtualNodes() throws ProActiveException {
-		try {
-			  remoteProActiveRuntime.listVirtualNodes();
-		  } catch (RemoteException re) {
-			  throw new ProActiveException(re);
-		  }
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
+     */
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getNodePolicyServer(nodeName);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
+     */
+    public void enableSecurityIfNeeded() throws ProActiveException {
+        try {
+            remoteProActiveRuntime.enableSecurityIfNeeded();
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodePolicyServer(java.lang.String)
-	 */
-	public PolicyServer getNodePolicyServer(String nodeName) throws ProActiveException {
-		try {
-		  return remoteProActiveRuntime.getNodePolicyServer(nodeName);
-	  } catch (RemoteException re) {
-		  throw new ProActiveException(re);
-	  }
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
+     */
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getNodeCertificate(nodeName);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getEntities(nodeName);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
-	 */
-	public void enableSecurityIfNeeded() throws ProActiveException {
-		try {
-			  remoteProActiveRuntime.enableSecurityIfNeeded();
-		  } catch (RemoteException re) {
-			  throw new ProActiveException(re);
-		  }
-		
-	}
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getEntities(uBody);
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getEntities();
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNodeCertificate(java.lang.String)
-	 */
-	public X509Certificate getNodeCertificate(String nodeName) throws ProActiveException {
-		try {
-				 return  remoteProActiveRuntime.getNodeCertificate(nodeName);
-			  } catch (RemoteException re) {
-				  throw new ProActiveException(re);
-			  }
-	}
+    /**
+     * @see org.objectweb.proactive.Job#getJobId()
+     */
+    public String getJobID() {
+        return vmInformation.getJobID();
+    }
+    
 	
-	/**
-		* @param nodeName
-		* @return returns all entities associated to the node
-		*/
-	   public ArrayList getEntities(String nodeName) throws ProActiveException {
-		   try {
-			   return remoteProActiveRuntime.getEntities(nodeName);
-		   } catch (RemoteException re) {
-			   throw new ProActiveException(re);
-		   }
-	   }
+		public String getJobID(String nodeUrl) throws ProActiveException{
+			try {
+			return remoteProActiveRuntime.getJobID(nodeUrl);
+		} catch (RemoteException re) {
+					throw new ProActiveException(re);
+				}
+		}
 
-	   /**
-		* @param nodeName
-		* @return returns all entities associated to the node
-		*/
-	   public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
-		   try {
-			   return remoteProActiveRuntime.getEntities(uBody);
-		   } catch (RemoteException re) {
-			   throw new ProActiveException(re);
-		   }
-	   }
-
-	   /**
-		* @return returns all entities associated to this runtime
-		*/
-	   public ArrayList getEntities() throws ProActiveException {
-		   try {
-			   return remoteProActiveRuntime.getEntities();
-		   } catch (RemoteException re) {
-			   throw new ProActiveException(re);
-		   }
-	   }
-  
-   
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -489,4 +505,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         throws RemoteException, AlreadyBoundException {
         return new RemoteProActiveRuntimeImpl();
     }
+
+	
 }

@@ -62,7 +62,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname) throws RemoteException, NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vnname, String jobId) throws RemoteException, NodeException {
         String nodeURL = null;
 
         //Node node;
@@ -74,7 +74,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
             //register the url in rmi registry
             register(nodeURL, replacePreviousBinding);
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,vnname);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,vnname, jobId);
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -316,6 +316,13 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
    public ArrayList getEntities() throws RemoteException {
 	   return proActiveRuntime.getEntities();
    }
+   
+   /**
+		* @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getJobID(java.lang.String)
+		*/
+	   public String getJobID(String nodeUrl) throws RemoteException {
+		return proActiveRuntime.getJobID(nodeUrl);
+	   }
 
 		
 
@@ -357,7 +364,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     private String buildRuntimeURL() {
         int port = RemoteRuntimeFactory.getRegistryHelper()
                                        .getRegistryPortNumber();
-        String host = getVMInformation().getInetAddress().getHostName();
+        String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
 
         return UrlBuilder.buildUrl(host, name, "ibis:", port);
@@ -369,7 +376,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress().getHostName();
+            String host = getVMInformation().getInetAddress().getCanonicalHostName();
             int port = RemoteRuntimeFactory.getRegistryHelper()
                                            .getRegistryPortNumber();
             return UrlBuilder.buildUrl(host, url, "ibis:", port);
@@ -377,4 +384,6 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             return UrlBuilder.checkUrl(url);
         }
     }
+
+	
 }

@@ -108,13 +108,14 @@ public class UniversalBodyProxy extends AbstractBodyProxy
             //added lines----------------------------
             Active activity = (Active) parameters[1];
             MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
+            String jobID = (String)parameters[3];
             Class[] argsClass = new Class[] {
                     ConstructorCall.class, String.class, Active.class,
-                    MetaObjectFactory.class
+                    MetaObjectFactory.class, String.class
                 };
             Object[] args = new Object[] {
                     constructorCall, node.getNodeInformation().getURL(),
-                    activity, factory
+                    activity, factory, jobID
                 };
 
             //added lines--------------------------

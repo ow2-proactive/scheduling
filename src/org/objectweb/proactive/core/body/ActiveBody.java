@@ -86,11 +86,11 @@ public class ActiveBody extends MigratableBody implements Runnable,
      * Build the body object, then fires its service thread
      */
     public ActiveBody(ConstructorCall c, String nodeURL, Active activity,
-        MetaObjectFactory factory)
+        MetaObjectFactory factory, String jobID)
         throws java.lang.reflect.InvocationTargetException, 
             ConstructorCallExecutionFailedException {
         // Creates the reified object
-        super(c.execute(), nodeURL, factory);
+        super(c.execute(), nodeURL, factory, jobID);
 
         // InitActive
         Object reifiedObject = localBodyStrategy.getReifiedObject();

@@ -30,23 +30,17 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.rmi.RemoteException;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceRegistration;
+
 import net.jini.discovery.DiscoveryEvent;
+
 import net.jini.lease.LeaseRenewalEvent;
+
 import net.jini.lookup.entry.Name;
 
 import org.objectweb.proactive.Body;
@@ -62,6 +56,19 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.rmi.RemoteException;
+
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
 
 
 /**
@@ -126,7 +133,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     // -- Implements JiniRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname)
+        boolean replacePreviousBinding, PolicyServer ps, String vnname, String jobId)
         throws java.rmi.RemoteException, NodeException {
         //counter used to check that the node has been registered at 
         //least once as jini service
@@ -147,7 +154,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             //System.out.println("name is : "+ name);
             //System.out.println("url is : "+ nodeURL);
             //create the node with the name 
-            proActiveRuntime.createLocalNode(name, replacePreviousBinding,ps,vnname);
+            proActiveRuntime.createLocalNode(name, replacePreviousBinding, ps,
+                vnname, jobId);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -189,9 +197,10 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) {
         proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeName,
-            creatorID, creationProtocol,vmName);
+            creatorID, creationProtocol, vmName);
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() {
@@ -334,7 +343,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
 
     public void notify(LeaseRenewalEvent evt) {
         logger.info("Lease expired " + evt.toString());
-       logger.info( evt.getException().getMessage());
+        logger.info(evt.getException().getMessage());
     }
 
     //
@@ -368,88 +377,96 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return new ServiceID(mostSig, leastSig);
     }
 
-	// SECURITY
+    // SECURITY
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getCreatorCertificate()
-	 */
-	public X509Certificate getCreatorCertificate()
-		throws java.rmi.RemoteException {
-		return proActiveRuntime.getCreatorCertificate();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getCreatorCertificate()
+     */
+    public X509Certificate getCreatorCertificate()
+        throws java.rmi.RemoteException {
+        return proActiveRuntime.getCreatorCertificate();
+    }
 
-	public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
-		return proActiveRuntime.getPolicyServer();
-	}
+    public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
+        return proActiveRuntime.getPolicyServer();
+    }
 
-	public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-		throws java.rmi.RemoteException {
-		proActiveRuntime.setProActiveSecurityManager(ps);
-	}
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws java.rmi.RemoteException {
+        proActiveRuntime.setProActiveSecurityManager(ps);
+    }
 
-	public String getVNName(String Nodename) throws java.rmi.RemoteException {
-		return proActiveRuntime.getVNName(Nodename);
-	}
+    public String getVNName(String Nodename) throws java.rmi.RemoteException {
+        return proActiveRuntime.getVNName(Nodename);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
-	 */
-	public void setDefaultNodeVirtualNodeName(String s)
-		throws RemoteException {
-		proActiveRuntime.setDefaultNodeVirtualNodeName(s);
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
+     */
+    public void setDefaultNodeVirtualNodeName(String s)
+        throws RemoteException {
+        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#updateLocalNodeVirtualName()
-	 */
-	public void updateLocalNodeVirtualName() throws RemoteException {
-		//proActiveRuntime.updateLocalNodeVirtualName();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#updateLocalNodeVirtualName()
+     */
+    public void updateLocalNodeVirtualName() throws RemoteException {
+        //proActiveRuntime.updateLocalNodeVirtualName();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodePolicyServer(java.lang.String)
-	 */
-	public PolicyServer getNodePolicyServer(String nodeName) throws RemoteException {
-		return   proActiveRuntime.getNodePolicyServer(nodeName);
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodePolicyServer(java.lang.String)
+     */
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws RemoteException {
+        return proActiveRuntime.getNodePolicyServer(nodeName);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#enableSecurityIfNeeded()
-	 */
-	public void enableSecurityIfNeeded() throws RemoteException {
-		proActiveRuntime.enableSecurityIfNeeded();		
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#enableSecurityIfNeeded()
+     */
+    public void enableSecurityIfNeeded() throws RemoteException {
+        proActiveRuntime.enableSecurityIfNeeded();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodeCertificate(java.lang.String)
-	 */
-	public X509Certificate getNodeCertificate(String nodeName) throws RemoteException {
-		return  proActiveRuntime.getNodeCertificate(nodeName);
-	}
-	
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(String nodeName) throws RemoteException {
-			return proActiveRuntime.getEntities(nodeName);
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodeCertificate(java.lang.String)
+     */
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws RemoteException {
+        return proActiveRuntime.getNodeCertificate(nodeName);
+    }
 
-	/**
-	 * @param nodeName
-	 * @return returns all entities associated to the node
-	 */
-	public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
-			return proActiveRuntime.getEntities(uBody);
-	}
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws RemoteException {
+        return proActiveRuntime.getEntities(nodeName);
+    }
 
-	/**
-	 * @return returns all entities associated to this runtime
-	 */
-	public ArrayList getEntities() throws RemoteException {
-			return proActiveRuntime.getEntities();
-	}	
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
+        return proActiveRuntime.getEntities(uBody);
+    }
 
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws RemoteException {
+        return proActiveRuntime.getEntities();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getJobID(java.lang.String)
+     */
+    public String getJobID(String nodeUrl) throws RemoteException {
+        return proActiveRuntime.getJobID(nodeUrl);
+    }
 
     //
     // ---PRIVATE METHODS--------------------------------------
@@ -491,7 +508,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     private String buildRuntimeURL() {
-        String host = getVMInformation().getInetAddress().getHostName();
+        String host = getVMInformation().getInetAddress().getCanonicalHostName();
         String name = getVMInformation().getName();
         return UrlBuilder.buildUrl(host, name, "jini:");
     }
@@ -501,7 +518,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         int i = url.indexOf('/');
         if (i == -1) {
             //it is an url given by a descriptor
-            String host = getVMInformation().getInetAddress().getHostName();
+            String host = getVMInformation().getInetAddress().getCanonicalHostName();
             return UrlBuilder.buildUrl(host, url, "jini:");
         } else {
             return UrlBuilder.checkUrl(url);
