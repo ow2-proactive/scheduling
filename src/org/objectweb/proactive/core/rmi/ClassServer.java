@@ -45,7 +45,7 @@ public class ClassServer implements Runnable {
 
     static {
         String newport;
-        if (System.getProperty("proactive.communication.protocol").equals("http")) {
+
             if(System.getProperty("proactive.http.port") != null){
                 newport = System.getProperty("proactive.http.port");
             } else {
@@ -53,7 +53,7 @@ public class ClassServer implements Runnable {
                 System.setProperty("proactive.http.port", newport);
             }
         }
-    }
+    
 
     protected String hostname;
     private java.net.ServerSocket server = null;
