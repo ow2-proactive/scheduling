@@ -64,7 +64,6 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     private Node sameVMNode = null;
     private Node localVMNode = null;
     private Node remoteVMNode = null;
-	private Node remoteACVMNode = null;
     private String remoteHostname = "localhost";
    // private RSHJVMProcess rshJVM = null;
  
@@ -238,14 +237,6 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     public Node getRemoteVMNode() {
         return remoteVMNode;
     }
-    
-	/**
-	 * @return the node with automatic continuations enabled
-	 */
-	public Node getRemoteACVMNode() {
-		return remoteACVMNode;
-	}
-
 
     /**
      * @return
