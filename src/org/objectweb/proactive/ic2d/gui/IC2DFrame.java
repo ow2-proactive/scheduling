@@ -220,7 +220,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     javax.swing.JMenu monitoringMenu = new javax.swing.JMenu("Monitoring");
     // Add new RMI host
     {
-    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor new RMI host");
+    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new RMI host");
     b.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           DialogUtils.openNewRMIHostDialog(IC2DFrame.this, ic2dObject.getWorldObject(), logger);
@@ -231,7 +231,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     
     // Add new RMI Node
     {
-    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor new RMI Node");
+    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new RMI Node");
     b.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
 	  DialogUtils.openNewNodeDialog(IC2DFrame.this, ic2dObject.getWorldObject(), logger);
@@ -252,7 +252,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     }
 
     {
-      javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor new JINI Hosts");
+      javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new JINI Hosts");
       b.addActionListener(new java.awt.event.ActionListener() {
 	  public void actionPerformed(java.awt.event.ActionEvent e) {
 	    DialogUtils.openNewJINIHostDialog(IC2DFrame.this, ic2dObject.getWorldObject(), logger);
