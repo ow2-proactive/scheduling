@@ -40,11 +40,14 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
 
+import org.xml.sax.SAXException;
+
 import testsuite.exception.BadTypeException;
 
 import testsuite.result.AbstractResult;
 import testsuite.result.ResultsCollections;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.InetAddress;
@@ -62,8 +65,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     private ProActiveDescriptor pad = null;
     private VirtualNode[] virtualNodes = null;
     private String xmlFileLocation = ProActiveBenchManager.class.getResource(
-	        "/" + ProActiveBenchManager.class.getName().replace('.', '/') +
-	        ".xml").getPath();
+            "/" + ProActiveBenchManager.class.getName().replace('.', '/') +
+            ".xml").getPath();
     private Node sameVMNode = null;
     private Node localVMNode = null;
     private Node remoteVMNode = null;
@@ -71,8 +74,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     private RSHJVMProcess rshJVM = null;
 
     /**
-     *
-     */
+ *
+ */
     public ProActiveBenchManager() {
         super("Remote Benchmark Manager",
             "Help you to manage your remote benchmarks.");
@@ -85,9 +88,9 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-     * @param name
-     * @param description
-     */
+ * @param name
+ * @param description
+ */
     public ProActiveBenchManager(String name, String description) {
         super(name, description);
         try {
@@ -95,6 +98,12 @@ public class ProActiveBenchManager extends BenchmarkManager
         } catch (IOException e1) {
             logger.warn("Can't load attributes", e1);
         }
+        initNodes();
+    }
+
+    public ProActiveBenchManager(File xmlDescriptor)
+        throws IOException, SAXException {
+        super(xmlDescriptor);
         initNodes();
     }
 
@@ -147,8 +156,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-     * @see testsuite.manager.AbstractManager#execute()
-     */
+ * @see testsuite.manager.AbstractManager#execute()
+ */
     public void execute(boolean useAttributesFile) {
         ResultsCollections results = getResults();
 
@@ -173,12 +182,12 @@ public class ProActiveBenchManager extends BenchmarkManager
                 "Unknown hostname, benchmark will be probably fail", e);
         }
 
-        super.execute(true);
+        super.execute(useAttributesFile);
     }
 
     /**
-     * @see testsuite.manager.AbstractManager#endManager()
-     */
+ * @see testsuite.manager.AbstractManager#endManager()
+ */
     public void endManager() throws Exception {
         if (pad != null) {
             pad.killall();
@@ -187,29 +196,29 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getLocalVMNode() {
         return localVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getRemoteVMNode() {
         return remoteVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getSameVMNode() {
         return sameVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public VirtualNode[] getVirtualNodes() {
         return virtualNodes;
     }
@@ -219,8 +228,8 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public String getRemoteHostname() {
         return remoteHostname;
     }
@@ -230,15 +239,15 @@ public class ProActiveBenchManager extends BenchmarkManager
     }
 
     /**
-             * @return
-             */
+         * @return
+         */
     public String getXmlFileLocation() {
         return xmlFileLocation;
     }
 
     /**
-     * @param xmlFileLocation
-     */
+ * @param xmlFileLocation
+ */
     public void setXmlFileLocation(String xmlFileLocation) {
         this.xmlFileLocation = xmlFileLocation;
     }

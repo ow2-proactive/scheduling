@@ -44,7 +44,7 @@
 				<h2><a name="globals"></a>Globals Results</h2>
 				<xsl:for-each select="//AllMessages//Result">
 					<xsl:if test="@type > -1 ">
-						<xsl:call-template name="Message" />
+						<xsl:call-template name="MessageGlobals" />
 					</xsl:if>
 				</xsl:for-each>
 				<p><address><a href="#nav">Return Quick navigation</a></address></p>
@@ -66,11 +66,11 @@
 				<xsl:for-each select="//Group">
 					<h3><a name="group{1+count(ancestor::Group)+count(preceding::Group)}"></a><xsl:value-of select="Name"/></h3>
 					<p><xsl:value-of select="Description" /></p>
-					<h4><a name="groupMsg{1+count(ancestor::Group)+count(preceding::Group)}"></a>Messages of <xsl:value-of select="Name"/> group : </h4>
+					<h4><a name="groupMsg{1+count(ancestor::Group)+count(preceding::Group)}"></a>Messages of <xsl:value-of select="Name"/> : </h4>
 					<xsl:for-each select="Results/Result">
 						<xsl:call-template name="Message" />
 					</xsl:for-each>
-					
+					<p>To see all results of this group in a <a href="bench_results_files/Group{1+count(ancestor::Group)+count(preceding::Group)}.png">BarChart</a>.</p>
 					<h4><a name="groupTests{1+count(ancestor::Group)+count(preceding::Group)}"></a>Tests of <xsl:value-of select="Name"/> group : </h4>
 					<xsl:for-each select="Results/Result">
 						<p><xsl:value-of select="TestName" /> : <xsl:value-of select="TestDescription" /></p>
@@ -88,9 +88,41 @@
 				
 				<p><address><a href="#nav">Return Quick navigation</a></address></p>
 				
+				<p class="textSmall">All charts are created with <a href="http://www.jfree.org/jfreechart/index.html">JFreeChart</a>.</p>
 			</body>
 		</html>
 		
+	</xsl:template>
+	
+<!-- MessageGlobals -->
+	
+	<xsl:template name="MessageGlobals">
+		<p><xsl:call-template name="DateFormat_SHORT">
+				<xsl:with-param name="date" select="Date" />
+			</xsl:call-template>
+			<xsl:if test="@type = -3"><i> [INFORMATION] </i></xsl:if>
+			<xsl:if test="@type = -2"><i> [MESSAGE] </i></xsl:if>
+			<xsl:if test="@type = -1"><i> [RESULT] </i></xsl:if>
+			<xsl:if test="@type = 0"><b><span style="color: rgb(0, 0, 255);"> [MESSAGE] </span></b></xsl:if>
+			<xsl:if test="@type = 1"><b><span style="color: rgb(0, 0, 255);"> [RESULT] </span></b></xsl:if>
+			<xsl:if test="@type = 2"><b><span style="color: rgb(255, 0, 0);"> [ERROR] </span></b></xsl:if>
+			<xsl:value-of select="TestName" /> : <xsl:value-of select="Message" />
+			<xsl:if test="@failed">
+				<xsl:if test="@failed = 'true'"><b><span style="color: rgb(255, 0, 0);"> [FAILED] </span></b></xsl:if>
+				<xsl:if test="@failed = 'false'"><b><span style="color: rgb(0, 255, 0);"> [SUCCESS] </span></b></xsl:if>
+			</xsl:if>
+			<xsl:if test="Benchmark">
+			    <xsl:variable name="i" ><xsl:number level="any"  from="AllMessages" count="Benchmark" /></xsl:variable>
+				 --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
+			</xsl:if>
+			<xsl:if test="Exception">
+				<p class="error">Stack Trace :<br />
+    				<xsl:call-template name="Replace">
+        				<xsl:with-param name="string" select="Exception"/>
+    				</xsl:call-template>
+				</p>
+			</xsl:if>
+		</p>
 	</xsl:template>
 	
 <!-- Message -->
@@ -111,7 +143,8 @@
 				<xsl:if test="@failed = 'false'"><b><span style="color: rgb(0, 255, 0);"> [SUCCESS] </span></b></xsl:if>
 			</xsl:if>
 			<xsl:if test="Benchmark">
-				Max=<xsl:value-of select ="Benchmark/MaxTime" />ms Moy=<xsl:value-of select ="Benchmark/MoyTime" />ms STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" />ms --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
+			    <xsl:variable name="i" ><xsl:number level="any"  from="AllMessages" count="Benchmark" /></xsl:variable>
+				<a href="bench_results_files/Bench{$i}.png">See the chart</a> Max=<xsl:value-of select ="Benchmark/MaxTime" />ms Moy=<xsl:value-of select ="Benchmark/MoyTime" />ms STDEV=<xsl:value-of select ="format-number(number(Benchmark/STDEV),'.00')" />ms --> <i>Min </i><b><xsl:value-of select ="Benchmark/BestTime" /></b><i>ms</i>
 			</xsl:if>
 			<xsl:if test="Exception">
 				<p class="error">Stack Trace :<br />

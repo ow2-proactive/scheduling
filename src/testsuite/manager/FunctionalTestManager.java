@@ -30,13 +30,19 @@
 */
 package testsuite.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
+import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
+
 import testsuite.result.AbstractResult;
 import testsuite.result.ResultsCollections;
+
 import testsuite.test.FunctionalTest;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.util.Iterator;
 
 
 /**
@@ -46,24 +52,29 @@ import testsuite.test.FunctionalTest;
 public abstract class FunctionalTestManager extends AbstractManager {
 
     /**
-     *
-     */
+ *
+ */
     public FunctionalTestManager() {
         super("FunctionalTestManager with no name",
             "FunctionalTestManager with no description");
     }
 
     /**
-     * @param name
-     * @param description
-     */
+ * @param name
+ * @param description
+ */
     public FunctionalTestManager(String name, String description) {
         super(name, description);
     }
 
+    public FunctionalTestManager(File xmlDescriptor)
+        throws IOException, SAXException {
+        super(xmlDescriptor);
+    }
+
     /**
-     * @see testsuite.manager.AbstractManager#execute()
-     */
+ * @see testsuite.manager.AbstractManager#execute()
+ */
     public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
@@ -132,8 +143,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 }
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
-                "Group : " + group.getName() + " Runs : " + runs + " Errors : " +
-                errors);
+                "Group : " + group.getName() + " Runs : " + runs +
+                " Errors : " + errors);
 
             try {
                 group.endGroup();
@@ -201,7 +212,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
             }
         }
 
-        results.add(AbstractResult.IMP_MSG, "Starting with interlinked Tests ...");
+        results.add(AbstractResult.IMP_MSG,
+            "Starting with interlinked Tests ...");
 
         try {
             initManager();

@@ -30,27 +30,30 @@
 */
 package testsuite.manager;
 
-import testsuite.group.Group;
-
-import testsuite.result.AbstractResult;
-import testsuite.result.BenchmarkResult;
-import testsuite.result.ResultsCollections;
-
-import testsuite.test.Benchmark;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-
 import java.util.Iterator;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.StandardXYItemRenderer;
+import org.jfree.data.DefaultCategoryDataset;
+import org.jfree.data.TableXYDataset;
+import org.jfree.data.XYSeries;
+import org.xml.sax.SAXException;
+
+import testsuite.group.Group;
+import testsuite.result.AbstractResult;
+import testsuite.result.BenchmarkResult;
+import testsuite.result.ResultsCollections;
+import testsuite.test.Benchmark;
 
 
 /**
@@ -60,24 +63,29 @@ import javax.xml.transform.stream.StreamSource;
 public abstract class BenchmarkManager extends AbstractManager {
 
     /**
-       *
-       */
+*
+*/
     public BenchmarkManager() {
         super("BenchmarkManager with no name",
             "BenchmarkManager with no description");
     }
 
     /**
-     * @param name
-     * @param description
-     */
+* @param name
+* @param description
+*/
     public BenchmarkManager(String name, String description) {
         super(name, description);
     }
 
+    public BenchmarkManager(File xmlDescriptor)
+        throws IOException, SAXException {
+        super(xmlDescriptor);
+    }
+
     /**
-     * @see testsuite.manager.AbstractManager#execute()
-     */
+* @see testsuite.manager.AbstractManager#execute()
+*/
     public void execute(boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
             logger.info("Starting ...");
@@ -184,30 +192,107 @@ public abstract class BenchmarkManager extends AbstractManager {
     }
 
     /**
-     * @see testsuite.result.ResultsExporter#toHTML(java.io.File)
-     */
+* @see testsuite.result.ResultsExporter#toHTML(java.io.File)
+*/
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
-        createSVG(location.getParentFile());
+        createBenchGraph(location.getParentFile());
+        createBarCharts(location.getParentFile());
         super.toHTML(location);
     }
 
-    private void createSVG(File location)
-        throws ParserConfigurationException, TransformerException, IOException {
-        TransformerFactory tFactory = TransformerFactory.newInstance();
-        String xslPath = "/" +
-            AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
-                "/xslt/svgExporter.xsl");
-        InputStream stylesheet = getClass().getResourceAsStream(xslPath);
-        Transformer transformer = tFactory.newTransformer(new StreamSource(
-                    stylesheet));
-        DOMSource xml = new DOMSource(toXML());
+    private void createBarCharts(File location) throws IOException {
+        if (!location.isDirectory()) {
+            throw new IOException(location.getName() + " is not a directory !");
+        }
 
-        transformer.setParameter("dest", location.getPath());
-        File tmp = File.createTempFile("bench", ".tmp");
-        tmp.deleteOnExit();
-        StreamResult os = new StreamResult(tmp);
-        transformer.transform(xml, os);
-        stylesheet.close();
+        if (logger.isInfoEnabled()) {
+            logger.info("Create all bar charts ...");
+        }
+
+        File graphDir = new File(location, "bench_results_files");
+        if (!graphDir.exists()) {
+            graphDir.mkdir();
+        }
+
+        Iterator itGroup = getGroups().iterator();
+        int numGroup = 0;
+        while (itGroup.hasNext()) {
+            numGroup++;
+            Group group = (Group) itGroup.next();
+            Iterator itResult = group.getResults().iterator();
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            while (itResult.hasNext()) {
+                AbstractResult absResult = (AbstractResult) itResult.next();
+                if (absResult instanceof BenchmarkResult) {
+                    BenchmarkResult result = (BenchmarkResult) absResult;
+                    dataset.addValue(result.getTimeResult(),
+                        result.getTest().getName(), group.getName());
+                }
+            }
+            JFreeChart chart = ChartFactory.createBarChart3D(group.getName(),
+                    "Benchmarks", "ms", dataset, PlotOrientation.VERTICAL,
+                    true, true, false);
+            ChartUtilities.saveChartAsPNG(new File(graphDir.getPath() +
+                    File.separator + "Group" + numGroup + ".png"), chart, 800,
+                600);
+            if (logger.isInfoEnabled()) {
+                logger.info("Bar Chart " + graphDir.getPath() + File.separator +
+                    "Group" + numGroup + ".png created");
+            }
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("... Finish to create bar charts");
+        }
+    }
+
+    private void createBenchGraph(File location) throws IOException {
+        if (!location.isDirectory()) {
+            throw new IOException(location.getName() + " is not a directory !");
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Create all charts ...");
+        }
+
+        File graphDir = new File(location, "bench_results_files");
+        if (!graphDir.exists()) {
+            graphDir.mkdir();
+        }
+
+        ResultsCollections results = this.getResults();
+        Iterator it = results.iterator();
+        int numBench = 0;
+        while (it.hasNext()) {
+            AbstractResult absResult = (AbstractResult) it.next();
+            if (absResult instanceof BenchmarkResult) {
+                BenchmarkResult result = (BenchmarkResult) absResult;
+                XYSeries series = new XYSeries(result.getTest().getName());
+                for (int i = 0; i < result.getSet().length; i++) {
+                    series.add(i + 1, result.getSet()[i]);
+                }
+                TableXYDataset table = new TableXYDataset(series);
+                XYPlot plot = new XYPlot(table, new NumberAxis("Nb Runs"),
+                        new NumberAxis("Time in ms"),
+                        new StandardXYItemRenderer(
+                            StandardXYItemRenderer.SHAPES_AND_LINES));
+                JFreeChart chart = new JFreeChart(result.getTest().getName(),
+                        plot);
+                ChartUtilities.saveChartAsPNG(new File(graphDir.getPath() +
+                        File.separator + "Bench" +
+                        ((numBench == 0) ? "" : (numBench + "")) + ".png"),
+                    chart, 800, 600);
+                numBench++;
+                if (logger.isInfoEnabled()) {
+                    logger.info("Chart " + graphDir.getPath() + File.separator +
+                        "Bench" + numBench + ".png created");
+                }
+            }
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("... Finish to create charts");
+        }
     }
 }

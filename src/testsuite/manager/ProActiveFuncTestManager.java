@@ -40,6 +40,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
 
+import org.xml.sax.SAXException;
+
 import testsuite.exception.BadTypeException;
 
 import testsuite.group.Group;
@@ -49,6 +51,7 @@ import testsuite.result.ResultsCollections;
 
 import testsuite.test.FunctionalTest;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.net.InetAddress;
@@ -64,8 +67,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     private ProActiveDescriptor pad = null;
     private VirtualNode[] virtualNodes = null;
     private String xmlFileLocation = ProActiveFuncTestManager.class.getResource(
-	        "/" + ProActiveFuncTestManager.class.getName().replace('.', '/') +
-	        ".xml").getPath();
+            "/" + ProActiveFuncTestManager.class.getName().replace('.', '/') +
+            ".xml").getPath();
     private Node sameVMNode = null;
     private Node localVMNode = null;
     private Node remoteVMNode = null;
@@ -73,8 +76,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     private RSHJVMProcess rshJVM = null;
 
     /**
-     *
-     */
+ *
+ */
     public ProActiveFuncTestManager() {
         super("Remote Functional Test Manager",
             "Help you to manage your remote Functional Tests.");
@@ -87,9 +90,9 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @param name
-     * @param description
-     */
+ * @param name
+ * @param description
+ */
     public ProActiveFuncTestManager(String name, String description) {
         super(name, description);
         try {
@@ -97,6 +100,12 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
         } catch (IOException e1) {
             logger.warn("Can't load attributes", e1);
         }
+        initNodes();
+    }
+
+    public ProActiveFuncTestManager(File xmlDescriptor)
+        throws IOException, SAXException {
+        super(xmlDescriptor);
         initNodes();
     }
 
@@ -149,8 +158,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @see testsuite.manager.AbstractManager#execute()
-     */
+ * @see testsuite.manager.AbstractManager#execute()
+ */
     public void execute(boolean useAttributesFile) {
         ResultsCollections results = getResults();
         try {
@@ -175,12 +184,12 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
                 "Unknown hostname, Functional Test will be probably fail", e);
         }
 
-        super.execute(true);
+        super.execute(useAttributesFile);
     }
 
     /**
-     * @see testsuite.manager.FunctionalTestManager#execute(testsuite.group.Group, testsuite.test.FunctionalTest)
-     */
+ * @see testsuite.manager.FunctionalTestManager#execute(testsuite.group.Group, testsuite.test.FunctionalTest)
+ */
     public void execute(Group group, FunctionalTest lastestTest,
         boolean useAttributesFile) {
         ResultsCollections results = getResults();
@@ -209,8 +218,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @see testsuite.manager.AbstractManager#endManager()
-     */
+ * @see testsuite.manager.AbstractManager#endManager()
+ */
     public void endManager() throws Exception {
         if (pad != null) {
             pad.killall();
@@ -219,29 +228,29 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getLocalVMNode() {
         return localVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getRemoteVMNode() {
         return remoteVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public Node getSameVMNode() {
         return sameVMNode;
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public VirtualNode[] getVirtualNodes() {
         return virtualNodes;
     }
@@ -251,8 +260,8 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public String getRemoteHostname() {
         return remoteHostname;
     }
@@ -262,15 +271,15 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     }
 
     /**
-     * @return
-     */
+ * @return
+ */
     public String getXmlFileLocation() {
         return xmlFileLocation;
     }
 
     /**
-     * @param xmlFileLocation
-     */
+ * @param xmlFileLocation
+ */
     public void setXmlFileLocation(String xmlFileLocation) {
         this.xmlFileLocation = xmlFileLocation;
     }

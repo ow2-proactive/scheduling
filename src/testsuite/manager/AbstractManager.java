@@ -39,6 +39,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.xml.sax.SAXException;
+
 import testsuite.bean.Beanable;
 
 import testsuite.group.Group;
@@ -47,6 +49,8 @@ import testsuite.result.ResultsCollections;
 import testsuite.result.ResultsExporter;
 
 import testsuite.test.AbstractTest;
+
+import testsuite.xml.ManagerDescriptorHandler;
 
 import testsuite.xslt.TransformerXSLT;
 
@@ -98,6 +102,13 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
         testAppender();
     }
 
+    public AbstractManager(File xmlDescriptor) throws IOException, SAXException {
+        logger = Logger.getLogger(getClass().getName());
+        testAppender();
+        ManagerDescriptorHandler.createManagerDescriptor(xmlDescriptor.getPath(),
+            this);
+    }
+
     private void testAppender() {
         int nbAppenders = 0;
         Enumeration enum = Logger.getRootLogger().getAllAppenders();
@@ -114,7 +125,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
             }
             Logger.getRootLogger().addAppender(new WriterAppender(
                     new PatternLayout("%d [%t] %-5p %c %x - %m%n"), out));
-             Logger.getRootLogger().setLevel((Level)Level.INFO);
+            Logger.getRootLogger().setLevel((Level) Level.INFO);
         }
     }
 
@@ -258,6 +269,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      */
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
+        if (logger.isInfoEnabled()) {
+            logger.info("Create HMTL file ...");
+        }
         String xslPath = "/" +
             AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
                 "/xslt/manager.xsl");
@@ -282,6 +296,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
         }
         css.close();
         out.close();
+        if (logger.isInfoEnabled()) {
+            logger.info("... Finish creating HTML file");
+        }
     }
 
     /**
@@ -397,7 +414,9 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      * @see testsuite.bean.Beanable#loadAttributes()
      */
     public void loadAttributes() throws IOException {
-        String filename = getClass().getResource("/"+getClass().getName().replace('.','/') + ".class").getPath();
+        String filename = getClass()
+                              .getResource("/" +
+                getClass().getName().replace('.', '/') + ".class").getPath();
         filename = filename.replaceAll("\\.class", ".prop");
         loadAttributes(new File(filename.replaceAll("%20", " ")));
     }
