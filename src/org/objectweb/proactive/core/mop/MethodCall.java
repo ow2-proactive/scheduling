@@ -48,10 +48,10 @@ import java.lang.reflect.Method;
  * @author Julien Vayssi&egrave;re
  */
 public final class MethodCall implements java.io.Serializable {
-    // added a tag for identification of component requests
+    // COMPONENTS added a tag for identification of component requests
     private String tag;
 
-    // added a field for the Fractal interface name 
+    // COMPONENTS added a field for the Fractal interface name 
     // (the name of the interface containing the method called)
     private String fcFunctionalInterfaceName;
 
@@ -221,6 +221,7 @@ public final class MethodCall implements java.io.Serializable {
     public synchronized static MethodCall getComponentMethodCall(
         Method reifiedMethod, Object[] effectiveArguments,
         String fcFunctionalInterfaceName) {
+        // COMPONENTS
         MethodCall mc = MethodCall.getMethodCall(reifiedMethod,
                 effectiveArguments);
         mc.setTag(COMPONENT_TAG);
