@@ -1,0 +1,215 @@
+<html>
+<head>
+<title>Handling Non-Functional Exceptions in ProActive</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="FAQ.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>Handling Non-Functional Exceptions in ProActive</h1>
+
+<h2>What are Non-Functional Exceptions ?</h2>
+<p class="textNormal">
+A few years ago, <b>Aspect-oriented Programming</b> defined <b>non-functional properties</b> (security, persistence, transaction...)
+to produce separation of concerns (for information and more, see <a href="http://aspectj.org">AspectJ website</a>). Because of its transparency
+in ProActive, distribution can be seen as a non-functional property. However, exceptions occuring in a distributed environment are raised
+from lower non-functional levels (i.e. network or Java RMI) to higher functional levels (functional code) with usually no other choice than stopping application.
+Such exceptions, raised from a <b>non-functional property</b>, are called <b>non-functional exceptions</b> and should not be propagated 
+outside the scope of non-functional property. The handlers mechanism developed within ProActive is a reliable solution. As this model has been
+subject to intensive work, a complete article can be found <a href="handlers.pdf">here</a>.
+</p>
+
+<p class="textNormal">
+<b>Non-functional exceptions</b> signal abnormal behavior of non-functional property, such as distribution. Thus, we defined a complete <b>hierarchy</b> 
+adapted to distribution and used by our own handling mechanism (see forward).
+</p>
+
+<div align="center"><img src="Exceptions.gif"/>
+<p class="textNormal"><b>Figure 1 : Hierarchy of Non-Functional Exceptions for Distribution</b></p>
+</div>
+
+<p class="textNormal">
+Those exceptions can be found in the following packages :
+</p>
+<menu>
+<li class="textNormal">Communication exceptions : org.objectweb.proactive.core.exceptions.communication</li>
+<li class="textNormal">Creation exceptions : org.objectweb.proactive.core.exceptions.creation</li>
+<li class="textNormal">Group exceptions : org.objectweb.proactive.core.exceptions.group</li>
+<li class="textNormal">Migration exceptions : org.objectweb.proactive.core.exceptions.migration</li>
+<li class="textNormal">Security exceptions : org.objectweb.proactive.core.exceptions.security</li>
+<li class="textNormal">Service exceptions : org.objectweb.proactive.core.exceptions.service</li>
+</menu>
+
+<h2>Mechanism of Handlers and API</h2>
+<p class="textNormal">
+<b>Handlers are dedicated exception managers</b> dealing with non-functional exceptions. Every handler implements the
+interface <b>HandlerInterface</b> in order to provide methods to handle exceptions. Here is the interface :
+<blockquote><pre>
+     <b>// Is the exception managed by the current handler ?</b>
+  public boolean isHandling(Exception e);
+
+     <b>// Provide a treatment for handled exception(s)</b>
+  public void handle(Exception e);
+</pre></blockquote>
+
+<p class="textNormal">
+Then, handlers are associated to static and dynamic structures and provide different levels according to the desired behavior. The following
+levels are ordered from lower to higher priority :
+</p>
+<menu>
+<li class="textNormal">Default : this level is static and initialized in core code. Static handlers provide basic handling for every distributed exception.</li>
+<li class="textNormal">Virtual Machine : dynamic handlers allow the configuration of a general handling behavior for every VM.</li>
+<li class="textNormal">Active Object : Such objects can have their own handlers.</li>
+<li class="textNormal">Proxy : References to active object can also have their own handlers.</li>
+<li class="textNormal">Future : Results of asynchronous calls can require a specific treatment.</li>
+<li class="textNormal">Code : Sometimes handlers are set punctually in the code.</li>
+</menu>
+<p class="textNormal">
+Default handlers provide a basic handling strategy which avoid intensive use of dynamic handlers. Construction and configuration happen during initialization 
+of ProActive. Default level contains only static handlers which are provided for every class of distributed exception. 
+
+VM and higher levels contain dynamic handlers to improve and adapt fault tolerance strategies defined at default level. This is particularly useful 
+when different versions of a distributed middleware (Peer to Peer, Client/Server or Desktop/Mobile applications) derive from a common source. Such 
+dynamic handlers are created at runtime and added to appropriate level (VM, active object, proxy, future or temporary code levels). \emph{A standard strategy, 
+common to every distributed application, is provided with the default level while more specific strategies are achieved with dynamic levels}. Of 
+course, as configuration change from application to application, or even from execution ton execution, dynamic handling offers obviously much more possibilities 
+than static handling. Handlers are modified or exchanged according to the context of environment.
+</p>
+
+<p class="textNormal">
+The API consists of three major static functions.
+</p>
+
+<blockquote><pre>
+  public static void <b>setExceptionHandler</b>(HashMap hash, HandlerInterface handler, ProActiveException ex);
+  public static HandlerInterface <b>unsetExceptionHandler</b>(HashMap hash, ProActiveException ex);
+  public static boolean <b>searchExceptionHandler</b>(HashMap handlerList, ProActiveException ex);
+</pre></blockquote>
+
+<p class="textNormal">
+<b>SetExceptionHandler</b> binds one handler with a class of exception at a specific level.<br>
+<b>UnsetExceptionHandler</b> removes from level the handler associated with the given class of exception.<br>
+<b>SearchExceptionHandler</b> searches a correct handler forn a class of exception and apply the handling method to the raised exception.
+</p>
+
+<h2>Dealing with Exceptions in ProActive Contributions : Static Handlers at Default Level and Dynamic Handlers</h2>
+<p class="textNormal">
+Default handlers, being part of the default level, are statically created when ProActive runtime is executing. They should not 
+be removed or overloaded. We don't advise any modification at runtime because of its use to produce specific safety behavior. 
+Dynamic handlers from VM and higher level are provided to improve fault tolerance behavior.
+<b>The default level gives a general behavior for exception handling while VM and higher level provides its specialization</b>.
+This is particularly useful if different versions of ProActive (ex : Peer to Peer application, Client/Server or Desktop/Mobile) are planed. 
+By constructing specific behavior statically, most of the configuration can be avoided at runtime.
+</p>
+
+<p class="textNormal">
+Here is how default and VM levels are declared and initialized.
+</p>
+<blockquote><pre>
+     <b>// The two lower levels of exception handling</b>
+  static public HashMap defaultLevel;
+  static public HashMap VMLevel;
+ 
+     <b>// Static initialization of ProActive</b>
+  static {
+	
+       <b>// Creation of main handlers levels</b>
+    defaultLevel = new HashMap();	
+    VMLevel = new HashMap();
+	
+       <b>// We set default handlers to use at default level</b>
+       <b>// VM and higher level remain empty from any handler</b>
+    setExceptionHandler(defaultLevel, "HandlerProActiveException", "ProActiveException");
+    setExceptionHandler(defaultLevel, "HandlerCommunicationException", "ProActiveCommunicationException");
+    setExceptionHandler(defaultLevel, "HandlerCreationException", "ProActiveCreationException");
+    setExceptionHandler(defaultLevel, "HandlerGroupException", "ProActiveGroupException");
+    setExceptionHandler(defaultLevel, "HandlerMigrationException", "ProActiveMigrationException");
+    setExceptionHandler(defaultLevel, "HandlerSecurityException", "ProActiveSecurityException");
+    setExceptionHandler(defaultLevel, "HandlerServiceException", "ProActiveServiceException");
+
+    // Other initializations follow...
+  }
+</blockquote></pre>
+
+<p class="textNormal">
+Other levels are created and configurated along with their associated objects.
+</p>
+<blockquote><pre>
+     <b>// Creation of a remote and mobile object</b>
+  RO ro = (RO) ProActive.newActive("RO", params);
+
+     <b>// Set a specific handler for communication</b>
+  setExceptionHandler(ro.remoteObjectLevel,
+                      "CommunicationHandler",
+                      "CommunicationException");
+
+     <b>// Remote method calls are now protected</b>
+  ro.foo();
+</blockquote></pre>
+
+<p class="textNormal">
+The following code shows how to search a specific handler when an exception is raised. Keep in mind that <b>the search starts from higher priority levels</b>
+as seen previously.
+</p>
+<blockquote><pre>
+  try {
+ 
+     <b>// Reified method call as founded in the core of ProActive </b>
+     sendRequest(methodCall, null);
+
+  catch (ProActiveException e) {
+
+       <b>// We search a reliable handler in levels for the given exception</b>
+    HandlerInterface handler = searchExceptionHandler(e);
+
+       <b>// Then we handle exception</b> 
+    handler.handle(e);
+  }
+</pre></blockquote>
+
+<p class="textNormal">
+To summarize, here are <b>the most important points to customize handlers mechanism</b> :
+</p>
+<menu>
+<li class="textNormal">Define a Distributed Exception within the hierarchy of non-functional exceptions.</li>
+<li class="textNormal">Create a reliable handler from scratch or from an existing one.</li>
+<li class="textNormal">Register handler during initialization or at runtime with <b>setExceptionHandler</b>.</li>
+<li class="textNormal">Adapt try/catch construction with <b>searchExceptionHandler</b>.</li>
+</menu>
+
+<h2>Example of a Complete Strategy within a ProActive Application</h2>
+<p class="textNormal">
+Coming soon...
+</p>
+<blockquote><pre>
+</pre></blockquote>
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2002 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>
