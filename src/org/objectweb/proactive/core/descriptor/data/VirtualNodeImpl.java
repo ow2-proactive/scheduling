@@ -359,7 +359,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty tab");
+                logger.warn("WARN: Returning empty array");
                 return new String[0];
             }
         }
@@ -388,7 +388,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 logger.warn("WARN: No nodes have yet been created.");
                 logger.warn(
                     "WARN: This behavior might be normal, since P2P service is used with MAX number of nodes requested");
-                logger.warn("WARN: Returning empty tab");
+                logger.warn("WARN: Returning empty array");
                 return new Node[0];
             }
         }
