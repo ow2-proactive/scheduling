@@ -176,7 +176,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         //		// should not have a ProActiveComponentRepresentativeImpl, but a sub-type of the functional interface 
         //	Component ci_group = ProActiveComponentGroup.newActiveComponentGroup(itfType);
         //	itf_ref.setFcItfImpl(ci_group);
-        ProActiveInterface itf_ref_group = ProActiveComponentGroup.newActiveComponentGroup(itfType);
+        ProActiveInterface itf_ref_group = ProActiveComponentGroup.newActiveComponentInterfaceGroup(itfType);
         itf_ref.setFcItfImpl(itf_ref_group);
         return itf_ref;
     }
