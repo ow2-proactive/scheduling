@@ -156,8 +156,10 @@ public class ActiveBody extends MigratableBody implements Runnable, java.io.Seri
       terminate();
     } finally {
       if (isActive()) activityStopped();
-      // execute the end of activity
-      if (endActive != null) endActive.endActivity(this);
+      // execute the end of activity if not after migration
+      if ((! hasJustMigrated) && endActive != null) {
+        endActive.endActivity(this);
+      }
     }
   }
 

@@ -47,7 +47,7 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
   protected MigrationManager migrationManager;
 
   /** signal that the body has just migrated */
-  private transient boolean hasJustMigrated;
+  protected transient boolean hasJustMigrated;
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -157,6 +157,8 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
     requestReceiver = migrationManager.createRequestReceiver(migratedBody, requestReceiver);
     replyReceiver = migrationManager.createReplyReceiver(migratedBody, replyReceiver);
     migrationManager = null;
+    // signal that this body (remaining after migration) has just migrated
+    hasJustMigrated = true;
   }
   
   
