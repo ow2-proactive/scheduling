@@ -142,10 +142,10 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createdNodeCount()
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
-    public int createdNodeCount() {
-        return virtualNode.createdNodeCount();
+    public int getNumberOfCurrentlyCreatedNodes() {
+        return virtualNode.getNumberOfCurrentlyCreatedNodes();
     }
 
     /**
@@ -158,6 +158,14 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new NodeException(pae);
         }
         return virtualNode.getNode();
+    }
+
+    /*
+     *  (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCreatedNodesAfterDeployment()
+     */
+    public int getNumberOfCreatedNodesAfterDeployment() {
+        return virtualNode.getNumberOfCreatedNodesAfterDeployment();
     }
 
     /**

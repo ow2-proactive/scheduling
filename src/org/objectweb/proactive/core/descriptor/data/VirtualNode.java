@@ -97,10 +97,18 @@ public interface VirtualNode extends java.io.Serializable, Job {
     public int getNodeCount();
 
     /**
-     * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
-     * @return int
+     * Returns the number of Nodes already created (at the time of the reception of method call) among the Nodes mapped to this VirtualNode 
+     * in the XML Descriptor
+     * @return int the number of nodes created at  the time of the method call
      */
-    public int createdNodeCount();
+    public int getNumberOfCurrentlyCreatedNodes();
+    
+    /**
+     * Returns the number of Nodes that could successfully be created at the end of the deployment
+     *  @return int the number of nodes effectively created
+     */
+    public int getNumberOfCreatedNodesAfterDeployment();
+
 
     /**
      * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor

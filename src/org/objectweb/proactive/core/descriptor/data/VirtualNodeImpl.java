@@ -106,15 +106,15 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private int lastNodeIndex;
 
     /** Number of Nodes mapped to this VirtualNode in the XML Descriptor */
-    private int nodeCount;
+    private int nbMappedNodes;
 
     /** Minimum number of nodes needed for this virtualnode while waiting on the nodes
      * creation.
      */
-    private int minNodeNumber = 0;
+    private int minNumberOfNodes = 0;
 
     /** Number of Nodes mapped to this VitualNode in the XML Descriptor that are actually created */
-    private int nodeCountCreated;
+    private int nbCreatedNodes;
 
     /** true if the node has been created*/
     private boolean nodeCreated = false;
@@ -305,16 +305,30 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @return int
      */
     public int getNodeCount() {
-        return nodeCount;
+        return nbMappedNodes;
     }
 
-    /**
-     * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
-     * @return int
+    /*
+     *  (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
-    public int createdNodeCount() {
-        return nodeCountCreated;
+    public int getNumberOfCurrentlyCreatedNodes() {
+        return nbCreatedNodes;
     }
+    
+    /*
+     *  (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCreatedNodesAfterDeployment()
+     */
+    public int getNumberOfCreatedNodesAfterDeployment() {
+        try {
+            waitForAllNodesCreation();
+        } catch (NodeException e) {
+            logger.error("Problem occured while waiting for nodes creation");
+        }
+        return nbCreatedNodes;
+    }
+
 
     /**
      * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor
@@ -683,14 +697,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @param min the minimum number of nodes
      */
     public void setMinNumberOfNodes(int min) {
-        this.minNodeNumber = min;
+        this.minNumberOfNodes = min;
     }
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
      */
     public int getMinNumberOfNodes() {
-        return minNodeNumber;
+        return minNumberOfNodes;
     }
 
     //  SECURITY
@@ -740,7 +754,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
             // we must increase the node count
             String url;
-            increaseNodeCount(1);
+            increaseNumberOfNodes(1);
             String nodeName = this.name +
                 Integer.toString(new java.util.Random(
                         System.currentTimeMillis()).nextInt());
@@ -796,7 +810,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     private synchronized void waitForAllNodesCreation()
         throws NodeException {
-        int tempNodeCount = nodeCount;
+        int tempNodeCount = nbMappedNodes;
         if (tempNodeCount != 0) {
             //nodeCount equal 0 means there is only a P2P service with MAX number of nodes requested
             // so if different of 0, we can set to false the boolean
@@ -811,10 +825,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } else {
             // check if we can release the vn before all nodes expected, are created
             // i.e the minNumber of nodes is set
-            if (minNodeNumber != 0) {
-                tempNodeCount = minNodeNumber;
+            if (minNumberOfNodes != 0) {
+                tempNodeCount = minNumberOfNodes;
             }
-            while (nodeCountCreated != tempNodeCount) {
+            while (nbCreatedNodes != tempNodeCount) {
                 if (!timeoutExpired()) {
                     try {
                         wait(getTimeToSleep());
@@ -825,12 +839,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         // the timeToSleep is < 0. It means that the timeout expired
                         // that is why we catch the runtime exception
                         throw new NodeException("After many retries, only " +
-                            nodeCountCreated + " nodes are created on " +
+                            nbCreatedNodes + " nodes are created on " +
                             tempNodeCount + " expected ");
                     }
                 } else {
                     throw new NodeException("After many retries, only " +
-                        nodeCountCreated + " nodes are created on " +
+                        nbCreatedNodes + " nodes are created on " +
                         tempNodeCount + " expected");
                 }
             }
@@ -874,7 +888,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             return copyProcess;
         } else {
             //increment the node count by nodeNumber
-            increaseNodeCount(new Integer(vm.getNodeNumber()).intValue());
+            increaseNumberOfNodes(new Integer(vm.getNodeNumber()).intValue());
             return process;
         }
     }
@@ -906,7 +920,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (processImpl instanceof LSFBSubProcess) {
                 //if the process is bsub we have to increase the node count by the number of processors
                 bsub = (LSFBSubProcess) processImpl;
-                increaseNodeCount((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
+                increaseNumberOfNodes((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof PrunSubProcess) {
                 //if the process is prun we have to increase the node count by the number of processors            
@@ -919,7 +933,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNodeCount((new Integer(prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                increaseNumberOfNodes((new Integer(prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         prun.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof PBSSubProcess) {
@@ -933,7 +947,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     logger.debug("VM " + vm);
                 }
 
-                increaseNodeCount((new Integer(pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+                increaseNumberOfNodes((new Integer(pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         pbs.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof OARSubProcess) {
@@ -944,17 +958,17 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                         oar.getHostsNumber());
                     logger.debug("VM " + vm);
                 }
-                increaseNodeCount((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
+                increaseNumberOfNodes((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof GlobusProcess) {
                 //if the process is globus we have to increase the node count by the number of processors
                 globus = (GlobusProcess) processImpl;
-                increaseNodeCount((new Integer(globus.getCount()).intValue()) * nodeNumber);
+                increaseNumberOfNodes((new Integer(globus.getCount()).intValue()) * nodeNumber);
             }
 
             if (processImpl instanceof GridEngineSubProcess) {
                 sge = (GridEngineSubProcess) processImpl;
-                increaseNodeCount((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
+                increaseNumberOfNodes((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
             }
 
             processImplDecorator = (ExternalProcessDecorator) processImpl;
@@ -974,7 +988,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if ((bsub == null) && (prun == null) && (globus == null) &&
                     (pbs == null) && (oar == null) && (sge == null)) {
                 //if bsub and prun and globus are null we can increase the nodeCount
-                increaseNodeCount(nodeNumber);
+                increaseNumberOfNodes(nodeNumber);
             }
 
             //if(!vmAlreadyAssigned){
@@ -1046,10 +1060,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
     }
 
-    private void increaseNodeCount(int n) {
-        nodeCount = nodeCount + n;
+    private void increaseNumberOfNodes(int n) {
+        nbMappedNodes = nbMappedNodes + n;
         if (logger.isDebugEnabled()) {
-            logger.debug("NodeCount: " + nodeCount);
+            logger.debug("Number of nodes = " + nbMappedNodes);
         }
     }
 
@@ -1073,12 +1087,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
-        nodeCountCreated++;
+        nbCreatedNodes++;
         // wakes up Thread that are waiting for the node creation 
         notifyAll();
         //notify all listeners that a node has been created
         notifyListeners(this, NodeCreationEvent.NODE_CREATED, node,
-            nodeCountCreated);
+            nbCreatedNodes);
     }
 
     private void register() {
@@ -1111,7 +1125,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             // if it is a P2Pservice we must increase the node count with the number
             // of nodes requested
             if (nodeRequested != ((P2PLookupService) service).getMAX()) {
-                increaseNodeCount(nodeRequested);
+                increaseNumberOfNodes(nodeRequested);
                 //nodeRequested = MAX means that the service will try to get every nodes 
                 // it can. So we can't predict how many nodes will return.
             } else {
@@ -1119,7 +1133,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         } else {
             //increase with 1 node
-            increaseNodeCount(1);
+            increaseNumberOfNodes(1);
         }
         new ServiceThread(this, vm).start();
     }
