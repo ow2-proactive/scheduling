@@ -19,7 +19,7 @@
 			
 			<!-- Variables -->
 			<xsl:variable name="numGroup" select="string(1+count(ancestor::Group)+count(preceding::Group))"/>
-			<xsl:variable name="width" select="if ((220+(count(Results/Result/Benchmark))* ( $rectW + 10) )>800) then  220+(count(Results/Result/Benchmark))* ($rectW + 10) else 800" />
+			<xsl:variable name="width" select="if ((220+(count(Results/Result/Benchmark/BestTime))* ( $rectW + 10) )>800) then  220+(count(Results/Result/Benchmark/BestTime))* ($rectW + 10) else 800" />
 			
 			<xsl:result-document href="{concat($dest,'/group',$numGroup,'.svg')}" format="svg">
 				
@@ -60,7 +60,7 @@
     				<!-- Results -->
     				<xsl:variable name ="maxVal" >
 						<xsl:call-template name ="max" >
-							 <xsl:with-param name ="list" select ="Results/Result/Benchmark" />
+							 <xsl:with-param name ="list" select ="Results/Result/Benchmark/BestTime" />
  						</xsl:call-template>
  					</xsl:variable>
     				<g style="stroke:none;fill:red;font-family: Verdana, Helvetica, Arial, sans-serif; font-size:10pt;">
@@ -90,8 +90,8 @@
     	<xsl:param name="maxTime" />
     	<xsl:param name="width" />
     	<xsl:variable name="node" select="child::Results/Result[position()=$pos]"/>
-    	<xsl:if test="not($pos > count($results/Result/Benchmark))">
-    		<xsl:if test="not($results/Result/Benchmark)">
+    	<xsl:if test="not($pos > count($results/Result/Benchmark/BestTime))">
+    		<xsl:if test="not($results/Result/Benchmark/BestTime)">
     			<xsl:call-template name="drawRect">
         			<xsl:with-param name="pos" select="$pos + 1"/>
         			<xsl:with-param name="current" select="$current"/>
@@ -109,9 +109,9 @@
  			</xsl:variable>
  			
  			<!-- SVG -->
-    		<rect x="{$posX + $rectW * $current }" y="{ $height - (30 + (($node/Benchmark * ($height - 90)) div $maxTime)) }" width="{ $rectW }" height="{ ($node/Benchmark * ($height - 90)) div $maxTime }" fill="{ $rectColor }" />
-    		<text x="{$posX + $rectW * $current - 5 }" y="{ $height - (30 + (($node/Benchmark * ($height - 90)) div $maxTime)) - 5 }" fill="white" >
-    			<xsl:value-of select="format-number(number($node/Benchmark), '.00')" />
+    		<rect x="{$posX + $rectW * $current }" y="{ $height - (30 + (($node/Benchmark/BestTime * ($height - 90)) div $maxTime)) }" width="{ $rectW }" height="{ ($node/Benchmark/BestTime * ($height - 90)) div $maxTime }" fill="{ $rectColor }" />
+    		<text x="{$posX + $rectW * $current - 5 }" y="{ $height - (30 + (($node/Benchmark/BestTime * ($height - 90)) div $maxTime)) - 5 }" fill="white" >
+    			<xsl:value-of select="format-number(number($node/Benchmark/BestTime), '.00')" />
     		</text>
     		<text x="{$posX + $rectW * $current + 5}" y="{ $height - 15}" fill="{ $rectColor }">
     			<xsl:value-of select="$current" />
