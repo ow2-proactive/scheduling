@@ -93,14 +93,18 @@ public class ThreadPool {
      * @param members - the number of members in the group
      */
     public void checkNumberOfThreads(int members) {
-        // System.out.println("ThreadPool there are " + members + " members in the pool");
         int i;
+        int f;
 
-        // System.out.println("ThreadPool there are " + members + " members in the pool");
-        int f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) +
-            this.additionalThreads;
+        // System.out.println("ThreadPool: there are " + members + " members in the pool");
+        if (this.memberToThreadRatio != 0) {
+            f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) +
+                this.additionalThreads;
+        } else {
+            f = this.additionalThreads;
+        }
 
-        // System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
+        // System.out.println("ThreadPool: we need " + f + " threads and we have " + this.threads.length);
         if (this.threads.length < f) {
             Thread[] tmp = new Thread[f];
             for (i = 0; i < this.threads.length; i++) {
