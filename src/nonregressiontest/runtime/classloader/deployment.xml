@@ -27,7 +27,7 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-					 <relativePath origin="user.home" value="/ProActive/classes"/>
+					 <relativePath origin="user.home" value="/ProActive/dist/ProActive/ProActive.jar"/>
 				     <relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/>
 				     <relativePath origin="user.home" value="/ProActive/lib/asm.jar"/>
 				     <relativePath origin="user.home" value="/ProActive/lib/log4j.jar"/>
@@ -35,6 +35,7 @@
 				     <relativePath origin="user.home" value="/ProActive/lib/reggie.jar"/>
 				     <relativePath origin="user.home" value="/ProActive/lib/bouncycastle.jar"/>
 				     <relativePath origin="user.home" value="/ProActive/lib/components/fractal.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/classes/nonregressiontest/runtime/classloader/"/>
 					</classpath>
 				</jvmProcess>
 			</processDefinition>
