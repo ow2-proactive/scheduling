@@ -105,7 +105,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 		//classloader
 		try {
             GlobalFTServer.classServerHelper.setShouldCreateClassServer(true);
-            GlobalFTServer.classServerHelper.setClasspath(System.getProperty ("java.class.path"));
+            //GlobalFTServer.classServerHelper.setClasspath(System.getProperty ("java.class.path"));
             this.codebase = GlobalFTServer.classServerHelper.initializeClassServer();
             System.setProperty("java.rmi.server.codebase", this.codebase);
             logger.info("ClassServer is bound on " + this.codebase);
