@@ -85,5 +85,6 @@ public interface Group {
      * Returns the index in the group of the first occurence of the specified element, -1 if the list does not contain this element.
      */
     public int indexOf(Object obj);
+    
 
 }

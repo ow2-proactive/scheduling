@@ -33,20 +33,16 @@ package org.objectweb.proactive.core.group;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
-import org.objectweb.proactive.core.mop.GenerationOfStubClassFailedException;
 import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 
 
 
@@ -312,6 +308,15 @@ public class ProActiveGroup {
 			((ProxyForGroup)proxytmp).setDispatchingOff();
    }
    
+   /**
+     * Return <code>true</code> if the "scatter option" is enabled for the group <code>ogroup</code>.
+     */
+    public static boolean isScatterGroupOn (Object ogroup) {
+ 		Proxy proxytmp = findProxyForGroup(ogroup);
+		if (proxytmp != null)
+			return ((ProxyForGroup)proxytmp).isDispatchingOn();
+		else return false;
+   }
 
     /**
      * Returns the ProxyForGroup of the object <code>obj</code>.

@@ -1,25 +1,19 @@
 package org.objectweb.proactive.core.group;
 
 import java.lang.reflect.InvocationTargetException;
-
 import java.util.ListIterator;
 import java.util.Vector;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
-import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
-
-
-import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.Body;
 
 /**
  * This proxy class manages the semantic of group communication and implements the Group Interface.
@@ -74,6 +68,16 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		dispatching = false;
 	}
 
+	protected boolean isDispatchingOn () {
+		return dispatching;
+	}
+	
+	private boolean isDispatchingCall (MethodCall mc) {
+		for (int i = 0 ; i < mc.getNumberOfParameter() ; i++)
+			if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i)))
+				return true;
+		return false;
+	}
 
 	/* ------------------------ THE PROXY'S METHOD ------------------------ */
 
@@ -109,7 +113,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 	}
 
-	private synchronized void decrementWaitedAndNotifyAll() {
+	protected synchronized void decrementWaitedAndNotifyAll() {
 		waited--;
 		notifyAll();
 	}
@@ -140,15 +144,16 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 
 		// Creating Threads
-		if (dispatching == false)
+		if (isDispatchingCall(mc) == false)
+
 			for (int index = 0; index < memberList.size(); index++)
 				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);
 
-		else { // dispatching == true
+		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
 				Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
 				for (int i = 0; i < mc.getNumberOfParameter(); i++)
-					if (ProActiveGroup.isGroup(mc.getParameter(i)))
+					if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i)))
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
@@ -162,11 +167,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 	private synchronized void createThreadForAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
-		new Thread(new MyProcessForGroupAsync(memberList, memberListOfResultGroup, index, mc, body)).start();
+		new Thread(new ProcessForAsyncCall(this,memberList, memberListOfResultGroup, index, mc, body)).start();
 		this.waited++;
 	}
 
-	private synchronized void addToListOfResult(Vector memberListOfResultGroup, Object o, int index) {
+	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object o, int index) {
 		memberListOfResultGroup.set(index, o);
 		decrementWaitedAndNotifyAll();
 	}
@@ -176,19 +181,19 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Launch threads for OneWay call of each member
 	 */
-	protected void oneWayCallOnGroup(MethodCall mc) {
+	protected synchronized void oneWayCallOnGroup(MethodCall mc) {
 		Body body = ProActive.getBodyOnThis();		
 		// Creating Threads
 
-		if (dispatching == false)
+		if (isDispatchingCall(mc) == false)
 			for (int index = 0; index < memberList.size(); index++)
 				this.createThreadForOneWay(this.memberList, index, mc, body);
 
-		else { // dispatching == true
+		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
 				Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
 				for (int i = 0; i < mc.getNumberOfParameter(); i++)
-					if (ProActiveGroup.isGroup(mc.getParameter(i)))
+					if (ProActiveGroup.isScatterGroupOn(mc.getParameter(i)))
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
@@ -198,61 +203,13 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 	}
+	
 
 	private synchronized void createThreadForOneWay(Vector memberListStubOfThis, int index, MethodCall mc, Body body) {
-		new Thread(new MyProcessForGroupOneWay(memberListStubOfThis, index, mc, body)).start();
+		new Thread(new ProcessForOneWayCall(this,memberListStubOfThis, index, mc, body)).start();
 		this.waited++;
 	}
 
-	/* -------------------- INNER CLASS ----------------- */
-	private class MyProcessForGroupAsync implements Runnable {
-		private Vector memberList;
-		private Vector memberListOfResultGroup;
-		private int index;
-		private MethodCall mc;
-		private Body body;
-
-		MyProcessForGroupAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
-			this.memberList = memberList;
-			this.memberListOfResultGroup = memberListOfResultGroup;
-			this.index = index;
-			this.mc = mc;
-			this.body = body;
-		}
-
-		public synchronized void run() {
-			try {
-					LocalBodyStore.getInstance().setCurrentThreadBody(body);
-					addToListOfResult(memberListOfResultGroup, ((StubObject) (memberList.get(index))).getProxy().reify(mc), index);
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	private class MyProcessForGroupOneWay implements Runnable {
-		private Vector memberList;
-		private int index;
-		private MethodCall mc;
-		private Body body;
-
-		MyProcessForGroupOneWay(Vector memberList, int index, MethodCall mc, Body body) {
-			this.memberList = memberList;
-			this.index = index;
-			this.mc = mc;
-			this.body = body;
-		}
-
-		public synchronized void run() {
-			try {
-					LocalBodyStore.getInstance().setCurrentThreadBody(body);
-					((StubObject) (memberList.get(index))).getProxy().reify(mc);
-					decrementWaitedAndNotifyAll();
-			} catch (Throwable e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	/* --------------- THE GROUP'S METHOD ------------------ */
 
@@ -430,35 +387,13 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 
-	/* ------------------------ METHODS FOR SYNCHRONOUS CREATION OF A TYPED GROUP ------------------------ */
+	/* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 
-	public synchronized void createThreadCreation(String className, Object[] param, String node) {
-		new Thread(new MyProcessForGroupCreation(this, className, param, node)).start();
+	protected synchronized void createThreadCreation(String className, Object[] param, String node) {
+		new Thread(new ProcessForGroupCreation(this, className, param, node)).start();
 		waited++;
 	}
 
-	private class MyProcessForGroupCreation implements Runnable {
-		private Group group;
-		private String className;
-		private Object[] param;
-		private String node;
-
-		MyProcessForGroupCreation(Group group, String className, Object[] param, String node) {
-			this.group = group;
-			this.className = className;
-			this.param = param;
-			this.node = node;
-		}
-
-		public void run() {
-			try {
-				group.add(ProActive.newActive(className, param, node));
-				((org.objectweb.proactive.core.group.ProxyForGroup) group).decrementWaitedAndNotifyAll();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
 
 	/* ------------------------ PRIVATE METHODS FOR SERIALIZATION --------------------- */
 	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
