@@ -6,9 +6,13 @@ package org.objectweb.proactive.core.component.xml;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.Fractal;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -26,6 +30,7 @@ import java.util.HashMap;
  */
 public class PrimitiveComponentHandler extends ComponentHandler {
     public static Logger logger = Logger.getLogger(PrimitiveComponentHandler.class.getName());
+    private String[] names; // when deployed on a VN
 
     /**
      * @param deploymentDescriptor
@@ -38,8 +43,15 @@ public class PrimitiveComponentHandler extends ComponentHandler {
 
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
-        logger.debug("startContextElement : " + name);
+        names = null;
+        if (logger.isDebugEnabled()) {
+            logger.debug("startContextElement : " + name + "of : " +
+                this.componentParameters.getName());
+        }
 
+        //		for (int i = 0; i < attributes.getLength(); i++) {
+        //			System.out.println("ATTRIBUTES [" + i + "] : " + attributes.getValue(i));
+        //		}
         super.startContextElement(name, attributes);
 
         String implementation = attributes.getValue(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_IMPLEMENTATION_TAG);
@@ -54,6 +66,16 @@ public class PrimitiveComponentHandler extends ComponentHandler {
             // get corresponding virtual node
             VirtualNode vn = null;
             try {
+                if (virtualNode.equals(ComponentsDescriptorConstants.NULL)) {
+                    //					componentsCache.addComponent(componentParameters.getName(),
+                    //					//PrimitiveComponentB.class.getName(),
+                    componentsCache.addComponent(componentParameters.getName(),
+                        //PrimitiveComponentB.class.getName(),
+                    ProActive.newActiveComponent(implementation,
+                            new Object[] {  }, null, null, null,
+                            componentParameters));
+                    return;
+                }
                 vn = deploymentDescriptor.getVirtualNode(virtualNode);
             } catch (NullPointerException npe) {
                 logger.fatal(
@@ -65,38 +87,33 @@ public class PrimitiveComponentHandler extends ComponentHandler {
                 throw new NodeException("No node defined for virtual node " +
                     vn.getName());
             }
-            if (nodes.length == 1) {
+            if ((nodes.length == 1)) {
                 //					componentsCache.addComponent(componentParameters.getName(),
                 //					//PrimitiveComponentB.class.getName(),
                 componentsCache.addComponent(componentParameters.getName(),
                     //PrimitiveComponentB.class.getName(),
                 ProActive.newActiveComponent(implementation, new Object[] {  },
-                        //nodes[0], 
-                null, null, null, componentParameters));
+                        vn.getNode(), null, null, componentParameters));
             } else {
-                logger.debug(
-                    "**************************************************************\n" +
-                    "Deployment of a primitive component on a cyclic virtual node will result in the" +
-                    "creation of one instance of the primitive on each node, with an extended name of type : " +
-                    "primitiveName-cyclicInstanceNumber-theNumber" +
-                    "**************************************************************\n");
-                // loop on nodes
-                String original_component_name = componentParameters.getName();
-                for (int i = 0; i < nodes.length; i++) {
-                    // add an index on the name of the component
-                    //					componentParameters.setName(original_component_name + "-cyclicInstanceNumber-" + i);
-                    //					componentsCache
-                    //						.addComponent(
-                    //							componentParameters.getName(),
-                    //							ProActive.newActiveComponent(implementation, new Object[] {
-                    //					}, nodes[i], null, null, componentParameters));
-                    //					FIXME local deployment for debugging 
-                    componentParameters.setName(original_component_name +
-                        "-cyclicInstanceNumber-" + i);
-                    componentsCache.addComponent(componentParameters.getName(),
-                        ProActive.newActiveComponent(implementation,
-                            new Object[] {  }, null, null, null,
-                            componentParameters));
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "**************************************************************\n" +
+                        "Deployment of a primitive component on a cyclic virtual node will result in the" +
+                        "creation of one instance of the primitive on each node, with an extended name of type : " +
+                        "primitiveName-cyclicInstanceNumber-theNumber" +
+                        "**************************************************************\n");
+                }
+                Component[] primitives = null;
+                primitives = ProActive.newActiveComponent(implementation,
+                        new Object[] {  }, vn, componentParameters);
+                if (primitives != null) {
+                    names = new String[primitives.length];
+                    for (int i = 0; i < primitives.length; i++) {
+                        // consider all generated names
+                        names[i] = Fractal.getComponentParametersController(primitives[i])
+                                          .getComponentParameters().getName();
+                        componentsCache.addComponent(names[i], primitives[i]);
+                    }
                 }
             }
         } catch (NodeException ne) {
@@ -107,6 +124,11 @@ public class PrimitiveComponentHandler extends ComponentHandler {
             logger.error(
                 "cannot create active component : active object creation exception");
             aoce.printStackTrace();
+        } catch (NoSuchInterfaceException e) {
+            logger.error(
+                "cannot create active component : interface not found " +
+                e.getMessage());
+            e.printStackTrace();
         }
         if (logger.isDebugEnabled()) {
             logger.debug("created primitive component : " +
@@ -118,7 +140,12 @@ public class PrimitiveComponentHandler extends ComponentHandler {
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
     public Object getResultObject() throws SAXException {
-        return componentParameters.getName();
+        if (names != null) {
+            // there are several primitives components based on the same name
+            return new ComponentResultObject(names);
+        } else {
+            return new ComponentResultObject(componentParameters.getName());
+        }
     }
 
     /* (non-Javadoc)
