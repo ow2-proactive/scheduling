@@ -430,6 +430,17 @@
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
 		</java>
 	</target>
+	
+	
+	
+		<target name="runTestsLocal" depends="testsuite, nonregressiontest">
+		<java classname="nonregressiontest.MainManager" fork="true">
+			<classpath refid="test.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
+		</java>
+	</target>
+	
 	<!--
 	   ================================================================
 	   ==

@@ -99,7 +99,7 @@ public class MainManager extends FunctionalTestManager {
         File xml = new File(path);
         ProActiveConfiguration.load();
 
-        try {
+         try {
             manager = new MainManager(xml);
         } catch (Exception e) {
             e.printStackTrace();

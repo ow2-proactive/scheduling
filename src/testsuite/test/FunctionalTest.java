@@ -40,6 +40,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
+
 /**
  * <p>Define a generic functional AbstractTest.</p>
  * <p>If you want to use a test with the results of other tests. You must do create an action method with params.
