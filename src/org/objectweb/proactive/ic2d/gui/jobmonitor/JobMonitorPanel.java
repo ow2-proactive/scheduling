@@ -38,8 +38,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.tree.*;
 
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
@@ -184,6 +183,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
     public void setTtr(int _ttr) {
         ttr = _ttr;
+        refresher.interrupt();
     }
 
     public void addMonitoredHost(String host) {
