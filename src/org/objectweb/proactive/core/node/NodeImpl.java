@@ -274,7 +274,7 @@ public class NodeImpl implements Node, Serializable {
         }
 
 		/**
-		 * @see org.objectweb.proactive.Job#getJobId()
+		 * @see org.objectweb.proactive.Job#getJobID()
 		 */
 		public String getJobID() {
 			return jobID;
