@@ -1,11 +1,3 @@
-/*
- * Created by IntelliJ IDEA.
- * User: fhuet
- * Date: Apr 18, 2002
- * Time: 1:38:12 PM
- * To change template for new class use
- * Code Style | Class Templates options (Tools | IDE Options).
- */
 package org.objectweb.proactive.ext.mixedlocation;
 
 import org.apache.log4j.Logger;

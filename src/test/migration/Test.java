@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 
 public class Test implements Serializable, EndActive { //  , RunActive {
 
@@ -22,14 +23,24 @@ public class Test implements Serializable, EndActive { //  , RunActive {
     System.out.println("Hello, I am here");
   }
 
-  public void migrateTo(String url) {
+  public void migrateTo(String url) throws MigrationException  {
   	System.out.println("Test migrating to " + url);
-    try {
+   // try {
       ProActive.migrateTo(url);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+ //   } catch (Exception e) {
+ //     e.printStackTrace();
+ //   }
   }
+  
+//  public void migrateTo(String url)   {
+//	  System.out.println("Test migrating to " + url);
+//	  try {
+//		ProActive.migrateTo(url);
+//      } catch (Exception e) {
+//        e.printStackTrace();
+//      }
+//  // return 0;
+//	}
 
   public void runtimeException() {
     Integer s = null;

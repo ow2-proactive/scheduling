@@ -1,12 +1,12 @@
 package test.mixedlocation;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 
-public class Test implements Serializable {
+import java.io.Serializable;
 
+
+public class Test implements Serializable {
     protected int index;
 
     public Test() {
@@ -23,7 +23,6 @@ public class Test implements Serializable {
             e.printStackTrace();
         }
     }
-   
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -31,14 +30,16 @@ public class Test implements Serializable {
             System.exit(0);
         }
         Test t = null;
-       
+
         Source s = null;
         Object[] arg = new Object[1];
         arg[0] = args;
 
         try {
-            t = (Test) ProActive.newActive(Test.class.getName(), null, null, null, MixedLocationMetaObjectFactory.newInstance());
-            s = (Source) ProActive.newActive(Source.class.getName(), arg, null, null, MixedLocationMetaObjectFactory.newInstance());
+            t = (Test) ProActive.newActive(Test.class.getName(), null, null,
+                    null, MixedLocationMetaObjectFactory.newInstance());
+            s = (Source) ProActive.newActive(Source.class.getName(), arg, null,
+                    null, MixedLocationMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -47,7 +48,6 @@ public class Test implements Serializable {
     }
 
     public static class Source {
-
         protected Test t;
         protected String[] destinations;
 
@@ -55,7 +55,7 @@ public class Test implements Serializable {
         }
 
         public Source(String[] s) {
-           this.destinations = s;
+            this.destinations = s;
         }
 
         public void setTarget(Test t) {
@@ -66,12 +66,11 @@ public class Test implements Serializable {
             System.out.println("First call");
             t.echo();
             t.migrateTo("//tuba/Node1");
-//            try {
-//                Thread.currentThread().sleep(2000);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
+            //            try {
+            //                Thread.currentThread().sleep(2000);
+            //            } catch (Exception e) {
+            //                e.printStackTrace();
+            //            }
             t.migrateTo("//tuba/Node2");
             try {
                 Thread.sleep(2000);
@@ -82,7 +81,6 @@ public class Test implements Serializable {
             t.echo();
             try {
                 Thread.sleep(5000);
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
