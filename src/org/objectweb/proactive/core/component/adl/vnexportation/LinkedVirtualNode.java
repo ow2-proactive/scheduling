@@ -201,7 +201,8 @@ public class LinkedVirtualNode {
         if (composer ==null) {
             return false;
         }
-        return composer.getDefiningComponentName().equals(getDefiningComponentName());
+        // FIXME find a better way
+        return (isLeaf || composer.getDefiningComponentName().equals(getDefiningComponentName()));
     }
     
    /**
