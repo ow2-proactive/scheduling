@@ -292,14 +292,14 @@ public class NodeImpl implements Node, Serializable {
     
     // SECURITY
 	/**
-	  * @return virtual node name
+	  * @see org.objectweb.proactive.core.node.Node#getVnName()
 	  */
 	 public String getVnName() {
 		 return vnName;
 	 }
 
 	 /**
-	  * @param string
+	  * @see org.objectweb.proactive.core.node.Node#setVnName(String)
 	  */
 	 public void setVnName(String string) {
 		 vnName = string;

@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.core.process.pbs;
 
-import java.util.ArrayList;
-import java.util.StringTokenizer;
-
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.util.MessageLogger;
+
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 
 /**
@@ -51,35 +51,38 @@ import org.objectweb.proactive.core.util.MessageLogger;
  * </p><pre>
  * ..............
  * PBSSubProcess PBS = new PBSSubProcess(new SimpleExternalProcess("ls -lsa"));
- * RLoginProcess p = new RLoginProcess(PBS, false);
+ * SSHProcess p = new SSHProcess(PBS, false);
  * p.setHostname("cluster_front_end_name");
  * p.startProcess();
  * ...............
  * </pre>
+ * Anyway it is strongly advised to use XML Deployment files to run such processes
  * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.4
+ * @version 1.0,  2004/09/20
+ * @since   ProActive 2.0.1
  */
 public class PBSSubProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
     public final static String DEFAULT_QSUBPATH = "/usr/local/bin/qsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "workProActive/ProActive" +
-        FILE_SEPARATOR + "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR +
-        "cluster" + FILE_SEPARATOR + "pbsStartRuntime.sh ";
+            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
+        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
+        FILE_SEPARATOR + "pbsStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
-    protected String hosts = DEFAULT_HOSTS_NUMBER;
+    protected String hostNumber = DEFAULT_HOSTS_NUMBER;
     protected String processorPerNode = DEFAULT_PROCESSOR_NUMBER;
     protected String bookingDuration = DEFAULT_BOOKING_DURATION;
     protected String interactive = "false";
     protected String outputFile;
     protected int jobID;
     protected String queueName;
-    protected String hostList;
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
+
+    //Following options is not yet available for pbs, it might be in the future
+    protected String hostList;
 
     public PBSSubProcess() {
         super();
@@ -94,6 +97,9 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         this.command_path = DEFAULT_QSUBPATH;
     }
 
+    //  ----------------------------------------------------------------------------------------
+    //-----------------------Extends AbstractExternalProcessDecorator-------------------------
+    //  ----------------------------------------------------------------------------------------
     public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
         super.setErrorMessageLogger(new CompositeMessageLogger(
                 new ParserMessageLogger(), errorMessageLogger));
@@ -105,6 +111,108 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         } else {
             super.setOutputMessageSink(outputMessageSink);
         }
+    }
+
+    /**
+     * Returns the number of hosts requested when running the job
+     * @return the number of nodes requested when running the job
+     */
+    public String getHostsNumber() {
+        return this.hostNumber;
+    }
+
+    /**
+     * Sets the number of nodes requested when running the job
+     * @param nodeNumber
+     */
+    public void setHostsNumber(String nodeNumber) {
+        checkStarted();
+        if (nodeNumber != null) {
+            this.hostNumber = nodeNumber;
+        }
+    }
+
+    /**
+     * Allows to launch this PBSubProcess with -I (interactive option)
+     * @param interactive true for -I option false otherwise
+     */
+    public void setInteractive(String interactive) {
+        this.interactive = interactive;
+    }
+
+    /**
+     * Sets the location of the script on the remote host
+     * @param location
+     */
+    public void setScriptLocation(String location) {
+        checkStarted();
+        //     if (location != null) {
+        this.scriptLocation = location;
+        //    }
+    }
+
+    /** Set the output file to be passed to pbs
+     * using the -o option
+     * @param string
+     */
+    public void setOutputFile(String string) {
+        outputFile = string;
+    }
+
+    /**
+     *  Set the booking duration of the cluster's nodes. The default is 00:01:00
+     * @param d duration
+     */
+    public void setBookingDuration(String d) {
+        this.bookingDuration = d;
+    }
+
+    /**
+     * Returns the number of processor per node requested when running the job
+     */
+    public String getProcessorPerNodeNumber() {
+        return this.processorPerNode;
+    }
+
+    /**
+     * Sets the number of processor per node requested when running the job
+     * @param processorPerNode processor per node
+     */
+    public void setProcessorPerNodeNumber(String processorPerNode) {
+        checkStarted();
+        if (processorPerNode != null) {
+            this.processorPerNode = processorPerNode;
+        }
+    }
+
+    /**
+     * Sets the value of the queue where the job will be launched. The default is 'normal'
+     * @param queueName
+     */
+    public void setQueueName(String queueName) {
+        checkStarted();
+        if (queueName == null) {
+            throw new NullPointerException();
+        }
+        this.queueName = queueName;
+    }
+
+    /**
+     * Sets the value of the hostList parameter with the given value
+     * Not yet included in the oar command
+     * @param hostList
+     */
+    public void setHostList(String hostList) {
+        checkStarted();
+        this.hostList = hostList;
+    }
+
+    /**
+     * Returns the hostList value of this process.
+     * @return String
+     */
+    public String getHostList() {
+        return hostList;
     }
 
     /**
@@ -138,11 +246,11 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     }
 
     protected void internalStartProcess(String commandToExecute) {
-    	//java does not seem to be able to deal with command
-    	//where there are quotation marks
-    	//thus we have to divide our command into tokens 
-    	//and pass them to the runtime
-    	//tokens are separated by space or quotation marks
+        //java does not seem to be able to deal with command
+        //where there are quotation marks
+        //thus we have to divide our command into tokens 
+        //and pass them to the runtime
+        //tokens are separated by space or quotation marks
         StringTokenizer st = new StringTokenizer(commandToExecute, " \"", true);
         String token;
         ArrayList al = new ArrayList();
@@ -204,6 +312,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (outputFile != null) {
             qsubCommand.append(" -o ").append(outputFile).append(" ");
         }
+
         //the parameters for the script are given as an 
         //environment variable
         qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\" ")
@@ -217,7 +326,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug("qsub command is " + qsubCommand.toString());
         }
-       System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
+        System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
         return qsubCommand.toString();
     }
 
@@ -226,99 +335,9 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         rs.append(" -l walltime=").append(bookingDuration).append(",");
         //to specify nodes and processor per nodes, the syntax is different from
         //other resources
-        rs.append("nodes=").append(hosts).append(":");
+        rs.append("nodes=").append(hostNumber).append(":");
         rs.append("ppn=").append(processorPerNode);
         return rs;
-    }
-
-    /**
-     * Sets the value of the hostList parameter with the given value
-     * @param hostList
-     */
-    public void setHostList(String hostList) {
-        checkStarted();
-        this.hostList = hostList;
-    }
-
-    /**
-     * Returns the hostList value of this process.
-     * @return String
-     */
-    public String getHostList() {
-        return hostList;
-    }
-    
-    public String getHostsNumber() {
-        return this.hosts;
-    }
-
-    public String getProcessorPerNodeNumber() {
-        return this.processorPerNode;
-    }
-
-    /**
-     * Allows to launch this BsubProcess with -I (interactive option)
-     * @param interactive true for -I option false otherwise
-     */
-    public void setInteractive(String interactive) {
-        this.interactive = interactive;
-    }
-
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param hosts
-     */
-    public void setHostsNumber(String hosts) {
-        checkStarted();
-        if (hosts != null) {
-            this.hosts = hosts;
-        }
-    }
-
-    public void setScriptLocation(String location) {
-        checkStarted();
-        //     if (location != null) {
-        this.scriptLocation = location;
-        //    }
-    }
-
-    /** Set the output file to be passed to prun
-     * using the -o option
-     * @param string
-     */
-    public void setOutputFile(String string) {
-        outputFile = string;
-    }
-
-    /**
-     *  Set the booking duration of the cluster's nodes. The default is 00:01:00
-     * @param d duration
-     */
-    public void setBookingDuration(String d) {
-        this.bookingDuration = d;
-    }
-
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param processorPerNode processor per node
-     */
-    public void setProcessorPerNodeNumber(String processorPerNode) {
-        checkStarted();
-        if (processorPerNode != null) {
-            this.processorPerNode = processorPerNode;
-        }
-    }
-
-    /**
-     * Sets the value of the queue where the job will be launched. The default is 'normal'
-     * @param queueName
-     */
-    public void setQueueName(String queueName) {
-        checkStarted();
-        if (queueName == null) {
-            throw new NullPointerException();
-        }
-        this.queueName = queueName;
     }
 
     /**
@@ -334,7 +353,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
 
         public void log(String message) {
             //System.out.println(" >>> log :" +message);
-            int nbProcessor = (new Integer(hosts)).intValue();
+            int nbProcessor = (new Integer(hostNumber)).intValue();
             String h = parseHostname(message);
 
             //            if (h != null) {

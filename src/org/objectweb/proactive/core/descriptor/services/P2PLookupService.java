@@ -1,8 +1,32 @@
 /*
- * Created on 23 juil. 2004
+ * ################################################################
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package org.objectweb.proactive.core.descriptor.services;
 
@@ -15,18 +39,17 @@ import java.util.Vector;
 
 
 /**
- * @author rquilici
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * This class represents a service to acquire ProActiveRuntime(JVMs) with the ProActive P2P infrastructure
+ * This service can be defined and used transparently when using XML Deployment descriptor
+ * @author  ProActive Team
+ * @version 1.0,  2004/09/20
+ * @since   ProActive 2.0.1
  */
 public class P2PLookupService implements UniversalService {
     protected static String serviceName = "P2PLookup";
     protected int MAX = 10000;
     protected int nodeNumber = 0;
     protected int nodeCount;
-
-    //protected int minNodeNumber;
     protected long timeout = 70000;
     protected int lookupFrequence = 900000;
     protected int TTL = P2PService.TTL;
@@ -64,31 +87,22 @@ public class P2PLookupService implements UniversalService {
     }
 
     /**
+     * Sets the number of nodes to be acquired with this P2P service
      * @param nodeNumber The nodeNumber to set.
      */
     public void setNodeNumber(int nodeNumber) {
         this.nodeNumber = nodeNumber;
     }
 
+    /**
+     * Sets the number of nodes to be acquired to 10000(Max Value)
+     * This method is usefull to acquire an undefined number of nodes. Indeed the number
+     * of nodes expected is never reached, the operation will be done again after lookupFrequence ms
+     * and if the timout has not expired
+     */
     public void setNodeNumberToMAX() {
         this.nodeNumber = MAX;
     }
-
-    /**
-     * @return Returns the minNodeNumber.
-     */
-
-    //    public int getMinNodeNumber() {
-    //        return minNodeNumber;
-    //    }
-
-    /**
-     * @param minNodeNumber The minNodeNumber to set.
-     */
-
-    //    public void setMinNodeNumber(int minNodeNumber) {
-    //        this.minNodeNumber = minNodeNumber;
-    //    }
 
     /**
      * @return Returns the timeout.
@@ -112,6 +126,7 @@ public class P2PLookupService implements UniversalService {
     }
 
     /**
+     * Sets the period of lookup. It means that every lookupFrequence(in ms) a P2P lookup will occur
      * @param lookupFrequence The lookupFrequence to set.
      */
     public void setLookupFrequence(int lookupFrequence) {
@@ -146,8 +161,9 @@ public class P2PLookupService implements UniversalService {
     }
 
     /**
-     * Sets the Maximum number of nodes
-     * @param max 
+     * Sets the Maximum number of nodes. Once this max number is reached the service provide access
+     * to acuired ProActiveRuntimes
+     * @param max
      */
     public void setMAX(int max) {
         MAX = max;

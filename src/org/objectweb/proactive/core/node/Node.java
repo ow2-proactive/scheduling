@@ -79,13 +79,21 @@ public interface Node
 	 * Returns all activeObjects with the given name deployed on this Node 
 	 * or null if such objects do not exist
 	 * @param className the class of the Active Objects
-	 * @return Object[].The set of activeObjects deployed on this node with the given name
+	 * @return Object[].The set of activeObjects deployed on this node of the given class
 	 */
 	public Object[] getActiveObjects(String className) throws NodeException,ActiveObjectCreationException;
 	
 
+	/**
+	 * Returns the name of the VirtualNode this Node belongs to
+	 * @return the name of the VirtualNode this Node belongs to
+	 */
 	public String getVnName();
 
+	/**
+	 * Sets the name of the VirtualNode this Node belongs to
+	 * @param virtualNodeName
+	 */
 	public void setVnName(String virtualNodeName);
 
 }

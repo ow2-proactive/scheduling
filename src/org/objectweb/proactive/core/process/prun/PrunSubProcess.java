@@ -58,8 +58,8 @@ import java.util.StringTokenizer;
  * ...............
  * </pre>
  * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.4
+ * @version 1.0,  2003/09/20
+ * @since   ProActive 2.0
  */
 public class PrunSubProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
@@ -138,7 +138,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     }
 
     /**
-     * Builds bdel command and encapsulates it in a process
+     * Builds qdel command and encapsulates it in a process
      * @param jobID The id of the job previously launched
      * @return ExternalProcess The process encapsulating the bkill command
      */
