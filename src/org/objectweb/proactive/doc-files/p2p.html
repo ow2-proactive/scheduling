@@ -3,8 +3,7 @@
 <head>
   <meta name="Keywords"
  content="infrastructure, p2p, peer-to-peer, proactive, daemon, xml">
-  <title>ProActive P2P
-Infrastructure</title>
+  <title>ProActive P2P Infrastructure</title>
   <link rel="stylesheet" href="ProActive.css">
   <meta name="Author" content="Alexandre di Costanzo">
 </head>
@@ -31,8 +30,8 @@ index</a>&nbsp;&nbsp;</td>
         </tbody>
       </table>
       </td>
-      <td align="right" valign="top">
-      <img src="ProActiveLogo200x34.gif"></td>
+      <td align="right" valign="top"> <img
+ src="ProActiveLogo200x34.gif"></td>
     </tr>
   </tbody>
 </table>
@@ -138,12 +137,9 @@ Infrastructure in short</a>
                 <li><a href="#mozTocId101413">Bootstrapping:
 First
 Contact</a></li>
-                <li><a href="#mozTocId290311">Creating
-a JVMs
-Overlay Network</a></li>
-                <li><a href="#mozTocId470123">Uncovering
+                <li><a href="#mozTocId470123">Discovering
 and
-Self-Organising in Continue</a></li>
+Self-Organizing in Continue</a></li>
                 <li><a href="#mozTocId299524">Asking
 Computational
 Nodes and Deploying Applications</a></li>
@@ -275,7 +271,8 @@ milliseconds for re-asking nodes. By default, it's value is 30 seconds.</li>
 to share only a node. Otherwise, 1
 node by CPU that means the p2p service which is running on a bi-pro
 will share 2 nodes. By default, 1 shared node for 1 CPU.</li>
-  <li><b>-xml_path</b> to share nodes from a XML deployment descriptor
+  <li><b>-xml_path</b>
+to share nodes from a XML deployment descriptor
 file. This option takes a file path. By default, no descriptors are
 specified that means the P2P Service shares only one local node or one
 local node by CPUs.</li>
@@ -483,13 +480,10 @@ Deployment Descriptors</h3>
 <p>You can customize some P2P
 settings such as:</p>
 <ul>
-  <li>The number of node you want
+  <li><b>nodesAsked</b> The number of node you want
 from the P2P infrastructure. Setting <b>MAX</b>
 as value is equivalent to an
-infinite number of node. (attribute <b>nodesAsked</b>)</li>
-  <li><b>host</b>
-that is the host name for starting a new P2P Service
-or acquiring one if exists. By default, it's the local host.</li>
+infinite number of node. This attribute is required.</li>
   <li><b>acq</b>
 is the communication
 protocol that's used to communicate with this P2P
@@ -515,6 +509,21 @@ Time
 To Live</b>
 represents messages live time in hops of JVMs (node). By default, its
 value is 5 hops.</li>
+  <li><b>multi_proc_nodes</b> is a boolean (use true or false)
+attribute. When its value is true the P2P service'll share 1 node by
+CPU, else only one node is shared. By default, its value is true, i.e.
+1 node / CPU.</li>
+  <li><b>xml_path</b> is used with a XML deployment descriptor path.
+The P2P Service shares nodes which are deployed by the descriptor. No
+default nodes are shared.<br>
+  </li>
+  <li><b>booking_nodes</b> is a boolean value (true or false). During
+asking nodes processs there is a timeout, booking timeout, for use
+obtained nodes that means if no active objects are created before the
+end of the timeout, the node will be free and no more shared. To avoid
+the booking timeout put this attribute at true, obtained nodes will be
+definitely booked for you. By default, its value is false. See below,
+for more information about the booking timeout.</li>
 </ul>
 <p>With elements <b>acq</b>
 and <b>port</b>&nbsp;
@@ -579,6 +588,14 @@ NOA="10" TTU="60000" TTL="10"&gt;<br>
 </table>
 <p>A complete example of file is
 available <a href="p2p_files/sample_p2p.xml">here</a>.</p>
+<p>The next figure shows a P2P Service started with a XML deployment
+descriptor (xml_path attribute). Six nodes are shared on different
+hosts:</p>
+<div align="center"> <img src="p2p_files/descriptor.jpg"
+ alt="Sharing nodes with descriptor.">
+<p><b class="legend">A P2P Service which is sharing nodes deployed by a
+descriptor.</b></p>
+</div>
 <p>For more information about
 ProActive XML Deployment Descriptor see this <a
  href="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Descriptor.html">page</a>.</p>
@@ -589,7 +606,7 @@ to the P2P Infrastructure</h3>
 <p>The next little sample of code
 explains how from an application you can start a P2P Service and deploy
 on it ProActive nodes:</p>
-<pre class="snippet"><br>import org.objectweb.proactive.ProActive;<br>import org.objectweb.proactive.core.ProActiveException;<br>import org.objectweb.proactive.core.mop.ClassNotReifiableException;<br>import org.objectweb.proactive.core.node.Node;<br>import org.objectweb.proactive.core.node.NodeException;<br>import org.objectweb.proactive.core.node.NodeFactory;<br>import org.objectweb.proactive.core.runtime.ProActiveRuntime;<br>import org.objectweb.proactive.core.runtime.RuntimeFactory;<br>import org.objectweb.proactive.p2p.core.service.P2PService;<br>import org.objectweb.proactive.p2p.core.service.StartP2PService;<br>...<br>// This constructor uses a file with address of peers<br>// See the Javadoc to choose different parameters<br>StartP2PService startServiceP2P = new StartP2PService(p2pFile)<br><br>// Start the P2P Service on the local host<br>startServiceP2P.start();<br><br>// Get the reference on the P2P Service<br>P2PService serviceP2P = startServiceP2P.getP2PService();<br><br>// By the application's P2P Service ask to the P2P infrastructure<br>// for get nodes.<br>P2PNodesLookup p2pNodesLookup = p2pService.getNodes(nNodes,<br> virtualNodeName, JobID);<br>// Use method from p2pNodeLookup to get nodes<br>...<br></pre>
+<pre class="snippet"><br>import org.objectweb.proactive.ProActive;<br>import org.objectweb.proactive.core.ProActiveException;<br>import org.objectweb.proactive.core.mop.ClassNotReifiableException;<br>import org.objectweb.proactive.core.node.Node;<br>import org.objectweb.proactive.core.node.NodeException;<br>import org.objectweb.proactive.core.node.NodeFactory;<br>import org.objectweb.proactive.core.runtime.ProActiveRuntime;<br>import org.objectweb.proactive.core.runtime.RuntimeFactory;<br>import org.objectweb.proactive.p2p.core.service.P2PService;<br>import org.objectweb.proactive.p2p.core.service.StartP2PService;<br>import org.objectweb.proactive.p2p.core.service.node.P2PNodeLookup;<br>...<br>// This constructor uses a file with address of peers<br>// See the Javadoc to choose different parameters<br>StartP2PService startServiceP2P = new StartP2PService(p2pFile)<br><br>// Start the P2P Service on the local host<br>startServiceP2P.start();<br><br>// Get the reference on the P2P Service<br>P2PService serviceP2P = startServiceP2P.getP2PService();<br><br>// By the application's P2P Service ask to the P2P infrastructure<br>// for getting nodes.<br>P2PNodeLookup p2pNodeLookup = p2pService.getNodes(nNodes,<br> virtualNodeName, JobID);<br><br>// You can migrate the P2P node lookup from the p2p service<br>// to an another node:<br>p2pNodeLookup.moveTo("//localhost/localNode");<br><br>// Use method from p2pNodeLookup to get nodes<br>// such as<br>while (! p2pNodeLookup.allArrived()) {<br>  Vector arrivedNodes = p2pNodeLookup.getAndRemoveNodes();<br>  // Do something with nodes<br>  ...<br>}<br><br>// Your application<br>...<br><br>// End of your program<br>// Free shared nodes<br>p2pNodeLookup.killAllNodes();<br></pre>
 <h2><a class="mozTocH2" name="mozTocId1224"></a><a
  name="infrastructure_model"></a>The
 P2P Infrastructure Model</h2>
@@ -628,7 +645,7 @@ Andy Oram):</li>
 </ul>
 <p>"[...] P2P is a class of
 applications that take advantage of <b>resources</b>
-- available at the edges of the Ineternet [...]"</p>
+- available at the edges of the Internet [...]"</p>
 <ul>
   <li>And from <span style="font-style: italic;">A Definition of
 Peer-to-Peer Networking for the Classification of Peer-to-Peer
@@ -650,17 +667,83 @@ Infrastructure in short</h3>
 <h4><a class="mozTocH4" name="mozTocId101413"></a>Bootstrapping:
 First
 Contact</h4>
+<p>A fresh (or new) peer which would like join the P2P network, will
+encounter a
+serious bootstrapping problem or first contact problem: "How can it
+connect to the P2P network?"</p>
+<p>A solution for that is to use a specific protocol. ProActive
+provides an interface for a network-centric services protocol which is
+named JINI. JINI can be used for discovering services in a dynamic
+computing environment, such as a fresh peer which would like join a P2P
+network. This protocol is perfectly adapted to solve the bootstrapping
+problem, however there is a serious drawback&nbsp; for using a
+protocol&nbsp; as JINI&nbsp; as peer discovering protocol. JINI is
+limited to work only in the same sub-network that means JINI doesn't
+pass through firewall or NAT and can't be considered to be used for
+Internet.</p>
+<p>Therefore,&nbsp; a different solution for the bootstrapping problem
+was chosen, the solution for ProActive first contact P2P is inspired
+from Data P2P Networks. This solution is based on real life , i.e. when
+a person wants to join a community, this person has to know first an
+another person which is already member of the community, after the
+first person took contact with the community member, the new person is
+introduce to all community members. <br>
+</p>
+<p>The ProActive P2P bootstrapping protocol works as follow:</p>
+<ul>
+  <li>A fresh peer has a list of "server" addresses. These are
+peers&nbsp; which have a high potential to be available and to be in
+the P2P network, they are in a certain way the P2P network core.</li>
+  <li>With this list the fresh peer tries to contact each servers. When
+a server is reachable the fresh peer add it in its list of known peers
+(acquaintances).<br>
+  </li>
+  <li>Then the fresh peers knows some servers, it is in the P2P Network
+and it is no more fresh peer, it is a peer of the P2P network.</li>
+</ul>
+<p>Furthermore, int the case of the fresh peer can't contact any
+servers from the list, the fresh peer will try every TTU (see below,
+about Time To Update parameter) to re-contact all of them until one or
+several of them are finally available. At any moments of the peer knows
+nobody because all of its acquaintances are no more available, the peer
+will try to contact all servers like earlier.</p>
+<p>An example of a fresh peer which is trying to join a P2P network is
+shown by the next Figure. The new peer has 2 servers to contact for
+joining the existed P2P infrastructure.<br>
+</p>
 <div align="center"> <img src="p2p_files/firstContact.jpg"
  alt="Bootstrapping">
 <p><b class="legend">Example of first contact
 (Bootstrapping).</b></p>
 </div>
-<h4><a class="mozTocH4" name="mozTocId290311"></a>Creating
-a JVMs
-Overlay Network</h4>
-<h4><a class="mozTocH4" name="mozTocId470123"></a>Uncovering
+<h4><a class="mozTocH4" name="mozTocId470123"></a>Discovering
 and
-Self-Organising in Continue</h4>
+Self-Organizing in Continue</h4>
+<p>The main particularity of a P2P network is the peers high
+volatility.&nbsp; This results from various attributes which composes
+P2P: <br>
+</p>
+<ul>
+  <li>Peers run on different kind of computer: desktop workstations,
+laptops, server, cluster nodes, etc.</li>
+  <li>Each peer has a particular configuration: operating systems, etc.</li>
+  <li>Communicating network between peers composes with different speed
+connections: modem, 100Mb Ethernet, fiber channel, etc.</li>
+  <li>Peers are not available all time and not all at the same moment.</li>
+  <li>Peer latency is not&nbsp; equal for all.</li>
+  <li>etc.</li>
+</ul>
+<p>As a result of these points is the instability of the P2P network
+Hence the ProActive P2P manages by automatically and transparency ways
+this problem.</p>
+<p>ProActive P2P aims to maintain a created P2P network alive until
+there are peers available in the network, this is called
+self-organizing of the P2P network. On condition that P2P doesn't have
+exterior entities, as such centralized servers which maintain peer data
+bases, the P2P network has to be self-organized. That means all peers
+should be enabled to stay in the P2P network by their own means.</p>
+<p>There is solution which is widely used in data P2P networks<br>
+</p>
 <div align="center"> <img src="p2p_files/heartbeat.jpg"
  alt="Heart Beat">
 <p><b class="legend">Heart beat sent every TTU.</b></p>
