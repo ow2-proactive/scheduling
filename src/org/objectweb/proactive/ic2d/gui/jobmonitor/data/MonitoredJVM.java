@@ -1,7 +1,10 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.rmi.registry.Registry;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MonitoredJVM extends BasicMonitoredObject {
@@ -9,7 +12,7 @@ public class MonitoredJVM extends BasicMonitoredObject {
     static protected Map prettyNames = new HashMap();
     private int depth;
     private int port;
-
+    
     protected int incLastID() {
         return ++lastID;
     }
@@ -18,10 +21,25 @@ public class MonitoredJVM extends BasicMonitoredObject {
         return prettyNames;
     }
 
-    public MonitoredJVM(String url, int port, int depth) {
+    private void extractPort() {
+    	Pattern p = Pattern.compile("(.*//)?([^:]+):?([0-9]*)/(.+)");
+        Matcher m = p.matcher(fullname);
+        if (!m.matches()) {
+            port = Registry.REGISTRY_PORT;
+        }
+
+        String portStr = m.group(3);
+        try {
+        	port = Integer.parseInt(portStr);
+        } catch (Exception e) {
+        	port = Registry.REGISTRY_PORT;
+        }
+    }
+    
+    public MonitoredJVM(String url, int depth) {
         super(JVM, "JVM",  url);
         this.depth = depth;
-        this.port = port;
+        extractPort();
     }
 
     public void copyInto(BasicMonitoredObject o) {

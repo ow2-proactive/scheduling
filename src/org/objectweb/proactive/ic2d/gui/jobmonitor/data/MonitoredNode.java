@@ -16,7 +16,7 @@ public class MonitoredNode extends BasicMonitoredObject {
         return prettyNames;
     }
 
-    public MonitoredNode(String fullname) {
-        super(NODE, null, fullname);
+    public MonitoredNode(String fullname, String jvm) {
+        super(NODE, fullname, fullname + " on " + jvm);
     }
 }
