@@ -1,0 +1,79 @@
+<html>
+<head>
+<title>Component programming with ProActive : architecture of this implementation of Fractal</title>
+<link rel="stylesheet" href="../ProActive.css">
+</head>
+<body bgcolor="white">
+
+
+
+
+<h2>Architecture and design </h2>
+<p class="textNormal">The implementation of the Fractal model is achieved by reusing
+  the extensible architecture of ProActive, notably the meta-object protocol and
+  the management of the queue of requests. This way, components stay fully compatible with standard active objects and as such, inherit from the features active objects exhibit : mobility, security, deployment etc.</p>
+  <p class="textNormal">A fundamental idea is to manage the non-functional properties at the meta-level : <b>each component is actually an active object </b>with dedicated meta-objects in charge of the component aspects.
+</p>
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+<h3>Meta-object protocol</h3>
+<p class="textNormal">ProActive is based on a meta-object protocol (MOP), that allows the addition of many aspects on top of standard Java objects, such as asynchronism and mobility. Active objects are referenced indirectly through stubs : this allows transparent communications, would the active objects be local or remote.</p>
+<p class="textNormal">The following diagram explains this mechanism :<br>
+Java objects 'b' and 'a' can be in different virtual machines (the network being represented here between the proxy and the body, though the invocation might be local). Object 'b' has a reference on active object 'a' (of type <code>A</code>) through a stub (of type <code>A</code> because it is generated as a subclass of <code>A</code>) and a proxy. When 'b' invokes a method on '<code>stub_A</code>', the invocation is forwarded through the communication layer (possibly through a network) to the body of the active object. At this point, the call can be intercepted by meta-objects, possibly resulting in induced actions, and then the call is forwarded to the base object 'a'.</p>
+<img align="middle" src="pics/standard-mop.gif" alt="standard ProActive MOP"/>
+<p class="textNormal"><b class="legend">ProActive's Meta-Objects Protocol.
+</b></p>
+
+
+<p class="textNormal">The same idea is used to manage components : we just add a set of meta-objects in charge of the component aspects.</p>
+<p class="textNormal">The following diagram shows what is changed :<br>
+A new set of meta-objects, managing the component aspect (constituting the controller of the component, in the Fractal terminology), is added to the active object 'a'.
+The standard ProActive stub (that gives a representation of type A on the figure) is not used here, as we manipulate components. In Fractal, a reference on a component is of type <code>Component</code>, and references to interfaces are of type <code>Interface</code>. 'b' can now manipulate the component based on 'a' through a specific stub, called a <i>component representative</i>. This <i>component representative</i> is of type <code>Component</code>, and also offers references to control and functional interfaces, of type <code>Interface</code>. Note that classes representing functional interfaces of components are generated on the fly : they are specific to each component and can be unknown at compile-time.<br>
+Method invocations on Fractal interfaces are reified and transmitted (possibly through a network) to the body of the active object corresponding to the component involved. All standard operations of the Fractal API are now accessible.</p>
+<img align="middle" src="pics/components-mop.gif" alt="MOP with components"/>
+<p><b class="legend">The ProActive MOP with component meta-objects and component representative</b></p>
+
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+
+<h3>Components vs active objects</h3>
+<p class="textNormal">In our implementation, because we make use of the MOP's facilities, all components are constituted of one active object (at least), are they composite or primitive components. If the component is a composite, and if it contains other components, then we can say it is constituted of several active objects. Also, if the component is primitive, but the programmer of this component has put some code within it for creating new active objects, the component is again constituted of several active objects.</p>
+<p class="textNormal">As a result, a composite component is an active object built on top of the <code>CompositeComponent</code> class, and a parallel component is built on top of the <code>ParallelComponent</code> class. These classes are empty classes, because for composite and parallel components, all the action takes place in the meta-level. But they are used as a base to build active objects, and their names help to identify them with the IC2D visual monitoring tool.</p>
+
+
+<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+ <h3>Method invocations on components interfaces</h3>
+ <p class="textNormal">Invoking a method on an active object means invoking a method on the stub of this active object. What usually happens then is that the method call is reified as a <code>Request</code> object and transferred (possibly through a network) to the body of the active object. It is then redirected towards the queue of requests, and delegated to the base object according to a customizable serving policy (standard is FIFO). </p>
+ <p class="textNormal">Component requests, on the other hand, are tagged so as to distinguish between functional requests and controller requests. A functional request targets a functional interface of the component, while a controller request targets a controller of the component.</p>
+<p class="textNormal">Like in the standard case (without components), requests are served from the request queue. The serving policy has to be FIFO to ensure coherency. <b>This is where the life cycle of the components is controlled </b>:  the dispatching of the request is dependent upon the nature of the request, and corresponds to the following algorithm :
+<pre class="snippet">
+loop
+	if componentLifeCycle.isStarted()
+		get next request
+		// all requests are served
+	else if componentLifeCycle.isStopped()
+		get next controller request
+		// only controller requests are served
+	;
+	if gotten request is a component life cycle request
+		if request is start --> set component state to started ;
+		if request is stop --> set component state to stopped ;
+	;
+;
+</pre>
+
+
+
+
+
+<h3>Collective interfaces and typed group communications</h3>
+<p class="textNormal">One may specify the cardinality of the interfaces of Fractal components (section 6.1). The <i>collection</i> cardinality means that a given component may have several interfaces of a given type ; the name of each of these interfaces has to begin with the same name.</p>
+<p class="textNormal">This feature is provided in our implementation through the <a href="../TypedGroupCommunication.html" target="_blank">Groups API</a>, and slightly differs from the Julia implementation : instead of creating one new interface with an extended name for each member of the collection, we just use one interface, which is a group. Collective bindings are then performed transparently as if they were successive bindings on the same interface. Using a collective server interface implies using the Groups API formalism, including the possibility to choose between scattering and broadcasting of the calls. Note that unbinding operations on a collective interface result in the removal of all the bindings of the collection. Examples are provided in the "component programming with ProActive" section.</p>
+
+
+<p class="textNormal">Because we target largely distributed and parallel applications, we introduced a new kind of component : parallel components (see image "parallel component"). These components are composite components, as they encapsulate other components. But they are specialized : their external server interfaces have a specific behavior. These external server interfaces are connected through the ProActive groups mechanism (i.e. through a group proxy) to the server interfaces of the same type of the internal components. The requests are then processed in a parallel manner.</p>
+<p class="textNormal">Next diagram illustrates where group communications are involved.
+</p>
+<img align="middle" src="pics/collective-interfaces.gif" alt="collective interfaces"/>
+<p><b class="legend">Group communications allowing collective bindings and parallel components.</b></p>
+
+</body>
