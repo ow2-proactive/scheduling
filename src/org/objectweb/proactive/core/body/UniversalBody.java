@@ -179,13 +179,13 @@ public interface UniversalBody {
 		 throws SecurityNotAvailableException, java.io.IOException;
 
 	 /**
-	  * @return
+	  * @return name of the virtual node where the object has been created
 	  */
 	 public String getVNName()
 		 throws SecurityNotAvailableException, java.io.IOException;
 
 	 /**
-	  * @return
+	  * @return object's X509Certificate as byte array
 	  */
 	 public byte[] getCertificateEncoded()
 		 throws SecurityNotAvailableException, IOException;

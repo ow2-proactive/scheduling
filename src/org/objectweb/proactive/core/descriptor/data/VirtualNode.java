@@ -212,7 +212,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
 	  public X509Certificate getCreatorCertificate() throws ProActiveException;
 
 	  /**
-	   * @return
+	   * @return policy server
 	   */
 	  public PolicyServer getPolicyServer();
 

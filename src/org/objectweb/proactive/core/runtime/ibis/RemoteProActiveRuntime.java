@@ -1,42 +1,40 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.runtime.ibis;
 
 import ibis.rmi.Remote;
 import ibis.rmi.RemoteException;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -49,6 +47,10 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
 
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate Ibis-specific
@@ -60,7 +62,8 @@ public interface RemoteProActiveRuntime extends Remote {
     static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
 
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding,PolicyServer ps, String vnname, String jobId) throws RemoteException, NodeException;
+        boolean replacePreviousBinding, PolicyServer ps, String vnname,
+        String jobId) throws RemoteException, NodeException;
 
     public void killAllNodes() throws RemoteException;
 
@@ -78,8 +81,8 @@ public interface RemoteProActiveRuntime extends Remote {
     public VMInformation getVMInformation() throws RemoteException;
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName)
-        throws RemoteException;
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws RemoteException;
 
     public ProActiveRuntime[] getProActiveRuntimes() throws RemoteException;
 
@@ -104,10 +107,10 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public void unregisterVirtualNode(String virtualNodeName)
         throws RemoteException;
-        
-	public void unregisterAllVirtualNodes() throws RemoteException;
-	
-	public String getJobID(String nodeUrl) throws RemoteException;
+
+    public void unregisterAllVirtualNodes() throws RemoteException;
+
+    public String getJobID(String nodeUrl) throws RemoteException;
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
@@ -116,62 +119,59 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws RemoteException;
-	/**
-		 * @return
-		 */
-		public X509Certificate getCreatorCertificate()
-			throws RemoteException;
 
-		public PolicyServer getPolicyServer() throws RemoteException;
+    /**
+     * @return creator certificate
+     */
+    public X509Certificate getCreatorCertificate() throws RemoteException;
 
-		public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-			throws RemoteException;
+    public PolicyServer getPolicyServer() throws RemoteException;
 
-		public String getVNName(String Nodename) throws RemoteException;
+    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+        throws RemoteException;
 
-		/**
-		 * @param s
-		 */
-		public void setDefaultNodeVirtualNodeName(String s) throws RemoteException;
+    public String getVNName(String Nodename) throws RemoteException;
 
-		public void updateLocalNodeVirtualName() throws RemoteException;
-	   public void listVirtualNodes() throws RemoteException ;
-	   public PolicyServer getNodePolicyServer(String nodeName)throws RemoteException;
+    /**
+     * @param s
+     */
+    public void setDefaultNodeVirtualNodeName(String s)
+        throws RemoteException;
 
+    public void updateLocalNodeVirtualName() throws RemoteException;
 
-		 /**
-		  *  sets all needed modifications to enable security components
-		  * MUST be called when the descriptor is ready 
-		  */
-		 public void enableSecurityIfNeeded()throws RemoteException;
+    public void listVirtualNodes() throws RemoteException;
 
+    public PolicyServer getNodePolicyServer(String nodeName)
+        throws RemoteException;
 
+    /**
+     *  sets all needed modifications to enable security components
+     * MUST be called when the descriptor is ready
+     */
+    public void enableSecurityIfNeeded() throws RemoteException;
 
-	   /**
-		* @param nodeName
-		* @return
-		*/
-	   public X509Certificate getNodeCertificate(String nodeName)throws RemoteException;
-	
-	
-	   /**
-		* @param nodeName
-		* @return returns all entities associated to the node
-		*/
-	   public ArrayList getEntities(String nodeName)throws RemoteException;
+    /**
+     * @param nodeName
+     * @return node certificate
+     */
+    public X509Certificate getNodeCertificate(String nodeName)
+        throws RemoteException;
 
-	   /**
-		* @param nodeName
-		* @return returns all entities associated to the node
-		*/
-	   public ArrayList getEntities(UniversalBody uBody)throws RemoteException;
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(String nodeName) throws RemoteException;
 
+    /**
+     * @param nodeName
+     * @return returns all entities associated to the node
+     */
+    public ArrayList getEntities(UniversalBody uBody) throws RemoteException;
 
-
-	   /**
-		* @return returns all entities associated to this runtime
-		*/
-	   public ArrayList getEntities() throws RemoteException;
-
-	
+    /**
+     * @return returns all entities associated to this runtime
+     */
+    public ArrayList getEntities() throws RemoteException;
 }

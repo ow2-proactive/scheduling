@@ -311,7 +311,7 @@ public interface ProActiveRuntime extends Job {
     public X509Certificate getCreatorCertificate() throws ProActiveException;
 
     /**
-     * @return
+     * @return Policy server
      */
     public PolicyServer getPolicyServer() throws ProActiveException;
 

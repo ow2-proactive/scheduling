@@ -182,7 +182,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String, boolean, PolicyServer, String, String)
      */
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vnName, String jobId)
@@ -309,7 +309,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String,String)
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,

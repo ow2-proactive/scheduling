@@ -263,8 +263,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     /**
-     * @return
-     */
+	* @return policy server
+	*/
     public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
         return proActiveRuntime.getPolicyServer();
     }

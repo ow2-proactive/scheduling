@@ -134,14 +134,14 @@ public class Policy implements Serializable {
         return to;
     }
 	/**
-	 * @return
+	 * @return true if object creation is authorized
 	 */
 	public boolean isAocreation() {
 		return aocreation;
 	}
 
 	/**
-	 * @return
+	 * @return true if migration is authorized
 	 */
 	public boolean isMigration() {
 		return migration;

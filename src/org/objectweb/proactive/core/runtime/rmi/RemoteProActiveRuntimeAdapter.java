@@ -352,9 +352,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
 
     // SECURITY 
 
-    /**
-     * @return
-     */
+    
     public PolicyServer getPolicyServer() throws ProActiveException {
         try {
             return remoteProActiveRuntime.getPolicyServer();

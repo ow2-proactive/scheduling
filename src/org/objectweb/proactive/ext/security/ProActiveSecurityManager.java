@@ -1635,21 +1635,21 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-     * @return
+     * @return virtual node name where object has been created
      */
     public String getVNName() {
         return VNName;
     }
 
     /**
-     * @return
-     */
+	* @return policy server
+	*/
     public PolicyServer getPolicyServer() {
         return policyServer;
     }
 
     /**
-     * @return
+     * @return certificate as byte array
      */
     public byte[] getCertificateEncoded() {
         try {
@@ -1662,7 +1662,7 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-     * @param object
+     * @param set object policy server 
      */
     public void setPolicyServer(PolicyServer policyServer) {
         this.policyServer = policyServer;
@@ -1672,14 +1672,14 @@ public class ProActiveSecurityManager implements Serializable {
      * @param type
      * @param from
      * @param to
-     * @return
+     * @return communication attributes
      */
     public Communication getPolicyFrom(String type, String from, String to) {
         return null;
     }
 
     /**
-     * @return
+     * @return entities that inforces security policy on the object
      */
     public ArrayList getEntities() {
         ProActiveRuntimeImpl proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
@@ -1689,7 +1689,6 @@ public class ProActiveSecurityManager implements Serializable {
         try {
             n = NodeFactory.getNode(myBody.getNodeURL());
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

@@ -441,7 +441,7 @@ public class PolicyServer implements Serializable {
     }
 
     /**
-     * @return
+     * @return virtual node name
      */
     public String getVNName() {
         return VNName;
@@ -529,7 +529,7 @@ public class PolicyServer implements Serializable {
     }
 
     /**
-     * @return
+     * @return application certificate
      */
     public X509Certificate getApplicationCertificate() {
         return this.applicationCertificate;
@@ -647,7 +647,7 @@ public class PolicyServer implements Serializable {
     }
 
     /**
-     * @param
+     * @param set application name 
      */
     public void setApplicationName(String applicationName) {
         this.applicationName = applicationName;

@@ -174,13 +174,13 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
 
 
 	   /**
-		* @return
+		* @return virtual node name where the object has been created
 		*/
 	   public String getVNName()
 		   throws java.io.IOException, SecurityNotAvailableException;
 
 	   /**
-		* @return
+		* @return object certificate as byte array
 		*/
 	   public byte[] getCertificateEncoded()
 		   throws java.io.IOException, SecurityNotAvailableException;

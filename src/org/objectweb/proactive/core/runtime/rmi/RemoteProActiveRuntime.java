@@ -118,7 +118,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public UniversalBody receiveBody(String nodeName, Body body)
         throws java.rmi.RemoteException;
 	/**
-	 * @return
+	 * @return creator certificate
 	 */
 	public X509Certificate getCreatorCertificate()
 		throws java.rmi.RemoteException;

@@ -283,7 +283,7 @@ public class NodeImpl implements Node, Serializable {
     
     // SECURITY
 	/**
-	  * @return
+	  * @return virtual node name
 	  */
 	 public String getVnName() {
 		 return vnName;
