@@ -37,221 +37,168 @@ import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
+import org.objectweb.fractal.util.Fractal;
+
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.node.NodeException;
 
 import testsuite.test.FunctionalTest;
 
+
 /**
  * @author Matthieu Morel
- * 
+ *
  * Step 1. Creation of the components
  *
  * Creates the following components :
- * 
- * 		__________________
- * 		|									|					________
- * 		|									|					|				|
- * 	i1	|									|i2 			i2	|	(p2)		|
- * 		|									|					|_______|
- * 		|									|					
- * 		|_(c1)______________|					
- * 																
- * 		__________________
- * 		|									|					________
- * 		|									|					|				|
- * 	i1	|									|i2 			i1	|	(p1)		|i2
- * 		|									|					|_______|
- * 		|									|					
- * 		|_(c2)_____________|						
  *
- * 	where :
- * 		(c1) and (c2) are composites, (p1) and (p2) are primitive components
- * 		i1 represents an interface of type I1
- * 		i2 represents an interface of type I2
- * 
+ *                 __________________
+ *                 |                                                                        |                                        ________
+ *                 |                                                                        |                                        |                                |
+ *         i1        |                                                                        |i2                         i2        |        (p2)                |
+ *                 |                                                                        |                                        |_______|
+ *                 |                                                                        |
+ *                 |_(c1)______________|
+ *
+ *                 __________________
+ *                 |                                                                        |                                        ________
+ *                 |                                                                        |                                        |                                |
+ *         i1        |                                                                        |i2                         i1        |        (p1)                |i2
+ *                 |                                                                        |                                        |_______|
+ *                 |                                                                        |
+ *                 |_(c2)_____________|
+ *
+ *         where :
+ *                 (c1) and (c2) are composites, (p1) and (p2) are primitive components
+ *                 i1 represents an interface of type I1
+ *                 i2 represents an interface of type I2
+ *
   */
 public class Test extends FunctionalTest {
-	private static final String P1_NAME = "primitive-component-1";
-	private static final String P2_NAME = "primitive-component-2";
-	private static final String C1_NAME = "composite-component1";
-	private static final String C2_NAME = "composite-component2";
-	public static final String MESSAGE = "-->Main";
-	Component primitiveComponentA;
-	String name;
-	String nodeUrl;
-	Message message;
-	Component p1;
-	Component p2;
-	Component c1;
-	Component c2;
+    private static final String P1_NAME = "primitive-component-1";
+    private static final String P2_NAME = "primitive-component-2";
+    private static final String C1_NAME = "composite-component1";
+    private static final String C2_NAME = "composite-component2";
+    public static final String MESSAGE = "-->Main";
+    Component primitiveComponentA;
+    String name;
+    String nodeUrl;
+    Message message;
+    Component p1;
+    Component p2;
+    Component c1;
+    Component c2;
 
-	public Test() {
-		super(
-			"Creation of a composite system on the local default node",
-			"Test creation of a composite system on the local default node");
+    public Test() {
+        super("Creation of a composite system on the local default node",
+            "Test creation of a composite system on the local default node");
+    }
 
-	}
+    /**
+     * @see testsuite.test.FunctionalTest#action()
+     */
+    public void action() throws Exception {
+        throw new testsuite.exception.NotStandAloneException();
+    }
 
-	/**
-	 * @see testsuite.test.FunctionalTest#action()
-	 */
-	public void action() throws Exception {
-		throw new testsuite.exception.NotStandAloneException();
-	}
+    /**
+     * first of interlinked tests
+     * @param obj
+     */
+    public Component[] action(Object obj) throws Exception {
+        System.setProperty("proactive.future.ac", "enable");
+        // start a new thread so that automatic continuations are enabled for components
+        ACThread acthread = new ACThread();
+        acthread.start();
+        acthread.join();
+        System.setProperty("proactive.future.ac", "disable");
+        return (new Component[] { p1, p2, c1, c2 });
+    }
 
-	/**
-	 * first of interlinked tests
-	 * @param obj
-	 */
-	public Component[] action(Object obj) throws Exception {
-		System.setProperty("proactive.future.ac", "enable");
-		// start a new thread so that automatic continuations are enabled for components
-		ACThread acthread = new ACThread();
-		acthread.start();
-		acthread.join();
-		System.setProperty("proactive.future.ac", "disable");
-		return (new Component[] { p1, p2, c1, c2 });
-	}
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
+    private class ACThread extends Thread {
+        public void run() {
+            try {
+                Component boot = Fractal.getBootstrapComponent();
+                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                GenericFactory cf = Fractal.getGenericFactory(boot);
+                ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
+                            type_factory.createFcItfType("i1",
+                                I1.class.getName(), TypeFactory.SERVER,
+                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                            type_factory.createFcItfType("i2",
+                                I2.class.getName(), TypeFactory.CLIENT,
+                                TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                        });
 
-	private class ACThread extends Thread {
+                p1 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentA.class.getName(),
+                            new Object[] {  }));
+                p2 = cf.newFcInstance(type_factory.createFcType(
+                            new InterfaceType[] {
+                                type_factory.createFcItfType("i2",
+                                    I2.class.getName(), TypeFactory.SERVER,
+                                    TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                            }),
+                        new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentB.class.getName(),
+                            new Object[] {  }));
+                c1 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(C1_NAME, Constants.COMPOSITE),
+                        new ContentDescription(Composite.class.getName(),
+                            new Object[] {  }));
+                c2 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(C2_NAME, Constants.COMPOSITE),
+                        new ContentDescription(Composite.class.getName(),
+                            new Object[] {  }));
+            } catch (Exception e) {
+                logger.error("cannot create components : " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
-		public void run() {
-			try {
-				ProActiveTypeFactory type_factory = ProActiveTypeFactory.instance();
-				ComponentType i1_i2_type =
-					type_factory.createFcType(
-						new InterfaceType[] {
-							type_factory.createFcItfType(
-								"i1",
-								I1.class.getName(),
-								TypeFactory.SERVER,
-								TypeFactory.MANDATORY,
-								TypeFactory.SINGLE),
-							type_factory.createFcItfType(
-								"i2",
-								I2.class.getName(),
-								TypeFactory.CLIENT,
-								TypeFactory.MANDATORY,
-								TypeFactory.SINGLE)});
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    }
 
-				ComponentParameters p1_parameters =
-					new ComponentParameters(P1_NAME, ComponentParameters.PRIMITIVE, i1_i2_type);
+    public boolean postConditions() throws Exception {
+        String p1_name = Fractive.getComponentParametersController(p1)
+                                 .getComponentParameters().getName();
+        String p2_name = Fractive.getComponentParametersController(p2)
+                                 .getComponentParameters().getName();
+        String c1_name = Fractive.getComponentParametersController(c1)
+                                 .getComponentParameters().getName();
+        String c2_name = Fractive.getComponentParametersController(c2)
+                                 .getComponentParameters().getName();
+        return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) &&
+        c1_name.equals(C1_NAME) && c2_name.equals(C2_NAME));
+    }
 
-				ComponentParameters p2_parameters =
-					new ComponentParameters(
-						P2_NAME,
-						ComponentParameters.PRIMITIVE,
-						type_factory.createFcType(
-							new InterfaceType[] {
-								type_factory.createFcItfType(
-									"i2",
-									I2.class.getName(),
-									TypeFactory.SERVER,
-									TypeFactory.MANDATORY,
-									TypeFactory.SINGLE),
-								}));
-				ComponentParameters c1_parameters =
-					new ComponentParameters(C1_NAME, ComponentParameters.COMPOSITE, i1_i2_type);
-				ComponentParameters c2_parameters =
-					new ComponentParameters(C2_NAME, ComponentParameters.COMPOSITE, i1_i2_type);
-				p1 = ProActive.newActiveComponent(PrimitiveComponentA.class.getName(), new Object[] {
-				}, null, null, null, p1_parameters);
-				p2 = ProActive.newActiveComponent(PrimitiveComponentB.class.getName(), new Object[] {
-				}, null, null, null, p2_parameters);
-				c1 = ProActive.newActiveComponent(Composite.class.getName(), new Object[] {
-				}, null, null, null, c1_parameters);
-				c2= ProActive.newActiveComponent(Composite.class.getName(), new Object[] {
-				}, null, null, null, c2_parameters);
-
-				//logger.debug("OK, instantiated the component");
-				//
-				//				// ASSEMBLY
-				//				 ((ContentController) c.getFcInterface(ContentController.CONTENT_CONTROLLER)).addFcSubComponent(p1);
-				//
-				//				// BINDINGS
-				//				((BindingController) c.getFcInterface(BindingController.BINDING_CONTROLLER)).bindFc(
-				//					"i1",
-				//					p1.getFcInterface("i1"));
-				//				((BindingController) p1.getFcInterface(BindingController.BINDING_CONTROLLER)).bindFc(
-				//					"i2",
-				//					c.getFcInterface("i2"));
-				//				((BindingController) c.getFcInterface(BindingController.BINDING_CONTROLLER)).bindFc(
-				//					"i2",
-				//					p2.getFcInterface("i2"));
-				//				//((BindingController)p1.getFcInterface(BindingController.BINDING_CONTROLLER)).bindFc("i2", p2.getFcInterface("i2"));
-				// start the components!
-				//				((LifeCycleController) c.getFcInterface(LifeCycleController.LIFECYCLE_CONTROLLER)).startFc();
-				//				((LifeCycleController) p1.getFcInterface(LifeCycleController.LIFECYCLE_CONTROLLER)).startFc();
-				//				//((LifeCycleController)p1.getFcInterface(LifeCycleController.LIFECYCLE_CONTROLLER)).startFc();
-				//				// then another call to p2 is needed
-				//				 ((LifeCycleController) p2.getFcInterface(LifeCycleController.LIFECYCLE_CONTROLLER)).startFc();
-
-				//				// now invoke method on composite
-				//				I1 i1 = (I1) c.getFcInterface("i1");
-				//				//I1 i1= (I1)p1.getFcInterface("i1");
-				//				message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
-				//				//System.out.println("message chain is :" + message);
-				//				//name = ref.getName();
-				//				//nodeUrl = ((ComponentInfo) primitiveComponentA.getFcInterface("componentInfo")).getNodeUrl();
-			} catch (ActiveObjectCreationException aoce) {
-				logger.error("cannot create component : " + aoce.getMessage());
-				aoce.printStackTrace();
-			} catch (NodeException ne) {
-				logger.error("problem with the node" + ne.getMessage());
-				ne.printStackTrace();
-			}
-
-		}
-	}
-
-	/**
-	 * @see testsuite.test.AbstractTest#endTest()
-	 */
-	public void endTest() throws Exception {
-	}
-
-	public boolean postConditions() throws Exception {
-			String p1_name = Fractal.getComponentParametersController(p1)
-					.getComponentParameters()
-					.getName();
-			String p2_name =
-			Fractal.getComponentParametersController(p2)
-					.getComponentParameters()
-					.getName();
-			String c1_name =
-			Fractal.getComponentParametersController(c1)
-					.getComponentParameters()
-					.getName();
-			String c2_name =
-			Fractal.getComponentParametersController(c2)
-					.getComponentParameters()
-					.getName();
-			return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) && c1_name.equals(C1_NAME) && c2_name.equals(C2_NAME));
-
-	}
-
-	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			test.action();
-			test.postConditions();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+            test.postConditions();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

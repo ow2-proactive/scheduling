@@ -30,115 +30,107 @@
 */
 package nonregressiontest.component.creation.local.newactive.primitive;
 
-import java.net.InetAddress;
-
 import nonregressiontest.component.creation.ComponentA;
 import nonregressiontest.component.creation.ComponentInfo;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.fractal.util.Fractal;
+
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 
 import testsuite.test.FunctionalTest;
 
+import java.net.InetAddress;
+
+
 /**
  * @author Matthieu Morel
- * 
+ *
  * creates a new component
  */
 public class Test extends FunctionalTest {
-	Component componentA;
-	String name;
-	String nodeUrl;
+    Component componentA;
+    String name;
+    String nodeUrl;
 
-	public Test() {
-		super(
-			"Creation of a primitive component on the local default node",
-			"Test newActiveComponent method for a primitive component on the local default node");
+    public Test() {
+        super("Creation of a primitive component on the local default node",
+            "Test newActiveComponent method for a primitive component on the local default node");
+    }
 
-	}
+    /**
+     * @see testsuite.test.FunctionalTest#action()
+     */
+    public void action() throws Exception {
+        System.setProperty("proactive.future.ac", "enable");
+        // start a new thread so that automatic continuations are enabled for components
+        ACThread acthread = new ACThread();
+        acthread.start();
+        acthread.join();
+        System.setProperty("proactive.future.ac", "disable");
+    }
 
-	/**
-	 * @see testsuite.test.FunctionalTest#action()
-	 */
-	public void action() throws Exception {
+    private class ACThread extends Thread {
+        public void run() {
+            try {
+                Component boot = Fractal.getBootstrapComponent();
+                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                GenericFactory cf = Fractal.getGenericFactory(boot);
 
-		System.setProperty("proactive.future.ac", "enable");
-		// start a new thread so that automatic continuations are enabled for components
-		ACThread acthread = new ACThread();
-		acthread.start();
-		acthread.join();
-		System.setProperty("proactive.future.ac", "disable");
-	}
+                componentA = cf.newFcInstance(type_factory.createFcType(
+                            new InterfaceType[] {
+                                type_factory.createFcItfType("componentInfo",
+                                    ComponentInfo.class.getName(),
+                                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                                    TypeFactory.SINGLE),
+                            }),
+                        new ControllerDescription("componentA",
+                            Constants.PRIMITIVE),
+                        new ContentDescription(ComponentA.class.getName(),
+                            new Object[] { "toto" }));
+                //logger.debug("OK, instantiated the component");
+                // start the component!
+                Fractal.getLifeCycleController(componentA).startFc();
+                ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
+                        "componentInfo");
+                name = ref.getName();
+                nodeUrl = ((ComponentInfo) componentA.getFcInterface(
+                        "componentInfo")).getNodeUrl();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
 
-	private class ACThread extends Thread {
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
-		public void run() {
-			
-			try {
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    }
 
-			ProActiveTypeFactory type_factory = ProActiveTypeFactory.instance();
-			ComponentParameters component_parameters =
-				new ComponentParameters(
-					"componentA",
-					ComponentParameters.PRIMITIVE,
-					type_factory.createFcType(
-						new InterfaceType[] {
-							type_factory.createFcItfType(
-								"componentInfo",
-								ComponentInfo.class.getName(),
-								TypeFactory.SERVER,
-								TypeFactory.MANDATORY,
-								TypeFactory.SINGLE),
-							}));
-			componentA =
-				ProActive.newActiveComponent(
-					ComponentA.class.getName(),
-					new Object[] { "toto" },
-					null,
-					null,
-					null,
-					component_parameters);
-			//logger.debug("OK, instantiated the component");
-			// start the component!
-			
-			Fractal.getLifeCycleController(componentA).startFc();
-			ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
-			name = ref.getName();
-			nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				e.printStackTrace();
-			}
-		}
-	}
+    public boolean postConditions() throws Exception {
+        return (name.equals("toto") &&
+        (nodeUrl.indexOf(InetAddress.getLocalHost().getHostName()) != -1));
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
-
-	/**
-	 * @see testsuite.test.AbstractTest#endTest()
-	 */
-	public void endTest() throws Exception {
-	}
-
-	public boolean postConditions() throws Exception {
-		return (name.equals("toto") && (nodeUrl.indexOf(InetAddress.getLocalHost().getHostName()) != -1));
-	}
-
-	public static void main(String[] args) {
-		Test test = new Test();
-		try {
-			test.action();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    public static void main(String[] args) {
+        Test test = new Test();
+        try {
+            test.action();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

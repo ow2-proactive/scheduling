@@ -32,89 +32,82 @@ package nonregressiontest.component.creation.remote.newactive.primitive;
 
 import nonregressiontest.component.creation.ComponentA;
 import nonregressiontest.component.creation.ComponentInfo;
+
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.fractal.util.Fractal;
+
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 
 import testsuite.test.FunctionalTest;
 
+
 /**
  * @author Matthieu Morel
- * 
+ *
  * creates a primitive component on a remote node with ACs
  */
 public class Test extends FunctionalTest {
-	Component componentA;
-	String name;
-	String nodeUrl;
-	String remoteHost;
+    Component componentA;
+    String name;
+    String nodeUrl;
+    String remoteHost;
 
-	public Test() {
-		super(
-			"Creation of a primitive component on a remote node",
-			"Test newActiveComponent method for a primitive component on a remote node");
-	}
+    public Test() {
+        super("Creation of a primitive component on a remote node",
+            "Test newActiveComponent method for a primitive component on a remote node");
+    }
 
-	/**
-	 * @see testsuite.test.FunctionalTest#action()
-	 */
-	public void action() throws Exception {
-		ProActiveTypeFactory type_factory = ProActiveTypeFactory.instance();
-		ComponentParameters component_parameters =
-			new ComponentParameters(
-				"componentA",
-				ComponentParameters.PRIMITIVE,
-				type_factory.createFcType(
-					new InterfaceType[] {
-						type_factory.createFcItfType(
-							"componentInfo",
-							ComponentInfo.class.getName(),
-							TypeFactory.SERVER,
-							TypeFactory.MANDATORY,
-							TypeFactory.SINGLE),
-						}));
-		componentA =
-			ProActive.newActiveComponent(
-				ComponentA.class.getName(),
-				new Object[] { "toto" },
-				TestNodes.getRemoteACVMNode(),
-				null,
-				null,
-				component_parameters);
-		//logger.debug("OK, instantiated the component");
-		// start the component!
+    /**
+     * @see testsuite.test.FunctionalTest#action()
+     */
+    public void action() throws Exception {
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        GenericFactory cf = Fractal.getGenericFactory(boot);
 
-		Fractal.getLifeCycleController(componentA).startFc();
-		ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
-		name = ref.getName();
-		nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
+        componentA = cf.newFcInstance(type_factory.createFcType(
+                    new InterfaceType[] {
+                        type_factory.createFcItfType("componentInfo",
+                            ComponentInfo.class.getName(), TypeFactory.SERVER,
+                            TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                    }),
+                new ControllerDescription("componentA", Constants.PRIMITIVE),
+                new ContentDescription(ComponentA.class.getName(),
+                    new Object[] { "toto" }, TestNodes.getRemoteACVMNode()));
+        //logger.debug("OK, instantiated the component");
+        // start the component!
+        Fractal.getLifeCycleController(componentA).startFc();
+        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
+                "componentInfo");
+        name = ref.getName();
+        nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
+    }
 
-	}
+    public boolean preConditions() throws Exception {
+        remoteHost = TestNodes.getRemoteHostname();
+        return (remoteHost != null);
+    }
 
-	public boolean preConditions() throws Exception {
-		remoteHost = TestNodes.getRemoteHostname();
-		return (remoteHost != null);
-	}
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#endTest()
-	 */
-	public void endTest() throws Exception {
-	}
-
-	public boolean postConditions() throws Exception {
-		return (name.equals("toto") && (nodeUrl.indexOf(remoteHost) != -1));
-	}
+    public boolean postConditions() throws Exception {
+        return (name.equals("toto") && (nodeUrl.indexOf(remoteHost) != -1));
+    }
 }

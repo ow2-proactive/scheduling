@@ -11,10 +11,8 @@ import nonregressiontest.component.PrimitiveComponentB;
 import nonregressiontest.component.PrimitiveComponentC;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.util.Fractal;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.component.Fractal;
 import org.objectweb.proactive.core.component.xml.Loader;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -55,11 +53,10 @@ public class Test extends FunctionalTest {
 		public void run() {
 			try {
 				// instantiate and deploy components
-				deploymentDescriptor = ProActive.getProactiveDescriptor("file:" + DEPLOYMENT_DESCRIPTOR_LOCATION);
 				Loader component_loader = new Loader();
 				component_loader.loadComponentsConfiguration(
 					"file:" + COMPONENTS_DESCRIPTOR_LOCATION,
-					deploymentDescriptor);
+					"file:" + DEPLOYMENT_DESCRIPTOR_LOCATION);
 				// start components
 				Component c = component_loader.getComponent("c");
 
@@ -79,11 +76,6 @@ public class Test extends FunctionalTest {
 				message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
 			} catch (Exception e) {
 				e.printStackTrace();
-				try {
-					deploymentDescriptor.killall(false);
-				} catch (ProActiveException pae) {
-					pae.printStackTrace();
-				}
 			}
 		}
 	}
@@ -98,7 +90,7 @@ public class Test extends FunctionalTest {
 	 * @see testsuite.test.AbstractTest#endTest()
 	 */
 	public void endTest() throws Exception {
-		deploymentDescriptor.killall(false);
+		//deploymentDescriptor.killall(false);
 	}
 
 	public boolean postConditions() throws Exception {
@@ -125,6 +117,7 @@ public class Test extends FunctionalTest {
 		Test test = new Test();
 		try {
 			test.action();
+			test.postConditions();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

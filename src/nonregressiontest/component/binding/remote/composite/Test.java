@@ -36,7 +36,7 @@ import nonregressiontest.component.PrimitiveComponentA;
 import nonregressiontest.component.PrimitiveComponentB;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.proactive.core.component.Fractal;
+import org.objectweb.fractal.util.Fractal;
 
 import testsuite.test.FunctionalTest;
 

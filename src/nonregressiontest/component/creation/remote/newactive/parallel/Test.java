@@ -39,13 +39,16 @@ import nonregressiontest.component.PrimitiveComponentB;
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.type.ParallelComposite;
 
 import testsuite.test.FunctionalTest;
@@ -131,7 +134,9 @@ public class Test extends FunctionalTest {
     private class ACThread extends Thread {
         public void run() {
             try {
-                TypeFactory type_factory = Fractal.getTypeFactory();
+                Component boot = Fractal.getBootstrapComponent();
+                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                GenericFactory cf = Fractal.getGenericFactory(boot);
                 ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                             type_factory.createFcItfType("i1",
                                 I1.class.getName(), TypeFactory.SERVER,
@@ -147,26 +152,26 @@ public class Test extends FunctionalTest {
                                 TypeFactory.MANDATORY, TypeFactory.SINGLE)
                         });
 
-                ComponentParameters p1_parameters = new ComponentParameters(P1_NAME,
-                        ComponentParameters.PRIMITIVE, i1_i2_type);
-                ComponentParameters p2_parameters = new ComponentParameters(P2_NAME,
-                        ComponentParameters.PRIMITIVE, i1_i2_type);
-                ComponentParameters p3_parameters = new ComponentParameters(P3_NAME,
-                        ComponentParameters.PRIMITIVE, i2_type);
-                ComponentParameters pr1_parameters = new ComponentParameters(PR1_NAME,
-                        ComponentParameters.PARALLEL, i1_i2_type);
-
-                p1 = ProActive.newActiveComponent(PrimitiveComponentA.class.getName(),
-                        new Object[] {  }, null, null, null, p1_parameters);
-                p2 = ProActive.newActiveComponent(PrimitiveComponentA.class.getName(),
-                        new Object[] {  }, TestNodes.getRemoteACVMNode(), null,
-                        null, p2_parameters);
-                p3 = ProActive.newActiveComponent(PrimitiveComponentB.class.getName(),
-                        new Object[] {  }, null, null, null, p3_parameters);
-                pr1 = ProActive.newActiveComponent(ParallelComposite.class.getName(),
-                        new Object[] {  }, TestNodes.getRemoteACVMNode(), null,
-                        null, pr1_parameters);
-                System.out.println();
+                p1 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentA.class.getName(),
+                            new Object[] {  }));
+                p2 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentA.class.getName(),
+                            new Object[] {  }, TestNodes.getRemoteACVMNode()));
+                p3 = cf.newFcInstance(i2_type,
+                        new ControllerDescription(P3_NAME, Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentB.class.getName(),
+                            new Object[] {  }));
+                pr1 = cf.newFcInstance(i1_i2_type,
+                        new ControllerDescription(PR1_NAME, Constants.PARALLEL),
+                        new ContentDescription(
+                            ParallelComposite.class.getName(),
+                            new Object[] {  }, TestNodes.getRemoteACVMNode()));
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 e.printStackTrace();
@@ -181,14 +186,14 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        String p1_name = Fractal.getComponentParametersController(p1)
-                                .getComponentParameters().getName();
-        String p2_name = Fractal.getComponentParametersController(p2)
-                                .getComponentParameters().getName();
-        String p3_name = Fractal.getComponentParametersController(p3)
-                                .getComponentParameters().getName();
-        String pr1_name = Fractal.getComponentParametersController(pr1)
+        String p1_name = Fractive.getComponentParametersController(p1)
                                  .getComponentParameters().getName();
+        String p2_name = Fractive.getComponentParametersController(p2)
+                                 .getComponentParameters().getName();
+        String p3_name = Fractive.getComponentParametersController(p3)
+                                 .getComponentParameters().getName();
+        String pr1_name = Fractive.getComponentParametersController(pr1)
+                                  .getComponentParameters().getName();
         return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) &&
         p3_name.equals(P3_NAME) && pr1_name.equals(PR1_NAME));
     }

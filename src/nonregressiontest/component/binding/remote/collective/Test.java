@@ -39,14 +39,15 @@ import nonregressiontest.component.PrimitiveComponentD;
 import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.Fractal;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import testsuite.test.FunctionalTest;
@@ -54,7 +55,7 @@ import testsuite.test.FunctionalTest;
 
 /**
  * @author Matthieu Morel
- * a test for bindings on client collective interfaces between remote components 
+ * a test for bindings on client collective interfaces between remote components
  */
 public class Test extends FunctionalTest {
     public static String MESSAGE = "-->Main";
@@ -83,7 +84,10 @@ public class Test extends FunctionalTest {
     private class ACThread extends Thread {
         public void run() {
             try {
-                ProActiveTypeFactory type_factory = ProActiveTypeFactory.instance();
+                Component boot = Fractal.getBootstrapComponent();
+                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                GenericFactory cf = Fractal.getGenericFactory(boot);
+
                 ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
                             type_factory.createFcItfType("i1",
                                 I1.class.getName(), TypeFactory.SERVER,
@@ -99,20 +103,22 @@ public class Test extends FunctionalTest {
                         });
 
                 // instantiate the components
-                pD1 = ProActive.newActiveComponent(PrimitiveComponentD.class.getName(),
-                        new Object[] { "component D" },
-                        TestNodes.getRemoteACVMNode(), null, null,
-                        new ComponentParameters("pD1",
-                            ComponentParameters.PRIMITIVE, D_Type));
-                pB1 = ProActive.newActiveComponent(PrimitiveComponentB.class.getName(),
-                        new Object[] {  }, null, null, null,
-                        new ComponentParameters("pB1",
-                            ComponentParameters.PRIMITIVE, B_Type));
-                pB2 = ProActive.newActiveComponent(PrimitiveComponentB.class.getName(),
-                        new Object[] {  }, TestNodes.getRemoteACVMNode(), null,
-                        null,
-                        new ComponentParameters("pB2",
-                            ComponentParameters.PRIMITIVE, B_Type));
+                pD1 = cf.newFcInstance(D_Type,
+                        new ControllerDescription("pD1", Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentD.class.getName(),
+                            new Object[] {},
+                            TestNodes.getRemoteACVMNode()));
+                pB1 = cf.newFcInstance(B_Type,
+                        new ControllerDescription("pB1", Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentB.class.getName(),
+                            new Object[] {  }));
+                pB2 = cf.newFcInstance(B_Type,
+                        new ControllerDescription("pB2", Constants.PRIMITIVE),
+                        new ContentDescription(
+                            PrimitiveComponentB.class.getName(),
+                            new Object[] {  }, TestNodes.getRemoteACVMNode()));
 
                 // bind the components
                 Fractal.getBindingController(pD1).bindFc("i2",
