@@ -1,48 +1,55 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/standard.dtd">
 
-<definition extends="nonregressiontest.component.descriptor.fractaladl.MessagePassingExampleType" name="nonregressiontest.component.descriptor.fractaladl.MessagePassingExample">
-  <component name="b">
-    <interface signature="nonregressiontest.component.I2" role="server" name="i1"/>
+<definition name="nonregressiontest.component.descriptor.fractaladl.MessagePassingExample" extends="nonregressiontest.component.descriptor.fractaladl.MessagePassingExampleType">
+  <component name="b2">
+    <interface name="i1" signature="nonregressiontest.component.I2" role="server"/>
     <content class="nonregressiontest.component.PrimitiveComponentB"/>
     <controller desc="primitive"/>
   </component>
   <component name="parallel">
-    <interface signature="nonregressiontest.component.I1" cardinality="collection" role="server" name="i1"/>
-    <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
+    <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
+    <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
     <component name="a1">
-      <interface signature="nonregressiontest.component.I1" role="server" name="i1"/>
-      <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
+      <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
+      <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
       <content class="nonregressiontest.component.PrimitiveComponentA"/>
       <controller desc="primitive"/>
     </component>
     <component name="parallel-2">
-      <interface signature="nonregressiontest.component.I1" cardinality="collection" role="server" name="i1"/>
-      <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
-      <interface signature="nonregressiontest.component.I2" role="client" name="i3"/>
+      <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
+      <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
+      <interface name="i3" signature="nonregressiontest.component.I2" role="client"/>
       <component name="a2-1">
-        <interface signature="nonregressiontest.component.I1" role="server" name="i1"/>
-        <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
+        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
+        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
         <content class="nonregressiontest.component.PrimitiveComponentA"/>
         <controller desc="primitive"/>
       </component>
       <component name="a2-3">
-        <interface signature="nonregressiontest.component.I1" role="server" name="i1"/>
-        <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
+        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
+        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
         <content class="nonregressiontest.component.PrimitiveComponentA"/>
         <controller desc="primitive"/>
       </component>
       <component name="a2-2">
-        <interface signature="nonregressiontest.component.I1" role="server" name="i1"/>
-        <interface signature="nonregressiontest.component.I2" role="client" name="i2"/>
+        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
+        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
         <content class="nonregressiontest.component.PrimitiveComponentA"/>
         <controller desc="primitive"/>
       </component>
+      <component name="b1">
+        <interface name="i1" signature="nonregressiontest.component.I2" role="server"/>
+        <content class="nonregressiontest.component.PrimitiveComponentB"/>
+        <controller desc="primitive"/>
+        <virtual-node name=""/>
+      </component>
       <binding client="this.i100" server="a2-2.i1"/>
       <binding client="this.i101" server="a2-3.i1"/>
-      <binding client="a2-3.i2" server="this.i2"/>
+      <binding client="a2-3.i2" server="b1.i1"/>
       <binding client="a2-2.i2" server="this.i2"/>
       <controller desc="parallel"/>
+      <virtual-node name="VN3"/>
     </component>
     <binding client="this.i100" server="parallel-2.i100"/>
     <binding client="this.i101" server="a1.i1"/>
@@ -50,15 +57,16 @@
     <binding client="parallel-2.i2" server="this.i2"/>
     <controller desc="parallel"/>
   </component>
-  <binding client="parallel.i2" server="b.i1"/>
+  <binding client="parallel.i2" server="b2.i1"/>
   <controller desc="composite"/>
-  <coordinates color="-73" y0="0.16382544535673782" x1="0.820230527544267" y1="0.27634476529491403" name="b" x0="0.7176872925493536"/>
-  <coordinates color="-73" y0="0.1844521492125818" x1="0.5319315148089923" y1="0.6778060904799701" name="parallel" x0="0.1340396978880492">
-    <coordinates color="-73" y0="0.5985089553595778" x1="0.604206205546455" y1="0.7765615055914172" name="a1" x0="0.38121536119243643"/>
-    <coordinates color="-73" y0="0.039265306122448884" x1="0.7451459491651145" y1="0.4481541950113378" name="parallel-2" x0="0.20034918389590842">
-      <coordinates color="-73" y0="0.5201692607338686" x1="0.4850210216554694" y1="0.6982218109657079" name="a2-1" x0="0.2620301773014508"/>
-      <coordinates color="-73" y0="0.30139459983381434" x1="0.4660194305688472" y1="0.47944715006565375" name="a2-3" x0="0.2430285862148287"/>
-      <coordinates color="-73" y0="0.07122910807070487" x1="0.44574753562757286" y1="0.24928165830254428" name="a2-2" x0="0.22275669127355427"/>
+  <coordinates name="b2" x1="1.0" y1="0.28306233663450664" x0="0.8974567650050865" y0="0.17054301669633043" color="-73"/>
+  <coordinates name="parallel" x1="0.842952072509999" y1="0.9741552156098688" x0="0.1340396978880492" y0="0.1844521492125818" color="-73">
+    <coordinates name="a1" x1="0.6812215532788868" y1="0.9760617150412144" x0="0.4582307089248683" y0="0.798009164809375" color="-73"/>
+    <coordinates name="parallel-2" x1="0.8963034331704434" y1="0.5172075367781521" x0="0.301176477960417" y0="0.039265306122448884" color="-73">
+      <coordinates name="a2-1" x1="0.5563780918487553" y1="0.7615970547001393" x0="0.33338724749473675" y0="0.5835445044682999" color="-73"/>
+      <coordinates name="a2-3" x1="0.5493594431051975" y1="0.48962158150747304" x0="0.3263685987511791" y0="0.3115690312756337" color="-73"/>
+      <coordinates name="a2-2" x1="0.5516118758764503" y1="0.24165083472117974" x0="0.3286210315224318" y0="0.06359828448934032" color="-73"/>
+      <coordinates name="b1" x1="0.9977707992392411" y1="0.45695583108441545" x0="0.7146623026228495" y0="0.26516153573525175" color="-73"/>
     </coordinates>
   </coordinates>
 </definition>
