@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.group;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
+import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -53,10 +54,20 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
 						((StubObject) object).getProxy().reify(new MethodCall(this.mc));
 					}
 					else {
-						((StubObject) object).getProxy().reify(this.mc);
+						if (object instanceof ProActiveComponentRepresentative) {
+							// component stubs can handle some method invocations  
+							this.mc.execute(object);
+						} else { 
+							((StubObject) object).getProxy().reify(this.mc);
+						}
 					}
 				} else {
-					((StubObject) object).getProxy().reify(this.mc);
+					if (object instanceof ProActiveComponentRepresentative) {
+							// component stubs can handle some method invocations	
+							this.mc.execute(object);
+					} else { 
+						((StubObject) object).getProxy().reify(this.mc);
+					}
 				}
             } catch (Throwable e) {
                 this.exceptionList.add(new ExceptionInGroup(object, e));
