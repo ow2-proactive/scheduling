@@ -11,7 +11,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 /**
  * Domains encapsulate one Planet, do their calculations, communicates with a Group, and synchronized by a master.
@@ -40,10 +39,10 @@ public class Domain implements Serializable{
      * @param i the unique identifier
      * @param r the boundaries containing the Planet at the begining of the simulation
      */
-    public Domain (Integer i, Rectangle r, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public Domain (Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         identification = i.intValue();
-        info = new Planet(r);
+        info = planet;
         try { this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {  e.printStackTrace();  }
     }

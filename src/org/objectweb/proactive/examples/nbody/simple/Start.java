@@ -5,6 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 
@@ -18,20 +19,18 @@ public class Start {
             org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING simplest VERSION");
         
-        int root = (int) Math.sqrt(totalNbBodies);
-        int STEP_X = 200 / root , STEP_Y = 200 / root;
+        Rectangle universe = new Rectangle(-100 , -100 , 100 , 100);
         Domain [] domainArray = new Domain [totalNbBodies];
         for (int  i = 0 ; i < totalNbBodies ; i++) {
-            Object [] params = new Object [] {
+            Object [] constructorParams = new Object [] {
                     new Integer(i), 
-                    new Rectangle(STEP_X * (i % root)-100, STEP_Y * (i / root) -100, STEP_X, STEP_Y),
+                    new Planet (universe)
             	};
-            
             try {
                 // Create all the Domains used in the simulation 
                 domainArray[i] = (Domain) ProActive.newActive(
                         Domain.class.getName(), 
-                        params, 
+                        constructorParams, 
                         nodes[(i+1) % nodes.length]
                 );
             }

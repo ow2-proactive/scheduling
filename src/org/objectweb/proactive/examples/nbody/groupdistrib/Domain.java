@@ -11,7 +11,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
     
@@ -47,11 +46,11 @@ public class Domain implements Serializable{
      * @param i the unique identifier
      * @param r the boundaries containing the Planet at the begining of the simulation
      */
-    public Domain (Integer i, Rectangle r, 
+    public Domain (Integer i, Planet planet, 
             org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.identification = i.intValue();
         this.prematureValues = new Vector(); 
-        this.info = new Planet(r);
+        this.info = planet;
         this.killsupport = killsupport;
         try {this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {e.printStackTrace();}
@@ -92,14 +91,10 @@ public class Domain implements Serializable{
         if (this.iter == receivedIter) {
             this.currentForce.add(info, inf);
             this.nbReceived ++ ;
-            if (this.nbReceived > this.nbvalues)
-                System.err.println(identification +  " : Too many answers " + this.nbReceived + "/" + this.nbvalues);
             if (this.nbReceived == this.nbvalues) 
                 moveBody();
         }
         else { 
-            if (this.iter > receivedIter)
-                this.killsupport.abort( new NullPointerException("Value arrives too late!"));
             this.prematureValues.add(new Carrier (inf, receivedIter));
         }
     }

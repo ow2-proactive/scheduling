@@ -9,7 +9,6 @@ import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
     
@@ -23,9 +22,9 @@ public class Domain implements Serializable{
     private Domain neighbours;								
     /**  The body information */
     private Planet info;									
-	/** The sum of the forces already worked out */
+    /** The sum of the forces already worked out */
     private Force currentForce ;
-	/** ProActive reference on self */
+    /** ProActive reference on self */
     private Domain asyncRefToSelf;					 
     
     /** iteration count related variables */
@@ -44,9 +43,9 @@ public class Domain implements Serializable{
      * @param i the unique identifier
      * @param r the boundaries containing the Planet at the begining of the simulation
      */
-    public Domain (Integer i, Rectangle r) {
+    public Domain (Integer i, Planet planet) {
         this.identification = i.intValue();
-        this.info = new Planet(r);
+        this.info = planet;
         try {this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {e.printStackTrace();}
     }
@@ -83,7 +82,7 @@ public class Domain implements Serializable{
      */
     public void setValue(Planet inf, int id) {
         if (id != this.identification)  
-            currentForce.add (info, inf);		// add this contribution to the force on Planet
+            this.currentForce.add (info, inf);		// add this contribution to the force on Planet
     }
     
     
@@ -102,11 +101,11 @@ public class Domain implements Serializable{
             if (this.identification==0)       // clean up all the deployment. 
                 killsupport.quit();
         }
-
+        
         // Display code
         if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
-            if (this.identification==0 && (iter % 50 == 0) ) 
-                System.out.println("Compute movement.");
+            if (this.identification==0 ) 
+                System.out.println("Compute movement. "+ iter);
         }
         else { 
             this.display.drawBody((int)this.info.x, (int)info.y, (int)info.vx, (int)info.vy, 

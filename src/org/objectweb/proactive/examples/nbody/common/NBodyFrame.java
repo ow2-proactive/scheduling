@@ -34,7 +34,6 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
     
     // fonctional
     private String [] bodyname;
-    private int counter = 0; 
     int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
     ArrayList names;
     int nbBodies;

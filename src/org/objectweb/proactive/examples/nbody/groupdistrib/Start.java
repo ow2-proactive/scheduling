@@ -6,6 +6,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 
@@ -20,21 +21,20 @@ public class Start {
             org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING groupdistrib VERSION");
         
-        int root = (int) Math.sqrt(totalNbBodies);
-        int STEP_X = 200 / root , STEP_Y = 200 / root;
-        Object [][] params = new Object [totalNbBodies][3] ;
+        Object [][] constructorParams = new Object [totalNbBodies][3] ;
         
+        Rectangle universe = new Rectangle (-100 , -100 , 100 , 100);
         for (int  i = 0 ; i < totalNbBodies ; i++) {
-            params[i][0] = new Integer(i);		      
+            constructorParams[i][0] = new Integer(i);		      
             // coordinates between -100,-100 and 100,100
-            params[i][1] = new Rectangle(STEP_X * (i % root)-100, STEP_Y * (i / root) -100, STEP_X, STEP_Y);
-            params[i][2] = killsupport;
+            constructorParams[i][1] = new Planet (universe); 
+            constructorParams[i][2] = killsupport;
         }
         
         Domain domainGroup = null;
         try {
             // Create a group containing all the Domain in the simulation 
-            domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
+            domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), constructorParams, nodes);
         }
         catch (ClassNotReifiableException e) { killsupport.abort(e); }
         catch (ClassNotFoundException e) { killsupport.abort(e); }

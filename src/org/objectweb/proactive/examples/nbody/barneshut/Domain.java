@@ -21,7 +21,7 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
  */
 public class Domain implements Serializable{
     
-    private class Carrier {
+    private class Carrier implements Serializable{
         Info inf;
         int iter;
         
@@ -30,24 +30,35 @@ public class Domain implements Serializable{
             this.iter = iter;
         }
     }
-    private int identification;					// unique domain identifier
-    private Domain neighbours;					// The Group containing all the other Domains
-    private boolean [] canIReceiveInfoFrom;		// list of Domains that can send info
-    private String hostName = "unknown";		// to display on which host we're running
+    /** unique domain identifier */
+    private int identification;					
+    /**  The Group containing all the other Domains */
+    private Domain neighbours;					
+    /**  list of Domains that can send info */
+    private boolean [] canIReceiveInfoFrom;		
+    /** to display on which host we're running */
+    private String hostName = "unknown";		
     
-    private Displayer display;					// If we want some graphical interface
+    /** If we want some graphical interface */
+    private Displayer display;				
     
+    /** references to all the Domains */
+    private Domain [] domainArray; 			
+    /** hierarchy between domains */
+    private QuadTree quadTree, treeNode;	  
     
-    private Domain [] domainArray; 				// references to all the Domains
-    private QuadTree quadTree, treeNode;		// hierarchy between domains  
-    
-    private boolean isLeaf;						// isLeaf = (treeNode.Q==null)
-    private Info info; 							// The local information
-    private Force [] totalForce;  				// the forces applying to the Planets inside the Info
-    private int nbNeighbours = 0, nbReceived = 0;  // iteration related variables, counting the "pings"
+    /** isLeaf = (treeNode.Q==null) */
+    private boolean isLeaf;		
+    /** The local information */
+    private Info info; 				
+    /** the forces applying to the Planets inside the Info */
+    private Force [] totalForce; 
+    /**  iteration related variables, counting the "pings" */
+    private int nbNeighbours = 0, nbReceived = 0;  
     private int iter = 0, maxIter;
     
-    private Vector prematureValues;				// If demands come too early, or a bit late. 				
+    /**  If demands come too early, or a bit late. */
+    private Vector prematureValues;				 				
     private Info [] savedInfo;
     private org.objectweb.proactive.examples.nbody.common.Start killsupport;
     
@@ -110,7 +121,7 @@ public class Domain implements Serializable{
     
     /**
      * Can only be called once all Domains are ready to receive addNeighbour.
-     * That's why it is called after the synchro() hand-made barrier 
+     * That's why it is called after barrier 
      */
     public void finishInit() {
         if (isLeaf) {

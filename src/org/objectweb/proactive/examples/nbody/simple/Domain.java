@@ -7,7 +7,6 @@ import java.net.UnknownHostException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
     
@@ -33,9 +32,9 @@ public class Domain implements Serializable{
      * @param i The unique identifier of this Domain
      * @param r The Planet will be created inside the region r 
      */
-    public Domain (Integer i, Rectangle r) {	 
+    public Domain (Integer i, Planet planet) {	 
         this.identification = i.intValue();
-        this.info = new Planet(r);
+        this.info = planet;
         try { this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) { e.printStackTrace();}
     }

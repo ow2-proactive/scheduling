@@ -34,16 +34,16 @@ public class Start {
         Vector info = tree.getInfo(); 
         int size = tree.size();
         
-        Object [][] params = new Object [size][3]; // the parameters passed to the Domain constructors
+        Object [][] constructorParams = new Object [size][3]; // the parameters passed to the Domain constructors
         for (int  i = 0 ; i < size; i++)  {
-            params[i][0] = new Integer(i);		      
-            params[i][1] = (Info) info.get(i);	
-            params[i][2] = killsupport;
+            constructorParams[i][0] = new Integer(i);		      
+            constructorParams[i][1] = (Info) info.get(i);	
+            constructorParams[i][2] = killsupport;
         }
         Domain domainGroup = null;
         try {
             // Create all the Domains, inside an SPMD Group, to enable barriers
-            domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
+            domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), constructorParams, nodes);
         }
         catch (ClassNotReifiableException e) { killsupport.abort(e); }
         catch (ClassNotFoundException e) { killsupport.abort(e); }
