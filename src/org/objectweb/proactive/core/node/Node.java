@@ -78,9 +78,9 @@ public interface Node
 	/**
 	 * Returns all activeObjects with the given name deployed on this Node 
 	 * or null if such objects do not exist
-	 * @param objectName the class of the Active Objects
+	 * @param className the class of the Active Objects
 	 * @return Object[].The set of activeObjects deployed on this node with the given name
 	 */
-	public Object[] getActiveObject(String objectName) throws NodeException,ActiveObjectCreationException;
+	public Object[] getActiveObjects(String className) throws NodeException,ActiveObjectCreationException;
 
 }
