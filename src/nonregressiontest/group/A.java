@@ -5,6 +5,7 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
 
 public class A implements InitActive, RunActive, EndActive,
@@ -94,4 +95,9 @@ public class A implements InitActive, RunActive, EndActive,
     public A asynchronousCallException() throws Exception {
         throw new Exception();
     }
+    
+	public void invokeBarrier() {
+		ProSPMD.barrier("MyBarrier");
+	}
+
 }
