@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
+
 public class JiniNodeFactory extends NodeFactory {
 
   protected final static int MAX_RETRY = 5;

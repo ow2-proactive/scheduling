@@ -49,6 +49,7 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeInformation;
 
+
 public class JiniNodeImpl
   extends java.rmi.server.UnicastRemoteObject
   implements JiniNode, java.io.Serializable, net.jini.discovery.DiscoveryListener, net.jini.lease.LeaseListener {

@@ -282,6 +282,7 @@ public abstract class NodeFactory {
       instanceFactoryMapping.put(protocol, nf);
       return nf;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new NodeException("Error while creating the factory "+factoryClass.getName()+" for the protocol "+protocol);
     }
   }
@@ -291,6 +292,7 @@ public abstract class NodeFactory {
     try {
       factoryClass = Class.forName(factoryClassName);
     } catch (ClassNotFoundException e) {
+      e.printStackTrace();
       throw new NodeException("Error while getting the class of the factory "+factoryClassName+" for the protocol "+protocol);
     }
     return createNodeFactory(factoryClass, protocol);

@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.mop;
 
 import java.lang.reflect.Field;
@@ -77,7 +77,6 @@ abstract class Utils extends Object {
     return result;
   }
 
-
   static public String getRidOfAbstract(String in) {
     String result;
     int leftindex, rightindex;
@@ -91,13 +90,11 @@ abstract class Utils extends Object {
     return result;
   }
 
-
   static public String getRidOfNativeAndAbstract(String in) {
     String s = in;
     s = getRidOfAbstract(s);
     return getRidOfNative(s);
   }
-
 
   /**
    * Checks if the given method can be reified.
@@ -118,15 +115,18 @@ abstract class Utils extends Object {
 
     // Final methods cannot be reified since we cannot redefine them
     // in a subclass
-    if (Modifier.isFinal(modifiers)) return false;
+    if (Modifier.isFinal(modifiers))
+      return false;
     // Static methods cannot be reified since they are not 'virtual'
-    if (Modifier.isStatic(modifiers)) return false;
-    if (!(Modifier.isPublic(modifiers))) return false;
+    if (Modifier.isStatic(modifiers))
+      return false;
+    if (!(Modifier.isPublic(modifiers)))
+      return false;
     // If method is finalize (), don't reify it
-    if ((met.getName().equals("finalize")) && (met.getParameterTypes().length == 0)) return false;
+    if ((met.getName().equals("finalize")) && (met.getParameterTypes().length == 0))
+      return false;
     return true;
   }
-
 
   /**
    * Returns a String representing the'source code style' declaration
@@ -146,8 +146,7 @@ abstract class Utils extends Object {
       //to fix an issue with jdk1.3 and inner class
       // A$B should be A.B in source code
       //System.out.println("Remplacing in " + cl.getName());
- 
-	  
+
       return cl.getName().replace('$', '.');
     } else {
       int nb = 0;
@@ -204,20 +203,14 @@ abstract class Utils extends Object {
    * Extract the package name from the fully qualified class name given as
    * an argument
    */
-
   public static String getPackageName(String fqnameofclass) {
-    int indexoflastdot;
-
-    indexoflastdot = fqnameofclass.lastIndexOf('.');
-
+    int indexoflastdot = fqnameofclass.lastIndexOf('.');
     if (indexoflastdot == -1) {
       return "";
     } else {
       return fqnameofclass.substring(0, indexoflastdot);
     }
-
   }
-
 
   /**
    * Extracts the simple name of the class from its fully qualified name
@@ -230,7 +223,7 @@ abstract class Utils extends Object {
     indexOfLastDot = fullyQualifiedNameOfClass.lastIndexOf('.');
 
     if (indexOfLastDot == -1) // There are no dots
-    {
+      {
       return fullyQualifiedNameOfClass;
     } else {
       // If last character is a dot, returns an empty string
@@ -241,14 +234,14 @@ abstract class Utils extends Object {
     }
   }
 
-
   /**
    * Returns the Class object that is a wrapper for the given <code>cl</code>
    * class.
    */
   public static Class getWrapperClass(Class cl) {
-    if (!(cl.isPrimitive())) return null;
-    String s = Utils.nameOfWrapper(cl);
+    if (!(cl.isPrimitive()))
+      return null;
+    String s = nameOfWrapper(cl);
     try {
       return MOP.forName(s);
     } catch (ClassNotFoundException e) {
@@ -256,18 +249,17 @@ abstract class Utils extends Object {
     }
   }
 
-
   /**
    * Performs the opposite operation as getWrapperClass
    */
   public static Class getPrimitiveType(Class cl) {
     Field cst;
-    if (Utils.isWrapperClass(cl)) {
+    if (isWrapperClass(cl)) {
       // These types are not classes , yet class static variables
       // We want to locale the TYPE field in the class
       try {
         cst = cl.getField("TYPE");
-        return (Class)cst.get(null);
+        return (Class) cst.get(null);
       } catch (NoSuchFieldException e) {
         throw new InternalException("Cannot locate constant TYPE in class " + cl.getName());
       } catch (SecurityException e) {
@@ -280,25 +272,23 @@ abstract class Utils extends Object {
     }
   }
 
-
   /**
    * Tests if the class given as an argument is a wrapper class
    * How can we be sure that all subclasses of java.lang.Number are wrappers ??
    */
 
   public static boolean isWrapperClass(Class cl) {
-    if (Utils.JAVA_LANG_NUMBER.isAssignableFrom(cl))
+    if (JAVA_LANG_NUMBER.isAssignableFrom(cl))
       return true;
-    else if (Utils.JAVA_LANG_BOOLEAN.isAssignableFrom(cl))
+    else if (JAVA_LANG_BOOLEAN.isAssignableFrom(cl))
       return true;
-    else if (Utils.JAVA_LANG_CHARACTER.isAssignableFrom(cl))
+    else if (JAVA_LANG_CHARACTER.isAssignableFrom(cl))
       return true;
-    else if (Utils.JAVA_LANG_VOID.isAssignableFrom(cl))
+    else if (JAVA_LANG_VOID.isAssignableFrom(cl))
       return true;
     else
       return false;
   }
-
 
   public static String getRelativePath(String className) {
     String packageName;
@@ -307,9 +297,9 @@ abstract class Utils extends Object {
     int indexOfDot, indexOfLastDot;
 
     fileSeparator = System.getProperty("file.separator");
-    packageName = Utils.getPackageName(className);
+    packageName = getPackageName(className);
 
-    indexOfDot = packageName.indexOf((int)'.', 0);
+    indexOfDot = packageName.indexOf((int) '.', 0);
     result = "";
     indexOfLastDot = 0;
 
@@ -317,7 +307,7 @@ abstract class Utils extends Object {
 
       result = result + fileSeparator + packageName.substring(indexOfLastDot, indexOfDot);
       indexOfLastDot = indexOfDot + 1;
-      indexOfDot = packageName.indexOf((int)'.', indexOfDot + 1);
+      indexOfDot = packageName.indexOf((int) '.', indexOfDot + 1);
       if (indexOfDot == -1)
         result = result + fileSeparator + packageName.substring(indexOfLastDot, packageName.length());
     }
@@ -328,19 +318,19 @@ abstract class Utils extends Object {
     return result;
   }
 
-/*
-  public static String getStubName(String nameOfClass) {
-    return Utils.getPackageName(nameOfClass) + "." + STUB_DEFAULT_PREFIX + Utils.getSimpleName(nameOfClass);
-  }
-*/
+  /*
+    public static String getStubName(String nameOfClass) {
+      return getPackageName(nameOfClass) + "." + STUB_DEFAULT_PREFIX + getSimpleName(nameOfClass);
+    }
+  */
 
   public static boolean isNormalException(Class exc) {
     boolean result;
 
-    if (Utils.JAVA_LANG_THROWABLE.isAssignableFrom(exc)) {
+    if (JAVA_LANG_THROWABLE.isAssignableFrom(exc)) {
       // It is a subclass of Throwable
-      if (Utils.JAVA_LANG_EXCEPTION.isAssignableFrom(exc)) {
-        if (Utils.JAVA_LANG_RUNTIMEEXCEPTION.isAssignableFrom(exc))
+      if (JAVA_LANG_EXCEPTION.isAssignableFrom(exc)) {
+        if (JAVA_LANG_RUNTIMEEXCEPTION.isAssignableFrom(exc))
           result = false;
         else
           result = true;
@@ -352,7 +342,6 @@ abstract class Utils extends Object {
 
     return result;
   }
-
 
   public static Class decipherPrimitiveType(String str) {
     if (str.equals("int"))
@@ -377,7 +366,6 @@ abstract class Utils extends Object {
     return null;
   }
 
-
   public static boolean isSuperTypeInArray(String className, Class[] types) {
     try {
       Class c = MOP.forName(className);
@@ -387,7 +375,6 @@ abstract class Utils extends Object {
     }
   }
 
-
   public static boolean isSuperTypeInArray(Class c, Class[] types) {
     for (int i = 0; i < types.length; i++) {
       if (types[i].isAssignableFrom(c))
@@ -395,8 +382,8 @@ abstract class Utils extends Object {
     }
     return false;
   }
-  
-    public static Object makeDeepCopy(Object source) throws java.io.IOException {
+
+  public static Object makeDeepCopy(Object source) throws java.io.IOException {
     java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
     java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
     oos.writeObject(source);
@@ -409,73 +396,56 @@ abstract class Utils extends Object {
       ois.close();
       return result;
     } catch (ClassNotFoundException e) {
-      throw new java.io.IOException("ClassNotFoundException e="+e);
+      throw new java.io.IOException("ClassNotFoundException e=" + e);
     }
   }
 
-  public static String convertClassNameToStubClassName (String classname)
-  {
-	return STUB_DEFAULT_PACKAGE + Utils.getPackageName(classname) + "." + STUB_DEFAULT_PREFIX + Utils.getSimpleName(classname);
+  public static String convertClassNameToStubClassName(String classname) {
+    if (classname.length() == 0) return classname;
+    int n = classname.lastIndexOf('.');
+    if (n == -1) {
+      // no package
+      return STUB_DEFAULT_PACKAGE + STUB_DEFAULT_PREFIX + classname;
+    } else {
+      return STUB_DEFAULT_PACKAGE + classname.substring(0,n+1) + STUB_DEFAULT_PREFIX + classname.substring(n+1);
+    }
   }
 
-  public static boolean isStubClassName (String classname)
-  {
-      if (classname.startsWith (STUB_DEFAULT_PACKAGE))
-	  {
-	     	 String simpleName;
-	 
-		 // Extracts the simple name from the fully-qualified class name
-		 int index = classname.lastIndexOf(".");
-		 if (index != -1)
-		     {
-			 return classname.substring(index+1).startsWith(Utils.STUB_DEFAULT_PREFIX);
-		     }
-		 else
-		     {
-		     return classname.startsWith(Utils.STUB_DEFAULT_PREFIX);
-		     }
-		 
-	  }
-      else
-	  {
-	      return false;
-	  }
-  }
-    
-  public static String convertStubClassNameToClassName (String stubclassname)
-  {
-     if (isStubClassName(stubclassname))
-	 {
-	     String temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
-	     String packageName = Utils.getPackageName(temp);
-	     String stubClassSimpleName =  Utils.getSimpleName(temp);	
-	     String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
-	     String result =  packageName + "." + classsimplename;
-//	     System.out.println ("CONVERT "+stubclassname+" -> "+result);
-	     return result;
-	 }
-     else
-	 {
-	     return stubclassname;
-	 }
+  public static boolean isStubClassName(String classname) {
+    if (classname.startsWith(STUB_DEFAULT_PACKAGE)) {
+      // Extracts the simple name from the fully-qualified class name
+      int index = classname.lastIndexOf('.');
+      if (index != -1) {
+        return classname.substring(index + 1).startsWith(STUB_DEFAULT_PREFIX);
+      } else {
+        return classname.startsWith(STUB_DEFAULT_PREFIX);
+      }
+    } else {
+      return false;
+    }
   }
 
-
+  public static String convertStubClassNameToClassName(String stubclassname) {
+    if (stubclassname.startsWith(STUB_DEFAULT_PACKAGE)) {
+      String temp = stubclassname.substring(STUB_DEFAULT_PACKAGE.length());
+      int n = temp.lastIndexOf('.');
+      if (n != -1) {
+        return temp.substring(0,n+1) + temp.substring(n+STUB_DEFAULT_PREFIX.length()+1);
+      } else {
+        return temp.substring(STUB_DEFAULT_PREFIX.length());
+      }
+    } else {
+      return stubclassname;
+    }
+  }
 
   private static final Class silentForName(String classname) {
     try {
       return MOP.forName(classname);
     } catch (ClassNotFoundException e) {
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classe "+classname);
+      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classe " + classname);
       return null;
     }
   }
 
-
 }
-
-
-
-
-
-
