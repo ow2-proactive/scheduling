@@ -190,7 +190,7 @@ examples. A Planet is no more than a point in
 space, with velocity and mass - the diameter expresses the size to use
 for the display:
     <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    </code><code>public
+public
 class Planet <span style="color: rgb(0, 121, 0);">implements
 Serializable</span>{<br>
 &nbsp;&nbsp;&nbsp;
@@ -319,12 +319,13 @@ which is an
 This&nbsp;
 <code>Domain</code>
 contains the code to manage the communication of the possitions of the <code>Planets</code>
-during the simulation. They are created in the Start.java file : <br>
-<code></code></p>
-<br>
-<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Rectangle
-universe = new Rectangle (-100,-100,100,100);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Domain
+during the simulation. They are created in the Start.java file : </p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Rectangle
+universe = new Rectangle
+(-100,-100,100,100);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Domain
 [] domainArray = new
 Domain
 [totalNbBodies];<br>
@@ -359,10 +360,10 @@ nodes[(i+1) % nodes.length]<br>
 catch (ActiveObjectCreationException e) { killsupport.abort(e); } <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 catch
-(NodeException e) { killsupport.abort(e); }<br>
-</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>}</code></p>
-<br>
+(NodeException e) { killsupport.abort(e);
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}</code></p>
 <p>See how the call to <code>
 ProActive.newActive</code> creates
 one new <code>Active Object</code>,
@@ -376,14 +377,14 @@ and since it's an <code>Object []</code>
 , the parameters may only be <code>Objects</code>
 (don't try to build constructors using ints in their
 constructor - this explains the use of the class <code>Integer</code>).
-The <code>Domains</code>, once created, are initialized, and then they
-are
+The <code>Domains</code>,
+once created, are initialized, and then they are
 synchronized by all pinging the maestro, with the notifyFinished
 call.&nbsp; are started
 by issuing the sendValueToNeighbours request. <br>
 <code></code></p>
 <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>//
+//
 init workers<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 for (int i=0 ; i &lt; totalNbBodies ; i ++)<br>
@@ -392,18 +393,18 @@ domainArray[i].init(domainArray, displayer, maestro);</code></p>
 <p><code><br>
 </code></p>
 <p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>public
+public
 void init(Domain [] domainArray, Displayer dp, Maestro
 master) {<br>
-</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>.....<br>
-</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>maestro.notifyFinished();
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+.....<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+maestro.notifyFinished();
 &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp; // say we're ready to start .<br>
-</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</code><code>&nbsp;&nbsp;&nbsp; }</code><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; }</code><br>
 </p>
 <p>While in their execution, the <code>Domains</code>
 gather information concerning the position of all
@@ -550,26 +551,29 @@ catch ....</a></code></p>
 <p><a>The
 double array params stores
 the parameters passed to the
-constructors of the <code>Domains</code> we're creating. <code>Domain
-0</code> will have
-<code>params[0][]</code> passed as arguments, <code>Domain 1
-params[1][]</code>, and so on. The
+constructors of the <code>Domains</code>
+we're creating. <code>Domain 0</code>
+will have
+<code>params[0][]</code>
+passed as arguments, <code>Domain
+1 params[1][]</code>, and so on. The
 nodes are the Nodes on which to display these Active Objects. Do notice
-the <code>try... catch</code> construction, which is needed, like
-around any
-creation of <code>Active Objects</code>, which may raise exceptions.
-In this
-previous bit of&nbsp; code, a <code>Group</code> containing new <code>Active
+the <code>try... catch</code>
+construction, which is needed, like around any
+creation of <code>Active Objects</code>,
+which may raise exceptions. In this
+previous bit of&nbsp; code, a <code>Group</code>
+containing new <code>Active
 Objects</code>
 has been created, and all these Objects belong to the group .&nbsp;
-You may have noticed that the type of the <code>Group</code> is
-Domain. It's a bit
+You may have noticed that the type of the <code>Group</code>
+is Domain. It's a bit
 strange at first, and you may think this reference points to only one
 Active Object at once, but
 that's not true. We're accesssing all the objects in the group, and to
 be able to continue using the methods of the Domain class, the group is
-typed as <code>Domain</code>, and that's the reason why it's called a
-typed Group. <br>
+typed as <code>Domain</code>,
+and that's the reason why it's called a typed Group. <br>
 <code></code></a></p>
 <p><a>Now,
 this group is passed as
@@ -582,7 +586,8 @@ domainGroup.init(domainGroup, displayer, maestro);
 method sets the local
 field as a copy of the passed parameter, and as such is unique, we can
 play around with it without affecting the others, so let's remove the
-local <code>Domain<code> from the Group, to avoid having calls on self:<br>
+local <code>Domain<code>
+from the Group, to avoid having calls on self:<br>
 </code></code></a></p>
 <p>
 </p>
@@ -624,35 +629,32 @@ this by the following code, because it works faster :</a></p>
 this.neighbours.setValue<span style="color: rgb(0, 121, 0);"></span>(this.info,
 this.identification);<br>
 </a></code></p>
-<p><a>This
+<p>This
 has the following meaning
 : call the method setValue, with the given parameters, to all the
-members of the Group neighbours.&nbsp;
-</a></p>
-<p><a>You
-may find another view of this example on this </a><a
+members of the Group neighbours.<br>
+You
+may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupcom.html">web
-page</a><a>.</a></p>
+page</a>.</p>
 <h3 class="textNormal"><a>6
 groupdistrib</a></h3>
 <p><a>Now,
 do like the idea that the
 synchronization is centralized on one
 entity? I don't and it's the bottleneck of the application anyway :
-once a <code>Domain</code> has finished, it sends the notifyFinshed,
-and then sits
+once a <code>Domain</code>
+has finished, it sends the notifyFinshed, and then sits
 idle. Well, a way of making this better is to remove it completly! You
-may have noticed that because a <code>Domain</code> needs to have all
-the
-information of all the <code>Domains</code> of the same iteration
-before going on
+may have noticed that because a <code>Domain</code>
+needs to have all the
+information of all the <code>Domains</code>
+of the same iteration before going on
 with the next iteration, if you change the behaviour of the setValue
 method to treat early calls, it would work nice and smoothly. That's
 what we've done : <br>
 <code></code></a></p>
-<a><br>
-</a>
-<p><code><a>&nbsp;&nbsp;&nbsp;
+<p><code>&nbsp;&nbsp;&nbsp;
 public
 void setValue(Planet inf, int
 receivedIter) {<br>
@@ -684,18 +686,13 @@ late!"));<br>
 <span style="color: rgb(0, 121, 0);">this.prematureValues.add</span>(new
 Carrier (inf, receivedIter));<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; }</a></code></p>
-<a><br>
-</a>
-<p><a>Also
-notice how the computation
+&nbsp;&nbsp;&nbsp; }</code></p>
+<p>Also notice how the computation
 is done when the result is received (<code>this.currentForce.add(info,
-inf);</code>),
-not
-when <span style="font-weight: bold;">all</span>
+inf);</code>), instead of when <span style="font-weight: bold;">all</span>
 the results have arrived. This allows for less time spent
 idle. Indeed, waiting for all the results before
-computing leaves idle time
+computing might leave idle time
 between setValue requests. And then, just before computing the new
 position of the body, the sum of all the forces has to be computed.
 It's better to have this sum ready when needed.<span
@@ -704,123 +701,56 @@ It's better to have this sum ready when needed.<span
 The <code>prematureValues </code>Vector
 is the place where we put the values that arrive out of sync. When
 a value is early, it is queued there, and dequeued as soon as this
-<code>Domain</code> changes iteration.</a></p>
-<a><br>
-</a>
-<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr>
-      <td> <code>public
+<code>Domain</code>
+changes iteration.</p>
+<p><code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </code><code>public
 void sendValueToNeighbours() {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 reset();<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 this.iter++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 if (this.iter &lt; this.maxIter) {&nbsp;&nbsp;&nbsp;
 &nbsp; <br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 neighbours.setValue(this.info, this.iter);<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ...<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
- style="color: rgb(0, 121, 0);">treatPremature();</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="color: rgb(0, 121, 0);">treatPremature();</span><br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 ...<br>
-&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;</code> </td>
-      <td>&nbsp;&nbsp;&nbsp; <code>private void
-treatPremature() {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-int size = this.prematureValues.size() ;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-for (int i = 0 ; i &lt; size ; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Carrier c = (Carrier) this.prematureValues.remove(0);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-setValue(c.planet , c.iter); // works even if c.iter &gt; iter<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp; }</code><br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<p><a>That
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</code><code>
+&nbsp;&nbsp; }</code><code><br>
+</code></p>
+<p>That
 treatPremature() method
-simply treats the values that were early
-as if they had just arrived. </a></p>
-<p><a>You
-may find another view of this example on this </a><a
+simply treats the values
+that were early
+as if they had just arrived.<br>
+You
+may find another view of this example on this <a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupdistrib.html">web
 page</a><a>.</a></p>
 <h3 class="textNormal"><a>7
 groupoospmd</a></h3>
-<p><a>This
-is another way to improve
+<p>This is another way to improve
 the groupcom example. It also removes
 the master, but this time by inserting oospmd barriers, that can be
 thought as behaving like the maestro
-class, but faster. What happens is that each Active Objects hits the
-barrier call, and then waits for all the others to have reached it,
-before reading its
-request queue again. <br>
-</a></p>
-<a><br>
-</a>
-<table style="width: 100%; text-align: left;" border="1" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr>
-      <td><code>public
-void moveBody() {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-Force force = new Force();&nbsp; <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-for (int i = 0 ; i &lt; values.length ; i++) {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-force.add(info, values[i]); // adds the interaction of the distant body
-      <br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.info.moveWithForce(force);<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-ProSPMD.barrier("BARRIER : " + this.iter );<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-((Domain)ProActive.getStubOnThis()).pleaseContinue();<br>
-&nbsp;&nbsp;&nbsp; } </code> </td>
-      <td><code>&nbsp;&nbsp;&nbsp;
-public void pleaseContinue () {<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-this.iter++;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-clearValues();<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-((Domain)ProActive.getStubOnThis()).sendValueToNeighbours(this.iter);<br>
-&nbsp;&nbsp;&nbsp; }<br>
-      </code> <br>
-      </td>
-    </tr>
-  </tbody>
-</table>
-<a><br>
-</a>
-<p><a>Beware,
-the&nbsp;
-stop-and-wait&nbsp; is
-not just after the barrier call, but instead blocks the request queue.
-So if there is code after that barrier, it <span
- style="font-weight: bold;">will </span>get
-executed. In fact, the barrier should be seen as a prioritary request
-on the queue. This explains why we had to put the code after the
-barrier in the <code>pleaseContinue</code>
-method. If we hadn't done it that way, but just appended the code of
-that method just after the barrier, the call to <code>sendValueToNeighbours()</code>
-would be executed <span style="font-weight: bold;">before</span>
-the barrier execution, which is exactly what we don't want! <br>
-To create functional OOspm Groups, there is a special instruction,
-which has the same parameters as a newGroup instruction : <br>
-</a></p>
+class, but faster. To create functional OOspmd Groups, there is a
+special instruction,
+which takes the same parameters as a newGroup instruction : <br>
 <a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 <code>Object [][] params = <br>
@@ -838,8 +768,45 @@ try {<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 catch ...<br>
 </code>
-</a>
-<p><a>You
+</a></p>
+<p>Now, to use this OOspmd group
+properly, we want to use the barrier() methods. We put these in the
+Domains code, to do the synchronization. What happens is that each
+Domain hits the
+barrier call, and then waits for all the others to have reached it,
+before reading its request queue again. </p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+void sendValueToNeighbours() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.neighbours.setValue(this.info,
+this.identification);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ProSPMD.barrier("barrier" + this.iter);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.iter++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.asyncRefToSelf.moveBody();&nbsp;&nbsp;&nbsp;&nbsp;
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+....<br>
+</code>Beware, the stop-and-wait is
+not just after the barrier call, but instead blocks the request queue.
+So if there is code after that barrier, it <span
+ style="font-weight: bold;">will </span>get
+executed. In fact, the barrier should be seen as a prioritary request
+on the queue. This explains why we had to put the code after the
+barrier as a method placed on an asynchronous refernce to self. If we
+hadn't done it that way, but just appended the code of
+that method just after the barrier, the call to <code>moveBody()</code>
+would be executed <span style="font-weight: bold;">before</span>
+the barrier execution, which is exactly what we don't want! <br>
+<a>You
 may find another view of this example on this </a><a
  href="http://www-sop.inria.fr/oasis/proactive/apps/nbody-groupoospmd.html">web
 page</a><a>.</a></p>
@@ -907,12 +874,12 @@ in the blue Domain are only one big one, centered at the center of mass
 of all the particles within the blue.</p>
 <p>In this version, the
 <code>Domains</code>
-communicate with a reduced set of other <code>Domains</code>, spanning
-on volumes of
+communicate with a reduced set of other <code>Domains</code>,
+spanning on volumes of
 different sizes. Synchronization is achieved by sending explicitely
 iteration numbers, and returning when needed older positions. You may
-notice that some <code>Domains</code> seem desynchronized with other
-ones, having
+notice that some <code>Domains</code>
+seem desynchronized with other ones, having
 several iterations inbetween. That is no problem because if they then
 need to be synchronized and send each other information, a mechanism
 saving the older positions permits to
