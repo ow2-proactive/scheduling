@@ -80,7 +80,8 @@ public class Hello {
     // Registers it with an URL
     try {
       // Creates an active instance of class HelloServer on the local node
-      Hello hello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), new Object[]{"remote"});
+      Hello hello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
+	                     new Object[]{"remote"});
       java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
       org.objectweb.proactive.ProActive.register(hello, "//" + localhost.getHostName() + "/Hello");
     } catch (Exception e) {
@@ -152,11 +153,13 @@ public class HelloClient {
       // checks for the server's URL
       if (args.length == 0) {
         // There is no url to the server, so create an active server within this VM
-        myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), new Object[]{"local"});
+        myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
+                          new Object[]{"local"});
       } else {
         // Lookups the server object
         System.out.println("Using server located on " + args[0]);
-        myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), args[0]);
+        myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), 
+                          args[0]);
       }
       // Invokes a remote method on this object to get the message
       message = myServer.sayHello();
