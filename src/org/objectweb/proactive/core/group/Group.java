@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.group;
 
+import java.util.ListIterator;
+
 
 
 /**
@@ -37,7 +39,7 @@ package org.objectweb.proactive.core.group;
  *
  * @see java.util.Collection
  *
- * @author Laurent Baduel - INRIA
+ * @author Laurent Baduel
  *
  */
 public interface Group extends java.util.Collection { 
@@ -61,12 +63,12 @@ public interface Group extends java.util.Collection {
 
     
     /**
-     * Merge a group into the group.
+     * Merges a group into the group.
      */
     public void addMerge(Object ogroup);
 
     /**
-     * Remove the object at the specified index.
+     * Removes the object at the specified index.
      */
     public void remove(int index);
 
@@ -75,5 +77,11 @@ public interface Group extends java.util.Collection {
      */
     public int indexOf(Object obj);
     
+    /**
+     * Returns a list iterator of the members in this Group (in proper sequence). 
+     */
+    public ListIterator listIterator();
 
+
+    
 }

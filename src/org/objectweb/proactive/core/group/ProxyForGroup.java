@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.group;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.ListIterator;
 import java.util.Vector;
 
 import org.objectweb.proactive.Body;
@@ -19,7 +20,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 /**
  * This proxy class manages the semantic of group communication and implements the Group Interface.
  *
- * @author Laurent Baduel - INRIA
+ * @author Laurent Baduel
  * @see org.objectweb.proactive.core.mop.Proxy
  *
  */
@@ -32,7 +33,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	protected Vector memberList;
 	/** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */ // NOT FULLY IMPLEMENTED !!!
 	transient private UniqueID proxyForGroupID;
-	/** Number of awaited call of method on the group's member : The Semantic is that we wait all call are done before continuing */
+	/** Number of awaited methodcall on the group's member. The Semantic is : we wait all call are done before continuing */
 	protected int waited = 0;
 	/** Flag to deternime the semantic of communication (broadcast or dispatching) */
 	protected boolean dispatching = false;
@@ -63,14 +64,24 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 	/* ----------------------------- GENERAL ---------------------------------- */
 
+	/**
+	 * Allows the Group to dispatch parameters.
+	 */
 	protected void setDispatchingOn() {
 		this.dispatching = true;
 	}
 
+	/**
+	 * Allows the Group to broadcast parameters.
+	 */
 	protected void setDispatchingOff() {
 		this.dispatching = false;
 	}
 
+	/**
+	 * Checks the semantic of communication of the Group.
+	 * @return <code>true</code> if the "scatter option" is enabled.
+	 */
 	protected boolean isDispatchingOn () {
 		return this.dispatching;
 	}
@@ -82,9 +93,18 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return false;
 	}
 
+
+
 	/* ------------------------ THE PROXY'S METHOD ------------------------ */
 
-	/** The proxy's method, implements the semantic of communication */
+	/**
+	 *  The proxy's method : implements the semantic of communication. This method invokes the
+	 * method call <code>mc</code> on each members of the Group.
+	 * @param <code>mc</code> the MethodCall to apply on each member of the Group.
+	 * @return the result of the call : <b> the result of a method call on a typed group is a
+	 * typed group</b>.
+	 * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
+	 */
 	public Object reify(MethodCall mc) throws InvocationTargetException {
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
@@ -103,9 +123,13 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return result;
 	}
 
-	/* -------------------------- METHOD FOR THREAD CREATION AND BARRIER OF SYNCHRONISATION -------------------------- */
 
-	/** Wait until the method has been apply to all the member */
+
+	/* -------------- METHOD FOR THREAD CREATION AND BARRIER OF SYNCHRONISATION ----------------- */
+
+	/**
+	 *  Waits until the method has been apply to all the members.
+	 */
 	protected synchronized void waitForAllCallsDone() {
 		while (this.waited != 0) {
 			try {
@@ -116,15 +140,23 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 	}
 
+	/**
+	 * Decrements the awaited counter and notify that a result is arrived.
+	 */
 	protected synchronized void decrementWaitedAndNotifyAll() {
 		waited--;
 		notifyAll();
 	}
 
+
+
+
 	/* ------------ FOR ASYNCHRONOUS CALL ------------ */
 
 	/**
-	 * Create and initialize (and return) the group of result, then launch threads for asynchronous call of each member
+	 * Creates and initializes (and returns) the group of result, then launch threads for asynchronous call of each member.
+	 * @param <code>mc</code> the MethodCall to be applied on each member of the Group.
+	 * @return the result of the call.
 	 */
 	protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
 		Object result;
@@ -169,20 +201,36 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return result;
 	}
 
+	/**
+	 * Creates the threads to make all the calls in parallel.
+	 * @param <code>memberList</code> the list of member on wich we make the call.
+	 * @param <code>memberListOfResultGroup</code> the list where we store the results.
+	 * @param <code>index</code> the rank of the member we consider
+	 * @param <code>mc</code> the MethodCall object to transmit to the member
+	 * @param <code>body</code> the body who have initiate the call.
+	 */
 	private synchronized void createThreadForAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
 		new Thread(new ProcessForAsyncCall(this,memberList, memberListOfResultGroup, index, mc, body)).start();
 		this.waited++;
 	}
 
-	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object o, int index) {
-		memberListOfResultGroup.set(index, o);
+	/**
+	 * Add the results (Future) into the typed group result at the correct poisition.
+	 * @param <code>memberListOfResultGroup</code> the list of the typed group result.
+	 * @param <code>result</code> the result of a call on member of a Group.  
+	 * @param <code>index</code> the rank of the result.
+	 */
+	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object result, int index) {
+		memberListOfResultGroup.set(index, result);
 		decrementWaitedAndNotifyAll();
 	}
+
 
 	/* -------------------- FOR ONEWAY CALL ---------------------- */
 
 	/**
-	 * Launch threads for OneWay call of each member
+	 * Launchs the threads for OneWay call of each member of the Group.
+	 * @param <code>mc</code> the MethodCall to be applied on each member of the Group.
 	 */
 	protected synchronized void oneWayCallOnGroup(MethodCall mc) {
 		Body body = ProActive.getBodyOnThis();		
@@ -208,9 +256,15 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 	}
 	
-
-	private synchronized void createThreadForOneWay(Vector memberListStubOfThis, int index, MethodCall mc, Body body) {
-		new Thread(new ProcessForOneWayCall(this,memberListStubOfThis, index, mc, body)).start();
+	/**
+	 * Creates the threads to make all the calls in parallel.
+	 * @param <code>memberList</code> the list of member on wich we make the call.
+	 * @param <code>index</code> the rank of the member we consider
+	 * @param <code>mc</code> the MethodCall object to transmit to the member
+	 * @param <code>body</code> the body who have initiate the call.
+	 */
+	private synchronized void createThreadForOneWay(Vector memberList, int index, MethodCall mc, Body body) {
+		new Thread(new ProcessForOneWayCall(this,memberList, index, mc, body)).start();
 		this.waited++;
 	}
 
@@ -218,9 +272,9 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/* ------------------- THE COLLECTION'S METHOD ------------------ */
 
 	/** 
-	 * If o is a reified object and if it is "assignableFrom" the class of the group, add it into the group
-	 *  - if o is a group merge it into the group
-	 *  - if o is not a reified object nor a group : do nothing
+	 * If o is a reified object and if it is "assignableFrom" the class of the group, add it into the group<br>
+	 *  - if o is a group merge it into the group<br>
+	 *  - if o is not a reified object nor a group : do nothing<br>
 	 * @param o - element whose presence in this group is to be ensured
 	 * @return <code>true</code> if this collection changed as a result of the call
 	 */
@@ -303,6 +357,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 	/**
 	 * Compares the specified object with this group for equality.
+	 * @param <o> the Object for wich we test the equality.
+	 * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.  
 	 */
 	public boolean equals(Object o) {
 		if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup)
@@ -312,7 +368,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 	/**
-	 * Returns the hash code value for this group
+	 * Returns the hash code value for this Group.
+	 * @return the hash code value for this Group.
 	 */
 	public int hashCode() {
 		return this.memberList.hashCode();
@@ -327,10 +384,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
  	}
 
 	/**
-	 * Returns a ListIterator of the member in the group
+	 * Returns an Iterator of the member in the Group.
+	 * @return an Iterator of the member in the Group.
 	 */
 	public Iterator iterator() {
-		return this.memberList.listIterator();
+		return this.memberList.iterator();
 	}
 
 	/**
@@ -378,6 +436,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
  
 	/**
 	 * Returns the number of member in this Group.
+	 * @return the number of member in this Group.
 	 */
 	public int size() {
 		return this.memberList.size();
@@ -385,6 +444,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	
 	/**
 	 * Returns an array containing all of the elements in this Group in the correct order.
+	 * @return an array containing all of the elements in this Group in the correct order.
 	 */
 	public Object[] toArray() {
 		return this.memberList.toArray();
@@ -395,7 +455,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * the runtime type of the returned array is that of the specified array. 
 	 * @param <code>a</code> - the array into which the elements of this collection are to be stored, if it is big enough;
 	 * otherwise, a new array of the same runtime type is allocated for this purpose.
-	 * @return an array containing the elements of this collection
+	 * @return an array containing the elements of this collection.
 	 */		
 	public Object[] toArray(Object[] a) {
 		return this.memberList.toArray(a);
@@ -405,8 +465,14 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 	/* ---------------------- THE GROUP'S METHOD ------------------- */
 
-
-	/** Add all member of the group oGroup into the Group */
+	/**
+	 *  Add all member of the group <code>ogroup</code> into the Group. <code>ogroup</code> can be :<br>
+	 * - a typed group<br>
+	 * - a Group<br>
+	 * - a standard Object<br>
+	 * but it have to be (or to extend) the Class of the Group.
+	 * @param <code>ogroup</code> the object(s) to merge into the Group.
+	 */
 	public void addMerge(Object oGroup) {
 		try {
 			/* check oGroup is an Reified Object and if it is "assignableFrom" the class of the group */
@@ -428,22 +494,36 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 
 	/**
-	 * Returns the index of the first occurence of the specified Object <code>obj</code>
-	 * @return -1 if the list does not contain this object.
+	 * Returns the index of the first occurence of the specified Object <code>obj</code>.
+	 * @param <code>obj</code> the obj tahat is searched in the Group. 
+	 * @return the rank of <code>obj</code> in the Group.
+	 * -1 if the list does not contain this object.
 	 */
 	public int indexOf(Object obj) {
 		return this.memberList.indexOf(obj);
 	}
 
 	/**
+	 * Returns a list iterator of the members in this Group (in proper sequence). 
+	 * @return a list iterator of the members in this Group.
+	 */
+	public ListIterator listIterator() {
+		return this.memberList.listIterator();
+	}
+
+
+	/**
 	 * Removes the element at the specified position.
+	 * @param <code>index</code> the rank of the object to remove in the Group.
 	 */
 	public void remove(int index) {
 		this.memberList.remove(index);
 	}
 
 	/**
-	 * Returns the i-th member of the group
+	 * Returns the i-th member of the group.
+	 * @param <code>index</code> the rank of the object to return.
+	 * @return the member of the Group at the specified rank.
 	 */
 	public Object get(int i) {
 		this.waitForAllCallsDone();
@@ -451,17 +531,27 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 
-	/** Return the ("higher") Class of group's member */
+	/**
+	 * Returns the ("higher") Class of group's member.
+	 * @return the Class that all Group's members are (or extend).
+	 * @throws java.lang.ClassNotFoundException if the class name of the Group is not known.
+	 */
 	public Class getType() throws java.lang.ClassNotFoundException {
 		return MOP.forName(this.className);
 	}
 
-	/** Return the full name of ("higher") Class of group's member */
+	/**
+	 * Returns the full name of ("higher") Class of group's member
+	 * @return the name of the Class that all Group's members are (or extend).
+	 */
 	public String getTypeName() {
 		return this.className;
 	}
 
-	/** Return an Object representing the group */
+	/**
+	 * Returns an Object (a <b>typed group</b> Object) representing the Group
+	 * @return a typed group corresponding to the Group.
+	 */
 	public Object getGroupByType() {
 		Object result;
 		try { // a new proxy is generated
@@ -485,43 +575,74 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	//  }
 	//  An other way is to "store" the stub and return it when asked
 
-	/** To debug, display all members and there position */
-	public void testClass() {
-		System.out.println(" Nombre d'elements : " + memberList.size());
+	/**
+	 * To debug, display the size of the Group and all its members with there position
+	 */
+	public void display() {
+		System.out.println("Number of member : " + memberList.size());
 		for (int i = 0; i < memberList.size(); i++) {
-			System.out.println(i + " : " + memberList.get(i).getClass().getName());
+			System.out.println("  " + i + " : " + memberList.get(i).getClass().getName());
 		}
 	}
 
+
+
 	/* ------------------- SYNCHRONIZATION -------------------- */
 
+	/**
+	 * Waits that all the members are arrived.
+	 */
 	protected void waitAll() {
 		ProActive.waitForAll(this.memberList);
 	}
 	
+	/**
+	 * Waits that at least one member is arrived.
+	 */
 	protected void waitOne() {
 		ProActive.waitForAny(this.memberList);
 	}
 
+	/**
+	 * Waits that the member at the specified rank is arrived.
+	 * @param <code>index</code> the rank of the awaited member.
+	 */
 	protected void waitTheNth(int n) {
 		ProActive.waitFor(this.memberList.get(n));
 	}
 
+	/**
+	 * Waits that at least <code>n</code> members are arrived.
+	 * @param <code>n</code> the number of awaited members.
+	 */
 	protected void waitN(int n) {
 		for (int i = 0; i < n ; i++) {
 			this.waitTheNth(i);
 		}
 	}
 
+	/**
+	 * Waits that at least one member is arrived and returns it.
+	 * @return a non-awaited member of the Group.
+	 */
 	protected Object waitAndGetOne() {
 		return this.memberList.get(ProActive.waitForAny(this.memberList));
 	}
 
+	/**
+	 * Waits that the member at the specified rank is arrived and returns it.
+	 * @param <code>n</code> the rank of the wanted member.
+	 * @return the member (non-awaited) at the rank <code>n</code> in the Group.
+	 */
 	protected Object waitAndGetTheNth(int n) {
 		ProActive.waitForTheNth(this.memberList,n);
 		return this.memberList.get(n);
 	}
 
+	/**
+	 * Checks if all the members of the Group are awaited.
+	 * @return <code>true</code> if all the members of the Group are awaited.
+	 */
 	protected boolean allAwaited() {
 		for (int i = 0 ; i < this.memberList.size() ; i++)
 			if (!(ProActive.isAwaited(this.memberList.get(i))))
@@ -529,6 +650,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return true;
 	}
 
+	/**
+	 * Checks if all the members of the Group are arrived.
+	 * @return <code>true</code> if all the members of the Group are arrived.
+	 */
 	protected boolean allArrived() {
 		for (int i = 0 ; i < this.memberList.size() ; i++)
 			if (ProActive.isAwaited(this.memberList.get(i)))
@@ -539,6 +664,12 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 	/* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 
+	/**
+	 * Creates the threads to build members in parallel.
+	 * @param <code>className</code> the name of the Class of the members.
+	 * @param <code>param</code> an array that contains the parameters for the constructor of member.
+	 * @param <code>node</code> the node where the member will be created.
+	 */
 	protected synchronized void createThreadCreation(String className, Object[] param, String node) {
 		new Thread(new ProcessForGroupCreation(this, className, param, node)).start();
 		waited++;

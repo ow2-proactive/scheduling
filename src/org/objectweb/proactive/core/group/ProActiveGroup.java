@@ -49,26 +49,51 @@ import org.objectweb.proactive.core.node.NodeException;
 /**
  * This class provides static methods to manage object representing a Group.
  *
- * @author Laurent Baduel - INRIA
+ * @author Laurent Baduel
  *
  */
 public class ProActiveGroup {
 
+	/** The name of the default proxy for group communication */
+	public static final Class DEFAULT_PROXYFORGROUP_CLASS = org.objectweb.proactive.core.group.ProxyForGroup.class;
 
+	/** The name of the default proxy for group communication */
     public static final String DEFAULT_PROXYFORGROUP_CLASS_NAME = "org.objectweb.proactive.core.group.ProxyForGroup";
 
 
 
-    /** Return a Group corresponding to the Object o representing a group. Return null if o does not representing a group. */
+    /**
+     * Returns a Group corresponding to the Object o representing a group. Return null if o does not representing a group.
+     * @param <code>o</code> - the object representing a group (a typed group).
+     * @return the Group corresponding to <code>o</code>.
+     */
     public static Group getGroup(Object o) {
 		return findProxyForGroup(o);
     }
     
+    /**
+     * Returns the name class of the typed group.
+     * If the parameter is not a typed group, returns the name of Class of the parameter.
+     * @param <code>o</code> the typed group for wich we want the name of the type (Class).
+     * @return the name class of the typed group 
+     */
+	public static String getType (Object o) {
+		ProxyForGroup tmp = findProxyForGroup(o);
+		if (tmp != null)
+			return tmp.getTypeName();
+		else
+			return o.getClass().getName();
+	}
 
 
-
-    /** Create an object representing an empty group specifying the upper class of member. */
-    public static Object newActiveGroup(String className) throws ClassNotFoundException, ClassNotReifiableException {
+    /**
+     * Creates an object representing an empty group specifying the upper class of member.
+     * @param the name of the (upper) class of the group's member. 
+     * @return an empty group of type <code>className</code>.  
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     */
+    public static Object newGroup(String className) throws ClassNotFoundException, ClassNotReifiableException {
 	
 	MOP.checkClassIsReifiable(MOP.forName(className));
 	
@@ -89,11 +114,21 @@ public class ProActiveGroup {
 
 
 
-    /** Create an object representing a group and create members with params cycling on nodeList. */
-    public static Object newActiveGroup(String className, Object[][] params, Node[] nodeList)
+    /**
+     * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
+     * @param <code>className</code> the name of the (upper) class of the group's member.
+     * @param <code>params</code> the array that contain the parameters used to build the group's member.
+     * @param <code>nodeList</code> the nodes where the members are created.
+     * @return a typed group with its members.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Object newGroup(String className, Object[][] params, Node[] nodeList)
 	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
 
-	Object result = newActiveGroup(className);
+	Object result = newGroup(className);
 	Group g = ProActiveGroup.getGroup(result);
 
 	for (int i=0 ; i < params.length ; i++)
@@ -102,13 +137,39 @@ public class ProActiveGroup {
 	return result;
     }
 
-   /** Create an object representing a group and create members with params cycling on nodeList. */
-    public static Object newActiveGroupTHREAD(String className, Object[][] params, String[] nodeList)
+
+	/**
+	 * Creates an Active Object representing an empty group specifying the upper class of member.
+	 * @param the name of the (upper) class of the group's member. 
+	 * @return an empty active group of type <code>className</code>.
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+     * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActiveGroup(Object ogroup)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup), (Node) null, null, null);
+	}
+
+
+   /**
+	* Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
+    * Threads are used to build the group's members. This methods returns when all members were created.
+	* @param <code>className</code> the name of the (upper) class of the group's member.
+	* @param <code>params</code> the array that contain the parameters used to build the group's member.
+	* @param <code>nodeList</code> the nodes where the members are created.
+	* @return a typed group with its members.
+    * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+    * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+    * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+    * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	*/
+    public static Object newGroupBuildWithMultithreading(String className, Object[][] params, String[] nodeList)
 	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
 
-	Object result = newActiveGroup(className);
+	Object result = newGroup(className);
 	Group g = ProActiveGroup.getGroup(result);
-
 
 	for (int i = 0 ; i < params.length ; i++)
 	    ((org.objectweb.proactive.core.group.ProxyForGroup)g).createThreadCreation(className, params[i], nodeList[i % nodeList.length]);
@@ -120,178 +181,199 @@ public class ProActiveGroup {
     
     
     /**
-     * Wait for all the futures are arrived.
+     * Waits for all the futures are arrived.
+     * @param <code>o</code> a typed group.
      */
     public static void waitAll(Object o) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAll();
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
-	}
+		if (MOP.isReifiedObject (o)) {
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAll();
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method
+		}
     }
     
     
     
     /**
-     * Wait for one future is arrived.
+     * Waits for (at least) one future is arrived.
+     * @param <code>o</code> a typed group.
      */
     public static void waitOne(Object o) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOne();
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
-	}
+		if (MOP.isReifiedObject (o)) {
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOne();
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method
+		}
     }
 
 
     
-    /**
-     * Wait n futures are arrived.
-     */
+	/**
+	 * Waits n futures are arrived.
+	 * @param <code>o</code> a typed group.
+	 * @param <code>n</code> the number of awaited members. 
+	 */
     public static void waitN(Object o, int n) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitN(n);
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
-	}
+		if (MOP.isReifiedObject (o)) {
+		    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+			((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitN(n);
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method
+		}
     }
     
 			
 
     /**
-     * Tests if all the member of the object <code>o</code> representing a group are awaited or not.
+     * Tests if all the members of the object <code>o</code> representing a group are awaited or not.
      * Always returns <code>false</code> if <code>o</code> is not a reified object (future or group).
+	 * @param <code>o</code> a typed group.
+	 * @return <code>true</code> if all the members of <code>o</code> are awaited.
      */
     public static boolean allAwaited (Object o) {
-	// If the object is not reified, it cannot be a future (or a group of future)
-	if (!(MOP.isReifiedObject (o)))
-	    return false;
-	else {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allAwaited();
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
-	    else
-		return false;
-	}
-    }
+		// If the object is not reified, it cannot be a future (or a group of future)
+		if (!(MOP.isReifiedObject (o)))
+		    return false;
+		else {
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+			return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allAwaited();
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
+	    	else
+			return false;
+		}
+   	}
 	    
 
     /**
      * Tests if all the member of the object <code>o</code> representing a group are arrived or not.
      * Always returns <code>true</code> if <code>o</code> is not a reified object (future or group).
+	 * @param <code>o</code> a typed group.
+	 * @return <code>true</code> if all the members of <code>o</code> are arrived.
      */
     public static boolean allArrived (Object o) {
     	// If the object is not reified, it cannot be a future (or a group of future)
-	if (!(MOP.isReifiedObject (o)))
-	    return true;
-	else {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allArrived();
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
-	    else
-		return true;
-	}
+		if (!(MOP.isReifiedObject (o)))
+		    return true;
+		else {
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allArrived();
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
+	    	else
+				return true;
+		}
     }
 
 
     /**
-     * Wait one future is arrived and get it.
+     * Waits one future is arrived and get it.
+	 * @param <code>o</code> a typed group.
+	 * @return a member of <code>o</code>.
      */
     public static Object waitAndGetOne (Object o) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
-	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOne();
-	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
-	    else
-		return o;
-	}
-	// if o is not a reified object just return it
-	else
-	    return o;
+		if (MOP.isReifiedObject (o)) {
+	    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+	    	if (theProxy != null)
+				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOne();
+	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
+	    	else
+				return o;
+		}
+		// if o is not a reified object just return it
+		else
+	    	return o;
     }
 
 
-   /**
+    /**
      * Wait the N-th future in the list is arrived.
+	 * @param <code>o</code> a typed group.
      */
     public static void waitTheNth (Object o, int n) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy  = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
- 	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitTheNth(n);
- 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
-	}
+		if (MOP.isReifiedObject (o)) {
+		    org.objectweb.proactive.core.mop.Proxy theProxy  = findProxyForGroup(o);
+		    // If the object represents a group, we use the proxyForGroup's method
+ 	    	if (theProxy != null)
+				((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitTheNth(n);
+ 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method
+		}
     }
-
 
 
     /**
      * Wait the N-th future is arrived and get it.
+	 * @param <code>o</code> a typed group.
+	 * @param <code>n</code> the rank of the awaited member.
+	 * @return the <code>n</code>-th member of th typed group <code>o</code>.
      */
     public static Object waitAndGetTheNth (Object o, int n) {
-	if (MOP.isReifiedObject (o)) {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
-	    // If the object represents a group, we use the proxyForGroup's method
-	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetTheNth(n);
-	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
-	    else
-		return o;
-	}
-	// if o is not a reified object just return it
-	else
-	    return o;
+		if (MOP.isReifiedObject (o)) {
+			org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+	    	// If the object represents a group, we use the proxyForGroup's method
+	    	if (theProxy != null)
+				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetTheNth(n);
+	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
+	    	else
+				return o;
+		}
+		// if o is not a reified object just return it
+		else
+	    	return o;
     }
 
 		
     /**
      * Returns the number of members of the object representing a Group.
-     * Throws an IllegalArgumentException if <code>obj</code> doesn't represent a Group.
+     * Throws an IllegalArgumentException if <code>o</code> doesn't represent a Group.
+	 * @param <code>o</code> a typed group.
+	 * @return the number of member of the typed group <code>o</code>.
      */
-    public static int size (Object obj) {
-    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(obj);
-	if (theProxy == null)
-	    throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
-	else
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).size();
+    public static int size (Object o) {
+    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+		if (theProxy == null)
+		    throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
+		else
+			return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).size();
     }
     
 
     /**
      * Returns the member at the specified index of the object representing a Group.
      * Returns <code>null</code> if <code>obj</code> doesn't represent a Group.
+     * @param <code>o</code> a typed group.
+	 * @param <code>n</code> the rank of the wanted member.
+	 * @return the member of the typed group at the rank <code>n</code>
      */
-    public static Object get (Object obj, int index) {
-    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(obj);
-	if (theProxy == null)
-	    return null;
-	else 
-	    return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).get(index);
+    public static Object get (Object o, int n) {
+    	org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+		if (theProxy == null)
+		    return null;
+		else 
+	    	return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).get(n);
     }
 
 
     /**
-     * Returns <code>true</code> if <code>obj</code> is an object representing a Group (future or not)
+     * Checks if the object <code>o</code> is an object representing a Group (future or not).
+     * @param <code>o</code> the Object to check.
+     * @return <code>true</code> if <code>o</code> is a typed group.  
      */  
-    public static boolean isGroup (Object obj) {	
-	    return (findProxyForGroup(obj) != null);
+    public static boolean isGroup (Object o) {	
+	    return (findProxyForGroup(o) != null);
     }
     
     /**
-     * Allows the object group to dispatch parameters
+     * Allows the typed group to dispatch parameters
+     * @param <code>ogroup</code> the typed group who will change is semantic of communication.
      */
     public static void setScatterGroup(Object ogroup) {
 		Proxy proxytmp = findProxyForGroup(ogroup);
@@ -300,7 +382,8 @@ public class ProActiveGroup {
     }
     
     /**
-     * Allows the object group to broadcast parameters
+     * Allows the typed group to broadcast parameters
+     * @param <code>ogroup</code> the typed group who will change is semantic of communication.
      */
     public static void unsetScatterGroup(Object ogroup) {
  		Proxy proxytmp = findProxyForGroup(ogroup);
@@ -308,8 +391,10 @@ public class ProActiveGroup {
 			((ProxyForGroup)proxytmp).setDispatchingOff();
    }
    
-   /**
-     * Return <code>true</code> if the "scatter option" is enabled for the group <code>ogroup</code>.
+    /**
+     * Checks the semantic of communication of the typed group <code>ogroup</code>.
+     * @param <code>ogroup</code> a typed group.
+     * @return <code>true</code> if the "scatter option" is enabled for the typed group <code>ogroup</code>.
      */
     public static boolean isScatterGroupOn (Object ogroup) {
  		Proxy proxytmp = findProxyForGroup(ogroup);
@@ -319,39 +404,38 @@ public class ProActiveGroup {
    }
 
     /**
-     * Returns the ProxyForGroup of the object <code>obj</code>.
-     * Returns <code>null</code> if <code>obj</code> does not represent a Group.
+     * Returns the ProxyForGroup of the typed group <code>ogroup</code>.
+     * @param <code>ogroup</code> the typed group. 
+     * @return the <code>ProxyForGroup</code> of the typed group <code>ogroup</code>.
+     * <code>null</code> if <code>ogroup</code> does not represent a Group.
      */
-    private static ProxyForGroup findProxyForGroup(Object obj) {
-	if (!(MOP.isReifiedObject(obj)))
-	    return null;
-	else {
-	    org.objectweb.proactive.core.mop.Proxy tmp = ((StubObject)obj).getProxy();
+    private static ProxyForGroup findProxyForGroup(Object ogroup) {
+		if (!(MOP.isReifiedObject(ogroup)))
+	    	return null;
+		else {
+	    	Proxy tmp = ((StubObject)ogroup).getProxy();
 
-	    // obj is an object representing a Group (and not a future)
-	    if (tmp instanceof org.objectweb.proactive.core.group.ProxyForGroup)
-		return (org.objectweb.proactive.core.group.ProxyForGroup) tmp;
+	    	// obj is an object representing a Group (and not a future)
+	    	if (tmp instanceof org.objectweb.proactive.core.group.ProxyForGroup)
+				return (org.objectweb.proactive.core.group.ProxyForGroup) tmp;
 	    
-	    // obj is a future ... but may be a future-Group
-	    while (tmp instanceof org.objectweb.proactive.core.body.future.FutureProxy)
-		// future of future ...
-		if (MOP.isReifiedObject(((FutureProxy)tmp).getResult()))
-		    tmp = ((StubObject)((FutureProxy)tmp).getResult()).getProxy();
-	        // future of standard objet
-		else
-		    return null;
+	    	// obj is a future ... but may be a future-Group
+	    	while (tmp instanceof org.objectweb.proactive.core.body.future.FutureProxy)
+				// future of future ...
+				if (MOP.isReifiedObject(((FutureProxy)tmp).getResult()))
+		    		tmp = ((StubObject)((FutureProxy)tmp).getResult()).getProxy();
+	        	// future of standard objet
+				else
+		    		return null;
 	    
-	    // future-Group
-	    if (tmp instanceof org.objectweb.proactive.core.group.ProxyForGroup)
-		return (org.objectweb.proactive.core.group.ProxyForGroup) tmp;
-	    // future of an active object
-	    else
-		return null;
+	    		// future-Group
+	    	if (tmp instanceof org.objectweb.proactive.core.group.ProxyForGroup)
+				return (org.objectweb.proactive.core.group.ProxyForGroup) tmp;
+	    	// future of an active object
+	    	else
+				return null;
+		}
 	}
-	
-    }
-
-
 
 
 }

@@ -353,7 +353,7 @@ public class Matrix implements Active, java.io.Serializable {
 	}
 
 	try {
-	    result = (Matrix) ProActiveGroup.newActiveGroup("org.objectweb.proactive.examples.matrix.Matrix",params,nodeList);
+	    result = (Matrix) ProActiveGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",params,nodeList);
 	}
 	catch (Exception e) { e.printStackTrace();}
 	

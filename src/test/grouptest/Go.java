@@ -19,7 +19,7 @@ public class Go {
 
 
 	try {
-	    group = (Obj) ProActiveGroup.newActiveGroup("test.grouptest.Obj");
+	    group = (Obj) ProActiveGroup.newGroup("test.grouptest.Obj");
 	}
 	catch (Exception e) {System.err.println("Go : Unable to create the typed group");}
 	
@@ -57,6 +57,7 @@ public class Go {
 
 
 	group.sayYourName();
+	group.say(new MyString("hello !!!"));
 //	MyString msg = group.getName();
 //	msg.display();
 
@@ -64,7 +65,7 @@ public class Go {
 
 	MyString groupString = null;
 	try {
-	    groupString = (MyString) ProActiveGroup.newActiveGroup("test.grouptest.MyString");
+	    groupString = (MyString) ProActiveGroup.newGroup("test.grouptest.MyString");
 	}
 	catch (Exception e) {System.err.println("Go : Unable to create the typed group");}
 	
