@@ -14,6 +14,7 @@ package org.objectweb.proactive.ic2d.gui.util;
 * @author  manu
 */
 public class RMIHostDialog extends javax.swing.JDialog {
+	private RMIHostDialog(){} //empty default constructor to avoid compiler to add one 
       /** Creates new form RMIHostDialog */
    private RMIHostDialog(java.awt.Frame parent, boolean modal) {
    	
