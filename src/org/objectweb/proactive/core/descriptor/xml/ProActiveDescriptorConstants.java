@@ -90,6 +90,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String ABS_PATH_TAG = "absolutePath";
   public static final String REL_PATH_TAG = "relativePath";  
   
+  public static final String JVMPARAMETERS_TAG = "jvmParameters";
   
   
 }

@@ -68,11 +68,14 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   public final static String DEFAULT_JAVAPATH = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"java";
   public final static String DEFAULT_POLICY_FILE = System.getProperty("user.dir")+FILE_SEPARATOR+POLICY_FILE;
   public final static String DEFAULT_CLASSNAME ="org.objectweb.proactive.StartNode";
+  public final static String DEFAULT_JVMPARAMETERS ="";
+
 
   protected String classpath = DEFAULT_CLASSPATH;
   protected String javaPath = DEFAULT_JAVAPATH;
   protected String policyFile = DEFAULT_POLICY_FILE;
   protected String classname = DEFAULT_CLASSNAME;
+  protected String jvmParameters = DEFAULT_JVMPARAMETERS;
   protected String parameters;
     
   
@@ -176,6 +179,9 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
     this.parameters = parameters;
   }
   
+  public void setJvmParameters(String string) {
+	  jvmParameters = string;
+  }
 
   //
   // -- PROTECTED METHODS -----------------------------------------------
@@ -194,6 +200,10 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
     } else {
       javaCommand.append(javaPath);
     }
+	// append jvmParameters
+	if ((jvmParameters != null) && (jvmParameters.length() > 0)) {
+	  javaCommand.append(" " + jvmParameters + " ");
+	} 
     // append classpath
     if ((classpath != null) && (classpath.length() > 0)) {
       javaCommand.append(" -cp ");

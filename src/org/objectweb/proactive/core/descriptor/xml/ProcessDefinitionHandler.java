@@ -261,6 +261,7 @@ public class ProcessDefinitionHandler
 			this.addHandler(POLICY_FILE_TAG, bch);
 			this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
 			this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
+			this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
 		}
 
 		//
@@ -314,6 +315,10 @@ public class ProcessDefinitionHandler
 			else if (name.equals(PARAMETERS_TAG))
 			{
 				jvmProcess.setParameters((String) activeHandler.getResultObject());
+			}
+			else if (name.equals(JVMPARAMETERS_TAG))
+			{
+				jvmProcess.setJvmParameters((String) activeHandler.getResultObject());
 			}
 			else
 			{
