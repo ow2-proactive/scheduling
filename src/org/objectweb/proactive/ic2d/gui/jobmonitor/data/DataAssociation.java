@@ -64,6 +64,7 @@ public class DataAssociation implements JobMonitorConstants {
     private Map asso;
     private MonitoredObjectSet[] sets;
     private static final int[][] CHILDREN_KEYS = new int[NB_KEYS][];
+    private static final MonitoredObjectSet EMPTY_MONITORED_SET = new MonitoredObjectSet();
 
     public DataAssociation() {
         asso = new TreeMap();
@@ -233,7 +234,7 @@ public class DataAssociation implements JobMonitorConstants {
         Set constraints, int step) {
         MonitoredObjectSet stepSet = getValues(from, step, constraints);
         if (stepSet.isEmpty()) {
-            return new MonitoredObjectSet();
+            return EMPTY_MONITORED_SET;
         }
 
         Iterator iter = stepSet.iterator();

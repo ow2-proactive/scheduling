@@ -316,6 +316,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     class TreeView {
+        private static final int ROW_HEIGHT = 25;
         private String label;
         private JTree tree;
         private JSplitPane pane;
@@ -431,6 +432,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             tree = new JTree(model);
             tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
             tree.setCellRenderer(new JobMonitorTreeCellRenderer());
+            tree.setLargeModel(true);
+            tree.setRowHeight(ROW_HEIGHT);
 
             JScrollPane pane = new JScrollPane(tree);
             left.add(pane, BorderLayout.CENTER);
