@@ -34,6 +34,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 
 
+import testsuite.test.Assertions;
 import testsuite.test.FunctionalTest;
 
 import java.util.Arrays;
@@ -73,8 +74,8 @@ public class Test extends FunctionalTest {
     Component[] c1SubComponents;
 
     public Test() {
-        super("Assembly of components on the local default node",
-            "Test creation of a composite system on the local default node");
+        super("Tests the creation of a composite system on the local default node, and tests super controller",
+            "Tests the creation of a composite system on the local default node, and tests super controller");
     }
 
     /**
@@ -130,6 +131,12 @@ public class Test extends FunctionalTest {
     public boolean postConditions() throws Exception {
         Component[] c2_sub_components = { c1 };
         Component[] c1_sub_components = { p1 };
+        
+        // a test for super controllers
+        Component[] c1_super_components = Fractal.getSuperController(c1).getFcSuperComponents();
+        Component[] p1_super_components = Fractal.getSuperController(p1).getFcSuperComponents();
+        
+        Assertions.assertTrue(Arrays.equals(c1_super_components, new Component[] {c2}) && Arrays.equals(p1_super_components, new Component [] {c1}));
 
         return (Arrays.equals(c2SubComponents, c2_sub_components) &&
         Arrays.equals(c1SubComponents, c1_sub_components));
@@ -144,3 +151,4 @@ public class Test extends FunctionalTest {
         //			}
     }
 }
+
