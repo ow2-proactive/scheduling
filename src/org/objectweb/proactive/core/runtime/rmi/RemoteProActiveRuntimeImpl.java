@@ -4,6 +4,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -283,6 +284,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
+        return proActiveRuntime.receiveCheckpoint(nodeName,ckpt,inc);
+    }
+    
     // SECURITY
 
     /* (non-Javadoc)

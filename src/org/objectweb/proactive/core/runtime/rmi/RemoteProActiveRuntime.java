@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -123,6 +124,10 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws java.rmi.RemoteException;
+    
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
+    	throws java.rmi.RemoteException;
+    
 	/**
 	 * @return creator certificate
 	 */
