@@ -110,7 +110,7 @@ then
 fi
 if [ -f $PROACTIVE/lib/bouncycastle.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/boucycastle.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bouncycastle.jar
 fi
 
 
