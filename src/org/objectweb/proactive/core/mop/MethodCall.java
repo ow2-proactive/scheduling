@@ -307,7 +307,6 @@ public final class MethodCall implements java.io.Serializable {
   //
 
 
-  // This method needs to be rewritten with Class being now serializable (as of Java 2)
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     out.writeObject(this.effectiveArguments);
     // The Method object needs to be converted
@@ -353,10 +352,6 @@ public final class MethodCall implements java.io.Serializable {
     if (this.reifiedMethod == null) {
       // Looks up the method
       try {
-        System.out.println("------> simpleName="+simpleName);
-        for (int i = 0; i<parameters.length; i++) {
-          System.out.println("------> parameters["+i+"]="+parameters[i]);
-        }
         this.reifiedMethod = declaringClass.getMethod(simpleName, parameters);
         reifiedMethodsTable.put(key, this.reifiedMethod);
       } catch (NoSuchMethodException e) {
@@ -408,7 +403,6 @@ public final class MethodCall implements java.io.Serializable {
 
     /**
      * Give back the original class
-     *
      */
     public Class getWrapped() {
       if (! isPrimitive) return encapsulated;
