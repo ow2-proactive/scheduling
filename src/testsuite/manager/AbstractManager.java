@@ -117,8 +117,8 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
 
     private void testAppender() {
         boolean hasAppender = false;
-        Enumeration enum = Logger.getRootLogger().getAllAppenders();
-        if (enum.hasMoreElements()) {
+        Enumeration enumerator = Logger.getRootLogger().getAllAppenders();
+        if (enumerator.hasMoreElements()) {
             hasAppender = true;
         }
         if (hasAppender) {
