@@ -32,7 +32,6 @@ public class Start {
         // Create all the Domains, based on the tree structure
         QuadTree tree = new QuadTree(totalNbBodies);
         Vector info = tree.getInfo(); 
-        System.err.println(tree);
         int size = tree.size();
         
         Object [][] params = new Object [size][3]; // the parameters passed to the Domain constructors

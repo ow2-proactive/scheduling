@@ -47,10 +47,12 @@ public class Domain implements Serializable{
      * @param i the unique identifier
      * @param r the boundaries containing the Planet at the begining of the simulation
      */
-    public Domain (Integer i, Rectangle r) {
+    public Domain (Integer i, Rectangle r, 
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.identification = i.intValue();
         this.prematureValues = new Vector(); 
         this.info = new Planet(r);
+        this.killsupport = killsupport;
         try {this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {e.printStackTrace();}
     }

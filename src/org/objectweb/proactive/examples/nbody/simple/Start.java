@@ -19,13 +19,12 @@ public class Start {
         System.out.println("RUNNING simplest VERSION");
         
         int root = (int) Math.sqrt(totalNbBodies);
-        int STEP_X = 400 / root , STEP_Y = 400 / root;
+        int STEP_X = 200 / root , STEP_Y = 200 / root;
         Domain [] domainArray = new Domain [totalNbBodies];
         for (int  i = 0 ; i < totalNbBodies ; i++) {
             Object [] params = new Object [] {
                     new Integer(i), 
-                    new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y),
-                    killsupport
+                    new Rectangle(STEP_X * (i % root)-100, STEP_Y * (i / root) -100, STEP_X, STEP_Y),
             	};
             
             try {

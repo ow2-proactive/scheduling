@@ -26,7 +26,8 @@ public class Start {
         
         for (int  i = 0 ; i < totalNbBodies ; i++) {
             params[i][0] = new Integer(i);		      
-            params[i][1] = new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y);
+            // coordinates between -100,-100 and 100,100
+            params[i][1] = new Rectangle(STEP_X * (i % root)-100, STEP_Y * (i / root) -100, STEP_X, STEP_Y);
             params[i][2] = killsupport;
         }
         

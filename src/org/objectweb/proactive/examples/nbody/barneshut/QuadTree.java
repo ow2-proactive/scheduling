@@ -24,7 +24,7 @@ public class QuadTree implements Serializable {
      * @param nbPlanets The number of Planets to use for the construction of this QuadTree 
      */
     public QuadTree(int nbPlanets) {
-        Rectangle R = new Rectangle (-100,-100,200,200);
+        Rectangle R = new Rectangle (-100,-100,100,100);
         Vector v = new Vector ();	// of type vector of planets
         for (int i = 0 ; i < nbPlanets ; i++ )
             v.add (new Planet(R, i));
