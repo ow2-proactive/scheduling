@@ -34,8 +34,12 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.globus.GlobusProcess;
+import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -68,6 +72,8 @@ public class ProcessHandler extends AbstractUnmarshallerDecorator implements Pro
     super();
     this.proActiveDescriptor = proActiveDescriptor;
     addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
+    addHandler(BSUB_OPTIONS_TAG,new BsubOptionHandler());
+    addHandler(GLOBUS_OPTIONS_TAG,new GlobusOptionHandler());
   }
 
 
@@ -198,4 +204,82 @@ public class ProcessHandler extends AbstractUnmarshallerDecorator implements Pro
     }
 
   } // end inner class EnvironmentHandler
+  
+  /**
+   * This class receives options events
+   */
+  
+  protected class BsubOptionHandler extends PassiveCompositeUnmarshaller{
+  	
+//  	private static final String HOSTLIST_ATTRIBUTE = "hostlist";
+//  	private static final String PROCESSOR_ATRIBUTE = "processor";
+  	//private LSFBSubProcess bSubProcess;
+  	
+  	
+  	public BsubOptionHandler(){
+  		
+  		//this.bSubProcess = (LSFBSubProcess)targetProcess;
+  		this.addHandler(HOST_LIST_TAG,new SingleValueUnmarshaller());
+  		this.addHandler(PROCESSOR_TAG,new SingleValueUnmarshaller());
+  	}
+  	
+  	
+  	public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+  	}
+  	
+  	protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+  		// we know that it is a bsub process since we are
+  		// in bsub option!!!
+  		LSFBSubProcess bSubProcess = (LSFBSubProcess)targetProcess;
+  		if(name.equals(HOST_LIST_TAG)){
+  			bSubProcess.setHostList((String)activeHandler.getResultObject());
+  		}else if (name.equals(PROCESSOR_TAG)){
+  			bSubProcess.setProcessorNumber((String)activeHandler.getResultObject());
+  		}
+  	}	
+  }// end inner class OptionHandler
+  
+  
+  /**
+   * This class receives globus options events
+   */
+  
+  protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller{
+  	
+  	public GlobusOptionHandler(){
+  		this.addHandler(GRAM_PORT_TAG,new SingleValueUnmarshaller());
+  		this.addHandler(GIS_PORT_TAG,new SingleValueUnmarshaller());
+  		CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+   		cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
+    	this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
+  	}
+  	
+  	public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+  	}
+  	
+  	protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+  		// we know that it is a globus process since we are
+  		// in globus option!!!
+  		GlobusProcess globusProcess = (GlobusProcess)targetProcess;
+  		if(name.equals(GRAM_PORT_TAG)){
+  			globusProcess.setGramPort((String)activeHandler.getResultObject());
+  		}else if (name.equals(GIS_PORT_TAG)){
+  			globusProcess.setGISPort((String)activeHandler.getResultObject());
+  		}else if (name.equals(GLOBUS_HOST_LIST_TAG)){
+  			String[] globusHostList = (String[])activeHandler.getResultObject();
+  			for (int i = 0; i < globusHostList.length; i++)
+				{
+					globusProcess.addGlobusHost(globusHostList[i]);
+				}
+  		}
+  	}
+  		
+  }
+  
+  private class SingleValueUnmarshaller extends BasicUnmarshaller {
+    	public void readValue(String value) throws org.xml.sax.SAXException {
+      setResultObject(value);
+    	} 	
+  	} //end of inner class SingleValueUnmarshaller
+  
 }
