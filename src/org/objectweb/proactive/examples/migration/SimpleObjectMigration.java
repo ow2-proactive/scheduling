@@ -30,17 +30,15 @@
 */
 package org.objectweb.proactive.examples.migration;
 
-import org.objectweb.proactive.core.node.NodeException;
-import java.net.UnknownHostException;
-import org.objectweb.proactive.ActiveObjectCreationException;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.node.Node;
-import java.net.InetAddress;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 
 /**
  * Our 'hello' server without IHM

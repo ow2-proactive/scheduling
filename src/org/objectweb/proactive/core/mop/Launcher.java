@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
-import java.lang.reflect.Method;
-
 public class Launcher
 {
   public static void main (String[] args) throws Throwable

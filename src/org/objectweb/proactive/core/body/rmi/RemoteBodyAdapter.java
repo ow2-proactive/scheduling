@@ -31,14 +31,10 @@
 package org.objectweb.proactive.core.body.rmi;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.reply.Reply;
-
-import java.rmi.RemoteException;
+import org.objectweb.proactive.core.body.request.Request;
 
 /**
  *   An adapter for a RemoteBody to be able to receive remote calls. This helps isolate RMI-specific

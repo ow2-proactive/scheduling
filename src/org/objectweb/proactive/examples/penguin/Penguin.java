@@ -31,10 +31,9 @@
 package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
 
@@ -76,7 +75,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
     //System.out.println("Penguin is here");
     sendMessageToControler("I just got in node "+ProActive.getBodyOnThis().getNodeURL());
     try {
-      Thread.currentThread().sleep(2000);
+      Thread.sleep(2000);
     } catch (InterruptedException e) {
     }
   }

@@ -33,7 +33,6 @@ package org.objectweb.proactive.ic2d.util;
 //import org.objectweb.proactive.core.node.rmi.RemoteNode;
 //import org.objectweb.proactive.core.node.rmi.RemoteNodeAdapter;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 //import org.objectweb.proactive.core.node.jini.JiniNode;
 /**
  * This class talks to ProActive nodes

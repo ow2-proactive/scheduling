@@ -31,7 +31,6 @@
 package org.objectweb.proactive.examples.philosophers;
 
 import org.objectweb.proactive.ObjectForSynchronousCall;
-import org.objectweb.proactive.ProActive;
 
 /**
  * This class implements the behaviors of the table and the storage of the forks

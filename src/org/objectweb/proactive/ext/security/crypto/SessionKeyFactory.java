@@ -29,11 +29,12 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import java.lang.*;
-import java.io.*;
-import java.security.*;
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import java.security.Key;
+import java.security.Provider;
+import java.security.SecureRandom;
+import java.security.Security;
+
+import javax.crypto.KeyGenerator;
 
 /**
  *  This class generates the symmetric keys (SessionKey) required for the confidentiality.

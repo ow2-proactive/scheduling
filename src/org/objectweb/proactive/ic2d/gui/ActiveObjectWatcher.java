@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.ic2d.gui;
 
-import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 
 /**

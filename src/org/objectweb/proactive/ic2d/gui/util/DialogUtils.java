@@ -33,11 +33,10 @@ package org.objectweb.proactive.ic2d.gui.util;
 import java.awt.Component;
 
 import org.objectweb.proactive.ic2d.data.WorldObject;
-import org.objectweb.proactive.ic2d.data.HostObject;
-import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
+import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
+import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 
 public class DialogUtils {
 

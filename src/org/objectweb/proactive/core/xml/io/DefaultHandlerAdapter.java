@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.core.xml.io;
 
-import java.io.IOException;
 
 /**
  *

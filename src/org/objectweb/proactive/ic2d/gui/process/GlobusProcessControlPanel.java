@@ -30,16 +30,14 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.process;
 
-import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
-import org.objectweb.proactive.core.util.MessageLogger;
+
 import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.process.globus.*;
-import java.awt.GridLayout;
-import java.awt.BorderLayout.*;
-import org.objectweb.proactive.core.util.UrlBuilder;    
+import org.objectweb.proactive.core.process.globus.GlobusProcess;
+import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.util.UrlBuilder;
  
 public class GlobusProcessControlPanel extends javax.swing.JPanel {
 

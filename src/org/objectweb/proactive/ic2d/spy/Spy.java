@@ -31,13 +31,11 @@
 package org.objectweb.proactive.ic2d.spy;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.migration.Migratable;
-import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.node.Node;
 
 /**
  * The master Spy class

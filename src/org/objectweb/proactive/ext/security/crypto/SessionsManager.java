@@ -30,13 +30,14 @@
 */ 
 package org.objectweb.proactive.ext.security.crypto;
 
-import java.util.Hashtable;
-import java.io.Serializable;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
-import java.security.*;
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import java.io.Serializable;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignedObject;
+import java.util.Hashtable;
 
 /**
  *  The SessionsManger is located in the SecureBody of an active object and manages the different communications sessions

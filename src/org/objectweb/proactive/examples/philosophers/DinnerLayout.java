@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.philosophers;
 
+import java.awt.GridBagConstraints;
+
 import org.objectweb.proactive.ObjectForSynchronousCall;
 
 /**
@@ -218,7 +220,7 @@ public class DinnerLayout {
 
       c.gridx = 2;
       c.gridy = 1;
-      c.fill = c.BOTH;
+      c.fill = GridBagConstraints.BOTH;
       c.weightx = c.weighty = 1.0;
       gridbag.setConstraints(philButtons[0], c);
       pPhil.add(philButtons[0]);

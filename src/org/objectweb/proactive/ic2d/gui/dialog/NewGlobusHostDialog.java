@@ -123,14 +123,14 @@ public class NewGlobusHostDialog extends JDialog implements ActionListener {
     }
     tfHost.addActionListener(this);
     c.gridx = 1;
-    c.fill = c.HORIZONTAL;
+    c.fill = GridBagConstraints.HORIZONTAL;
     gb.setConstraints(tfHost, c);
     content.add(tfHost);
 
     tfPort = new JTextField("754");
     tfPort.addActionListener(this);
     c.gridx = 2;
-    c.fill = c.HORIZONTAL;
+    c.fill = GridBagConstraints.HORIZONTAL;
     gb.setConstraints(tfPort, c);
     content.add(tfPort);
 

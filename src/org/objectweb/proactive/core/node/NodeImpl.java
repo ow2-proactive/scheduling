@@ -34,15 +34,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 

@@ -29,9 +29,11 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import org.bouncycastle.jce.provider.*;
-import java.security.*;
-import java.io.*;
+import java.io.Serializable;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignedObject;
 
 /**
  *  A SigningEngine is used to sign object and to check their signature

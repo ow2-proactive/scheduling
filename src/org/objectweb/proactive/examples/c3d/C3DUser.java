@@ -30,27 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.c3d;
 
-import java.awt.Button;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.TextArea;
-import java.awt.TextField;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -64,7 +44,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
@@ -781,7 +760,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c.gridheight = 1;
 
       //fill
-      c.fill = c.BOTH; // components will fill their whole area
+      c.fill = GridBagConstraints.BOTH; // components will fill their whole area
 
       gridbag.setConstraints(p_image, c);
       //System.out.println("p image "+p_image.getSize().width);
@@ -810,13 +789,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
       GridBagConstraints pc = new GridBagConstraints();
 
-      pc.fill = pc.BOTH;
+      pc.fill = GridBagConstraints.BOTH;
       pc.insets = new Insets(5, 5, 0, 5);
       pc.gridx = 0;
       pc.gridy = 0;
       pc.weightx = 1;
       pc.weighty = 1;
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       gb_panel.setConstraints(l_user, pc);
       p_log.add(l_user);
       
@@ -867,7 +846,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       pc.gridy = 0;
       pc.gridx = 0;
       pc.gridwidth = 1;
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
 
       gb_input.setConstraints(b_unclock, pc);
       b_unclock.addActionListener(this);
@@ -914,7 +893,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       //c.gridwidth = c.REMAINDER;
       c.gridheight = 1;
       c.gridx = 1;
-      c.fill = c.NONE;
+      c.fill = GridBagConstraints.NONE;
 
       gridbag.setConstraints(b_addSphere, c);
       b_addSphere.addActionListener(this);
@@ -924,7 +903,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       // This one is added in the main fram
       c.gridx = 2;
       c.gridy = 1;
-      c.fill = c.NONE;
+      c.fill = GridBagConstraints.NONE;
 
       gridbag.setConstraints(b_reset, c);
       b_reset.addActionListener(this);
@@ -940,8 +919,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c.insets = new Insets(10, 10, 10, 10);
       c.gridx = 0;
       c.gridy = 2;
-      c.gridwidth = c.REMAINDER;
-      c.fill = c.BOTH;
+      c.gridwidth = GridBagConstraints.REMAINDER;
+      c.fill = GridBagConstraints.BOTH;
       gridbag.setConstraints(p_mess, c);
       add(p_mess);
 
@@ -958,15 +937,15 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       //      pc.anchor=pc.WEST;
       pc.gridx = 0;
       pc.gridy = 0;
-      pc.fill = pc.BOTH;
-      pc.gridwidth = pc.RELATIVE;
+      pc.fill = GridBagConstraints.BOTH;
+      pc.gridwidth = GridBagConstraints.RELATIVE;
       g_mess.setConstraints(li_users, pc);
       p_mess.add(li_users);
 
       // Output
       ta_mess = new TextArea(5, 30);
       ta_mess.setEditable(false);
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       pc.gridx = 1;
       g_mess.setConstraints(ta_mess, pc);
       p_mess.add(ta_mess);
@@ -984,7 +963,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       // SpyEvent
       pc.gridx = 0;
       pc.gridy = 0;
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
       Label l_mess = new Label("SpyEvent:");
       g_msg.setConstraints(l_mess, pc);
       p_msg.add(l_mess);
@@ -993,17 +972,17 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       tf_mess = new TextField();
       tf_mess.addActionListener(this);
       pc.weightx = 1.0;
-      pc.gridwidth = pc.RELATIVE;
-      pc.fill = pc.BOTH;
+      pc.gridwidth = GridBagConstraints.RELATIVE;
+      pc.fill = GridBagConstraints.BOTH;
       pc.gridx = 1;
       g_msg.setConstraints(tf_mess, pc);
       p_msg.add(tf_mess);
       
       // Send button
       pc.weightx = 0.0;
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       b_send.addActionListener(this);
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
       pc.gridx = 2;
       g_msg.setConstraints(b_send, pc);
       p_msg.add(b_send);
@@ -1087,7 +1066,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c.gridheight = 1;
 
       //fill
-      c.fill = c.BOTH; // components will fill their whole area
+      c.fill = GridBagConstraints.BOTH; // components will fill their whole area
 
       gridbag.setConstraints(p_image, c);
       //System.out.println("p image "+p_image.getSize().width);
@@ -1116,13 +1095,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
       GridBagConstraints pc = new GridBagConstraints();
 
-      pc.fill = pc.BOTH;
+      pc.fill = GridBagConstraints.BOTH;
       pc.insets = new Insets(5, 5, 0, 5);
       pc.gridx = 0;
       pc.gridy = 0;
       pc.weightx = 1;
       pc.weighty = 1;
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       gb_panel.setConstraints(l_user, pc);
       p_log.add(l_user);
       
@@ -1173,7 +1152,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       pc.gridy = 0;
       pc.gridx = 0;
       pc.gridwidth = 1;
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
 
       gb_input.setConstraints(b_unclock, pc);
       b_unclock.addActionListener(this);
@@ -1220,7 +1199,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       //c.gridwidth = c.REMAINDER;
       c.gridheight = 1;
       c.gridx = 1;
-      c.fill = c.NONE;
+      c.fill = GridBagConstraints.NONE;
 
       gridbag.setConstraints(b_addSphere, c);
       b_addSphere.addActionListener(this);
@@ -1230,7 +1209,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       // This one is added in the main fram
       c.gridx = 2;
       c.gridy = 1;
-      c.fill = c.NONE;
+      c.fill = GridBagConstraints.NONE;
 
       gridbag.setConstraints(b_reset, c);
       b_reset.addActionListener(this);
@@ -1246,8 +1225,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c.insets = new Insets(10, 10, 10, 10);
       c.gridx = 0;
       c.gridy = 2;
-      c.gridwidth = c.REMAINDER;
-      c.fill = c.BOTH;
+      c.gridwidth = GridBagConstraints.REMAINDER;
+      c.fill = GridBagConstraints.BOTH;
       gridbag.setConstraints(p_mess, c);
       add(p_mess);
 
@@ -1264,15 +1243,15 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       //      pc.anchor=pc.WEST;
       pc.gridx = 0;
       pc.gridy = 0;
-      pc.fill = pc.BOTH;
-      pc.gridwidth = pc.RELATIVE;
+      pc.fill = GridBagConstraints.BOTH;
+      pc.gridwidth = GridBagConstraints.RELATIVE;
       g_mess.setConstraints(li_users, pc);
       p_mess.add(li_users);
 
       // Output
       ta_mess = new TextArea(5, 30);
       ta_mess.setEditable(false);
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       pc.gridx = 1;
       g_mess.setConstraints(ta_mess, pc);
       p_mess.add(ta_mess);
@@ -1290,7 +1269,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       // SpyEvent
       pc.gridx = 0;
       pc.gridy = 0;
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
       Label l_mess = new Label("SpyEvent:");
       g_msg.setConstraints(l_mess, pc);
       p_msg.add(l_mess);
@@ -1299,17 +1278,17 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       tf_mess = new TextField();
       tf_mess.addActionListener(this);
       pc.weightx = 1.0;
-      pc.gridwidth = pc.RELATIVE;
-      pc.fill = pc.BOTH;
+      pc.gridwidth = GridBagConstraints.RELATIVE;
+      pc.fill = GridBagConstraints.BOTH;
       pc.gridx = 1;
       g_msg.setConstraints(tf_mess, pc);
       p_msg.add(tf_mess);
       
       // Send button
       pc.weightx = 0.0;
-      pc.gridwidth = pc.REMAINDER;
+      pc.gridwidth = GridBagConstraints.REMAINDER;
       b_send.addActionListener(this);
-      pc.fill = pc.NONE;
+      pc.fill = GridBagConstraints.NONE;
       pc.gridx = 2;
       g_msg.setConstraints(b_send, pc);
       p_msg.add(b_send);
@@ -1518,7 +1497,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       
       // Title
       c.gridy = 0;
-      c.fill = c.HORIZONTAL;
+      c.fill = GridBagConstraints.HORIZONTAL;
       gb.setConstraints(d_title, c);
       d_title.setForeground(Color.blue);
       d_title.setFont(new Font("arial", Font.BOLD | Font.ITALIC, 16));
@@ -1534,7 +1513,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
       //Button
       c.gridy = 2;
-      c.fill = c.NONE;
+      c.fill = GridBagConstraints.NONE;
       gb.setConstraints(b_ok, c);
       b_ok.addActionListener(this);
       add(b_ok);

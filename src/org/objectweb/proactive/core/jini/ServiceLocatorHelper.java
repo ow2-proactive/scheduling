@@ -119,7 +119,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
    * false if you want a unicast service Locator
    */
   public void setMulticastLocator(boolean v) {
-    this.multicastLocator = v;
+    ServiceLocatorHelper.multicastLocator = v;
   }
 
   /**
@@ -157,7 +157,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     ServiceRegistrar[] registrars = evt.getRegistrars();
     System.out.println(">> > " + registrars.length + " registrars : ");
     for (int n = 0; n < registrars.length; n++) {
-      this.registrar = registrars[n];
+      ServiceLocatorHelper.registrar = registrars[n];
       //displayServices(); // just for test
     }
     //System.out.println(">> Stop  discover...");
@@ -208,18 +208,18 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   private void displayServices() {
     try {
       // the code takes separate routes from here for client or service
-      System.out.println(">> found a service locator (registrar) : " + this.registrar);
-      System.out.println(">> >> ServiceID : " + this.registrar.getServiceID());
+      System.out.println(">> found a service locator (registrar) : " + ServiceLocatorHelper.registrar);
+      System.out.println(">> >> ServiceID : " + ServiceLocatorHelper.registrar.getServiceID());
   
       System.out.println(">> >> >> Groups : ");
-      String[] groups = this.registrar.getGroups();
+      String[] groups = ServiceLocatorHelper.registrar.getGroups();
       for (int i = 0; i < groups.length; i++) {
         System.out.println(">> >> >> >> " + i + ") " + groups[i]);
       }
-      System.out.println(">> >> >> Locator : " + this.registrar.getLocator());
+      System.out.println(">> >> >> Locator : " + ServiceLocatorHelper.registrar.getLocator());
   
       ServiceTemplate template = new ServiceTemplate(null, new Class[] { JiniRuntime.class }, null);
-      ServiceMatches matches = this.registrar.lookup(template, Integer.MAX_VALUE);
+      ServiceMatches matches = ServiceLocatorHelper.registrar.lookup(template, Integer.MAX_VALUE);
       System.out.println(">> >> >> " + matches.items.length + " required ");
       System.out.println(">> >> >> " + matches.totalMatches + " founded ");
       for (int i = 0; i < matches.items.length; i++) {
@@ -266,8 +266,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
       discover.addDiscoveryListener(this);
       // stay around long enough to receive replies
       try {
-        Thread.currentThread().sleep(MAX_WAIT);
-        if (this.registrar == null) createServiceLocator();
+        Thread.sleep(MAX_WAIT);
+        if (ServiceLocatorHelper.registrar == null) createServiceLocator();
       } catch (InterruptedException e) {}
 
     } else {
@@ -276,7 +276,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
       try {
         lookup = new LookupLocator("jini://" + host);
         System.out.println("Lookup.getRegistrar() on " + host);
-        this.registrar = lookup.getRegistrar();
+        ServiceLocatorHelper.registrar = lookup.getRegistrar();
       } catch (java.net.MalformedURLException e) {
         throw new java.io.IOException("Lookup failed: " + e.getMessage() );
       } catch (java.io.IOException e) {

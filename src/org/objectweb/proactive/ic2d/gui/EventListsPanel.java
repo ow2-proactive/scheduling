@@ -30,15 +30,16 @@
 */ 
 package org.objectweb.proactive.ic2d.gui;
 
+import javax.swing.SwingConstants;
+
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
+import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
 import org.objectweb.proactive.ic2d.gui.data.UniqueIDDropTargetListener;
 import org.objectweb.proactive.ic2d.gui.recording.PlayerFrameTimeLine;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 
 
 public class EventListsPanel extends javax.swing.JPanel implements CommunicationEventListener, ActiveObjectWatcher {
@@ -689,7 +690,7 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
         javax.swing.JLabel l = new javax.swing.JLabel("SpyEvent position: " + (-(i - ((SHADES.length - 1) / 2))), javax.swing.JLabel.LEFT);
         l.setBackground(SHADES[i]);
         l.setOpaque(true);
-        l.setVerticalAlignment(l.CENTER);
+        l.setVerticalAlignment(SwingConstants.CENTER);
         add(l);
       }
     }

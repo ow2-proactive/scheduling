@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.event;
 
 import org.objectweb.proactive.ic2d.data.VMObject;
-import org.objectweb.proactive.core.event.ProActiveListener;
 
 /**
  * Listener of events from HostObject

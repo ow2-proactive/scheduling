@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.ic2d.spy;
 
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.ProActiveListener;
 
 public interface SpyListener extends ProActiveListener {

@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive;
 
+import java.util.HashMap;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -47,6 +49,20 @@ import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
+import org.objectweb.proactive.core.exceptions.creation.ProActiveCreationException;
+import org.objectweb.proactive.core.exceptions.group.ProActiveGroupException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerCommunicationException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerCreationException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerGroupException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerInterface;
+import org.objectweb.proactive.core.exceptions.handler.HandlerMigrationException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerProActiveException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerSecurityException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerServiceException;
+import org.objectweb.proactive.core.exceptions.migration.ProActiveMigrationException;
+import org.objectweb.proactive.core.exceptions.security.ProActiveSecurityException;
+import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -55,18 +71,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-
-// For exceptions handling
-import java.util.HashMap;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.exceptions.communication.*;
-import org.objectweb.proactive.core.exceptions.creation.*;
-import org.objectweb.proactive.core.exceptions.group.*;
-import org.objectweb.proactive.core.exceptions.migration.*;
-import org.objectweb.proactive.core.exceptions.security.*;
-import org.objectweb.proactive.core.exceptions.service.*;
-import org.objectweb.proactive.core.exceptions.handler.*;
 
 /**
  * <p>

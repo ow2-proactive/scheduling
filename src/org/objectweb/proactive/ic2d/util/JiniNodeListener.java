@@ -61,7 +61,7 @@ public class JiniNodeListener  implements DiscoveryListener {
   public JiniNodeListener(String _host) {    
     host = _host;
     System.setSecurityManager(new RMISecurityManager());
-    this.logger = logger;
+//    this.logger = logger;
     LookupDiscovery discover = null;
     LookupLocator lookup = null;
     if(host != null){
@@ -250,7 +250,7 @@ public class JiniNodeListener  implements DiscoveryListener {
     JiniNodeListener jnf = new JiniNodeListener(null);
     // stay around long enough to receive replies
     try {
-      Thread.currentThread().sleep(100000L);
+      Thread.sleep(100000L);
     } catch(java.lang.InterruptedException e) {
       // do nothing
     }

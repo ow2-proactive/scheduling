@@ -30,13 +30,12 @@
 */ 
 package org.objectweb.proactive.core.body.message;
 
-import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.AbstractEventProducer;
+import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.core.UniqueID;
 
 public class MessageEventProducerImpl extends AbstractEventProducer implements MessageEventProducer, java.io.Serializable {
   

@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.ic2d.util;
 
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.Node;
 
 public interface AllNodeFinder extends NodeFinder{

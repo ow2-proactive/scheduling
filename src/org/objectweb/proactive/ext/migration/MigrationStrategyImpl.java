@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.ext.migration;
 
-import org.objectweb.proactive.core.node.Node;
 
 /**
  * MigrationStrategyImpl contains destination. It allows us to program an Agent to follow an itinary

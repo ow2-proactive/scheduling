@@ -32,26 +32,22 @@
 package org.objectweb.proactive.examples.handlers;
 
 // Exceptions and handlers
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.*;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.exceptions.communication.*;
-import org.objectweb.proactive.core.exceptions.creation.*;
-import org.objectweb.proactive.core.exceptions.group.*;
-import org.objectweb.proactive.core.exceptions.migration.*;
-import org.objectweb.proactive.core.exceptions.security.*;
-import org.objectweb.proactive.core.exceptions.service.*;
-import org.objectweb.proactive.core.exceptions.handler.*;
-
-// Package importation
-import java.awt.*; 
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.JTabbedPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import java.io.*;
+import org.objectweb.proactive.core.exceptions.handler.HandlerCommunicationException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerInterface;
 
 public class Student extends JFrame {
 

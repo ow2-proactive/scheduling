@@ -30,14 +30,13 @@
 */ 
 package org.objectweb.proactive.ic2d.spy;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.BodyEvent;
+import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.event.RequestQueueEvent;

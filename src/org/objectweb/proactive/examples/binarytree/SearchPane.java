@@ -30,12 +30,12 @@
 */ 
 package org.objectweb.proactive.examples.binarytree;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.net.*;
-import java.io.*;
-import java.util.Vector;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 
 public class SearchPane extends JPanel {
     private JScrollPane scrollPane;

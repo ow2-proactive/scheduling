@@ -5,8 +5,7 @@
 
 package org.objectweb.proactive.core.process.globus;
 
-import java.io.*;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * This class inform about globus host configuration

@@ -31,17 +31,14 @@
 package org.objectweb.proactive.core.body.future;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.ProActiveProperties;
-import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.LocalBodyStore;
 
 public class FuturePool extends Object implements java.io.Serializable {
 

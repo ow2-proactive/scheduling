@@ -29,10 +29,10 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import org.bouncycastle.jce.provider.*;
-import java.security.*;
-import java.util.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.security.Provider;
+import java.security.Security;
 
 /**
  * This class provides a command-line tool to display the properties of a public or private certificate.

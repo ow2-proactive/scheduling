@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
 public class RegistryHelper {
 

@@ -30,14 +30,10 @@
 */
 package org.objectweb.proactive.core.runtime.jini;
 
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.rmi.RemoteException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Hashtable;
 
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
@@ -49,14 +45,9 @@ import net.jini.discovery.DiscoveryEvent;
 import net.jini.lease.LeaseRenewalEvent;
 import net.jini.lookup.entry.Name;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
-import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;

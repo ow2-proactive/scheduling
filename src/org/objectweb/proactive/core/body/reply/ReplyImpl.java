@@ -34,7 +34,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.Utils;
 
 

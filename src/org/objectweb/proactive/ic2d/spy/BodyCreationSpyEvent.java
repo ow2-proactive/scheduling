@@ -31,8 +31,6 @@
 package org.objectweb.proactive.ic2d.spy;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.ic2d.spy.Spy;
 
 public class BodyCreationSpyEvent extends BodySpyEvent implements java.io.Serializable {
 

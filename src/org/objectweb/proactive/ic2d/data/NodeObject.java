@@ -35,10 +35,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.ic2d.spy.Spy;
 import org.objectweb.proactive.ic2d.event.NodeObjectListener;
-
-import java.rmi.dgc.VMID;
 
 /**
  * Holder class for the host data representation

@@ -33,8 +33,6 @@ package org.objectweb.proactive.ic2d.spy;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 
-import java.net.InetAddress;
-
 public class SpyEvent extends ProActiveEvent implements java.io.Serializable {
   
   public static final int GENERIC_TYPE = 0;

@@ -30,16 +30,12 @@
 */ 
 package org.objectweb.proactive.ic2d.data;
 
-import org.objectweb.proactive.ic2d.spy.Spy;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.HostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RMIHostNodeFinder;
-import org.objectweb.proactive.ic2d.event.HostObjectListener;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.Constants;
-
 import org.objectweb.proactive.ic2d.util.RunnableProcessor;
 
 /**

@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.examples.readers;
 
-import org.objectweb.proactive.ProActive;
 
 public class Writer implements org.objectweb.proactive.RunActive {
 

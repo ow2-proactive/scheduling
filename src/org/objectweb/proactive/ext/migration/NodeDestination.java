@@ -30,10 +30,6 @@
 */ 
 package org.objectweb.proactive.ext.migration;
 
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-
 import java.io.Serializable;
 
 public class NodeDestination implements Destination, Serializable {

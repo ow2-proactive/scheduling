@@ -32,20 +32,13 @@
 package org.objectweb.proactive.examples.handlers;
 
 // Exceptions and handlers
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.exceptions.communication.*;
-import org.objectweb.proactive.core.exceptions.creation.*;
-import org.objectweb.proactive.core.exceptions.group.*;
-import org.objectweb.proactive.core.exceptions.migration.*;
-import org.objectweb.proactive.core.exceptions.security.*;
-import org.objectweb.proactive.core.exceptions.service.*;
-import org.objectweb.proactive.core.exceptions.handler.*;
-
-import java.io.ObjectOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.exceptions.handler.HandlerProActiveException;
 
 public class Space {
 

@@ -31,10 +31,6 @@ package org.objectweb.proactive.examples.matrix;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.mop.StubObject;
-
-import org.objectweb.proactive.core.group.*;
 
 
 public class Launcher implements java.io.Serializable {

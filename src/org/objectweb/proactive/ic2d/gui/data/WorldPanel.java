@@ -30,14 +30,12 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.data;
 
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
+import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
-import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
-import java.rmi.dgc.VMID;
+import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
 
 public class WorldPanel extends AbstractDataObjectPanel implements WorldObjectListener, javax.swing.Scrollable {
 

@@ -31,12 +31,11 @@
 package org.objectweb.proactive.ext.mixedlocation;
 
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.RequestWithLocationServer;
 
 public class RequestWithMixedLocation extends RequestImpl implements java.io.Serializable {
 

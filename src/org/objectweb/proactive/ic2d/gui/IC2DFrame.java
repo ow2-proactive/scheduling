@@ -32,25 +32,20 @@
 */ 
 package org.objectweb.proactive.ic2d.gui;
 
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.ic2d.IC2D;
-import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
-import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
-import org.objectweb.proactive.ic2d.gui.EventListsPanel;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.Legend;
-import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
-import org.objectweb.proactive.ic2d.data.IC2DObject;
-import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
+import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.process.FileChooser;
-import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.process.GlobusProcessControlFrame;
-import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
+import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
-import org.objectweb.proactive.core.process.ExternalProcess;   
+import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
+import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 
 public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener {
 

@@ -58,7 +58,7 @@ public class HandlerCommunicationException implements HandlerInterface {
      */
     public void handle(ProActiveException e) {
 	
-	//System.out.println("*** Handle Communication Exception ***");
-	//e.printStackTrace();
+	System.out.println("*** Handle Communication Exception ***");
+	e.printStackTrace();
     }
 }

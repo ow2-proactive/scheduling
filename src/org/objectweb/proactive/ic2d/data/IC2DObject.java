@@ -30,12 +30,10 @@
 */ 
 package org.objectweb.proactive.ic2d.data;
 
-import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
-import org.objectweb.proactive.ic2d.util.HostNodeFinder;
-import org.objectweb.proactive.ic2d.util.RMIHostNodeFinder;
-import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
+import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 
 /**
  * Holder class for all hosts

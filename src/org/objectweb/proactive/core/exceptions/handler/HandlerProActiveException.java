@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.exceptions.handler;
 /*import org.objectweb.proactive.core.exceptions.*;*/
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.exceptions.communication.*;
+
 /**
  * Handle ProActive exceptions
  *

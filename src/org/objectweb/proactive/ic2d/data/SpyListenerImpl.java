@@ -32,12 +32,11 @@ package org.objectweb.proactive.ic2d.data;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-import org.objectweb.proactive.ic2d.spy.SpyListener;
+import org.objectweb.proactive.ic2d.event.SpyEventListener;
 import org.objectweb.proactive.ic2d.spy.BodyCreationSpyEvent;
 import org.objectweb.proactive.ic2d.spy.BodySpyEvent;
-import org.objectweb.proactive.ic2d.event.SpyEventListener;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyListener;
 
 public class SpyListenerImpl implements SpyListener {
 

@@ -30,13 +30,9 @@
 */
 package org.objectweb.proactive.ic2d.gui.data;
 
-import org.objectweb.proactive.ic2d.IC2D;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.ActiveObjectListener;
-import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
-
-import org.objectweb.proactive.ic2d.gui.menu.MessageMonitoringMenu;
 
 public class ActiveObjectPanel extends AbstractDataObjectPanel implements ActiveObjectListener {
 

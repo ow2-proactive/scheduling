@@ -31,22 +31,19 @@
 package org.objectweb.proactive.ic2d.gui.data;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
-import org.objectweb.proactive.ic2d.data.IC2DObject;
-import org.objectweb.proactive.ic2d.data.WorldObject;
-import org.objectweb.proactive.ic2d.data.HostObject;
-import org.objectweb.proactive.ic2d.data.VMObject;
-import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
+import org.objectweb.proactive.ic2d.data.HostObject;
+import org.objectweb.proactive.ic2d.data.IC2DObject;
+import org.objectweb.proactive.ic2d.data.NodeObject;
+import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
-import org.objectweb.proactive.ic2d.event.NodeObjectListener;
-import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
 import org.objectweb.proactive.ic2d.gui.ActiveObjectWatcher;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
+import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
 
 public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationEventListener {
 
@@ -168,12 +165,12 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     b1.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (b1.isSelected()) {
-            communicationRecorder.setDrawingStyle(communicationRecorder.PROPORTIONAL_DRAWING_STYLE);
+            communicationRecorder.setDrawingStyle(ActiveObjectCommunicationRecorder.PROPORTIONAL_DRAWING_STYLE);
             repaint();
           }
         }
       });
-    b1.setSelected(communicationRecorder.getDrawingStyle() == communicationRecorder.PROPORTIONAL_DRAWING_STYLE);
+    b1.setSelected(communicationRecorder.getDrawingStyle() == ActiveObjectCommunicationRecorder.PROPORTIONAL_DRAWING_STYLE);
     group.add(b1);
     p.add(b1);
     
@@ -181,12 +178,12 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     b2.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (b2.isSelected()) {
-            communicationRecorder.setDrawingStyle(communicationRecorder.RATIO_DRAWING_STYLE);
+            communicationRecorder.setDrawingStyle(ActiveObjectCommunicationRecorder.RATIO_DRAWING_STYLE);
             repaint();
           }
         }
       });
-    b2.setSelected(communicationRecorder.getDrawingStyle() == communicationRecorder.RATIO_DRAWING_STYLE);
+    b2.setSelected(communicationRecorder.getDrawingStyle() == ActiveObjectCommunicationRecorder.RATIO_DRAWING_STYLE);
     group.add(b2);
     p.add(b2);
     
@@ -194,12 +191,12 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     b3.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (b3.isSelected()) {
-            communicationRecorder.setDrawingStyle(communicationRecorder.FILAIRE_DRAWING_STYLE);
+            communicationRecorder.setDrawingStyle(ActiveObjectCommunicationRecorder.FILAIRE_DRAWING_STYLE);
             repaint();
           }
         }
       });
-    b3.setSelected(communicationRecorder.getDrawingStyle() == communicationRecorder.FILAIRE_DRAWING_STYLE);
+    b3.setSelected(communicationRecorder.getDrawingStyle() == ActiveObjectCommunicationRecorder.FILAIRE_DRAWING_STYLE);
     group.add(b3);
     p.add(b3);
 

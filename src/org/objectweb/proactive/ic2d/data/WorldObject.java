@@ -31,10 +31,8 @@
 package org.objectweb.proactive.ic2d.data;
 
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-
-import org.objectweb.proactive.ic2d.util.RunnableProcessor;
 import org.objectweb.proactive.ic2d.util.CreateJiniNodeTask;
+import org.objectweb.proactive.ic2d.util.RunnableProcessor;
 
 /**
  * Holder class for all hosts

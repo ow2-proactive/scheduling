@@ -1,18 +1,28 @@
 package org.objectweb.proactive.ic2d.gui.process;
 
 //Standard Package
-import java.io.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.filechooser.*;
-//ProActive Package
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.ic2d.gui.process.GlobusProcessControlFrame;
-import org.objectweb.proactive.core.process.ExternalProcess;   
+import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.globus.GlobusProcess;
 
 public class FileChooser extends JFrame {
 

@@ -228,7 +228,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
     try {
       job.cancel();
     } catch (GramException e) {
-      System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
+      System.out.println("Error : "+ GramException.getMessage(e.getErrorCode()));
       return;
     } catch (GlobusProxyException e) {
       System.out.println("Erreur : "+ e.getMessage());
@@ -240,7 +240,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       try {
 	  job.cancel();
       } catch (GramException e) {
-	  System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
+	  System.out.println("Error : "+ GramException.getMessage(e.getErrorCode()));
 	  return;
       } catch (GlobusProxyException e) {
 	  System.out.println("Erreur : "+ e.getMessage());
@@ -376,7 +376,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       job.request(contact);
       System.out.println("job submited : "+ job.getIDAsString());
     } catch (GramException e) {
-	System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
+	System.out.println("Error : "+ GramException.getMessage(e.getErrorCode()));
 	e.printStackTrace();
 	return;
     } catch (GlobusProxyException e) {
@@ -417,7 +417,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       job.request(contact);
       System.out.println("job submited : "+ job.getIDAsString());
     } catch (GramException e) {
-      System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
+      System.out.println("Error : "+ GramException.getMessage(e.getErrorCode()));
       return;
     } catch (GlobusProxyException e) {
       System.out.println("Erreur : "+ e.getMessage());

@@ -30,22 +30,21 @@
 */ 
 package org.objectweb.proactive.ic2d.data;
 
-import org.objectweb.proactive.ic2d.spy.Spy;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-import org.objectweb.proactive.ic2d.spy.SpyListener;
+import java.rmi.dgc.VMID;
+
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ic2d.event.VMObjectListener;
-import org.objectweb.proactive.ic2d.event.SpyEventListener;
-import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.rmi.dgc.VMID;
+import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
+import org.objectweb.proactive.ic2d.event.SpyEventListener;
+import org.objectweb.proactive.ic2d.event.VMObjectListener;
+import org.objectweb.proactive.ic2d.spy.Spy;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
 
 /**
  * Holder class for the host data representation

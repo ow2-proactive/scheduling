@@ -30,14 +30,10 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.data;
 
-import org.objectweb.proactive.ic2d.IC2D;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
-import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
-
-import java.rmi.dgc.VMID;
 
 public class HostPanel extends AbstractDataObjectPanel implements HostObjectListener {
 

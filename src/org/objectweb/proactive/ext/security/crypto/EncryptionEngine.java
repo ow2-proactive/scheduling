@@ -29,11 +29,14 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import java.lang.*;
-import java.io.*;
-import java.security.*;
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import java.io.Serializable;
+import java.security.Key;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+
+import javax.crypto.Cipher;
+import javax.crypto.SealedObject;
 
 /**
  * This class is used to provide confidentiality. 

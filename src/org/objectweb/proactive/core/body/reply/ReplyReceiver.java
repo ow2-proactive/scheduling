@@ -30,9 +30,8 @@
 */ 
 package org.objectweb.proactive.core.body.reply;
 
-import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.future.FuturePool;
 
 public interface ReplyReceiver {	
   public void receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException;

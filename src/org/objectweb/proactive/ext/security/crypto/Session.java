@@ -29,12 +29,7 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import java.lang.*;
-import java.util.*;
-import java.io.*;
-import java.security.*;
-import javax.crypto.*;
-import javax.crypto.spec.*;
+import java.security.Key;
 
 /**
  * This class contains the basic informations of a communication session.

@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.data;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.ic2d.event.MessageMonitoringListener;
-import org.objectweb.proactive.core.body.migration.MigrationException;
 
 /**
  * Holder class for the host data representation

@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.examples.doctor;
 
-import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.FontMetrics;

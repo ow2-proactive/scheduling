@@ -238,7 +238,7 @@ public class BytecodeStubBuilder {
     if (this.cl.isInterface() == false) {
       // First, check if the method is called from within the constructor
       // Load 'this' onto the stack
-      instructionList.append(factory.createThis());
+      instructionList.append(InstructionFactory.createThis());
 
       // Gets the value of the field 'outsideConstructor'
       instructionList.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
@@ -248,13 +248,13 @@ public class BytecodeStubBuilder {
     // the constructor, i.e. we want the call to be reified
 
     // Pushes on the stack the reference to the proxy object
-    InstructionHandle outsideConstructorHandle = instructionList.append(factory.createThis());
+    InstructionHandle outsideConstructorHandle = instructionList.append(InstructionFactory.createThis());
     instructionList.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
 
     // Pushes on the stack the Method object that represents the current method
     instructionList.append(factory.createGetStatic(this.stubClassFullName, "methods", METHOD_ARRAY_TYPE));
     instructionList.append(new PUSH(this.classGenerator.getConstantPool(), methodIndex));
-    instructionList.append(factory.createArrayLoad(METHOD_TYPE));
+    instructionList.append(InstructionFactory.createArrayLoad(METHOD_TYPE));
 
     Class[] paramTypes = m.getParameterTypes();
     // Create an array of type Object[] for holding all the parameters
@@ -268,7 +268,7 @@ public class BytecodeStubBuilder {
     for (int i = 0; i < paramTypes.length; i++) {
       // First, duplicate the reference to the array of type Object[]
       // That currently sits on top of the stack
-      instructionList.append(factory.createDup(1));
+      instructionList.append(InstructionFactory.createDup(1));
 
       // Load the array index for storing the result
       PUSH push = new PUSH(this.classGenerator.getConstantPool(), i);
@@ -281,9 +281,9 @@ public class BytecodeStubBuilder {
         // If we have a primitive type, we need to first create a wrapper objet
         String nameOfWrapper = Utils.nameOfWrapper(paramTypes[i]);
         instructionList.append(factory.createNew(nameOfWrapper));
-        instructionList.append(factory.createDup(1));
+        instructionList.append(InstructionFactory.createDup(1));
         // Load the primitive value on to the stack
-        instructionList.append(factory.createLoad(theType, indexInParameterArray));
+        instructionList.append(InstructionFactory.createLoad(theType, indexInParameterArray));
         // Handles the fact that some primitive types need 2 slots
         indexInParameterArray = indexInParameterArray + lengthOfType(paramTypes[i]);
 
@@ -292,12 +292,12 @@ public class BytecodeStubBuilder {
         instructionList.append(factory.createInvoke(nameOfWrapper, "<init>", Type.VOID, argtypes, Constants.INVOKESPECIAL));
       } else {
         // Simply pushes the argument on to the stack
-        instructionList.append(factory.createLoad(theType, indexInParameterArray));
+        instructionList.append(InstructionFactory.createLoad(theType, indexInParameterArray));
         indexInParameterArray++; // Non-primitive types only use one slot
       }
 
       // Stores the object in the array
-      instructionList.append(factory.createArrayStore(OBJECT_TYPE));
+      instructionList.append(InstructionFactory.createArrayStore(OBJECT_TYPE));
     }
 
     // So now we have the Method object and the array of objects on the stack,
@@ -330,19 +330,19 @@ public class BytecodeStubBuilder {
     if (this.cl.isInterface() == false) {
       // Now we need to perform the call to super.blablabla if need be
       // Let's stack up the arguments
-      InstructionHandle inConstructorHandle = instructionList.append(factory.createThis());
+      InstructionHandle inConstructorHandle = instructionList.append(InstructionFactory.createThis());
 
       // The following line is for inserting the conditional branch instruction
       // at the beginning of the method. If the condition is satisfied, the
       // control flows move to the previous instruction
-      instructionList.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
+      instructionList.insert(outsideConstructorHandle, InstructionFactory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
 
       // This is for browsing the parameter array, not forgetting that some parameters
       // require two slots (longs and doubles)
       indexInParameterArray = 1;
       for (int i = 0; i < paramTypes.length; i++) {
         Type theType = convertClassToType(paramTypes[i]);
-        LocalVariableInstruction lvi = factory.createLoad(theType, indexInParameterArray);
+        LocalVariableInstruction lvi = InstructionFactory.createLoad(theType, indexInParameterArray);
         instructionList.append(lvi);
         indexInParameterArray = indexInParameterArray + lengthOfType(paramTypes[i]);
       }
@@ -358,7 +358,7 @@ public class BytecodeStubBuilder {
           Constants.INVOKESPECIAL));
 
       // Returns the result to the caller
-      InstructionHandle returnHandle = instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
+      InstructionHandle returnHandle = instructionList.append(InstructionFactory.createReturn(convertClassToType(m.getReturnType())));
 
       // insert  a jump from the
       instructionList.insert(inConstructorHandle, new GOTO(returnHandle));
@@ -367,7 +367,7 @@ public class BytecodeStubBuilder {
       // the value of  boolean field that tells whether we are inside a constructor
       // or not
       //	instructionList.append(factory.createPop(1));
-      instructionList.append(factory.createReturn(convertClassToType(m.getReturnType())));
+      instructionList.append(InstructionFactory.createReturn(convertClassToType(m.getReturnType())));
     }
     mg.removeLocalVariables();
     mg.setMaxStack(); // Needed stack size
@@ -383,7 +383,7 @@ public class BytecodeStubBuilder {
 
     if (c.equals(Void.TYPE)) {
       // There is nothing to do, simply pop the object returned by reify
-      instructionList.append(factory.createPop(1));
+      instructionList.append(InstructionFactory.createPop(1));
     } else {
       String nameOfPrimitiveType = c.getName();
       String nameOfWrapperClass = Utils.nameOfWrapper(c);
@@ -437,16 +437,16 @@ public class BytecodeStubBuilder {
 
     if (!this.cl.isInterface()) {
       // Calls the constructor of the super class
-      instructionList.append(factory.createLoad(Type.OBJECT, 0));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 0));
       instructionList.append(factory.createInvoke(this.className, "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
 
       // Sets the value of 'outsideConstructor' to true
-      instructionList.append(factory.createLoad(Type.OBJECT, 0));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 0));
       instructionList.append(new ICONST(1));
       instructionList.append(factory.createPutField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
     } else {
       // Calls the constructor of the super class
-      instructionList.append(factory.createLoad(Type.OBJECT, 0));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 0));
       instructionList.append(factory.createInvoke("java.lang.Object", "<init>", Type.VOID, Type.NO_ARGS, Constants.INVOKESPECIAL));
     }
 
@@ -515,12 +515,12 @@ public class BytecodeStubBuilder {
     // Creates an array of class objects of that size
     instructionList.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
     // Stores the reference to this newly-created array as the local variable with index '1'
-    instructionList.append(factory.createStore(Type.OBJECT, 1));
+    instructionList.append(InstructionFactory.createStore(Type.OBJECT, 1));
 
     // Make as many calls to Class.forName as is needed to fill in the array
     for (int i = 0; i < vectorOfSuperClasses.size(); i++) {
       // Load onto the stack a pointer to the array
-      instructionList.append(factory.createLoad(Type.OBJECT, 1));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 1));
       // Load the index in the array where we want to store the result
       instructionList.append(new PUSH(this.classGenerator.getConstantPool(), i));
       // Loads the name of the class onto the stack
@@ -534,7 +534,7 @@ public class BytecodeStubBuilder {
       // Stores the result of the invocation of forName into the array
       // The index into which to store as well as the reference to the array
       // are already on the stack
-      instructionList.append(factory.createArrayStore(Type.OBJECT));
+      instructionList.append(InstructionFactory.createArrayStore(Type.OBJECT));
     }
 
     // Now, lookup each of the Method objects and store it into the 'method' array
@@ -547,10 +547,10 @@ public class BytecodeStubBuilder {
       int indexInClassArray = vectorOfSuperClasses.indexOf(this.methods[i].getDeclaringClass());
       if (indexInClassArray == -1) {}
       // Load a pointer to the Class array (local variable number 1)
-      instructionList.append(factory.createLoad(Type.OBJECT, 1));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 1));
       // Access element number 'indexInClassArray'
       instructionList.append(new PUSH(this.classGenerator.getConstantPool(), indexInClassArray));
-      instructionList.append(factory.createArrayLoad(CLASS_TYPE));
+      instructionList.append(InstructionFactory.createArrayLoad(CLASS_TYPE));
       // Now, perform a call to 'getDeclaredMethod'
       // First, stack up the simple name of the method to solve
       instructionList.append(new PUSH(this.classGenerator.getConstantPool(), this.methods[i].getName()));
@@ -562,14 +562,14 @@ public class BytecodeStubBuilder {
       // Creates an array of class objects of that size
       instructionList.append((Instruction) factory.createNewArray(CLASS_TYPE, (byte) 1));
       // Stores the reference to this newly-created array as the local variable with index '2'
-      instructionList.append(factory.createStore(Type.OBJECT, 2));
+      instructionList.append(InstructionFactory.createStore(Type.OBJECT, 2));
 
       // Stack up the class objects that represent the types of all the arguments to this method
       for (int j = 0; j < this.methods[i].getParameterTypes().length; j++) {
         Class currentParameter = this.methods[i].getParameterTypes()[j];
 
         // Load onto the stack a pointer to the array of Class objects (for parameters)
-        instructionList.append(factory.createLoad(Type.OBJECT, 2));
+        instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 2));
         // Load the index in the array where we want to store the result
         instructionList.append(new PUSH(this.classGenerator.getConstantPool(), j));
 
@@ -588,11 +588,11 @@ public class BytecodeStubBuilder {
         }
 
         // Stores the result in the array
-        instructionList.append(factory.createArrayStore(Type.OBJECT));
+        instructionList.append(InstructionFactory.createArrayStore(Type.OBJECT));
       }
 
       // Loads the array
-      instructionList.append(factory.createLoad(Type.OBJECT, 2));
+      instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 2));
 
       // Perform the actual call to 'getDeclaredMethod'
       Type[] argstypes = new Type[2];
@@ -600,7 +600,7 @@ public class BytecodeStubBuilder {
       argstypes[1] = CLASS_ARRAY_TYPE;
       instructionList.append(factory.createInvoke("java.lang.Class", "getDeclaredMethod", METHOD_TYPE, argstypes, Constants.INVOKEVIRTUAL));
       // Now that we have the result, let's store it into the array
-      instructionList.append(factory.createArrayStore(Type.OBJECT));
+      instructionList.append(InstructionFactory.createArrayStore(Type.OBJECT));
     }
 
     // And returns
@@ -630,9 +630,9 @@ public class BytecodeStubBuilder {
     // Now, fills in the instruction list
     InstructionFactory factory = new InstructionFactory(this.classGenerator);
 
-    instructionList.append(factory.createLoad(Type.OBJECT, 0));
+    instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 0));
     instructionList.append(factory.createGetField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
-    instructionList.append(factory.createReturn(Type.OBJECT));
+    instructionList.append(InstructionFactory.createReturn(Type.OBJECT));
 
     mg.setMaxStack(); // Needed stack size
     mg.setMaxLocals(); // Needed locals
@@ -656,10 +656,10 @@ public class BytecodeStubBuilder {
     // Now, fills in the instruction list
     factory = new InstructionFactory(this.classGenerator);
 
-    instructionList.append(factory.createLoad(Type.OBJECT, 0));
-    instructionList.append(factory.createLoad(Type.OBJECT, 1));
+    instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 0));
+    instructionList.append(InstructionFactory.createLoad(Type.OBJECT, 1));
     instructionList.append(factory.createPutField(this.stubClassFullName, PROXY_FIELD_NAME, PROXY_TYPE));
-    instructionList.append(factory.createReturn(Type.VOID));
+    instructionList.append(InstructionFactory.createReturn(Type.VOID));
 
     mg.setMaxStack(); // Needed stack size
     mg.setMaxLocals(); // Needed locals

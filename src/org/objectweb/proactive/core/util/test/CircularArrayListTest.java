@@ -2,8 +2,6 @@ package org.objectweb.proactive.core.util.test;
 
 import junit.framework.Assert;
 import junit.framework.TestCase;
-import org.objectweb.proactive.core.body.request.RequestImpl;
-import org.objectweb.proactive.core.body.request.RequestQueueImpl;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 public class CircularArrayListTest extends TestCase {

@@ -74,7 +74,7 @@ public class TestFutureList {
     System.out.println("*** Sleeping for 5 seconds");
 
     try {
-      Thread.currentThread().sleep(5000);
+      Thread.sleep(5000);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -85,7 +85,7 @@ public class TestFutureList {
 
     System.out.println("*** Sleeping for 1 seconds");
     try {
-      Thread.currentThread().sleep(1000);
+      Thread.sleep(1000);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -103,7 +103,7 @@ public class TestFutureList {
     //tf.waitAllFuture();
     System.out.println("*** Sleeping for 5 seconds");
     try {
-      Thread.currentThread().sleep(5000);
+      Thread.sleep(5000);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -114,7 +114,7 @@ public class TestFutureList {
     tf.displayAllFutures();
     // 	//now we ask for the display of the futures
     try {
-      Thread.currentThread().sleep(5000);
+      Thread.sleep(5000);
     } catch (Exception e) {
       e.printStackTrace();
     }

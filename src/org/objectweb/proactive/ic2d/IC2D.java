@@ -29,10 +29,9 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ic2d;
-import org.objectweb.proactive.ic2d.gui.IC2DFrame;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.ic2d.gui.IC2DFrame;
 
 /**
  * <p>

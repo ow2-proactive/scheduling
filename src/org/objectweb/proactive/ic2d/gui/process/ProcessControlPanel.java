@@ -30,11 +30,10 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.process;
 
-import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
-import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.rsh.RSHProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 
 public class ProcessControlPanel extends javax.swing.JPanel {
 

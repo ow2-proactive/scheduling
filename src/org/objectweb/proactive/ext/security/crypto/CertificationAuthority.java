@@ -29,10 +29,16 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import org.bouncycastle.jce.provider.*;
-import java.security.*;
-import java.util.*;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.Security;
+
+import org.bouncycastle.jce.provider.JDKKeyPairGenerator;
 
 
 /**

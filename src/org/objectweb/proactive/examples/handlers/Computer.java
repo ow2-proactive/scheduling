@@ -31,9 +31,6 @@
 
 package org.objectweb.proactive.examples.handlers;
 
-import org.objectweb.proactive.ProActive;
-import java.lang.Double;
-import java.lang.Integer;
 
 public class Computer implements java.io.Serializable {
 

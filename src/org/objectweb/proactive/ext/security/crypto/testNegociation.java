@@ -29,10 +29,11 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import org.bouncycastle.jce.provider.*;
-import java.security.*;
-import java.util.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
 
 /**
  *  This class is the simple class to test the security protocols. To start the test just type :

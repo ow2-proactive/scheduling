@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.future.FuturePool;
 
 public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
 

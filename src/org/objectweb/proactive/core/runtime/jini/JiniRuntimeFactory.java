@@ -32,13 +32,8 @@ package org.objectweb.proactive.core.runtime.jini;
 
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.entry.Entry;
-import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
-import net.jini.discovery.LookupDiscovery;
-import net.jini.discovery.LookupDiscoveryManager;
-import net.jini.lease.LeaseRenewalManager;
-import net.jini.lookup.ServiceDiscoveryManager;
 import net.jini.lookup.entry.Name;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jini.ServiceLocatorHelper;

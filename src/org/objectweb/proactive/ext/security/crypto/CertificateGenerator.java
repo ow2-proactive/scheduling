@@ -29,13 +29,30 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import javax.swing.UIManager;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import java.io.*;
-import java.security.*;
-import org.bouncycastle.jce.provider.*;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowEvent;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
 
 /**
  *  This class provides a graphical interface for the Certificates Generation.
@@ -162,7 +179,7 @@ class CertificateGeneratorFrame extends JFrame {
 		contentPane = (JPanel) this.getContentPane();
 
 		contentPane.setLayout(borderLayout1);
-		contentPane.add(myPanel, borderLayout1.CENTER);
+		contentPane.add(myPanel, BorderLayout.CENTER);
 		this.setSize(new Dimension(400, 300));
 		this.setTitle("Certificate Generator");
 	}

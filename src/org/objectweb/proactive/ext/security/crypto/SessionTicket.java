@@ -29,12 +29,6 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ext.security.crypto;
-import java.lang.*;
-import java.util.*;
-import java.io.*;
-import java.security.*;
-import javax.crypto.*;
-import javax.crypto.spec.*;
 
 /**
  *  A sessionTicket is required to initiate a new session

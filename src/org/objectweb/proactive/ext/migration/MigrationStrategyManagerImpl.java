@@ -30,17 +30,15 @@
 */ 
 package org.objectweb.proactive.ext.migration;
 
-import org.objectweb.proactive.ProActive;
+import java.lang.reflect.Method;
+
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.event.MigrationEvent;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-
-import java.lang.reflect.Method;
 
 public class MigrationStrategyManagerImpl implements MigrationStrategyManager, MigrationEventListener, java.io.Serializable {
 

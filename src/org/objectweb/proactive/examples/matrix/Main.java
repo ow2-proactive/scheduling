@@ -1,26 +1,8 @@
 package org.objectweb.proactive.examples.matrix;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-
-import java.io.*;
-import java.util.StringTokenizer;
-import java.util.ArrayList;
-
-
-import org.objectweb.proactive.core.group.*;
-import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.ProxyForGroup;
-
-
-
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
 public class Main {

@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.examples.hello;
 
-import org.objectweb.proactive.ProActive;
 
 public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame {
 
@@ -113,7 +112,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
       while (shouldRun) {
         lMessage.setText(activeHello.sayHello());
         try {
-          Thread.currentThread().sleep(1000);
+          Thread.sleep(1000);
         } catch (InterruptedException e) {}
       }
     }

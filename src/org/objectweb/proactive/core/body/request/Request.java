@@ -30,12 +30,10 @@
 */ 
 package org.objectweb.proactive.core.body.request;
 
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.body.message.Message;
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.message.Message;
+import org.objectweb.proactive.core.body.reply.Reply;
 
 /**
  * <p>
