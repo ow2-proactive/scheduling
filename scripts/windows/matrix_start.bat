@@ -12,12 +12,9 @@ goto end
 :doit
 SETLOCAL
 call init.bat
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/Renderer1
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/Renderer2
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/Renderer3
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/Renderer4
 
-%JAVA_CMD% org.objectweb.proactive.examples.matrix.Main c3d.hosts 300
+set XMLDESCRIPTOR=..\..\descriptors\Matrix.xml
+%JAVA_CMD% org.objectweb.proactive.examples.matrix.Main 300 %XMLDESCRIPTOR%
 ENDLOCAL
 
 :end

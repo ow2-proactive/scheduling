@@ -12,10 +12,10 @@ goto end
 :doit
 SETLOCAL
 call init.bat
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/one 
-start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/two
 
-%JAVA_CMD% org.objectweb.proactive.examples.penguin.PenguinControler //localhost/one //localhost/two
+set XMLDESCRIPTOR=..\..\descriptors\Penguin.xml
+
+%JAVA_CMD% org.objectweb.proactive.examples.penguin.PenguinControler %XMLDESCRIPTOR%
 ENDLOCAL
 
 :end
