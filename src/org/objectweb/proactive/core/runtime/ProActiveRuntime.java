@@ -180,7 +180,7 @@ public interface ProActiveRuntime extends Job {
      * Returns all Active Objects with the specified class name, deployed on the node with the given name on
      * this ProActiveRuntime
      * @param nodeName the name of the node
-     * @param classname class of the Active Objects to look for
+     * @param className class of the Active Objects to look for
      * @return Object[] Active Objects of the specified class name deployed on this ProactiveRuntime
      */
     public ArrayList getActiveObjects(String nodeName, String className)
@@ -188,7 +188,7 @@ public interface ProActiveRuntime extends Job {
 
     /**
      * Returns the VirtualNode with the given name
-     * @param VirtualNodeName the name of the VirtualNode to be acquired
+     * @param virtualNodeName the name of the VirtualNode to be acquired
      * @return VirtualNode the virtualnode of the given name or null if such virtualNode
      * does not exist.
      */
@@ -217,7 +217,7 @@ public interface ProActiveRuntime extends Job {
     public void unregisterAllVirtualNodes() throws ProActiveException;
 
     /**
-     * @param nodeName
+     * @param nodeUrl
      * @return the jobId of the node with the given name
      * @throws ProActiveException
      */
@@ -308,7 +308,7 @@ public interface ProActiveRuntime extends Job {
     public ArrayList getEntities(String nodeName) throws ProActiveException;
 
     /**
-     * @param nodeName
+     * @param uBody
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException;

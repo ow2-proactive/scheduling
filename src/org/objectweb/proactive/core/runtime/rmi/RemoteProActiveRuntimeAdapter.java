@@ -462,7 +462,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @param nodeName
+     * @param uBody
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {

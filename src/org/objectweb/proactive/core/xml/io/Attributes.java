@@ -61,7 +61,7 @@ public interface Attributes {
  /**
   * Looks up the index of an attribute by Namespace name.
   * @param uri The Namespace URI, or the empty string if the name has no Namespace URI.
-  * @param localName The attribute's local name.
+  * @param localPart The attribute's local name.
   * @return The attribute value as a string, or null if the attribute is not in the list.
   */
   public String getValue(String uri, String localPart); 

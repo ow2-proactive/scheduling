@@ -167,7 +167,7 @@ public interface RemoteProActiveRuntime extends Remote {
     public ArrayList getEntities(String nodeName) throws RemoteException;
 
     /**
-     * @param nodeName
+     * @param uBody
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws RemoteException;

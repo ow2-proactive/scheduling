@@ -184,7 +184,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * Register the given VirtualNode on this ProActiveRuntime. This method cannot be called remotely.
      * @param vn the virtualnode to register
-     * @param vnname the name of the VirtualNode to register
+     * @param vnName the name of the VirtualNode to register
      */
     public void registerLocalVirtualNode(VirtualNode vn, String vnName) {
         //System.out.println("vn "+vnName+" registered");

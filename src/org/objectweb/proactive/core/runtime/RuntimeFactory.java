@@ -97,8 +97,8 @@ public abstract class RuntimeFactory {
     /**
      * Associates the factory of class <code>factoryClassName</code> as the factory to create
      * proactiveRuntime for the given protocol. Replaces any previous association.
-     * @param <code>protocol</code> the protocol to associate the factory to
-     * @param <code>factoryClassName</code> the fully qualified name of the class of the factory
+     * @param protocol the protocol to associate the factory to
+     * @param factoryClassName the fully qualified name of the class of the factory
      * responsible of creating the proActiveRuntime for that protocol
      */
     public static synchronized void setFactory(String protocol,
@@ -112,8 +112,8 @@ public abstract class RuntimeFactory {
     /**
      * Associates the factory of class <code>factoryClassName</code> as the factory to create
      * proactiveRuntime for the given protocol. Replaces any previous association.
-     * @param <code>protocol</code> the protocol to associate the factory to
-     * @param <code>factoryObject</code> the class of the factory
+     * @param protocol the protocol to associate the factory to
+     * @param factoryObject the class of the factory
      * responsible of creating the proactiveRuntime for that protocol
      */
     public static synchronized void setFactory(String protocol,

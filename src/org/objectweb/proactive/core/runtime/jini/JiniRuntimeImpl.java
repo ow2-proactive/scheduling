@@ -449,7 +449,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     /**
-     * @param nodeName
+     * @param uBody
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
