@@ -217,4 +217,11 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return policy server
      */
     public PolicyServer getPolicyServer();
+    
+    
+    /**
+     * checks the cardinality of the virtual node (i.e. whether the node is mapped to several nodes or not)
+     * @return true if the virtual node is mapped to several nodes, false otherwise
+     */
+    public boolean isMultiple();
 }

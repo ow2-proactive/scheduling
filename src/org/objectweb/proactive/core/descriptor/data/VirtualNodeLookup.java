@@ -296,6 +296,13 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         return virtualNode.getPolicyServer();
     }
 
+    /**
+     * see {@link VirtualNode#isMultiple()}
+     */
+    public boolean isMultiple() {
+    	return virtualNode.isMultiple();
+    }
+
     //
     //-------------------PRIVATE METHODS---------------------------------
     //
@@ -322,4 +329,6 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new ProActiveException(exceptionMessage);
         }
     }
+    
+	
 }

@@ -707,6 +707,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public void setPolicyFile(String file) {
         policyServerFile = file;
     }
+    
+    /**
+     * see {@link VirtualNode#isMultiple()}
+     */
+    public boolean isMultiple() {
+    	return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
+    }
 
     //
     //-------------------PRIVATE METHODS--------------------------------------
@@ -1084,4 +1091,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
+    
+
 }
