@@ -1,0 +1,99 @@
+<html>
+<head>
+<title>ProActive Test Suite API</title>
+<link href="Files/ProActive.css" rel="stylesheet">
+</head>
+<body style="background-color: rgb(255, 255, 255);">
+<table width="100%">
+<tbody>
+<tr>
+<td valign="middle" align="left">
+<table border="1" cellspacing="0" cellpadding="2">
+<tbody>
+<tr>
+<td class="smallLink1">&nbsp;&nbsp;<a href="index.html"
+class="smallLink1">back
+to index</a>&nbsp;&nbsp;</td>
+<td class="smallLink2">&nbsp;&nbsp;<a href="format.html"
+class="smallLink2">prev</a>&nbsp;&nbsp;</td>
+<td class="smallLink2">&nbsp;&nbsp;<a href="descriptor.html"
+class="smallLink2">next</a>&nbsp;&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td valign="top" align="right"> <a
+href="http://www-sop.inria.fr/oasis/ProActive/"><img border="0"
+height="34" width="200" src="Files/ProActiveLogo200x34.gif"></a> </td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h1>0.4 Logs</h1>
+<p>TestSuite API offers to tests developers a log system, to tace or
+debug their tests.
+</p>
+<h2>Which logger ?</h2>
+<p>As in ProActive API we choose <a
+href="http://jakarta.apache.org/log4j/">Jakarta Log4J</a> like logger.
+</p>
+<h2>How it works in TestSuite API ?</h2>
+<p>A static logger is create in Manager, all Groups and Tests who are
+added in the Manager have a reference to this logger.
+</p>
+<p>By default all logs are written in a simple text file : <b>$HOME/tests.log</b>
+</p>
+<p>
+With this file, it very easy to debug your test. You can also, with
+Log4J, specify a different place and
+different format for your logs. For more details see the next part.
+</p>
+<h2>How to use it ?</h2>
+<h3>Log your code</h3>
+<p>To add logs in your Test code it is very easy : you can directly use the
+variable <b>logger</b> or the getter <b>getLogger()</b>. This is a <b>org.apache.log4j.Logger</b>
+</p>
+<h4>Example</h4>
+<p>In your Test code just add logs like this :</p>
+<pre><code>
+ if (logger.isDebugEnabled())
+   logger.debug("A debug message ...");
+</code></pre>
+
+<p>For more information about use logger see the <a href="http://jakarta.apache.org/log4j/docs/manual.html">log4J manual</a>.</p>
+<h3>Configure the logger</h3>
+<p>By default all logs with a level higher than INFO are written in
+<b>$HOME/tests.log</b>.</p>
+<p>But you can configure the format and plac where you want to get logs.</p>
+<p>The log4j environment is fully configurable programmatically. However, it
+is far more flexible to configure log4j using configuration files. Currently,
+configuration files can be written in XML or in Java properties (key=value)
+format.</p>
+
+    <p>You can also configure the logger by the <a href="descriptor.html">configuration file</a>.</p>
+
+<h4>Example</h4>
+<p>Use default configuration of log4J. Add this code Manager constructor :</p>
+<pre><code>
+ // Set up a simple configuration that logs on the console.
+ BasicConfigurator.configure();
+</code></pre>
+<p>An another example to write logs in a HTML file :</p>
+<pre><code>
+public YourManager() {
+        super("Function calls", "Alpha version");
+        HTMLLayout layout = new HTMLLayout();
+        WriterAppender appender = null;
+        try {
+            FileOutputStream output = new FileOutputStream(
+                    "/net/home/adicosta/output2.html");
+            appender = new WriterAppender(layout, output);
+        } catch (Exception e) {
+        }
+        logger.addAppender(appender);
+        logger.setLevel(Level.DEBUG);
+    }
+</code></pre>
+<p>For more information about logger configuration see the <a href="http://jakarta.apache.org/log4j/docs/manual.html">log4J manual</a>.</p>
+</body>
+</html>
