@@ -157,6 +157,13 @@ public interface VirtualNode extends java.io.Serializable {
     public void createNodeOnCurrentJvm(String protocol);
 
     /**
+     * Kills all nodes mapped to this VirtualNode.
+     * It is in fact the runtime(so the jvm) on which the node is running that is killed.
+     * Nodes are previously unregistered from any registry.
+     */
+    public void killAll();
+
+    /**
      * Returns the unique active object created on the unique node mapped to this VirtualNode.
      * This method should be called on a virtualNode, with unique_singleAO property defined in the XML descriptor. If more than one active object are found, a
      * warning is generated, and the first active object found is returned
@@ -164,6 +171,11 @@ public interface VirtualNode extends java.io.Serializable {
      * @throws ProActiveException if no active objects are created on this VirtualNode.
      */
     public Object getUniqueAO() throws ProActiveException;
+
+    /**
+     * Returns true is this VirtualNode is already activated, false otherwise
+     */
+    public boolean isActivated();
 
     /**
      * Allows to set runtime informations for this VirtualNode activation.
