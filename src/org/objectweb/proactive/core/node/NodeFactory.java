@@ -30,16 +30,16 @@
 */
 package org.objectweb.proactive.core.node;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.net.UnknownHostException;
 
 
 /**
@@ -73,6 +73,10 @@ public class NodeFactory {
     protected static Logger logger = Logger.getLogger(NodeFactory.class.getName());
     private static final String DEFAULT_NODE_NAME = "//localhost/Node";
     private static Node defaultNode = null;
+
+	static {
+		ProActiveConfiguration.load();
+	}
 
     // test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
