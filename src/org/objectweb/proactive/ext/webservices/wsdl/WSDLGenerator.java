@@ -82,7 +82,7 @@ public class WSDLGenerator extends WSConstants {
             emitter.setImplNamespace(namespace);
             emitter.setCls(c);
             emitter.setServiceElementName(serviceName);
-            emitter.setEmitAllTypes(true);
+           
             
             String wsdl = emitter.emitToString(Emitter.MODE_ALL);
 
