@@ -13,7 +13,6 @@ import org.objectweb.proactive.core.component.Constants;
 /**
  * a controller for accessing configuration parameters of the component.
  * 
- * Currently not used
  * 
  * @author Matthieu Morel
  *
@@ -24,6 +23,7 @@ public class ProActiveComponentParametersController extends ProActiveController
     private ComponentParameters componentParameters;
 
 	/**
+	 * Constructor
 	 * @param owner
 	 */
     public  ProActiveComponentParametersController(Component owner) {
@@ -31,14 +31,14 @@ public class ProActiveComponentParametersController extends ProActiveController
     }
 
     /**
-     * @see org.objectweb.fractal.proactive.control.ComponentParametersController#getFcComponentParameters()
+     * see {@link org.objectweb.fractal.proactive.control.ComponentParametersController#getFcComponentParameters()}
      */
     public ComponentParameters getComponentParameters() {
         return componentParameters;
     }
 
     /**
-     * @see org.objectweb.fractal.proactive.control.ComponentParametersController#setFcComponentParameters(ComponentParameters)
+     * see {@link org.objectweb.fractal.proactive.control.ComponentParametersController#setFcComponentParameters(ComponentParameters)}
      */
     public void setComponentParameters(ComponentParameters componentParameters) {
         this.componentParameters = componentParameters;
