@@ -39,10 +39,8 @@ import benchmark.util.ReifiableObject;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class BenchNewActive extends ProActiveBenchmark {
 

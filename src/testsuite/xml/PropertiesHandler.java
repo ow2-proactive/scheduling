@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class PropertiesHandler extends AbstractUnmarshallerDecorator

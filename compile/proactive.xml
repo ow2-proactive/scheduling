@@ -23,6 +23,7 @@
 		<pathelement location="${base}/dev/lib/xml-apis.jar"/>
 		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar"/>
 		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar"/>
+		<pathelement location="${base}/dev/lib/jmf.jar"/>
 	</path>
 	<!-- default target that displays usage -->
 	<target name="usage">
@@ -436,7 +437,22 @@
       ==
       ================================================================
 	-->
-	<target name="benchmark" depends="testsuite">
+	<target name="microTimer">
+		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/local/bin/gcc" os="Linux" output="output.txt">
+			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o Testsuite_timer_micro_MicroTimer.o  testsuite_timer_micro_MicroTimer.cc"/>
+		</exec>
+		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/bin/ld" os="Linux" output="output2.txt">
+			<arg line="  -G Testsuite_timer_micro_MicroTimer.o -o  libTestsuite_timer_micro_MicroTimer.so"/>
+		</exec>
+		<copy toDir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.so"/>
+				<include name="**/*.o"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="benchmark" depends="testsuite, microTimer">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
@@ -450,6 +466,7 @@
 	-->
 	<target name="runBench" depends="testsuite, benchmark">
 		<java classname="benchmark.BenchCenter" fork="true">
+			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro"/>
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
 		</java>

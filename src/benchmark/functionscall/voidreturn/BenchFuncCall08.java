@@ -37,7 +37,10 @@ import org.objectweb.proactive.core.node.NodeImpl;
 import benchmark.functionscall.FunctionCall;
 import benchmark.util.ReifiableObject;
 
-
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
 public class BenchFuncCall08 extends FunctionCall {
     public BenchFuncCall08() {
     }

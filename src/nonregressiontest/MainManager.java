@@ -33,19 +33,21 @@ package nonregressiontest;
 import java.io.File;
 import java.io.IOException;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.SimpleLayout;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.xml.sax.SAXException;
 
-import testsuite.manager.ProActiveFuncTestManager;
+import testsuite.manager.FunctionalTestManager;
 
 
 /**
  * @author rquilici
  *
  */
-public class MainManager extends ProActiveFuncTestManager {
+public class MainManager extends FunctionalTestManager {
 
     /**
      * Constructor for MainManager.
@@ -74,18 +76,36 @@ public class MainManager extends ProActiveFuncTestManager {
         super(xmlFile);
     }
 
+    /**
+     * @see testsuite.manager.AbstractManager#initManager()
+     */
+    public void initManager() throws Exception {
+        // nothing to do
+    }
+
+    /**
+     * @see testsuite.manager.AbstractManager#endManager()
+     */
+    public void endManager() throws Exception {
+        // delete all nodes
+        TestNodes.killNodes();
+    }
+
     public static void main(String[] args) {
+        ProActiveConfiguration.load();
         MainManager manager = null;
         String path = MainManager.class.getResource(
                 "/nonregressiontest/MainManager.xml").getPath();
         File xml = new File(path);
-		ProActiveConfiguration.load();
-        
+        ProActiveConfiguration.load();
+
         try {
             manager = new MainManager(xml);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        // Launch all unit tests and interlinked tests
         manager.execute();
         System.out.println(
             "You can see results in test.hmtl file in your ProActive directory.");

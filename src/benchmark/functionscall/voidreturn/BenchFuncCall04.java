@@ -36,7 +36,10 @@ import org.objectweb.proactive.core.node.NodeImpl;
 
 import java.net.InetAddress;
 
-
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
 public class BenchFuncCall04 extends FunctionCall {
     public BenchFuncCall04() {
     }

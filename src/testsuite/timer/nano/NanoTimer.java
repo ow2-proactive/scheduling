@@ -28,51 +28,54 @@
 *
 * ################################################################
 */
-package testsuite.timer;
+package testsuite.timer.nano;
+
+import testsuite.timer.Timeable;
+
+import javax.media.SystemTimeBase;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
-public class MsTimer implements Timeable {
-    private static final String unit = "ms";
-    private long time;
+public class NanoTimer implements Timeable {
+    private SystemTimeBase timer = null;
+    private long end;
     private long start;
 
     /**
      *
      */
-    public MsTimer() {
-        this.time = 0;
+    public NanoTimer() {
     }
 
     /**
      * @see testsuite.timer.Timeable#start()
      */
     public void start() {
-        this.start = System.currentTimeMillis();
+        this.timer = new SystemTimeBase();
+        start = this.timer.getNanoseconds();
     }
 
     /**
      * @see testsuite.timer.Timeable#stop()
      */
     public void stop() {
-        long stop = System.currentTimeMillis();
-        this.time = (stop - this.start);
+        this.end = this.timer.getNanoseconds();
     }
 
     /**
      * @see testsuite.timer.Timeable#getCumulatedTime()
      */
     public long getCumulatedTime() {
-        return this.time;
+        return end - start;
     }
 
     /**
      * @see testsuite.timer.Timeable#getUnit()
      */
     public String getUnit() {
-        return unit;
+        return "ns";
     }
 }

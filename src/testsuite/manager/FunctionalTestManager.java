@@ -60,7 +60,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
             "FunctionalTestManager with no description");
     }
 
-
     /**
      * @param name
      * @param description
@@ -74,7 +73,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
         super(xmlDescriptor);
         this.loadAttributes(getProperties());
     }
-
 
     /**
      * @see testsuite.manager.AbstractManager#execute()
@@ -376,5 +374,14 @@ public abstract class FunctionalTestManager extends AbstractManager {
     public void setInterLinkedGroups(ArrayList list) {
         this.interLinkedGroups = list;
     }
-}
 
+    /**
+     * @see testsuite.manager.AbstractManager#execute()
+     */
+    public void execute() {
+        super.execute();
+        if (this.interLinkedGroups != null) {
+            this.executeInterLinkedTest();
+        }
+    }
+}

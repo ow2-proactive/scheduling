@@ -5,18 +5,19 @@ package nonregressiontest.group.result;
 
 import java.util.Iterator;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import nonregressiontest.group.A;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 /**
  * @author Laurent Baduel
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
 
 	private A resultTypedGroup = null;
 	private A resultResultTypedGroup = null;
@@ -37,7 +38,7 @@ public class Test extends ProActiveFunctionalTest {
 
 	public void initTest() throws Exception {
 		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
+		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
 		A typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
 		this.resultTypedGroup = typedGroup.asynchronousCall();
 	}

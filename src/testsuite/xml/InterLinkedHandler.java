@@ -47,7 +47,7 @@ import java.util.Hashtable;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class InterLinkedHandler extends AbstractUnmarshallerDecorator

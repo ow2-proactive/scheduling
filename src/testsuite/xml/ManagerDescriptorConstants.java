@@ -32,7 +32,7 @@ package testsuite.xml;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public interface ManagerDescriptorConstants {

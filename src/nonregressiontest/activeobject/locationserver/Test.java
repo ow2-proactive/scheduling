@@ -30,6 +30,8 @@
 */
 package nonregressiontest.activeobject.locationserver;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
@@ -38,9 +40,7 @@ import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-import testsuite.manager.ProActiveFuncTestManager;
-
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -51,7 +51,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
     A a;
     MigratableA migratableA;
     SimpleLocationServer server;
@@ -70,14 +70,14 @@ public class Test extends ProActiveFunctionalTest {
                 new Object[] { serverUrl });
         Thread.sleep(3000);
         a = (A) ProActive.newActive(A.class.getName(), new Object[] { "toto" },
-                ((ProActiveFuncTestManager) manager).getSameVMNode(), null,
+		TestNodes.getSameVMNode(), null,
                 LocationServerMetaObjectFactory.newInstance());
         migratableA = (MigratableA) ProActive.newActive(MigratableA.class.getName(),
                 new Object[] { "toto" },
-                ((ProActiveFuncTestManager) manager).getSameVMNode(), null,
+		TestNodes.getSameVMNode(), null,
                 LocationServerMetaObjectFactory.newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
-        migratableA.moveTo(((ProActiveFuncTestManager) manager).getLocalVMNode());
+        migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);
     }
 

@@ -34,7 +34,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -45,7 +45,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
 	
 		ProActiveDescriptor proActiveDescriptorAgent;
     private static String FS = System.getProperty("file.separator");

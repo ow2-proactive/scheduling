@@ -38,7 +38,7 @@ import testsuite.manager.AbstractManager;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class ResultHandler extends BasicUnmarshaller

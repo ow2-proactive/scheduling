@@ -42,7 +42,7 @@ import java.rmi.Remote;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public abstract class RMIBenchmark extends ProActiveBenchmark

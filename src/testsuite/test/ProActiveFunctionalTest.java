@@ -38,10 +38,8 @@ import java.io.Serializable;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public abstract class ProActiveFunctionalTest extends FunctionalTest
     implements Serializable, InterfaceProActiveTest {

@@ -45,8 +45,7 @@ import java.io.Serializable;
  *
  */
 public abstract class Benchmark extends AbstractTest implements Serializable {
-
-  //  /** Time in ms of a benchmark. */
+    //  /** Time in ms of a benchmark. */
     long resultTime = 0;
 
     /** To know if the benchmark run with success or not. If you don't run anytime a benchmark
@@ -129,10 +128,10 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
 
         // benchmark
         try {
-			resultTime =action();
+            resultTime = action();
             if (logger.isInfoEnabled()) {
                 logger.info("Bench action method runs with success in " +
-                    resultTime + "ms");
+                    resultTime + this.getTimer().getUnit());
             }
             failed = false;
         } catch (Exception e) {

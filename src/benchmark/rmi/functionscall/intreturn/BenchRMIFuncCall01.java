@@ -37,7 +37,10 @@ import org.objectweb.proactive.core.node.Node;
 
 import benchmark.rmi.functionscall.RMIFunctionCall;
 
-
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
 public class BenchRMIFuncCall01 extends RMIFunctionCall {
     public BenchRMIFuncCall01() {
     }

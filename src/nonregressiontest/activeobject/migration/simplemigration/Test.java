@@ -30,11 +30,12 @@
 */
 package nonregressiontest.activeobject.migration.simplemigration;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.manager.ProActiveFuncTestManager;
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 /**
  * @author rquilici
@@ -44,7 +45,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest
+public class Test extends FunctionalTest
 {
 	A a;
 	Node sameVmNode, localVmNode;
@@ -60,8 +61,8 @@ public class Test extends ProActiveFunctionalTest
 	 */
 	public void action() throws Exception
 	{
-		sameVmNode = ((ProActiveFuncTestManager)manager).getSameVMNode();
-		localVmNode = ((ProActiveFuncTestManager)manager).getLocalVMNode();
+		sameVmNode = TestNodes.getSameVMNode();
+		localVmNode = TestNodes.getLocalVMNode();
 		a = (A)ProActive.newActive(A.class.getName(), new Object[]{"toto"},sameVmNode);
 		a.moveTo(localVmNode);
 	}

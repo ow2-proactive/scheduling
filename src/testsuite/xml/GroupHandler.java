@@ -50,7 +50,7 @@ import java.io.File;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class GroupHandler {

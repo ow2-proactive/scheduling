@@ -30,22 +30,20 @@
 */
 package benchmark;
 
-import benchmark.objectcreation.newactive.BenchNewActive;
-
-import benchmark.objectcreation.turnactive.BenchTurnActive;
-
-import org.xml.sax.SAXException;
-
-import testsuite.group.Group;
-
-import testsuite.manager.ProActiveBenchManager;
-
 import java.io.File;
 import java.io.IOException;
 
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.xml.sax.SAXException;
+
+import testsuite.group.Group;
+import testsuite.manager.ProActiveBenchManager;
+import benchmark.objectcreation.newactive.BenchNewActive;
+import benchmark.objectcreation.turnactive.BenchTurnActive;
+
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class BenchCenter extends ProActiveBenchManager {
@@ -259,6 +257,7 @@ public class BenchCenter extends ProActiveBenchManager {
     }
 
     public static void main(String[] args) {
+        ProActiveConfiguration.load();
         System.out.println("Start benchmark ...");
         BenchCenter center = null;
         String path = BenchCenter.class.getResource(
@@ -267,11 +266,11 @@ public class BenchCenter extends ProActiveBenchManager {
         try {
             center = new BenchCenter(xml);
             center.execute();
+            System.out.println(
+                "You can see results in benchmark.hmtl file in your ProActive directory.");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(
-            "You can see results in benchmark.hmtl file in your ProActive directory.");
         System.exit(0);
     }
 }

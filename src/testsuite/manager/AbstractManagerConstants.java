@@ -32,7 +32,7 @@ package testsuite.manager;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public interface AbstractManagerConstants {

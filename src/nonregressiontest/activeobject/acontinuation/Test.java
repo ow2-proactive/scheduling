@@ -30,11 +30,11 @@
 */
 package nonregressiontest.activeobject.acontinuation;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.ProActive;
 
-import testsuite.test.ProActiveFunctionalTest;
-
-import java.util.Vector;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -45,7 +45,7 @@ import java.util.Vector;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
     A a;
     A b;
     Id idPrincipal;

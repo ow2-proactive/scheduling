@@ -36,7 +36,10 @@ import org.objectweb.proactive.core.node.NodeImpl;
 
 import java.net.InetAddress;
 
-
+/**
+ * @author Alexandre di Costanzo
+ *
+ */
 public class BenchRMIFuncCall05 extends RMIFunctionCall {
     public BenchRMIFuncCall05() {
     }

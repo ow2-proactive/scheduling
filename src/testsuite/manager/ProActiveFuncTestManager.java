@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
 import org.xml.sax.SAXException;
 
 import testsuite.exception.BadTypeException;
@@ -52,7 +51,7 @@ import testsuite.test.FunctionalTest;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class ProActiveFuncTestManager extends FunctionalTestManager
@@ -66,7 +65,7 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     private Node localVMNode = null;
     private Node remoteVMNode = null;
     private String remoteHostname = "localhost";
-    private RSHJVMProcess rshJVM = null;
+   // private RSHJVMProcess rshJVM = null;
  
 
     /**

@@ -46,7 +46,7 @@ import java.util.Properties;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator

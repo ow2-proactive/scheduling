@@ -30,11 +30,11 @@
 */
 package nonregressiontest.activeobject.migration.loopmigration;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 
-import testsuite.manager.ProActiveFuncTestManager;
-
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -45,7 +45,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
     String node1;
     String node2;
     A a;
@@ -58,9 +58,9 @@ public class Test extends ProActiveFunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        node1 = ((ProActiveFuncTestManager) manager).getSameVMNode()
+        node1 = TestNodes.getSameVMNode()
                  .getNodeInformation().getURL();
-        node2 = ((ProActiveFuncTestManager) manager).getLocalVMNode()
+        node2 = TestNodes.getLocalVMNode()
                  .getNodeInformation().getURL();
         a = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { node1, node2 }, node1);

@@ -140,7 +140,8 @@ public class BenchmarkResult extends TestResult {
     public String toString() {
         return super.toString() +
         (((getType() == RESULT) || (getType() == GLOBAL_RESULT))
-        ? ("Bench run in " + min + "ms\n") : "");
+        ? ("Bench run in " + min +
+        ((Benchmark) this.getTest()).getTimer().getUnit() + "\n") : "");
     }
 
     /**

@@ -36,7 +36,7 @@ import testsuite.test.RMIBenchmark;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public abstract class RMIFunctionCall extends RMIBenchmark {

@@ -54,8 +54,8 @@ import testsuite.result.AbstractResult;
 import testsuite.result.BenchmarkResult;
 import testsuite.result.ResultsCollections;
 import testsuite.test.Benchmark;
-import testsuite.timer.MsTimer;
 import testsuite.timer.Timeable;
+import testsuite.timer.ms.MsTimer;
 
 
 /**
@@ -84,7 +84,7 @@ public abstract class BenchmarkManager extends AbstractManager {
     public BenchmarkManager(File xmlDescriptor)
         throws IOException, SAXException {
         super(xmlDescriptor);
-        this.loadAttributes(getProperties());
+        this.loadAttributes(this.getProperties());
     }
 
     /**
@@ -156,7 +156,7 @@ public abstract class BenchmarkManager extends AbstractManager {
                         if (logger.isInfoEnabled()) {
                             logger.info("Bench " + test.getName() +
                                 " runs with success in " +
-                                test.getResultTime() + "ms");
+                                test.getResultTime() + this.timer.getUnit());
                         }
                         runs++;
                         sum += test.getResultTime();
@@ -167,7 +167,8 @@ public abstract class BenchmarkManager extends AbstractManager {
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
                 "Group : " + group.getName() + ", Moy in " +
-                ((runs == 0) ? "Failed" : ((sum / (double) runs) + "ms")) +
+                ((runs == 0) ? "Failed"
+                             : ((sum / (double) runs) + this.timer.getUnit())) +
                 " Runs : " + runs + " Errors : " + errors);
 
             try {
@@ -309,13 +310,6 @@ public abstract class BenchmarkManager extends AbstractManager {
         return this.timer;
     }
 
-    /**
-     * @param timeable
-     */
-    public void setTimer(Timeable timeable) {
-        this.timer = timeable;
-    }
-
     public void setTimer(String className) {
         try {
             Class c = getClass().getClassLoader().loadClass(className);
@@ -328,5 +322,9 @@ public abstract class BenchmarkManager extends AbstractManager {
         } catch (IllegalAccessException e) {
             logger.warn(className + " illegal access. Use default timer", e);
         }
+    }
+
+    public void setTimer(Timeable timer) {
+        this.timer = timer;
     }
 }

@@ -30,31 +30,6 @@
  */
 package testsuite.manager;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.WriterAppender;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
-
-import testsuite.bean.Beanable;
-
-import testsuite.group.Group;
-
-import testsuite.result.ResultsCollections;
-import testsuite.result.ResultsExporter;
-
-import testsuite.test.AbstractTest;
-
-import testsuite.xml.ManagerDescriptorHandler;
-
-import testsuite.xslt.TransformerXSLT;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -63,21 +38,36 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.WriterAppender;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import testsuite.bean.Beanable;
+import testsuite.group.Group;
+import testsuite.result.ResultsCollections;
+import testsuite.result.ResultsExporter;
+import testsuite.test.AbstractTest;
+import testsuite.xml.ManagerDescriptorHandler;
+import testsuite.xslt.TransformerXSLT;
 
 
 /**
@@ -98,41 +88,35 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String outputPath = null;
 
     public AbstractManager() {
-        //  logger = Logger.getLogger(getClass().getName());
         testAppender();
     }
 
     public AbstractManager(String name, String description) {
         this.name = name;
         this.description = description;
-        logger = Logger.getLogger(getClass().getName());
 
         testAppender();
     }
 
     public AbstractManager(File xmlDescriptor) throws IOException, SAXException {
-        //    logger = Logger.getLogger(getClass().getName());
         testAppender();
         ManagerDescriptorHandler.createManagerDescriptor(xmlDescriptor.getPath(),
             this);
     }
 
     private void testAppender() {
-        int nbAppenders = 0;
+       boolean hasAppender = false;
         Enumeration enum = Logger.getRootLogger().getAllAppenders();
-
-        while (enum.hasMoreElements()) {
-            nbAppenders++;
-            enum.nextElement();
+        if (enum.hasMoreElements()){
+            hasAppender = true;
         }
-        if (nbAppenders == 0) {
+        if (hasAppender) {
             File log = new File(System.getProperty("user.home") +
                     File.separatorChar + "tests.log");
             FileOutputStream out = null;
             try {
                 out = new FileOutputStream(log);
             } catch (FileNotFoundException e) {
-                System.out.println("XXXXXXXXXXXXXXXXXXXXX");
                 logger.warn("Log file not found", e);
             }
             Logger.getRootLogger().addAppender(new WriterAppender(
@@ -488,7 +472,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
                         }
                     } catch (InvocationTargetException e1) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug(e1);
+                            logger.debug(e1.getTargetException());
                         }
                     }
                 } catch (SecurityException e) {

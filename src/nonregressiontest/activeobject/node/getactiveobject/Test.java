@@ -30,12 +30,12 @@
 */
 package nonregressiontest.activeobject.node.getactiveobject;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.manager.ProActiveFuncTestManager;
-
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -46,7 +46,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
     Node node;
     A a;
 
@@ -58,7 +58,7 @@ public class Test extends ProActiveFunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        node = ((ProActiveFuncTestManager) manager).getLocalVMNode();
+        node = TestNodes.getLocalVMNode();
         ProActive.newActive(A.class.getName(), new Object[] { "toto" }, node);
         Thread.sleep(3000);
         a = (A) node.getActiveObjects(A.class.getName())[0];

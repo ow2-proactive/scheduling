@@ -32,7 +32,7 @@ package nonregressiontest.activeobject.request.immediateservice;
 
 import org.objectweb.proactive.ProActive;
 
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 
 /**
@@ -43,7 +43,7 @@ import testsuite.test.ProActiveFunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
     A a;
     DummyObject dum;
     String name;

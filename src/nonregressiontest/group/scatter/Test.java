@@ -3,18 +3,19 @@
  */
 package nonregressiontest.group.scatter;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import nonregressiontest.group.A;
 
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-import testsuite.test.ProActiveFunctionalTest;
+import testsuite.test.FunctionalTest;
 
 /**
  * @author Laurent Baduel
  */
-public class Test extends ProActiveFunctionalTest {
+public class Test extends FunctionalTest {
 
 	private A typedGroup = null;
 	private A parameterGroup = null;
@@ -36,10 +37,10 @@ public class Test extends ProActiveFunctionalTest {
 
 	public void initTest() throws Exception {
 		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
+		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
 		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
 		Object[][] paramsParameter = {{"AgentA"}, {"AgentB"}, {"AgentC"}};
-		Node[] nodesParameter = {this.getRemoteVMNode(), this.getSameVMNode(), this.getLocalVMNode()};
+		Node[] nodesParameter = {TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(), TestNodes.getLocalVMNode()};
 		this.parameterGroup = (A) ProActiveGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
 	}
 

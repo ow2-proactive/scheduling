@@ -39,10 +39,8 @@ import testsuite.test.ProActiveBenchmark;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public abstract class FunctionCall extends ProActiveBenchmark {
     public FunctionCall() {

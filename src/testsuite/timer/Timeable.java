@@ -32,7 +32,7 @@ package testsuite.timer;
 
 
 /**
- * @author adicosta
+ * @author Alexandre di Costanzo
  *
  */
 public interface Timeable {

@@ -11,6 +11,8 @@
 		packageName="nonregressiontest" >
 			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
 			<unitTest class="nonregressiontest.node.nodefactory.Test" />
+			<!-- the next test create 3 nodes, accessible by 3 static methods -->
+			<unitTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
 			<unitTest class="nonregressiontest.stub.stubgeneration.Test" />
 			<unitTest class="nonregressiontest.stub.stubinterface.Test" />
 			<unitTest class="nonregressiontest.activeobject.creation.local.newactive.Test" />
@@ -40,12 +42,12 @@
 			<unitTest class="nonregressiontest.group.exception.Test" />
 	</packageGroup>
 	
-	<log4j>../compile/proactive-log4j</log4j>
+	<!--<log4j>../compile/proactive-log4j</log4j>-->
 	
 	<result type="html" file="../test.html" />
 	
 	<!--<properties>
-		<prop key="RemoteHostname" value="owenii" />
+		<prop key="RemoteHostname" value="nahuel />
 	</properties>-->
 	
 </Manager>
