@@ -132,7 +132,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
             String username = attributes.getValue("username");
             if (checkNonEmpty(username)) {
-                targetProcess.setUsername("username");
+                targetProcess.setUsername(username);
             }
         }
 
