@@ -72,7 +72,13 @@ public class StartP2PService {
         }
         this.portNumber = args[1];
     }
-
+    
+    public StartP2PService(String protocol, String port, Vector serverList){
+        this.noRegister = false;
+        this.serverList = serverList;
+        this.acquisitionMethod = protocol;
+        this.portNumber = port;
+    }
     /**
      * Usage: java org.objectweb.proactive.p2p.daemon.P2PProActiveRuntime
      * acquisitionMethod portNumber [Servers List File]
