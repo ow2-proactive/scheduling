@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<componentsDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../org/objectweb/proactive/core/component/xml/components.xsd">
+    <types>
+        <component-type name="B-Type">
+            <provides>
+                <interface name="i2" signature="nonregressiontest.component.I2"/>
+            </provides>
+        </component-type>
+        <component-type name="A-Type" >
+            <!-- extends attribute to allow! -->
+            <provides>
+                <interface name="i1" signature="nonregressiontest.component.I1"/>
+            </provides>
+            <requires>
+                <interface name="i2" signature="nonregressiontest.component.I2"/>
+            </requires>
+        </component-type>
+    </types>
+    <components>
+        <primitive-component implementation="nonregressiontest.component.PrimitiveComponentB"
+            name="p2" type="B-Type" virtualNode="Dispatcher1-AC"/>
+        <composite-component name="c" type="A-Type" virtualNode="Dispatcher1-AC">
+            <components>
+                <primitive-component
+                    implementation="nonregressiontest.component.PrimitiveComponentA" name="p1"
+                    type="A-Type" virtualNode="Dispatcher1-AC"/>
+            </components>
+            <bindings>
+                <binding client="c.i1" server="p1.i1"/>
+                <binding client="p1.i2" server="c.i2"/>
+            </bindings>
+        </composite-component>
+    </components>
+    <bindings>
+        <binding client="c.i2" server="p2.i2"/>
+    </bindings>
+</componentsDescriptor>

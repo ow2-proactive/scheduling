@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Dispatcher1-AC"/>
+			<virtualNode name="Dispatcher2-AC"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="Dispatcher1-AC">
+				<jvmSet>
+					<vmName value="Jvm1-AC"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Dispatcher2-AC">
+				<jvmSet>
+					<vmName value="Jvm2-AC"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1-AC">
+				<acquisition method="rmi"/>
+				<creation>
+					<processReference refid="linuxJVM-AC"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2-AC">
+				<acquisition method="rmi"/>
+				<creation>
+					<!--<processReference refid="rshProcess-AC"/>-->
+					<processReference refid="linuxJVM-AC"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="linuxJVM-AC">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<jvmParameters>-Dproactive.future.ac=enable</jvmParameters>
+					</jvmProcess>
+			</processDefinition>
+			<processDefinition id="rshProcess">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+					<processReference refid="linuxJVM"/>
+				</rshProcess>
+				</processDefinition>
+				<processDefinition id="rshProcess-AC">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+					<processReference refid="linuxJVM-AC"/>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
