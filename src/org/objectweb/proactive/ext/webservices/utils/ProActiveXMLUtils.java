@@ -217,11 +217,11 @@ public class ProActiveXMLUtils {
 
             return rep;
         } catch (ConnectException e) {
-            throw new HTTPRemoteException("Error while connecting the remote host", e);
+            throw new HTTPRemoteException("Error while connecting the remote host: " + url, e);
         } catch (UnknownHostException e) {
-            throw new HTTPRemoteException("Unknowm remote host", e);
+            throw new HTTPRemoteException("Unknown remote host: " + url, e);
         } catch (IOException e) {
-            throw new HTTPRemoteException("Error during connection with remote host", e);
+            throw new HTTPRemoteException("Error during connection with remote host" + url, e);
         }
     }
 
