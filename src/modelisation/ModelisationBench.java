@@ -111,7 +111,7 @@ public class ModelisationBench {
 
     public static void killAll() {
         try {
-            pad.killall();
+            pad.killall(false);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

@@ -43,6 +43,10 @@ public class RegistryHelper {
     protected int registryPortNumber = DEFAULT_REGISTRY_PORT;
     protected boolean shouldCreateRegistry = true;
     protected boolean registryChecked;
+    protected static java.rmi.registry.Registry registry;
+
+    //following boolean is used to know which runtime has created RMI registry
+    protected static boolean registryCreator = false;
 
     //
     // -- Constructors -----------------------------------------------
@@ -90,16 +94,27 @@ public class RegistryHelper {
         }
     }
 
+   
+    public static java.rmi.registry.Registry getRegistry() {
+        return registry;
+    }
+
+    public static boolean getRegistryCreator() {
+        return registryCreator;
+    }
+
     //
     // -- PRIVATE METHODS -----------------------------------------------
     // 
     private static java.rmi.registry.Registry createRegistry(int port)
         throws java.rmi.RemoteException {
-        return java.rmi.registry.LocateRegistry.createRegistry(port);
+        registry = java.rmi.registry.LocateRegistry.createRegistry(port);
+		registryCreator = true;
+        return registry;
     }
 
     private static java.rmi.registry.Registry detectRegistry(int port) {
-        java.rmi.registry.Registry registry = null;
+        // java.rmi.registry.Registry registry = null;
         try {
             // whether an effective registry exists or not we should get a reference
             registry = java.rmi.registry.LocateRegistry.getRegistry(port);
@@ -122,7 +137,7 @@ public class RegistryHelper {
 
     private static java.rmi.registry.Registry getOrCreateRegistry(int port)
         throws java.rmi.RemoteException {
-        java.rmi.registry.Registry registry = detectRegistry(port);
+        registry = detectRegistry(port);
         if (registry != null) {
             return registry;
         }
