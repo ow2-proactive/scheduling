@@ -76,9 +76,9 @@ if [ -f $PROACTIVE/lib/cryptix32.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix32.jar
 fi
-if [ -f $PROACTIVE/lib/log4j-core.jar ]
+if [ -f $PROACTIVE/lib/log4j.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j.jar
 fi
 if [ -f $PROACTIVE/lib/ibis.jar ]
 then
