@@ -15,11 +15,10 @@ workingDir=`dirname $0`
 PROACTIVE=$workingDir/../../../.
 export PROACTIVE
 fi
-
+. $workingDir/../env.sh
 if [ ! $ENV_WS]
 then
 export ENV_WS=env_ws
-
 
 # ----------------------------------------------------------------------------
 
@@ -76,7 +75,10 @@ if [ -f $PROACTIVE/lib/ws/mail.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/mail.jar
 fi
-
-#echo CLASSPATH=$CLASSPATH
+if [ -f $PROACTIVE/dev/lib/xml-apis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/dev/lib/xml-apis.jar
 fi
-. $workingDir/../env.sh
+fi
+echo CLASSPATHWS=$CLASSPATH
+
