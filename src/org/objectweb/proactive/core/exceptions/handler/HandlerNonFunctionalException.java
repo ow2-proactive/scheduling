@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.exceptions.handler;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
@@ -42,7 +40,7 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
  * @since   ProActive 0.9.3
  *
  */
-public class HandlerNonFunctionalException implements IHandler, Serializable {
+public class HandlerNonFunctionalException implements Handler {
 
 
     /** 
@@ -58,6 +56,6 @@ public class HandlerNonFunctionalException implements IHandler, Serializable {
      * @param e The exception to be handled
      */
     public void handle(NonFunctionalException e) {
-		System.out.println("*** " + this.getClass().getName() + " HANDLE " + e.getDescription());
+		System.out.println("[" + this.getClass().getName() + "] HANDLES [" + e.getDescription()+ "]");
     }
 }

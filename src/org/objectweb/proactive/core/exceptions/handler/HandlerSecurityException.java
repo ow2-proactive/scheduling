@@ -56,6 +56,6 @@ public class HandlerSecurityException extends HandlerNonFunctionalException {
      * @param e The exception to be handled
      */
     public void handle(NonFunctionalException e) {
-		System.out.println("*** " + this.getClass().getName() + " HANDLE " + e.getDescription());
+		super.handle(e);
     }
 }

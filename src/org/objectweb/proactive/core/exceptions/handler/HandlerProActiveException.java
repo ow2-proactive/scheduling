@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.exceptions.handler;
 /*import org.objectweb.proactive.core.exceptions.*;*/
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Handle ProActive exceptions
@@ -40,25 +41,27 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class HandlerProActiveException implements HandlerInterface {
 
 
-    /** 
-     * Is the exception handled by the handler ? 
-     */
-    public boolean isHandling(ProActiveException e) {
-	if (e instanceof ProActiveException)
-	    return true;
-	else
-	    return false;
-    }
+/** This handler is provided for compatibility with old form of proactive exceptions */
+public class HandlerProActiveException implements Handler {
 
-    /**
-     * Provide a treatment for the handled exception(s) 
-     */
-    public void handle(ProActiveException e) {
+	/** 
+		* Is the exception handled by the handler ? 
+		*/
+	   public boolean isHandling(NonFunctionalException e) {
+	   if (e instanceof ProActiveException)
+		   return true;
+	   else
+		   return false;
+	   }
+
+	   /**
+		* Provide a treatment for the handled exception(s) 
+		*/
+	   public void handle(NonFunctionalException e) {
 	
-	System.out.println("*** Handle ProActive Exception ***");
-	e.printStackTrace();
-    }
+	   System.out.println("*** Handle ProActive Exception ***");
+	   e.printStackTrace();
+	   }   
 }
