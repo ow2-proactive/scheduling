@@ -8,6 +8,7 @@ if [ ! $PROACTIVE ]
 then
 workingDir=`dirname $0`
 PROACTIVE=$workingDir/../../.
+CLASSPATH=.
 fi
 
 
@@ -27,7 +28,7 @@ fi
 # ----
 # Set up the classpath using classes dir or jar files
 #
-CLASSPATH=.
+
 if [ -d $PROACTIVE/classes ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes
@@ -149,45 +150,7 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
 fi
 
-if [ -f $PROACTIVE/lib/soap.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/soap.jar
-fi
-if [ -f $PROACTIVE/lib/wsdl4j.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/wsdl4j.jar
-fi
-
-if [ -f $PROACTIVE/lib/axis.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/axis.jar
-fi
-if [ -f $PROACTIVE/lib/jaxrpc.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jaxrpc.jar
-fi
-if [ -f $PROACTIVE/lib/activation.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/activation.jar
-fi
-if [ -f $PROACTIVE/lib/saaj-api.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/saaj-api.jar
-fi 
-
-if [ -f $PROACTIVE/lib/commons-logging.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-logging.jar
-fi
-if [ -f $PROACTIVE/lib/commons-discovery.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-discovery.jar
-fi
-if [ -f $PROACTIVE/lib/mail.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/mail.jar
-fi
-
+ 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 

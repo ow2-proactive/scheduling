@@ -11,7 +11,7 @@ PROACTIVE=$workingDir/../../../.
 export PROACTIVE
 fi
 
-
+CLASSPATH=.
 # ----------------------------------------------------------------------------
 
 JAVA_HOME=${JAVA_HOME-NULL};
@@ -28,10 +28,10 @@ fi
 # ----
 # Set up the classpath using classes dir or jar files
 #
-CLASSPATH=.
 
 
-if [ -f $PROACTIVE/lib/ws/soap.jar ]
+
+if [ -f $PROACTIVE/lib/ws/soap.jar ] 
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/soap.jar
 fi
@@ -70,7 +70,9 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ws/mail.jar
 fi
 
-export CLASSPATH
+
+
+echo CLASSPATH=$CLASSPATH
 
 JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.library.path=$PROACTIVE/lib -Djava.security.policy=$workingDir/proactive.java.policy -Dlog4j.configuration=$workingDir/proactive-log4j"
 export JAVACMD
