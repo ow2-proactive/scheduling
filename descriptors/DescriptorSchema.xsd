@@ -395,6 +395,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="sshProcess" type="SshProcessType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
+			<xs:element name="pbsProcess" type="PbsProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
 			<xs:element name="prunProcess" type="prunProcessType"/>
 		</xs:choice>
@@ -546,6 +547,26 @@ The following element ProActiveDescriptor defines the root of the schema
 			</xs:element>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+	<!--PBSProcess-->
+	<xs:complexType name="PbsProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element name="pbsOption" type="PbsOptionType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess"/>
+		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<!--PbsOption-->
+	<xs:complexType name="PbsOptionType">
+		<xs:complexContent>
+			<xs:extension base="prunOptionType">
+			<xs:sequence>
+			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+			</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
 	</xs:complexType>
 	<!--prunProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, prunOption element that may not appear and represents different options of prun command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.prun.PrunSubProcess, interactive which is optinal to run prun command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run prun command-->
 	<xs:complexType name="prunProcessType">
