@@ -2,6 +2,7 @@
 package org.objectweb.proactive.core.component.xml;
 
 import java.util.Hashtable;
+import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
 
@@ -14,10 +15,10 @@ import org.objectweb.fractal.api.Component;
  */
 public class ComponentsCache {
 	
-	private Hashtable componentsTable;
+	private Map componentsTable;
 	
 	public ComponentsCache(){
-			componentsTable = new Hashtable(10);
+		componentsTable = new Hashtable();
 	}
 	
 	public void addComponent(String name, Component component) {
@@ -27,6 +28,10 @@ public class ComponentsCache {
 	
 	public Component getComponent(String name) {
 		return (Component)componentsTable.get(name);
+	}
+	
+	public boolean containsComponentNamed(String componentName) {
+		return componentsTable.containsKey(componentName);
 	}
 	
 
