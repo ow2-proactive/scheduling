@@ -48,7 +48,7 @@ public class ReceiveRequestSecurityException extends ReceiveSecurityException {
 	*/
 	public ReceiveRequestSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveRequestSecurityException extends ReceiveSecurityException {
 	*/
 	public ReceiveRequestSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}     
 }

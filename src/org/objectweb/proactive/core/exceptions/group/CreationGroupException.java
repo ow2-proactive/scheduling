@@ -48,7 +48,7 @@ public class CreationGroupException extends ProActiveGroupException {
 	*/
 	public CreationGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Group -> ";
+		description = description + "Group" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class CreationGroupException extends ProActiveGroupException {
 	*/
 	public CreationGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Group -> ";
+		description = description + "Group" + separator;
 	}           
 }

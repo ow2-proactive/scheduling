@@ -48,7 +48,7 @@ public class SerializationMigrationException extends ProActiveMigrationException
 	*/
 	public SerializationMigrationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Serialization -> ";
+		description = description + "Serialization" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SerializationMigrationException extends ProActiveMigrationException
 	*/
 	public SerializationMigrationException(Throwable ex) {
 		super(ex);
-		description = description + "Serialization -> ";
+		description = description + "Serialization" + separator;
 	}     
 }

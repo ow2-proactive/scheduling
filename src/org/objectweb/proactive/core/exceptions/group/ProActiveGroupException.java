@@ -50,7 +50,7 @@ public class ProActiveGroupException extends NonFunctionalException {
 	*/
 	public ProActiveGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "= Group -> ";
+		description = description + "= Group" + separator;
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class ProActiveGroupException extends NonFunctionalException {
 	*/
 	public ProActiveGroupException(Throwable ex) {
 		super(ex);
-		description = description + "= Group -> ";
+		description = description + "= Group" + separator;
 	}           
 }

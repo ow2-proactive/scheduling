@@ -48,7 +48,7 @@ public class ActiveObjectCreationException extends ProActiveCreationException {
 	*/
 	public ActiveObjectCreationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Active Object -> ";
+		description = description + "Active Object" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ActiveObjectCreationException extends ProActiveCreationException {
 	*/
 	public ActiveObjectCreationException(Throwable ex) {
 		super(ex);
-		description = description + "Active Object -> ";
+		description = description + "Active Object" + separator;
 	}       
 }

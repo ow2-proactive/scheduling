@@ -50,7 +50,7 @@ public class ProActiveServiceException extends NonFunctionalException {
 	*/
 	public ProActiveServiceException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Service -> ";
+		description = description + "Service" + separator;
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class ProActiveServiceException extends NonFunctionalException {
 	*/
 	public ProActiveServiceException(Throwable ex) {
 		super(ex);
-		description = description + "Service -> ";
+		description = description + "Service" + separator;
 	}     
 }

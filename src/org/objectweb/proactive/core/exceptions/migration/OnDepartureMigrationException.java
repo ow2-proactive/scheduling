@@ -48,7 +48,7 @@ public class OnDepartureMigrationException extends ProActiveMigrationException {
 	*/
 	public OnDepartureMigrationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "On Departure -> ";
+		description = description + "On Departure" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class OnDepartureMigrationException extends ProActiveMigrationException {
 	*/
 	public OnDepartureMigrationException(Throwable ex) {
 		super(ex);
-		description = description + "On Departure -> ";
+		description = description + "On Departure" + separator;
 	}     
 }

@@ -49,7 +49,7 @@ public class SendCommunicationException extends ProActiveCommunicationException 
 	*/
 	public SendCommunicationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}
 
 	/**
@@ -59,6 +59,6 @@ public class SendCommunicationException extends ProActiveCommunicationException 
 	*/
 	public SendCommunicationException(Throwable ex) {
 		super(ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}
 }

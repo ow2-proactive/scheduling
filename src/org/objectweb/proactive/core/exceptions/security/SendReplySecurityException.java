@@ -48,7 +48,7 @@ public class SendReplySecurityException extends SendSecurityException {
 	*/
 	public SendReplySecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendReplySecurityException extends SendSecurityException {
 	*/
 	public SendReplySecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	}     
 }

@@ -48,7 +48,7 @@ public class SendRequestCommunicationException extends SendCommunicationExceptio
 			*/
 		public SendRequestCommunicationException(String s, Throwable ex) {
 			super(s, ex);
-			description = description + "Request -> ";
+			description = description + "Request" + separator;
 		}
 
 		/**
@@ -58,6 +58,6 @@ public class SendRequestCommunicationException extends SendCommunicationExceptio
 		*/
 		public SendRequestCommunicationException(Throwable ex) {
 			super(ex);
-			description = description + "Request -> ";
+			description = description + "Request" + separator;
 		}
 }

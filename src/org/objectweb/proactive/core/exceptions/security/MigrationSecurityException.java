@@ -48,7 +48,7 @@ public class MigrationSecurityException extends ProActiveSecurityException {
 	*/
 	public MigrationSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Migration -> ";
+		description = description + "Migration" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class MigrationSecurityException extends ProActiveSecurityException {
 	*/
 	public MigrationSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Migration -> ";
+		description = description + "Migration" + separator;
 	}       
 }

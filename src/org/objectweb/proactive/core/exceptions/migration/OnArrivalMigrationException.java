@@ -48,7 +48,7 @@ public class OnArrivalMigrationException extends ProActiveMigrationException {
 	*/
 	public OnArrivalMigrationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "On Arrival -> ";
+		description = description + "On Arrival" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class OnArrivalMigrationException extends ProActiveMigrationException {
 	*/
 	public OnArrivalMigrationException(Throwable ex) {
 		super(ex);
-		description = description + "On Arrival -> ";
+		description = description + "On Arrival" + separator;
 	}     
 }

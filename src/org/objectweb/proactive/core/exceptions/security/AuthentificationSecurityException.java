@@ -48,7 +48,7 @@ public class AuthentificationSecurityException extends ProActiveSecurityExceptio
 	*/
 	public AuthentificationSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Authentification -> ";
+		description = description + "Authentification" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class AuthentificationSecurityException extends ProActiveSecurityExceptio
 	*/
 	public AuthentificationSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Authentification -> ";
+		description = description + "Authentification"  + separator;
 	}     
 }

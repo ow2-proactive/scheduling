@@ -48,7 +48,7 @@ public class ReceiveRequestCommunicationException extends ReceiveCommunicationEx
 	*/
 	public ReceiveRequestCommunicationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveRequestCommunicationException extends ReceiveCommunicationEx
 	*/
 	public ReceiveRequestCommunicationException(Throwable ex) {
 		super(ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}  
 }

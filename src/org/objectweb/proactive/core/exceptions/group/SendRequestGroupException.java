@@ -48,7 +48,7 @@ public class SendRequestGroupException extends SendGroupException {
 	*/
 	public SendRequestGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendRequestGroupException extends SendGroupException {
 	*/
 	public SendRequestGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}           
 }

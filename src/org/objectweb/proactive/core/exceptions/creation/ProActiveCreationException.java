@@ -50,7 +50,7 @@ public class ProActiveCreationException extends NonFunctionalException {
 	*/
 	public ProActiveCreationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Creation -> ";
+		description = description + "Creation" + separator;
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class ProActiveCreationException extends NonFunctionalException {
 	*/
 	public ProActiveCreationException(Throwable ex) {
 		super(ex);
-		description = description + "Creation -> ";
+		description = description + "Creation" + separator;
 	}     
 }

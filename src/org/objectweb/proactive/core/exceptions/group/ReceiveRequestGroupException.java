@@ -48,7 +48,7 @@ public class ReceiveRequestGroupException extends ReceiveGroupException {
 	*/
 	public ReceiveRequestGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveRequestGroupException extends ReceiveGroupException {
 	*/
 	public ReceiveRequestGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}           
 }

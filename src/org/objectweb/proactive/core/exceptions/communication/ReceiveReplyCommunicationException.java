@@ -48,7 +48,7 @@ public class ReceiveReplyCommunicationException extends ReceiveCommunicationExce
 	*/
 	public ReceiveReplyCommunicationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveReplyCommunicationException extends ReceiveCommunicationExce
 	*/
 	public ReceiveReplyCommunicationException(Throwable ex) {
 		super(ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	} 
 }

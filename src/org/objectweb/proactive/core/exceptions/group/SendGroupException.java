@@ -48,7 +48,7 @@ public class SendGroupException extends ProActiveGroupException {
 	*/
 	public SendGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendGroupException extends ProActiveGroupException {
 	*/
 	public SendGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}           
 }

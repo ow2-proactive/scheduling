@@ -48,7 +48,7 @@ public class ReceiveGroupException extends ProActiveGroupException {
 	*/
 	public ReceiveGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveGroupException extends ProActiveGroupException {
 	*/
 	public ReceiveGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}           
 }

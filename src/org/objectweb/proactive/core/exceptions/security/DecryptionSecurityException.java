@@ -48,7 +48,7 @@ public class DecryptionSecurityException extends ProActiveSecurityException {
 	*/
 	public DecryptionSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Decryption -> ";
+		description = description + "Decryption" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class DecryptionSecurityException extends ProActiveSecurityException {
 	*/
 	public DecryptionSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Decryption -> ";
+		description = description + "Decryption" + separator;
 	}     
 }

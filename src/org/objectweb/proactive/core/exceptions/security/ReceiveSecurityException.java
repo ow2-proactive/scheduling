@@ -48,7 +48,7 @@ public class ReceiveSecurityException extends ProActiveSecurityException {
 	*/
 	public ReceiveSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReceiveSecurityException extends ProActiveSecurityException {
 	*/
 	public ReceiveSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Receive -> ";
+		description = description + "Receive" + separator;
 	}     
 }

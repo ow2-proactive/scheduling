@@ -48,7 +48,7 @@ public class SendReplyGroupException extends SendGroupException {
 	*/
 	public SendReplyGroupException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendReplyGroupException extends SendGroupException {
 	*/
 	public SendReplyGroupException(Throwable ex) {
 		super(ex);
-		description = description + "Reply -> ";
+		description = description + "Reply" + separator;
 	}           
 }

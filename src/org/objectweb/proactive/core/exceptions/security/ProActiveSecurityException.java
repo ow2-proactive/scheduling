@@ -50,7 +50,7 @@ public class ProActiveSecurityException extends NonFunctionalException {
 	*/
 	public ProActiveSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Security -> ";
+		description = description + "Security" + separator;
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class ProActiveSecurityException extends NonFunctionalException {
 	*/
 	public ProActiveSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Security -> ";
+		description = description + "Security" + separator;
 	}     
 }

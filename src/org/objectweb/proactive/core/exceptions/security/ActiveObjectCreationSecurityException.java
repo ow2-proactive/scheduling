@@ -48,7 +48,7 @@ public class ActiveObjectCreationSecurityException extends ProActiveSecurityExce
 	*/
 	public ActiveObjectCreationSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Active Object Creation -> ";
+		description = description + "Active Object Creation" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ActiveObjectCreationSecurityException extends ProActiveSecurityExce
 	*/
 	public ActiveObjectCreationSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Active Object Creation -> ";
+		description = description + "Active Object Creation" + separator;
 	}     
 }

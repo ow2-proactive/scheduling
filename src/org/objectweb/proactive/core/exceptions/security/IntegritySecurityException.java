@@ -48,7 +48,7 @@ public class IntegritySecurityException extends ProActiveSecurityException {
 	*/
 	public IntegritySecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Integrity -> ";
+		description = description + "Integrity" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class IntegritySecurityException extends ProActiveSecurityException {
 	*/
 	public IntegritySecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Integrity -> ";
+		description = description + "Integrity" + separator;
 	}     
 }

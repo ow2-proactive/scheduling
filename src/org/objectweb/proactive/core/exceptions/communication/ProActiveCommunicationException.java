@@ -48,7 +48,7 @@ public class ProActiveCommunicationException extends NonFunctionalException {
 	 */
 	public ProActiveCommunicationException() {
 		super();
-		description += "Communication -> ";
+		description += "Communication" + separator;
 	}
 		
 	/**
@@ -59,7 +59,7 @@ public class ProActiveCommunicationException extends NonFunctionalException {
 		*/
 	public ProActiveCommunicationException(String s, Throwable ex) {
 		super(s,ex);
-		description = description + "Communication -> ";
+		description = description + "Communication" + separator;
 	  }
 
 
@@ -70,6 +70,6 @@ public class ProActiveCommunicationException extends NonFunctionalException {
 	  */
 	  public ProActiveCommunicationException(Throwable ex) {
 		super(ex);
-		description = description + "Communication -> ";
+		description = description + "Communication" + separator;
 	  }
 }

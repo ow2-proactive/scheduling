@@ -48,7 +48,7 @@ public class FutureCreationException extends ProActiveCreationException {
 	*/
 	public FutureCreationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Future Object -> ";
+		description = description + "Future Object" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class FutureCreationException extends ProActiveCreationException {
 	*/
 	public FutureCreationException(Throwable ex) {
 		super(ex);
-		description = description + "Future Object -> ";
+		description = description + "Future Object" + separator;
 	}         
 }

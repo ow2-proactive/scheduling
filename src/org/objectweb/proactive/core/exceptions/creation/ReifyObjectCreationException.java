@@ -48,7 +48,7 @@ public class ReifyObjectCreationException extends ProActiveCreationException {
 	*/
 	public ReifyObjectCreationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Reify Object -> ";
+		description = description + "Reify Object" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ReifyObjectCreationException extends ProActiveCreationException {
 	*/
 	public ReifyObjectCreationException(Throwable ex) {
 		super(ex);
-		description = description + "Reify Object -> ";
+		description = description + "Reify Object" + separator;
 	}         
 }

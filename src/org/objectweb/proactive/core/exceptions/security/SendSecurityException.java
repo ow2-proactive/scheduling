@@ -48,7 +48,7 @@ public class SendSecurityException extends ProActiveSecurityException {
 	*/
 	public SendSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendSecurityException extends ProActiveSecurityException {
 	*/
 	public SendSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Send -> ";
+		description = description + "Send" + separator;
 	}     
 }

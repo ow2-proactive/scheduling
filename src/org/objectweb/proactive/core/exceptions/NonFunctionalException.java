@@ -30,20 +30,23 @@
 */ 
 package org.objectweb.proactive.core.exceptions;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.ProActiveException;
 
 /**
  * An interface for non functional exceptions 
- *
+ * Should implement Serializable but Exception class do it
  * @author  ProActive Team
  * @version 1.0,  2003/04/01
  * @since   ProActive 1.0.2
  *
  */
-public class NonFunctionalException extends ProActiveException implements Serializable {
+public class NonFunctionalException extends ProActiveException /*implements Serializable*/ {
 
+	/**
+	* separator for exception description
+	 */
+	static protected String separator = " :: ";
+		
 	/**
 	 * self description of the non functional exception
 	 */
@@ -56,7 +59,7 @@ public class NonFunctionalException extends ProActiveException implements Serial
 	 */
 	public NonFunctionalException() {
 		super();
-		description = "Non Functional Exception -> ";
+		description = "NFE" + separator;
     }
 	  
 	  
@@ -68,7 +71,7 @@ public class NonFunctionalException extends ProActiveException implements Serial
 	  */
 	public NonFunctionalException(String s, Throwable ex) {
 		super(s, ex);
-		description = "Non Functional Exception -> ";
+		description = "NFE" + separator;
 	  }
 
 
@@ -79,7 +82,7 @@ public class NonFunctionalException extends ProActiveException implements Serial
 	  */
 	  public NonFunctionalException(Throwable ex) {
 		super(ex);
-		description = "Non Functional Exception -> ";
+		description = "NFE" + separator;
 	  }
 	  
 	  

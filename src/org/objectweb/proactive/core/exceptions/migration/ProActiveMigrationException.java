@@ -50,7 +50,7 @@ public class ProActiveMigrationException extends NonFunctionalException {
 	*/
 	public ProActiveMigrationException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Migration -> ";
+		description = description + "Migration" + separator;
 	}
 
 	/**
@@ -60,6 +60,6 @@ public class ProActiveMigrationException extends NonFunctionalException {
 	*/
 	public ProActiveMigrationException(Throwable ex) {
 		super(ex);
-		description = description + "Migration -> ";
+		description = description + "Migration" + separator;
 	}   
 }

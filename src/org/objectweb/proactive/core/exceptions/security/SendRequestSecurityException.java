@@ -48,7 +48,7 @@ public class SendRequestSecurityException extends SendSecurityException {
 	*/
 	public SendRequestSecurityException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class SendRequestSecurityException extends SendSecurityException {
 	*/
 	public SendRequestSecurityException(Throwable ex) {
 		super(ex);
-		description = description + "Request -> ";
+		description = description + "Request" + separator;
 	}     
 }

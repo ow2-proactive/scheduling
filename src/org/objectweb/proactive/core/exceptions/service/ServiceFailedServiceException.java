@@ -48,7 +48,7 @@ public class ServiceFailedServiceException extends ProActiveServiceException {
 	*/
 	public ServiceFailedServiceException(String s, Throwable ex) {
 		super(s, ex);
-		description = description + "Failed -> ";
+		description = description + "Failed" + separator;
 	}
 
 	/**
@@ -58,6 +58,6 @@ public class ServiceFailedServiceException extends ProActiveServiceException {
 	*/
 	public ServiceFailedServiceException(Throwable ex) {
 		super(ex);
-		description = description + "Failed -> ";
+		description = description + "Failed" + separator;
 	}     
 }
