@@ -63,5 +63,11 @@ public interface NodeInformation extends VMInformation {
    * @return the complete URL of the node
    */
   public String getURL();
+  
+  /**
+   * Returns the host where the node has been created 
+   * @return the host where the node has been created
+   */
+  public String getHostName();
 
 }

@@ -204,12 +204,14 @@ public class NodeImpl implements Node, Serializable {
         private String jobID;
         private java.net.InetAddress hostInetAddress;
         private java.rmi.dgc.VMID hostVMID;
+        private String hostname;
 
         public NodeInformationImpl(String url, String protocol, String jobID) {
             this.nodeURL = url;
             this.hostVMID = proActiveRuntime.getVMInformation().getVMID();
             this.hostInetAddress = proActiveRuntime.getVMInformation()
                                                    .getInetAddress();
+            this.hostname = proActiveRuntime.getVMInformation().getHostName();
             this.protocol = protocol;
             this.nodeName = extractNameFromUrl(url);
             this.jobID = jobID;
@@ -279,6 +281,13 @@ public class NodeImpl implements Node, Serializable {
 		public String getJobID() {
 			return jobID;
 		}
+
+        /**
+         * @see org.objectweb.proactive.core.node.NodeInformation#getHostName()
+         */
+        public String getHostName() {
+            return this.hostname;
+        }
     }
     
     // SECURITY

@@ -220,7 +220,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String jobId) throws NodeException {
         //Node node = new NodeImpl(this,nodeName);
         //System.out.println("node created with name "+nodeName+"on proActiveruntime "+this);
-        
         if (replacePreviousBinding) {
             if (nodeMap.get(nodeName) != null) {
                 nodeMap.remove(nodeName);
@@ -388,8 +387,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     public String getURL() {
-        return "//" + UrlBuilder.getHostNameorIP(vmInformation.getInetAddress()) +
-        "/" + vmInformation.getName();
+        return "//" +
+        UrlBuilder.getHostNameorIP(vmInformation.getInetAddress()) + "/" +
+        vmInformation.getName();
     }
 
     public ArrayList getActiveObjects(String nodeName) {
@@ -398,30 +398,30 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
         synchronized (bodyList) {
-        	for (int i = 0; i < bodyList.size(); i++) {
-        		UniqueID bodyID = (UniqueID) bodyList.get(i);
+            for (int i = 0; i < bodyList.size(); i++) {
+                UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-        		//check if the body is still on this vm
-        		Body body = localBodystore.getLocalBody(bodyID);
-        		if (body == null) {
-        			runtimeLogger.warn("body null");
-        			// the body with the given ID is not any more on this ProActiveRuntime
-        			// unregister it from this ProActiveRuntime
-        			unregisterBody(nodeName, bodyID);
-        		} else {
-        			//the body is on this runtime then return adapter and class name of the reified
-        			//object to enable the construction of stub-proxy couple.
-        			ArrayList bodyAndObjectClass = new ArrayList(2);
+                //check if the body is still on this vm
+                Body body = localBodystore.getLocalBody(bodyID);
+                if (body == null) {
+                    runtimeLogger.warn("body null");
+                    // the body with the given ID is not any more on this ProActiveRuntime
+                    // unregister it from this ProActiveRuntime
+                    unregisterBody(nodeName, bodyID);
+                } else {
+                    //the body is on this runtime then return adapter and class name of the reified
+                    //object to enable the construction of stub-proxy couple.
+                    ArrayList bodyAndObjectClass = new ArrayList(2);
 
-        			//adapter
-        			bodyAndObjectClass.add(0, body.getRemoteAdapter());
-        			//className
-        			bodyAndObjectClass.add(1,
-        					body.getReifiedObject().getClass().getName());
-        			localBodies.add(bodyAndObjectClass);
-        		}
-        	}
-        	return localBodies;
+                    //adapter
+                    bodyAndObjectClass.add(0, body.getRemoteAdapter());
+                    //className
+                    bodyAndObjectClass.add(1,
+                        body.getReifiedObject().getClass().getName());
+                    localBodies.add(bodyAndObjectClass);
+                }
+            }
+            return localBodies;
         }
     }
 
@@ -458,29 +458,30 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-    	ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
         synchronized (bodyList) {
-        	for (int i = 0; i < bodyList.size(); i++) {
-        		UniqueID bodyID = (UniqueID) bodyList.get(i);
+            for (int i = 0; i < bodyList.size(); i++) {
+                UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-        		//check if the body is still on this vm
-        		Body body = localBodystore.getLocalBody(bodyID);
-        		if (body == null) {
-        			runtimeLogger.warn("body null");
-        			// the body with the given ID is not any more on this ProActiveRuntime
-        			// unregister it from this ProActiveRuntime
-        			unregisterBody(nodeName, bodyID);
-        		} else {
-        			String objectClass = body.getReifiedObject().getClass().getName();
+                //check if the body is still on this vm
+                Body body = localBodystore.getLocalBody(bodyID);
+                if (body == null) {
+                    runtimeLogger.warn("body null");
+                    // the body with the given ID is not any more on this ProActiveRuntime
+                    // unregister it from this ProActiveRuntime
+                    unregisterBody(nodeName, bodyID);
+                } else {
+                    String objectClass = body.getReifiedObject().getClass()
+                                             .getName();
 
-        			// if the reified object is of the specified type
-        			// return the body adapter 
-        			if (objectClass.equals((String) className)) {
-        				localBodies.add(body.getRemoteAdapter());
-        			}
-        		}
-        	}
-        	return localBodies;
+                    // if the reified object is of the specified type
+                    // return the body adapter 
+                    if (objectClass.equals((String) className)) {
+                        localBodies.add(body.getRemoteAdapter());
+                    }
+                }
+            }
+            return localBodies;
         }
     }
 
@@ -498,38 +499,36 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         PolicyServer objectPolicyServer = null;
 
         // SECURITY
-//        try {
-//            PolicyServer ps = (PolicyServer) policyServerMap.get(nodeName);
-//            if (ps != null) {
-//                objectPolicyServer = (PolicyServer) ps.clone();
-//
-//                String objectName = localBody.toString();
-//
-//                System.out.println("local Object Name " + objectName +
-//                    "On node " + nodeName);
-//                objectPolicyServer.generateEntityCertificate(objectName);
-//
-//                localBody.setPolicyServer(objectPolicyServer);
-//             //   localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMap.get(
-            //            nodeName));
-      //      }
-
-            /*} catch (IOException e) {
-               e.printStackTrace();
-               } catch (SecurityNotAvailableException e) {
-                       // do nothing
-                       // security not available
-            
-             */
-//        } catch (CloneNotSupportedException e) {
-//            // should never happen
-//            e.printStackTrace();
-//        } catch (SecurityNotAvailableException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
+        //        try {
+        //            PolicyServer ps = (PolicyServer) policyServerMap.get(nodeName);
+        //            if (ps != null) {
+        //                objectPolicyServer = (PolicyServer) ps.clone();
+        //
+        //                String objectName = localBody.toString();
+        //
+        //                System.out.println("local Object Name " + objectName +
+        //                    "On node " + nodeName);
+        //                objectPolicyServer.generateEntityCertificate(objectName);
+        //
+        //                localBody.setPolicyServer(objectPolicyServer);
+        //             //   localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMap.get(
+        //            nodeName));
+        //      }
+        /*} catch (IOException e) {
+           e.printStackTrace();
+           } catch (SecurityNotAvailableException e) {
+                   // do nothing
+                   // security not available
+        
+         */
+        //        } catch (CloneNotSupportedException e) {
+        //            // should never happen
+        //            e.printStackTrace();
+        //        } catch (SecurityNotAvailableException e) {
+        //            e.printStackTrace();
+        //        } catch (IOException e) {
+        //            e.printStackTrace();
+        //        }
         registerBody(nodeName, localBody);
 
         if (isLocal) {
@@ -661,11 +660,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private String processCreatorId;
         private String jobId;
+        private String hostName;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
             hostInetAddress = java.net.InetAddress.getLocalHost();
-            String hostName = UrlBuilder.getHostNameorIP(hostInetAddress);
+            hostName = UrlBuilder.getHostNameorIP(hostInetAddress);
             this.processCreatorId = "jvm";
 
             //            this.name = "PA_JVM" +
@@ -721,6 +721,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
          */
         public String getJobID() {
             return this.jobId;
+        }
+
+        /**
+         * @see org.objectweb.proactive.core.runtime.VMInformation#getHostName()
+         */
+        public String getHostName() {
+            return this.hostName;
         }
     }
 

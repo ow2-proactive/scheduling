@@ -73,5 +73,11 @@ public interface VMInformation extends java.io.Serializable, Job {
      */
     public void setCreationProtocolID(String protocolId);
     
+    /**
+     * Returns the host where the vm is located
+     * @return the host where the vm is located
+     */
+    public String getHostName();
+    
     
 }
