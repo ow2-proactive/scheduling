@@ -30,239 +30,137 @@
 */ 
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.ProActiveException;
 
 /**
- * This class represents a ProActiveDescriptor
+ * <p>
+ * A <code>ProactiveDescriptor</code> is an internal representation of XML
+ * Descriptor. It offers a set of services to access/activate/desactivate
+ * <code>VirtualNode</code>.
+ * </p>
  *
- * @author       Lionel Mestre
- * @version      1.0
+ * @author  ProActive Team
+ * @version 1.0,  2002/06/20
+ * @since   ProActive 0.9.3
+ *
  */
-public class ProActiveDescriptor {
+public interface ProActiveDescriptor extends java.io.Serializable{
 
-  //
-  //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
-  //
+  
+  /**
+   * Returns all VirtualNodes described in the XML Descriptor
+   * @return VirtualNode[] all the VirtualNodes described in the XML Descriptor
+   */
+  public VirtualNode[] getVirtualNodes();
+  
+  /**
+   * Returns the specified VirtualNode
+   * @param name name of the VirtualNode
+   * @return VirtualNode VirtualNode of the given name
+   */  
+  public VirtualNode getVirtualNode(String name);
+  
+  
+  /**
+   * Returns the VitualMachine of the given name
+   * @param name
+   * @return VirtualMachine
+   */
+  public VirtualMachine getVirtualMachine(String name);
 
-  /** map virtualNode name and objects */
-  private java.util.HashMap virtualNodeMapping;
+	
+	/**
+   * Returns the Process of the given name
+   * @param name
+   * @return ExternalProcess
+   */
+  public ExternalProcess getProcess(String name);
 
-  /** map jvm name and object */
-  private java.util.HashMap virtualMachineMapping;
-  
-  /** map process id and process */
-  private java.util.HashMap processMapping;
-
-  /** map process id and process updater for later update of the process */
-  private java.util.HashMap pendingProcessMapping;
-
-
-  //
-  //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
-  //
-
- /**
-  * Contructs a new intance of VirtualNode
-  */
-  public ProActiveDescriptor() {
-    virtualNodeMapping = new java.util.HashMap();
-    virtualMachineMapping = new java.util.HashMap();
-    processMapping = new java.util.HashMap();
-    pendingProcessMapping = new java.util.HashMap();
-  }
-
-
-  //
-  //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
-  //
-    
-  public VirtualNode getVirtualNode(String name) {
-    return (VirtualNode) virtualNodeMapping.get(name);
-  }
+	
+	/**
+   * Creates a VirtualNode of the given name
+   * @param vnName
+   * @return VirtualNode
+   */
+  public VirtualNode createVirtualNode(String vnName);
   
   
-  public VirtualMachine getVirtualMachine(String name) {
-    return (VirtualMachine) virtualMachineMapping.get(name);
-  }
-
-
-  public ExternalProcess getProcess(String name) {
-    return (ExternalProcess) processMapping.get(name);
-  }
-
-
-  public VirtualNode createVirtualNode(String vnName) {
-    VirtualNode vn = getVirtualNode(vnName);
-    if (vn == null) {
-      vn = new VirtualNode();
-      vn.setName(vnName);
-      virtualNodeMapping.put(vnName, vn);
-      System.out.println("created VirtualNode name="+vnName);
-    }
-    return vn;
-  }
+  /**
+   * Creates a VirtualMachine of the given name
+   * @param vmName
+   * @return VirtualMachine
+   */
+  public VirtualMachine createVirtualMachine(String vmName);
   
   
-  public VirtualMachine createVirtualMachine(String vmName) {
-    VirtualMachine vm = getVirtualMachine(vmName);
-    if (vm == null) {
-      vm = new VirtualMachine();
-      vm.setName(vmName);
-      virtualMachineMapping.put(vmName, vm);
-      System.out.println("created VirtualMachine name="+vmName);
-    }
-    return vm;
-  }
+  /**
+   * Creates an ExternalProcess with the specified ProcessID
+   * @param processID
+   * @param processClassName
+   * @return ExternalProcess
+   * @throws ProActiveException
+   */
+  public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException;
   
   
-  public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException {
-    ExternalProcess process = getProcess(processID);
-    if (process == null) {
-      process = createProcess(processClassName);
-      addExternalProcess(processID, process);
-      System.out.println("created Process="+process);
-    }
-    return process;
-  }
+  /**
+   * Returns a new instance of ExternalProcess from processClassName
+   * @param processClassName
+   * @return ExternalProcess
+   * @throws ProActiveException
+   */
+  public ExternalProcess createProcess(String processClassName) throws ProActiveException;
   
   
-  public ExternalProcess createProcess(String processClassName) throws ProActiveException {
-    try {
-      Class processClass = Class.forName(processClassName);
-      return (ExternalProcess) processClass.newInstance();
-    } catch (ClassNotFoundException e) {
-      throw new ProActiveException(e);
-    } catch (InstantiationException e) {
-      throw new ProActiveException(e);
-    } catch (IllegalAccessException e) {
-      throw new ProActiveException(e);
-    }      
-  }
+  /**
+   * Maps the process given by the specified processID with the specified virtualMachine.
+   * @param virtualMachine
+   * @param processID
+   */
+  public void registerProcess(VirtualMachine virtualMachine, String processID);
   
   
-  public void registerProcess(VirtualMachine virtualMachine, String processID) {
-    ExternalProcess process = getProcess(processID);
-    if (process == null) {
-      addPendingProcess(processID, virtualMachine);
-      System.out.println("registered Process name="+processID+" for a virtualMachine="+virtualMachine.getName());
-    } else {
-      System.out.println("found existing process="+process+" for a virtualMachine="+virtualMachine.getName());
-      virtualMachine.setProcess(process);
-    }
-  }
+  /**
+   * Registers the specified composite process with the specified processID.
+   * @param compositeProcess
+   * @param processID
+   */
+  public void registerProcess(ExternalProcessDecorator compositeProcess, String processID);
   
   
-  public void registerProcess(ExternalProcessDecorator compositeProcess, String processID) {
-    ExternalProcess process = getProcess(processID);
-    if (process == null) {
-      addPendingProcess(processID, compositeProcess);
-      System.out.println("registered Process name="+processID+" for a compositeProcess");
-    } else {
-      compositeProcess.setTargetProcess(process);
-      System.out.println("found existing process for compositeProcess="+compositeProcess);
-    }
-  }
-  
-
-  //
-  //  ----- PROTECTED METHODS -----------------------------------------------------------------------------------
-  //
-    
-
-
-  //
-  //  ----- PRIVATE METHODS -----------------------------------------------------------------------------------
-  //
-    
-  private void addExternalProcess(String processID, ExternalProcess process) {
-    ProcessUpdater processUpdater = (ProcessUpdater) pendingProcessMapping.remove(processID);
-    if (processUpdater != null) {
-      System.out.println("Updating Process name="+processID);
-      processUpdater.updateProcess(process);
-    }
-    processMapping.put(processID, process);
-  }
+  /**
+   * Creates all Nodes mapped to VirtualNodes in the XML Descriptor.
+   */
+  public void activateMappings();
   
   
-  private void addPendingProcess(String processID, VirtualMachine virtualMachine) {
-    ProcessUpdater updater = new VirtualMachineProcessUpdater(virtualMachine);
-    //adding the following line to know that the virtualMachine references a process
-    //and has to be updated when this process will be defined
-    pendingProcessMapping.put(processID,updater);
-  }
+  /**
+   * Create Nodes mapped to the specified VirtualNode in the XML Descriptor
+   * @param virtualNodeName name of the VirtulNode to be activated
+   */
+  public void activateMapping(String virtualNodeName);
   
   
-  private void addPendingProcess(String processID, ExternalProcessDecorator compositeProcess) {
-    ProcessUpdater updater = new CompositeExternalProcessUpdater(compositeProcess);
-    //adding the following line to know that the process referebces another process
-    //and has to be updated when this other process will be defined
-    pendingProcessMapping.put(processID,updater);
-  }
+  /**
+   * Kills all Nodes mapped to VirtualNodes in the XML Descriptor
+   */
+  public void desactivateMapping();
   
   
-  private void addPendingProcess(String processID, ProcessUpdater processUpdater) {
-    CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
-    if (compositeProcessUpdater == null) {
-      compositeProcessUpdater = new CompositeProcessUpdater();
-      pendingProcessMapping.put(processID, processUpdater);
-    }
-    compositeProcessUpdater.addProcessUpdater(processUpdater);
-  }
+  /**
+   * Kills all Nodes mapped to the specified VirutalNode in the XML Descriptor
+   * @param vitualNodeName name of the virtualNode to be desactivated
+   */
+  public void desactivateMapping(String virtualNodeName);
   
-  //
-  //  ----- INNER CLASSES -----------------------------------------------------------------------------------
-  //
-  
-  private interface ProcessUpdater {
-    public void updateProcess(ExternalProcess p);
-  }
-  
-  
-  private class CompositeProcessUpdater implements ProcessUpdater {
-  
-    private java.util.ArrayList updaterList;
-    
-    public CompositeProcessUpdater() {
-      updaterList = new java.util.ArrayList();
-    }
-    
-    public void addProcessUpdater(ProcessUpdater p) {
-      updaterList.add(p);
-    }
-    
-    public void updateProcess(ExternalProcess p) {
-      java.util.Iterator it = updaterList.iterator();
-      while (it.hasNext()) {
-        ProcessUpdater processUpdater = (ProcessUpdater) it.next();
-        processUpdater.updateProcess(p);
-      }
-      updaterList.clear();
-    }
-  }
-  
-  
-  private class CompositeExternalProcessUpdater implements ProcessUpdater {
-    private ExternalProcessDecorator compositeExternalProcess;
-    public CompositeExternalProcessUpdater(ExternalProcessDecorator compositeExternalProcess) {
-      this.compositeExternalProcess = compositeExternalProcess;
-    }
-    public void updateProcess(ExternalProcess p) {
-      System.out.println("Updating CompositeExternal Process");
-      compositeExternalProcess.setTargetProcess(p);
-    }
-  }
-  
-  
-  private class VirtualMachineProcessUpdater implements ProcessUpdater {
-    private VirtualMachine virtualMachine;
-    public VirtualMachineProcessUpdater(VirtualMachine virtualMachine) {
-      this.virtualMachine = virtualMachine;
-    }
-    public void updateProcess(ExternalProcess p) {
-      System.out.println("Updating VirtualMachine Process");
-      virtualMachine.setProcess(p);
-    }
-  }
+	/**
+	 * Returns the size of virualNodeMapping HashMap
+	 * @return int
+	 */
+	public int getVirtualNodeMappingSize();
 }
+
