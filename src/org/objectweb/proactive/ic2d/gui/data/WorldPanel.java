@@ -142,7 +142,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 "Horizontal");
         JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayout(false);
+                    setAlignLayoutChild(false);
                 }
             });
 
@@ -151,7 +151,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 "Vertical");
         JRadioButtonMenuItemVertic.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayout(true);
+                    setAlignLayoutChild(true);
                 }
             });
 
@@ -178,8 +178,8 @@ public class WorldPanel extends AbstractDataObjectPanel
         }
     }
 
-    // Set hosts child Alignement H  / V 
-    public void setAlignLayout(boolean align) {
+    // Set child Alignement H  / V 
+    public void setAlignLayoutChild(boolean align) {
         java.util.Iterator iterator = childsIterator();
         while (iterator.hasNext()) {
             ((HostPanel) iterator.next()).setAlignLayout(align);
