@@ -50,22 +50,18 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
-/**
- * A <code>VirtualNode</code> represents a conceptual entity. After activation
- * a <code>VirtualNode</code> represents one or several nodes.
- *
- * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.4
- */
-
 public class VirtualNodeImpl extends RuntimeDeploymentProperties implements VirtualNode,Serializable,RuntimeRegistrationEventListener
+
+
+
 {
 //
 
 	
   //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
   //
+  
+  
   /** Reference on the local runtime*/
   protected transient ProActiveRuntimeImpl proActiveRuntimeImpl;
   
@@ -104,9 +100,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   
   private boolean registration = false;
   
-  //private boolean deepCopyTag;
+  private boolean waitForTimeout = false;
   
-	protected static final int MAX_RETRY = 70;
+	protected int MAX_RETRY = 70;
 	
 	private Object uniqueActiveObject = null;
 	
@@ -128,7 +124,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
     createdNodes = new java.util.ArrayList();
     awaitedVirtualNodes = new Hashtable();
     proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-   // System.out.println("vn "+this.name+" registered on "+proActiveRuntimeImpl.getVMInformation().getVMID().toString());
+		if (logger.isDebugEnabled()) {
+   	 logger.debug("vn "+this.name+" registered on "+proActiveRuntimeImpl.getVMInformation().getVMID().toString());
+		}
     proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
     proActiveRuntimeImpl.registerLocalVirtualNode(this,this.name);
     
@@ -146,7 +144,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   public String getProperty() {
     return property;
   }
-
+  
+  public void setTimeout(String timeout){
+  	MAX_RETRY = new Integer (timeout).intValue();
+  	waitForTimeout = true;
+  }
+  
 
   public void setName(String s) {
     this.name = s;
@@ -165,7 +168,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
 				//we need to do it here otherwise event could occurs, whereas vm 's creator id is not in the hash map
 				//just synchro pb, this workaround solves the pb
     }
-    //System.out.println("mapped VirtualNode="+name+" with VirtualMachine="+virtualMachine.getName());
+		if (logger.isDebugEnabled()) {
+    	logger.debug("mapped VirtualNode="+name+" with VirtualMachine="+virtualMachine.getName());
+		}
   }
 
   public VirtualMachine getVirtualMachine() {
@@ -197,7 +202,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
     				proActiveRuntimeImpl.createVM(process);	
     			}catch(java.io.IOException e){
     				e.printStackTrace();
-    				System.out.println("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
+    				logger.error("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
     			}
 				}
 //			}else{
@@ -269,7 +274,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	try{
   	waitForAllNodesCreation();
   	}catch(NodeException e){
-  		System.out.println(e.getMessage());
+
+  		logger.error(e.getMessage());
+
   	}
   	if (!createdNodes.isEmpty()){
   		synchronized(createdNodes){
@@ -291,7 +298,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	try{
   	waitForAllNodesCreation();
   	}catch(NodeException e){
-  		System.out.println(e.getMessage());
+
+  		logger.error(e.getMessage());
+
   	}
   	if (!createdNodes.isEmpty()){
   		synchronized(createdNodes){
@@ -313,7 +322,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
     try{
     waitForAllNodesCreation();
     }catch(NodeException e){
-  		System.out.println(e.getMessage());
+
+  		logger.error(e.getMessage());
+
   	}
     if (!createdNodes.isEmpty()){
     	synchronized(createdNodes){
@@ -347,7 +358,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	defaultRuntime.createLocalNode(url,false);
   	//add this node to this virtualNode
 //  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
-//  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+
 //		nodeCreated = true;
 //  	nodeCountCreated ++ ;
 			performOperations(defaultRuntime,url,protocol);
@@ -359,11 +370,15 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   
   public Object getUniqueAO() throws ProActiveException{
   	
-  	if(!property.equals("unique_singleAO")) System.out.println("!!!!!!!!!!WARNING. This VirtualNode is not defined with unique_single_AO property in the XML descriptor. Calling getUniqueAO() on this VirtualNode can lead to unexpected behaviour");
+
+  	if(!property.equals("unique_singleAO")) logger.warn("!!!!!!!!!!WARNING. This VirtualNode is not defined with unique_single_AO property in the XML descriptor. Calling getUniqueAO() on this VirtualNode can lead to unexpected behaviour");
+
   	if(uniqueActiveObject == null){
   		try{
   		Node node = getNode();
-  		if(node.getActiveObjects().length > 1) System.out.println("!!!!!!!!!!WARNING. More than one active object is created on this VirtualNode.");
+
+  		if(node.getActiveObjects().length > 1) logger.warn("!!!!!!!!!!WARNING. More than one active object is created on this VirtualNode.");
+
   		uniqueActiveObject = node.getActiveObjects()[0];
  		 
   		}catch(Exception e){
@@ -381,7 +396,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   //
   
   public synchronized void runtimeRegistered(RuntimeRegistrationEvent event) {
-  	//System.out.println("receive event");
+
   	String nodeName;
   	String [] nodeNames = null;
   	ProActiveRuntime proActiveRuntimeRegistered;
@@ -390,7 +405,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	String url;
   	//Check if it this virtualNode that originates the process
   	if(event.getCreatorID().equals(this.name)){
-  		//System.out.println("runtime "+event.getCreatorID()+" registered on virtualnode "+this.name);
+			if (logger.isDebugEnabled()) {
+  			logger.debug("runtime "+event.getCreatorID()+" registered on virtualnode "+this.name);
+			}
   	  protocol = event.getProtocol();
   		//gets the registered runtime
   	  proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
@@ -403,14 +420,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   		// get the host of nodes
   		nodeHost = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
   		for (int i = 0; i < nodeNames.length; i++){
-  			//System.out.println(buildURL(nodeHost,nodeNames[i]));
+			
 				nodeName = nodeNames[i];
 			  url = buildURL(nodeHost,nodeName,protocol);
-//				createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
-//				System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");
-//				//System.out.println("nodecount "+nodeCountCreated);
-//			  nodeCreated = true;
-//				nodeCountCreated++;
 				performOperations(proActiveRuntimeRegistered,url,protocol);
 			}
 			
@@ -432,11 +444,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
 						url = buildURL(nodeHost,nodeName,protocol);
 						// nodes are created from the registered runtime, since this virtualNode is
 						// waiting for runtime registration to perform co-allocation in the jvm.
-					  proActiveRuntimeRegistered.createLocalNode(url,false);
-//						createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
-//						System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
-//						nodeCreated = true;
-//						nodeCountCreated++;
+					  proActiveRuntimeRegistered.createLocalNode(url,false);						
 							performOperations(proActiveRuntimeRegistered,url,protocol);
 					}catch(ProActiveException e){
 						e.printStackTrace();
@@ -479,7 +487,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	int count = 0;
   	while(!nodeCreated){
   		if(count<MAX_RETRY){
-  			//System.out.println("Error when getting the node, retrying ("+count+")");
+
   			count ++;
   			try {
          	Thread.sleep(1000);
@@ -500,15 +508,29 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   private void waitForAllNodesCreation() throws NodeException{
   	int count = 0;
   	
-  	while(nodeCountCreated != nodeCount){
-  		if(count<MAX_RETRY){
-  			//System.out.println("Error when getting the node, retrying ("+count+")");
+  	if (waitForTimeout){
+  		while(count<MAX_RETRY){
   			count ++;
   			try {
          	Thread.sleep(1000);
-      	} catch (InterruptedException e2) {}
-  		}else{
-  			throw new NodeException("After many retries, only "+nodeCountCreated+" nodes are created on "+nodeCount+" expected");
+      	} catch (InterruptedException e2) {
+      		e2.printStackTrace();
+      	}
+  		}
+  		
+  	}else{
+  		while(nodeCountCreated != nodeCount){
+  			if(count<MAX_RETRY){
+
+  				count ++;
+  				try {
+         		Thread.sleep(1000);
+      		} catch (InterruptedException e2) {
+      			e2.printStackTrace();
+      		}
+  			}else{
+  				throw new NodeException("After many retries, only "+nodeCountCreated+" nodes are created on "+nodeCount+" expected");
+  			}
   		}
   	}
   	
@@ -551,7 +573,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   	LSFBSubProcess bsub = null;
   	
   	int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
-  	//System.out.println("nodeNumber "+nodeNumber);
+		if (logger.isDebugEnabled()) {
+  		logger.debug("nodeNumber "+nodeNumber);
+		}
   	
   	while(ExternalProcessDecorator.class.isInstance(processImpl)){
   		if(processImpl instanceof LSFBSubProcess){
@@ -576,12 +600,16 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   		//if(!vmAlreadyAssigned){
   			String vnName = this.name;
   			String acquisitionMethod = vm.getAcquisitionMethod();
-  			//System.out.println("Aquisition method :"+acquisitionMethod);
-  			//System.out.println(vnName);
+				if (logger.isDebugEnabled()) {
+	  			logger.debug("Aquisition method :"+acquisitionMethod);
+	  			logger.debug(vnName);
+				}
   			String localruntimeURL = proActiveRuntimeImpl.getURL();
-  			//System.out.println(localruntimeURL);
+				if (logger.isDebugEnabled()) {
+  				logger.debug(localruntimeURL);
+				}
   			jvmProcess.setParameters(vnName+" "+localruntimeURL+" "+acquisitionMethod+":"+" "+nodeNumber);
-  		//}
+  		
   	}
   }
   
@@ -625,7 +653,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   
   private void increaseNodeCount(int n){
   	nodeCount = nodeCount + n;
-  	//System.out.println("NodeCount: "+nodeCount);
+		if (logger.isDebugEnabled()) {
+  		logger.debug("NodeCount: "+nodeCount);
+		}
   }
   
   private void increaseNodeIndex(){
@@ -633,6 +663,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   			lastNodeIndex = (lastNodeIndex + 1) % createdNodes.size();
   	}
   }
+  
   	
   private String checkProtocol(String protocol){
   	
@@ -643,7 +674,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
   
   private void performOperations(ProActiveRuntime part, String url, String protocol){
   	createdNodes.add(new NodeImpl(part,url,checkProtocol(protocol)));
-  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+  	logger.info("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
 		nodeCreated = true;
 		nodeCountCreated++;
   }
@@ -656,7 +687,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties implements Virt
 //  	part.registerVirtualnode(this.name,false);
 		ProActive.registerVirtualNode(this,registrationProtocol,false);
   	}catch(NodeException e){
-  		System.out.println(e.getMessage());
+
+  		logger.error(e.getMessage());
+
   	}
   	catch(ProActiveException e){
   		e.printStackTrace();
