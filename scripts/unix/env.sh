@@ -92,6 +92,10 @@ if [ -f $PROACTIVE/lib/crimson.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/crimson.jar
 fi
+if [ -f $PROACTIVE/lib/ibis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ibis.jar
+fi
 CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 
 echo "CLASSPATH"=$CLASSPATH

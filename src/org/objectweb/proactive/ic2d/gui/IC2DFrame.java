@@ -265,6 +265,8 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     monitoringMenu.add(b);
     }
     
+	
+    
     // Add new RMI Node
     {
     javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new RMI Node");
@@ -276,6 +278,15 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     monitoringMenu.add(b);
     }
     
+	{
+		  javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new Ibis host");
+		  b.addActionListener(new java.awt.event.ActionListener() {
+			  public void actionPerformed(java.awt.event.ActionEvent e) {
+				DialogUtils.openNewIbisHostDialog(IC2DFrame.this, ic2dObject.getWorldObject(), logger);
+			  }
+			});
+		  monitoringMenu.add(b);
+		  }
  
     {
       javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor all JINI Hosts");

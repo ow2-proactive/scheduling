@@ -104,7 +104,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             } else {
                 return new Boolean(false);
             }
-        }
+        }        
         // Now gives the MethodCall object to the body
         try {
             if (isOneWayCall(methodCall)) {
@@ -184,6 +184,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     f.setCreatorID(bodyID);
     // Set it as the 'thing' to send results to methodCall.res = f;
     // Send the request
+    
     try {
       sendRequest(methodCall, f);
     } catch (java.io.IOException e) {

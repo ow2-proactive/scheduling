@@ -130,7 +130,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
    * @return a string representation of this object
    */
   public String toString() {
-    return "Body for "+localBodyStrategy.getName()+" node="+nodeURL+" id=" + bodyID;
+     return "Body for "+localBodyStrategy.getName()+" node="+nodeURL+" id=" + bodyID;
   }
 
 

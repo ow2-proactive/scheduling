@@ -71,12 +71,12 @@ public class WorldObject extends AbstractDataObject {
   // Host related methods
   //
     
-  public HostObject addHostObject(String hostname) throws java.rmi.RemoteException {
-    return addHostObject(hostname, null);
+  public HostObject addHostObject(String hostname, String protocol) throws java.rmi.RemoteException {
+    return addHostObject(hostname, null, protocol);
   }
   
 
-  public HostObject addHostObject(String hostname, String nodeName) throws java.rmi.RemoteException {
+  public HostObject addHostObject(String hostname, String nodeName, String protocol) throws java.rmi.RemoteException {
     try {
       hostname = java.net.InetAddress.getByName(hostname).getHostName();
     } catch (java.net.UnknownHostException e) {
@@ -85,7 +85,7 @@ public class WorldObject extends AbstractDataObject {
     }
     HostObject host = getHostObject(hostname);
     if (host == null) {
-      host = new HostObject(this, hostname);
+      host = new HostObject(this, hostname, protocol);
       putChild(hostname, host);
       if (listener != null) listener.hostObjectAdded(host);
     } else {

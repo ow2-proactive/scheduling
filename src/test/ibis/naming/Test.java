@@ -28,41 +28,48 @@
 *
 * ################################################################
 */
-package org.objectweb.proactive.core.body.request;
+package test.ibis.naming;
 
-import org.objectweb.proactive.Body;
+import ibis.rmi.Naming;
+import ibis.rmi.NotBoundException;
+import ibis.rmi.RemoteException;
+
+import org.objectweb.proactive.core.util.IbisProperties;
+
+import java.net.MalformedURLException;
 
 
-public class RequestReceiverImpl implements RequestReceiver,
-    java.io.Serializable {
-    //list of immediate services (method names)
-    private java.util.Vector immediateServices;
-
-    public RequestReceiverImpl() {
-        this.immediateServices = new java.util.Vector(2);
-        this.immediateServices.add("toString");
-        this.immediateServices.add("hashCode");
+public class Test {
+    static {
+        IbisProperties.load();
     }
 
-    public void receiveRequest(Request request, Body bodyReceiver)
-        throws java.io.IOException {
-        if (immediateExecution(request.getMethodName())) {
-            bodyReceiver.serve(request);
-        } else {
-            request.notifyReception(bodyReceiver);
-            bodyReceiver.getRequestQueue().add(request);
+    public Test() {
+    }
+
+    public static void lookup(String name) {
+        try {
+            RemoteTest t = (RemoteTest) Naming.lookup(name);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
         }
     }
 
-    private boolean immediateExecution(String methodName) {
-        if (immediateServices.contains(methodName)) {
-            return true;
-        } else {
-            return false;
+    public static void main(String[] arguments) {
+    	System.out.println(System.getProperty("sun.boot.library.path"));
+		System.out.println(System.getProperty("sun.boot.class.path"));
+        if (arguments.length < 1) {
+            System.err.println("Usage: " + Test.class.getName() +
+                " <bindName>");
+            System.exit(-1);
         }
-    }
 
-    public void setImmediateService(String methodName) {
-        this.immediateServices.add(methodName);
+        System.out.println("Test: calling lookup ");
+        Test.lookup(arguments[0]);
+        System.out.println("Test: lookup done");
     }
 }

@@ -83,10 +83,13 @@ public class VMObject extends AbstractDataObject {
   public VMObject(HostObject host, VMID vmid, Node node) throws ActiveObjectCreationException, NodeException {
     super(host);
     //System.out.println("nodeURL : "+node.getNodeInformation().getURL());
+    System.out.println("VMObject.<init>");
     this.vmid = vmid;
     this.objectNodeMap = new java.util.HashMap();
     SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
+	System.out.println("VMObject.<init> creating activeSpyListener");
     this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener, SPY_LISTENER_NODE);
+	System.out.println("VMObject.<init> creating spy");
     this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] {activeSpyListener} , node);
     addNodeObject(node);
     controller.log("VMObject id="+vmid+" created based on node "+node.getNodeInformation().getURL());
@@ -172,6 +175,7 @@ public class VMObject extends AbstractDataObject {
   
  
   public void sendEventsForAllActiveObjects() {
+  	System.out.println("VMObject.sendEventForAllActiveObjects()");
     try {
       spy.sendEventsForAllActiveObjects();
     } catch (Exception e) {
@@ -186,6 +190,7 @@ public class VMObject extends AbstractDataObject {
   //
   
   public NodeObject addNodeObject(Node node) {
+  	System.out.println("VMObject: addNodeObject()");
     String nodeName = node.getNodeInformation().getName();
     NodeObject nodeObject = (NodeObject) getChild(nodeName);
     if (nodeObject == null) {

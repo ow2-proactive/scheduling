@@ -387,12 +387,14 @@ public abstract class Utils extends Object {
 
   public static Object makeDeepCopy(Object source) throws java.io.IOException {
     java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-    java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
+    //java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
+	java.io.ObjectOutputStream oos = new PAObjectOutputStream(baos);
     oos.writeObject(source);
     oos.flush();
     oos.close();
     java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
-    java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
+//    java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
+	java.io.ObjectInputStream ois = new PAObjectInputStream(bais);
     try {
       Object result = ois.readObject();
       ois.close();

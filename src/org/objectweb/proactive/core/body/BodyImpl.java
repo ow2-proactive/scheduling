@@ -262,10 +262,8 @@ public abstract class BodyImpl extends AbstractBody
 				return;
 			try {
 				messageEventProducer.notifyListeners(request, MessageEvent.SERVING_STARTED, 
-							bodyID, getRequestQueue().size());
-							
+							bodyID, getRequestQueue().size());		
 				Reply reply = request.serve(BodyImpl.this);
-				
 				if (reply == null) {
 					if(!isActive()) return;//test if active in case of terminate() method otherwise eventProducer would be null
 					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, 
@@ -277,7 +275,7 @@ public abstract class BodyImpl extends AbstractBody
 					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId,
   						getRequestQueue().size());
 				this.getFuturePool().registerDestination(request.getSender());
-				reply.send(request.getSender());
+				reply.send(request.getSender());		
 				this.getFuturePool().removeDestination();
 			} catch (ServeException e) {
 				// handle error here

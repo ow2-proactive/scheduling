@@ -118,10 +118,15 @@ public class MOPClassLoader extends URLClassLoader {
 	}
 
 	public Class loadClass(String name) throws ClassNotFoundException {
-		return this.loadClass(name, false);
+		return this.loadClass(name, null, false);
 	}
 
-	protected synchronized Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
+
+	public Class loadClass(String name, ClassLoader cl)  throws ClassNotFoundException {		
+		return this.loadClass(name, cl, false);
+	}
+
+	protected synchronized Class loadClass(String name, ClassLoader cl, boolean resolve) throws ClassNotFoundException {
 		if (this.getParent() != null) {
 			try {
 				return this.getParent().loadClass(name);
@@ -131,7 +136,7 @@ public class MOPClassLoader extends URLClassLoader {
 		}
 
 		try {
-			return super.loadClass(name, resolve);
+			return cl.loadClass(name);
 		} catch (ClassNotFoundException e) {
 			// Test if the name of the class is actually a request for
 			// a stub class to be created

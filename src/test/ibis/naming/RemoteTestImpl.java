@@ -28,41 +28,54 @@
 *
 * ################################################################
 */
-package org.objectweb.proactive.core.body.request;
+package test.ibis.naming;
 
-import org.objectweb.proactive.Body;
+import ibis.rmi.AlreadyBoundException;
+import ibis.rmi.Naming;
+import ibis.rmi.RemoteException;
+import ibis.rmi.server.UnicastRemoteObject;
+
+import java.net.MalformedURLException;
+
+import org.objectweb.proactive.core.util.IbisProperties;
 
 
-public class RequestReceiverImpl implements RequestReceiver,
-    java.io.Serializable {
-    //list of immediate services (method names)
-    private java.util.Vector immediateServices;
-
-    public RequestReceiverImpl() {
-        this.immediateServices = new java.util.Vector(2);
-        this.immediateServices.add("toString");
-        this.immediateServices.add("hashCode");
+public class RemoteTestImpl extends UnicastRemoteObject implements RemoteTest {
+	
+	static {
+			IbisProperties.load();
+		}
+	
+    public RemoteTestImpl() throws RemoteException {
     }
 
-    public void receiveRequest(Request request, Body bodyReceiver)
-        throws java.io.IOException {
-        if (immediateExecution(request.getMethodName())) {
-            bodyReceiver.serve(request);
-        } else {
-            request.notifyReception(bodyReceiver);
-            bodyReceiver.getRequestQueue().add(request);
+    public void bind(String name) {
+        try {
+            Naming.bind(name, this);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (AlreadyBoundException e) {
+            e.printStackTrace();
         }
     }
 
-    private boolean immediateExecution(String methodName) {
-        if (immediateServices.contains(methodName)) {
-            return true;
-        } else {
-            return false;
+    public static void main(String[] arguments) {
+        if (arguments.length < 1) {
+            System.err.println("Usage: " + RemoteTestImpl.class.getName() +
+                " <bindName>");
+            System.exit(-1);
         }
-    }
 
-    public void setImmediateService(String methodName) {
-        this.immediateServices.add(methodName);
+        RemoteTestImpl t = null;
+
+        try {
+            t = new RemoteTestImpl();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        t.bind(arguments[0]);
     }
 }

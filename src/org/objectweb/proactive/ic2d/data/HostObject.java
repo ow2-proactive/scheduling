@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.util.HostNodeFinder;
+import org.objectweb.proactive.ic2d.util.IbisHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RMIHostNodeFinder;
 import org.objectweb.proactive.ic2d.util.RunnableProcessor;
 
@@ -57,7 +58,7 @@ public class HostObject extends AbstractDataObject {
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  public HostObject(WorldObject parent, String hostname) {
+  public HostObject(WorldObject parent, String hostname, String protocol) {
     super(parent);
     try {
       this.hostname = java.net.InetAddress.getByName(hostname).getHostName();
@@ -66,7 +67,12 @@ public class HostObject extends AbstractDataObject {
       this.hostname = hostname;
       controller.warn("Hostname "+hostname+ " failed reverse lookup.");
     }
-    this.nodeFinder = new RMIHostNodeFinder(controller);
+    if ("ibis".equals(protocol)) {
+		this.nodeFinder = new IbisHostNodeFinder(controller);
+    }
+     else {
+		this.nodeFinder = new RMIHostNodeFinder(controller);
+     }
   }
 
 
@@ -230,6 +236,7 @@ public class HostObject extends AbstractDataObject {
       Node[] nodes;
       try {
         nodes = nodeFinder.findNodes(hostname);
+      //  System.out.println("XXXXXXX");
       } catch (java.io.IOException e) {
         controller.log("There is no RMI Registry on host "+hostname, e);
         return;

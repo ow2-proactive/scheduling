@@ -33,6 +33,7 @@ IF EXIST %PROACTIVE%\lib\iaik_ssl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar
 IF EXIST %PROACTIVE%\lib\jaxp.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jaxp.jar
 IF EXIST %PROACTIVE%\lib\crimson.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\crimson.jar
+IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis.jar
 echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy 
