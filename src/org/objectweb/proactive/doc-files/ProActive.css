@@ -10,6 +10,7 @@ H2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, A
 H3 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold;}
 H4 { margin-left: 15px; padding-left: 5px; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
 B  { color: #00257E; }
+b.java { color: #0000FF ; font-weight: bold }
 P{ margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 LI{margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 
@@ -44,7 +45,7 @@ LI{margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial,
 #Default		{ color: #0000FF ; font-weight: bold }
 #Do			{ color: #0000FF ; font-weight: bold }
 #Double		{ color: #0000FF ; font-weight: bold }
-#Else			{ color: #0000FF ; font-weight: bold }
+#Else			 { color: #0000FF ; font-weight: bold }
 #Extends		{ color: #0000FF ; font-weight: bold }
 #False			{ color: #0000FF ; font-weight: bold }
 #Final			{ color: #0000FF ; font-weight: bold }
