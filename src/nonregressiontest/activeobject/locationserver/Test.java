@@ -35,8 +35,8 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        String serverUrl = ProActiveProperties.getLocationServerRmi();
+        String serverUrl = ProActiveConfiguration.getLocationServerRmi();
         server = (SimpleLocationServer) ProActive.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
