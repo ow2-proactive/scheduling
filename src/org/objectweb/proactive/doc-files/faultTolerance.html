@@ -1,0 +1,377 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<html>
+<head>
+<title>Fault-Tolerance in ProActive</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Security.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="p2p.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>Fault-Tolerance</h1>
+
+
+<h2>Overview</h2>
+
+<p class="textNormal">
+
+ProActive provides fault-tolerance capabilities through a
+Communication-Induced Checkpointing protocol. Making a ProActive application
+fault-tolerant is <b>fully transparent</b>; active objects are turned
+fault-tolerant using Java properties that can be set in the <A
+href="Descriptor.html">deployment descriptor</A>. Persistence of active
+objects is obtained through standard Java serialization; a checkpoint thus
+consists in an object containing a serialized copy of an active object and a
+few informations related to the protocol. As a consequence, a fault-tolerant
+active object must be serializable. <BR><BR>
+
+
+Each active object in a fault-tolerant application have to checkpoint at least
+every <b>TTC</b> (Time To Checkpoint) seconds. When all the active objects
+have taken a checkpoint, a <b>global state</b> is formed. If a failure occurs,
+the <i>entire</i> application must restarts from such a global state. The TTC
+value depends mainly on the assessed frequency of failures. A little TTC value
+leads to very frequent global state creation and thus to a little rollback in
+the execution in case of failure. But a little TTC value leads also to a
+bigger overhead between a non-fault-tolerant and a fault-tolerant
+execution. The TTC value can be set by the programmer in the deployment
+descriptor.
+
+
+
+
+
+
+
+
+
+</p>
+
+<BR><BR> 
+<h2>Making a ProActive application fault-tolerant</h2>
+
+
+<h3>Fault-Tolerance servers</h3>
+<p class="textNormal">
+Fault-tolerance mechanism needs servers for the checkpoints storage, the
+localization of the active objects, and the failure detection. This server are
+implemented in the current version as a unique server
+(<code>ft.util.GlobalFTServer</code>), that implements the interfaces of each
+server (<code>ft.util.*.*</code>). This server is still implemented using Java
+RMI, but an active object version will come soon.
+</p>
+<p class="textNormal">
+The global fault-tolerance server can be launched using the
+<code>startGlobalFTServer.sh</code> script, with 3 optional parameters:
+<ul>
+<li>the server name: <code>-name &lt;serverName&gt;</code>. The default name
+	is FTServer.
+<li>the port number: <code>-port &lt;portNumber&gt;</code>. The default port
+	number is 1100.
+<li>the fault detection period: <code>-fdperiod
+	  &lt;periodInSec&gt;</code>. This value defines the time between two
+	consecutive fault detection scanning. The default value is 10 sec.
+</ul>
+<p class="textNormal">
+The server can also be directly launched in the java source code, using
+<code>org.objectweb.proactive.core.process.JVMProcessImpl</code> class:
+
+<blockquote><pre>
+GlobalFTServer server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+this.server.setClassname("org.objectweb.proactive.core.body.ft.util.StartFTServer");
+this.server.startProcess();
+</pre></blockquote>
+</p></p>
+
+
+
+<p class="textNormal">
+Note that if one of the servers is unreachable when a fault-tolerant
+application is deploying, fault-tolerance is automatically and transparently
+disabled for all the application.
+</p>
+
+
+
+<BR>
+
+
+
+
+
+<h3><A NAME="configuration">Configure fault-tolerance for a ProActive application</A></h3> 
+<p class="textNormal">
+Fault-tolerance capabilities of a ProActive application are set in the
+deployment descriptor, using the <code>faultTolerance</code> service. This
+service is attached to <i>a virtual node</i>: active objects that are deployed
+on this virtual node are turned fault-tolerant. The service defines <b>servers
+URLs</b> :
+</p>
+<ul>
+<li> <code>&lt;globalServer url="..."/&gt;</code> set the
+	URL of a <i>global</i> server, i.e. a server that implements all
+	needed methods for fault-tolerance mechanism (stable storage, fault
+	detection, localization). If this value is set, all others URLs will be
+	<i>ignored</i>.
+<li> <code>&lt;checkpointServer url="..."/&gt;</code> set the
+	URL of the checkpoint server, i.e. the server where checkpoints are stored.
+<li> <code>&lt;locationServer url="..."/&gt;</code> set the
+	URL of the location server, i.e. the server responsible for giving
+	references on failed and recovered active objects.
+<li> <code>&lt;recoveryProcess url="..."/&gt;</code> set the
+	URL of the recovery process, i.e. the process responsible for launching the
+	recovery of the application after a failure.
+</ul>
+<p class="textNormal">
+A virtual node can also be a <b>resource node</b>, i.e. a node that can be
+used to recover a failed active object. The fault-tolerance service must set
+the <code>&lt;resourceServer url="..."/&gt;</code>; all the nodes mapped on this
+virtual node are then registered has resource nodes for a recovery.  <BR><BR>
+Finally, the <b>TTC</b> value is set in fault-tolerance service, using <code>
+&lt;ttc value="x"/&gt;</code>, where x is expressed in <i>seconds</i>. If not, the
+default value (30 sec) is used.
+</p>
+<BR>
+
+
+
+
+<h3>A deployment descriptor example</h3>
+<p class="textNormal">
+Here is an example of deployment descriptor that deploys 2 virtual nodes : one
+for starting the application, and one as resource for recovery. This two behaviors
+correspond to two fault-tolerance services, <code>appli</code> and
+<code>resource</code>. TTC is set to 5 sec for all the application.
+</p>
+
+<pre>
+&lt;ProActiveDescriptor&gt;
+ &lt;componentDefinition&gt;
+  &lt;virtualNodesDefinition&gt;
+   &lt;virtualNode name="Workers" property="multiple" <b>ftServiceId="appli"</b>/&gt; 
+   &lt;virtualNode name="Failed" property="multiple" <b>ftServiceId="resource"</b>/&gt;
+  &lt;/virtualNodesDefinition&gt;
+ &lt;/componentDefinition&gt;
+ &lt;deployment&gt;
+  &lt;mapping&gt;
+   &lt;mapvirtualNode="Workers"&gt;
+    &lt;jvmSet&gt;
+     &lt;vmNamevalue="Jvm1"/&gt;&lt;vmName value="Jvm2"/&gt;
+    &lt;/jvmSet&gt;
+   &lt;/map&gt;
+   &lt;mapvirtualNode="Failed"&gt;
+    &lt;jvmSet&gt;
+     &lt;vmNamevalue="JvmS1"/&gt;&lt;vmName value="JvmS2"/&gt;
+    &lt;/jvmSet&gt;
+   &lt;/map&gt;
+  &lt;/mapping&gt;
+ &lt;jvms&gt;
+  &lt;jvmname="Jvm1"&gt;
+   &lt;creation&gt;
+    &lt;processReferencerefid="linuxJVM"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvmname="Jvm2"&gt;
+   &lt;creation&gt;
+    &lt;processReferencerefid="linuxJVM"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvmname="JvmS1"&gt;
+   &lt;creation&gt;
+    &lt;processReferencerefid="linuxJVM"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+  &lt;jvmname="JvmS2"&gt;
+   &lt;creation&gt;
+    &lt;processReferencerefid="linuxJVM"/&gt;
+   &lt;/creation&gt;
+  &lt;/jvm&gt;
+ &lt;/jvms&gt;
+ &lt;/deployment&gt;
+&lt;infrastructure&gt;
+ &lt;processes&gt;
+  &lt;processDefinitionid="linuxJVM"&gt;
+   &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
+  &lt;/processDefinition&gt;
+ &lt;/processes&gt;
+ &lt;services&gt;
+  &lt;<b>serviceDefinitionid="appli"</b>&gt;
+   &lt;faultTolerance&gt;
+    &lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;
+    &lt;ttc value="5"&gt;&lt;/ttc&gt;
+   &lt;/faultTolerance&gt;
+  &lt;/serviceDefinition&gt;
+  &lt;<b>serviceDefinitionid="resource"</b>&gt;
+   &lt;faultTolerance&gt;
+    &lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;
+    &lt;resourceServer url="rmi://localhost:1100/FTServer"&gt;&lt;/resourceServer&gt;
+    &lt;ttc value="5"&gt;&lt;/ttc&gt;
+   &lt;/faultTolerance&gt;
+  &lt;/serviceDefinition&gt;
+ &lt;/services&gt;
+&lt;/infrastructure&gt;
+&lt;/ProActiveDescriptor&gt;
+</pre>
+
+
+<BR><BR> 
+<h2>Programming rules</h2>
+
+
+<h3>Serializable</h3> 
+
+<p class="textNormal">
+Persistence of active objects is obtained through standard Java serialization;
+a checkpoint thus consists in an object containing a serialized copy of an
+active object and a few informations related to the protocol. As a
+consequence, a fault-tolerant active object <i>must be serializable</i>. If a
+non serializable object is activated on a fault-tolerant virtual node,
+fault-tolerance is automatically and transparently disabled for this active
+object.
+</p>
+
+<h3>Standard Java main method</h3>
+<p class="textNormal">
+Standard Java thread, typically main method, cannot be turned
+fault-tolerant. As a consequence, if a standard main method interacts with
+active objects during the execution, consistency after a failure can no more
+be ensured: after a failure, all the active objects will roll back to the most
+recent global state <i>but the main will not</i>.  
+
+<BR><BR>So as to avoid such inconsistency on recovery, the programmer must
+minimizes the use of standard main by, for example, delegating the
+initialization and launching procedure to an active object.
+</p>
+
+
+<blockquote><pre>
+...
+public static void main(String[] args){
+   Initializer init = (Initializer)(ProActive.newActive("Initializer.getClass.getName()", args);
+   init.launchApplication();
+   System.out.println("End of main thread");
+}
+...
+</pre></blockquote>
+
+<p class="textNormal">
+The object <code>init</code> is an active object, and as such will be rolled
+back if a failure occurs: the application is kept consistent.
+</p>
+
+
+<h3>Checkpointing occurrence</h3>
+<p class="textNormal">
+To keep fault-tolerance fully transparent (see <A
+href="http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf">the
+technical report</A> for more details), active objects can take a checkpoint
+<i>before the service of a request</i>.
+
+
+As a first consequence, if the service of a request is infinite, or at least
+much greater than TTC, the active object that serves such a request can no
+more take checkpoints. If a failure occurs during the execution, this object
+will force the entire application to rolls back to the beginning of the
+execution. The programmer must thus avoid infinite method such as
+
+<blockquote><pre>
+...
+public void infiniteMethod(){
+   while (true){
+     this.doStuff();
+   }
+}
+...
+</pre></blockquote>
+<BR><BR>
+
+<p>
+The second consequence concerns the definition of the
+<code>runActivity()</code> method (see <A
+HREF="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/RunActive.html"><code>runActive</code></A>).
+Let us consider the following example :
+</p>
+    
+<blockquote><pre>
+...
+public void runActivity(Body body) {
+   org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+   while (body.isActive()) {
+      Request r = service.blockingRemoveOldest();
+      ...
+      /* CODE A */
+      ...
+      /* CHECKPOINT OCCURENCE */
+      service.serve(r);
+   }
+}
+...
+</pre></blockquote>
+
+<p>
+If a checkpoint is triggered before the service of <code>r</code>, it
+characterizes the state of the active object at the point <code>/* CHECKPOINT
+OCCURENCE */</code>. If a failure occurs, this active object is restarted by
+calling the <code>runActivity()</code> method, <i>from a state in which the
+code <code>/* CODE A */</code> has been already executed</i>. As a
+consequence, the execution looks like if <code>/* CODE A */</code> was executed
+two times.<BR> The programmer should then avoid to alter the state of an
+active object in the code preceding the call to <code>service.serve(r)</code>
+      when he redefines the <code>runActivity()</code> method.
+
+
+
+</p>
+
+
+<h3>Activity Determinism</h3>
+<p class="textNormal">
+All the activities of a fault-tolerant application must be deterministic (see
+<A href="http://www-sop.inria.fr/oasis/personnel/Christian.Delbe/publis/rr5246.pdf">
+the technical report</A> for more details). The programmer must then avoid the
+use of non-deterministic methods such as <code>Math.random()</code>.
+</p>
+
+
+<h3>Limitations</h3>
+<p class="textNormal">
+Fault-tolerance in ProActive is still not compliant with the following
+    features :
+<ul>
+<li> active objects exposed as <A href="WSDoc.html">Web services</A>, or reachable using http protocol,
+<li> <A href="OOSPMD.html">OO-SPMD barriers<A>,
+<li> <A href="./Security.html">security</A>.
+</ul>
+</p>
+
+
+
+
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &copy; February 2005 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

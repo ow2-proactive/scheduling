@@ -140,7 +140,44 @@ Note that if not specified those properties are set programmatically
 with the default value. </li>
   <br>
   <br>
-  <li class="textNormal"><b>Peer-to-Peer
+ 
+
+ <li class="textNormal"><b>Fault-tolerance 
+properties<a name="p2p_properties"></a></b><br>
+    <br>
+Note that those properties should not be altered if the programmer uses
+deployment descriptor files. See <A HREF="faultTolerance.html">here</A> for
+more details.
+    <ul class="listWithSpace">
+      <li class="textNormal"><b>proactive.ft</b>. Two values are possible: <b>enable,
+disable</b>. If enable, the fault-tolerance is enable and a set of servers
+	  must be defined with the following properties. Default value is <b>disable</b>.
+<br>
+      </li>
+      <li class="textNormal"><b>proactive.ft.server.checkpoint</b> is the URL
+	  of the <A HREF="faultTolerance.html#configuration">checkpoint server</A>.<br>
+      </li>
+      <li class="textNormal"><b>proactive.ft.server.location</b> is the URL of
+	  the <A HREF="faultTolerance.html#configuration">location server</A>.<br>
+      </li>
+      <li class="textNormal"><b>proactive.ft.server.recovery</b> is the URL
+	  of the <A HREF="faultTolerance.html#configuration">recovery process</A>.<br>
+      </li>
+      <li class="textNormal"><b>proactive.ft.server.resource</b> is the URL of
+	  the <A HREF="faultTolerance.html#configuration">resource server</A>.<br>
+      </li>
+	 <li class="textNormal"><b>proactive.ft.server.global</b> is the URL of
+	  the <A HREF="faultTolerance.html#configuration">global server</A>. If this property is set, all others
+	  <b>proactive.fr.server.*</b> are ignored.<br>
+      </li>
+	 <li class="textNormal"><b>proactive.ft.ttc</b> is the value of the <A
+	 HREF="faultTolerance.html#configuration">Time To Checkpoint</A>
+	 counter, in seconds. The default value is 30 sec.<BR> </li>
+
+    </ul>
+<br><br>
+
+ <li class="textNormal"><b>Peer-to-Peer
 properties<a name="p2p_properties"></a></b><br>
     <br>
     <ul class="listWithSpace">
