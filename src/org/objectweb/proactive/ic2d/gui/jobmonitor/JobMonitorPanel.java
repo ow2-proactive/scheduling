@@ -1,15 +1,35 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -20,7 +40,11 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.*;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.NodeHelper;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
@@ -39,16 +63,16 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	
 	private static final String EXTRACT_MENU_LABEL = "Extract view to a new window";
 	
-	private static final String [] JOB_VIEW_KEYS 	= {JOB, HOST, JVM, VN, NODE, AO};
-	private static final String [] HOST_VIEW_KEYS = {HOST, JOB, JVM, VN, NODE, AO};
-	private static final String [] VN_VIEW_KEYS	 	= {JOB, VN, HOST, JVM, NODE, AO};
+	private static final int [] JOB_VIEW_KEYS  = {JOB, HOST, JVM, VN, NODE, AO};
+	private static final int [] HOST_VIEW_KEYS = {HOST, JOB, JVM, VN, NODE, AO};
+	private static final int [] VN_VIEW_KEYS   = {JOB, VN, HOST, JVM, NODE, AO};
 	
 	private IC2DGUIController controller;
 	
 	private JTabbedPane tabs;
 	private Vector frames;
 	
-	private DataModelNode modelRoot = DataModelNode.createModelRootInstance ();
+	private DataAssociation asso = new DataAssociation();
 	private DataTreeModel jobViewModel;
 	private DataTreeModel vnViewModel;
 	private DataTreeModel hostViewModel;
@@ -238,12 +262,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	
 	private void handleHosts ()
 	{
-		((DataModelNode) vnViewModel.getRoot()).removeAllChildren();
-		((DataModelNode) jobViewModel.getRoot()).removeAllChildren();
-		((DataModelNode) hostViewModel.getRoot()).removeAllChildren();
-		
 		synchronized (monitoredHosts)
 		{
+			asso.clear();
+
 			for (int i = 0, size = monitoredHosts.size(); i < size; ++i)
 			{
 				String host = (String) monitoredHosts.get (i);
@@ -251,27 +273,24 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				handleHost (host);
 			}
 		}
-	
-		vnViewModel.update();
-        jobViewModel.update();
-        hostViewModel.update();
+
+		vnViewModel.rebuild();
+		jobViewModel.rebuild();
+		hostViewModel.rebuild();
 	}
 	
-	public void updateHost (final String host)
+	public void updateHost (final DataTreeNode hostNode)
 	{
 		new Thread (new Runnable()
 		{
 			public void run ()
 			{
-				vnViewModel.removeHostChildren (host);
-				jobViewModel.removeHostChildren (host);
-				hostViewModel.removeHostChildren (host);
+				asso.removeItem(HOST, hostNode.getName());
+				handleHost (hostNode.getName());
 				
-				handleHost (host);
-				
-				vnViewModel.update();
-		        jobViewModel.update();
-		        hostViewModel.update();
+				vnViewModel.rebuild(hostNode);
+				jobViewModel.rebuild(hostNode);
+				hostViewModel.rebuild(hostNode);
 			}
 		}).start();
 	}
@@ -381,29 +400,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		String jobId = pr.getJobID();
 		String hostname = pr.getVMInformation().getInetAddress().getCanonicalHostName();
 		String vmName = pr.getVMInformation().getName();
-			
-//		Prepare root data
-		DataModelNode jobA = modelRoot.getChild (jobId, JOB);		
-		DataModelNode hostA = modelRoot.getChild (hostname, HOST);
-		
-		DataModelNode hostB = jobA.getChild (hostname, HOST);		
-		DataModelNode jobB = hostA.getChild (jobId, JOB);		
-		
-//		Prepare data for Job view
-		DataModelNode vmA = hostB.getChild (vmName, JVM);
-		
-//		Prepare data for Host view
-		DataModelNode vmB = jobB.getChild (vmName, JVM);
-				
-//		Fill data
-		handleLocalNodes (pr, vmA, vmB, jobA);
-	}
-	
-	private void handleLocalNodes (ProActiveRuntime pr, DataModelNode vmA, DataModelNode vmB, DataModelNode job) throws ProActiveException
-	{
-		String hostname = pr.getVMInformation().getInetAddress().getCanonicalHostName();
-		String vmName = pr.getVMInformation().getName();
-		
+
+		asso.addChild(HOST, hostname, vmName);
+
 		String [] nodes = pr.getLocalNodeNames();
 //		System.out.println ("Found " + nodes.length + " nodes on this runtime");
 		for (int i = 0; i < nodes.length; ++i)
@@ -426,37 +425,14 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				controller.log ("Unexpected ProActive exception caught while obtaining the active objects list", e);
 			}
 			
-			DataModelNode nodeVmA = handleVMNode (nodeName, vnName, vmA);
-			if (activeObjects != null)
-				handleActiveObjects (nodeVmA, activeObjects);
-
-			DataModelNode nodeVmB = handleVMNode (nodeName, vnName, vmB);
-			if (activeObjects != null)
-				handleActiveObjects (nodeVmB, activeObjects);
-
-			DataModelNode nodeJob = handleJobNode (hostname, vmName, nodeName, vnName, job);
-			if (activeObjects != null)
-				handleActiveObjects (nodeJob, activeObjects);
+			asso.addChild(JOB, jobId, vnName);
+			asso.addChild(VN, vnName, hostname);
+			asso.addChild(JVM, vmName, nodeName);
+			handleActiveObjects(nodeName, activeObjects);
 		}
 	}
 
-	private DataModelNode handleJobNode (String hostname, String vmName, String nodeName, String vnName, DataModelNode job)
-	{
-		DataModelNode vn = job.getChild (vnName, VN);
-		DataModelNode host = vn.getChild (hostname, HOST);
-		DataModelNode vm =	 host.getChild (vmName, JVM);
-		DataModelNode node = 	vm.getChild (nodeName, NODE);
-		return node;
-	}
-
-	private DataModelNode handleVMNode (String nodeName, String vnName, DataModelNode vm)
-	{
-		DataModelNode vn = vm.getChild (vnName, VN);
-		DataModelNode node = 	vn.getChild (nodeName, NODE);
-		return node;
-	}
-
-	private void handleActiveObjects (DataModelNode node, ArrayList activeObjects)
+	private void handleActiveObjects (String nodeName, ArrayList activeObjects)
 	{
 		for (int i = 0, size = activeObjects.size(); i < size; ++i)
 		{
@@ -477,7 +453,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				aos.put (rba.getID(), aoName);
 			}
 			
-			DataModelNode ao = node.getChild (aoName, AO);
+			asso.addChild(NODE, nodeName, aoName);
 		}
 	}
 	
@@ -500,8 +476,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				f.show();
 		}
 	}
-	
-	private boolean constructPopupMenu (final DataModelNode node)
+
+	private boolean constructPopupMenu (final DataTreeNode node)
 	{
 		boolean showMenu = false;
 		
@@ -530,7 +506,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	    }
 	    else
 	    {
-	    	String key = node.getKey();
+	    	int key = node.getKey();
 	    	
 	    	AbstractAction a = null;
 	    	if (key == HOST)
@@ -540,7 +516,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 					public void actionPerformed (ActionEvent e)
 					{
 //						System.out.println ("Asking for a host refresh: " + node.getName());
-						updateHost (node.getName());
+						updateHost (node);
 					}
 				};
 	    	}
@@ -567,10 +543,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	    		showMenu = true;
 	    	}
 	    }
-	    
+
 	    return showMenu;
 	}
-	
+
 	private Container createContent (DataTreeModel model)
 	{
 		//JSplitPane sp = new JSplitPane ();
@@ -591,10 +567,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		final JTree j = new JTree (model);
 		j.getSelectionModel().setSelectionMode (TreeSelectionModel.SINGLE_TREE_SELECTION);
 		j.setCellRenderer (new JobMonitorTreeCellRenderer());
-		
+
 		JScrollPane pane = new JScrollPane (j);
 		left.add (pane, BorderLayout.CENTER);
-		
+
 		j.addMouseListener (new MouseAdapter ()
 		{	
 		    public void mousePressed (MouseEvent e)
@@ -602,27 +578,27 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		        if (e.isPopupTrigger())
 		        {		        	
 		        	TreePath selPath = j.getPathForLocation (e.getX(), e.getY());		          
-		        	DataModelNode node = null;
+		        	DataTreeNode node = null;
 		          
 		        	if (selPath != null)
 		        	{
-		        		node = (DataModelNode) selPath.getLastPathComponent();
-		        		
+		        		node = (DataTreeNode) selPath.getLastPathComponent();
+
 				        if (node == null)
 				        	return;
-				        
+
 				        if (node == vnViewModel.getRoot() || node == jobViewModel.getRoot() || node == hostViewModel.getRoot())
 				        	node = null;
-				        
+
 				        j.setSelectionPath (selPath);
 		        	}
-			          
+
 			        if (constructPopupMenu (node))
 			        	popupmenu.show (j, e.getX(), e.getY());
 		        }
 		    }
 		});
-		
+
 		return left;
 	}
 	
@@ -635,40 +611,34 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	
 	private JPanel createJobView ()
 	{
-		SwitcherModel jobSwitchModel = new SwitcherModel (new String [] {"Job", "Host", "JVM", "VN", "Node", "AO"}, JOB_VIEW_KEYS);
+		SwitcherModel jobSwitchModel = new SwitcherModel (JOB_VIEW_KEYS);
 		NodeHelper helper = new NodeHelper (jobSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (JOB_VIEW_KEYS);
-		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, helper, modelRoot);	
-		
-		jobViewModel = new DataTreeModel (root, jobSwitchModel, traversal, helper);
+		jobViewModel = new DataTreeModel (asso, jobSwitchModel, traversal, helper);
 		
 		return createPanel (jobViewModel);
 	}
 	
 	private JPanel createHostView ()
 	{
-		SwitcherModel hostSwitchModel = new SwitcherModel (new String [] {"Host", "Job", "JVM", "VN", "Node", "AO"}, HOST_VIEW_KEYS);
+		SwitcherModel hostSwitchModel = new SwitcherModel (HOST_VIEW_KEYS);
 		NodeHelper helper = new NodeHelper (hostSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (HOST_VIEW_KEYS);
-		DataModelRoot root = new DataModelRoot (HOST_VIEW_ROOT, traversal, helper, modelRoot);
+		hostViewModel = new DataTreeModel (asso, hostSwitchModel, traversal, helper);
 		
-		hostViewModel = new DataTreeModel (root, hostSwitchModel, traversal, helper);
-
 		return createPanel (hostViewModel);
 	}
 	
 	private JPanel createVNView ()
 	{
-		SwitcherModel vnSwitchModel = new SwitcherModel (new String [] {"Job", "VN", "Host", "JVM", "Node", "AO"}, VN_VIEW_KEYS);
+		SwitcherModel vnSwitchModel = new SwitcherModel (VN_VIEW_KEYS);
 		NodeHelper helper = new NodeHelper (vnSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (VN_VIEW_KEYS);
-		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, helper, modelRoot);
+		vnViewModel = new DataTreeModel (asso, vnSwitchModel,  traversal, helper);
 		
-		vnViewModel = new DataTreeModel (root, vnSwitchModel,  traversal, helper);
-
 		return createPanel (vnViewModel);
 	}	
 }

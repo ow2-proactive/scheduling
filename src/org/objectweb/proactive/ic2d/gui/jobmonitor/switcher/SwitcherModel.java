@@ -1,10 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.switcher;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-public class SwitcherModel
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+
+public class SwitcherModel implements JobMonitorConstants
 {
 	private List labels;
 	private List keys;
@@ -12,14 +14,16 @@ public class SwitcherModel
 	
 	private Vector listeners;
 	
-	public SwitcherModel (String [] _labels, String [] _keys) throws RuntimeException
+	public SwitcherModel (int[] _keys)
 	{
-		if (_labels.length != _keys.length)
-			throw new RuntimeException ("Trying to create a SwitcherModel with different array sizes");
+		labels = new ArrayList();
+		keys = new ArrayList();
 		
-		labels = Arrays.asList (_labels);
-		keys = Arrays.asList (_keys);
-		
+		for (int i = 0; i < _keys.length; i++) {
+			labels.add(NAMES[_keys[i]]);
+			keys.add(new Integer(_keys[i]));
+		}
+
 		states = new boolean [labels.size()];
 		for (int i = 0; i < states.length; ++i)
 			states [i] = true;
@@ -75,9 +79,9 @@ public class SwitcherModel
 		return getStateAt (i);
 	}
 
-	public boolean isStateONKey (String key)
+	public boolean isStateONKey (int key)
 	{
-		int i = keys.indexOf (key);
+		int i = keys.indexOf (new Integer(key));
 		return getStateAt (i);
 	}
 

@@ -11,7 +11,7 @@ public class NodeHelper
 		model = _model;
 	}
 	
-	public boolean isNodeDisplayed (DataModelNode node)
+	public boolean isNodeDisplayed (DataTreeNode node)
 	{
 		return model.isStateONKey (node.getKey());
 	}

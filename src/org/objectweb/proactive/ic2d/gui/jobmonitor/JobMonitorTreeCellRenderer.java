@@ -1,14 +1,11 @@
-package org.objectweb.proactive.ic2d.gui.jobmonitor
-;
+package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
 import java.awt.Component;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implements JobMonitorConstants
 {
@@ -61,8 +58,8 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implemen
 		
 		Icon icon = null;
 
-		DataModelNode currentNode = (DataModelNode) value;
-		String key = currentNode.getKey();
+		DataTreeNode currentNode = (DataTreeNode) value;
+		int key = currentNode.getKey();
 		
 		if (key == HOST)
 			icon = host;
