@@ -235,12 +235,12 @@ public class JVMProcessImpl extends AbstractExternalProcess
         if (javaPath == null) {
             javaCommand.append("java");
         } else {
-            javaCommand.append(javaPath);
+            javaCommand.append(checkWhiteSpaces(javaPath));
         }
 
         if (bootClasspath != null) {
             javaCommand.append(" -Xbootclasspath:");
-            javaCommand.append(bootClasspath);
+            javaCommand.append(checkWhiteSpaces(bootClasspath));
             javaCommand.append(" ");
         }
 
@@ -252,19 +252,19 @@ public class JVMProcessImpl extends AbstractExternalProcess
         // append classpath
         if ((classpath != null) && (classpath.length() > 0)) {
             javaCommand.append(" -cp ");
-            javaCommand.append(classpath);
+            javaCommand.append(checkWhiteSpaces(classpath));
         }
 
         // append policy option
         if (policyFile != null) {
             javaCommand.append(POLICY_OPTION);
-            javaCommand.append(policyFile);
+            javaCommand.append(checkWhiteSpaces(policyFile));
         }
 
         // append log4j option
         if (log4jFile != null) {
             javaCommand.append(LOG4J_OPTION);
-            javaCommand.append(log4jFile);
+            javaCommand.append(checkWhiteSpaces(log4jFile));
         }
 
         // append proactive policy File
@@ -324,5 +324,17 @@ public class JVMProcessImpl extends AbstractExternalProcess
             logger.error(e.getMessage());
        		return path;
         }
+    }
+    
+    private String checkWhiteSpaces(String path){
+        if (!path.startsWith("\"") && !path.startsWith("'")){
+            //if path does not start with " or ' we can check if there is whitespaces, 
+            //if it does, we let the user handle its path
+            if(path.indexOf(" ")> 0 ){
+                //if whitespaces, we surround all the path with double quotes
+                path="\""+path+"\"";
+            }
+        }
+        return path;
     }
 }
