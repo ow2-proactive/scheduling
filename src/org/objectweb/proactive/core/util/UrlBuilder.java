@@ -245,6 +245,9 @@ public class UrlBuilder {
     }
 
     public static String getHostNameorIP(InetAddress address) {
+    	if(System.getProperty("proactive.hostname")  != null ){
+    		return System.getProperty("proactive.hostname");
+    	}
         if ((System.getProperty("proactive.useIPaddress") != null) &&
                 (System.getProperty("proactive.useIPaddress").equals("true"))) {
             return address.getHostAddress();
