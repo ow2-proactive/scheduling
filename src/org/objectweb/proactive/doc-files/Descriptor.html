@@ -112,9 +112,11 @@ Parameters tied to the deployment of an application should be totally described 
 		&lt;/jvms&gt
 	&lt;/deployment&gt
  	&lt;infrastructure&gt
-		&lt;processDefinition id="<b>linuxJVM</b>"&gt
-			&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
-		&lt;/processDefinition&gt
+ 		&lt;processes&gt
+			&lt;processDefinition id="<b>linuxJVM</b>"&gt
+				&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
+			&lt;/processDefinition&gt
+		&lt;/processes&gt
 	&lt;/infrastructure&gt
 &lt;/ProActiveDescriptor&gt
 		</pre></blockquote>
@@ -382,9 +384,11 @@ Following XML files examples are used for the C3D application. The first file is
 		&lt;/jvms&gt
 	&lt;/deployment&gt
  	&lt;infrastructure&gt
-		&lt;processDefinition id="<b>linuxJVM</b>"&gt
-			&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
-		&lt;/processDefinition&gt
+ 		&lt;processes&gt
+			&lt;processDefinition id="<b>linuxJVM</b>"&gt
+				&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
+			&lt;/processDefinition&gt
+		&lt;/processes&gt
 	&lt;/infrastructure&gt
 &lt;/ProActiveDescriptor&gt
 </pre></blockquote>
@@ -412,9 +416,11 @@ This example represents xml deployment descriptor for the C3D application. The a
 		&lt;lookup virtualNode="<b>Dispatcher</b>" host="*" protocol="rmi"/&gt
 	&lt;/deployment&gt
 	&lt;infrastructure&gt
-		&lt;processDefinition id="<b>linuxJVM</b>"&gt
-			&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
-		&lt;/processDefinition&gt
+		&lt;processes&gt
+			&lt;processDefinition id="<b>linuxJVM</b>"&gt
+				&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt
+			&lt;/processDefinition&gt
+		&lt;/processes&gt
 	&lt;/infrastructure&gt
 &lt;/ProActiveDescriptor&gt
 </pre></blockquote>
