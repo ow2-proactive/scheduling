@@ -129,12 +129,12 @@ public interface ProActiveRuntime extends Job {
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
      * Allows this ProactiveRuntime on this VM to register another ProActiveRuntime
      * @param proActiveRuntimeDist the remote ProactiveRuntime to register
-     * @param proActiveRuntimeName the name of the remote ProActiveRuntime
+     * @param proActiveRuntimeUrl the url of the remote ProActiveRuntime
      * @param creatorID the name of the creator of the remote ProActiveRuntime
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName);
 
     /**
