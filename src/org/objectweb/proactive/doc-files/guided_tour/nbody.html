@@ -1,0 +1,863 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>ProActive guided tour</title>
+  <link href="../ProActive.css" rel="stylesheet">
+</head>
+<body style="background-color: rgb(255, 255, 255);">
+<!--
+ Header : start
+~~~ -->
+<table width="100%">
+  <tbody>
+    <tr>
+      <td align="left" valign="middle">
+      <table border="1" cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../../../../../overview-summary.html">back
+to API</a>&nbsp;&nbsp;</td>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../index.html">back
+to index</a>&nbsp;&nbsp;</td>
+            <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="index.html">back
+to guided tour index</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="mobile_agents.html">prev</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="conclusion.html">next</a>&nbsp;&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="right" valign="top"> <a
+ href="http://www-sop.inria.fr/oasis/ProActive/"><img
+ src="../ProActiveLogo200x34.gif" border="0" height="34" width="200"></a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<h1>4.0. The nbody example<br>
+</h1>
+<h2>Using facilities provided by
+ProActive on a complete example</h2>
+<h3 class="textNormal">1
+Rationale<br>
+</h3>
+<p>This section of the guided tour
+goes through the different steps that
+could take you to writing an application with ProActive, from a simple
+design, to a more complicated structure. This is meant to help you get
+familiar with the Group facilities offered by ProActive.</p>
+<p>
+n-body is a classic problem. It consists in working out the position of
+bodies in space, which depend only on the gravitational forces that
+apply to them. A good introduction to the problem is given <a
+ href="http://www.cs.berkeley.edu/%7Esouravc/cs267/nbody.htm">here</a>.
+You may find a detailled explanation of the underlying mathematics <a
+ href="http://members.fortunecity.com/kokhuitan/nbody.html">here</a>.
+Different ways of finding numerical solutions are given <a
+ href="http://www.amara.com/papers/nbody.html">here</a>.
+</p>
+<p>
+In short, one considers several bodies (sometimes called particles) in
+space, where the only force is due to gravity. When only two bodies are
+at hand, this is expressed as </p>
+<div style="text-align: center;">
+<table style="text-align: left; width: 1221px; height: 456px;"
+ border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td>
+      <div style="text-align: center;"><img
+ style="width: 230px; height: 51px;" alt=""
+ src="pics/nbody/forces_simple.gif"><br>
+      </div>
+      <p> <span style="font-style: italic;">F</span><sub
+ style="font-style: italic;">p-&gt;b</sub>
+is the force that <span style="font-style: italic;">p</span>
+applies on <span style="font-style: italic;">b</span>, <span
+ style="font-style: italic;">G</span>
+is the gravitational constant,<span style="font-style: italic;"> m</span><sub
+ style="font-style: italic;">p</sub><span style="font-style: italic;">
+m</span><sub style="font-style: italic;">b</sub>
+describe the mass of the bodies, <span style="font-style: italic;">r</span>
+is the distance between <span style="font-style: italic;">p</span>
+and <span style="font-style: italic;">b</span>,
+and<span style="font-style: italic;">
+u</span> is a unit vector in the
+direction going from <span style="font-style: italic;">p</span>
+to <span style="font-style: italic;">b</span>.
+When we consider all the forces that apply to one given body, we have
+to sum
+up the contribution of all the other bodies : </p>
+      <div style="text-align: center;"><img
+ style="width: 183px; height: 54px;" alt=""
+ src="pics/nbody/forces_sum.gif"> <br>
+      </div>
+      <p>This
+should be read as : the total force on the body <span
+ style="font-style: italic;">p</span>
+is the sum of all the forces between <span style="font-style: italic;">b</span>
+and all the other bodies in the system.<br>
+This
+is the force one has to compute for every body in the system. With this
+force, using the the usual physics formulae, <br>
+      </p>
+      <div style="text-align: center;"><img
+ style="width: 88px; height: 32px;" alt="" src="pics/nbody/acc.gif"><br>
+      </div>
+      <p class="textNormal">one
+may now compute the movement of a particle for a given time step
+(<span style="font-style: italic;">a</span>
+the acceleration, <span style="font-style: italic;">v</span>
+the velocity, <span style="font-style: italic;">x</span>
+the position, <span style="font-style: italic;">t</span>
+the time):<br>
+      </p>
+      <div style="text-align: center;"><img
+ style="width: 237px; height: 70px;" alt=""
+ src="pics/nbody/movement_equations.gif"><br>
+      </div>
+      </td>
+      <td><img style="width: 150px; height: 300px;" alt=""
+ src="pics/nbody/interactions.gif"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+</div>
+<h3 class="textNormal">2
+Source files: ProActive/src/org/objectweb/proactive/examples/nbody</h3>
+<br>
+<p>
+This guided tour is based on the files you may find in the directory
+ProActive/src/org/objectweb/proactive/examples/nbody. You'll find the
+following tree: </p>
+<img style="width: 130px; height: 120px;" alt=""
+ src="pics/nbody/directory.jpg"><br>
+<br>
+<p>The common directory contains
+files reused through the different
+version. 'simple' is the simplest example, groupcom is the first
+example with Group communication, and 'groupdistrib' and 'groupoospmd'
+are two enhancement based on different synchronization schemes.
+'barneshut' is a bit special, in that it contains a different algorithm
+to solve the nbody problem. <br>
+</p>
+<br>
+<h3 class="textNormal">3
+common</h3>
+<p>The files contained in 'common'
+are those that are reused throughout
+the different versions.&nbsp; Let's see what they do:</p>
+<br>
+<ul>
+  <li>First of all there are the
+two files
+called Displayer.java and NBodyFrame.java. These handle the graphical
+output of the bodies, as they move about in space. They are not
+specially of interest, as GUI is not the point of this tutorial.
+Nonetheless, please note that the important method here is
+    <p class="textNormal"> <code>public
+void drawBody(int x, int y, int vx, int vy, int weight, int d,
+int id) ;</code></p>
+Taking position, velocity, diameter and unique identifier of a body, it
+updates the display window. </li>
+  <br>
+  <li>Then, we have the files
+Force.java and Planet.java. They are used to compute the interaction
+between two distant bodies in the universe. Since they are in the
+common
+directory, they can be modified to include other forces (for example,
+collision) in a simple manner, which would be spread to all the
+examples. A Planet is no more than a point in
+space, with velocity and mass - the diameter expresses the size to use
+for the display:
+    <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+class Planet <span style="color: rgb(0, 121, 0);">implements
+Serializable</span>{<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+double mass;<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+double x,y,vx,vy;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; //
+position and velocity<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+double diameter;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; //
+diameter of the body,
+used by the Displayer <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+...</code></p>
+Please take note that it implements Serializable because it will be
+sent as parameter to method calls on Active Objects, but it is good
+practice to have <span style="font-weight: bold;">all</span>
+your ProActive classes implement Serializable. For example, migration
+requires everything to implement it, fault-tolerance also....
+    <p>The Force class is just the
+implementation of what a physical force
+really is. It is the implementation of a 2D vector, with the
+method add following the physics rule <br>
+    </p>
+    <div style="text-align: center;"><img
+ style="width: 230px; height: 51px;" alt=""
+ src="pics/nbody/forces_simple.gif"><span style="color: rgb(255, 0, 0);">
+    </span><br>
+    </div>
+  </li>
+  <li>Point2D.java and
+Rectangle.java are helper files. They simply implement what a point in
+space looks like, and what a rectangle is. They were created to avoid
+the trouble of using the standard java java.awt.geom.Point2D and
+java.awt.geom.Rectangle2D, which carry a bit too much overhead, and
+also to have them Serializable. <span style="color: rgb(255, 0, 0);"></span></li>
+  <li>And finally, the Start.java
+acts as the wrapper for the main() method. There is a part which reads
+command line parameters,&nbsp; counting bodies and iterations,
+and&nbsp; constructing the optional Displayer. Before choosing
+which example to run, it creates the nodes required by the simulation :
+    <br>
+    <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Construct deployment-related variables: pad &amp; nodes<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+staticPad = null;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+VirtualNode vnode;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try { staticPad = ProActive.getProactiveDescriptor(xmlFileName); }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+catch (ProActiveException e) { abort(e); }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+staticPad.activateMappings();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+vnode = staticPad.getVirtualNode("Workers");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Node[] nodes = null;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try { <span style="color: rgb(0, 121, 0);">nodes
+= vnode.getNodes();</span> }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+catch
+(NodeException e) { abort(e); }<br>
+    </code></p>
+the <code>Node [] nodes</code>
+are the different JVMs that were created on possibly different
+machines. They are used for Active Object creation. For example, in the
+simple example, the Maestro is created on the first of theses JVMs, and
+takes three parameters, a <code>Domain
+[]</code>, an <code>Integer</code>,
+and a <code>Start</code>
+(it will be detailed later)
+: <br>
+    <p class="textNormal"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Object [] constructorParams ; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+constructorParams = {domainArray, new Integer(maxIter), killsupport} ; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+maestro
+= (Maestro) ProActive.newActive ( Maestro.class.getName(),
+constructorParams , nodes[0] ) ;</code></p>
+  </li>
+</ul>
+<br>
+<p>The files contained in the
+other directories, 'simple', 'groupcom',
+'groupdistrib' , 'groupoospmd' , detail steps of increasing complexity,
+making the application use different concepts. 'barneshut' contains the
+final implementation, featuring the Barnes-Hut algorithm. But let's not
+go too fast. Let's have a look at the insides of the simplest
+implementation of the n-body problem. <br>
+</p>
+<h3 class="textNormal">4
+simple</h3>
+<br>
+<p>This is the implementation of
+the simplest example of nbody. We defined
+the <code>Planet</code>
+to be a passive object, and it does nothing. It
+is a container for position, velocity and mass, as we've seen in the
+description given higher up. The real actors are the Domains, who do
+all the work. To every
+<code>Planet</code>,
+in the universe, is associated a
+<code>Domain</code>,
+which is an
+<code>Active Object</code>.
+This&nbsp;
+<code>Domain</code>
+contains the code to manage the communication of the possitions of the <code>Planets</code>
+during the simulation. They are created in the Start.java file : <br>
+<code></code></p>
+<br>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Domain
+[] domainArray = new
+Domain
+[totalNbBodies];<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int&nbsp; i = 0 ; i &lt; totalNbBodies ; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Object [] <span style="color: rgb(0, 121, 0);">constructorParams</span>
+= new Object [] {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new Integer(i), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X,
+STEP_Y),<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+killsupport<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; };<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Create all the Domains used in the simulation <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+domainArray[i] = (Domain) <span style="color: rgb(0, 121, 0);">ProActive.newActive</span>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Domain.class.getName(), <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+constructorParams, <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+nodes[(i+1) % nodes.length]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+catch (ActiveObjectCreationException e) { killsupport.abort(e); } <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+catch
+(NodeException e) { killsupport.abort(e); }<br>
+</code><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</code><code>}</code></p>
+<br>
+<p>See how the call to <code>
+ProActive.newActive</code> creates
+one new <code>Active Object</code>,
+a <code> Domain</code>,
+at each iteration in the loop. The parameter <code>nodes</code>
+contains all the nodes on which an Active Object may be deployed. The
+<code>constructorParams</code>
+are the parameters that are to be passed to the constructor of
+<code>Domain</code>,
+and since it's an <code>Object []</code>
+, the parameters may only be <code>Objects</code>
+(don't try to build constructors using ints in their
+constructor - this explains the use of the class <code>Integer</code>).
+The Domains, once created, are initialized, and then they are
+synchronized by all pinging the maestro, with the notifyFinished
+call.&nbsp; are started
+by issuing the sendValueToNeighbours request. <br>
+<code></code></p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// init workers<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int i=0 ; i &lt; totalNbBodies ; i ++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+domainArray[i].init(domainArray, displayer, maestro);</code></p>
+<p><code><br>
+</code></p>
+<p><code>&nbsp;public
+void init(Domain [] domainArray, Displayer dp, Maestro master) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+maestro.notifyFinished(); &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; // say we're ready to start .<br>
+&nbsp;&nbsp;&nbsp; }<br>
+</code> </p>
+<br>
+<p>While in their execution, the <code>Domains</code>
+gather information concerning the position of all
+the other bodies, which need to be known to move the local <code>Planet</code>,
+at every time step. This is done using a push schema : instead of
+explicitly asking for information, this information is automatically
+issued : <br>
+<code></code></p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public void sendValueToNeighbours()
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int i = 0 ; i &lt; this.neighbours.length ; i ++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+if (i != this.identification) // don't notify self!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;
+this.neighbours[i].<span style="color: rgb(0, 121, 0);">setValue</span>(this.info,
+this.identification);<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; .....&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp; <br>
+&nbsp;
+&nbsp; &nbsp;&nbsp; public
+void setValue(Planet
+inf, int id) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;
+&nbsp; this.values [id] = inf;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+this.nbReceived
+++ ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+if (this.nbReceived &gt; this.nbvalues)&nbsp; // This is a bad
+sign!<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+System.err.println("Domain " + identification + " received too many
+answers");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+if (this.nbReceived == this.nbvalues) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="color: rgb(0, 121, 0);">this.maestro.notifyFinished()</span>;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;
+moveBody();<br>
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}&nbsp;&nbsp; </code> </p>
+<br>
+<p>This means that each <code>Domain</code>
+sends its
+information to all the other <code>Domains</code>,
+and then waits until it has received all the positions it is waiting
+for. The other <code>Domains</code>
+are stored as an array, and a Maestro is built
+to coordinate all the computation : to avoid having Domains computing
+iterations ahead of the others, explicit synchronization is achieved by
+the <code>Maestro</code>.
+It waits for all to notify it, before asking them to go on with the
+next iteration. <br>
+<code></code></p>
+<br>
+<p class="textNormal"><code>&nbsp;
+&nbsp; &nbsp;&nbsp; public
+void notifyFinished() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+this.nbFinished ++ ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+if
+(this.nbFinished == this.domainArray.length)
+{<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+this.iter ++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+if
+(this.iter == this.maxIter)&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;
+this.killsupport.quit();<br>
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.nbFinished = 0 ;<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int i = 0 ; i &lt; domainArray.length ; i++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.domainArray[i].<span style="color: rgb(0, 121, 0);">sendValueToNeighbours()</span>;<br>
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;
+&nbsp;
+}<br>
+</code>
+</p>
+<h3 class="textNormal">5
+groupcom</h3>
+<br>
+<p>This is a simple improvement,
+which allows to have faster
+communication. You may have noticed the Group capabilities of
+ProActive. They give us the ability to call on operation on an object
+which is&nbsp; a Group, and have it sent to all the members of the
+Group. In the previous example, the neighbours where stocked in an
+array, and each was accessed in turn:<br>
+<code></code></p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for
+(int i = 0 ; i &lt; this.neighbours.length ; i ++)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;
+if (i != this.identification) // don't notify self!<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp; &nbsp;
+this.neighbours[i].<span style="color: rgb(0, 121, 0);">setValue</span>(this.info,
+this.identification);<br>
+</code></p>
+<br>
+<p>Well, that's BAAAAD! Replace
+this by the following code, because it works faster :</p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.neighbours.setValue<span style="color: rgb(0, 121, 0);"></span>(this.info,
+this.identification);<br>
+</code></p>
+<p>It's a bit strange at first,
+because <code>neighbours</code>
+is of type <code>Domain</code>.
+You may think we're accessing only one Active Object at once, but
+that's not true. We're accesssing all the objects in the group, and to
+be able to continue using the methods of the Domain class, the group is
+type as one Domain. You have to create the <code>neighbours</code>
+group
+at the beginning of the code of the <code>Domain</code>,
+for example in the <code>init()</code>
+method, but you can then use it everywhere, in replacement of the
+array! <br>
+<code></code></p>
+<br>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+public
+void init(Domain domainGroup,
+Displayer dp, Maestro master) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.neighbours = domainGroup;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Group g = ProActiveGroup.getGroup(neighbours);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+g.remove(ProActive.getStubOnThis()); &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; // no need to send information to self<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp; &nbsp; .....<br>
+</code></p>
+<p>Such a group must be created
+as a Group, either empty, then filled in, or can be created as the
+Active Objects are created. That's more elegant, and here's how it's
+done :</p>
+<p><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Object
+[][] params = ... <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Domain&nbsp; domainGroup = null; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+// Create all the Domains as part of a Group<br>
+&nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+domainGroup = (Domain) ProActiveGroup.newGroup (
+Domain.class.getName(), params, nodes);<br>
+&nbsp;&nbsp; &nbsp; &nbsp;
+&nbsp;&nbsp;&nbsp;
+} <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;
+&nbsp;&nbsp;
+catch ....</code></p>
+<p>The double array params stores
+the parameters passed to the
+constructors of the Domains we're creating. Domain 0 will have
+params[0][] passed as arguments, Domain 1 params[1][], and so on. The
+nodes are the Nodes on which to display these Active Objects. Do notice
+the try... catch construction, which is needed, like around any
+creation of Active Objects, which may raise exceptions.&nbsp;
+</p>
+<br>
+<h3 class="textNormal">6
+groupdistrib</h3>
+<br>
+<p>Now, do like the idea that the
+synchronization is centralized on one
+entity? I don't and it's the bottleneck of the application anyway :
+once a Domain has finished, it sends the notifyFinshed, and then sits
+idle. Well, a way of making this better is to remove it completly! You
+may have noticed that because a Domain needs to have all the
+information of all the Domains of the same iteration before going on
+with the next iteration, if you change the behaviour of the setValue
+method to treat early calls, it would work nice and smoothly. That's
+what we've done : <br>
+<code></code></p>
+<br>
+<p><code>&nbsp;&nbsp;&nbsp;
+public
+void setValue(Planet inf, int
+receivedIter) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (this.iter == receivedIter) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="color: rgb(0, 121, 0);">this.currentForce.add(info,
+inf);</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.nbReceived ++ ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (this.nbReceived &gt; this.nbvalues)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+System.err.println(identification +&nbsp; " : Too many answers " +
+this.nbReceived + "/" + this.nbvalues);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (this.nbReceived == this.nbvalues) <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+moveBody();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+else { <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (this.iter &gt; receivedIter)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.killsupport.abort( new NullPointerException("Value arrives too
+late!"));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<span style="color: rgb(0, 121, 0);">this.prematureValues.add</span>(new
+Carrier (inf, receivedIter));<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }</code></p>
+<br>
+<p>Also notice how the computation
+is done when the result is received (<code>this.currentForce.add(info,
+inf);</code>),
+not
+when <span style="font-weight: bold;">all</span>
+the results have arrived. This allows for less time spent
+idle. Indeed, waiting for all the results before
+computing leaves idle time
+between setValue requests. And then, just before computing the new
+position of the body, the sum of all the forces has to be computed.
+It's better to have this sum ready when needed.<span
+ style="color: rgb(255, 0, 0);"></span>
+<br>
+The <code>prematureValues </code>Vector
+is the place where we put the values that arrive out of sync. When
+a value is early, it is queued there, and dequeued as soon as this
+Domain changes iteration.</p>
+<br>
+<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td> <code>public
+void sendValueToNeighbours() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+reset();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.iter++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+if (this.iter &lt; this.maxIter) {&nbsp;&nbsp;&nbsp;
+&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+neighbours.setValue(this.info, this.iter);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span
+ style="color: rgb(0, 121, 0);">treatPremature();</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+...<br>
+&nbsp;&nbsp; }&nbsp;&nbsp;&nbsp;</code> </td>
+      <td>&nbsp;&nbsp;&nbsp; <code>private void
+treatPremature() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+int size = this.prematureValues.size() ;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int i = 0 ; i &lt; size ; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Carrier c = (Carrier) this.prematureValues.remove(0);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+setValue(c.planet , c.iter); // works even if c.iter &gt; iter<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; }</code><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p>That treatPremature() method
+simply treats the values that were early
+as if they had just arrived. </p>
+<br>
+<br>
+<h3 class="textNormal">7
+groupoospmd</h3>
+<br>
+<p>This is another way to improve
+the groupcom example. It also removes
+the master, but this time by inserting oospmd barriers, that can be
+thought as behaving like the maestro
+class, but faster. What happens is that each Active Objects hits the
+barrier call, and then waits for all the others to have reached it,
+before reading its
+request queue again. <br>
+</p>
+<br>
+<table style="width: 100%; text-align: left;" border="1" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr>
+      <td><code>public
+void moveBody() {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Force force = new Force();&nbsp; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+for (int i = 0 ; i &lt; values.length ; i++) {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+force.add(info, values[i]); // adds the interaction of the distant body
+      <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.info.moveWithForce(force);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+ProSPMD.barrier("BARRIER : " + this.iter );<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+((Domain)ProActive.getStubOnThis()).pleaseContinue();<br>
+&nbsp;&nbsp;&nbsp; } </code> </td>
+      <td><code>&nbsp;&nbsp;&nbsp;
+public void pleaseContinue () {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+this.iter++;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+clearValues();<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+((Domain)ProActive.getStubOnThis()).sendValueToNeighbours(this.iter);<br>
+&nbsp;&nbsp;&nbsp; }<br>
+      </code> <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+<p>Beware, the&nbsp;
+stop-and-wait&nbsp; is
+not just after the barrier call, but instead blocks the request queue.
+So if there is code after that barrier, it <span
+ style="font-weight: bold;">will </span>get
+executed. In fact, the barrier should be seen as a prioritary request
+on the queue. This explains why we had to put the code after the
+barrier in the <code>pleaseContinue</code>
+method. If we hadn't done it that way, but just appended the code of
+that method just after the barrier, the call to <code>sendValueToNeighbours()</code>
+would be executed <span style="font-weight: bold;">before</span>
+the barrier execution, which is exactly what we don't want! <br>
+To create functional OOspm Groups, there is a special instruction,
+which has the same parameters as a newGroup instruction : <br>
+</p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<code>Object [][] params = <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+...<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Domain domainGroup = null; <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+try {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; domainGroup =
+(Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+}<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+catch ...<br>
+</code>
+<br>
+<h3 class="textNormal">8
+Barnes-Hut</h3>
+<br>
+<p class="textNormal">
+This way to construct the nbody simulation is based on a very different
+algorithm. This is inserted to show how one can express this algorithm
+in ProActive, but breaks off from the previous track, having such a
+different approach to solving the problem. Here's how it works: <br>
+</p>
+<p class="textNormal">To
+avoid broadcasting to every active object the new position of every
+particle, a tree implementation can simplify the problem by
+agglomerating sets of particles as a single particle, with a mass equal
+to the sum of masses of the all the particles:. This is the core of the
+Barnes-Hut algorithm. References on this can be found for example <a
+ href="http://physics.gmu.edu/%7Elarge/lr_forces/desc/bh/bhdesc.html">here</a>,
+and <a
+ href="http://www.cita.utoronto.ca/%7Edubinski/treecode/node2.html">here</a>.
+This method allows us to have a complexity brought down to <span
+ style="font-style: italic;">O(N log N)</span>.<br>
+</p>
+<p class="textNormal">In
+our parallel implementation, we have defined an <code>Active
+Object</code> called
+<code>Domain</code>,
+which represents a volume in space, and which contains <code>Planets</code>.
+It is either subdivided into smaller <code>Domains</code>,
+or is a leaf of the total tree, and then only contains <code>Planets</code>.
+A Planet is still an Object with mass, velocity and position, but is no
+longer on a one-to-one connection with a <code>Domain</code>.
+We have cut down communications to the biggest Domains possible : when
+a <code>Planet</code>
+is distant enough, its interactions are not computed, but it is grouped
+with its local neighbours to a bigger particle. Here is an example of
+the <code>Domains</code>
+which would be known by the <code>Domain</code>
+drawn in red :<br>
+</p>
+<p style="text-align: center;" class="textNormal">&nbsp;&nbsp;&nbsp; </p>
+<table
+ style="width: 70%; text-align: left; margin-left: auto; margin-right: auto;"
+ border="0" cellpadding="2" cellspacing="2">
+  <tbody>
+    <tr>
+      <td style="text-align: right;"><img
+ style="width: 200px; height: 200px;" alt=""
+ src="pics/nbody/Domain_subdivision.gif"></td>
+      <td style="width: 10%;"><br>
+      </td>
+      <td style="text-align: left;">
+      <p class="textNormal"><img style="width: 240px; height: 200px;"
+ alt="" src="pics/nbody/tree.gif"></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p style="text-align: left;" class="textNormal">The Domain in the lower
+left
+hand-corner, drawn in blue, is also divided into sub-Domains, but this
+needs not be known by the Domain in red : it assumes all the particles
+in the blue Domain are only one big one, centered at the center of mass
+of all the particles within the blue.</p>
+<p>In this version, the
+Domains
+communicate with a reduced set of other Domains, spanning on volumes of
+different sizes. Synchronization is achieved by sending explicitely
+iteration numbers, and returning when needed older positions. You may
+notice that some Domains seem dsynchronized with other ones, having
+several iterations inbetween. That is no problem because if they then
+need to be synchronized and send each other information, a mechanism
+saving the older positions permits to
+send them when needed.&nbsp;&nbsp; <a href="../nbody-barnes-hut.html">Barnes-Hut
+example</a>.
+</p>
+<br>
+<h3 class="textNormal">9
+Conclusion</h3>
+<br>
+<p>In this guided tour, we tried
+to show different facilities provided by
+ProActive, based on a real problem (nbody). We first saw how to deploy
+the application, then tuned it by adding Group communication, then
+removed a bottleneck ( due to the hard synchronization) . Finally,
+given is the code associated to a different algorithm, which
+cumbersomely shows how to get Active Objects deployed along a tree
+structure to communicate. <br>
+Recall the difffernt tricks used. </p>
+<br>
+<br>
+</body>
+</html>
