@@ -135,11 +135,15 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 
 <p>Go to the directory: <code>ProActive/compile</code> and run this
       command:</p>
-<code>$ ./build damon</code>
+<code>$ ./build daemon</code>
 
 <p>Before compile you should change some parameter like the daemon
       user or the port in the file:
       <code>ProActive/p2p/src/common/proactivep2p.h</code>.</p>
+
+<p>Ask to your system administrator to add the daemon in a crontab or
+      init.d. The process to run is located here:
+      <code>ProActive/p2p/build/proactivep2p</code></p>
 
 <h5>Micorsoft Windows</h5>
 
@@ -191,6 +195,10 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
   <li><b>Kill the daemon</b>:<br> 
     <code>$ ProActive/p2p/build/p2pctl killdaemon</code></li> 
 </ul> 
+
+<p>Under Windows you could use some littles scripts in
+      <code>ProActive/p2p/script/windows/JVM</code> to do that.</p>
+
 <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--> 
 <h2><a name=appli></a>Launch your Application</h2> 
 <h3>Simple: Use ProActive XML Deployment Descriptors</h3>
