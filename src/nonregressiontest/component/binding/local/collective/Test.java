@@ -53,8 +53,7 @@ import testsuite.test.FunctionalTest;
 /**
  * @author Matthieu Morel
  *
- * creates a new component
- * same than PrimitiveComponentA, but supports a collective interface on i2
+ * a test for bindings on client collective interfaces between remote components
  */
 public class Test extends FunctionalTest {
     public static String MESSAGE = "-->Main";
