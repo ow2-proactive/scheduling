@@ -365,10 +365,10 @@
 			create zip version of ProActive without source
 		-->
 		<zip zipfile="${dist.dir}/ProActive_2_1.zip">
-			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
-			<zipfileset dir="${PAdist.dir}/scripts" prefix="ProActive/scripts"/>
-			<zipfileset dir="${PAdist.dir}/lib" prefix="ProActive/lib"/>
-			<zipfileset dir="${PAdist.dir}/descriptors" prefix="ProActive/descriptors"/>
+			<zipfileset dir="${PAdist.dir}" filemode="755" prefix="ProActive">
+				<exclude name="src/**"/>
+				<exclude name="compile/**"/>
+			</zipfileset>
 		</zip>
 		<!-- 
 			create zip version of ProActive with source
