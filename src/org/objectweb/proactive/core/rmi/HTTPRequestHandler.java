@@ -48,12 +48,12 @@ import java.net.Socket;
  * It calls the right service (or "module") to perform the request and send back the appropriate response.
  * For example, when a request for a class file incomes, the thread calls the FileProcess.
  */
-public class ProActiveService extends Thread {
+public class HTTPRequestHandler extends Thread {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
     private final Socket socket;
     private String paths;
 
-    public ProActiveService(Socket socket, String paths) {
+    public HTTPRequestHandler(Socket socket, String paths) {
         this.socket = socket;
         this.paths = paths;
     }

@@ -182,7 +182,7 @@ public class ClassServer implements Runnable {
             try {
                 socket = server.accept();
 
-                ProActiveService service = (new ProActiveService(socket, paths));
+                HTTPRequestHandler service = (new HTTPRequestHandler(socket, paths));
                 service.start();
             } catch (java.io.IOException e) {
                 System.out.println("Class Server died: " + e.getMessage());
