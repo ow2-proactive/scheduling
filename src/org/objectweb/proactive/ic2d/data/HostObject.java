@@ -108,6 +108,7 @@ public class HostObject extends AbstractDataObject {
 
 
   public boolean isGlobusEnabled() {
+  	if (this.hostname.indexOf("globus") != -1) return true;
     return false;
   }
   
