@@ -2,6 +2,7 @@ package test.loopmigration;
 
 import java.io.Serializable;
 
+import modelisation.forwarder.DummyObject;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
