@@ -33,7 +33,9 @@ package org.objectweb.proactive.core.mop;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class contains static convenience and utility methods
@@ -455,19 +457,40 @@ public abstract class Utils extends Object {
   }
   
   /**
-   * looks for all super interfaces of the given interface, and adds them in the given Vector
+   * Looks for all super interfaces of the given interface, and adds them in the given List
    * @param cl the base interface
    * @param superItfs a vector that will list all Class instances corresponding to the super interfaces of cl
    */
-  public static void addSuperInterfaces(Class cl, Vector superItfs) {
+  public static void addSuperInterfaces(Class cl, List superItfs) {
 	  if (!cl.isInterface()) {
 		  return;
 	  }
 	  Class[] super_interfaces = cl.getInterfaces();
 	  for (int i = 0; i < super_interfaces.length; i++) {
-		  superItfs.addElement(super_interfaces[i]);
+		  superItfs.add(super_interfaces[i]);
 		  addSuperInterfaces(super_interfaces[i], superItfs);
 	  }
+  }
+  
+  /**
+   * Gets all super-interfaces from the interfaces of this list, and
+   * adds them to this list.
+   * @param interfaces a list of interfaces
+   */
+  public static void addSuperInterfaces(List interfaces) {
+      for (int i=0; i<interfaces.size(); i++) {
+          Class[] super_itfs_table = ((Class)interfaces.get(i)).getInterfaces();
+          List super_itfs = new ArrayList(super_itfs_table.length); // resizable list
+          for (int j=0; j<super_itfs_table.length; j++) {
+              super_itfs.add(super_itfs_table[j]);
+          }
+          addSuperInterfaces(super_itfs);
+          for (int j=0; j<super_itfs.size(); j++) {
+              if (!interfaces.contains(super_itfs.get(j))) {
+                  interfaces.add(super_itfs.get(j));
+              }
+          }
+      }
   }
 
   private static final Class silentForName(String classname) {
