@@ -36,5 +36,6 @@ package nonregressiontest;
  * Created on Jan 25, 2005
  */
 public class TestCVSMessageLog {
+	// Adding a dummy line in the class to test the diff
 
 }
