@@ -72,7 +72,7 @@ public interface RunActive extends Active {
   
   /**
    * Runs the activity of the active object.
-   * @param <code>body</code> the body of the active object being started
+   * @param body the body of the active object being started
    */
   public void runActivity(Body body);
 

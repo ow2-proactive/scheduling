@@ -366,17 +366,14 @@ public class ProActive {
      * A reference on the active object base class can be retreived through the component parameters controller's
      * method "getStubOnReifiedObject".
      *
-     * @param classname the name of the base class. "Composite" if the component is a composite,
+     * @param className the name of the base class. "Composite" if the component is a composite,
      * "ParallelComposite" if the component is a parallel composite component
      * @param constructorParameters the parameters of the constructor of the object
      *    to instantiate as active. If some parameters are primitive types, the wrapper
      *    class types should be given here. null can be used to specify that no parameter
      *    are passed to the constructor.
-     * @param node the possibly null node where to create the active object. If null, the active object
+     * @param vn the possibly null node where to create the active object. If null, the active object
      *       is created localy on a default node
-     * @param activity the possibly null activity object defining the different step in the activity of the object.
-     *               see the definition of the activity in the javadoc of this class for more information.
-     * @param factory should be null for components (automatically created)
      * @param componentParameters the parameters of the component
      * @return a typed group of component representative elements, of type Component
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
@@ -706,7 +703,7 @@ public class ProActive {
     /**
      * Returns a <code>ProActiveDescriptor</code> that gives an object representation
      * of the XML document located at the given url.
-     * @param xmlDescriptorUrl. The url of the XML document
+     * @param xmlDescriptorUrl The url of the XML document
      * @return ProActiveDescriptor. The object representation of the XML document
      * @throws ProActiveException if a problem occurs during the creation of the object
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor

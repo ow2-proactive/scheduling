@@ -55,7 +55,7 @@ public interface InitActive extends Active {
   
   /**
    * Initializes the activity of the active object.
-   * @param <code>body</code> the body of the active object being initialized
+   * @param body the body of the active object being initialized
    */
   public void initActivity(Body body);
 

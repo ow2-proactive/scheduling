@@ -66,7 +66,7 @@ public class ActiveObjectCreationException extends ProActiveException {
   * detail message and nested exception.
   *
   * @param s the detail message
-  * @param ex the nested exception
+  * @param detail the nested exception
   */
   public ActiveObjectCreationException(String s, Throwable detail) {
     super(s, detail);
@@ -76,7 +76,7 @@ public class ActiveObjectCreationException extends ProActiveException {
   /**
   * Constructs a <code>ActiveObjectCreationException</code> with the specified
   * detail message and nested exception.
-  * @param ex the nested exception
+  * @param detail the nested exception
   */
   public ActiveObjectCreationException(Throwable detail) {
     super(detail);

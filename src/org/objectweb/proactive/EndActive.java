@@ -62,7 +62,7 @@ public interface EndActive extends Active {
   
   /**
    * Finalized the active object after the activity has been stopped.
-   * @param <code>body</code> the body of the active object being finalized.
+   * @param body the body of the active object being finalized.
    */
   public void endActivity(Body body);
 

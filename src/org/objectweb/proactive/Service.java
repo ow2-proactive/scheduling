@@ -103,10 +103,7 @@ public class Service  {
   //
 
 
-  /**
-   * Serves the request given in parameter
-   * @param request the request to be served
-   */
+
   public String toString() {
     return "Service\n  Body="+body.toString()+"\n  RequestQueue="+requestQueue.toString();
   }
