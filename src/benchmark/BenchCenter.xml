@@ -7,8 +7,8 @@
 	
 	<result type="html" file="../benchmark.html" />
 	
-	<properties>
+	<!--<properties>
 		<prop key="RemoteHostname" value="amda" />
-	</properties>
+	</properties>-->
 
 </Manager>

@@ -1,38 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Manager>
+
 	<name>Main unit test manager</name>
 	<description>Manage all unit non-regression tests</description>
+	
 	<!-- all classes in package nonregressiontest are added, only the specified
 		tests are sorted. -->
-	<packageGroup name="Unit test group" description="group of unit tests" dir="../classes" packageName="nonregressiontest">
-		<unitTest class="nonregressiontest.runtime.defaultruntime.Test"/>
-		<unitTest class="nonregressiontest.node.nodefactory.Test"/>
-		<unitTest class="nonregressiontest.stub.stubinterface.Test"/>
-		<unitTest class="nonregressiontest.stub.stubgeneration.Test"/>
-		<unitTest class="nonregressiontest.activeobject.creation.local.newactive.Test"/>
-		<unitTest class="nonregressiontest.activeobject.creation.local.turnactive.Test"/>
-		<unitTest class="nonregressiontest.activeobject.creation.remote.newactive.Test"/>
-		<unitTest class="nonregressiontest.activeobject.creation.remote.turnactive.Test"/>
-		<unitTest class="nonregressiontest.activeobject.request.Test"/>
-		<unitTest class="nonregressiontest.activeobject.request.immediateservice.Test"/>
-		<unitTest class="nonregressiontest.activeobject.request.terminate.Test"/>
-		<unitTest class="nonregressiontest.activeobject.lookupactive.Test"/>
-		<unitTest class="nonregressiontest.activeobject.node.getactiveobject.Test"/>
-		<unitTest class="nonregressiontest.activeobject.migration.simplemigration.Test"/>
-		<unitTest class="nonregressiontest.activeobject.migration.multiplemigration.Test"/>
-		<unitTest class="nonregressiontest.activeobject.migration.loopmigration.Test"/>
-		<unitTest class="nonregressiontest.activeobject.migration.strategy.Test"/>
-		<unitTest class="nonregressiontest.activeobject.locationserver.Test"/>
-		<unitTest class="nonregressiontest.activeobject.loopmixedlocation.Test"/>
-		<unitTest class="nonregressiontest.activeobject.acontinuation.Test"/>
-		<unitTest class="nonregressiontest.descriptor.Test"/>
-		<unitTest class="nonregressiontest.descriptor.lookupregister.Test"/>
-		<unitTest class="nonregressiontest.group.creation.Test"/>
-		<unitTest class="nonregressiontest.group.onewaycall.Test"/>
-		<unitTest class="nonregressiontest.group.asynchronouscall.Test"/>
-		<unitTest class="nonregressiontest.group.result.Test"/>
-		<unitTest class="nonregressiontest.group.scatter.Test"/>
-		<unitTest class="nonregressiontest.group.oneserialization.Test"/>
-		<unitTest class="nonregressiontest.group.exception.Test"/>
+	<packageGroup name="Unit test group" description="group of unit tests" 
+		dir="../classes" 
+		packageName="nonregressiontest" >
+			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
+			<unitTest class="nonregressiontest.node.nodefactory.Test" />
+			<unitTest class="nonregressiontest.stub.stubgeneration.Test" />
+			<unitTest class="nonregressiontest.stub.stubinterface.Test" />
+			<unitTest class="nonregressiontest.activeobject.creation.local.newactive.Test" />
+			<unitTest class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
+			<unitTest class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
+			<unitTest class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
+			<unitTest class="nonregressiontest.activeobject.request.Test" />
+			<unitTest class="nonregressiontest.activeobject.request.immediateservice.Test" />
+			<unitTest class="nonregressiontest.activeobject.request.terminate.Test" />
+			<unitTest class="nonregressiontest.activeobject.lookupactive.Test" />
+			<unitTest class="nonregressiontest.activeobject.node.getactiveobject.Test" />
+			<unitTest class="nonregressiontest.activeobject.migration.simplemigration.Test" />
+			<unitTest class="nonregressiontest.activeobject.migration.multiplemigration.Test" />
+			<unitTest class="nonregressiontest.activeobject.migration.loopmigration.Test" />
+			<unitTest class="nonregressiontest.activeobject.migration.strategy.Test" />
+			<unitTest class="nonregressiontest.activeobject.locationserver.Test" />
+			<unitTest class="nonregressiontest.activeobject.loopmixedlocation.Test" />
+			<unitTest class="nonregressiontest.activeobject.acontinuation.Test" />
+			<unitTest class="nonregressiontest.descriptor.Test" />
+			<unitTest class="nonregressiontest.descriptor.lookupregister.Test" />
+			<unitTest class="nonregressiontest.group.creation.Test" />
+			<unitTest class="nonregressiontest.group.onewaycall.Test" />
+			<unitTest class="nonregressiontest.group.asynchronouscall.Test" />
+			<unitTest class="nonregressiontest.group.result.Test" />
+			<unitTest class="nonregressiontest.group.scatter.Test" />
+			<unitTest class="nonregressiontest.group.oneserialization.Test" />
+			<unitTest class="nonregressiontest.group.exception.Test" />
 	</packageGroup>
+	
+	<log4j>../compile/proactive-log4j</log4j>
+	
+	<result type="html" file="../test.html" />
+	
+	<!--<properties>
+		<prop key="RemoteHostname" value="owenii" />
+	</properties>-->
+	
 </Manager>
