@@ -12,7 +12,7 @@ org.objectweb.proactive.core.body.jini
 org.objectweb.proactive.core.descriptor.data
 org.objectweb.proactive.core.descriptor.xml
 org.objectweb.proactive.core.event
-org.objectweb.proactive.core.group
+# org.objectweb.proactive.core.group
 org.objectweb.proactive.core.mop
 org.objectweb.proactive.core.node
 # org.objectweb.proactive.core.node.jini

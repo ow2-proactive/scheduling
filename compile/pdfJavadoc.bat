@@ -11,6 +11,9 @@ echo Filtering html doc-files...
 
 %JAVA_HOME%\bin\java util.FilterDocFiles ..\src\org\objectweb\proactive\doc-files
 
+echo Copying image files to compile directory to fix bug with MIFDoclet ...
+copy ..\src\org\objectweb\proactive\doc-files\*.gif ..\compile
+
 
 echo Producing javadoc with MIFDoclet
 
@@ -32,6 +35,9 @@ echo Producing javadoc with MIFDoclet
 
 echo Removing filtered html doc-files...
 del ..\src\org\objectweb\proactive\doc-files\_*.*
+
+echo Removing copied images...
+del ..\compile\*.gif
 
 ENDLOCAL
 goto end
