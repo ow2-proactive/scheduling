@@ -41,6 +41,7 @@ public class HostPanel extends AbstractDataObjectPanel
     private HostObject hostObject;
     protected java.awt.Dimension minimumSize = new java.awt.Dimension(150, 80);
     protected PanelPopupMenu popup;
+    private String alignLayout; //keep state of layout H or V
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -56,7 +57,8 @@ public class HostPanel extends AbstractDataObjectPanel
         //else 
         setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
         createBorder(hostObject.getOperatingSystem());
-        setAlignLayout(false);
+        WorldPanel parent =(WorldPanel) getParentDataObjectPanel(); // get parent
+        alignLayout(parent.getAlignLayout()); //the host default alignement is the worldpanel alignement
         // Popup menu
         popup = new PanelPopupMenu("Host " + name + " OS " +
                 hostObject.getOperatingSystem());
@@ -82,7 +84,7 @@ public class HostPanel extends AbstractDataObjectPanel
                 "Horizontal");
         JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayout(false);
+                    alignLayout("H");
                 }
             });
 
@@ -91,7 +93,7 @@ public class HostPanel extends AbstractDataObjectPanel
                 "Vertical");
         JRadioButtonMenuItemVertic.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayout(true);
+                    alignLayout("V");
                 }
             });
 
@@ -130,24 +132,25 @@ public class HostPanel extends AbstractDataObjectPanel
     //
     // ebe 06/2004
     // set VM horiz or vertic layout for that host
-    public void setAlignLayout(boolean align) {
+    public void alignLayout(String align) {
+    	alignLayout=align;
         setPreferredSize(null);
-        if (align == false) {
+        if (align == "H") {
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
         } else {
             setLayout(new javax.swing.BoxLayout(HostPanel.this,
                     javax.swing.BoxLayout.Y_AXIS));
         }
-        this.setAlignLayoutChild(align); // 
+        this.alignLayoutChild(align); // 
         revalidate();
         repaint();
     }
 
     // Set child (vm) Alignement H  / V 
-    public void setAlignLayoutChild(boolean align) {
+    public void alignLayoutChild(String align) {
         java.util.Iterator iterator = childsIterator();
         while (iterator.hasNext()) {
-            ((VMPanel) iterator.next()).setAlignLayout(align);
+            ((VMPanel) iterator.next()).alignLayout(align);
         }
     }
 
@@ -222,4 +225,10 @@ public class HostPanel extends AbstractDataObjectPanel
                 javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION,
                 javax.swing.border.TitledBorder.DEFAULT_POSITION, defaultFont));
     }
+	/**
+	 * @return Returns the alignLayout.
+	 */
+	public String getAlignLayout() {
+		return alignLayout;
+	}
 }

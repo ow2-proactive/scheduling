@@ -43,6 +43,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
 
   private VMObject vmObject;
   protected PanelPopupMenu popup;
+  private String alignLayout; //keep state of layout H or V
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -52,7 +53,9 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     super(parentDataObjectPanel, "VM id="+targetVMObject.getID().toString(), "VMObject");
     activeObjectFilter.addClass(SpyListenerImpl.class.getName());
     this.vmObject = targetVMObject;
-    this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));
+    //this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));
+    HostPanel parent =(HostPanel) getParentDataObjectPanel(); // get parent
+    alignLayout(parent.getAlignLayout()); //the host default alignement is the worldpanel alignement
     if (targetVMObject.getProtocolId().indexOf("globus")>=0){
     	this.setBackground(new Color(0xff, 0xd0, 0xd0));
     }
@@ -104,10 +107,10 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
   // ebe 06/2004
   // set VM horiz or vertic layout for that VM
   // needed if there's more than one node in one VM
-  public void setAlignLayout(boolean align) {
+  public void alignLayout(String align) {
+  	alignLayout=align;
       setPreferredSize(null);
-      if (align == false) {
-          
+      if (align == "H") {
           setLayout(new java.awt.GridLayout(1, 0, 4, 4));
       } else {
           this.setLayout(new java.awt.GridLayout(0, 1, 4, 4));

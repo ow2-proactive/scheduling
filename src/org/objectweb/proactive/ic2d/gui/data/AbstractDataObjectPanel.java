@@ -437,6 +437,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
         private class MyMouseListener extends java.awt.event.MouseAdapter {
             public void mousePressed(java.awt.event.MouseEvent e) {
                 if (e.isPopupTrigger()) {
+                	coherentMenu();
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -446,6 +447,10 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
                     show(e.getComponent(), e.getX(), e.getY());
                 }
             }
+            
+            private void coherentMenu(){
+            	
+            }
         } // end inner class MyMouseListener
 
         private class FontSizeMenu extends javax.swing.JMenu {
@@ -453,7 +458,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
 
             public FontSizeMenu() {
                 super("Change font size");
-                System.out.println("font = " + getFont());
+                //System.out.println("font = " + getFont());
                 add(createItem("Very large font size", VERY_BIG_FONT_SIZE, false));
                 add(createItem("Large font size", BIG_FONT_SIZE, false));
                 add(createItem("Regular font size", REGULAR_FONT_SIZE, true));
@@ -475,7 +480,8 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
                 group.add(menuItem);
                 return menuItem;
             }
-
+            public void selectRightRB(){
+            	}
             /**
              * @return Returns the group.
              */

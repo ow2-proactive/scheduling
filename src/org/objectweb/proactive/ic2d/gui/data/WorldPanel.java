@@ -42,6 +42,7 @@ public class WorldPanel extends AbstractDataObjectPanel
     implements WorldObjectListener, javax.swing.Scrollable {
     private WorldObject worldObject;
     private ActiveObjectCommunicationRecorder communicationRecorder;
+    private String alignLayout="H"; //keep state of layout H or V
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -142,7 +143,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 "Horizontal");
         JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayoutChild(false);
+                   alignLayoutChild("H");
                 }
             });
 
@@ -151,7 +152,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 "Vertical");
         JRadioButtonMenuItemVertic.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    setAlignLayoutChild(true);
+                    alignLayoutChild("V");
                 }
             });
 
@@ -179,10 +180,11 @@ public class WorldPanel extends AbstractDataObjectPanel
     }
 
     // Set child Alignement H  / V 
-    public void setAlignLayoutChild(boolean align) {
+    public void alignLayoutChild(String align) {
+    	alignLayout=align;
         java.util.Iterator iterator = childsIterator();
         while (iterator.hasNext()) {
-            ((HostPanel) iterator.next()).setAlignLayout(align);
+            ((HostPanel) iterator.next()).alignLayout(align);
         }
     }
 
@@ -374,4 +376,10 @@ public class WorldPanel extends AbstractDataObjectPanel
             return preferredLayoutSize(target);
         }
     }
+	/**
+	 * @return Returns the alignLayout.
+	 */
+	public String getAlignLayout() {
+		return alignLayout;
+	}
 }
