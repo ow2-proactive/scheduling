@@ -56,16 +56,17 @@ public class HandlerCommunicationException extends HandlerNonFunctionalException
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException e) {
-        super.handle(e);
+    public void handle(NonFunctionalException e, Object info) {
+    	// System.out.println("PROBLEM ON " + ((String) info));
+        super.handle(e, info);
     }
 
     /**
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException nfe, Exception e)
+    public void handle(NonFunctionalException nfe, Exception e, Object info)
         throws Exception {
-        super.handle(nfe, e);
+        super.handle(nfe, e, info);
     }
 }

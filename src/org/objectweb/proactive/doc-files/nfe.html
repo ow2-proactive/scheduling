@@ -102,7 +102,10 @@ public Interface Handler implements java.io.Serializable {
      <b>// Is the exception managed by the current handler ?</b>
   public boolean isHandling(NonFunctionalException e);
 
-     <b>// Provide a treatment for handled exception(s)</b>
+     <b>// Handle non-functional exception(s) but still raised an exception to higher level</b>
+  public void handle(NonFunctionalException nfe, Exception e) throws Exception {
+  
+     <b>// Handle non-functional exception(s)</b>
   public void handle(NonFunctionalException e);
 }
 </pre></blockquote>
@@ -363,18 +366,18 @@ Here is the code of the three main functions of the API
 
 <H3>Users API : setExceptionHandler()</H3>
 <blockquote><pre>
-   /**
-     * Add one handler of Non Functional Exception (nfe) to a specific level.
-     * Similar handlers are overwritten except those at default level.
-     * @param handler A class of handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @param levelID An identificator for the level where the handler is added.
-     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
-     */
+ 
+    /**
+      * Add one handler of Non Functional Exception (nfe) to a specific level.
+      * Similar handlers are overwritten except those at default level.
+      * @param handler A class of handler associated with a class of non functional exception.
+      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+      * @param levelID An identificator for the level where the handler is added.
+      * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
+      */
     public static void setExceptionHandler(Class handler, Class exception,
         int levelID, Object target) {
-
-     // Information
+        // Information
         if (logger.isDebugEnabled()) {
             logger.debug("*** SETTING " + handler.getName() + " FOR " +
                 exception.getName() + " AT " + levelID + "  LEVEL");
@@ -421,6 +424,11 @@ Here is the code of the three main functions of the API
                             handler.getName() + " in BODY LEVEL");
                     }
                 }
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD HANDLER TO NULL BODY OBJECT");
+                }
             }
             break;
         case (Handler.ID_Proxy):
@@ -431,19 +439,40 @@ Here is the code of the three main functions of the API
                         exception);
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("*** ERROR while SETTNG handler " +
+                        logger.debug("*** ERROR while SETTING handler " +
                             handler.getName() + " in PROXY LEVEL");
                     }
+                }
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD HANDLER TO NULL PROXY OBJECT");
                 }
             }
             break;
         case (Handler.ID_Future):
             break;
         case (Handler.ID_Code):
-            if (codeLevel == null) {
-                codeLevel = new HashMap();
+            if (target != null) {
+                if (codeLevel == null) {
+                    codeLevel = new HashMap();
+                }
+
+                // Try to get the hashmap associated to this object
+                if (codeLevel.containsKey(new Integer(target.hashCode()))) {
+                    ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
+                        handler);
+                } else {
+                    codeLevel.put(new Integer(target.hashCode()), new HashMap());
+                    ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
+                        handler);
+                }
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                        "*** ERROR: CANNOT ADD TEMP. HANDLER TO NULL OBJECT");
+                }
             }
-            codeLevel.put(exception, handler);
             break;
         }
     }
@@ -452,45 +481,42 @@ Here is the code of the three main functions of the API
 
 <H3>Users API : unsetExceptionHandler()</H3>
 <blockquote><pre>
-   /**
-     * Remove a handler associated to a class of non functional exceptions.
-     * @param exception A class of non functional exception which does not require the given handler anymore.
-     * @param levelID An identificator for the level where the handler is removed.
-     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
-     */
+
+    /**
+      * Remove a handler associated to a class of non functional exceptions.
+      * @param exception A class of non functional exception which does not require the given handler anymore.
+      * @param levelID An identificator for the level where the handler is removed.
+      * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
+      */
     public static Handler unsetExceptionHandler(Class exception, int levelID,
         Object target) {
-        
         // We keep a trace of the removed handler
         Class handlerClass = null;
         Handler handler = null;
 
         // The correct level is identified
-        HashMap level = null;
         switch (levelID) {
         // Default level must not be modified !
         case (Handler.ID_Default):
             if (logger.isDebugEnabled()) {
                 logger.debug(
-                    "*** ERROR : CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+                    "*** ERROR: REMOVING HANDLER from DEFAULT LEVEL is FORBIDDEN !");
             }
             return null;
         case (Handler.ID_VM):
             if (VMLevel != null) {
-                handlerClass = (Class) level.remove(exception);
+                handlerClass = (Class) VMLevel.remove(exception);
             }
             break;
         case (Handler.ID_Body):
-            // The target object must be a body
+            // The target must be a body
             if (((target != null) && target instanceof UniversalBody)) {
-                //	Get the body of the target object
+                //	Get the body of target (remote) object
                 UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                 try {
                     if (body instanceof ActiveBody) {
-                        // Local body
                         body.unsetExceptionHandler(exception);
                     } else if (body instanceof RemoteBodyAdapter) {
-                        // Remote body
                         body.getRemoteAdapter().unsetExceptionHandler(exception);
                     }
                 } catch (ProActiveException e) {
@@ -502,7 +528,7 @@ Here is the code of the three main functions of the API
             }
             break;
         case (Handler.ID_Proxy):
-            // The target object must be a proxy
+            // The target must be a proxy
             if (((target != null) && target instanceof AbstractProxy)) {
                 // Create a request to associate handler to the distant body
                 try {
@@ -519,9 +545,13 @@ Here is the code of the three main functions of the API
         case (Handler.ID_Future):
             break;
         case (Handler.ID_Code):
-            if (codeLevel != null) {
-                handlerClass = (Class) level.remove(exception);
+            if ((target != null) && (codeLevel != null)) {
+                if (codeLevel.containsKey(new Integer(target.hashCode()))) {
+                    handlerClass = (Class) ((HashMap) codeLevel.get(new Integer(
+                                target.hashCode()))).remove(exception);
+                }
             }
+            break;
         }
 
         // Instantiation of the removed handler
@@ -548,35 +578,38 @@ Here is the code of the three main functions of the API
 <H3>Developers API : searchExceptionHandler()</H3>
 <blockquote><pre>
 
-     /**
-       * Search an appropriate handler for a given non functional exception.
-       * The search starts in the highest level and continue in lower levels. When no
-       * handler is available in one level, the search steps down into the hierarchy.
-       * @param ex Exception for which we search a handler.
-       * @param target An object which contains its own level.
-       * @return A reliable handler or null if no handler is available
-       */
+    /**
+      * Search an appropriate handler for a given non functional exception.
+      * The search starts in the highest level and continue in lower levels. When no
+      * handler is available in one level, the search steps down into the hierarchy.
+      * @param ex Exception for which we search a handler.
+      * @param target An object which contains its own level.
+      * @return A reliable handler or null if no handler is available
+      */
     public static Handler searchExceptionHandler(NonFunctionalException ex,
         Object target) {
-
-        // Try to get an handler from code level
+        // Temporary handler
         Handler handler = null;
-        if ((handler = searchExceptionHandler(ex.getClass(), codeLevel,
-                        Handler.ID_Code)) != null) {
-            return handler;
-        }
 
         // Try to get a handler from object level (active object = body or proxy)
         if (target != null) {
-            //	Get the body of the target object
-            UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+            // Try to get an handler from code level
+            if (codeLevel != null) {
+                if ((handler = searchExceptionHandler(ex.getClass(),
+                                (HashMap) codeLevel.get(
+                                    new Integer(target.hashCode())),
+                                Handler.ID_Code)) != null) {
+                    return handler;
+                }
+            }
 
             // target is local body (i.e. active object level) ?			
             if (target instanceof ActiveBody) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("*** SEARCH HANDLER IN LOCAL BODY");
+                    logger.debug("*** SEARCHING HANDLER IN LOCAL BODY");
                 }
                 try {
+                    UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Body)) != null) {
@@ -587,14 +620,14 @@ Here is the code of the three main functions of the API
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-            }
 
-            // target is remote body (i.e. active object level) ?
-            if (target instanceof RemoteBodyAdapter) {
+                // target is remote body (i.e. active object level) ?
+            } else if (target instanceof RemoteBodyAdapter) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("*** SEARCH HANDLER IN REMOTE BODY");
+                    logger.debug("*** SEARCHING HANDLER IN REMOTE BODY");
                 }
                 try {
+                    UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
                     HashMap map = ((UniversalBody) body).getRemoteAdapter()
                                    .getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
@@ -606,10 +639,12 @@ Here is the code of the three main functions of the API
                         logger.debug("*** ERROR : " + e.getMessage());
                     }
                 }
-            }
 
-            //	target is a proxy (i.e. a ref. to a body) ?			
-            if (target instanceof AbstractProxy) {
+                // target is a proxy (i.e. a ref. to a body) ?
+            } else if (target instanceof AbstractProxy) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCHING HANDLER IN PROXY");
+                }
                 try {
                     HashMap map = ((AbstractProxy) target).getHandlersLevel();
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
@@ -622,7 +657,7 @@ Here is the code of the three main functions of the API
                     }
                 }
             }
-        }   
+        }
 
         // Try to get an handler from VM level
         if ((handler = searchExceptionHandler(ex.getClass(), VMLevel,
@@ -636,18 +671,18 @@ Here is the code of the three main functions of the API
     }
 
 
-   /**
-     * Search an appropriate handler for a given non functional exception.
-     * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
-     * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
-     * @param NFEClass Class of the non-functional exception for which a handler is searched.
-     * @param level The level where handlers are searched
-     * @param levelID Identificator of the level
-     * @return A reliable handler or null if no handler is available
-     */
+    /**
+      * Search an appropriate handler for a given non functional exception.
+      * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
+      * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
+      * @param NFEClass Class of the non-functional exception for which a handler is searched.
+      * @param level The level where handlers are searched
+      * @param levelID Identificator of the level
+      * @return A reliable handler or null if no handler is available
+      */
     public static Handler searchExceptionHandler(Class NFEClass, HashMap level,
         int levelID) {
-
+        
         // Test level capacity
         if ((level == null) || level.isEmpty()) {
             return null;
@@ -687,8 +722,7 @@ Here is the code of the three main functions of the API
         // We return the handler
         return handler;
     }
-</blockquote></pre>
-
+    </blockquote></pre>
 
 <H2>Contacts</H2>
 <p class="textNormal">

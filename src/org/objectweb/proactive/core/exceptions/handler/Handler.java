@@ -93,12 +93,12 @@ public interface Handler extends java.io.Serializable {
       * Provide a treatment for the handled exception(s)
       * @param e The exception to be handled
       */
-    public void handle(NonFunctionalException e);
+    public void handle(NonFunctionalException e, Object info);
 
     /**
      * Provide a treatment for the handled exception(s)
     * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException nfe, Exception e)
+    public void handle(NonFunctionalException nfe, Exception e, Object info)
         throws Exception;
 }

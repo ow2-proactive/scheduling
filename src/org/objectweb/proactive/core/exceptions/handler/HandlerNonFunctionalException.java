@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.exceptions.handler;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
@@ -44,10 +43,10 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
  *
  */
 public class HandlerNonFunctionalException implements Handler {
-
-	// Logger
-	protected static Logger logger = Logger.getLogger(ActiveBody.class.getName());
 	
+    // Logger
+    protected static Logger logger = Logger.getLogger("NFE");
+
     /**
      * Contains a suggestion to resolve the problem
      */
@@ -93,28 +92,27 @@ public class HandlerNonFunctionalException implements Handler {
     /**
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
-     */ 
-    public void handle(NonFunctionalException e) {
-        logger.debug("EXCEPTION [" + e.getDescription() +
-            "] HANDLED WITH [" + this.getClass().getName() + "]");
-        logger.debug(suggestion);
-        logger.debug(
-            "=> (solution 2) SET HANDLER FOR EXCEPTION [" +
+     */
+    public void handle(NonFunctionalException e, Object info) {
+		logger.info("PROBLEM ON " + ((String) info));
+        logger.info("EXCEPTION [" + e.getDescription() + "] HANDLED WITH [" +
+            this.getClass().getName() + "]");
+        logger.info(suggestion);
+        logger.info("=> (solution 2) SET HANDLER FOR EXCEPTION [" +
             e.getClass().getName() + "]");
-            logger.error("NFE",e);
+        logger.error("NFE", e);
     }
 
     /**
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException nfe, Exception e)
+    public void handle(NonFunctionalException nfe, Exception e, Object info)
         throws Exception {
-        logger.debug("EXCEPTION [" + nfe.getDescription() +
-            "] HANDLED WITH [" + this.getClass().getName() + "]");
+        logger.debug("EXCEPTION [" + nfe.getDescription() + "] HANDLED WITH [" +
+            this.getClass().getName() + "]");
         logger.debug(suggestion);
-        logger.debug(
-            "=> (solution 2) SET HANDLER FOR EXCEPTION [" +
+        logger.debug("=> (solution 2) SET HANDLER FOR EXCEPTION [" +
             nfe.getClass().getName() + "]");
         throw e;
     }

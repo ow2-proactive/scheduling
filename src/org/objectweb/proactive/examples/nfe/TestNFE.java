@@ -134,7 +134,7 @@ public class TestNFE {
 		} catch (NonFunctionalException nfe) {
 			Handler handler = ProActive.searchExceptionHandler(nfe, null); 
 			if (handler != null) {
-				handler.handle(nfe);
+				handler.handle(nfe, null);
 				System.out.println("EXCEPTION CATCHED BY => " + handler.getClass().getName());
 			} else {
 				System.out.println("EXCEPTION NOT CATCHED");
@@ -148,7 +148,7 @@ public class TestNFE {
 		} catch (NonFunctionalException nfe) {
 			Handler handler = ProActive.searchExceptionHandler(nfe, null);
 			if (handler != null) {
-				handler.handle(nfe);	
+				handler.handle(nfe, null);	
 				System.out.println("EXCEPTION CATCHED BY => " + handler.getClass().getName());
 			} else {
 				System.out.println("EXCEPTION NOT CATCHED");
