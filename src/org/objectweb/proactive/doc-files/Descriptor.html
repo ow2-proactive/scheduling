@@ -754,6 +754,17 @@ If you want to submit the job directly from the cluster entry point, define only
 Even if quite a lot of things can be configured in the xml files, sometimes you will have to perform additional steps to get everything working properly, it is the case when using ssh, or globus as seen before. In this example, DISPLAY variable is defined for the globus process, that means that we want the penguin icon to appears on the local machine, be carefull to authorize your X server to display such icons by running the following command before launching the application: xhost +globus1.inria.fr. If you want to do the same for the cluster machine, that you plan to access with ssh you must run xhost +galere10.inria.fr, and on the cluster side you need to create under ~/.ssh a file called environment where you define the DISPLAY variable. If you are not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a>
 </ul></ul>
 
+<h2>Killing the application</h2>
+ProActive gives the ability to kill all JVMs and Nodes deployed with an XML descriptor with the method: killall in class <a href="../core/descriptor/data/ProActiveDescriptor.html">ProActiveDescriptor</a>:
+<blockquote><pre>
+	ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String xmlFileLocation);   //----------- Returns a ProActiveDescriptor object from the xml file
+	pad.activateMappings();
+	--------------------------------------------
+	--------------------------------------------
+	--------------------------------------------
+	pad.killall(); //----------- Kills every jvms deployed with the descriptor
+</pre></blockquote>
+
 <h2>Processes</h2>
 There is the possiblity to use only the infrastructure part in order to create processes. A Schema called ProcessSchema located in the examples directory allows to validate XML files for processes.
 ProActive provides also the ability to use all processes defined above without using XML Deployment Descriptor. You can programmatically create such processes.<br>
