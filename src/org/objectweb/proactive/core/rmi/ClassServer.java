@@ -52,6 +52,7 @@ public class ClassServer implements Runnable {
         }
         else
         	DEFAULT_SERVER_BASE_PORT = 2222;
+        
     }
 
     private java.net.ServerSocket server = null;
@@ -77,6 +78,11 @@ public class ClassServer implements Runnable {
         }
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         newListener();
+        
+        if (logger.isInfoEnabled()) {
+            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
+        }
+
     }
     
     /**
@@ -86,24 +92,10 @@ public class ClassServer implements Runnable {
      * @exception java.io.IOException if the ClassServer could not listen
      *            on <b>port</b>.
      */
-    protected ClassServer(int port_, String paths) throws java.io.IOException {
-        this.paths = paths;
-
-        if (port_ == 0) {
-            port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
-        } else {
-        	port = port_;
-            server = new java.net.ServerSocket(port);
-        }
-
-        hostname = java.net.InetAddress.getLocalHost().getHostAddress();
-
-        if (logger.isInfoEnabled()) {
-            logger.info("http server port = " + port);
-        }
-
+    protected ClassServer(int port_, String paths) throws java.io.IOException {        
+    	this(port_);
+    	this.paths = paths;
         printMessage();
-        newListener();
     }
 
     /**
