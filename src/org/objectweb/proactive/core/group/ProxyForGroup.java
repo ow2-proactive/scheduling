@@ -963,7 +963,7 @@ public class ProxyForGroup extends AbstractProxy
         ExceptionList exceptionList = new ExceptionList();
         for (int i = 0; i < this.memberList.size(); i++) {
             if (this.memberList.get(i) instanceof Throwable) {
-                exceptionList.add(new ExceptionInGroup(null,
+                exceptionList.add(new ExceptionInGroup(null, i,
                         (Throwable) this.memberList.get(i)));
             }
         }

@@ -37,30 +37,42 @@ package org.objectweb.proactive.core.group;
  */
 public class ExceptionInGroup extends RuntimeException {
 
-	/** The Object who thrown the Throwable */
+	/** The Object who throwns the Throwable */
 	private Object object;
+	/** The index of the object who throwns the Throwable in the caller group */
+	private int index;
 	/** The Throwable thrown */
 	private Throwable throwable;
 	
 	/**
 	 * Built an ThrowableInGroup
-	 * @param object - the object who thrown the throwable (use null if the object is unknown)
+	 * @param object - the object who throwns the throwable (use null if the object is unknown)
+	 * @param index - the index of the object who throwns the throwable in the caller group
 	 * @param throwable - the throwable thrown
 	 */
-	public ExceptionInGroup (Object object, Throwable throwable) {
+	public ExceptionInGroup (Object object, int index, Throwable throwable) {
 		this.object = object;
+		this.index = index;
 		this.throwable = throwable; 
 	}
 	
 
 	/**
-	 * Returns the object who thrown the Throwable
-	 * @return the object who thrown the Throwable
+	 * Returns the object who throwns the Throwable
+	 * @return the object who throwns the Throwable
 	 */
 	public Object getObject() {
 		return this.object;
 	}
 
+	/**
+	 * Returns the index of the object who throwns the Throwable
+	 * @return the index of the object who throwns the Throwable
+	 */
+	public int getIndex() {
+		return this.index;
+	}
+	
 	/**
 	 * Returns the Throwable thrown
 	 * @return the Throwable thrown

@@ -72,7 +72,7 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
 
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
                 this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                    new ExceptionInGroup(this.memberList.get(this.index), e),
+                    new ExceptionInGroup(this.memberList.get(this.index), this.index, e),
                     this.index);
         	}
 		} else {
