@@ -1,8 +1,9 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
-import org.objectweb.proactive.*;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 
 /* 
 * ################################################################

@@ -1,7 +1,6 @@
 package org.objectweb.proactive.examples.migration;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 

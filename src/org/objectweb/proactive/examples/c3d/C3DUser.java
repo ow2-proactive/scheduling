@@ -30,7 +30,27 @@
 */ 
 package org.objectweb.proactive.examples.c3d;
 
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Panel;
+import java.awt.TextArea;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -44,17 +64,11 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
-//import org.objectweb.proactive.examples.c3d.EqualButton;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-//import org.objectweb.proactive.examples.c3d.Interval;
-//import org.objectweb.proactive.examples.c3d.MsgDialog;
-//import org.objectweb.proactive.examples.c3d.Scene;
-//import org.objectweb.proactive.examples.c3d.View;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;

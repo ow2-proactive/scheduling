@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 

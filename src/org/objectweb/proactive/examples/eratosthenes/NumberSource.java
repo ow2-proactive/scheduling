@@ -32,13 +32,9 @@ package org.objectweb.proactive.examples.eratosthenes;
 *
 */
 
-import java.awt.GridLayout;
-import java.awt.event.*;
-import javax.swing.*;
-
-import org.objectweb.proactive.*;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 
 /** This class sends increasing numbers to the first PrimeNumber for testing.
  * NumberSource is migratable. pause() serves to pause sending of numbers
