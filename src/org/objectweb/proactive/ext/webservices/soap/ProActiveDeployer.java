@@ -30,20 +30,15 @@
  */
 package org.objectweb.proactive.ext.webservices.soap;
 
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Hashtable;
 
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPMessage;
-
 import org.apache.soap.SOAPException;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.ServiceManagerClient;
-import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveWSUtils;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
 
 
 /**
@@ -51,12 +46,13 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
  * This class is responsible to deploy an active object as a web service.
  * It serialize the stub/proxy into a string and send it to the rcprouter Servlet in order to register it on the tomcat server.
  * */
+
 public class ProActiveDeployer {
     private static final String PROACTIVE_PROVIDER = "org.objectweb.proactive.ext.webservices.soap.ProActiveProvider";
     private static final String PROACTIVE_STUB = "Stub";
     private static final String WSDL_FILE = "Wsdl";
     private static final String ROUTER="/soap/servlet/rpcrouter";
-    private static final String DEPLOYER = "/soap/servlet/deployer";
+    private static final String DOCUMENTATION = "ProActive Active Object";
     
     private static Hashtable deployedObjects = new Hashtable();
 
@@ -67,8 +63,13 @@ public class ProActiveDeployer {
      * @param o The active Object
      * @param methods The methods of the active object you  want to be accessible
      */
-    public static void deploy(String urn, String url, Object o, String wsdl, String[] methods) {
+    
+    public static void deploy(String urn, String url, Object o,  String [] methods) {
 
+    	/* first we need to generate a WSDL description of the object we want to deploy */
+    	String wsdl = WSDLGenerator.getWSDL(o, urn, url + ROUTER, DOCUMENTATION,methods );
+    	
+    	
         /*For deploying an active object we need a ServiceManagerClient that will contact the Serlvet */
         ServiceManagerClient serviceManagerClient = null;
 
@@ -82,8 +83,9 @@ public class ProActiveDeployer {
         DeploymentDescriptor dd = new DeploymentDescriptor();
         dd.setID(urn);
         dd.setProviderType(DeploymentDescriptor.PROVIDER_USER_DEFINED);
+    
         dd.setServiceClass(PROACTIVE_PROVIDER);
-
+        
         dd.setIsStatic(false);
         dd.setMethods(methods);
         dd.setProviderClass(o.getClass().getName());
@@ -91,7 +93,7 @@ public class ProActiveDeployer {
         /* Here we put the serialized stub into a dd property */
         Hashtable props = new Hashtable();
         props.put(PROACTIVE_STUB,
-            ProActiveXMLUtils.serializeObject((StubObject) o));
+            ProActiveXMLUtils.serializeObject(o));
 		props.put(WSDL_FILE, wsdl);
         dd.setProps(props);
 
@@ -100,30 +102,25 @@ public class ProActiveDeployer {
         } catch (SOAPException e1) {
             e1.printStackTrace();
         }
-        //Now that the service is deployed, we can send the wsdl file to the server
-        //sendWsdlFile(url,o , urn);
+   
     }
     
-    /**
-     * 
-     * @param url
-     * @param o
-     */
-    private static void sendWsdlFile (String url , Object o , String urn) {
-    		try {
-				SOAPMessage message = ProActiveWSUtils.createMessage();
-				SOAPBody body = message.getSOAPBody ();
-				
-				File wsdlFile = new File ("/net/home/vlegrand/test.wsdl");
-				//HERE WE MUST INTEGRATE CHRIS CODE
-		//		ProActiveWSUtils.attachFile (message, wsdlFile,urn);
-				ProActiveWSUtils.sendMessage(url + DEPLOYER ,message);
-			
-			} catch (javax.xml.soap.SOAPException e) {
-			
-				e.printStackTrace();
-			}
-    		
+ /**
+  *  Undeploy a service on a web server
+  * @param urn The name (urn) of the service	
+  * @param url The web server url
+  */
+    public static void undeploy (String urn , String url) {
+    	 ServiceManagerClient serviceManagerClient = null;
+
+         try {
+             serviceManagerClient = new ServiceManagerClient(new URL(url + ROUTER));
+             serviceManagerClient.undeploy(urn);
+         } catch (MalformedURLException e) {
+             e.printStackTrace();
+         }catch (SOAPException e1) {
+            e1.printStackTrace();
+        }
     }
     
   

@@ -1,4 +1,4 @@
-/*
+ /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ext.webservices.soap;
 
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Hashtable;
 
 import javax.servlet.http.HttpServlet;
@@ -46,13 +47,13 @@ import org.apache.soap.rpc.SOAPContext;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.RPCRouter;
 import org.apache.soap.util.Provider;
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 
 /**
- *
  * @author vlegrand
- *
  * This class is responsible to locate an active object deployed as a web service and invoke a method on this object.
  */
 public class ProActiveProvider implements Provider {
@@ -67,6 +68,13 @@ public class ProActiveProvider implements Provider {
     private HttpSession session;
     private Object targetObject;
 
+    static {
+    	  System.setSecurityManager(new java.rmi.RMISecurityManager());
+    	  // Creation of the default level which contains standard exception handlers
+          ProActive.defaultLevel = new HashMap();
+          HandlerManager.initialize();
+    }
+    
     /**
      * This method is responsible for locating the active object.
      * First, we make a lookup active in order to retrieve the active object and then store it in the private field tqrgetObject
@@ -91,12 +99,7 @@ public class ProActiveProvider implements Provider {
         Hashtable props = dd.getProps();
         String className = dd.getProviderClass();
         System.out.println(" object class " + className);
-        System.out.println("Some properties about this object :");
-
-        //System.out.println("props = " + props);
-        String url = (String) props.get("URL");
-        System.out.println("url of the active object :" + url);
-
+      
         //Set the private fields of this class
         this.dd = dd;
         this.envelope = env;
@@ -105,19 +108,24 @@ public class ProActiveProvider implements Provider {
         this.targetObjectURI = targetObjectURI;
         this.servlet = servlet;
         this.session = session;
-        System.out.println("Is it a valid Call ?");
+
         if (!RPCRouter.validCall(dd, call)) {
+        	System.out.println("It's not a valid call");
             SOAPException e = new SOAPException(Constants.FAULT_CODE_CLIENT,
                     "It's not a  valid call");
-            System.out.println("It's not a valid call");
+            
             throw e;
         }
-        System.out.println("Objet serialized = ");
-        String serObj = (String) props.get("Stub");
+        
+        byte[] serObj = (byte [])props.get("Stub");
+        
+        
+        
         try {
-            targetObject = ProActiveXMLUtils.deserializeObject(serObj.getBytes());
-        } catch (NullPointerException e) {
-            System.out.println("Null pointerException : " + e.getMessage());
+            targetObject = ProActiveXMLUtils.deserializeObject(serObj);
+            System.out.println("target object = " + targetObject );
+        } catch (Exception e) {
+            System.out.println("Exception : " + e.getMessage());
             e.printStackTrace(System.out);
         }
     }
@@ -138,8 +146,6 @@ public class ProActiveProvider implements Provider {
         try {
             Response resp = RPCRouter.invoke(dd, call, targetObject,
                     reqContext, resContext);
-            System.out.println("returned value = " +
-                resp.getReturnValue().getValue());
 
             //build the enveloppe that contains the response 	
             Envelope env = resp.buildEnvelope();
@@ -148,6 +154,8 @@ public class ProActiveProvider implements Provider {
             resContext.setRootPart(sw.toString(),
                 Constants.HEADERVAL_CONTENT_TYPE_UTF8);
         } catch (Exception e) {
+        	System.out.println("exception ! "  + e.getMessage ());
+        	e.printStackTrace(System.out);
             SOAPException ex = new SOAPException(Constants.FAULT_CODE_SERVER,
                     e.getMessage());
             System.out.println(
