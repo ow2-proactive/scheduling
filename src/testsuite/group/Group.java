@@ -263,7 +263,7 @@ public class Group {
         Iterator it = tests.iterator();
         while (it.hasNext()) {
             AbstractTest test = (AbstractTest) it.next();
-            test.initTest();
+            test.uponInitOfGroupOfTests();
             if (timer != null) {
                 ((Benchmark) test).setTimer(timer);
             }
@@ -290,7 +290,7 @@ public class Group {
         Iterator it = tests.iterator();
         while (it.hasNext()) {
             AbstractTest test = (AbstractTest) it.next();
-            test.endTest();
+            test.uponEndOfGroupOfTests();
         }
         if (logger.isDebugEnabled()) {
             logger.debug("Finnishing groupTest " + name + "' ending");
