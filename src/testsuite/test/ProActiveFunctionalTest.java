@@ -43,6 +43,14 @@ public abstract class ProActiveFunctionalTest extends FunctionalTest
         super(name, "This test is executed in remote host.");
         this.node = node;
     }
+    
+    /**
+     * @param name
+     * @param description
+     */
+    public ProActiveFunctionalTest(String name, String description) {
+        super(name, description);
+    }
 
     /**
      * @param name
