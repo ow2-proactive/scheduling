@@ -93,6 +93,41 @@ public class Assertions {
 			throw new AssertionFailedException(failureMessage);
 		}
 	}
+	
+	/**
+	 * Asserts the non-equality of 2 elements. <br>
+	 * The elements  can be null
+	 * If the elements are equal , a runtime exception is thrown (AssertionFailedException) and
+	 * the current test is terminated
+	* 
+	 * @param o1 first object
+	 *  @param o2 second object
+	 */
+	static public void assertNonEquals(Object o1, Object o2) {
+		assertNonEquals(null, o1, o2);
+	}
+	
+	/**
+	 * Asserts the non-equality of 2 elements. <br>
+	 * The elements  can be null
+	 * If the elements are equal, a runtime exception is thrown (AssertionFailedException) and
+	 * the current test is terminated
+	*  @param failureMessage failure explanation
+	 * @param o1 first object
+	 *  @param o2 second object
+	 */
+	static public void assertNonEquals(String failureMessage, Object o1, Object o2) {
+		if ((o1 == null) || (o2 == null)) {
+			if (o1 == o2) {
+				throw new AssertionFailedException(failureMessage);
+			} else {
+				return;
+			}
+		}
+		if (o1.equals(o2)) {
+			throw new AssertionFailedException(failureMessage);
+		}
+	}
 
 	static private void failureNotification() {
 		failureNotification(null);
