@@ -36,8 +36,9 @@ import org.objectweb.proactive.core.Constants;
 /**
  * This class is a utility class to perform modifications and operations on urls.
  */
+
 public class UrlBuilder {
-    private static String[] LOCAL_URLS = { "///", "//localhost/", "//127.0.0.1/" };
+    private static String[] LOCAL_URLS = { "///", "//localhost", "//127.0.0.1" };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
 
     //
@@ -58,46 +59,51 @@ public class UrlBuilder {
      */
     public static String checkUrl(String url)
         throws java.net.UnknownHostException {
-        String noProtocolUrl = internalCheckUrl(url);
-        return readHostAndName(noProtocolUrl);
+        String protocol = getProtocol(url);
+        String noProtocolUrl = internalCheck(removeProtocol(url, protocol));
+        return readHostAndName(noProtocolUrl, protocol);
     }
 
-    /**
-     * Returns a well-formed url.
-     * @param host
-     * @param name
-     * @return String the well formed url
-     */
-    public static String buildUrl(String host, String name) {
-        return buildUrl(host, name, DEFAULT_REGISTRY_PORT);
+   
+    public static String buildUrl(String host, String name, String protocol) {
+        return buildUrl(host, name, protocol, DEFAULT_REGISTRY_PORT);
     }
 
-    /**
-     * Returns a well-formed url.
-     * @param host
-     * @param name
-     * @param port
-     * @return String the well formed url
-     */
-    public static String buildUrl(String host, String name, int port) {
-        if (port == DEFAULT_REGISTRY_PORT) {
-            return "//" + host + "/" + name;
+    //	
+    public static String buildUrl(String host, String name, String protocol,
+        int port) {
+        String noProtocolUrl = buildUrl(host, name, port);
+        if (protocol.equals(Constants.DEFAULT_PROTOCOL_IDENTIFIER)) {
+            return noProtocolUrl;
         } else {
-            return "//" + host + ":" + port + "/" + name;
+            return protocol + noProtocolUrl;
         }
     }
-
-    public static String buildUrl(String host, String name, String protocol) {
-        return protocol + "//" + host + "/" + name;
-    }
-
+	
+	/**
+	 * This method build an url in the form protocol://host:port/name where the port
+	 * is given from system propeties, except when the protocol is jini. In that case the url
+	 * looks like jini://host/name.
+	 * @param host
+	 * @param name
+	 * @param protocol
+	 * @return
+	 */
+	public static String buildUrlFromProperties(String host, String name, String protocol)
+	{	
+		String port = System.getProperty("proactive.rmi.port");
+		if (checkProtocol(protocol).equals("jini:") || port == null) return buildUrl(host,name,protocol);
+		else return buildUrl(host, name, protocol, new Integer(port).intValue());
+	}
+	
     public static String buildVirtualNodeUrl(String url)
         throws java.net.UnknownHostException {
         String vnName = getNameFromUrl(url);
         vnName = vnName.concat("_VN");
         String host = getHostNameFromUrl(url);
         String protocol = getProtocol(url);
-        return buildUrl(host, vnName, protocol);
+        int port = getPortFromUrl(url);
+        return buildUrl(host, vnName, protocol, port);
     }
 
     public static String appendVnSuffix(String name) {
@@ -113,7 +119,12 @@ public class UrlBuilder {
         return url.substring(0, index);
     }
 
-    public static String getNameFromUrl(String url) {
+    /**
+     * Returns the name included in the url
+	 * @param url
+	 * @return
+	 */
+	public static String getNameFromUrl(String url) {
         int n = url.lastIndexOf("/");
         String name = url.substring(n + 1);
         return name;
@@ -125,20 +136,13 @@ public class UrlBuilder {
      */
     public static String getProtocol(String nodeURL) {
         if (nodeURL == null) {
-           return getDefaultProtocole();
-           // return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+            return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
         }
         int n = nodeURL.indexOf("://");
         if (n <= 0) {
-           return getDefaultProtocole();
-           // return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+            return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
         }
         return nodeURL.substring(0, n + 1);
-    }
-    
-    private static String getDefaultProtocole() {
-    	return System.getProperty("proactive.rmi")+":";
-    	//return null;
     }
 
     /**
@@ -156,7 +160,8 @@ public class UrlBuilder {
         String validUrl = checkUrl(url);
         int n = validUrl.indexOf("//");
         int m = validUrl.lastIndexOf("/"); // looking for the end of the host
-        return validUrl.substring(n + 2, m);
+        //check if there is a port
+        return getHostFromUrl(validUrl.substring(n + 2, m));
     }
 
     public static String checkProtocol(String protocol) {
@@ -165,31 +170,73 @@ public class UrlBuilder {
         }
         return protocol;
     }
+    
+    public static String removePortFromHost(String hostname){
+    	int n = hostname.lastIndexOf(":");
+    	if(n>-1) return hostname.substring(0,n);
+    	return hostname;
+    }
+
+    /**
+     * Returns port number include in the url or 1099 if no port is specified
+	 * @param url
+	 * @return
+	 */
+	public static int getPortFromUrl(String url) {
+		try {
+			String validUrl = checkUrl(url);
+			int n = validUrl.indexOf("//");
+			int m = validUrl.lastIndexOf("/");
+            return getPortNumber(validUrl.substring(n + 2, m));
+        } catch (java.net.UnknownHostException e) {
+            e.printStackTrace();
+            return DEFAULT_REGISTRY_PORT;
+        }
+    }
 
     //
     //-----------------Private Static Methods-----------------------------
     //
-    private static String internalCheckUrl(String url)
-        throws java.net.UnknownHostException {
-        String noProtocolUrl = internalCheck(url);
-        if (noProtocolUrl.charAt(noProtocolUrl.length() - 1) == '/') {
-            noProtocolUrl = noProtocolUrl.substring(0,
-                    noProtocolUrl.length() - 1);
+    //	private static String internalCheckUrl(String url) throws java.net.UnknownHostException{
+    //		String validlUrl = internalCheck(url);
+    //		String noProtocolUrl
+    //    if (noProtocolUrl.charAt(noProtocolUrl.length()-1) == '/')
+    //      noProtocolUrl = noProtocolUrl.substring(0,noProtocolUrl.length()-1);
+    //    if (! noProtocolUrl.startsWith("//"))
+    //      throw new java.net.UnknownHostException("Malformed URL = "+url);
+    //    return noProtocolUrl;
+    //	}
+
+    
+    private static String buildUrl(String host, String name, int port) {
+        if (port == DEFAULT_REGISTRY_PORT) {
+            return "//" + host + "/" + name;
+        } else {
+            return "//" + host + ":" + port + "/" + name;
         }
-        if (!noProtocolUrl.startsWith("//")) {
-            throw new java.net.UnknownHostException("Malformed URL = " + url);
-        }
-        return noProtocolUrl;
     }
 
-    private static String readHostAndName(String urlToRead)
+
+    private static String readHostAndName(String urlToRead, String protocol)
         throws java.net.UnknownHostException {
         java.net.InetAddress hostInetAddress = java.net.InetAddress.getLocalHost();
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (urlToRead.toLowerCase().startsWith(LOCAL_URLS[i])) {
                 // local url
                 String name = urlToRead.substring(LOCAL_URLS[i].length());
-                return buildUrl(hostInetAddress.getHostName(), name);
+                if (name.startsWith("/")) {
+                    //there is no port and the name starts with /
+                    return buildUrl(hostInetAddress.getHostName(),
+                        name.substring(1), protocol);
+                } else {
+                	//there is no port and only the name 
+                	if (name.indexOf(":")<0) return buildUrl(hostInetAddress.getHostName(),name, protocol);
+                    //port is define, extract port and build url
+                    return buildUrl(hostInetAddress.getHostName(),
+                        name.substring(name.lastIndexOf("/")+1, name.length()),
+                        protocol,
+                        new Integer(name.substring(1, name.lastIndexOf("/"))).intValue());
+                }
             }
         }
 
@@ -210,16 +257,19 @@ public class UrlBuilder {
         int portNumber = getPortNumber(urlToRead.substring(2, n));
         String name = urlToRead.substring(n + 1);
 
-        //build the url
-        if (portNumber > 0) {
-            return buildUrl(hostInetAddress.getHostName(), name, portNumber);
-        } else {
-            return buildUrl(hostInetAddress.getHostName(), name);
-        }
+        
+         return buildUrl(hostInetAddress.getHostName(), name, protocol,
+                portNumber);
+        
     }
 
+    /**
+     * This method extract the port from a string in the form host:port or host
+     * @param url
+     * @return port number or 0 if there is no  port
+     */
     private static int getPortNumber(String url) {
-        int portNumber = 0;
+        int portNumber = DEFAULT_REGISTRY_PORT;
         int index = url.lastIndexOf(":");
         if (index > -1) {
             portNumber = Integer.parseInt(url.substring(index + 1, url.length()));
@@ -227,20 +277,30 @@ public class UrlBuilder {
         return portNumber;
     }
 
+    /**
+     * This method extract the host name from a string in the form host:port or host
+     * @param url
+     * @return
+     */
     private static String getHostFromUrl(String url) {
         int index = url.lastIndexOf(":");
+
+        //there is a port
         if (index > -1) {
             return url.substring(0, index);
         }
+
+        //there is no port
         return url;
     }
 
     private static String internalCheck(String url) {
-        String noprotocoUrl = removeProtocol(url, getProtocol(url));
-        String tmp = noprotocoUrl;
-        if (!tmp.startsWith("//")) {
-            tmp = "//" + tmp;
+        if (!url.startsWith("//")) {
+            url = "//" + url;
         }
-        return tmp;
-    }
+        if (url.charAt(url.length() - 1) == '/') {
+            url = url.substring(0, url.length() - 1);
+        }
+        return url;
+
 }
