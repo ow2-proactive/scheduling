@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor>
+	<virtualNodes>
+		<virtualNode name="dispatcher"/>
+		<virtualNode name="renderers"/>
+		<virtualNode name="users"/>
+	</virtualNodes>
+	<deployment>
+		<mapping>
+			<map virtualNode="dispatcher" jvm="jvmClusterInria"/>
+			<map virtualNode="renderers" jvm="jvmClusterInria"/>
+			<map virtualNode="users" jvm="jvmClusterInria"/>
+		</mapping>
+		<jvms>
+			<jvm name="jvmClusterInria" >
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="rLoginInriaCluster"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<process class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="galere1.inria.fr" username="">
+				<environment>
+					<variable name="" value=""/>
+				</environment>
+			</process>
+			<process id="rshSea" class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea.inria.fr">
+				<jvmProcess refid="linuxJVM"/>
+			</process>
+			<process id="rLoginInriaCluster" class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="galere1.inria.fr">
+				<process refid="bsubInriaCluster"/>
+			</process>
+			<process id="bsubInriaCluster" class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
+				<jvmProcess refid="linuxJVM"/>
+			</process>
+			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMProcessImpl">
+				<classpath>
+					<path type="relative" origin="userHome" value="ProActive/classes"/>
+				</classpath>
+				<javaPath>
+					<path type="absolute" value="/usr/local/jdk1.3.1/bin/java"/>
+				</javaPath>
+				<policyFile>
+					<path type="relative" origin="userHome" value="ProActive/scripts/unix/proactive.java.policy"/>
+				</policyFile>
+				<classname>org.objectweb.proactive.rmi.StartNode</classname>
+				<parameters>///bob</parameters>
+			</jvmProcess>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor>
+	<virtualNodes>
+		<virtualNode name="penguinNode" cyclic="true"/>
+	</virtualNodes>
+	<deployment>
+		<mapping>
+			<map virtualNode="penguinNode">
+				<jvmSet>
+					<vmName>currentJVM</vmName>
+					<vmName>Jvm1</vmName>
+					<vmName>Jvm2</vmName>
+					<vmName>Jvm3</vmName>
+					<vmName>Jvm4</vmName>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="currentJVM">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm1">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<acquisition method="jini"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
+				<acquisition method="jini"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

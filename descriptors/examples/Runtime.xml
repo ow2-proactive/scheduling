@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor>
+	<virtualNodes>
+		<virtualNode name="dispatcher"/>
+		<virtualNode name="renderer"/>
+	</virtualNodes>
+	<deployment>
+		<mapping>
+			<map virtualNode="dispatcher" jvm="currentJvm"/>
+			<map virtualNode="renderer" jvm="Jvm1"/>
+		</mapping>
+		<jvms>
+			<jvm name="currentJvm">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm1">
+				<acquisition method="rmi"/>
+				<creation>
+					<process refid="rshProcess"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			<process id="rshProcess" class="org.objectweb.proactive.core.process.rsh.RSHNodeProcess" hostname="ornata.inria.fr">
+				<jvmProcess refid="linuxJVM"/>
+			</process>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
