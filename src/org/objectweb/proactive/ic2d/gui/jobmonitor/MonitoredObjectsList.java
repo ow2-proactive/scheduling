@@ -80,6 +80,7 @@ public class MonitoredObjectsList extends JDialog {
             });
 
         JTabbedPane tabbedPane = new javax.swing.JTabbedPane();
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
         getContentPane().add(tabbedPane);
 
         JPanel buttons = new JPanel();

@@ -45,7 +45,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
   private javax.swing.text.Style errorStyle;
   private javax.swing.text.Style threadNameStyle;
   private javax.swing.text.Style timeStampStyle;
-  private static int MAX_LENGTH = 10000;
+  private static int MAX_LENGTH = 100000;
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
