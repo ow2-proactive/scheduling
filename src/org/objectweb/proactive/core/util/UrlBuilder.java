@@ -217,7 +217,6 @@ public class UrlBuilder {
     public static int getPortFromUrl(String url) {
         try {
             String validUrl = checkUrl(url);
-            System.out.println(validUrl);
             int n = validUrl.indexOf("//");
             int m = validUrl.lastIndexOf("/");
             if (m == (n + 1)) {
