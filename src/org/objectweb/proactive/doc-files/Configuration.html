@@ -2,13 +2,13 @@
 <html>
 <head>
 <!-- saved from url=(0022)http://internet.e-mail -->
-  <title>ProActive Basic Configuration</title>
+  <title>ProActive Basic
+Configuration</title>
   <link rel="stylesheet" href="ProActive.css">
 </head>
 <body style="background-color: white;">
 <!--
- Header : start 
-~~~ -->
+Header : start ~~~ -->
 <table width="100%">
   <tbody>
     <tr>
@@ -30,8 +30,8 @@ index</a>&nbsp;&nbsp;</td>
         </tbody>
       </table>
       </td>
-      <td align="right" valign="top"> <img
- src="ProActiveLogo200x34.gif"></td>
+      <td align="right" valign="top">
+      <img src="ProActiveLogo200x34.gif"></td>
     </tr>
   </tbody>
 </table>
@@ -107,7 +107,7 @@ is provided in <a href="Descriptor.html">Deployment
 Descriptor</a> to notify remote jvms
 which configuration file to load once created:
 </p>
-<pre>&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>...<br> &lt;ProActiveUserPropertiesFile&gt;<br>     &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;<br> &lt;/ProActiveUserPropertiesFile&gt;<br>...<br>&lt;/jvmProcess&gt;<br> </pre>
+<pre>&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;<br>...<br> &lt;ProActiveUserPropertiesFile&gt;<br> &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;<br> &lt;/ProActiveUserPropertiesFile&gt;<br>...<br>&lt;/jvmProcess&gt;<br> </pre>
 <h2>ProActive properties</h2>
 <p>
 </p>
@@ -140,40 +140,54 @@ Note that if not specified those properties are set programmatically
 with the default value. </li>
   <br>
   <br>
-  <li class="textNormal"><b>Fault-tolerance properties</b><br>
+  <li class="textNormal"><b>Fault-tolerance
+properties</b><br>
     <br>
 Note that those properties should not be altered if the programmer uses
 deployment descriptor files. See <a href="faultTolerance.html">here</a>
 for
 more details.
     <ul class="listWithSpace">
-      <li class="textNormal"><b>proactive.ft</b>. Two values are
+      <li class="textNormal"><b>proactive.ft</b>.
+Two values are
 possible: <b>enable,
-disable</b>. If enable, the fault-tolerance is enable and a set of
+disable</b>. If enable, the
+fault-tolerance is enable and a set of
 servers must be defined with the following properties. Default value is
         <b>disable</b>.
         <br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.checkpoint</b> is
+      <li class="textNormal"><b>proactive.ft.server.checkpoint</b>
+is
 the URL of the <a href="faultTolerance.html#configuration">checkpoint
 server</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.location</b> is the
-URL of the <a href="faultTolerance.html#configuration">location server</a>.<br>
+      <li class="textNormal"><b>proactive.ft.server.location</b>
+is the
+URL of the <a href="faultTolerance.html#configuration">location
+server</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.recovery</b> is the
-URL of the <a href="faultTolerance.html#configuration">recovery process</a>.<br>
+      <li class="textNormal"><b>proactive.ft.server.recovery</b>
+is the
+URL of the <a href="faultTolerance.html#configuration">recovery
+process</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.resource</b> is the
-URL of the <a href="faultTolerance.html#configuration">resource server</a>.<br>
+      <li class="textNormal"><b>proactive.ft.server.resource</b>
+is the
+URL of the <a href="faultTolerance.html#configuration">resource
+server</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.global</b> is the
+      <li class="textNormal"><b>proactive.ft.server.global</b>
+is the
 URL of the <a href="faultTolerance.html#configuration">global server</a>.
-If this property is set, all others <b>proactive.fr.server.*</b> are
+If this property is set, all others <b>proactive.fr.server.*</b>
+are
 ignored.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.ttc</b> is the value of
-the <a href="faultTolerance.html#configuration">Time To Checkpoint</a>
+      <li class="textNormal"><b>proactive.ft.ttc</b>
+is the value of
+the <a href="faultTolerance.html#configuration">Time To
+Checkpoint</a>
 counter, in seconds. The default value is 30 sec.<br>
       </li>
     </ul>
@@ -231,17 +245,82 @@ acquisition. The default value is 3 minutes.<br>
 also uses with descriptor file. It is the lookup frequency in
 milliseconds for re-asking nodes. By default, it's value is 30 seconds.<br>
       </li>
-      <li class="textNormal"><b>proactive.p2p.multi_proc_nodes</b> if
+      <li class="textNormal"><b>proactive.p2p.multi_proc_nodes</b>
+if
 true deploying one shared nodes by CPU that means the p2p service which
 is running on a bi-pro will share 2 nodes, else only one node is shared
 independently of the number of CPU. By default, it's value is true,
 i.e. 1 shared node for 1 CPU.</li>
-      <li class="textNormal"><b>proactive.p2p.xml_path</b> is the XML
+      <li class="textNormal"><b>proactive.p2p.xml_path</b>
+is the XML
 deployment descriptor file path for sharing nodes more than a single
 node.</li>
       <br>
     </ul>
   </li>
+  <li class="textNormal"><b>rmi
+ssh
+properties</b></li>
+</ul>
+<div style="margin-left: 80px;">
+<p>The following
+properties are specific to the protocol <a href="SSHTunneling.html">rmissh</a></p>
+</div>
+<ul class="listWithSpace">
+  <ul>
+    <li class="textNormal"><b>proactive.ssh.port</b>:
+the port number on which all the ssh daemons to which this JVM must
+connect to are expected to listen. If this property is not set, the
+default is 22.</li>
+    <li class="textNormal"><b>proactive.ssh.username</b>:
+the username which will be used during authentication with all the ssh
+daemons to which this JVM will need to connect to. If this property is
+not set, the default is the user.name java property.</li>
+    <li class="textNormal"><b>proactive.ssh.known_hosts</b>:
+a filename which identifies the file which contains the traditional ssh
+known_hosts list. This list of hosts is used during authentication with
+each ssh daemon to which this JVM will need to connect to. If the host
+key does not match the one stored in this file, the authentication will
+fail. If this property is not set, the default is System.getProperty
+("user.home") + "/.ssh/known_hosts"</li>
+    <li class="textNormal"><b>proactive.ssh.key_directory</b>:
+a directory which is expected to contain the pairs of public/private
+keys used during authentication. the private keys must not be
+encrypted. The public keys filenames must match "*.pub". Private keys
+are ignored if their associated public key is not present. If this
+property is not set, the default is System.getProperty ("user.home") +
+"/.ssh/"</li>
+    <li class="textNormal"><b>proactive.tunneling.try_normal_first</b>:
+if this property is set to "yes", the tunneling code always attempts to
+make a direct rmi connection to the remote object before tunneling. If
+this property is not set, the default is not to make these
+direct-connection attempts. This property is especially useful if you
+want to deploy a number of objects on a LAN where only one of the hosts
+needs to run with the rmissh protocol to allow hosts outside the LAN to
+connect to this frontend host. The other hosts located on the LAN can
+use the try_normal_first property to avoid using tunneling to make
+requests to the LAN frontend.</li>
+    <li class="textNormal"><b>proactive.tunneling.connect_timeout</b>:
+this property specifies how long the tunneling code will wait while
+trying to establish a connection to a remote host before declaring that
+the connection failed. If this property is not set, the default value
+is 2000ms.</li>
+    <li class="textNormal"><b>proactive.tunneling.use_gc</b>:
+if this property is set to "yes", the client JVM does not destroy the
+ssh tunnels are soon as they are not used anymore. They are queued into
+a list of unused tunnels which can be reused. If this property is not
+set or is set to another value, the tunnels are destroyed as soon as
+they are not needed anymore by the JVM.</li>
+    <li class="textNormal"><b>proactive.tunneling.gc_period</b>:
+this property specifies how long the tunnel garbage collector will wait
+before destroying a unused tunnel. If a tunnel is older than this
+value, it is automatically destroyed. If this property is not set, the
+default value is 10000ms.</li>
+  </ul>
+</ul>
+<ul style="margin-left: 40px;" class="listWithSpace">
+</ul>
+<ul class="listWithSpace">
   <li class="textNormal"><b>Other
 properties</b><br>
     <br>
@@ -272,57 +351,12 @@ RMIRegistry</li>
       <li class="textNormal"><b>fractal.provider</b>
 This property defines the bootstrap component for the Fractal component
 model</li>
-      <p class="textNormal">Following
-properties are specific to the protocol <b><a href="SSHTunneling.html">rmissh</a>
-      </b></p>
-      <li class="textNormal"><b>proactive.ssh.port</b>:
-the port number on which all the ssh daemons to which this JVM must
-connect to are expected to listen. If this property is not set, the
-default is 22.</li>
-      <li class="textNormal"><b>proactive.ssh.username</b>:
-the username which will be used during authentication with all the ssh
-daemons to which this JVM will need to connect to. If this property is
-not set, the default is the user.name java property.</li>
-      <li class="textNormal"><b>proactive.ssh.known_hosts</b>:
-a filename which identifies the file which contains the traditional ssh
-known_hosts list. This list of hosts is used during authentication with
-each ssh daemon to which this JVM will need to connect to. If the host
-key does not match the one stored in this file, the authentication will
-fail. If this property is not set, the default is System.getProperty
-("user.home") + "/.ssh/known_hosts"</li>
-      <li class="textNormal"><b>proactive.ssh.key_directory</b>:
-a directory which is expected to contain the pairs of public/private
-keys used during authentication. the private keys must not be
-encrypted. The public keys filenames must match "*.pub". Private keys
-are ignored if their associated public key is not present. If this
-property is not set, the default is System.getProperty ("user.home") +
-"/.ssh/"</li>
-      <li class="textNormal"><b>proactive.tunneling.try_normal_first</b>:
-if this property is set to "yes", the tunneling code always attempts to
-make a direct rmi connection to the remote object before tunneling. If
-this property is not set, the default is not to make these
-direct-connection attempts. This property is especially useful if you
-want to deploy a number of objects on a LAN where only one of the hosts
-needs to run with the rmissh protocol to allow hosts outside the LAN to
-connect to this frontend host. The other hosts located on the LAN can
-use the try_normal_first property to avoid using tunneling to make
-requests to the LAN frontend.</li>
-      <li class="textNormal"><b>proactive.tunneling.connect_timeout</b>:
-this property specifies how long the tunneling code will wait while
-trying to establish a connection to a remote host before declaring that
-the connection failed. If this property is not set, the default value
-is 2000ms.</li>
-      <li class="textNormal"><b>proactive.tunneling.use_gc</b>:
-if this property is set to "yes", the client JVM does not destroy the
-ssh tunnels are soon as they are not used anymore. They are queued into
-a list of unused tunnels which can be reused. If this property is not
-set or is set to another value, the tunnels are destroyed as soon as
-they are not needed anymore by the JVM.</li>
-      <li class="textNormal"><b>proactive.tunneling.gc_period</b>:
-this property specifies how long the tunnel garbage collector will wait
-before destroying a unused tunnel. If a tunnel is older than this
-value, it is automatically destroyed. If this property is not set, the
-default value is 10000ms.</li>
+      <li class="textNormal"><b>proactive.classloader</b>
+runtimes created with this property enabled fetch missing classes using
+a <a href="../core/classloader/package.html">special
+mechanism</a>. This is an
+alternative to RMI dynamic class downloading, useful for instance when
+performing hierarchical deployment.</li>
       <br>
       <br>
 Note that as mentionned above, user-defined properties can be added.
@@ -332,7 +366,7 @@ Note that as mentionned above, user-defined properties can be added.
 <h2>Example</h2>
 <p class="textNormal">Configuration
 file must have following structure: </p>
-<pre>&lt;ProActiveUserProperties&gt;<br> &lt;properties&gt;<br>  &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;<br>  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;<br>  &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;<br>  &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;<br>  ....<br>  &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;<br>  ....<br> &lt;/properties&gt;<br>&lt;/ProActiveUserProperties&gt;<br></pre>
+<pre>&lt;ProActiveUserProperties&gt;<br> &lt;properties&gt;<br> &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;<br> &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;<br> &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;<br> &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;<br> ....<br> &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;<br> ....<br> &lt;/properties&gt;<br>&lt;/ProActiveUserProperties&gt;<br></pre>
 <p class="textNormal">Note
 that tag <b>ProActiveUserProperties</b>,
 tag <b>properties</b>
@@ -340,8 +374,7 @@ and the model: &lt;prop <b>key</b>="somekey"
 <b>value</b>="somevalue"/&gt;
 are mandatory for ProActive to parse correctly the document </p>
 <!--
- Footer : start 
-~~~ --> <br>
+Footer : start ~~~ --> <br>
 <hr>
 <div class="textSmall" align="right">Copyright
 &copy; October 2004 INRIA All Rights Reserved.
