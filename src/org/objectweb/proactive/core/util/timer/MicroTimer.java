@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.util.timer;
 
-import testsuite.timer.Timeable;
+
 
 
 public class MicroTimer implements Timeable {
