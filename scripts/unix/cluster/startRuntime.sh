@@ -12,7 +12,6 @@ done
 
 CMD=$(echo ${ARGS})
 
-echo "command = $CMD"
 nodesList=""
 
 # node1
