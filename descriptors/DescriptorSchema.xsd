@@ -22,6 +22,10 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
 			<xs:field xpath="@name"/>
 		</xs:keyref>
+		<xs:keyref name="vnFtServiceId" refer="serviceid">
+			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
+			<xs:field xpath="@ftServiceId"/>
+		</xs:keyref>
 		<xs:keyref name="vnNameinAcquisitionPart" refer="virtualNodeNameForLookup">
 			<xs:selector xpath="componentDefinition/virtualNodesAcquisition/virtualNode"/>
 			<xs:field xpath="@name"/>
@@ -212,6 +216,7 @@ The following element ProActiveDescriptor defines the root of the schema
 						</xs:restriction>
 					</xs:simpleType>
 				</xs:attribute>
+				<xs:attribute name="ftServiceId" type="xs:string" use="optional"/>
 				<xs:attribute name="timeout" type="xs:positiveInteger" use="optional"/>
 				<xs:attribute name="waitForTimeout" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
@@ -352,8 +357,26 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:choice>
 			<xs:element name="RMIRegistryLookup" type="RMIRegistryLookupType"/>
 			<xs:element name="P2PService" type="P2PServiceType"/>
+			<xs:element name="faultTolerance" type="faultToleranceType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!-- ftService has -->
+	<xs:complexType name="faultToleranceType">
+		<xs:sequence>
+			<xs:element name="globalServer" type="serverType" minOccurs="0"/>
+			<xs:element name="locationServer" type="serverType" minOccurs="0"/>
+			<xs:element name="recoveryServer" type="serverType" minOccurs="0"/>
+			<xs:element name="checkpointServer" type="serverType" minOccurs="0"/>
+			<xs:element name="ressourceServer" type="serverType" minOccurs="0"/>
+			<xs:element name="ttc" type="ttcType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="serverType">
+		<xs:attribute name="url" type="xs:string" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="ttcType">
+		<xs:attribute name="value" type="xs:positiveInteger" use="required"/>
 	</xs:complexType>
 	<!-- RMIRegistryLookup has one attribute: the url to looup-->
 	<xs:complexType name="RMIRegistryLookupType">
