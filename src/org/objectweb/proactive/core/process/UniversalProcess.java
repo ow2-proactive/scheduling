@@ -37,7 +37,7 @@ package org.objectweb.proactive.core.process;
  * The external process can be customized up to the moment it is started. Once started the call
  * to methods to set the command throw an exception.
  */
-public interface UniversalProcess {
+public interface UniversalProcess extends java.io.Serializable {
 
   /**
    * Returns the current environment for this process. Each
