@@ -155,7 +155,8 @@ public class JiniRuntimeImpl
     }
     // if counter=0 no node are registered as jini Service
     if(counter == 0) throw new java.rmi.RemoteException("register exception ");
-    System.out.println(" service JiniNode Registered");
+    System.out.println(" service JiniNode Registered " + nodeURL);
+    //System.out.println("Registrar "+registrar.getLocator().getHost());
       // on lance le lease manager pour que l'objet puisse se reenregistrer
     leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
 		}
@@ -391,7 +392,12 @@ public class JiniRuntimeImpl
       			System.out.println("register exception " + ex.toString());
       			continue;
     			}
-    			System.out.println(" service JiniNode Registered");
+    			System.out.println(" service JiniNode Registered " + nodeURL);
+//    			try{
+//    			System.out.println("Registrar "+registrar.getLocator().getHost());
+//    			}catch(Exception et){
+//    				et.printStackTrace();
+//    			}
       		// on lance le lease manager pour que l'objet puisse se reenregistrer
     			leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
 				}
