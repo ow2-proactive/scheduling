@@ -61,8 +61,8 @@ public class HostObject extends AbstractDataObject {
         super(parent);
         //	Test if there is port defined, then remove it to see if hostname exists
         try {
-            String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(hostname))
-                                                       .getHostName();
+            String shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(
+                        hostname)).getHostName();
 
             this.hostname = hostname;
 
@@ -267,5 +267,6 @@ public class HostObject extends AbstractDataObject {
             }
         }
     }
-     // end inner class CreateNodeTask
+
+    // end inner class CreateNodeTask
 }

@@ -7,7 +7,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
@@ -16,6 +15,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredVN;
+import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -42,10 +42,10 @@ public class NodeExploration implements JobMonitorConstants {
     private Map aos;
     private Set visitedVM;
     private Map runtimes;
-    private IC2DGUIController controller;
+    private IC2DMessageLogger controller;
 
     public NodeExploration(DataAssociation asso,
-        DefaultListModel skippedObjects, IC2DGUIController controller) {
+        DefaultListModel skippedObjects, IC2DMessageLogger controller) {
         this.maxDepth = 10;
         this.asso = asso;
         this.skippedObjects = skippedObjects;
@@ -61,6 +61,13 @@ public class NodeExploration implements JobMonitorConstants {
     public void setMaxDepth(int maxDepth) {
         if (maxDepth > 0) {
             this.maxDepth = maxDepth;
+        }
+    }
+
+    public void setMaxDepth(String maxDepth) {
+        try {
+            setMaxDepth(Integer.parseInt(maxDepth.trim()));
+        } catch (NumberFormatException e) {
         }
     }
 
@@ -189,7 +196,6 @@ public class NodeExploration implements JobMonitorConstants {
             log(e);
             return;
         }
-
         MonitoredJVM jvmObject = new MonitoredJVM(url, depth);
 
         if (visitedVM.contains(vmName) || skippedObjects.contains(jvmObject)) {
@@ -296,7 +302,6 @@ public class NodeExploration implements JobMonitorConstants {
             if (skippedObjects.contains(jobObject)) {
                 continue;
             }
-
             MonitoredAO aoObject = new MonitoredAO(className,
                     rba.getID().toString());
             if (!skippedObjects.contains(aoObject)) {

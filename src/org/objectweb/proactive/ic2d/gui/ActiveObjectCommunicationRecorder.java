@@ -30,10 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.gui;
 
-import java.awt.RenderingHints;
-
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
+
+import java.awt.RenderingHints;
 
 
 public class ActiveObjectCommunicationRecorder {
@@ -49,7 +49,7 @@ public class ActiveObjectCommunicationRecorder {
     private int maxCommunicationCounter = 1;
     private int drawingStyle;
     private boolean enabled;
-    private boolean antiAlias=true;
+    private boolean antiAlias = true;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -223,12 +223,15 @@ public class ActiveObjectCommunicationRecorder {
             ratio = -1;
             break;
         }
+
         //anti alias added ebe 07/2004
         if (antiAlias) {
-        	g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-    		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);	
-		}
-        
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+                RenderingHints.VALUE_RENDER_QUALITY);
+        }
+
         //System.out.println("ratio = "+ratio+"  proportionalLinks="+proportionalLinks+" maxCommunicationCounter="+maxCommunicationCounter);
         java.util.Iterator sourceEntryIterator = panelToPanelsMap.entrySet()
                                                                  .iterator();
@@ -314,15 +317,16 @@ public class ActiveObjectCommunicationRecorder {
         if (xDest < xSource) {
             angle += Math.PI;
         }
+
         // ebe specific for arc draw left and right
-        if (alignVertic==true) {
-			if (upWay==true) {
-				angle= Math.PI;
-			} else {
-				angle=0;
-			}
-		}
-        
+        if (alignVertic == true) {
+            if (upWay == true) {
+                angle = Math.PI;
+            } else {
+                angle = 0;
+            }
+        }
+
         g2.drawLine(xDest, yDest,
             xDest - (int) (Math.cos(angle - (Math.PI / 4)) * 6),
             yDest - (int) (Math.sin(angle - (Math.PI / 4)) * 6));
@@ -337,29 +341,27 @@ public class ActiveObjectCommunicationRecorder {
 
     private void drawCommunicationPointDifferentNode(int xSource, int ySource,
         int sourceWidth, int xDest, int yDest, int destWidth,
-        java.awt.Graphics2D g2, boolean alignVertic , boolean upWay) {
+        java.awt.Graphics2D g2, boolean alignVertic, boolean upWay) {
         // Look for the good corner to join...
-    	
-    	
-    	if (alignVertic==true){
-    		if (upWay==true) {
-    			xDest += destWidth; //left draw	
-			} else {//right draw
-
-			}
-    		
-    	}
-    	else {
-        if (Math.abs(xSource - xDest) > Math.abs((xSource + sourceWidth) -
-                    xDest)) {
-            xSource += sourceWidth;
+        if (alignVertic == true) {
+            if (upWay == true) {
+                xDest += destWidth; //left draw	
+            } else { //right draw
+            }
+        } else {
+            if (Math.abs(xSource - xDest) > Math.abs((xSource + sourceWidth) -
+                        xDest)) {
+                xSource += sourceWidth;
+            }
+            if (Math.abs(xDest - xSource) > Math.abs((xDest + destWidth) -
+                        xSource)) {
+                xDest += destWidth;
+            }
         }
-        if (Math.abs(xDest - xSource) > Math.abs((xDest + destWidth) - xSource)) {
-            xDest += destWidth;
-        	}
-    	}
+
         //    g2.fillOval(xDest - 4, yDest + 9, 8, 8);  // xySource before, but that was obviously wrong
-        drawArrowHead(xSource, ySource + 13, xDest, yDest + 13, g2, alignVertic, upWay);
+        drawArrowHead(xSource, ySource + 13, xDest, yDest + 13, g2,
+            alignVertic, upWay);
     }
 
     private void drawCommunicationPointSameNode(int xSource, int ySource,
@@ -372,48 +374,54 @@ public class ActiveObjectCommunicationRecorder {
                 xDest + destWidth, yDest + 13, g2, false, false);
         } else {
             //      g2.fillOval(xDest - 4, yDest + 9, 8, 8);
-            drawArrowHead(xDest - 100, yDest + 13, xDest, yDest + 13, g2, false, false);
+            drawArrowHead(xDest - 100, yDest + 13, xDest, yDest + 13, g2,
+                false, false);
         }
     }
 
-    private void drawOneArcDifferentNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
-//		System.out.println("-->source : x=" + xSource + " y=" + ySource + " width=" + sourceWidth);
-//		System.out.println("-->destin  : x=" + xDest + " y=" + yDest + " width=" + destWidth);
-		boolean alignVertic = false;
-		boolean upWay     = false;
-		// align vertical -> arc arrow
-		if (xSource == xDest) {
-			alignVertic=true;
-	        int shape = Math.abs(ySource - yDest) / 3;
-	        // com way : 
-	        
-	        if (ySource > yDest) {//up  -> right draw
-	        	upWay     = true;
-	        	//g2.setColor(java.awt.Color.GREEN);
-	            g2.drawArc(xSource - shape + sourceWidth, yDest + 13, shape * 2, Math.abs(ySource - yDest), 90, -180);
-	            
-	        } else { //down  left Draw
-	        	upWay     = false;
-	        	//g2.setColor(java.awt.Color.ORANGE);
-	            g2.drawArc(xSource - shape, ySource + 13, shape * 2, Math.abs(ySource - yDest), 90, 180);
-	            
-	        }
-			
-		} else { // align Horizontal line arrow
-			alignVertic=false;
-//			 Look for the good corner to join...
-			int tmpxSource=xSource;
-			int tmpxDest=xDest ;
-			if (Math.abs(xSource - xDest) > Math.abs((xSource + sourceWidth) - xDest)) {
-				tmpxSource = tmpxSource + sourceWidth;
-			}
-			if (Math.abs(xDest - xSource) > Math.abs((xDest + destWidth) - xSource)) {
-				tmpxDest = tmpxDest + destWidth;
-			}
-			g2.drawLine(tmpxSource, ySource + 13, tmpxDest, yDest + 13);
-		}
-		drawCommunicationPointDifferentNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2,alignVertic, upWay);
-	}
+    private void drawOneArcDifferentNode(int xSource, int ySource,
+        int sourceWidth, int xDest, int yDest, int destWidth,
+        java.awt.Graphics2D g2) {
+        //		System.out.println("-->source : x=" + xSource + " y=" + ySource + " width=" + sourceWidth);
+        //		System.out.println("-->destin  : x=" + xDest + " y=" + yDest + " width=" + destWidth);
+        boolean alignVertic = false;
+        boolean upWay = false;
+
+        // align vertical -> arc arrow
+        if (xSource == xDest) {
+            alignVertic = true;
+            int shape = Math.abs(ySource - yDest) / 3;
+
+            // com way : 
+            if (ySource > yDest) { //up  -> right draw
+                upWay = true;
+                //g2.setColor(java.awt.Color.GREEN);
+                g2.drawArc(xSource - shape + sourceWidth, yDest + 13,
+                    shape * 2, Math.abs(ySource - yDest), 90, -180);
+            } else { //down  left Draw
+                upWay = false;
+                //g2.setColor(java.awt.Color.ORANGE);
+                g2.drawArc(xSource - shape, ySource + 13, shape * 2,
+                    Math.abs(ySource - yDest), 90, 180);
+            }
+        } else { // align Horizontal line arrow
+            alignVertic = false;
+            //			 Look for the good corner to join...
+            int tmpxSource = xSource;
+            int tmpxDest = xDest;
+            if (Math.abs(xSource - xDest) > Math.abs((xSource + sourceWidth) -
+                        xDest)) {
+                tmpxSource = tmpxSource + sourceWidth;
+            }
+            if (Math.abs(xDest - xSource) > Math.abs((xDest + destWidth) -
+                        xSource)) {
+                tmpxDest = tmpxDest + destWidth;
+            }
+            g2.drawLine(tmpxSource, ySource + 13, tmpxDest, yDest + 13);
+        }
+        drawCommunicationPointDifferentNode(xSource, ySource, sourceWidth,
+            xDest, yDest, destWidth, g2, alignVertic, upWay);
+    }
 
     private void drawOneArcSameNode(int xSource, int ySource, int sourceWidth,
         int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
@@ -426,7 +434,8 @@ public class ActiveObjectCommunicationRecorder {
             g2.drawArc(xSource - shape, ySource + 13, shape * 2,
                 Math.abs(ySource - yDest), 90, 180);
         }
-        drawCommunicationPointSameNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
+        drawCommunicationPointSameNode(xSource, ySource, sourceWidth, xDest,
+            yDest, destWidth, g2);
     }
 
     //
@@ -452,16 +461,17 @@ public class ActiveObjectCommunicationRecorder {
         }
     } // end inner class SourceIterator
 
-	/**
-	 * @param antiAlias The antiAlias to set.
-	 */
-	public void setAntiAlias(boolean antiAlias) {
-		this.antiAlias = antiAlias;
-	}
-	/**
-	 * @return Returns the antiAlias.
-	 */
-	public boolean isAntiAlias() {
-		return antiAlias;
-	}
+    /**
+     * @param antiAlias The antiAlias to set.
+     */
+    public void setAntiAlias(boolean antiAlias) {
+        this.antiAlias = antiAlias;
+    }
+
+    /**
+     * @return Returns the antiAlias.
+     */
+    public boolean isAntiAlias() {
+        return antiAlias;
+    }
 }

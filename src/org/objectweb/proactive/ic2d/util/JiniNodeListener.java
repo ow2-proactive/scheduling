@@ -214,11 +214,14 @@ public class JiniNodeListener implements DiscoveryListener {
                                                     if ((info.getInetAddress()).equals(
                                                                 java.net.InetAddress.getByName(
                                                                     host))) {
-																		ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
+                                                        ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
+
                                                         //System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
                                                         nodes.add(new NodeImpl(
-                                                                part,
-                                                                name, "jini",part.getJobID(name)));
+                                                                part, name,
+                                                                "jini",
+                                                                part.getJobID(
+                                                                    name)));
                                                     }
                                                 } catch (java.net.UnknownHostException e) {
                                                     log4jlogger.error(
@@ -227,10 +230,10 @@ public class JiniNodeListener implements DiscoveryListener {
                                             } else {
                                                 //System.out.println("host null: ");
                                                 //System.out.println("JiniNodeListener: ajout du noeud");
-												ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
-                                                nodes.add(new NodeImpl(
-                                                        part, name,
-                                                        "jini",part.getJobID(name)));
+                                                ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
+                                                nodes.add(new NodeImpl(part,
+                                                        name, "jini",
+                                                        part.getJobID(name)));
                                             }
                                         } catch (org.objectweb.proactive.core.ProActiveException e) {
                                             e.printStackTrace();

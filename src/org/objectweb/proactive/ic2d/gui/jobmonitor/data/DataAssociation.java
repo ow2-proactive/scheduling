@@ -247,7 +247,11 @@ public class DataAssociation implements JobMonitorConstants {
 
         return res;
     }
-
+    
+    public MonitoredObjectSet getHosts() {
+        return list(HOST, null);
+    }
+    
     public MonitoredObjectSet getValues(BasicMonitoredObject from, int to,
         Set constraints) {
         int key = from.getKey();

@@ -53,7 +53,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
         super(parentDataObjectPanel,
             "VM id=" + targetVMObject.getID().toString(), "VMObject");
         activeObjectFilter.addClass(SpyListenerImpl.class.getName());
-//      ebe la classe Spy est aussi filtrée par defaut
+        //      ebe la classe Spy est aussi filtr?e par defaut
         activeObjectFilter.addClass(Spy.class.getName());
         this.vmObject = targetVMObject;
         //this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));

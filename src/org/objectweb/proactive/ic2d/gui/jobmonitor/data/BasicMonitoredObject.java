@@ -21,9 +21,9 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     private Set references;
 
     protected BasicMonitoredObject(int key, String fullname) {
-    	this(key, fullname, fullname);
+        this(key, fullname, fullname);
     }
-    
+
     protected BasicMonitoredObject(int key, String prettyPrefix, String fullname) {
         this.key = key;
         this.fullname = fullname;
@@ -34,32 +34,32 @@ public class BasicMonitoredObject implements JobMonitorConstants, Comparable {
     }
 
     protected int incLastID() {
-    	return 0;
+        return 0;
     }
 
     protected Map getPrettyNames() {
-    	return null;
+        return null;
     }
-    
-    private void computePrettyName(String prefix) {
-    	Map prettyNames = getPrettyNames();
-    	if (prettyNames == null) {
-    		prettyName = null;
-    		return;
-    	}
 
-    	if (prefix == null) {
-    		prettyName = fullname;
-    		return;
-    	}
-    		
-    	prettyName = (String) prettyNames.get(fullname);
-    	if (prettyName == null) {
-    		prettyName = prefix + "#" + incLastID();
-    		prettyNames.put(fullname, prettyName);
-    	}
+    private void computePrettyName(String prefix) {
+        Map prettyNames = getPrettyNames();
+        if (prettyNames == null) {
+            prettyName = null;
+            return;
+        }
+
+        if (prefix == null) {
+            prettyName = fullname;
+            return;
+        }
+
+        prettyName = (String) prettyNames.get(fullname);
+        if (prettyName == null) {
+            prettyName = prefix + "#" + incLastID();
+            prettyNames.put(fullname, prettyName);
+        }
     }
-    
+
     public void addReference(MonitoredObjectSet set) {
         references.add(set);
     }

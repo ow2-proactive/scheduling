@@ -30,11 +30,11 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
-import java.awt.RenderingHints;
-
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.ActiveObjectListener;
+
+import java.awt.RenderingHints;
 
 
 public class ActiveObjectPanel extends AbstractDataObjectPanel
@@ -119,11 +119,13 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
 
     /** Redraw the component */
     public void paintComponent(java.awt.Graphics g) {
-    	java.awt.Graphics2D g2 = (java.awt.Graphics2D) g; // ebe subtypying for antialiasing and better rendering
-    	super.paintComponent(g2);
-        
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g; // ebe subtypying for antialiasing and better rendering
+        super.paintComponent(g2);
+
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
+            RenderingHints.VALUE_RENDER_QUALITY);
         java.awt.Color old = g2.getColor();
         if (isGhost) {
             g2.setColor(COLOR_WHEN_MIGRATING);
@@ -170,7 +172,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         }
 
         g2.setColor(old);
-       // paintChildren(g2);
+        // paintChildren(g2);
     }
 
     //
