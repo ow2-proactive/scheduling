@@ -90,12 +90,16 @@ public class ParallelCompositeComponentHandler
                         // then instantiate the component and add a stub on it to the cache
                         VirtualNode vn = deploymentDescriptor.getVirtualNode(virtualNode);
 
-                        if (vn.getNodeCount() != 1) {
-                            throw new NodeException(
-                                "can only create an enclosing parallel composite on a single node \n" +
-                                " (internal primitive components can be deployed on multiple nodes)");
-                        }
-                        // get corresponding node
+						if (vn.getNodeCount() == 0) {
+						   throw new NodeException(
+							   "no node defined for the virtual node " + vn.getName());
+					   }
+					   if (logger.isDebugEnabled()) {
+						   if (vn.getNodeCount() > 1) {
+							   logger.debug("creating a parallel composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");							
+						   }
+					   }
+                        // get corresponding node (1st one if there are several nodes)
                         Node targeted_node = vn.getNode();
                         parallel = cf.newFcInstance(componentType,
                                 new ControllerDescription(controllerDescription.getName(),
