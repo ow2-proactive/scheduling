@@ -262,8 +262,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 			ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
-        // Returns the result
-        // note : it seems that a functional exception is returned -> NFE are not necessary
+        // Returns the result (exception returned is a functional one -> NFE is not needed)
         if (f.getRaisedException() != null) {
             throw f.getRaisedException();
         } else {

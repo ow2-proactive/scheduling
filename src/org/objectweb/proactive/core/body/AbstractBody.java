@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -41,9 +42,9 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.group.ProActiveGroupManager;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.ProActiveGroupManager;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
@@ -65,16 +66,17 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 import java.io.IOException;
 
+import java.lang.reflect.InvocationTargetException;
+
 import java.security.Provider;
 import java.security.PublicKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.Hashtable;
 
 
 /**
@@ -139,8 +141,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
        stopping the activity thread is not immediate */
     private transient boolean isDead;
 
-	/** table of handlers associated to the body */
-	private HashMap bodyLevel;
+    /** table of handlers associated to the body */
+    private HashMap bodyLevel;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -176,7 +178,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (reifiedObject instanceof Secure) {
             isInterfaceSecureImplemented = true;
         }
-		psm = new ProActiveSecurityManager();
+        psm = new ProActiveSecurityManager();
         internalBodySecurity = new InternalBodySecurity(null); // SECURITY
 
         /*
@@ -603,7 +605,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             byte[][] ske;
 
-             renegociateSessionIfNeeded(sessionID);
+            renegociateSessionIfNeeded(sessionID);
             if (internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
                 ske = psm.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
@@ -847,52 +849,58 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-	/** Give a reference to a local map of handlers
-		   * @return A reference to a map of handlers
-		   */
-	 public HashMap getHandlersLevel() throws ProActiveException {
-		 return bodyLevel;
-	 }
+    /** Give a reference to a local map of handlers
+               * @return A reference to a map of handlers
+               */
+    public HashMap getHandlersLevel() throws ProActiveException {
+        return bodyLevel;
+    }
 
-	 /** Set a new handler within the table of the Handlerizable Object
-		  * @param handler A class of handler associated with a class of non functional exception.
-		  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		  */
-	 public void setExceptionHandler(Class handler, Class exception)
-		 throws ProActiveException {
-		 // add handler to the body level
-		 //System.out.println("[SET_EXCEPTION_HANDLER] " + "[P1=" + handler.getName() + "] [P2=" + exception.getName() + "]");
-		 if (bodyLevel == null) {
-			 bodyLevel = new HashMap();
-		 }
-		 bodyLevel.put(exception, handler);
-		 //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
-	 }
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param handler A class of handler associated with a class of non functional exception.
+     */
+    public void setExceptionHandler(Class exception, Class handler)
+        throws ProActiveException {
+        // add handler to body level
+        if (bodyLevel == null) {
+            bodyLevel = new HashMap();
+        }
+        try {
+            bodyLevel.put(exception, handler.newInstance());
+        } catch (InstantiationException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "[NFE_SET_BODY_ERROR] : Cannot instantiate handler of class" +
+                    handler.getName());
+            }
+        } catch (IllegalAccessException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("[NFE_SET_BODY_ERROR] : Cannot acces class" +
+                    handler.getName());
+            }
+        }
+    }
 
-	 /** Remove a handler from the table of the Handlerizable Object
-		  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		  * @return The removed handler or null
-		  */
-	 public Handler unsetExceptionHandler(Class exception)
-		 throws ProActiveException {
-		 // add handler to the body level
-		 if (bodyLevel != null) {
-			 // System.out.println("[UNSET_EXCEPTION_HANDLER] " + "[P1=" + exception.getName() + "]");
-			 Class handlerClass = (Class) bodyLevel.remove(exception);
-
-			 //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
-			 try {
-				 Handler handler = (Handler) handlerClass.newInstance();
-				 return handler;
-			 } catch (IllegalAccessException e) {
-				 System.out.println("*** ERROR : " + e);
-			 } catch (InstantiationException e) {
-				 System.out.println("*** INSTANTIATION ERROR : " + e);
-			 }
-			 return null;
-		 }
-		 return null;
-	 }
+    /** Remove a handler from the table of the Handlerizable Object
+             * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+             * @return The removed handler or null
+             */
+    public Handler unsetExceptionHandler(Class exception)
+        throws ProActiveException {
+        // remove handler from body level
+        if (bodyLevel != null) {
+            Handler handler = (Handler) bodyLevel.remove(exception);
+            return handler;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "[NFE_REMOVE_BODY_WARNING] : handler for exception " +
+                    exception.getName() + "did not exist in BODY level");
+            }
+            return null;
+        }
+    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -965,26 +973,27 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         return this.pgm.getSPMDGroup();
     }
 
-	/**
-	 * Returns the size of of the SPMD group
-	 * @return the size of of the SPMD group
-	 */
-	public int getSPMDGroupSize() {
-		return ProActiveGroup.size(this.getSPMDGroup());
-	}
-	
-	/**
-	 * Send a call to all member of the SPMD group
-	 * @param gmc the control method call for group
-	 */
-	public void sendSPMDGroupCall (MethodCallControlForGroup gmc) {
-		try {
-			((ProxyForGroup) ProActiveGroup.getGroup(this.pgm.getSPMDGroup())).reify(gmc);
-		} catch (InvocationTargetException e) {
-			System.err.println("Unable to invoke a method call to control groups");
-			e.printStackTrace();
-		}
-	}
+    /**
+     * Returns the size of of the SPMD group
+     * @return the size of of the SPMD group
+     */
+    public int getSPMDGroupSize() {
+        return ProActiveGroup.size(this.getSPMDGroup());
+    }
+
+    /**
+     * Send a call to all member of the SPMD group
+     * @param gmc the control method call for group
+     */
+    public void sendSPMDGroupCall(MethodCallControlForGroup gmc) {
+        try {
+            ((ProxyForGroup) ProActiveGroup.getGroup(this.pgm.getSPMDGroup())).reify(gmc);
+        } catch (InvocationTargetException e) {
+            System.err.println(
+                "Unable to invoke a method call to control groups");
+            e.printStackTrace();
+        }
+    }
 
     //
     // -- SERIALIZATION METHODS -----------------------------------------------

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 1.0.2
  *
  */
-public class NonFunctionalException extends ProActiveException /*implements Serializable*/ {
+public class NonFunctionalException extends ProActiveException {
 
 	/**
 	* separator for exception description

@@ -30,16 +30,20 @@
 */
 package org.objectweb.proactive.core.body.proxy;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 
-//add comments 
 import java.util.HashMap;
 
 
 public abstract class AbstractProxy implements Proxy, java.io.Serializable {
+    // Get logger
+    protected static Logger logger = Logger.getLogger("NFE");
+
     // table of handlers associated to proxy
     private HashMap proxyLevel;
 
@@ -87,16 +91,29 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
     }
 
     /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A class of handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param handler A class of handler associated with a class of non functional exception.
      */
-    public void setExceptionHandler(Class handler, Class exception)
+    public void setExceptionHandler(Class exception, Class handler)
         throws ProActiveException {
         // add handler to proxy level
         if (proxyLevel == null) {
             proxyLevel = new HashMap();
         }
-        proxyLevel.put(exception, handler);
+        try {
+            proxyLevel.put(exception, handler.newInstance());
+        } catch (InstantiationException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "[NFE_SET_PROXY_ERROR] : Cannot instantiate handler of class" +
+                    handler.getName());
+            }
+        } catch (IllegalAccessException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("[NFE_SET_PROXY_ERROR] : Cannot acces class" +
+                    handler.getName());
+            }
+        }
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -105,19 +122,16 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
      */
     public Handler unsetExceptionHandler(Class exception)
         throws ProActiveException {
-        // add handler to proxy level
+        // remove handler from proxy level
         if (proxyLevel != null) {
-            Class handlerClass = (Class) proxyLevel.remove(exception);
-            try {
-                Handler handler = (Handler) handlerClass.newInstance();
-                return handler;
-            } catch (IllegalAccessException e) {
-                System.out.println("*** ERROR : " + e);
-            } catch (InstantiationException e) {
-                System.out.println("*** INSTANTIATION ERROR : " + e);
+            Handler handler = (Handler) proxyLevel.remove(exception);
+            return handler;
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("[NFE_REMOVE_PROXY_WARNING] : handler for exception " +
+                    exception.getName() + "did not exist in PROXY level");
             }
             return null;
         }
-        return null;
     }
 }
