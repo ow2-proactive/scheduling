@@ -26,10 +26,10 @@ public interface ComponentsDescriptorConstants {
 	public static final String INTERFACE_SIGNATURE_TAG = "signature";
 	public static final String INTERFACE_CARDINALITY_TAG = "cardinality";
 	public static final String INTERFACE_CARDINALITY_SINGLE_TAG = "single";
-	public static final String INTERFACE_CARDINALITY_COLLECTIVE_TAG = "single";
+	public static final String INTERFACE_CARDINALITY_COLLECTIVE_TAG = "collection";
 	public static final String INTERFACE_CONTINGENCY_TAG = "contingency";
 	public static final String INTERFACE_CONTINGENCY_MANDATORY_TAG = "mandatory";
-	public static final String INTERFACE_CONTINGENCY_OPTIONAL_TAG = "mandatory";
+	public static final String INTERFACE_CONTINGENCY_OPTIONAL_TAG = "optional";
 	public static final String REQUIRES_TAG = "requires";
 	public static final String PARALLEL_COMPOSITE_COMPONENT_TAG = "parallel-composite-component";
 	public static final String PRIMITIVE_COMPONENT_TAG = "primitive-component";
