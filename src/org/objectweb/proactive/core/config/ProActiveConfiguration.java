@@ -13,6 +13,7 @@ public class ProActiveConfiguration {
     protected HashMap loadedProperties;
     protected HashMap addedProperties;
     protected static ProActiveConfiguration singleton;
+    protected static boolean isLoaded = false;
 
     private ProActiveConfiguration() {
         this.loadedProperties = new HashMap();
@@ -34,20 +35,24 @@ public class ProActiveConfiguration {
      * as the configuration file
      */
     public static void load() {
-        String filename = null;
-        if (System.getProperty("proactive.configuration") != null) {
-            filename = System.getProperty("proactive.configuration");
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("******** No proactive.configuration");
+        if (!isLoaded) {
+            String filename = null;
+            if (System.getProperty("proactive.configuration") != null) {
+                filename = System.getProperty("proactive.configuration");
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("******** No proactive.configuration");
+                }
+                filename = ProActiveConfiguration.class.getResource(
+                        "ProActiveConfiguration.xml").toString();
             }
-            filename = ProActiveConfiguration.class.getResource(
-                    "ProActiveConfiguration.xml").toString();
+            if (logger.isDebugEnabled()) {
+                System.out.println("****** Reading configuration from " +
+                    filename);
+            }
+            ProActiveConfiguration.load(filename);
+            isLoaded = true;
         }
-        if (logger.isDebugEnabled()) {
-            System.out.println("****** Reading configuration from " + filename);
-        }
-        ProActiveConfiguration.load(filename);
     }
 
     /**
@@ -55,9 +60,12 @@ public class ProActiveConfiguration {
      * @param filename an XML file name
      */
     public static void load(String filename) {
-        MasterFileHandler.createMasterFileHandler(filename,
-            ProActiveConfiguration.getConfiguration());
-        ProActiveConfiguration.getConfiguration().addProperties();
+        if (!isLoaded) {
+            MasterFileHandler.createMasterFileHandler(filename,
+                ProActiveConfiguration.getConfiguration());
+            ProActiveConfiguration.getConfiguration().addProperties();
+            isLoaded = true;
+        }
     }
 
     public synchronized static ProActiveConfiguration getConfiguration() {
