@@ -31,20 +31,26 @@
 package org.objectweb.proactive.core.component.adl.vnexportation;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
 /**
- * @author Matthieu Morel
  * <p>
- * This class is a link of a chained list of virtual nodes. An instance contains : <br>
+ * This class is a link of a chained list of virtual nodes. An instance specifies : <br>
+ * - the name of the component which defines it<br>
+ * - the name of this virtual node <br>
  * - if it is part of a virtual node composition  (i.e. a "composingVirtualNode in the ADL) : 
- * a reference on a "composer" virtual node
+ * a reference on a "composer" virtual node<br>
  *-  if it is a composer of other virtual nodes (i.e. an "exportedVirtualNode" in the ADL) :
  * references on "composing" virtual nodes</p>
+ * <p>The highest virtual node in the hierarchy of composed virtual nodes gives its name to all underlying
+ * virtual nodes. This name can be retreived by the method {@link #getExportedVirtualNodeNameAfterComposition()}.</p> 
  * <p>LinkedVirtualNode elements inherit from the multiplicity of their composing nodes :
  * if at least one of them is multiple, then this LinkedVirtualNode is multiple</p>
- * 
+ *  
+ *  
+ * @author Matthieu Morel
  */
 public class LinkedVirtualNode {
     private List composingVirtualNodes;
@@ -52,58 +58,189 @@ public class LinkedVirtualNode {
     private String componentName;
     private String virtualNodeName;
     private boolean isMultiple = false;
+//    /private boolean selfExported = false;
+    public final static String EMPTY_COMPONENT_NAME="component_name";
+    public final static String EMPTY_VIRTUAL_NODE_NAME = "virtual_node_name";
 
+    /**
+     * Constructor
+     * @param componentName the name of the component which defines this virtual node
+     * @param virtualNodeName the name of the virtual node
+     */
     public LinkedVirtualNode(String componentName, String virtualNodeName) {
         this.componentName = componentName;
         this.virtualNodeName = virtualNodeName;
         composingVirtualNodes = new ArrayList();
     }
 
+    void setComposer(LinkedVirtualNode composer) {
+        this.composer = composer;
+    }
+    
+    /**
+     * Adds a composing virtual node
+     * @param vn a composing virtual node
+     * @return true if the virtual node was added, false if it was already present as a composing virtual node
+     */
     public boolean addComposingVirtualNode(LinkedVirtualNode vn) {
         setMultiple(vn.isMultiple());
         if (!composingVirtualNodes.contains(vn)) {
             composingVirtualNodes.add(vn);
-            if (composer != null) {
-                vn.composeIn(composer);
-            } else {
-                vn.composeIn(this);
-            }
+            vn.setComposer(this);
             return true;
         }
         return false;
     }
 
+    /**
+     * Getter for the composing virtual nodes 
+     * @return the list of the composing virtual nodes for this virtual node 
+     */
     public List getComposingVirtualNodes() {
         return composingVirtualNodes;
     }
-
-    public void composeIn(LinkedVirtualNode vn) {
-        composer = vn;
+    
+    /**
+     * Returns a String representation of the composing virtual nodes
+     * @return a String representation of the composing virtual nodes
+     */
+    public String getComposingVirtualNodesAsString() {
+        Iterator iter = getComposingVirtualNodes().iterator();
+        StringBuffer buff = new StringBuffer();
+        while (iter.hasNext()) {
+            LinkedVirtualNode element = (LinkedVirtualNode)iter.next();
+            if (element.getDefiningComponentName().equals(EMPTY_COMPONENT_NAME) || element.getVirtualNodeNameBeforeComposition().equals(EMPTY_VIRTUAL_NODE_NAME)) {
+                continue;
+            }
+            buff.append(element.getDefiningComponentName() + "." + element.getVirtualNodeNameBeforeComposition());
+            buff.append(";");
+        }
+        return buff.toString();
     }
 
     /**
+     * 
      * @return the name of the virtual node given at construction time
      */
-    public String getOriginalName() {
+    public String getVirtualNodeNameBeforeComposition() {
         return virtualNodeName;
+    }
+    
+    /**
+     * 
+     * @return name_of_the_defining_component.name_of_the_virtual_node_at_construction_time
+     */
+    public String getCompleteNameBeforeComposition() {
+        return componentName + '.' + virtualNodeName;
     }
 
     /**
-     *
-     * @return the composer's name if there is one, the name of the virtualNode given at construction time otherwise
+     * @return the name resulting from the composition. It corresponds to the name of the highest 
+     * virtual node in the hierarchy of composed virtual nodes 
      */
-    public String getExportedName() {
-        return ((composer == null) ? virtualNodeName : composer.getExportedName());
+    public String getExportedVirtualNodeNameAfterComposition() {
+        return ((composer == null) ? virtualNodeName : composer.getExportedVirtualNodeNameAfterComposition());
     }
-
+    
+    /**
+     * 
+     * @return the name 
+     */
+    public String getExportedNameBeforeComposition() {
+        return ((composer == null) ? virtualNodeName : composer.getVirtualNodeNameBeforeComposition());
+    }
+    
+    /**
+     * Setter for cardinality
+     * @param yes if true the cardinality is set to multiple
+     */
     public void setMultiple(boolean yes) {
         if (yes) {
             isMultiple = true;
-            System.out.println("CARDINALITY : " + componentName + "." + virtualNodeName + " set to multiple");
         }
     }
 
+    /**
+     * Getter for cardinality
+     * @return true if this virtual node is multiple
+     */
     public boolean isMultiple() {
         return isMultiple;
     }
+    
+    /**
+     * Checks whether this virtual node is exported
+     * @return true if this virtual node is an exported virtual node (i.e. if it is holds composing virtual nodes) 
+     */
+    public boolean isExported() {
+        return composingVirtualNodes.size()>0;
+    }
+    
+    /**
+     * Returns the component that defined this linked virtual node
+     * @return the component that defined this linked virtual node
+     */
+    public String getDefiningComponentName() {
+        return componentName;
+    }
+    
+    /**
+     * Indicates that the composing virtual node and the exported virtual node are defined in the same component. 
+     *
+     */
+//    public void setSelfExported() {
+//        selfExported=true;
+//    }
+    
+    /**
+     * @return true if the composing virtual node and the exported virtual node are defined in the same component. 
+     */
+    public boolean isSelfExported() {
+        if (composer ==null) {
+            return false;
+        }
+        return composer.getDefiningComponentName().equals(getDefiningComponentName());
+    }
+    
+   /**
+    * 
+    * @param componentName name of the component
+    * @param virtualNodeName name of the virtual node
+    * @return true if the current component contains the specified virtual node as a composing element.
+    */ 
+    public boolean isComposedFrom(String componentName, String virtualNodeName) {
+        Iterator it = composingVirtualNodes.iterator();
+        while (it.hasNext()) {
+            LinkedVirtualNode lvn = (LinkedVirtualNode)it.next();
+            if (lvn.getDefiningComponentName().equals(componentName)) {
+                if (lvn.getVirtualNodeNameBeforeComposition().equals(virtualNodeName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * 
+     * @return the composer linked virtual node. null if this virtual node is not exported
+     */
+    public LinkedVirtualNode getComposer() {
+        return composer;
+    }
+    
+    
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        if (composer != null) {
+            buffer.append(composer.getDefiningComponentName() +"." +composer.getVirtualNodeNameBeforeComposition() + "<--" +componentName + "." + virtualNodeName +"-->{" );
+        }
+        Iterator it = composingVirtualNodes.iterator();
+        while (it.hasNext()) {
+            LinkedVirtualNode lvn = (LinkedVirtualNode)it.next();
+            buffer.append(lvn.toString());
+        }
+        return buffer.append("}").toString();
+    }
+
 }
