@@ -49,7 +49,7 @@ In <b>ProActive</b> there are two ways to create active objects. One way is to u
 </p>
 <h2>Instantiation-Based Creation</h2>
 <p class="textNormal">
-When using instantiation based creation, any argument passed to the constructor of the reified object through <code>ProActive.newActive</code> is serialized and passed by copy to the object. This is because the model behind <b>ProActive</b> is uniform whether the active object is instantiated locally or remotely. The parameters are therefore guarantee to be passed by copy to the constructor. When using <code>ProActive.newActive</code> you must make sure that the arguments of the constructor are <code>Serializable</code>. On the other hand, the class used to create the active object <b>does not need to be</b> <code>Serializable</code> even in the case the active object is created remotly.
+When using instantiation based creation, any argument passed to the constructor of the reified object through <code>ProActive.newActive</code> is serialized and passed by copy to the object. This is because the model behind <b>ProActive</b> is uniform whether the active object is instantiated locally or remotely. The parameters are therefore guarantee to be passed by copy to the constructor. When using <code>ProActive.newActive</code> you must make sure that the arguments of the constructor are <code>Serializable</code>. On the other hand, the class used to create the active object <b>does not need to be</b> <code>Serializable</code> even in the case the active object is created remotly. Remind also that to be created properly, the reified object must have a declared empty no-args constructor.
 </p>
 <pre>
     A a;
@@ -59,6 +59,9 @@ When using instantiation based creation, any argument passed to the constructor 
     } catch (ActiveObjectCreationException e) {
       // creation of ActiveObject failed
       e.printStackTrace();
+    }
+    catch(NodeException ex){
+    	ex.printStackTrace();
     }
 </pre>
 <p class="textNormal">
