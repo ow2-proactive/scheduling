@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime.ibis;
 
 import ibis.rmi.AlreadyBoundException;
 import ibis.rmi.RemoteException;
+import ibis.rmi.UnmarshalException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
@@ -68,6 +69,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     protected RemoteProActiveRuntime remoteProActiveRuntime;
     protected VMInformation vmInformation;
     protected String proActiveRuntimeURL;
+	protected boolean alreadykilled = false;
 
     //
     // -- Constructors -----------------------------------------------
@@ -244,13 +246,20 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void killRT(boolean softly) throws Exception {
-        try {
-            remoteProActiveRuntime.killRT(softly);
-        } catch (RemoteException re) {
-            throw new ProActiveException(re);
-        }
-    }
+	public void killRT(boolean softly) throws Exception {
+		try {
+			if (!alreadykilled) {
+				remoteProActiveRuntime.killRT(softly);
+			}
+			alreadykilled = true;
+		} catch (UnmarshalException e) {
+			//here should be caught the exception from System.exit
+			alreadykilled = true;
+			throw e;
+		} catch (RemoteException re) {
+			throw new ProActiveException(re);
+		}
+	}
 
     public String getURL() throws ProActiveException {
         return proActiveRuntimeURL;
@@ -481,7 +490,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @see org.objectweb.proactive.Job#getJobId()
+     * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
         return vmInformation.getJobID();

@@ -88,7 +88,7 @@ public class UrlBuilder {
 	 * @param host
 	 * @param name
 	 * @param protocol
-	 * @return
+	 * @return an Url built from properties
 	 */
 	public static String buildUrlFromProperties(String host, String name, String protocol)
 	{	
@@ -123,7 +123,7 @@ public class UrlBuilder {
     /**
      * Returns the name included in the url
 	 * @param url
-	 * @return
+	 * @return the name included in the url
 	 */
 	public static String getNameFromUrl(String url) {
         int n = url.lastIndexOf("/");
@@ -179,9 +179,9 @@ public class UrlBuilder {
     }
 
     /**
-     * Returns port number include in the url or 1099 if no port is specified
+     * Returns port number included in the url or 1099 if no port is specified
 	 * @param url
-	 * @return
+	 * @return the port number included in the url or 1099 if no port is specified
 	 */
 	public static int getPortFromUrl(String url) {
 		try {

@@ -62,11 +62,6 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
-//		String port = System.getProperty("proactive.rmi.port");
-//				
-//		if ( port != null){
-//			registryHelper.setRegistryPortNumber(new Integer(port).intValue());
-//		}
 
         registryHelper.initializeRegistry();
     }
