@@ -127,7 +127,6 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
 			new PenguinControler(nodes);
     }catch(Exception e){
     e.printStackTrace();
-    System.out.println("Pb in main");
     }
     
   }

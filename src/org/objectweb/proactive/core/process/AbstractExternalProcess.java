@@ -247,10 +247,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   public static class StandardOutputMessageLogger implements MessageLogger,java.io.Serializable {
   
     public StandardOutputMessageLogger() {
+    	//messageLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p %m %n")));
     }
     
     public void log(String message) {
-      System.out.println(message);
+     messageLogger.info(message);
     }
     
     public void log(Throwable t) {
@@ -258,7 +259,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
     }
     
     public void log(String message, Throwable t) {
-      System.out.println(message);
+      messageLogger.info(message);
       t.printStackTrace();
     }
   

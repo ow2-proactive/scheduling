@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -25,6 +26,8 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 
 public class FileChooser extends JFrame {
+	
+		static Logger logger = Logger.getLogger(FileChooser.class.getName());
 
     private static final int DEFAULT_WIDTH =500;
     private static final int DEFAULT_HEIGHT = 250;         
@@ -84,7 +87,7 @@ public class FileChooser extends JFrame {
 		    ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:"+fc.getSelectedFile());
 		    GlobusProcess globusProcess = (GlobusProcess)pad.getProcess("globusProcess");
 		    if (globusProcess==null){
-			System.out.println("globusProcess is null");
+			logger.warn("globusProcess is null");
 		    }
 		    //this.setVisible(false);
 		    frame.setVisible(false);

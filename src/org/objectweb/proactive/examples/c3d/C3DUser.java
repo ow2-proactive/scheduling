@@ -64,6 +64,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -77,6 +78,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Serializable {
 	
+	static Logger logger = Logger.getLogger(C3DUser.class.getName());
 	
 	private MigrationStrategyManagerImpl myStrategyManager;
 	private boolean onMigration;
@@ -228,7 +230,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 	}
 	
   public void runActivity(org.objectweb.proactive.Body body) {
-    System.out.println("Starting custom live in C3DUser");
+   logger.info("Starting custom live in C3DUser");
     //System.out.println("migration "+getOnMigration());
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
@@ -274,7 +276,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			System.out.println("Pb in main");
+			logger.fatal("Pb in main");
 		}
  
     VirtualNode user =
@@ -546,7 +548,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
 
   private void trace(String s_message) {
-    System.out.println("C3DUser: " + s_message);
+    logger.info("C3DUser: " + s_message);
   }
 
 

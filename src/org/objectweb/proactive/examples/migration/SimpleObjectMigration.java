@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
@@ -49,6 +50,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * @version ProActive 1.0 (March 2002)
  */
 public class SimpleObjectMigration implements Serializable {
+	
+	static Logger logger = Logger.getLogger(SimpleObjectMigration.class.getName());
 
   private static final int SLEEP_TIME = 9000;
 
@@ -60,7 +63,7 @@ public class SimpleObjectMigration implements Serializable {
    *
    */
   public SimpleObjectMigration() {
-    System.out.println("SimpleObjectMigration> Empty constructor");
+    logger.info("SimpleObjectMigration> Empty constructor");
   }
 
   /**
@@ -70,7 +73,7 @@ public class SimpleObjectMigration implements Serializable {
    of the instance
   */
   public SimpleObjectMigration(String name) {
-    System.out.println("SimpleObjectMigration> Constructor with a parameter : " + name);
+    logger.info("SimpleObjectMigration> Constructor with a parameter : " + name);
     this.name = name;
   }
 
@@ -80,7 +83,7 @@ public class SimpleObjectMigration implements Serializable {
    * @return a <code>String</code> value who is the 'hello' sentence
    */
   public String sayHello() {
-    System.out.println("SimpleObjectMigration> sayHello()");
+    logger.info("SimpleObjectMigration> sayHello()");
     String localhost = null;
     try {
       localhost = InetAddress.getLocalHost().toString();
@@ -88,7 +91,7 @@ public class SimpleObjectMigration implements Serializable {
       e.printStackTrace();
     }
     String sentence = name + hi + localhost;
-    System.out.println("SimpleObjectMigration> sayHello() --> " + sentence);
+    logger.info("SimpleObjectMigration> sayHello() --> " + sentence);
     return sentence;
   }
 
@@ -101,9 +104,9 @@ public class SimpleObjectMigration implements Serializable {
   public void moveTo(String t) {
     try {
 
-      System.out.println("SimpleObjectMigration> moveTo(" + t + ") " + "% start migration");
+      logger.info("SimpleObjectMigration> moveTo(" + t + ") " + "% start migration");
       ProActive.migrateTo(t);
-      System.out.println("SimpleObjectMigration> moveTo(" + t + ") " + "% stop migration");
+      logger.info("SimpleObjectMigration> moveTo(" + t + ") " + "% stop migration");
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -135,8 +138,8 @@ public class SimpleObjectMigration implements Serializable {
       urlSourceNode = args[0];
       urlDestinationNode = args[1];
     } else {
-      System.out.println("USAGE   : java SimpleObjectMigration " + "urlSourceNode        urlDestinationNode ");
-      System.out.println("Example : java SimpleObjectMigration " + "rmi://host1/Mynode1  jini://host2/MyNode2 ");
+      logger.info("USAGE   : java SimpleObjectMigration " + "urlSourceNode        urlDestinationNode ");
+      logger.info("Example : java SimpleObjectMigration " + "rmi://host1/Mynode1  jini://host2/MyNode2 ");
       System.exit(1);
     }
 
@@ -149,14 +152,14 @@ public class SimpleObjectMigration implements Serializable {
 
     try {
 
-      System.out.println("SimpleObjectMigration> main() > " + "we try to get the source node : " + urlSourceNode);
+      logger.info("SimpleObjectMigration> main() > " + "we try to get the source node : " + urlSourceNode);
 
       sourceNode = NodeFactory.getNode(urlSourceNode);
 
-      System.out.println("SimpleObjectMigration> main() > " + "we obtain the source node : " + urlSourceNode);
+      logger.info("SimpleObjectMigration> main() > " + "we obtain the source node : " + urlSourceNode);
 
     } catch (NodeException e) {
-      System.out.println(
+     logger.info(
         "SimpleObjectMigration> main() > "
           + "Exception during the getting of "
           + " the source node "
@@ -169,12 +172,12 @@ public class SimpleObjectMigration implements Serializable {
 
     try {
 
-      System.out.println(
+      logger.info(
         "SimpleObjectMigration> main() > " + "we try to get the destination node : " + urlDestinationNode);
 
       destinationNode = NodeFactory.getNode(urlDestinationNode);
 
-      System.out.println("SimpleObjectMigration> main() > " + "we obtain the destination node : " + urlDestinationNode);
+      logger.info("SimpleObjectMigration> main() > " + "we obtain the destination node : " + urlDestinationNode);
 
     } catch (NodeException e) {
       System.out.println(
@@ -188,12 +191,12 @@ public class SimpleObjectMigration implements Serializable {
       e.printStackTrace();
     }
 
-    System.out.println(
+    logger.info(
       "SimpleObjectMigration> main() > " + "We shows the state before" + " to create the Active Object");
     // We show the two nodes states
     showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
-    System.out.println("SimpleObjectMigration> main() > " + "We try to create an simple active object");
+    logger.info("SimpleObjectMigration> main() > " + "We try to create an simple active object");
 
     // The active obect
     SimpleObjectMigration activeHello = null;
@@ -202,16 +205,16 @@ public class SimpleObjectMigration implements Serializable {
       Object[] params = new Object[] { "Created by " + InetAddress.getLocalHost().toString()};
 
       activeHello = (SimpleObjectMigration) ProActive.newActive(className, params, sourceNode);
-      System.out.println("SimpleObjectMigration> main() > " + "We created an simple active object");
+      logger.info("SimpleObjectMigration> main() > " + "We created an simple active object");
 
-      System.out.println("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
+      logger.info("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
 
       String helloAnswer = activeHello.sayHello();
 
-      System.out.println("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
+      logger.info("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
 
     } catch (UnknownHostException e) {
-      System.out.println(
+      logger.info(
         "SimpleObjectMigration> main() > "
           + "Exception during the creation of the active object"
           + " ("
@@ -219,7 +222,7 @@ public class SimpleObjectMigration implements Serializable {
           + ")");
       e.printStackTrace();
     } catch (ActiveObjectCreationException e) {
-      System.out.println(
+     logger.info(
         "SimpleObjectMigration> main() > "
           + "Exception during the creation of the active object"
           + " ("
@@ -227,7 +230,7 @@ public class SimpleObjectMigration implements Serializable {
           + ")");
       e.printStackTrace();
     } catch (NodeException e) {
-      System.out.println(
+      logger.info(
         "SimpleObjectMigration> main() > "
           + "Exception during the creation of the active object"
           + " ("
@@ -236,35 +239,35 @@ public class SimpleObjectMigration implements Serializable {
       e.printStackTrace();
     }
 
-    System.out.println(
+    logger.info(
       "SimpleObjectMigration> main() > " + "We show the state before" + " the migration of the Active Object");
     // We show the two nodes states
     showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
     try {
-      System.out.println("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
+     logger.info("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
       Thread.sleep(SLEEP_TIME);
-      System.out.println("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
+      logger.info("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
 
     } catch (InterruptedException e2) {
     }
 
-    System.out.println("SimpleObjectMigration> main() > " + "migrate active object to " + urlDestinationNode);
+    logger.info("SimpleObjectMigration> main() > " + "migrate active object to " + urlDestinationNode);
 
-    System.out.println(
+    logger.info(
       "SimpleObjectMigration> main() > " + "We show the state after" + " the migration of the Active Object");
 
-    System.out.println("");
+    logger.info("");
 
     // We migrate the Active Object
     activeHello.moveTo(urlDestinationNode);
 
-    System.out.println("");
+    logger.info("");
 
     try {
-      System.out.println("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
+      logger.info("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
       Thread.sleep(SLEEP_TIME);
-      System.out.println("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
+      logger.info("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
 
     } catch (InterruptedException e2) {
     }
@@ -272,13 +275,13 @@ public class SimpleObjectMigration implements Serializable {
     // We show the two nodes states
     showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
-    System.out.println("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
+    logger.info("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
 
     String helloAnswer = activeHello.sayHello();
 
-    System.out.println("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
+    logger.info("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
 
-    System.out.println("SimpleObjectMigration> main() > end of test");
+    logger.info("SimpleObjectMigration> main() > end of test");
 
   }
 
@@ -288,9 +291,9 @@ public class SimpleObjectMigration implements Serializable {
     String urlDestinationNode,
     Node destinationNode) {
     try {
-      System.out.println("");
-      System.out.println("SimpleObjectMigration> showIds() > ");
-      System.out.println("-------- Ids on " + urlSourceNode + " ------");
+      logger.info("");
+      logger.info("SimpleObjectMigration> showIds() > ");
+      logger.info("-------- Ids on " + urlSourceNode + " ------");
       /*
       UniqueID[] ids = sourceNode.getActiveObjectIDs();
       for (int j = 0; j < ids.length; j++) {
@@ -308,7 +311,7 @@ public class SimpleObjectMigration implements Serializable {
       System.out.println("-----------------------------------------------");
       */
     } catch (Exception e) {
-      System.out.println(
+      logger.info(
         "SimpleObjectMigration> showIds() > "
           + "Exception during the of the node's state"
           + " ("

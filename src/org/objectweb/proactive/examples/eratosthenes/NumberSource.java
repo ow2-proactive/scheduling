@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.eratosthenes;
 *
 */
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -43,7 +44,8 @@ import org.objectweb.proactive.Service;
  * @author Jonathan Streit
  */
 public class NumberSource implements java.io.Serializable, RunActive, Slowable {
-
+	
+	static Logger logger = Logger.getLogger(NumberSource.class.getName());
   private PrimeOutputListener outputListener;
   private ActivePrimeContainer first;
   private boolean pause;
@@ -78,7 +80,7 @@ public class NumberSource implements java.io.Serializable, RunActive, Slowable {
       		Thread.sleep(100);
       	} catch (InterruptedException ex) {}
       } else if (first != null) {
-	    System.out.println("        Testing numbers from "+currentNumber+" to "+(currentNumber+98));
+	    logger.info("        Testing numbers from "+currentNumber+" to "+(currentNumber+98));
         for (int i = 0; i < 100; i ++) { // start several requests at a time in order to increase speed
     	  first.tryModulo(currentNumber);
     	  currentNumber += 2;

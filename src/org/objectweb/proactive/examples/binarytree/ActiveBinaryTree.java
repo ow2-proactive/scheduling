@@ -58,7 +58,7 @@ public class ActiveBinaryTree extends BinaryTree {
       this.leftTree = (BinaryTree)org.objectweb.proactive.ProActive.newActive(s, null);
       this.rightTree = (BinaryTree)org.objectweb.proactive.ProActive.newActive(s, null);
     } catch (Exception e) {
-      System.out.println(e);
+      logger.error(e);
     }
   }
 }

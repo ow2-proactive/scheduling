@@ -1,7 +1,11 @@
 
 package org.objectweb.proactive.core.process.globus;
 
+import org.apache.log4j.Logger;
+
 public class GlobusHostInfos {
+	
+	static Logger logger = Logger.getLogger(GlobusHostInfos.class.getName());
 
   protected String hostname,
 		   javahome,
@@ -96,14 +100,14 @@ public class GlobusHostInfos {
 
   public void DisplayYourSelf(){
 
-    System.out.println("============= GLOBUS HOST INFOS =============");
-    System.out.println("Host Name:" + hostname);
-    System.out.println("Java Home:" + javahome);
-    System.out.println("ProActive Home:" + proactivehome);
-    System.out.println("Stdout:" + stdout);
-    System.out.println("GRAM port:" + gramport);
-    System.out.println("GIS port:" + gisport);
-    System.out.println("=============================================");
+    logger.info("============= GLOBUS HOST INFOS =============");
+    logger.info("Host Name:" + hostname);
+    logger.info("Java Home:" + javahome);
+    logger.info("ProActive Home:" + proactivehome);
+    logger.info("Stdout:" + stdout);
+    logger.info("GRAM port:" + gramport);
+    logger.info("GIS port:" + gisport);
+    logger.info("=============================================");
 
   }  
 

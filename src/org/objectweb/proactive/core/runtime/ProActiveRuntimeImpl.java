@@ -69,7 +69,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
   //
   // -- PRIVATE MEMBERS -----------------------------------------------------------
   //
-
+ 
   private VMInformation vmInformation;
   
   // map nodes and an ArrayList of Active Objects Id 
@@ -98,9 +98,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
       
      //System.out.println(vmInformation.getVMID().toString());
     } catch (java.net.UnknownHostException e) {
-      System.out.println();
-      System.out.println(" !!! Cannot do a reverse lookup on that host");
-      System.out.println();
+      //System.out.println();
+      logger.fatal(" !!! Cannot do a reverse lookup on that host");
+     // System.out.println();
       e.printStackTrace();
       System.exit(1);
     }
@@ -292,7 +292,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 			//check if the body is still on this vm
 			Body body = localBodystore.getLocalBody(bodyID);
 			if (body == null){
-				System.out.println("body null");
+				runtimeLogger.warn("body null"); 
 				// the body with the given ID is not any more on this ProActiveRuntime
 				// unregister it from this ProActiveRuntime
 				unregisterBody(nodeName,bodyID);
@@ -342,7 +342,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 			//check if the body is still on this vm
 			Body body = localBodystore.getLocalBody(bodyID);
 			if (body == null){
-				System.out.println("body null");
+				runtimeLogger.warn("body null");
 				// the body with the given ID is not any more on this ProActiveRuntime
 				// unregister it from this ProActiveRuntime
 				unregisterBody(nodeName,bodyID);

@@ -70,7 +70,9 @@ public abstract class RuntimeFactory {
 
     // test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
-
+		
+		
+		
     /** the table where associations Protocol - Factory are kept */
     private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
     private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();

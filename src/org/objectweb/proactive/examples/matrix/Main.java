@@ -1,16 +1,20 @@
 package org.objectweb.proactive.examples.matrix;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 
 public class Main {
-
+	
+	
+	static Logger logger = Logger.getLogger(Main.class.getName());
+	
     public static void main (String args[]) {
 
 	if (args.length != 2) {
-	    System.err.println("missing argument : <MatrixSize>");
+	   logger.error("missing argument : <MatrixSize>");
 	    System.exit(0);
 	}
 //	
@@ -26,7 +30,7 @@ public class Main {
 			 nodesList = vn1.getNodesURL();
      	}catch(Exception e){
     e.printStackTrace();
-    System.out.println("Pb when reading descriptor");
+    logger.error("Pb when reading descriptor");
     }
      	
 			
@@ -34,7 +38,7 @@ public class Main {
 
 	try {
 	    l = (Launcher) ProActive.newActive("org.objectweb.proactive.examples.matrix.Launcher", new Object[] {nodesList});//,targetNode);
-	} catch (Exception e) {System.err.println("\nUnable to create the Launcher !!!!!\n"); e.printStackTrace();}
+	} catch (Exception e) {logger.error("\nUnable to create the Launcher !!!!!\n"); e.printStackTrace();}
 
 	int matrixSize=Integer.parseInt(args[0]);
 
@@ -56,7 +60,7 @@ public class Main {
 	catch (Exception e) { e.printStackTrace();}
 
 	endTime = System.currentTimeMillis() - startTime;
-	System.out.println("   Asynchronous Distribution : " + endTime + " millisecondes\n\n");
+	logger.info("   Asynchronous Distribution : " + endTime + " millisecondes\n\n");
 
 
 	// MULTIPLICATION
@@ -73,7 +77,7 @@ public class Main {
 
 	    l.start(m1,m2group,i);
 
-	    System.out.println("   Operation ("+i+") launched\n");
+	    logger.info("   Operation ("+i+") launched\n");
 
 	    //endTime = System.currentTimeMillis() - startTime;
 	    //System.out.println("Total Distributed Multiplication : " + endTime + " millisecondes\n\n");
@@ -84,8 +88,8 @@ public class Main {
     
     private static void printMessageAndWait(String msg) {
 	java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-	System.out.print(msg);
-	System.out.println("   --> Press <return> to continue");
+	logger.info(msg);
+	logger.info("   --> Press <return> to continue");
 	try { 
 	    d.readLine(); 
 	} catch (Exception e) {

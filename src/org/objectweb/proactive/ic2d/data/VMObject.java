@@ -31,6 +31,8 @@
 package org.objectweb.proactive.ic2d.data;
 
 import java.rmi.dgc.VMID;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -50,6 +52,8 @@ import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
  * Holder class for the host data representation
  */
 public class VMObject extends AbstractDataObject {
+	
+	static Logger log4jlogger = Logger.getLogger(VMObject.class.getName());
 
   private static String SPY_LISTENER_NODE_NAME = "SpyListenerNode";
   private static Node SPY_LISTENER_NODE;
@@ -83,13 +87,19 @@ public class VMObject extends AbstractDataObject {
   public VMObject(HostObject host, VMID vmid, Node node) throws ActiveObjectCreationException, NodeException {
     super(host);
     //System.out.println("nodeURL : "+node.getNodeInformation().getURL());
-    System.out.println("VMObject.<init>");
+    if (log4jlogger.isDebugEnabled()){
+    log4jlogger.debug ("VMObject.<init>");
+    }
     this.vmid = vmid;
     this.objectNodeMap = new java.util.HashMap();
     SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
-	System.out.println("VMObject.<init> creating activeSpyListener");
+		if (log4jlogger.isDebugEnabled()){
+    	log4jlogger.debug("VMObject.<init> creating activeSpyListener");
+		}
     this.activeSpyListener = (SpyListenerImpl) ProActive.turnActive(spyListener, SPY_LISTENER_NODE);
-	System.out.println("VMObject.<init> creating spy");
+		if (log4jlogger.isDebugEnabled()){
+    log4jlogger.debug("VMObject.<init> creating spy");
+		}
     this.spy = (Spy) ProActive.newActive(Spy.class.getName(), new Object[] {activeSpyListener} , node);
     addNodeObject(node);
     controller.log("VMObject id="+vmid+" created based on node "+node.getNodeInformation().getURL());
@@ -175,7 +185,9 @@ public class VMObject extends AbstractDataObject {
   
  
   public void sendEventsForAllActiveObjects() {
-  	System.out.println("VMObject.sendEventForAllActiveObjects()");
+  	if (log4jlogger.isDebugEnabled()){
+    log4jlogger.debug("VMObject.sendEventForAllActiveObjects()");
+  	}
     try {
       spy.sendEventsForAllActiveObjects();
     } catch (Exception e) {
@@ -190,7 +202,9 @@ public class VMObject extends AbstractDataObject {
   //
   
   public NodeObject addNodeObject(Node node) {
-  	System.out.println("VMObject: addNodeObject()");
+  	if (log4jlogger.isDebugEnabled()){
+    log4jlogger.debug("VMObject: addNodeObject()");
+  	}
     String nodeName = node.getNodeInformation().getName();
     NodeObject nodeObject = (NodeObject) getChild(nodeName);
     if (nodeObject == null) {

@@ -80,7 +80,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             //create the node with the name 
             proActiveRuntime.createLocalNode(name, replacePreviousBinding);
 
-            System.out.println("Node " + nodeURL +
+            logger.info("Node " + nodeURL +
                 " successfully bound in registry at " + nodeURL);
         } catch (java.rmi.AlreadyBoundException e) {
             throw new java.rmi.RemoteException("Node " + nodeURL +
@@ -189,7 +189,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             } else {
                 java.rmi.Naming.bind(virtualNodeURL, this);
             }
-            System.out.println("VirtualNode " + virtualNodeURL +
+            logger.info("VirtualNode " + virtualNodeURL +
                 " successfully bound in registry at " + virtualNodeURL);
         } catch (java.rmi.AlreadyBoundException e) {
             throw new java.rmi.RemoteException("VirtualNode " + virtualNodeURL +

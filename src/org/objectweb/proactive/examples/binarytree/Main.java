@@ -30,7 +30,12 @@
 */
 package org.objectweb.proactive.examples.binarytree;
 
+import org.apache.log4j.Logger;
+
 public class Main {
+	
+	static Logger logger = Logger.getLogger(Main.class.getName());
+	
     public static void main(String[] args) {
         Main theMainActiveObject = null;
         // Creates an active instance of this class
@@ -38,7 +43,7 @@ public class Main {
             theMainActiveObject = (Main)org.objectweb.proactive.ProActive.newActive(Main.class.getName(), 
                                                                                     null);
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e);
             System.exit(1);
         }
         // Asks it to perform the test
@@ -63,7 +68,7 @@ public class Main {
             myTree = (BinaryTree)org.objectweb.proactive.ProActive.newActive(ActiveBinaryTree.class.getName(), 
                                                                              null);
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error(e);
             e.printStackTrace();
         }
         // Now we insert 4 elements in the tree
@@ -81,10 +86,10 @@ public class Main {
         ObjectWrapper tmp2 = myTree.get(4);
         ObjectWrapper tmp3 = myTree.get(2);
         ObjectWrapper tmp4 = myTree.get(1);
-        System.out.println("Value associated to key 1 is " + tmp4);
-        System.out.println("Value associated to key 2 is " + tmp3);
-        System.out.println("Value associated to key 3 is " + tmp1);
-        System.out.println("Value associated to key 4 is " + tmp2);
-        System.out.println("Use CTRL+C to stop the program");
+        logger.info("Value associated to key 1 is " + tmp4);
+        logger.info("Value associated to key 2 is " + tmp3);
+        logger.info("Value associated to key 3 is " + tmp1);
+        logger.info("Value associated to key 4 is " + tmp2);
+        logger.info("Use CTRL+C to stop the program");
     }
 }

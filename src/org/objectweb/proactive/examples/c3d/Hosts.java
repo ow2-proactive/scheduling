@@ -37,7 +37,7 @@ class Hosts {
 
 
   public Hosts(String filename) throws java.io.IOException {
-    System.out.println("Using host file " + filename);
+    //System.out.println("Using host file " + filename);
     java.io.File f = new java.io.File(filename);
     if (f.canRead()) {
       byte[] b = getBytesFromInputStream(new java.io.FileInputStream(f));

@@ -30,7 +30,11 @@
 */ 
 package org.objectweb.proactive.examples.hello;
 
+import org.apache.log4j.Logger;
+
 public class HelloClient {
+	
+	static Logger logger = Logger.getLogger(HelloClient.class.getName());
 
   public static void main(String[] args) {
     Hello myServer;
@@ -42,15 +46,15 @@ public class HelloClient {
         myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), new Object[]{"local"});
       } else {
         // Lookups the server object
-        System.out.println("Using server located on " + args[0]);
+        logger.info("Using server located on " + args[0]);
         myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), args[0]);
       }
       // Invokes a remote method on this object to get the message
       message = myServer.sayHello();
       // Prints out the message
-      System.out.println("The message is : " + message);
+      logger.info("The message is : " + message);
     } catch (Exception e) {
-      System.err.println("Could not reach/create server object");
+      logger.error("Could not reach/create server object");
       e.printStackTrace();
       System.exit(1);
     }

@@ -32,7 +32,11 @@ package org.objectweb.proactive.examples.algebra;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
+
 public class Column extends Vector implements Serializable, Cloneable {
+	
+	static Logger logger = Logger.getLogger(Column.class.getName());
 
   public Column(int _size) {
     super(_size);
@@ -54,7 +58,7 @@ public class Column extends Vector implements Serializable, Cloneable {
     for (i = 0; i < this.size; i++) {
       System.out.println(this.getElement(i));
     }
-    System.out.println();
+    
     return;
   }
   /*

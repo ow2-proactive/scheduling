@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.node;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -68,6 +69,9 @@ import java.net.UnknownHostException;
  *
  */
 public class NodeFactory {
+
+protected static Logger logger = Logger.getLogger(NodeFactory.class.getName());
+
     private static final String DEFAULT_NODE_NAME = "//localhost/Node";
     private static Node defaultNode = null;
 
@@ -148,7 +152,9 @@ public class NodeFactory {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
 
-        //System.out.println("NodeFactory: createNode(" + nodeURL+ ")");
+				if (logger.isDebugEnabled()) {
+        	logger.debug("NodeFactory: createNode(" + url+ ")");
+				}
         //first look for the prototcol
         String protocol = UrlBuilder.getProtocol(url);
 
@@ -176,7 +182,9 @@ public class NodeFactory {
         ProActiveRuntime proActiveRuntime;
         String url;
 
-        // System.out.println("NodeFactory: getNode() for " + nodeURL);
+				if (logger.isDebugEnabled()) {
+        	 logger.debug("NodeFactory: getNode() for " + nodeURL);
+				}
         //do we have any association for this node?
         String protocol = UrlBuilder.getProtocol(nodeURL);
         String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);

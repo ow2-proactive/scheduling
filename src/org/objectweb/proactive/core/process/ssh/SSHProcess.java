@@ -64,6 +64,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
    */
   public SSHProcess() {
     super();
+  
   }
   
   /**
@@ -82,9 +83,11 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     
   public static void main(String[] args) {
     try {
+
       SSHProcess ssh = new SSHProcess(new SimpleExternalProcess("ls -lsa"));
-      ssh.setHostname("solida");
+      ssh.setHostname("galere1.inria.fr");
       ssh.startProcess();
+
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -120,7 +123,10 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     // append host
     command.append(" ");
     command.append(hostname);
-    command.append(" ");   
+    command.append(" "); 
+    if(logger.isDebugEnabled()){
+    logger.debug(command.toString());  
+    }
     return command.toString();
   }
   

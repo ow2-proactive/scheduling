@@ -1,5 +1,7 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
+import org.apache.log4j.Logger;
+
 /* 
 * ################################################################
 * 
@@ -36,7 +38,8 @@ package org.objectweb.proactive.examples.eratosthenes;
 * Serves to print newly found prime numbers to the console.
 */
 public class ConsolePrimeOutputListener implements PrimeOutputListener, java.io.Serializable {
-
+	
+	static Logger logger = Logger.getLogger(ConsolePrimeOutputListener.class.getName());
   private long startTime;
   private int numberCounter;
 
@@ -64,7 +67,7 @@ public class ConsolePrimeOutputListener implements PrimeOutputListener, java.io.
   	for (int i = time.length(); i < 6; i ++) line.append('0');
   	line.append(time);
   	line.append("s)\n");
-  	System.out.print(line);
+  	logger.info(line);
   }
 
 }

@@ -31,7 +31,12 @@
 package org.objectweb.proactive.core.rmi;
 
 
+import org.apache.log4j.Logger;
+
 public class RegistryHelper {
+
+protected static Logger logger = Logger.getLogger(RegistryHelper.class.getName());
+
 
   protected final static int DEFAULT_REGISTRY_PORT = 1099;
 
@@ -104,10 +109,10 @@ public class RegistryHelper {
       // doing a lookup should produce ConnectException if registry doesn't exist
       // and no exception or NotBoundException if the registry does exist.
       java.rmi.Remote r = registry.lookup("blah!");
-      System.out.println("Detected an existing RMI Registry on port "+port);
+      logger.info("Detected an existing RMI Registry on port "+port);
       return registry;
     } catch (java.rmi.NotBoundException e) {
-      System.out.println("Detected an existing RMI Registry on port "+port);
+      logger.info("Detected an existing RMI Registry on port "+port);
       return registry;
     } catch (java.rmi.RemoteException e) {
       return null;
@@ -121,14 +126,14 @@ public class RegistryHelper {
     // no registry created
     try {
       registry = createRegistry(port);
-      System.out.println("Created a new registry on port "+port);
+      logger.info("Created a new registry on port "+port);
       return registry;
     } catch (java.rmi.RemoteException e) {
       // problem to bind the registry : may be somebody created one in the meantime
       // try to find the rmi registry one more time
       registry = detectRegistry(port);
       if (registry != null) return registry;
-      System.out.println("Cannot detect an existing RMI Registry on port "+port+" nor create one e="+e);
+      logger.error("Cannot detect an existing RMI Registry on port "+port+" nor create one e="+e);
       throw e;
     }
   }  

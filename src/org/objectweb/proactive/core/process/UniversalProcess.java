@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.process;
 
+import org.apache.log4j.Logger;
+
 /**
  * A class implementing this interface is able to start a process based on a command 
  * to execute. The command is built from arbitrary parameters (up to the implementation) and 
@@ -38,7 +40,10 @@ package org.objectweb.proactive.core.process;
  * to methods to set the command throw an exception.
  */
 public interface UniversalProcess extends java.io.Serializable {
-
+		
+		
+	static Logger logger = Logger.getLogger(UniversalProcess.class.getName());
+	
   /**
    * Returns the current environment for this process. Each
    * cell of the array contains the definition of one variable in a 

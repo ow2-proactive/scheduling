@@ -34,12 +34,15 @@ import java.awt.GridLayout;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
 import org.objectweb.proactive.core.util.UrlBuilder;
  
 public class GlobusProcessControlPanel extends javax.swing.JPanel {
+	
+	static Logger logger = Logger.getLogger(FileChooser.class.getName());
 
 private int MAX_RETRY=50;
   private static final java.awt.Color FINISHED_PROCESS_COLOR = new java.awt.Color(211,32,47);
@@ -158,17 +161,17 @@ private int MAX_RETRY=50;
     public void addProcess(GlobusProcess globusProcess) {
       int n = processesList.size();
       processesList.add(globusProcess.getId());
-      System.out.println("***Key added:"+ (globusProcess.getId()).toString() +"***");
+      logger.info("***Key added:"+ (globusProcess.getId()).toString() +"***");
       globusProcesses.put(globusProcess.getId() , globusProcess);
       fireIntervalAdded(this, n, n);
     }
 
     public void removeProcess(int index) {
-      System.out.println("***removeProcess***");
+      logger.info("***removeProcess***");
       String idToRemove = (String) processesList.remove(index);
       GlobusProcess gp = (GlobusProcess) globusProcesses.get(idToRemove);
       gp.stopProcess();
-      System.out.println("***Process have been stop***");
+      logger.info("***Process have been stop***");
       fireIntervalRemoved(this, index, index);
       globusProcesses.remove(idToRemove);
     }
@@ -243,7 +246,7 @@ private int MAX_RETRY=50;
     }
       
     public GlobusProcess getCurrentProcess() {
-      System.out.println("***Key to remove:"+ (processesJList.getSelectedValue()).toString()+"***" );
+      logger.info("***Key to remove:"+ (processesJList.getSelectedValue()).toString()+"***" );
       return (GlobusProcess) globusProcesses.get( (processesJList.getSelectedValue()).toString() );
     }
     
@@ -330,7 +333,7 @@ private int MAX_RETRY=50;
 	      String protocol = filterEmptyString(protocolField.getText());
 	      String nodeName = filterEmptyString(nodeNameField.getText());
 	      String nodeURL = UrlBuilder.buildUrl(hostname, nodeName,protocol+":");
-	      System.out.println("Node URL:"+nodeURL);
+	      logger.info("Node URL:"+nodeURL);
 	      
 	      //Make the deep copy of the process to be able to run multiple globus process
 	      globusCopyProcess = (GlobusProcess)makeDeepCopy(globusProcess);
@@ -348,9 +351,9 @@ private int MAX_RETRY=50;
 		      Thread.sleep(750);
 		  }
 		  catch(java.lang.InterruptedException ie){
-		      System.out.println("exception in GlobusProcessControlPanel");
+		      logger.error("exception in GlobusProcessControlPanel");
 		  }
-		  System.out.println("attente GlobusProcessControlPanel:"+i);
+		  logger.info("attente GlobusProcessControlPanel:"+i);
 	      }
 	      processesListModel.addProcess(globusCopyProcess);
 
@@ -436,22 +439,22 @@ private int MAX_RETRY=50;
 
   public class SynchronizedMessageLogger implements MessageLogger {
     
-    private MessageLogger logger;
+    private MessageLogger mlogger;
     
     public SynchronizedMessageLogger(MessageLogger logger) {
-      this.logger = logger;
+      this.mlogger = logger;
     }
 
     public synchronized void log(String message) {
-      logger.log(message);
+      mlogger.log(message);
     }
 
     public synchronized void log(String message, Throwable e) {
-      logger.log(message, e);
+      mlogger.log(message, e);
     }
 
     public synchronized void log(Throwable e) {
-      logger.log(e);
+      mlogger.log(e);
     }
 
   }
@@ -494,7 +497,7 @@ private int MAX_RETRY=50;
 	// We add a panel with contaning the output of the process
         processPanel=new javax.swing.JPanel();
         processPanel.setLayout(g);
-	System.out.println("Process:"+process.getOutput());
+				logger.info("Process:"+process.getOutput());
         text.setText( process.getOutput() );
         processPanel.add(text,java.awt.BorderLayout.CENTER );
         add(processPanel,java.awt.BorderLayout.CENTER );

@@ -33,6 +33,8 @@ package org.objectweb.proactive.ic2d.util;
 import ibis.rmi.NotBoundException;
 import ibis.rmi.registry.LocateRegistry;
 import ibis.rmi.registry.Registry;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
@@ -45,6 +47,7 @@ import org.objectweb.proactive.core.util.IbisProperties;
  */
 public class IbisHostNodeFinder implements HostNodeFinder {
 
+static Logger log4jlogger = Logger.getLogger(IbisHostNodeFinder.class.getName());
 
 static {
 	IbisProperties.load();
@@ -104,7 +107,9 @@ static {
     // enumarate through the rmi binding on the registry
     log("Listing bindings for " + registry);
     String[] list = registry.list();
-    System.out.println("list " + list.length);
+    if(log4jlogger.isDebugEnabled()){
+    log4jlogger.debug("list " + list.length);
+    }
     if (list.length == 0) {
       return new Node[0];
     }
@@ -148,7 +153,7 @@ static {
     if (logger != null) {
       logger.log(s);
     } else {
-      System.out.println(s);
+      log4jlogger.info(s);
     }
   }
   
@@ -156,7 +161,7 @@ static {
     if (logger != null) {
       logger.log(s, e);
     } else {
-      System.out.println(s);
+      log4jlogger.info(s);
       e.printStackTrace();
     }
   }

@@ -1,5 +1,7 @@
 package org.objectweb.proactive.examples.eratosthenes;
 
+import org.apache.log4j.Logger;
+
 /* 
 * ################################################################
 * 
@@ -37,7 +39,8 @@ package org.objectweb.proactive.examples.eratosthenes;
 * One prime number. This object is owned by an ActivePrimeContainer.
 */
 public class PrimeNumberImpl implements PrimeNumber, java.io.Serializable {
-
+	
+	static Logger logger = Logger.getLogger(PrimeNumberImpl.class.getName());
   private long value;
   private PrimeNumber next;
   private ActivePrimeContainer container;
@@ -68,7 +71,7 @@ public class PrimeNumberImpl implements PrimeNumber, java.io.Serializable {
   	  	next = container.newPrimeNumber(n);
   	  } else {
   	  	if (n <= nextValue) {
-  	  		System.out.println("Requests arrived out of order. Should never occur when using FIFO serving.");
+  	  		logger.fatal("Requests arrived out of order. Should never occur when using FIFO serving.");
   	  		System.exit(2);
   	  	}
   	    next.tryModulo(n);	

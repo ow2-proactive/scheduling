@@ -63,10 +63,13 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
   private final static String POLICY_FILE = "proactive.java.policy";
   private final static String POLICY_OPTION = " -Djava.security.policy=";
+  private final static String LOG4J_OPTION = " -Dlog4j.configuration=file:";
+  private final static String LOG4J_FILE = "proactive-log4j";
 
   public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System.getProperty("java.class.path"));
   public final static String DEFAULT_JAVAPATH = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"java";
   public final static String DEFAULT_POLICY_FILE = System.getProperty("user.dir")+FILE_SEPARATOR+POLICY_FILE;
+  public final static String DEFAULT_LOG4J_FILE = System.getProperty("user.dir")+FILE_SEPARATOR+LOG4J_FILE;
   public final static String DEFAULT_CLASSNAME ="org.objectweb.proactive.StartNode";
   public final static String DEFAULT_JVMPARAMETERS ="";
 
@@ -74,6 +77,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   protected String classpath = DEFAULT_CLASSPATH;
   protected String javaPath = DEFAULT_JAVAPATH;
   protected String policyFile = DEFAULT_POLICY_FILE;
+  protected String log4jFile = DEFAULT_LOG4J_FILE;
   protected String classname = DEFAULT_CLASSNAME;
   protected String jvmParameters = DEFAULT_JVMPARAMETERS;
   protected String parameters;
@@ -159,7 +163,17 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
     this.policyFile = policyFile;
   }
   
-
+	
+	public String getLog4jFile(){
+		return log4jFile;
+	}
+	
+	
+	public void setLog4jFile(String log4jFile){
+		this.log4jFile = log4jFile;
+	}
+	
+	
   public String getClassname() {
     return classname;
   }
@@ -214,6 +228,11 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
       javaCommand.append(POLICY_OPTION);
       javaCommand.append(policyFile);
     }
+    // append log4j option
+    if (log4jFile != null) {
+      javaCommand.append(LOG4J_OPTION);
+      javaCommand.append(log4jFile);
+    }
     // append classname
     javaCommand.append(" ");
     javaCommand.append(classname);
@@ -221,6 +240,9 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
       javaCommand.append(" ");
       javaCommand.append(parameters);
     }
+    if (logger.isDebugEnabled()){
+    logger.debug(javaCommand.toString());
+ 		}
     return javaCommand.toString();
   }
 

@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -68,6 +69,8 @@ import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 public class StartNode {
   
   public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
+  
+  static Logger logger = Logger.getLogger(StartNode.class.getName());
   
   protected static final int DEFAULT_PORT = 1099;
   protected static final int MAX_RETRY = 3;
@@ -160,7 +163,7 @@ public class StartNode {
       	new StartNode(args).run();    
    		}catch (Exception e) {
       	e.printStackTrace();
-      	System.out.println(e.toString());
+      	logger.fatal(e.toString());
     	}	
   	}
   }
@@ -223,14 +226,14 @@ public class StartNode {
 	         node = NodeFactory.createNode(nodeURL, ! noRebind);
         }
         //System.out.println("nodeurl "+node.getNodeInformation().getURL());
-        System.out.println("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
+        logger.info("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
 	      break;
       } catch (NodeException e) {
         exceptionCount++;
         if (exceptionCount == MAX_RETRY) {
           throw e;
         } else {
-          System.out.println("Error, retrying ("+exceptionCount+")");
+          logger.error("Error, retrying ("+exceptionCount+")");
           try {
             Thread.sleep(1000);
           } catch (InterruptedException e2) {}
@@ -305,25 +308,25 @@ public class StartNode {
     try {
       localhost = java.net.InetAddress.getLocalHost().getHostName();
     } catch(java.net.UnknownHostException  e) {
-      System.err.println("InetAddress failed: " + e.getMessage());
+      logger.error("InetAddress failed: " + e.getMessage());
       e.printStackTrace();
     } catch(java.lang.SecurityException e) {
-      System.err.println("InetAddress failed: " + e.getMessage());
+      logger.error("InetAddress failed: " + e.getMessage());
       e.printStackTrace();
     }
     
-    System.out.println("usage: java "+this.getClass().getName()+" <node URL> [options]");
-    System.out.println(" - options");
-    System.out.println("     "+NO_CLASS_SERVER_OPTION_NAME+" : indicates not to create a ClassServer for JINI and RMI.");
-    System.out.println("                      By default a ClassServer is automatically created");
-    System.out.println("                      to serve class files on demand.");
-    System.out.println("     "+NO_REBIND_OPTION_NAME+"      : indicates not to use rebind when registering the");
-    System.out.println("                      node to the RMIRegistry. If a node of the same name");
-    System.out.println("                      already exists, the creation of the new node will fail.");
-    System.out.println("  for instance: java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"//"+localhost+"/node1");
-    System.out.println("                java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
-    System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
-    System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
+    logger.info("usage: java "+this.getClass().getName()+" <node URL> [options]");
+    logger.info(" - options");
+    logger.info("     "+NO_CLASS_SERVER_OPTION_NAME+" : indicates not to create a ClassServer for JINI and RMI.");
+    logger.info("                      By default a ClassServer is automatically created");
+    logger.info("                      to serve class files on demand.");
+    logger.info("     "+NO_REBIND_OPTION_NAME+"      : indicates not to use rebind when registering the");
+    logger.info("                      node to the RMIRegistry. If a node of the same name");
+    logger.info("                      already exists, the creation of the new node will fail.");
+    logger.info("  for instance: java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"//"+localhost+"/node1");
+    logger.info("                java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
+    logger.info("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
+    logger.info("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
   }
 } // end class
 

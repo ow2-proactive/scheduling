@@ -33,6 +33,7 @@ package org.objectweb.proactive.ic2d.util;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeImpl;
@@ -43,7 +44,8 @@ import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
  * This class talks to ProActive nodes
  */
 public class RMIHostNodeFinder implements HostNodeFinder {
-
+	
+	static Logger log4jlogger = Logger.getLogger(RMIHostNodeFinder.class.getName());
   private static final int DEFAULT_RMI_PORT = 1099;
   private IC2DMessageLogger logger;
   
@@ -98,7 +100,9 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     // enumarate through the rmi binding on the registry
     log("Listing bindings for " + registry);
     String[] list = registry.list();
-    System.out.println("list " + list.length);
+    if(log4jlogger.isDebugEnabled()){
+    log4jlogger.debug("list " + list.length);
+    }
     if (list.length == 0) {
       return new Node[0];
     }
@@ -142,7 +146,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     if (logger != null) {
       logger.log(s);
     } else {
-      System.out.println(s);
+      log4jlogger.info(s);
     }
   }
   
@@ -150,7 +154,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     if (logger != null) {
       logger.log(s, e);
     } else {
-      System.out.println(s);
+      log4jlogger.info(s);
       e.printStackTrace();
     }
   }

@@ -1,18 +1,47 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/
 package org.objectweb.proactive.examples.migration;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 /**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * This class is a client for a migratable Agent
  */
 public class AgentClient {
+	
+	
+	static Logger logger = Logger.getLogger(AgentClient.class.getName());
 
   public static void main(String[] args) {
     Agent myServer;
@@ -31,20 +60,20 @@ public class AgentClient {
       // Invokes a remote method on this object to get the message
      hostName = myServer.getName();
    	 nodeName=myServer.getNodeName();
-     System.out.println("Agent is on: host " + hostName+" Node " + nodeName);
+     logger.info("Agent is on: host " + hostName+" Node " + nodeName);
       
       for(int i=0; i<nodeList.length;i++){
       // Prints out the message
       myServer.moveTo(nodeList[i]);
       nodeName=myServer.getNodeName();
       hostName=myServer.getName();
-      System.out.println("Agent is on: host " + hostName+" Node " + nodeName);
+      logger.info("Agent is on: host " + hostName+" Node " + nodeName);
       }
       myServer.endBodyActivity();
     }
       
       catch (Exception e) {
-      System.err.println("Could not reach/create server object");
+      logger.error("Could not reach/create server object");
       e.printStackTrace();
       System.exit(1);
     	}

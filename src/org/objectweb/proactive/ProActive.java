@@ -209,7 +209,7 @@ public class ProActive {
 
         // We create default handler and add them to default level
         if (logger.isDebugEnabled()) {
-            // logger.debug("*** Initialization of default level handlers");
+           // logger.debug("*** Initialization of default level handlers");
         }
         setExceptionHandler(IHandler.ID_defaultLevel, null,
             HandlerNonFunctionalException.class, NonFunctionalException.class);
@@ -660,8 +660,8 @@ public class ProActive {
         RuntimeFactory.getDefaultRuntime();
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("************* Reading deployment descriptor: " +
+            if (logger.isInfoEnabled()) {
+                logger.info("************* Reading deployment descriptor: " +
                     xmlDescriptorUrl + " ********************");
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
@@ -669,17 +669,19 @@ public class ProActive {
             return (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
         } catch (org.xml.sax.SAXException e) {
             e.printStackTrace();
-            if (logger.isInfoEnabled()) {
-                logger.info(
-                    "a problem occurs when getting the proactiveDescriptor");
-            }
+            logger.fatal("a problem occurs when getting the proActiveDescriptor");
+//            if (logger.isInfoEnabled()) {
+//                logger.info(
+//                    "a problem occurs when getting the proactiveDescriptor");
+//            }
             throw new ProActiveException(e);
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "a problem occurs during the ProactiveDescriptor object creation");
-            }
+            logger.fatal("a problem occurs during the ProActiveDescriptor object creation");
+//            if (logger.isDebugEnabled()) {
+//                logger.debug(
+//                    "a problem occurs during the ProactiveDescriptor object creation");
+//            }
             throw new ProActiveException(e);
         }
     }
@@ -721,9 +723,7 @@ public class ProActive {
         throws ProActiveException {
         ProActiveRuntime remoteProActiveRuntime = null;
         try {
-            if (logger.isDebugEnabled()) {
-                //logger.debug("vn url "+UrlBuilder.buildVirtualNodeUrl(url));	
-            }
+
             remoteProActiveRuntime = RuntimeFactory.getRuntime(UrlBuilder.buildVirtualNodeUrl(
                         url), protocol);
         } catch (UnknownHostException ex) {
@@ -750,8 +750,8 @@ public class ProActive {
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(((VirtualNodeImpl) virtualNode).getRegistrationProtocol());
         part.unregisterVirtualNode(UrlBuilder.appendVnSuffix(
                 virtualNode.getName()));
-        if (logger.isDebugEnabled()) {
-            logger.debug("Success at unbinding " + virtualNodeName);
+        if (logger.isInfoEnabled()) {
+            logger.info("Success at unbinding " + virtualNodeName);
         }
     }
 

@@ -4,6 +4,7 @@ package org.objectweb.proactive.examples.chat;
 import java.io.IOException;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -23,6 +24,8 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
  * @author Laurent Baduel
  */
 public class Chat implements java.io.Serializable, RunActive {
+	
+	static Logger logger = Logger.getLogger(Chat.class.getName());
 	
 	/** The name of the user */
 	private String name = "";
@@ -272,7 +275,7 @@ public class Chat implements java.io.Serializable, RunActive {
 		String neighbourName = null;
 
 		if ((args.length != 1) && (args.length != 3)) {
-			System.out.println("usage : chat.[sh|bat] UserName [ServerHost ServerName]");
+			logger.info("usage : chat.[sh|bat] UserName [ServerHost ServerName]");
 			System.exit(0);
 		}
 		

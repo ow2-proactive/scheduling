@@ -36,7 +36,12 @@ package org.objectweb.proactive.core.rmi;
  * doc for the "Main" method for how to run this
  * server.
  */
+
+
 public class ClassFileServer extends ClassServer {
+
+
+
 
     private java.io.File[] codebases;
 
@@ -140,7 +145,7 @@ public class ClassFileServer extends ClassServer {
       try {
         new ClassFileServer(port, classpath);
       } catch (java.io.IOException e) {
-        System.out.println("Unable to start ClassServer: " + e.getMessage());
+        logger.fatal("Unable to start ClassServer: " + e.getMessage());
         e.printStackTrace();
       }
     }
@@ -205,7 +210,9 @@ public class ClassFileServer extends ClassServer {
       java.io.InputStream in = this.getClass().getClassLoader().getResourceAsStream(filename);
       if (in == null) return null;
       int length = in.available();
-      //System.out.println("ClassFileServer reading: " + filename+"  length="+length+" from classpath");
+			//if (logger.isDebugEnabled()) {
+			//      //logger.debug("ClassFileServer reading: " + filename+"  length="+length+" from classpath");
+			//}
       if (length == -1) {
         throw new java.io.IOException("File length is unknown: " + filename);
       } else {
@@ -230,7 +237,9 @@ public class ClassFileServer extends ClassServer {
       java.util.zip.ZipEntry zipEntry = jarFile.getEntry(filename);
       if (zipEntry == null) return null;
       int length = (int)(zipEntry.getSize());
-      //System.out.println("ClassFileServer reading: " + filename+"  length="+length+" from jar/xip file "+archive.getAbsolutePath());
+			//if (logger.isDebugEnabled()) {
+			//      //logger.debug("ClassFileServer reading: " + filename+"  length="+length+" from jar/xip file "+archive.getAbsolutePath());
+			//}
       if (length == -1) {
         throw new java.io.IOException("File length is unknown: " + filename);
       } else {
@@ -253,7 +262,9 @@ public class ClassFileServer extends ClassServer {
       java.io.File f = new java.io.File(directory, path.replace('.', java.io.File.separatorChar) + ".class");
       if (! f.exists()) return null;
       int length = (int)(f.length());
-      //System.out.println("ClassFileServer reading: " + f.getAbsolutePath()+"  length="+length);
+			//if (logger.isDebugEnabled()) {
+			//      //logger.debug("ClassFileServer reading: " + f.getAbsolutePath()+"  length="+length);
+			//}
       if (length == 0) {
         throw new java.io.IOException("File length is zero: " + path);
       } else {
@@ -283,13 +294,15 @@ public class ClassFileServer extends ClassServer {
 
 
     private void printMessage() {
-      //System.out.println("To use this ClassFileServer set the property java.rmi.server.codebase to http://"+hostname+":"+port+"/");
+		if (logger.isDebugEnabled()) {
+      logger.debug("To use this ClassFileServer set the property java.rmi.server.codebase to http://"+hostname+":"+port+"/");
+		}
       if (codebases == null) {
-        System.out.println(" --> This ClassFileServer is reading resources from classpath");
+        logger.info(" --> This ClassFileServer is reading resources from classpath");
       } else {
-        System.out.println(" --> This ClassFileServer is reading resources from the following paths");
+        logger.info(" --> This ClassFileServer is reading resources from the following paths");
         for (int i=0; i<codebases.length; i++) {
-          System.out.println("     ("+i+") : "+codebases[i].getAbsolutePath());
+          logger.info("     ("+i+") : "+codebases[i].getAbsolutePath());
         }
       }
     }

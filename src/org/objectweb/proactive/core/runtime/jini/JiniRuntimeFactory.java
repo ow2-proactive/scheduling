@@ -54,7 +54,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
 	private int count;
 
   static {
-    System.out.println ("JiniRuntimeFactory created with "+JiniRuntimeFactory.class.getClassLoader().getClass().getName());
+    logger.info ("JiniRuntimeFactory created with "+JiniRuntimeFactory.class.getClassLoader().getClass().getName());
   }
 
   //
@@ -89,7 +89,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
   
   
   protected ProActiveRuntime getRemoteRuntimeImpl(String s) throws ProActiveException {
-  	System.out.println("> JiniRuntimeFactory.getJiniRuntimeImpl("+s+")");
+  	logger.info("> JiniRuntimeFactory.getJiniRuntimeImpl("+s+")");
   	String host = null;
   	Entry[] entries;
   	JiniRuntime jiniRuntime  = null;
@@ -97,9 +97,9 @@ public class JiniRuntimeFactory extends RuntimeFactory {
   	ServiceRegistrar registrar = null;
   	try{
   	host = UrlBuilder.getHostNameFromUrl(s);
-  	System.out.println("Try to find the service lookup on host: "+host);
+  	logger.info("Try to find the service lookup on host: "+host);
   	}catch(java.net.UnknownHostException e){
-  		System.out.println("Unable to locate host");
+  		logger.fatal("Unable to locate host");
   		e.printStackTrace();
   	}
   	//ServiceDiscoveryManager clientMgr = null;
@@ -108,14 +108,14 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     	// recherche unicast
     	try {
         	lookup = new LookupLocator("jini://" + host);
-        	System.out.println("Service lookup found ");
+        	logger.info("Service lookup found ");
         	registrar = lookup.getRegistrar();
    	 	}catch (java.net.MalformedURLException e) {
         	throw new ProActiveException("Lookup failed: " + e.getMessage() );
     	}catch (java.io.IOException e) {
-        	System.err.println("Registrar search failed: " + e.getMessage() );
+        	logger.error("Registrar search failed: " + e.getMessage() );
         	if (MAX_RETRY-- > 0) {
-        		System.out.println("failed to contact the service lookup, retrying ...");
+        		logger.info("failed to contact the service lookup, retrying ...");
         		getRemoteRuntimeImpl(s);
         	}else {
           		throw new ProActiveException("Cannot contact the lookup service for node "+s);
@@ -130,7 +130,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     	ServiceTemplate template = new ServiceTemplate(null,classes,entries);
     	try{
     		jiniRuntime = (JiniRuntime)registrar.lookup(template);
-    		if(jiniRuntime == null) System.out.println("No service found for url: "+s);
+    		if(jiniRuntime == null) logger.info("No service found for url: "+s);
     		return createRuntimeAdapter(jiniRuntime);
     	}catch(java.rmi.RemoteException e){
     		throw new ProActiveException(e);

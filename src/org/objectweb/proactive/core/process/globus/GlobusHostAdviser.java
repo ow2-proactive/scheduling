@@ -7,6 +7,8 @@ package org.objectweb.proactive.core.process.globus;
 
 import java.util.Iterator;
 
+import org.apache.log4j.Logger;
+
 /**
  * This class inform about globus host configuration
  */
@@ -15,6 +17,7 @@ public class GlobusHostAdviser implements java.io.Serializable{
 
 //    protected static XMLConfigurator xmlConfig;
 //    protected Dictionary globusHostsInfos;
+			static Logger logger = Logger.getLogger(GlobusHostAdviser.class.getName());
 			private java.util.ArrayList hostList;
 
     //===========================================================
@@ -131,7 +134,7 @@ public class GlobusHostAdviser implements java.io.Serializable{
        if ((hostList.contains(aHostName))){
 	 return true;
        }
-       System.out.println("Error: The host name you use ("+aHostName+") is not valid");
+       logger.error("Error: The host name you use ("+aHostName+") is not valid");
        displayAllValidHostName();
        return false;
     }
@@ -140,11 +143,11 @@ public class GlobusHostAdviser implements java.io.Serializable{
     //Display all valid host name
     public void displayAllValidHostName(){
 
-      System.out.println("Here is the list of valid host:");
+      logger.info("Here is the list of valid host:");
       for (Iterator iter = hostList.iterator(); iter.hasNext();)
 			{
 				String hostName = (String) iter.next();
-				System.out.println("Valid Globus Host "+hostName);
+				logger.info("Valid Globus Host "+hostName);
 			}
 //      Enumeration keys = hostList.keys();
 //      while(keys.hasMoreElements()){

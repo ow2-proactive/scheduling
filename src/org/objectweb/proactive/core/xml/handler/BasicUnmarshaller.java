@@ -41,7 +41,8 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  *
  */
 public class BasicUnmarshaller implements UnmarshallerHandler {
-
+	
+	
   protected Object resultObject;
   protected boolean isResultValid = true;
   

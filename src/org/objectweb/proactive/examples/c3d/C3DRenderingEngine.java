@@ -37,6 +37,7 @@ import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Surface;
 
+
 import java.awt.image.ColorModel;
 
 /**

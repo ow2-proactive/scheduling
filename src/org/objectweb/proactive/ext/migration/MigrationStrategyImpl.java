@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.ext.migration;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * MigrationStrategyImpl contains destination. It allows us to program an Agent to follow an itinary
@@ -37,6 +39,8 @@ package org.objectweb.proactive.ext.migration;
  * An migrationStrategy is instanciated by the user.
  */
 public class MigrationStrategyImpl implements java.io.Serializable, MigrationStrategy {
+	
+	static Logger logger = Logger.getLogger(MigrationStrategyImpl.class.getName());
 
   private java.util.Vector table;
   private int index;
@@ -67,7 +71,7 @@ public class MigrationStrategyImpl implements java.io.Serializable, MigrationStr
     try {
       f_in = new java.io.FileReader(filename);
     } catch (java.io.FileNotFoundException e) {
-      System.out.println("File not Found");
+      logger.error("File not Found");
     }
     // on ouvre un "lecteur" sur ce fichier
     java.io.BufferedReader _in = new java.io.BufferedReader(f_in);

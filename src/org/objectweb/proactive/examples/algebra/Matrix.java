@@ -30,7 +30,11 @@
 */ 
 package org.objectweb.proactive.examples.algebra;
 
+import org.apache.log4j.Logger;
+
 public class Matrix implements java.io.Serializable {
+	
+	static Logger logger = Logger.getLogger(Matrix.class.getName());
 
   int m;               // height
   int n;               // width
@@ -56,7 +60,7 @@ public class Matrix implements java.io.Serializable {
 
   public Matrix(Matrix _m) {
     this(_m.getHeight(), _m.getWidth());
-    System.out.println("Matrix: constructor (Matrix _m)");
+    logger.info("Matrix: constructor (Matrix _m)");
     int i;
     Row r;
 
@@ -137,11 +141,11 @@ public class Matrix implements java.io.Serializable {
     int i,j;
 
     for (i = 0; i < this.m; i++) {
-      System.out.print(i + " |");
+      logger.info(i + " |");
       for (j = 0; j < this.n; j++) {
-        System.out.print(this.getElement(i, j) + " ");
+        logger.info(this.getElement(i, j) + " ");
       }
-      System.out.println("|");
+      logger.info("|");
     }
 
     System.out.println();
@@ -385,7 +389,7 @@ public class Matrix implements java.io.Serializable {
       }
 
     }
-    System.out.println("Inversion terminee pour n = " + this.m);
+    logger.info("Inversion terminee pour n = " + this.m);
 
     return result;
   }

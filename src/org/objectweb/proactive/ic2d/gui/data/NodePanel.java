@@ -61,12 +61,10 @@ public class NodePanel extends AbstractDataObjectPanel implements NodeObjectList
 
   public NodePanel(AbstractDataObjectPanel parentDataObjectPanel, NodeObject targetNodeObject) {
     this(parentDataObjectPanel, targetNodeObject, new java.awt.Color(0xd0, 0xd0, 0xe0));
-	System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
   }
 
   public NodePanel(AbstractDataObjectPanel parentDataObjectPanel, NodeObject targetNodeObject, java.awt.Color c) {
     super(parentDataObjectPanel, targetNodeObject.getName(), "NodeObject");
-    System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
     if (targetNodeObject.getProtocol().equals("jini")) {
       c = java.awt.Color.cyan;
     }

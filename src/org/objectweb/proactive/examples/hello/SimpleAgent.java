@@ -31,18 +31,21 @@
 package org.objectweb.proactive.examples.hello;
 
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 
 public class SimpleAgent implements java.io.Serializable {
+	
+	static Logger logger = Logger.getLogger(SimpleAgent.class.getName());
 
   public SimpleAgent() {
   }
 
   public void moveTo(String t) {
     try {
-      System.out.println("Avant la migration ");
+      logger.info("Avant la migration ");
       ProActive.migrateTo(t);
-      System.out.println("Apres la migration je suis sur "+whereAreYou());
+      logger.info("Apres la migration je suis sur "+whereAreYou());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -58,7 +61,7 @@ public class SimpleAgent implements java.io.Serializable {
 
   public static void main (String[] args) {
     if (!(args.length>0)) {
-      System.out.println("Usage: java org.objectweb.proactive.examples.hello.SimpleAgent hostname/NodeName ");
+      logger.info("Usage: java org.objectweb.proactive.examples.hello.SimpleAgent hostname/NodeName ");
       System.exit(-1);
     }
  
@@ -71,8 +74,8 @@ public class SimpleAgent implements java.io.Serializable {
     }
     // migrate the SimpleAgent to the location identified by the given node URL
     // we assume here that the node does already exist
-    System.out.println("Je migre depuis " + t.whereAreYou());
+    logger.info("Je migre depuis " + t.whereAreYou());
     t.moveTo(args[0]);
-    System.out.println("The Active Object is now on host (j'suis ici) : " + t.whereAreYou());
+    logger.info("The Active Object is now on host (j'suis ici) : " + t.whereAreYou());
   }
 }

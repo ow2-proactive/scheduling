@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.cs;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>
  * A client/server example made using ProActive. In one window you
@@ -47,6 +49,8 @@ package org.objectweb.proactive.examples.cs;
  *
  */
 public class Server {
+	
+	static Logger logger = Logger.getLogger(Server.class.getName());
 
   protected String messageOfTheDay;
   protected java.util.ArrayList clients;
@@ -68,7 +72,7 @@ public class Server {
 
 
   public void setMessageOfTheDay(String messageOfTheDay) {
-    System.out.println("Server: new message: " + messageOfTheDay);
+    logger.info("Server: new message: " + messageOfTheDay);
     this.messageOfTheDay = messageOfTheDay;
     this.notifyClients();
   }

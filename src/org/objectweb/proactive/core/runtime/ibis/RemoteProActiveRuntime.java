@@ -35,6 +35,7 @@ import ibis.rmi.RemoteException;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -55,6 +56,8 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 
 public interface RemoteProActiveRuntime extends Remote
 {
+	
+	static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
   
   public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws RemoteException, NodeException;
   

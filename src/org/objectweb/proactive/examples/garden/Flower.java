@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.garden;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <p>
@@ -45,6 +47,8 @@ package org.objectweb.proactive.examples.garden;
  *
  */
 public class Flower {
+	
+	static Logger logger = Logger.getLogger(Flower.class.getName());
 
   private String myName;
 
@@ -55,7 +59,7 @@ public class Flower {
 
   public Flower(String name) {
     this.myName = name;
-    System.out.println("I am flower " + this.myName + " just been created");
+    logger.info("I am flower " + this.myName + " just been created");
   }
 
 
@@ -65,7 +69,7 @@ public class Flower {
 
 
   public void acceptReference(Flower f) {
-    System.out.println("I am flower " + this.myName + " and I received a reference on flower " + f.getName());
+    logger.info("I am flower " + this.myName + " and I received a reference on flower " + f.getName());
   }
   
   public int bob() {
@@ -80,8 +84,8 @@ public class Flower {
       String nodeName2 = "///vm2";
       if (args.length >= 1) nodeName1 = args[0];
       if (args.length >= 2) nodeName2 = args[1];
-      System.out.println("Node 1 : "+nodeName1);
-      System.out.println("Node 2 : "+nodeName2);
+      logger.info("Node 1 : "+nodeName1);
+      logger.info("Node 2 : "+nodeName2);
       Flower a = (Flower)org.objectweb.proactive.ProActive.newActive(Flower.class.getName(), new Object[]{"Amaryllis - LOCAL"});
       Flower b = (Flower)org.objectweb.proactive.ProActive.newActive(Flower.class.getName(), new Object[]{"Bouton d'Or - LOCAL"});
       Flower c = (Flower)org.objectweb.proactive.ProActive.newActive(Flower.class.getName(), new Object[]{"Coquelicot - vm1"}, nodeName1);

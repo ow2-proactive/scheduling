@@ -39,6 +39,8 @@ import net.jini.core.lookup.ServiceTemplate;
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
@@ -47,7 +49,8 @@ import org.objectweb.proactive.core.runtime.jini.JiniRuntimeAdapter;
 
 
 public class JiniNodeListener  implements DiscoveryListener {
-
+	
+	static Logger log4jlogger = Logger.getLogger(JiniNodeListener.class.getName());
   protected java.util.ArrayList nodes = new java.util.ArrayList();
   private String host;
   private IC2DMessageLogger logger;
@@ -79,19 +82,19 @@ public class JiniNodeListener  implements DiscoveryListener {
 	     //System.out.println("JiniNodeListener:  lookup registrar");
 	     matches = registrar.lookup(template,Integer.MAX_VALUE);
 	      if (matches.totalMatches >0 ){
-					System.out.println("matches "+matches.items.length);
+					//System.out.println("matches "+matches.items.length);
 					for (int i=0;i< matches.items.length; i++){
 						//check if it is really a node and not a ProactiveRuntime
 						String jiniName = matches.items[i].attributeSets[0].toString();
-						System.out.println("name of the node "+jiniName);
+						//System.out.println("name of the node "+jiniName);
 						if(jiniName.indexOf("PA_RT") == -1 && jiniName.indexOf("_VN") == -1){
 							// it is a node
 							int k = jiniName.indexOf("=");
 							String name = jiniName.substring(k+1,jiniName.length()-1);
-							System.out.println("-----------------name "+name);
+							//System.out.println("-----------------name "+name);
 		  					try{
 		    					if (matches.items[i].service == null){
-		      						System.out.println("Service : NULL !!!");	
+		      						log4jlogger.warn("Service : NULL !!!");	
 		    					}else {
 		      						runtime = (JiniRuntime) matches.items[i].service;
 		      						//System.out.println("JiniNodeListener: node "+node);
@@ -110,7 +113,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 			      									nodes.add(new NodeImpl(new JiniRuntimeAdapter(runtime),name,"jini"));
 			    								}
 										}catch(java.net.UnknownHostException e){
-			    										System.err.println("Unknown host "+host);
+			    										log4jlogger.error("Unknown host "+host);
 			    						}
 			  							catch (org.objectweb.proactive.core.ProActiveException e){
 			 							 		e.printStackTrace();
@@ -118,7 +121,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 		      						}
 		    					}
 		  					}catch (java.rmi.ConnectException e) {
-		    					System.err.println("JiniNodeListener ConnectException ");
+		    					log4jlogger.error("JiniNodeListener ConnectException ");
 		    					//e.printStackTrace();
 		    					continue;
 		    					//e.printStackTrace();
@@ -126,16 +129,16 @@ public class JiniNodeListener  implements DiscoveryListener {
 						} 
 					}
 	      }else{
-				System.out.println("JiniNodeListener: No JiniNode");
+				log4jlogger.error("JiniNodeListener: No JiniNode");
 	      }
       }catch (java.net.MalformedURLException e) {
-        System.err.println("Lookup failed: " + e.getMessage());
+        log4jlogger.error("Lookup failed: " + e.getMessage());
       }
       catch (java.io.IOException e) {
-        System.err.println("Registrar search failed: " + e.getMessage());
+        log4jlogger.error("Registrar search failed: " + e.getMessage());
       }
       catch(java.lang.ClassNotFoundException e){
-      	System.err.println("Class Not Found: "+e.getMessage());
+      	log4jlogger.error("Class Not Found: "+e.getMessage());
       }
       
     }
@@ -144,7 +147,7 @@ public class JiniNodeListener  implements DiscoveryListener {
    	 	try{
       		discover = new LookupDiscovery(LookupDiscovery.ALL_GROUPS);
 		} catch (Exception e){
-	  	System.err.println(" JiniNodeFinder exception");
+	  	log4jlogger.fatal(" JiniNodeFinder exception");
 	  	e.printStackTrace();
 		}
     
@@ -156,7 +159,7 @@ public class JiniNodeListener  implements DiscoveryListener {
   public void discovered(DiscoveryEvent evt) {
 
 	ServiceRegistrar[] registrars = evt.getRegistrars();
-	System.out.println("registar lenght :"+registrars.length);
+	//System.out.println("registar lenght :"+registrars.length);
 	Class[] classes = new Class[] {JiniRuntime.class};
 	JiniRuntime runtime = null;
 	ServiceMatches matches = null;
@@ -170,19 +173,19 @@ public class JiniNodeListener  implements DiscoveryListener {
 	      //System.out.println("JiniNodeListener:  lookup registrar");
 	      matches = registrar.lookup(template,Integer.MAX_VALUE);
 	      if (matches.totalMatches >0 ){
-					System.out.println("matches "+matches.items.length);
+					//System.out.println("matches "+matches.items.length);
 					for (int i=0;i< matches.items.length; i++){
 						//check if it is really a node and not a ProactiveRuntime
 						String jiniName = matches.items[i].attributeSets[0].toString();
-						System.out.println("name of the node "+jiniName);
+						//System.out.println("name of the node "+jiniName);
 						if(jiniName.indexOf("PA_RT") == -1 && jiniName.indexOf("_VN") == -1){
 							// it is a node
 							int k = jiniName.indexOf("=");
 							String name = jiniName.substring(k+1,jiniName.length()-1);
-							System.out.println("-----------------name "+name);
+							//System.out.println("-----------------name "+name);
 		  					try{
 		    					if (matches.items[i].service == null){
-		      						System.out.println("Service : NULL !!!");	
+		      						log4jlogger.warn("Service : NULL !!!");	
 		    					}else {
 		      						runtime = (JiniRuntime) matches.items[i].service;
 		      						//System.out.println("JiniNodeListener: node "+node);
@@ -201,7 +204,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 			      											nodes.add(new NodeImpl(new JiniRuntimeAdapter(runtime),name,"jini"));
 			    										}
 			    									}catch(java.net.UnknownHostException e){
-			    										System.err.println("Unknown host "+host);
+			    										log4jlogger.error("Unknown host "+host);
 			    									}
 			  									}else{
 			    									//System.out.println("host null: ");
@@ -214,7 +217,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 		      						}
 		    					}
 		  					}catch (java.rmi.ConnectException e) {
-		    				System.err.println("JiniNodeListener ConnectException ");
+		    				log4jlogger.error("JiniNodeListener ConnectException ");
 		    				//e.printStackTrace();
 		    				continue;
 		    				//e.printStackTrace();
@@ -222,7 +225,7 @@ public class JiniNodeListener  implements DiscoveryListener {
 						} 
 					}
 	      }else{
-					System.out.println("JiniNodeListener: No JiniNode");
+					log4jlogger.error("JiniNodeListener: No JiniNode");
 	      }
 	    }catch (java.rmi.RemoteException e){
 	    //System.err.println("JiniNodeListener RemoteException ");

@@ -30,10 +30,14 @@
 */ 
 package org.objectweb.proactive.examples.binarytree;
 
+import org.apache.log4j.Logger;
+
 /**
  * A standard implementation of a node in a binary tree.
  */
 public class BinaryTree {
+	
+	static Logger logger = Logger.getLogger(BinaryTree.class.getName());
 
   protected int key;              // The key for accessing the value contained in this node
   protected Object value;         // The actual value contained in this node

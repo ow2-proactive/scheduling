@@ -45,6 +45,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -63,7 +64,7 @@ import org.objectweb.proactive.examples.c3d.prim.Sphere;
  */
 public class C3DDispatcher implements org.objectweb.proactive.RunActive
 {
-
+	static Logger logger = Logger.getLogger(C3DDispatcher.class.getName());
 
 	protected VirtualNode vn;
 	/**
@@ -625,7 +626,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 
 	public void changeColorAll()
 	{
-		System.out.println("changeColorAll()");
+		logger.info("changeColorAll()");
 		for (Enumeration e = h_users.elements(); e.hasMoreElements();)
 			((User) e.nextElement())
 				.getObject()
@@ -1086,7 +1087,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		catch (Exception e)
 		{
 			e.printStackTrace();
-			System.out.println("Pb in main");
+			logger.error("Pb in main");
 		}
 		
 		
@@ -1362,7 +1363,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 
 	private void trace(String s_message)
 	{
-		System.out.println("C3DDispatcher: " + s_message);
+		logger.info("C3DDispatcher: " + s_message);
 	}
 
 	public void addSphere(Sphere s)

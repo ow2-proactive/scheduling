@@ -104,7 +104,7 @@ public class JiniRuntimeImpl
       // stay around long enough to receice replies
       //Thread.currentThread().sleep(10000L);
     } catch (Exception e) {
-      System.err.println(e.toString());
+      logger.error(e.toString());
     }
 
     discover.addDiscoveryListener(this);
@@ -201,7 +201,7 @@ public class JiniRuntimeImpl
 
 
 	
-	public void killRT()
+	public void killRT() 
 	{
 		proActiveRuntime.killRT();
 	}
@@ -308,7 +308,7 @@ public class JiniRuntimeImpl
         
       } catch (Exception e) {
       	//e.printStackTrace();
-        System.out.println("register exception " + e.toString());
+        logger.error("register exception " + e.toString());
         continue;
       }
       
@@ -333,7 +333,7 @@ public class JiniRuntimeImpl
   public void discarded(DiscoveryEvent evt) {}
 
   public void notify(LeaseRenewalEvent evt) {
-    System.out.println("Lease expired " + evt.toString());
+    logger.info("Lease expired " + evt.toString());
    evt.getException().printStackTrace();
   }
 
@@ -398,10 +398,10 @@ public class JiniRuntimeImpl
 					try{
 						reg = registrar.register(item, Lease.FOREVER);
 					}catch (Exception ex) {
-      			System.out.println("register exception " + ex.toString());
+      			logger.info("register exception " + ex.toString());
       			continue;
     			}
-    				System.out.println(" Service Registered " + objectURL);
+    				logger.info(" Service Registered " + objectURL);
 
       		// on lance le lease manager pour que l'objet puisse se reenregistrer
     				leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
@@ -449,12 +449,12 @@ public class JiniRuntimeImpl
       	reg = registrar.register(item, Lease.FOREVER);
       	counter++;
     	} catch (Exception e) {
-      	System.out.println("register exception " + e.toString());
+      	logger.info("register exception " + e.toString());
       	continue;
     	}
     	// if counter=0 no node or vn are registered as jini Service
     	if(counter == 0) throw new java.rmi.RemoteException("register exception ");
-    	System.out.println("Service registered " + objectUrl);
+    	logger.info("Service registered " + objectUrl);
     	//System.out.println("Registrar "+registrar.getLocator().getHost());
       // on lance le lease manager pour que l'objet puisse se reenregistrer
     	leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);

@@ -172,6 +172,17 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
   }
   
   
+  public String getLog4jFile() {
+    return jvmProcess.getLog4jFile();
+  }
+  
+  
+  public void setLog4jFile(String log4jFile) {
+    checkStarted();
+    jvmProcess.setLog4jFile(log4jFile);
+  }
+  
+  
   /**
 	 * Returns the class name that the target JVMProcess is about to start
 	 * @return String The value of the class that the target JVMProcess is going to start

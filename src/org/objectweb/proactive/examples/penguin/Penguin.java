@@ -233,7 +233,7 @@ public class Penguin implements org.objectweb.proactive.RunActive, java.io.Seria
 
   public static void main(String[] args) {
     if (!(args.length > 1)) {
-      System.out.println("Usage: java org.objectweb.proactive.examples.penguin.Penguin hostname1/NodeName1 hostname2/NodeName2 ");
+     System.out.println("Usage: java org.objectweb.proactive.examples.penguin.Penguin hostname1/NodeName1 hostname2/NodeName2 ");
       System.exit(-1);
     }
     try {

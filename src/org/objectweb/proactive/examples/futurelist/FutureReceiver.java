@@ -30,10 +30,13 @@
 */ 
 package org.objectweb.proactive.examples.futurelist;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ext.util.FutureList;
 
 
 public class FutureReceiver implements java.io.Serializable {
+	
+	static Logger logger = Logger.getLogger(FutureReceiver.class.getName());
 
   int etape = 0; // this is to count the jumps we have made so far
   BlockedObject blocked;
@@ -65,7 +68,7 @@ public class FutureReceiver implements java.io.Serializable {
 
     for (java.util.Enumeration e = waitingFutures.elements(); e.hasMoreElements();) {
       temp = (EmptyFuture)e.nextElement();
-      System.out.println("Result: " + temp.getName());
+      logger.info("Result: " + temp.getName());
     }
   }
 
@@ -96,28 +99,28 @@ public class FutureReceiver implements java.io.Serializable {
 
   public void displayAwaited() {
     if (futureList != null) {
-      System.out.println("FutureReceiver: I am still waiting " + futureList.countAwaited() + " futures");
+      logger.info("FutureReceiver: I am still waiting " + futureList.countAwaited() + " futures");
     }
   }
 
 
   public void displayAllAwaited() {
     if (futureList != null) {
-      System.out.println("FutureReceiver: I am waiting for all my futures:  " + futureList.allAwaited());
+      logger.info("FutureReceiver: I am waiting for all my futures:  " + futureList.allAwaited());
     }
   }
 
 
   public void displayNoneAwaited() {
     if (futureList != null) {
-      System.out.println("FutureReceiver: I don't have any pending future:  " + futureList.noneAwaited());
+     logger.info("FutureReceiver: I don't have any pending future:  " + futureList.noneAwaited());
     }
   }
 
 
   public void waitAllFuture() {
     if (futureList != null) {
-      System.out.println("FutureReceiver: waiting all futures  ");
+      logger.info("FutureReceiver: waiting all futures  ");
       futureList.waitAll();
     }
   }
@@ -125,7 +128,7 @@ public class FutureReceiver implements java.io.Serializable {
 
   public void waitOneFuture() {
     if (futureList != null) {
-      System.out.println("FutureReceiver: waiting one future  ");
+      logger.info("FutureReceiver: waiting one future  ");
       futureList.waitOne();
     }
   }
@@ -135,7 +138,7 @@ public class FutureReceiver implements java.io.Serializable {
     Object tmp;
     if (futureList != null) {
       tmp = futureList.waitAndRemoveOne();
-      System.out.println("I got this future: " + tmp);
+      logger.info("I got this future: " + tmp);
     }
   }
 

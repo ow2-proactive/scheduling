@@ -30,7 +30,11 @@
 */ 
 package org.objectweb.proactive.examples.doctor;
 
+import org.apache.log4j.Logger;
+
 public class Receptionnist implements org.objectweb.proactive.RunActive {
+	
+	static Logger logger = Logger.getLogger(Receptionnist.class.getName());
 
   public final static int NO_ONE = -1;
   int pat_id;
@@ -50,7 +54,7 @@ public class Receptionnist implements org.objectweb.proactive.RunActive {
 
   public synchronized void addPatient(int pat) {
     if (pat_id != NO_ONE) {
-      System.out.println("ERROR: addPatient(" + pat + ") with pat_id=" + pat_id);
+      logger.error("ERROR: addPatient(" + pat + ") with pat_id=" + pat_id);
       System.exit(0);
     }
     pat_id = pat;
@@ -63,7 +67,7 @@ public class Receptionnist implements org.objectweb.proactive.RunActive {
 
   public synchronized void addDoctor(int doc) {
     if (doc_id != NO_ONE) {
-      System.out.println("ERROR: addDoctor(" + doc + ") with doc_id=" + doc_id);
+      logger.error("ERROR: addDoctor(" + doc + ") with doc_id=" + doc_id);
       System.exit(0);
     }
     doc_id = doc;

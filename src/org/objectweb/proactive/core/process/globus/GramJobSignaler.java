@@ -30,16 +30,20 @@
 */ 
 package org.objectweb.proactive.core.process.globus;
 
+import org.apache.log4j.Logger;
 import org.globus.gram.GramJob;
 import org.globus.gram.GramJobListener;
 
 class GramJobSignaler implements GramJobListener {
+	
+	
+	static Logger logger = Logger.getLogger(GramJobSignaler.class.getName());
 
   private boolean b = false;
 
 
   public void statusChanged(GramJob job) {
-    System.out.println("Job status change \n" + "    ID     : " + job.getIDAsString() + "\n" + "    Status : " + job.getStatusAsString());
+    logger.info("Job status change \n" + "    ID     : " + job.getIDAsString() + "\n" + "    Status : " + job.getStatusAsString());
     b = true;
   }
 

@@ -35,6 +35,8 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 
+import org.apache.log4j.Logger;
+
 /**
  * Title:
  * Description:
@@ -46,6 +48,8 @@ import javax.swing.border.*;
  */
 
 public abstract class StandardFrame extends javax.swing.JFrame {
+	
+	static Logger logger = Logger.getLogger(StandardFrame.class.getName());
 
   protected final static int MESSAGE_ZONE_HEIGHT = 250;
   protected String name;
@@ -89,7 +93,7 @@ public abstract class StandardFrame extends javax.swing.JFrame {
 			   + ")\n      => " + message + "\n", regularStyle);
 	}
 	catch (Exception e) {
-	  System.err.println("Couldn't insert initial text.");
+	  logger.error("Couldn't insert initial text.");
 	}
       }
     });
@@ -111,7 +115,7 @@ public abstract class StandardFrame extends javax.swing.JFrame {
 	  doc.insertString(doc.getLength(), message + "\n", s);
 	}
 	catch (Exception e) {
-	  System.err.println("Couldn't insert initial text.");
+	  logger.error("Couldn't insert initial text.");
 	}
       }
     });

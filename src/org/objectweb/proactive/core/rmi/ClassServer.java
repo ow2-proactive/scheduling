@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.rmi;
 
+import org.apache.log4j.Logger;
+
 /**
  * ClassServer is an abstract class that provides the
  * basic functionality of a mini-webserver, specialized
@@ -49,6 +51,7 @@ package org.objectweb.proactive.core.rmi;
  */
 public abstract class ClassServer implements Runnable {
 
+	protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
   protected static int DEFAULT_SERVER_BASE_PORT = 2001;
   protected static int DEFAULT_SERVER_PORT_INCREMENT = 20;
   protected static int MAX_RETRY = 50;
@@ -113,7 +116,7 @@ public abstract class ClassServer implements Runnable {
     try {
       socket = server.accept();
     } catch (java.io.IOException e) {
-      System.out.println("Class Server died: " + e.getMessage());
+      logger.fatal("Class Server died: " + e.getMessage());
       e.printStackTrace();
       return;
     }
@@ -136,14 +139,14 @@ public abstract class ClassServer implements Runnable {
           out.writeBytes("Content-Type: application/java\r\n\r\n");
           out.write(bytecodes);
           out.flush();
-          System.out.println("ClassServer sent class " + info.path+" successfully");
+          logger.info("ClassServer sent class " + info.path+" successfully");
         } catch (java.io.IOException ie) {
           return;
         }
       } catch (Exception e) {
         // write out error response
         e.printStackTrace();
-        System.out.println("!!! ClassServer failed to load class " + info.path);
+        logger.error("!!! ClassServer failed to load class " + info.path);
         out.writeBytes("HTTP/1.0 400 " + e.getMessage() + "\r\n");
         out.writeBytes("Content-Type: text/html\r\n\r\n");
         out.flush();

@@ -42,7 +42,8 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  *
  */
 public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandler {
-
+	
+	
   private java.util.HashMap handlersMap;
   private int elementCounter = 0;
   private UnmarshallerHandler currentActiveHandler;
@@ -126,6 +127,7 @@ public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandl
 
   
   public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException {
+//  	System.out.println("prefix "+prefix+" uri "+uri);
     checkActiveHandler();
     currentActiveHandler.startPrefixMapping(prefix, uri);
   }

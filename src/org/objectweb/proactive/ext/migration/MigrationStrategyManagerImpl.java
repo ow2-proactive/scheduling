@@ -194,6 +194,7 @@ public class MigrationStrategyManagerImpl implements MigrationStrategyManager, M
     }
     methodOnArrival = r.getMethodName();
     ProActive.migrateTo(body, r.getDestination(), fifoFirst);
+    
   }
 
 

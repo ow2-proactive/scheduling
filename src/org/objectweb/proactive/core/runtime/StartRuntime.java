@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.core.runtime;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 
@@ -53,6 +54,8 @@ public class StartRuntime
 	//Name of the runtime that launched this class reading the ProActiveDescriptor
 	//private static final String DefaultRuntimeName = "PART_DEFAULT";
 	//Name of the runtime's host that launched this class reading the ProActiveDescriptor
+
+	static Logger logger = Logger.getLogger(StartRuntime.class.getName());
 	
 	protected String DefaultRuntimeURL;
 	protected String nodeURL;
@@ -66,6 +69,7 @@ public class StartRuntime
 	//
 	
 	protected StartRuntime(){
+			
 	}
 	
 	private StartRuntime(String args[]){
@@ -82,11 +86,11 @@ public class StartRuntime
 	public static void main(String[] args)
 	{
 		if (args.length < 3) {
-      System.err.println("Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod>");
+      logger.error("Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod>");
       System.exit(1);
     }
     try{
-    	System.out.println("**** Starting jvm on "+java.net.InetAddress.getLocalHost().getHostName());
+    	logger.info("**** Starting jvm on "+java.net.InetAddress.getLocalHost().getHostName());
     }catch(java.net.UnknownHostException e){
     	e.printStackTrace();
     }
@@ -125,7 +129,7 @@ public class StartRuntime
    * of ProActiveDescriptor.
    */
 	private void register(String hostName){
-		
+		  
 		try{
 			//System.out.println("//"+hostName+"/"+DefaultRuntimeName);
 		ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,Constants.DEFAULT_PROTOCOL_IDENTIFIER);

@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime.rmi;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -52,7 +53,10 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 
 public interface RemoteProActiveRuntime extends java.rmi.Remote
 {
-  
+ 	
+ 	static Logger logger = Logger.getLogger(RemoteProActiveRuntime.class.getName());
+ 	
+ 	
   public String createLocalNode(String nodeName,boolean replacePreviousBinding) throws java.rmi.RemoteException, NodeException;
   
   

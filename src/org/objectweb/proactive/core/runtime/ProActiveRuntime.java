@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -66,6 +67,10 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  *
  */
 public interface ProActiveRuntime {
+	
+	
+	
+	static Logger runtimeLogger = Logger.getLogger(ProActiveRuntime.class.getName());
 
   /**
    * Creates a new Node in the same VM as this ProActiveRuntime
@@ -189,7 +194,7 @@ public interface ProActiveRuntime {
   /**
    * Kills this ProActiveRuntime and this VM
    */
-  public void killRT() throws ProActiveException;
+  public void killRT() throws Exception;
   
   /**
    * Returns the url of this ProActiveRuntime on the local or remote VM

@@ -30,8 +30,14 @@
 */ 
 package org.objectweb.proactive.examples.futurelist;
 
-public class BlockedObject implements org.objectweb.proactive.RunActive, java.io.Serializable {
+import org.apache.log4j.Logger;
 
+public class BlockedObject implements org.objectweb.proactive.RunActive, java.io.Serializable {
+	
+	
+	static Logger logger = Logger.getLogger(BlockedObject.class.getName());
+	
+	
   public BlockedObject() {
   }
 
@@ -39,14 +45,14 @@ public class BlockedObject implements org.objectweb.proactive.RunActive, java.io
     //first we wait to allow the caller to migrate with its futures
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     service.blockingRemoveOldest("go");
-    System.out.println("BlockedObject: Now in service");
+    logger.info("BlockedObject: Now in service");
     service.fifoServing();
   }
 
 
   //unblock the live method
   public void go() {
-    System.out.println("BlockedObject: go()");
+    logger.info("BlockedObject: go()");
   }
 
 

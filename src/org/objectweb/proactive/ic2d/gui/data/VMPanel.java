@@ -84,7 +84,6 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
   //
 
   public void nodeObjectAdded(NodeObject nodeObject) {
-  	System.out.println("VMPanel.nodeObjectAdded");
     NodePanel panel = new NodePanel(this, nodeObject);
     addChild(nodeObject, panel);
     nodeObject.registerListener(panel);

@@ -31,11 +31,13 @@
 package org.objectweb.proactive.core.process.globus;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.apache.log4j.Logger;
 import org.globus.gram.Gram;
 import org.globus.gram.GramJob;
 
 public class Globus {
-
+	
+	static Logger logger = Logger.getLogger(Globus.class.getName());
   public static final int DEFAULT_PORT = 754;
   public static final String GLOBUS_HOST_PROP_NAME = "globus_host";
   public static final String GLOBUS_PORT_PROP_NAME = "globus_port";
@@ -91,14 +93,14 @@ public class Globus {
         cp = classpath;
 
       String rsl;
-      System.out.println("-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+\n" + commandName + " " + args + "<=\n-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+");
+      logger.info("-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+\n" + commandName + " " + args + "<=\n-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+-=+");
       if (args == null || args.equals(""))
         rsl = "&(executable=" + commandName + ")(directory=/u/satura/0/oasis/abergel)(environment=(CLASSPATH " + cp + "))";
       else
         rsl = "&(executable=" + commandName + ")(arguments=" + args + ")(directory=/u/satura/0/oasis/abergel)(environment=(CLASSPATH " + cp + "))";
 
       if (Globus.debug)
-        System.out.println("-=+-=+-=+-=+-=+-=+\nRSL: " + rsl + "\n-=+-=+-=+-=+-=+-=+");
+        logger.info("-=+-=+-=+-=+-=+-=+\nRSL: " + rsl + "\n-=+-=+-=+-=+-=+-=+");
 
       GramJob job = new GramJob(rsl);
 
@@ -146,7 +148,7 @@ public class Globus {
           rsl = "&(executable=" + jp + "java)(directory=/u/satura/0/oasis/abergel)" + "(environment=(CLASSPATH " + cp + "))(arguments=" + nameCls + " " + args + ")";
       }
       if (Globus.debug)
-        System.out.println("-=+-=+-=+-=+-=+-=+\nRSL: " + rsl + "\n-=+-=+-=+-=+-=+-=+");
+        logger.info("-=+-=+-=+-=+-=+-=+\nRSL: " + rsl + "\n-=+-=+-=+-=+-=+-=+");
 
       GramJob job = new GramJob(rsl);
 

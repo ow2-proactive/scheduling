@@ -263,14 +263,14 @@ public class RemoteProActiveRuntimeAdapter
 	}
 
 	
-	public void killRT() 
+	public void killRT() throws Exception
 	{
-		try{
+//		try{
 		remoteProActiveRuntime.killRT();
-		}catch(java.rmi.RemoteException re){
-			re.printStackTrace();
-			// behavior to be defined
-		}
+//		}catch(java.rmi.RemoteException re){
+//			re.printStackTrace();
+//			// behavior to be defined
+//		}
 	}
 	
 	public String getURL()throws ProActiveException{

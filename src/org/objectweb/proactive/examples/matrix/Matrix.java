@@ -1,22 +1,25 @@
 package org.objectweb.proactive.examples.matrix;
 
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 
-public class Matrix implements Active, java.io.Serializable {
+public class Matrix implements java.io.Serializable {
 
-
+		static Logger logger = Logger.getLogger(Matrix.class.getName());
     private int width;
     private int height;
     private double[][] tab;
-
+		boolean migration = true;
 
 
     // -----------------------------//
@@ -246,7 +249,7 @@ public class Matrix implements Active, java.io.Serializable {
 
     //Udab: Modifie pour tests
     public String toString() {
-	System.out.println("Methode Matrix::toString");
+	//System.out.println("Methode Matrix::toString");
 	String s = new String("");
 	int height = this.getHeight();
 	int width = this.getWidth();
@@ -284,9 +287,9 @@ public class Matrix implements Active, java.io.Serializable {
 	try {
 	    vsm = (Matrix) ProActive.newActive("org.objectweb.proactive.examples.matrix.Matrix", params, node); }
 	catch (ActiveObjectCreationException e) {
-	    System.err.println("Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n"); }
+	    logger.error("Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n"); }
 	catch (NodeException e) {
-	    System.err.println("Error create Active Vertical Sub Matrix : NodeException\n"); }
+	    logger.error("Error create Active Vertical Sub Matrix : NodeException\n"); }
 	return vsm;
     }
 
@@ -399,7 +402,7 @@ public class Matrix implements Active, java.io.Serializable {
     
     public Matrix distributedMultiply (Matrix m, Node[] nodeList) {
 	if (getWidth() != m.getHeight()) {
-	    System.err.println("Error : no compatible Matrix");
+	    logger.error("Error : no compatible Matrix");
 	    return null;
 	}
        	else {
@@ -471,7 +474,7 @@ public class Matrix implements Active, java.io.Serializable {
 
     public Matrix distributedMultiplyWithOutGroup (Matrix m, Node[] nodeList) {
 	if (getWidth() != m.getHeight()) {
-	    System.err.println("Error : no compatible Matrix");
+	    logger.error("Error : no compatible Matrix");
 	    return null;
 	}
        	else {
@@ -487,7 +490,6 @@ public class Matrix implements Active, java.io.Serializable {
 	    return new Matrix(mr);
 	}
     }
-
 
 
 

@@ -78,6 +78,7 @@ public class PassiveCompositeUnmarshaller extends AbstractUnmarshallerDecorator 
   //
   
   protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+  	
   }
   
   //

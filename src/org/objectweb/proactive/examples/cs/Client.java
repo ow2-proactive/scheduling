@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.examples.cs;
 
+import org.apache.log4j.Logger;
+
 
 /**
  * <p>
@@ -48,6 +50,8 @@ package org.objectweb.proactive.examples.cs;
  *
  */
 public class Client {
+	
+	static Logger logger = Logger.getLogger(Client.class.getName());
 
   protected String myName;
   protected String serverHostName;
@@ -64,9 +68,9 @@ public class Client {
     this.serverHostName = serverHostName;
     // Looks up for the server
     String urlAsString = "//" + serverHostName + "/theServer";
-    System.out.println("Client " + clientName + " is looking up server at " + urlAsString);
+    logger.info("Client " + clientName + " is looking up server at " + urlAsString);
     this.theServer = (Server)org.objectweb.proactive.ProActive.lookupActive(Server.class.getName(), urlAsString);
-    System.out.println("Client " + this.myName + " successfully found the server");
+     logger.info("Client " + this.myName + " successfully found the server");
   }
 
 
@@ -76,7 +80,7 @@ public class Client {
     if (myself != null) {
       theServer.register(myself);
     } else {
-      System.out.println("Cannot get a stub on myself");
+       logger.info("Cannot get a stub on myself");
     }
   }
 

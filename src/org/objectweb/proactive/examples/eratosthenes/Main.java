@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JToggleButton;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
@@ -61,7 +62,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * temporarily the NumberSource.
  * */
 public class Main implements ActivePrimeContainerCreator, InitActive {
-
+	
+	static Logger logger = Logger.getLogger(Main.class.getName());
   private PrimeOutputListener outputListener;
   private NumberSource source;
   private VirtualNode containersVirtualNode;
@@ -115,7 +117,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   		}
   		else node = NodeFactory.getDefaultNode();
   		
-  		System.out.println("    Creating container with size "+containerSize+" starting with number "+n);
+  		logger.info("    Creating container with size "+containerSize+" starting with number "+n);
     	ActivePrimeContainer result =
     	   (ActivePrimeContainer) ProActive.newActive(ActivePrimeContainer.class.getName(), 
   	        new Object [] { ProActive.getStubOnThis(), outputListener, 
@@ -170,8 +172,8 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
 
   public void exit() {
     	if (containersVirtualNode != null) {
-      		System.out.println("Killing nodes...");
-      		System.out.println("This may print out some exception messages, but that's OK.");
+      		logger.info("Killing nodes...");
+      		logger.info("This may print out some exception messages, but that's OK.");
       		java.util.Vector killedRTs = new java.util.Vector();
     		for (int i = -2; i < containersVirtualNode.getNodeCount(); i ++) {
     			try {
@@ -190,7 +192,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     	 		} catch (Throwable ex) {
     			}
     		}
-    		System.out.println("Killed nodes.");
+    		logger.info("Killed nodes.");
     	}
     	System.exit(0);
   }

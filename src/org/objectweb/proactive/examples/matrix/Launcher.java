@@ -28,12 +28,15 @@
  */
 package org.objectweb.proactive.examples.matrix;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 
 public class Launcher implements java.io.Serializable {
+	
+		static Logger logger = Logger.getLogger(Launcher.class.getName());
 
     Node[] nodesList;
 
@@ -74,7 +77,7 @@ public class Launcher implements java.io.Serializable {
 	
 
 	endTime = System.currentTimeMillis() - startTime;
-	System.out.println("\n       Result (" +i+ ") : Total time spent = " + endTime + " millisecondes");
+	logger.info("\n       Result (" +i+ ") : Total time spent = " + endTime + " millisecondes");
 
 	//System.out.println(result);
     }

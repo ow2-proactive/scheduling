@@ -30,7 +30,11 @@
 */ 
 package org.objectweb.proactive.examples.doctor;
 
+import org.apache.log4j.Logger;
+
 public class Office {
+	
+	static Logger logger = Logger.getLogger(Office.class.getName());
 
   //Number of patients being created at startup 
   public static final int NB_PAT = 15;
@@ -165,7 +169,7 @@ public class Office {
 
 
   public static void main(String argv[]) {
-    System.out.println("The Salishan problems : Problem 3 - The Doctor's Office");
+    logger.info("The Salishan problems : Problem 3 - The Doctor's Office");
     try {
       Office off = (Office)org.objectweb.proactive.ProActive.newActive(Office.class.getName(), new Object[]{new Integer(0)});
       Receptionnist recept = (Receptionnist)org.objectweb.proactive.ProActive.newActive(Receptionnist.class.getName(), new Object[]{off});
