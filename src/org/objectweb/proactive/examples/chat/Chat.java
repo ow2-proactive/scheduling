@@ -262,7 +262,7 @@ public class Chat implements java.io.Serializable, RunActive {
 	 * @param userName - the name to remove
 	 */
 	public void removeUserFromTheList (String userName) {
-		this.frame.list.setText(this.frame.list.getText().replaceAll("\n"+userName+"\n","\n"));
+		this.frame.list.setText(this.frame.list.getText().replaceAll(userName+"\n",""));
 	}
 
 	public static void main (String[] args) {
