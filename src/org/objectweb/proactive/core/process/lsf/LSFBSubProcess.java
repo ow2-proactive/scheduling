@@ -173,7 +173,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   		bSubCommand.append("-m "+hostList+" ");
   	}
   	if(getCompositionType() == GIVE_COMMAND_AS_PARAMETER){
-  	bSubCommand.append("-R 'span[ptile=2]' "+scriptLocation+getTargetProcess().getCommand());
+  	bSubCommand.append("-R 'span[ptile=2]' "+scriptLocation+" "+getTargetProcess().getCommand());
   	}
   	System.out.println("bsub command is "+bSubCommand.toString());
     return bSubCommand.toString();
