@@ -74,7 +74,9 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         names = new ArrayList(nb);
         for (int i=0;i<nb;i++){
             names.add(i," ");
+            bodyname[i] = "";
         }
+
         
         this.nbBodies = nb;
         ClassLoader cl = this.getClass().getClassLoader();
