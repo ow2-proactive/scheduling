@@ -14,7 +14,7 @@ fi
 
 workingDir=`dirname $0`
 . $workingDir/envWS.sh
-export XMLDESCRIPTOR=$workingDir/../../descriptors/C3D_Dispatcher_Renderer.xml
+export XMLDESCRIPTOR=$workingDir/../../../descriptors/C3D_Dispatcher_Renderer.xml
 $JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR $1 $2
 echo
 echo ---------------------------------------------------------
