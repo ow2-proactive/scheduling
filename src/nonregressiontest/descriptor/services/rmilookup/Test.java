@@ -40,6 +40,7 @@ import testsuite.test.FunctionalTest;
 
 /**
  * @author ProActiveTeam
+ * @version 1.0 6 aout 2004
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
@@ -75,7 +76,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        // TODO Auto-generated method stub
     }
 
     /* (non-Javadoc)

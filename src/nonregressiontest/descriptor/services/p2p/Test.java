@@ -87,7 +87,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        // TODO Auto-generated method stub
     }
 
     /* (non-Javadoc)

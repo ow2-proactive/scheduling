@@ -164,7 +164,6 @@ public SecurityContext receiveRequest(SecurityContext sc) {
  * @see org.objectweb.proactive.ext.security.Secure#execute(org.objectweb.proactive.ext.security.SecurityContext)
  */
 public SecurityContext execute(SecurityContext sc) {
-	// TODO Auto-generated method stub
 	return null;
 }
 }
