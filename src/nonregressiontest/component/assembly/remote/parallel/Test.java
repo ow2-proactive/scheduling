@@ -31,8 +31,8 @@
 package nonregressiontest.component.assembly.remote.parallel;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.util.Fractal;
 
-import org.objectweb.proactive.core.component.Fractal;
 
 import testsuite.test.FunctionalTest;
 
