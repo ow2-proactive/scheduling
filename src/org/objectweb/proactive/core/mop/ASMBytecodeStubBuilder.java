@@ -558,7 +558,10 @@ public class ASMBytecodeStubBuilder implements Constants {
 			vectorOfSuperClasses.addElement(currentClass);
 			currentClass = currentClass.getSuperclass();
 		}
-
+		
+		// BUGFIX #300591 do not forget implemented interfaces and super-interfaces
+		Utils.addSuperInterfaces(cl, vectorOfSuperClasses);
+		
 		// Pushes on the stack the size of the array
 		pushInt(cv, vectorOfSuperClasses.size());
 		// Creates an array of class objects of that size
