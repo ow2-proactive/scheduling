@@ -1,3 +1,5 @@
 currentDir=`dirname $0`
 
+#build file for Unix system
+
 $JAVA_HOME/bin/java -classpath $JAVA_HOME/lib/tools.jar:$currentDir/ant.jar:$currentDir/jaxp.jar:$currentDir/crimson.jar:$CLASSPATH org.apache.tools.ant.Main -emacs -buildfile $currentDir/proactive.xml $@
