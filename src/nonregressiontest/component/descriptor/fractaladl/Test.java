@@ -18,6 +18,13 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import testsuite.test.FunctionalTest;
 
 /**
+ * For a graphical representation, open the MessagePassingExample.fractal with the fractal gui
+ * 
+ * parralel-2 and sub-components are located on VN3, which is a "multiple" virtual node :
+ * it is mapped onto 2 nodes.  
+ * Therefore, each of the primitive component inside parallel-2 will have 2 instances, one on
+ * each of the underlying nodes.
+ * 
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
@@ -53,10 +60,8 @@ public class Test extends FunctionalTest {
 						"",
 						Test.class.getResource("/nonregressiontest/component/descriptor/deploymentDescriptor.xml").getPath() });
 
-				//System.out.println("name of c is : " + ((ComponentParametersController)c.getFcInterface(ComponentParametersController.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
 				Component c = Registry.instance().getComponent("parallel");
 
-				//System.out.println("name of p2 is : " + ((ComponentParametersController)p2.getFcInterface(ComponentParametersController.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
 				// invoke method on composite
 				I1 i1 = (I1) c.getFcInterface("i1");
 
@@ -103,7 +108,8 @@ public class Test extends FunctionalTest {
 				+ PrimitiveComponentA.MESSAGE
 				+ Test.MESSAGE;
 
-		return resulting_msg.toString().equals(single_message + single_message + single_message);
+		// there should be 5 messages with the current configuration
+		return resulting_msg.toString().equals(single_message + single_message + single_message + single_message + single_message);
 	}
 	
 	private void append(StringBuffer buffer, Message message) {
