@@ -61,7 +61,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
      * @param title
      * @throws java.awt.HeadlessException
      */
-    public NBodyFrame(String title, int nb, boolean displayft) throws HeadlessException {
+    public NBodyFrame(String title, int nb) throws HeadlessException {
         super(title);
         setSize(SIZE+11, SIZE+90);
         setLocation(10, 10);
@@ -164,8 +164,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         drawPanel.add(this.queue);
         drawPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
         
-        if (displayft)
-            this.gui.add(killingPanel);
+        this.gui.add(killingPanel);
         this.gui.add(drawPanel);
         //this.gui.setBorder(BorderFactory.createTitledBorder("Controls"));
         
