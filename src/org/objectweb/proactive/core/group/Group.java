@@ -79,7 +79,7 @@ public interface Group {
     /**
      * Returns an object representing the group, and assignable from the (upper) class of member.
      */
-    public Object getGrouped();
+    public Object getGroupByType();
 
     /**
      * Returns the index in the group of the first occurence of the specified element, -1 if the list does not contain this element.
