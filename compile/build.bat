@@ -4,7 +4,7 @@ if NOT DEFINED JAVA_HOME goto javahome
 if "%JAVA_HOME%" == "" goto javahome
 
 SETLOCAL
-set CLASSPATH=%JAVA_HOME%\lib\tools.jar;ant.jar;xercesImpl.jar;xml-apis.jar;doclet.jar;%CLASSPATH%
+set CLASSPATH=%JAVA_HOME%\lib\tools.jar;ant.jar;ant-launcher.jar;xercesImpl.jar;xml-apis.jar;doclet.jar;%CLASSPATH%
 echo %CLASSPATH%
 %JAVA_HOME%\bin\java org.apache.tools.ant.Main -buildfile proactive.xml %1 %2 %3 %4 %5
 ENDLOCAL
