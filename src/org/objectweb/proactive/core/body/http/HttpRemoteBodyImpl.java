@@ -71,6 +71,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
 	private static Logger logger = Logger.getLogger("XML_HTTP");
     
 	UniqueID bodyID;
+	String jobID;
     String url;
     int port;
 
@@ -79,10 +80,11 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      * @param bodyID
      * @param url
      */
-    public HttpRemoteBodyImpl(UniqueID bodyID, String url) {
+    public HttpRemoteBodyImpl(UniqueID bodyID, String url, String jobID) {
         this.bodyID = bodyID;
         this.url = url;
         this.port = UrlBuilder.getPortFromUrl(url);
+        this.jobID = jobID;
     }
 
     public void receiveRequest(Request request)
@@ -508,14 +510,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     }
 
     public String getJobID() {
-        try {
-            return (String) sendRequest(new BodyRequest("getJobID",
-                    new ArrayList(), bodyID));
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return "";
-        }
+        return this.jobID;
     }
 
     /**

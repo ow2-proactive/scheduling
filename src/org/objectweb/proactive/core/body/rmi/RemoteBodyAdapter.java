@@ -8,7 +8,7 @@
  * Contact: proactive-support@inria.fr
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public 
+ * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import org.apache.log4j.Logger; 
+import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -75,13 +75,14 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      * Cache the jobID locally for speed
      */
     protected String jobID;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    protected RemoteBodyAdapter() {}
-    
-    protected void construct (RemoteBody remoteBody) throws ProActiveException {
+    protected RemoteBodyAdapter() {
+    }
+
+    protected void construct(RemoteBody remoteBody) throws ProActiveException {
         this.proxiedRemoteBody = remoteBody;
         if (logger.isDebugEnabled()) {
             logger.debug(proxiedRemoteBody.getClass());
@@ -90,17 +91,17 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
             this.bodyID = remoteBody.getID();
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
-        }    	
+        }
     }
-    
-    private RemoteBodyAdapter (RemoteBody remoteBody) throws ProActiveException {
-    	construct (remoteBody);
+
+    private RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
+        construct(remoteBody);
     }
 
     public RemoteBodyAdapter(UniversalBody body) throws ProActiveException {
         try {
-        		RemoteBody remoteBody = new RemoteBodyImpl(body);
-                construct (remoteBody);
+            RemoteBody remoteBody = new RemoteBodyImpl(body);
+            construct(remoteBody);
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
@@ -109,18 +110,17 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-
     public String getJobID() {
-    	if (jobID == null) {
-    		try {
-    			jobID = proxiedRemoteBody.getJobID();
-    		} catch (java.rmi.RemoteException e) {
-    			e.printStackTrace();
-    			return "";
-    		}
-    	}
-    	
-    	return jobID;
+        if (jobID == null) {
+            try {
+                jobID = proxiedRemoteBody.getJobID();
+            } catch (java.rmi.RemoteException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+
+        return jobID;
     }
 
     /**
@@ -159,18 +159,18 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      * @exception java.io.IOException if the remote body cannot be found under the given url
      *      or if the object found is not of type RemoteBody
      */
-    public static UniversalBody lookup(String url) throws java.io.IOException {  
+    public static UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
 
         // Try if URL is the address of a RemoteBody
         try {
             o = java.rmi.Naming.lookup(url);
         } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
-        	throw new java.io.IOException("The url " + url +
-        	 	 " is not bound to any known object");
+            throw new java.io.IOException("The url " + url +
+                " is not bound to any known object");
         }
-        //catch (java.rmi.ConnectException e)
 
+        //catch (java.rmi.ConnectException e)
         if (o instanceof RemoteBody) {
             try {
                 return new RemoteBodyAdapter((RemoteBody) o);
@@ -343,40 +343,40 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
         return proxiedRemoteBody.getEntities();
     }
 
-	//====================
+    //====================
     // Implements Handlerizable
-	//====================
-	
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return proxiedRemoteBody.getHandlerizableInfo();
-	}
+    //====================
+
+    /**
+     * Get information about the handlerizable object
+     * @return information about the handlerizable object
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+        return proxiedRemoteBody.getHandlerizableInfo();
+    }
 
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
     public HashMap getHandlersLevel() throws java.io.IOException {
-            HashMap map = proxiedRemoteBody.getHandlersLevel();
-            return map;
+        HashMap map = proxiedRemoteBody.getHandlersLevel();
+        return map;
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-		proxiedRemoteBody.clearHandlersLevel();
-	}
-	
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+        proxiedRemoteBody.clearHandlersLevel();
+    }
+
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
     public void setExceptionHandler(Handler handler, Class exception)
         throws java.io.IOException {
-            proxiedRemoteBody.setExceptionHandler(handler, exception);
+        proxiedRemoteBody.setExceptionHandler(handler, exception);
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -385,8 +385,8 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     public Handler unsetExceptionHandler(Class exception)
         throws java.io.IOException {
-            Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
-            return handler;
+        Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
+        return handler;
     }
 
     //

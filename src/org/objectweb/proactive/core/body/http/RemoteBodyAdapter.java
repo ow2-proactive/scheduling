@@ -65,17 +65,17 @@ import java.util.Hashtable;
 
 
 public class RemoteBodyAdapter implements UniversalBody, Serializable {
+
     /**
-    * an Hashtable containing all the http  adapters registered. They can be retrieved
-    * thanks to the ProActive.lookupActive method
-    */
+     * an Hashtable containing all the http  adapters registered. They can be retrieved
+     * thanks to the ProActive.lookupActive method
+     */
     protected static transient Hashtable urnBodys = new Hashtable();
-    
     private static Logger logger = Logger.getLogger("XML_HTTP");
 
     /**
-    * Cache the jobID locally for speed
-    */
+     * Cache the jobID locally for speed
+     */
     protected String jobID;
     private transient UniversalBody remoteBodyStrategy;
 
@@ -105,7 +105,6 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         this.bodyID = body.getID();
         this.url = ClassServer.getUrl();
         this.port = ClassServer.getServerSocketPort();
-        
         remoteBodyStrategy = body;
         jobID = remoteBodyStrategy.getJobID();
     }
@@ -122,14 +121,14 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      */
     public static void register(RemoteBodyAdapter paBody, String urn)
         throws java.io.IOException {
-	
-	
-	int port = UrlBuilder.getPortFromUrl(urn);
-	if (port != ClassServer.getServerSocketPort())
-	    throw new IOException ("Bad registering port. You have to register on the same port as the runtime");
+        int port = UrlBuilder.getPortFromUrl(urn);
+        if (port != ClassServer.getServerSocketPort()) {
+            throw new IOException(
+                "Bad registering port. You have to register on the same port as the runtime");
+        }
 
-	urn = urn.substring(urn.lastIndexOf('/') + 1);
-	
+        urn = urn.substring(urn.lastIndexOf('/') + 1);
+
         urnBodys.put(urn, paBody);
 
         if (logger.isInfoEnabled()) {
@@ -154,7 +153,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     public static UniversalBody lookup(String urn) throws java.io.IOException {
         try {
             String url;
-            int port = Integer.parseInt(System.getProperty("proactive.http.port"));
+            int port = Integer.parseInt(System.getProperty(
+                        "proactive.http.port"));
             url = urn;
 
             if (urn.lastIndexOf(":") > 4) {
@@ -166,17 +166,17 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
             urn = urn.substring(urn.lastIndexOf('/') + 1);
 
-            
             HttpLookupMessage message = new HttpLookupMessage(urn);
             message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
                     port, message, ProActiveXMLUtils.MESSAGE);
 
-            UniversalBody result = (UniversalBody) message.processMessage();  
-            if (result == null)
-            	throw new java.io.IOException("The url " + url +
-       	 	 		" is not bound to any known object");
-            else
-            	return result;
+            UniversalBody result = (UniversalBody) message.processMessage();
+            if (result == null) {
+                throw new java.io.IOException("The url " + url +
+                    " is not bound to any known object");
+            } else {
+                return result;
+            }
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -191,9 +191,8 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         }
         RemoteBodyAdapter rba = (RemoteBodyAdapter) o;
         return remoteBodyStrategy.equals(rba.remoteBodyStrategy);
-       //return (url.equals(rba.getURL()) && bodyID.equals(rba.getBodyID())) &&
-		//(port == rba.getPort());       
-       
+        //return (url.equals(rba.getURL()) && bodyID.equals(rba.getBodyID())) &&
+        //(port == rba.getPort());       
     }
 
     public void receiveRequest(Request request)
@@ -336,13 +335,12 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     /*
-        public void setExceptionHandler(Class handler, Class exception)
-            throws IOException {
-
-                logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
-                //        remoteBodyStrategy.setExceptionHandler(handler, exception);
-        }
-    */
+       public void setExceptionHandler(Class handler, Class exception)
+           throws IOException {
+               logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
+               //        remoteBodyStrategy.setExceptionHandler(handler, exception);
+       }
+     */
     public Handler unsetExceptionHandler(Class exception)
         throws IOException {
         return remoteBodyStrategy.unsetExceptionHandler(exception);
@@ -372,22 +370,18 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     }
 
     public UniqueID getBodyID() {
-    	return this.bodyID;
+        return this.bodyID;
     }
-      
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.remoteBodyStrategy = new HttpRemoteBodyImpl(this.bodyID, this.url);
+        this.remoteBodyStrategy = new HttpRemoteBodyImpl(this.bodyID, this.url,
+                this.jobID);
     }
-     
-    
+
     public int hashCode() {
         //return bodyID.hashCode();//jobID
         return remoteBodyStrategy.hashCode();
-        
     }
-    
-    
 }
