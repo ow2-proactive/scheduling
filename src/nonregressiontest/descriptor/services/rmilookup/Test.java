@@ -40,7 +40,6 @@ import testsuite.test.FunctionalTest;
 
 /**
  * @author ProActiveTeam
- * @version 1.0 6 ao�t 2004
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {

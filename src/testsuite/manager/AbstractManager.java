@@ -462,11 +462,11 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
         if (properties != null) {
             this.properties = properties;
             Class[] parameterTypes = { String.class };
-            Enumeration enum = properties.propertyNames();
+            Enumeration enumerator = properties.propertyNames();
             Method setter = null;
 
-            while (enum.hasMoreElements()) {
-                String name = (String) enum.nextElement();
+            while (enumerator.hasMoreElements()) {
+                String name = (String) enumerator.nextElement();
                 String value = properties.getProperty(name);
                 try {
                     setter = getClass().getMethod("set" + name, parameterTypes);
