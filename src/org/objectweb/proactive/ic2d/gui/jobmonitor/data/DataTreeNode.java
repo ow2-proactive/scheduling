@@ -8,7 +8,10 @@ import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
-
+/*
+ * A DataTreeNode is an element in a displayed tree.
+ * It is associated with a BasicMonitoredObject.
+ */
 public class DataTreeNode extends DefaultMutableTreeNode
     implements JobMonitorConstants {
     private static final int STATE_NEW = 0;
@@ -17,11 +20,13 @@ public class DataTreeNode extends DefaultMutableTreeNode
     private int state = STATE_NEW;
     private BasicMonitoredObject object;
 
+    /* Root element */
     public DataTreeNode(DataModelTraversal traversal) {
         int key = traversal.getFollowingKey(NO_KEY);
         object = BasicMonitoredObject.createRoot(key);
     }
 
+    /* Normal element */
     public DataTreeNode(DataTreeModel model, BasicMonitoredObject value,
         Set constraints) {
         rebuild(model, value, constraints);
@@ -35,6 +40,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
     }
 
+    /* Find a child equal to the param */
     public DataTreeNode getChild(BasicMonitoredObject value) {
         int length = getChildCount();
 
@@ -44,6 +50,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
 
         DataTreeNode firstChild = (DataTreeNode) getChildAt(0);
         if (firstChild.getKey() != value.getKey()) {
+        	/* On a level, every child is of the same key */
             return null;
         }
 
@@ -56,6 +63,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
         return null;
     }
 
+    /* Did we remove all children and read none ? */
     private boolean isEverythingRemoved() {
         for (int i = 0, length = getChildCount(); i < length; i++) {
             DataTreeNode child = (DataTreeNode) getChildAt(i);

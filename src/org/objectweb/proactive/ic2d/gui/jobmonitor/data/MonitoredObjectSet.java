@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 
-public class MonitoredObjectSet {
+public class MonitoredObjectSet implements Cloneable {
     private TreeMap map;
     private BasicMonitoredObject parent;
 
@@ -62,5 +62,20 @@ public class MonitoredObjectSet {
 
     public BasicMonitoredObject getParent() {
         return parent;
+    }
+    
+    public BasicMonitoredObject firstElement() {
+    	Iterator iter = iterator();
+    	BasicMonitoredObject first = null;
+    	if (iter.hasNext())
+    		first = (BasicMonitoredObject) iter.next();
+    	
+    	return first;
+    }
+    
+    public Object clone() {
+    	MonitoredObjectSet copy = new MonitoredObjectSet(parent);
+    	copy.addAll(this);
+    	return copy;
     }
 }

@@ -314,7 +314,11 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     public void exploreKnownJVM() {
-        Iterator iter = asso.getJVM().iterator();
+    	/*
+    	 * We clone the set to avoid ConcurrentModificationException because we modify
+    	 * it when traversing the network.
+    	 */
+        Iterator iter = ((MonitoredObjectSet) asso.getJVM().clone()).iterator();
         while (iter.hasNext()) {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
             ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());

@@ -4,7 +4,14 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
 
 import javax.swing.tree.DefaultTreeModel;
 
-
+/*
+ * The TreeModel is built on top of the DataAssociation and feeded with a JTree
+ * to java which will display it.
+ * The 4 instances of the model (4 views) are always the same, they are just rebuilt
+ * when the underlying data changes.
+ * The model contains a DataTreeNode which is the root and itself contains DataTreeNode which
+ * are its children ...
+ */
 public class DataTreeModel extends DefaultTreeModel
     implements JobMonitorConstants {
     private DataAssociation asso;

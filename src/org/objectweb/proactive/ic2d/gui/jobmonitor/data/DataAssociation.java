@@ -10,43 +10,43 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-
+/*
+ * The key used in the TreeMap association
+ */
 class AssoKey implements Comparable {
-    private int lkey;
     private int rkey;
-    private String name;
+    private BasicMonitoredObject from;
 
     public AssoKey(BasicMonitoredObject from, int rkey) {
-        this.lkey = from.getKey();
         this.rkey = rkey;
-        this.name = from.getFullName();
+        this.from = from;
     }
 
     public int compareTo(Object o) {
         AssoKey a = (AssoKey) o;
+        int lkey = from.getKey();
+        int alkey = a.from.getKey();
 
-        if (lkey != a.lkey) {
-            return lkey - a.lkey;
+        if (lkey != alkey) {
+            return lkey - alkey;
         }
 
         if (rkey != a.rkey) {
             return rkey - a.rkey;
         }
 
-        return name.compareTo(a.name);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String toString() {
-        return name + "(" + lkey + "->" + rkey + ")";
+        return from.getFullName().compareTo(a.from.getFullName());
     }
 }
 
 
 /*
+ * This is the main data structure. Here we keep track of the relationship between
+ * all the elements we have. We have lots of associations summed up in the following diagram.
+ * The arrow means one to many. For example, a host can contain many jvms but a jvm is in
+ * only one host. 
+ * 
+ * 
  *           Job Job-*->VN     Job
  *            |         |       |
  *            *         *       *
@@ -59,11 +59,18 @@ class AssoKey implements Comparable {
  *                      |
  *                     Job
  *
+ * We traverse this data structure to find the associated elements of any other elements.
+ * For example, to find out in which VN a JVM is, we find its nodes, and for each node
+ * its VN.
+ * All these informations are stored in a map : (BasicMonitoredObject, key) -> MonitoredObjectSet
+ * For a given object, and a given key. The latter being a successor on the diagram, it is
+ * associated with its children. We also associate the child with its parent, thus the graph
+ * can be traversed in both directions.
  */
 public class DataAssociation implements JobMonitorConstants {
     private Map asso;
-    private MonitoredObjectSet[] sets;
-    private static final int[][] CHILDREN_KEYS = new int[NB_KEYS][];
+    private MonitoredObjectSet[] sets; /* We also keep track of every element of each key */
+    private static final int[][] CHILDREN_KEYS = new int[NB_KEYS][]; /* The graph */
     private static final MonitoredObjectSet EMPTY_MONITORED_SET = new MonitoredObjectSet();
 
     public DataAssociation() {
@@ -104,6 +111,10 @@ public class DataAssociation implements JobMonitorConstants {
         return sets[index];
     }
 
+    /* 
+     * We add the object to our collection, but if we already had it, we return
+     * the previous version which should replace the just created new version.
+     */
     private BasicMonitoredObject addToSet(BasicMonitoredObject value) {
         int key = value.getKey();
         MonitoredObjectSet set = getSetForKey(key);
@@ -116,42 +127,66 @@ public class DataAssociation implements JobMonitorConstants {
         return orig;
     }
 
-    private void delAsso(BasicMonitoredObject from, BasicMonitoredObject to) {
-    	AssoKey key = new AssoKey(from, to.getKey());
-    	asso.remove(key);
+    /*
+     * Remove all children of a given key.
+     */
+    private void delAsso(BasicMonitoredObject from, int key) {
+    	AssoKey assoKey = new AssoKey(from, key);
+    	asso.remove(assoKey);
     }
     
+    /*
+     * Add a child to an association. The from.getKey() -*-> to.getKey() or its
+     * opposite should exist in the graph.
+     */
     private void addAsso(BasicMonitoredObject from, BasicMonitoredObject to) {
-        AssoKey key = new AssoKey(from, to.getKey());
-        Object res = asso.get(key);
-        if (res == null) {
-            res = new MonitoredObjectSet(from);
-            asso.put(key, res);
-        }
-
-        MonitoredObjectSet l = (MonitoredObjectSet) res;
+        MonitoredObjectSet l = getWritableAsso(from, to.getKey());
         l.add(to);
     }
 
+    /*
+     * Called when exploring the network. We add the association in both directions.
+     */
     public void addChild(BasicMonitoredObject from, BasicMonitoredObject to) {
         from = addToSet(from);
         to = addToSet(to);
 
+        /*
+         * Remove the element in its previous parent
+         */
+        BasicMonitoredObject previousParent = getWritableAsso(to, from.getKey()).firstElement();
+        if (previousParent != null) {
+        	getWritableAsso(previousParent, to.getKey()).remove(to);
+        }
+        
+        /*
+         * First new child of 'from', remove the previous ones.
+         */
         if (from.isDeleted())
-        	delAsso(from, to);
+        	delAsso(from, to.getKey());
         
         from.setDeleted(false);
         to.setDeleted(false);
 
-        addAsso(from, to);        
-        delAsso(to, from);
+        addAsso(from, to);
+        
+        /*
+         * We now know the only one true parent of 'to'.
+         */
+        delAsso(to, from.getKey());
         addAsso(to, from);
     }
 
+    /*
+     * In the beginning the graph was a tree, now it is no more.
+     */
     private static boolean isSpecialKey(int key) {
         return (key == VN) || (key == JOB);
     }
 
+    /*
+     * Get the children, we can write the to set, the modifications will be saved.
+     */
     private MonitoredObjectSet getWritableAsso(BasicMonitoredObject from, int to) {
         AssoKey key = new AssoKey(from, to);
         Object res = asso.get(key);
@@ -163,11 +198,20 @@ public class DataAssociation implements JobMonitorConstants {
         return (MonitoredObjectSet) res;
     }
 
+    /*
+     * As the graph is not a tree when traversing we may encounter elements
+     * which are not descendants of the previously traversed elements, so we
+     * filter them out.
+     */
     private boolean isValid(BasicMonitoredObject value, Set constraints) {
         Iterator iter = constraints.iterator();
+        int key = value.getKey();
+        
         while (iter.hasNext()) {
             BasicMonitoredObject testValue = (BasicMonitoredObject) iter.next();
-            if (testValue.getKey() == JOB && value.getKey() == AO)
+
+            if (key == AO && testValue.getKey() == JOB)
+            	/* Migration */
             	continue;
 
             MonitoredObjectSet test = getValues(value, testValue.getKey(), null);
@@ -179,6 +223,10 @@ public class DataAssociation implements JobMonitorConstants {
         return true;
     }
 
+    /*
+     * We check every element against the constraints, see the above comment for the
+     * rationale.
+     */
     private MonitoredObjectSet filter(MonitoredObjectSet set, Set constraints) {
         if ((constraints == null) || constraints.isEmpty() || set.isEmpty()) {
             return set;
@@ -194,12 +242,6 @@ public class DataAssociation implements JobMonitorConstants {
         }
 
         return res;
-    }
-
-    private MonitoredObjectSet getAsso(BasicMonitoredObject from, int to,
-        Set constraints) {
-        MonitoredObjectSet res = getWritableAsso(from, to);
-        return filter(res, constraints);
     }
 
     private static boolean isPermutation(int a, int b, int aa, int bb) {
@@ -218,6 +260,10 @@ public class DataAssociation implements JobMonitorConstants {
         return (a == aa) && (b == bb);
     }
 
+    /*
+     * When we are not simply traversing the tree, we end up there.
+     * Lots of special cases ;-)
+     */
     private MonitoredObjectSet handleSpecialPath(BasicMonitoredObject from,
         int to, Set constraints) {
         int key = from.getKey();
@@ -235,9 +281,12 @@ public class DataAssociation implements JobMonitorConstants {
             return getValues(from, to, constraints, NODE);
         }
 
-        return getAsso(from, to, constraints);
+        return getWritableAsso(from, to);
     }
 
+    /*
+     * Advance one step in a getValues() call
+     */
     private MonitoredObjectSet getValues(BasicMonitoredObject from, int to,
         Set constraints, int step) {
         MonitoredObjectSet stepSet = getValues(from, step, constraints);
@@ -256,10 +305,16 @@ public class DataAssociation implements JobMonitorConstants {
         return res;
     }
     
+    /*
+     * Listing for the IC2D with big boxes
+     */
     public MonitoredObjectSet getHosts() {
         return list(HOST, null);
     }
     
+    /*
+     * Main entry point to extract data.
+     */
     public MonitoredObjectSet getValues(BasicMonitoredObject from, int to,
         Set constraints) {
         int key = from.getKey();
@@ -275,16 +330,16 @@ public class DataAssociation implements JobMonitorConstants {
         }
 
         if (isSpecialKey(key) || isSpecialKey(to)) {
-            return handleSpecialPath(from, to, constraints);
+            return filter(handleSpecialPath(from, to, null), constraints);
         }
 
         if ((to == (key + 1)) || (to == (key - 1))) {
-            return getAsso(from, to, constraints);
+            return filter(getWritableAsso(from, to), constraints);
         }
 
         int inc = (to > key) ? 1 : (-1);
         int step = to - inc;
-        return getValues(from, to, constraints, step);
+        return filter(getValues(from, to, null, step), constraints);
     }
 
     private MonitoredObjectSet list(int key, Set constraints) {
@@ -297,6 +352,10 @@ public class DataAssociation implements JobMonitorConstants {
         return list(JVM, null);
     }
 
+    /*
+     * Before exploring the network, we clear everything, to have Mark-and-sweep
+     * in some sort.
+     */
     public void clear() {
         for (int j = 0; j < sets.length; j++)
             if (sets[j] != null) {
@@ -311,6 +370,9 @@ public class DataAssociation implements JobMonitorConstants {
         public void doSomething(BasicMonitoredObject child);
     }
 
+    /*
+     * Recursively traverse an element and its children
+     */
     private void traverse(BasicMonitoredObject object, Traversal t) {
         int key = object.getKey();
 
@@ -344,6 +406,11 @@ public class DataAssociation implements JobMonitorConstants {
         traverse(object, t);
     }
 
+    /*
+     * Really remove the element and its children from our knowledge.
+     * To avoid ConcurrentModificationException, we first get all the elements
+     * we will remove.
+     */
     public void removeItem(BasicMonitoredObject object) {
         final List assoKeysToRemove = new ArrayList();
         final List childrenToRemove = new ArrayList();
@@ -358,14 +425,17 @@ public class DataAssociation implements JobMonitorConstants {
                 }
             };
 
+        /* Fill in assoKeysToRemove and childrenToRemove */
         traverse(object, t);
 
+        /* Remove the associations */
         Iterator iter = assoKeysToRemove.iterator();
         while (iter.hasNext()) {
             AssoKey assoKey = (AssoKey) iter.next();
             asso.remove(assoKey);
         }
 
+        /* Remove the children in their parents, keep track of emptied parents */
         iter = childrenToRemove.iterator();
         Set clearedSets = new HashSet();
         while (iter.hasNext()) {
@@ -390,10 +460,15 @@ nextCleared:
                     continue nextCleared;
                 }
             }
+            /* If the parent has no more children, remove it */
             removeItem(parent);
         }
     }
 
+    /*
+     * Elements marked as deleted are really deleted.
+     * Again we use a copy to avoid ConcurrentModificationException.
+     */
     public void clearDeleted() {
         List toDelete = new ArrayList();
 
@@ -413,6 +488,7 @@ nextCleared:
         }
     }
 
+    /* Sweep phase of the Mark-and-sweep */
     public void updateReallyDeleted() {
         for (int i = 0; i < sets.length; i++) {
             Iterator iter = sets[i].iterator();
