@@ -143,7 +143,7 @@ with the default value. </li>
  
 
  <li class="textNormal"><b>Fault-tolerance 
-properties<a name="p2p_properties"></a></b><br>
+properties</b><br>
     <br>
 Note that those properties should not be altered if the programmer uses
 deployment descriptor files. See <A HREF="faultTolerance.html">here</A> for
@@ -227,8 +227,12 @@ acquisition. The default value is 3 minutes.<br>
       <li class="textNormal"><b>proactive.p2p.lookup_freq</b>
 also uses with descriptor file. It is the lookup frequency in
 milliseconds for re-asking nodes. By default, it's value is 30 seconds.<br>
-        <br>
       </li>
+      <li class="textNormal"><b>proactive.p2p.multi_proc_nodes</b> if
+    true deploying one shared nodes by CPU that means the p2p service
+    which is running on a bi-pro will share 2 nodes, else only one
+    node is shared independently of the number of CPU. By default,
+    it's value is true, i.e. 1 shared node for 1 CPU.</li><br>
     </ul>
   </li>
   <li class="textNormal"><b>Other
