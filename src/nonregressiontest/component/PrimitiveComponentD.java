@@ -11,10 +11,8 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
-import org.objectweb.proactive.core.component.Fractal;
-import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 
 
 /**
@@ -28,28 +26,13 @@ public class PrimitiveComponentD implements I1, BindingController {
     public final static String I2_ITF_NAME = "i2";
 
     // typed collective interface
-    I2 i2;
+    I2 i2 = (I2) Fractive.createCollectiveClientInterface(I2_ITF_NAME,
+            I2.class.getName());
 
     /**
      *
      */
     public PrimitiveComponentD() {
-    }
-
-    public PrimitiveComponentD(String name) {
-        // a dummy constructor with parameters (walkaround proactive's 
-        //requirement of an *empty* no-args constructor
-        try {
-            i2 = (I2) Fractal.createCollectiveClientInterface(I2_ITF_NAME,
-                    I2.class.getName());
-            //i2Group = (I2) ProActiveGroup.newGroup(I2.class.getName());
-        } catch (ClassNotReifiableException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (InterfaceGenerationFailedException e) {
-            e.printStackTrace();
-        }
     }
 
     /* (non-Javadoc)
@@ -58,10 +41,8 @@ public class PrimitiveComponentD implements I1, BindingController {
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
             ProActiveGroup.getGroup(i2).add(serverItf);
-            //logger.debug("MotorImpl : added binding on a wheel");
         } else {
-            logger.error(
-                "no such binding is possible : client interface name does not match");
+            logger.error("Binding impossible : wrong client interface name");
         }
     }
 
