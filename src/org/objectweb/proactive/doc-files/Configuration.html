@@ -1,0 +1,107 @@
+<!-- saved from url=(0022)http://internet.e-mail -->
+<html>
+<head>
+<title>ProActive Basic Configuration</title>
+<link rel="stylesheet" href="ProActive.css">
+</head>
+<body bgcolor="white">
+
+<!--
+ Header : start 
+~~~ -->
+<table width="100%">
+<tr>
+<td align="left" valign="middle">
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Migration.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Descriptor.html">next</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
+</td>
+<td  align="right" valign="top">
+<img src="ProActiveLogo200x34.gif"/>
+</td>
+</tr>
+</table>
+<hr>
+<!-- Link to index : end -->
+
+<h1>ProActive Basic Configuration</h1>
+
+
+<h2>Overview</h2>
+<p class="textNormal">
+ In order to get easier and more flexible configuration in ProActive, we introduced an xml file where all ProActive related configuration is located. It represents properties that will be added to the System when an application using ProActive is launched. Some well-known properties(explained after) will determine the behaviour of ProActive services inside a global application. That file can also contain <b>user-defined</b> properties to be used in their application.
+</p><br>
+<h2>How does it work ?</h2>
+<p class="textNormal">
+ Using this file is very straightforward, since all lines must follow the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt;<br></br>
+ Those properties will be set in the System using System.setProperty(key,value) <b>if and only if</b> this property is not already set in the System.<br>
+ If an application is using  ProActive, that file is loaded once when a method is called through  a ProActive "entry point". By "entry point" we mean ProActive class, NodeFactory class, RuntimeFactory class (static block in all that classes).<br>
+For instance calling  <b>ProActive.newActive or NodeFactory.getNode </b> .... loads that file. This only occurs once inside a jvm. <br></br>
+As said before this file can contain <b>user-defined</b> properties. It means that people used to run their application with:<br>
+java .... -Dprop1=value1 -Dprop2=value2 .... -Dpropn=valuen can define all their properties in the ProActive configuration file with:<br></br>
+&lt;prop <b>key</b>="prop1" <b>value</b>="value1"/&gt;<br>
+&lt;prop <b>key</b>="prop2" <b>value</b>="value2"/&gt;<br>
+...<br>
+&lt;prop <b>key</b>="propn" <b>value</b>="valuen"/&gt;<br>
+</p>
+<h2>Where to access this file ?</h2>
+<p class="textNormal">
+There is a default file with default ProActive options located under ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml. This file is automatically copied with the same package structure under the classes directory when compiling source files with the ProActive/compile/build facility. Hence it is included in the jar file of the distribution under org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below for default options).<br></br>
+People can specify their own configuration file by running their application with proactive.configuration option, i.e <br>
+java ... <b>-Dproactive.configuration=pathToTheConfigFile</b>. In that case, the given xml file is loaded. Some ProActive properties(defined below) are required for applications using ProActive to work, so even if not defined in user config file, they will be loaded programatically with default values. So people can just ignore the config file if they are happy with the default configuration or create their own file if they want to change ProActive properties values or add their own properties <br></br>
+A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a> to notify remote jvms which configuration file to load once created.
+</p>
+<h2>ProActive properties</h2>
+<p>
+<ul class="listWithSpace">
+	<li class="textNormal"><b>Required</b><br></br>
+		<ul class="listWithSpace">
+			<li class="textNormal"><b>proactive.protocol</b> represents the registration and lookup protocol.  At this stage two values are possible: <b>rmi, jini</b>. It means that once the JVM starts, nodes that will be created on this JVM, will register themselves in the RMIRegistry if the <b>proactive.protocol</b> property is <b>rmi</b>, in the JINI Lookup Service if it is <b>jini</b>. It replaces former acquisition method defined in Deployment Descriptor. Default value is <b>rmi</b></li>
+			<li class="textNormal"><b>schema.validation</b>. Two values are possible:<b>enable, disable</b>. If enable, all xml files will be validated against provided schema. Default is <b>disable</b></li>
+			<li class="textNormal"><b>proactive.future.ac</b>. Two values are possible:<b>enable, disable</b> If enable, <a href="AC.html">automatic continuations</a> are activated. Default is <b>enable</b></li>
+		</ul><br></br>
+		Note that if not specified those properties are set programmatically with the default value.
+	</li><br></br>
+	<li class="textNormal"><b>Other properties</b><br></br>
+		<ul class="listWithSpace">
+			<li class="textNormal"><b>proactive.rmi.port</b> represents the port number on which to start the RMIRegistry. Default is 1099</li>
+			<li class="textNormal"><b>proactive.locationserver</b> represents the location server class to instantiate when using Active Objects with Location Server</li>
+			<li class="textNormal"><b>proactive.locationserver.rmi</b> represents the url under which the Location Server is registered in the RMIRegistry</li>
+			<li class="textNormal"><b>fractal.provider</b> This property defines the bootstrap component for the Fractal component model</li>
+		</ul><br></br>
+		Note that as mentionned above, user-defined properties can be added.
+	</li>
+</ul>
+</p>
+
+<h2>Example</h2>
+<p class="textNormal">
+Configuration file must have following structure:
+<blockquote><pre>
+&lt;masterFile&gt;
+	&lt;properties&gt;
+		&lt;prop <b>key</b>="schema.validation"<b>value</b>="enable"/&gt;
+		&lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="disable"/&gt;
+		&lt;prop <b>key</b>="proactive.protocol" <b>value</b>="rmi"/&gt;
+		&lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
+		&lt;prop <b>key</b>="proactive.locationserver" <b>value</b>="org.objectweb.proactive.ext.locationserver.LocationServer"/&gt;
+		&lt;prop <b>key</b>="proactive.locationserver.rmi" <b>value</b>="//localhost/LocationServer"/&gt;
+	&lt;/properties&gt;
+&lt;/masterFile&gt;
+</pre></blockquote>
+</p>
+<p class="textNormal">
+Note that <b>masterFile</b>, <b>properties</b> tag and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
+</p>
+<!--
+ Footer : start 
+~~~ -->
+<br><hr><div align="right" class="textSmall">Copyright &#169; October 2003 INRIA All Rights Reserved.</p>
+<!-- Footer : end -->
+</body>
+</html>

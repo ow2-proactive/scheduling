@@ -16,7 +16,7 @@
     <tr>
     <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
     <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Migration.html">prev</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Configuration.html">prev</a>&nbsp;&nbsp;</td>
     <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="TypedGroupCommunication.html">next</a>&nbsp;&nbsp;</td>
     </tr>
     </table>
@@ -104,7 +104,6 @@ Parameters tied to the deployment of an application should be totally described 
 	   	&lt;/mapping&gt;
 	      	&lt;jvms&gt;
 		   	&lt;jvm name="<b>Jvm1</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
@@ -121,7 +120,7 @@ Parameters tied to the deployment of an application should be totally described 
 &lt;/ProActiveDescriptor&gt;
 		</pre></blockquote>
 		This example shows a VirtualNode called <b>Dispatcher</b>, that is mapped to a jvm called <b>Jvm1</b><br>
-		This <b>Jvm1</b>will be created using the process called <b>jvmProcess </b>which is defined in the infrastructure part(This part will be discussed later, just notice that there are two parts in the descriptor, an abstract one containing VirtualNode definition and deployment informations and a more concrete one containing concrete infrastructure informations, that is where all processes are defined) and will be acquired using <b>rmi </b>protocol(Lookup in a RMIRegistry).<br></br>
+		This <b>Jvm1</b>will be created using the process called <b>jvmProcess </b>which is defined in the infrastructure part(This part will be discussed later, just notice that there are two parts in the descriptor, an abstract one containing VirtualNode definition and deployment informations and a more concrete one containing concrete infrastructure informations, that is where all processes are defined). <br></br>
 	</ul>
 <li class="textNormal"><b>Typical example of a program code:	</b>
 <blockquote><pre>
@@ -189,13 +188,13 @@ Set of methods are provided in org.objectweb.proactive.descriptor.ProActiveDescr
 			&lt;/map&gt;
 		&lt;/mapping&gt;
 		</pre></blockquote>
-Note that the <b>property </b> attribute is set to <b>multiple</b> if you want to map 1 VN to multiple JVMs, and then a set of JVMs is defined for the VirtualNode <b>Renderer</b>. Four values are possible for the <b>property</b> attribute: <b>unique </b> which means one to one mapping, <b>unique_singleAO</b>: one to one mapping and only one AO deployed on the corresponding node, <b>multiple</b>: one to N mapping, <b>multiple_cyclic</b>: one to N mapping in a cyclic manner. This property is not mandatory but an exception can be thrown in case of incompatibility. For instance property set to unique, and more than one jvm defined in the jvmSet tag. In case of property set to <b>unique_singleAO</b> method <b>getUniqueAO()</b> in class org.objectweb.proactive.core.descriptor.data.VirtualNode called on such VirtualNode returns the unique AO created<br>Another attribute <b>timeout</b> can be set when defining a virtualNode
+Note that the <b>property </b> attribute is set to <b>multiple</b> if you want to map 1 VN to multiple JVMs, and then a set of JVMs is defined for the VirtualNode <b>Renderer</b>. Four values are possible for the <b>property</b> attribute: <b>unique </b> which means one to one mapping, <b>unique_singleAO</b>: one to one mapping and only one AO deployed on the corresponding node, <b>multiple</b>: one to N mapping, <b>multiple_cyclic</b>: one to N mapping in a cyclic manner. This property is not mandatory but an exception can be thrown in case of incompatibility. For instance property set to unique, and more than one jvm defined in the jvmSet tag. In case of property set to <b>unique_singleAO</b> method <b>getUniqueAO()</b> in class org.objectweb.proactive.core.descriptor.data.VirtualNode called on such VirtualNode returns the unique AO created<br>Two other attributes <b>timeout, waitForTimeout</b> can be set when defining a virtualNode
 <blockquote><pre>
 	&lt;virtualNodesDefinition&gt;
-		&lt;virtualNode name="<b>Renderer</b>" timeout="<b>200</b>"/&gt;
+		&lt;virtualNode name="<b>Renderer</b>" timeout="<b>200</b>" waitForTimeout="<b>true</b>"/&gt;
 	&lt;virtualNodesDefinition/&gt;
 </pre></blockquote>
-This attribute represents the maximum amount of time(in seconds) to wait before accessing Nodes mapped on the VirtualNode. Keep in mind that if the timeout is too short, not all nodes will have time to be created, and if it is to high, even if all nodes have been created, you will have to wait untile the timeout expires. In fact this attribute shoul be mainly used when, there is no idea about how many nodes will be mapped on the VirtualNode(which is often unsusal). This attribute is optional
+The <b>timeout</b> attribute represents an amount of time(in seconds) to wait before accessing Nodes mapped on the VirtualNode. The <b>waitForTimeout</b> attribute is a boolean. If set to <b>true</b>, you will have to wait exaclty timeout seconds before accessing Nodes. If set to <b>false</b>, timeout represents the maximum amount of time to wait, it means that if all nodes are created before the timeout expires, you get access to the Nodes. Defaut value for <b>waitForTimeout</b> attribute is <b>false</b>. The first option is very usefull when there is no idea about how many nodes will be mapped on the VirtualNode(which is often unsusal). Those attributes are optional
 <br></br>
 		<li class="textNormal">Mapping n to one: N VN --> 1 JVMs 
 		<blockquote><pre>
@@ -281,19 +280,17 @@ Registration and lookup can be performed automatically when using tags in the de
 		<blockquote><pre>
 	...........................
 		   &lt;jvm name="<b>jvm1</b>"&gt;
-			&lt;acquisition method="<b>rmi</b>"/&gt;
 			&lt;creation&gt;
 				&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 			&lt;/creation&gt;
 		   &lt;/jvm&gt;
 	.................................
 		</pre></blockquote>
-In this example, <b>jvm1 </b>will be created using the process called <b>jvmProcess </b>(discussed later, this process represents a java process and can be seen as java ProActiveClassname command) and will be acquired using <b>rmi </b>protocol(Lookup in a RMIRgistry).<br></br>
+In this example, <b>jvm1 </b>will be created using the process called <b>jvmProcess </b>(discussed later, this process represents a java process and can be seen as java ProActiveClassname command) <br></br>
 		<li class="textNormal">1 JVM --> N Nodes
 		<blockquote><pre>
 	.........................
 		&lt;jvm name="<b>Jvm1</b>" nodeNumber="<b>3</b>"&gt;
-			&lt;acquisition method="<b>rmi</b>"/&gt;
 			&lt;creation&gt;
 				&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 			&lt;/creation&gt;
@@ -301,27 +298,7 @@ In this example, <b>jvm1 </b>will be created using the process called <b>jvmProc
 	..........................
 		</pre></blockquote>
 Note that the <b>nodeNumber</b> attribute that is set to the number of Nodes associated to the <b>Jvm1</b><br></br>
-		<li class="textNormal">Different acquisition protocols: <b>RMI</b> or <b>JINI</b>
-		<blockquote><pre>
-	...........................										
-		 &lt;jvm name="<b>Jvm1</b>"&gt;						
-			&lt;acquisition method="<b>rmi</b>"/&gt;						
-			&lt;creation&gt;												
-				&lt;processReference refid="<b>jvmProcess</b>"/&gt;						
-			&lt;/creation&gt;												
-		 &lt;/jvm&gt;													
-	.................................										
-	.................................
-		&lt;jvm name="<b>Jvm1</b>"&gt;
-			&lt;acquisition method="<b>jini</b>"/&gt;
-			&lt;creation&gt;
-				&lt;processReference refid="<b>jvmProcess</b>"/&gt;	
-			&lt;/creation&gt;
-		&lt;/jvm&gt;
-	................................
-		</blockquote></pre>
-Looking at both examples, the only difference is the acquisition method for <b>Jvm1</b>, on the first it is <b>rmi</b> on the second <b>jini</b>. It means that once the JVM will start, nodes that will be created on this JVM, by activating the VirtualNode mapped with this JVM, will register themselves in the RMIRegistry if the acquisition method is <b>RMI</b>, in the JINI Lookup Service if it is <b>JINI</b>. Then When trying to get the nodes from the VirtualNode, the <b>ProActive </b>application performs a lookup in the right place. All this part is hidden, that means that you only have to care about activating the VirtualNode and getting the associated nodes.<br></br>
-<b><font color="#FF0000">Note that if you want to use JINI, remind that you must copy a version of proactive.java.policy located in ProActive/scripts/unix or ProActive/scripts/windows in your home directory. Indeed ProActive takes care of running the rmid deamon, if it is not started, and creating JINI Lookup Service if it does not exist, but for the rmid deamon to start you need a policy file. In ProActive, the rmid deamon will look for proactive.java.policy in your home directory and it needs this file to be able to start otherwise you will get a  Security exception. Of course keep a version of the security file in ProActive/scripts/unix or ProActive/scripts/windows, every ProActive application need this file at this place.</font> </b>
+		<b><font color="#FF0000"><li class="textNormal">Former Acquisition Protocol section does no longer exist. Indeed the way to acquire nodes or jvms is no longer defined in deployment descriptor, but in the <a href="Configuration.html">configuration file</a> with the ProActive property: proactive.protocol.</font></b>
 	</ul>
 	</ul>
 <br></br>	
@@ -331,7 +308,7 @@ To avoid mistake when building XML descriptors, ProActive provides an XML Schema
 	&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
 "Location_of_DescriptorSchema.xsd"&gt;
 	</blockquote></pre>
-Note that this schema is available in the ProActive distribution package under ProActive\descriptor directory. Using descriptors related methods (Proactive.getProActiveDescriptor(file)) triggers automatic and transparent validation of the file using  <a href="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</a>. If a problem occurs during the validation, an error message is displayed otherwise if the validation is successful no message appear.
+Note that this schema is available in the ProActive distribution package under ProActive\descriptor directory. Using descriptors related methods (Proactive.getProActiveDescriptor(file)) triggers automatic and transparent validation of the file using  <a href="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</a> if the ProActive property <b>schema.validation</b> is set to <b>enable</b>(see <a href="Configuration.html">configuration file</a> for more details). If a problem occurs during the validation, an error message is displayed otherwise if the validation is successful no message appear.
 An XML validation tool such as XMLSPY5.0(windows) can also be used to validate XML descriptors.
 <h2>Complete description and examples</h2>
 Following XML files examples are used for the C3D application. The first file is read when launching the C3DDispatcher. The second one is read every time a C3DUser is added. Both files contain many features described earlier in this document.
@@ -365,25 +342,21 @@ Following XML files examples are used for the C3D application. The first file is
 		&lt;/mapping&gt;
 	      	&lt;jvms&gt;
 			&lt;jvm name="<b>Jvm1</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
-			      	&lt;creation&gt;
+				&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm2</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm3</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm4</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
@@ -399,7 +372,7 @@ Following XML files examples are used for the C3D application. The first file is
 	&lt;/infrastructure&gt;
 &lt;/ProActiveDescriptor&gt;
 </pre></blockquote>
-This example represents xml deployment descriptor for the C3D application. The abstract part containing VirtualNodes definition and deployment informations has already been explained. To summarize, two VirtualNodes are defined <b>Dispatcher</b> and <b>Renderer</b>. <b>Dispatcher</b> is mapped to the jvm running the main(), whose acquisition method is performed by  looking up the RMIRegistry. This VirtualNode will be registred in the RMIRegistry when activated. <b>Renderer</b> is mapped to a set of JVMs called <b>Jvm1</b>, ..., <b>Jvm4</b>. Acquisition method for these JVMs will be performed using RMI. You can of course change this acquisition method to be performed with JINI as it was explained previously.<br></br>
+This example represents xml deployment descriptor for the C3D application. The abstract part containing VirtualNodes definition and deployment informations has already been explained. To summarize, two VirtualNodes are defined <b>Dispatcher</b> and <b>Renderer</b>. <b>Dispatcher</b> is mapped to the jvm running the main(), whose acquisition method is performed by  looking up the RMIRegistry. This VirtualNode will be registred in the RMIRegistry when activated. <b>Renderer</b> is mapped to a set of JVMs called <b>Jvm1</b>, ..., <b>Jvm4</b>. <br></br>
 <li class="textNormal"><b>Example2: C3D_User.xml</b>
 <blockquote><pre>
 &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
@@ -444,29 +417,38 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 			&lt;processDefinition id="<b>jvmProcess</b>"&gt;
 		   		&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;
 					&lt;classpath&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/classes"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/bcel.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/asm.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/jini-core.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/jini-ext.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/reggie.jar"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/classes"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/lib/asm.jar"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/lib/jini-core.jar"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/lib/jini-ext.jar"/&gt;
+						&lt;relativePath origin="user.home" value="/ProActive/lib/reggie.jar"/&gt;
 					&lt;/classpath&gt;
 					&lt;javaPath&gt;
-						&lt;absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/&gt;
+						&lt;absolutePath value="/usr/local/jdk1.4.0/bin/java"/&gt;
 					&lt;/javaPath&gt;
 					&lt;policyFile&gt;
-						&lt;absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/&gt;
+						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/&gt;
 					&lt;/policyFile&gt;
 					&lt;log4jpropertiesFile&gt;
-						&lt;relativePath type="relative" origin="userHome" value="ProActive/scripts/unix/proactive-log4j"/&gt;
+						&lt;relativePath origin="user.home" value="ProActive/scripts/unix/proactive-log4j"/&gt;
 					&lt;/log4jpropertiesFile&gt;
-					&lt;jvmParameters&gt;-Xms512 -Xmx512&lt;jvmParameters/&gt;
+					&lt;proActivePropertiesFile&gt;
+						&lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
+					&lt;/proActivePropertiesFile&gt;
+					&lt;jvmParameters>
+						&lt;parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/&gt;
+						&lt;parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386"/&gt;
+						&lt;parameter value=-Xms512 -Xmx512"/&gt;
+					&lt;/jvmParameters>
 				&lt;/jvmProcess&gt;
 			&lt;/processDefinition&gt;
 		&lt;/processes&gt;
 	&lt;/infrastructure&gt;
 		</pre></blockquote>
-		As shown in the example above, <b>ProActive </b>provides the ability to define or change the <b>classpath </b>environment variable, the <b>java path</b>, the <b>policy file path</b>, the <b>log4j properties file path</b> and also to pass <b>parameters</b> to the JVM to be created. If not specified, there is a default value (except for the jvmParameters element) for each of these variable. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa.<br></br>
+		As shown in the example above, <b>ProActive </b>provides the ability to define or change the <b>classpath </b>environment variable, the <b>java path</b>, the <b>policy file path</b>, the <b>log4j properties file path</b>, the <b>ProActive properties file path </b>(see <a href="Configuration.html">configuration file</a> for more details) and also to pass <b>parameters</b> to the JVM to be created. <b><font color="#FF0000">Note that parameters to be passed here are related to the jvm in opposition to properties given in the  <a href="Configuration.html">configuration file</a>(more focused on ProActive or application behaviour). In fact parameters given here will be part of the java command to create other jvms, whereas properties given in the config file will be loaded once the jvm is created.</font></b><br>
+ If not specified, there is a default value (except for the jvmParameters element) for each of these variable. In the first example of this section, just the <b>Id</b> of the process, and the <b>class </b>to instantiate are defined. You might want to define the <b>classpath</b> or <b>java path</b> or <b>policyfile path</b>, etc, when creating remote JVMs(discussed later) if the home directory is not the same on your machine and on the machine where you want to create the JVM or for instance if you want to interact with <b>Windows OS</b> if you work on Linux and vice versa.<br>
+As mentionned in the  <a href="Configuration.html">configuration file</a>, if the &lt;proActivePropertiesFile&gt; is not defined for remote jvms, they will load a default one once created.<br></br>
 		<li class="textNormal">Remote JVMs<br></br>
 		<ul type="circle" class="listWithSpace">
 			With XML Deployment Descriptor, <b>ProActive</b> provides the ability to create remote Nodes (remote JVMs). You can specify in the descriptor if you want to access the remote host with <b>rsh</b>, <b>rlogin</b>, <b>ssh</b>, <b>lsf</b>, <b>globus</b>. How to use these protocols is explained in the following examples. Just remind that you can combine these protocols, and you will notice that there is at least one combination for each remote protocol, indeed each remote protocol <b>must </b>have a pointer on a process that will create a local JVM(discussed previoulsy). The principe is fairly simple, you can imagine that once log on the remote host with the chosen protocol, you have to create a local JVM.<br></br>
@@ -475,7 +457,6 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 			<li class="textNormal">RSH<br></br>
 			<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>rshProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -499,7 +480,6 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 		<li class="textNormal">RLOGIN<br></br>
 		<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>rloginProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -523,7 +503,6 @@ In the previous example, all defined JVMs will be created using <b>jvmProcess</b
 		<li class="textNormal">SSH<br></br>
 		<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>sshProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -551,7 +530,6 @@ These steps must be performed <b>before </b>running any ProActive application us
  In this part we assume that you want to submit a job from a machine which is outside the cluster.  As described before, you can combine protocols. In this case , you will have to define a process to log on the front-end of the cluster(<b>rlogin</b> if your machine is on the same LAN than the cluster front-end, else <b>ssh</b> (Remember that to use <b>ssh</b> you will have to run some commands as explained above).
 		<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>sshProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -570,7 +548,7 @@ These steps must be performed <b>before </b>running any ProActive application us
 					&lt;hostlist&gt;cluster_machine1 cluster_machine2&lt;hostlist/&gt;
 					&lt;processor&gt;6&lt;/processor&gt;
 					&lt;scriptPath&gt;
-						&lt;absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
+						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
 					&lt;/scriptPath&gt;
 				&lt;/bsubOption&gt;
 			&lt;/bsubProcess&gt;
@@ -588,7 +566,6 @@ It is exactly the same with <b>rlogin</b> instead of <b>ssh.</b><br></br>
 If you want to submit the job directly from the cluster entry point, define only the <b>bsubProcess</b>, like in the above example and skip the ssh definition.
 		<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>bsubProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -607,7 +584,7 @@ If you want to submit the job directly from the cluster entry point, define only
 					&lt;hostlist&gt;cluster_machine1 cluster_machine2&lt;hostlist/&gt;
 					&lt;processor&gt;6&lt;/processor&gt;
 					&lt;scriptPath&gt;
-						&lt;absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
+						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
 					&lt;/scriptPath&gt;
 				&lt;/bsubOption&gt;
 			&lt;/bsubProcess&gt;
@@ -621,7 +598,6 @@ If you want to submit the job directly from the cluster entry point, define only
 <b>ProActive</b> provides <code><a href="../core/process/globus/GlobusProcess.html">org.objectweb.proactive.core.process.globus.GlobusProcess</a></code> to create <b>globus</b> process. <br>
 		<blockquote><pre>
 	&lt;jvm name="<b>Jvm2</b>"&gt;
-		&lt;acquisition method="<b>rmi</b>"/&gt;
 		&lt;creation&gt;
 			&lt;processReference refid="<b>globusProcess</b>"/&gt;
 		&lt;/creation&gt;
@@ -640,15 +616,14 @@ If you want to submit the job directly from the cluster entry point, define only
 					&lt;variable name="DISPLAY" value="machine_name0.0"/&gt;
 				&lt;/environment&gt;
 				&lt;globusOption&gt;
-					&lt;gramPort&gt;2119&lt;/gramPort&gt;
-					&lt;gisPort&gt;2135&lt;/gisPort&gt;
+					&lt;count&gt;10&lt;/count&gt;
 				&lt;/globusOption&gt;
 			&lt;/globusProcess&gt;
 		&lt;/processDefinition&gt;	
 	&lt;/processes&gt;
 		</pre></blockquote>
 
-		In this example, <b>Jvm2</b> will be created using <b>GRAM</b>. An <b>RSL</b> request will be generated with informations provided in the descriptor. For instance, the &lt;environment&gt; tag is not mandatory, but for the globus host to export the DISPLAY on your machine, you can define the value in the descriptor as well as other environment variable, except the classpath(or java path,...) which must be defined in the local process referenced by <b>globusProcess</b> as explained before. &lt;globusOption&gt; is neither manatory, the default value for the gramPort is 2119, for the gisPort 2135, you can define them in the descriptor if you want to change these values.<br></br>
+		In this example, <b>Jvm2</b> will be created using <b>GRAM</b>. An <b>RSL</b> request will be generated with informations provided in the descriptor. For instance, the &lt;environment&gt; tag is not mandatory, but for the globus host to export the DISPLAY on your machine, you can define the value in the descriptor as well as other environment variable, except the classpath(or java path,...) which must be defined in the local process referenced by <b>globusProcess</b> as explained before. &lt;globusOption&gt; is neither manatory. Default value for &lt;count&gt; element is 1. It represents the number of processor requested.<br></br>
 		<li class="textNormal">Complete example of XML Deployment Descriptor<br></br>
 		<blockquote><pre>
 	&lt;virtualNodesDefinition&gt;
@@ -667,25 +642,21 @@ If you want to submit the job directly from the cluster entry point, define only
 		&lt;/mapping&gt;
 		&lt;jvms&gt;
 			&lt;jvm name="<b>Jvm1</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm2</b>"&gt;
-			   	&lt;acquisition method="<b>jini</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>jvmProcess</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm3</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>sshInriaCluster</b>"/&gt;
 				&lt;/creation&gt;
 		   	&lt;/jvm&gt;
 			&lt;jvm name="<b>Jvm4</b>"&gt;
-			   	&lt;acquisition method="<b>rmi</b>"/&gt;
 			      	&lt;creation&gt;
 				   	&lt;processReference refid="<b>globusProcess</b>"/&gt;
 				&lt;/creation&gt;
@@ -700,19 +671,26 @@ If you want to submit the job directly from the cluster entry point, define only
 			&lt;processDefinition id="<b>jvmProcess1</b>"&gt;
 		   		&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;
 					&lt;classpath&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/classes"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/bcel.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/asm.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/jini-core.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/jini-ext.jar"/&gt;
-						&lt;relativePath type="relative" origin="userHome" value="/ProActive/lib/reggie.jar"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/classes"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/lib/bcel.jar"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/lib/asm.jar"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/lib/jini-core.jar"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/lib/jini-ext.jar"/&gt;
+						&lt;relativePath origin="userHome" value="/ProActive/lib/reggie.jar"/&gt;
+						.............
 					&lt;/classpath&gt;
 					&lt;javaPath&gt;
-						&lt;absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/&gt;
+						&lt;absolutePath value="/usr/local/jdk1.4.0/bin/java"/&gt;
 					&lt;/javaPath&gt;
 					&lt;policyFile&gt;
-						&lt;absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/&gt;
+						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/&gt;
 					&lt;/policyFile&gt;
+					&lt;log4jpropertiesFile&gt;
+						&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive-log4j"/&gt;
+					&lt;/log4jpropertiesFile&gt;
+					&lt;proActivePropertiesFile&gt;
+						&lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
+					&lt;/proActivePropertiesFile&gt;
 				&lt;/jvmProcess&gt;
 			&lt;/processDefinition&gt;
 			&lt;processDefinition id="<b>bsubInriaCluster</b>"&gt;
@@ -722,7 +700,7 @@ If you want to submit the job directly from the cluster entry point, define only
 						&lt;hostlist&gt;cluster_machine1 cluster_machine2&lt;hostlist/&gt;
 						&lt;processor&gt;4&lt;/processor&gt;
 						&lt;scriptPath&gt;
-							&lt;absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
+							&lt;absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/&gt;
 						&lt;/scriptPath&gt;
 					&lt;/bsubOption&gt;
 				&lt;/bsubProcess&gt;
@@ -733,14 +711,13 @@ If you want to submit the job directly from the cluster entry point, define only
 				&lt;/sshProcess&gt;
 			&lt;/processDefinition&gt;	
 			&lt;processDefinition id="<b>globusProcess</b>"&gt;
-				&lt;globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
+				&lt;globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="cluster.inria.fr">
 					&lt;processReference refid="<b>jvmProcess1</b>"/&gt;
 					&lt;environment&gt;
 						&lt;variable name="DISPLAY" value="machine_name0.0"/&gt;
 					&lt;/environment&gt;
 					&lt;globusOption&gt;
-						&lt;gramPort&gt;2119&lt;/gramPort&gt;
-						&lt;gisPort&gt;2135&lt;/gisPort&gt;
+						&lt;count&gt;10&lt;/count&gt;
 					&lt;/globusOption&gt;
 				&lt;/globusProcess&gt;
 			&lt;/processDefinition&gt;	
@@ -749,22 +726,22 @@ If you want to submit the job directly from the cluster entry point, define only
 &lt;/ProActiveDescriptor&gt;
 
 		</pre></blockquote>
-		This xml deployment descriptor shows how to deploy the Penguin application on several places. Two Nodes will be created locally, one will be acquired using <b>RMI</b> lookup, the other one with <b>JINI </b>lookup. We can see that with the definition of <b>Jvm1</b> and <b>Jvm2</b>. These JVMs will be created locally since they reference directly the process defined by <b>jvmProcess</b>. <b>Jvm3</b> will be created on the cluster using <b>ssh</b> to log on galere1(cluster entry point). Two nodes will then be created on galere10.inria.fr since processor tag is set to 2, and the hoslist tag gives galere10.inria.fr as the only one candidate. At Last <b>Jvm4</b> will be created on a globus host: globus1.inria.fr using <b>gram</b> protocol. We can notice that two local processes were defined, the reason is that the first one <b>jvmProcess</b> will use default value for the classpath, java path and policyfile path, whereas for the second one <b>jvmProcess1</b> , we need to define these value, since the home directory is different between the local machine, and globus and the cluster(home dir is the same on globus machines and on the cluster, that is why both processes reference the same local process : <b>jvmProcess1</b>).<br></br>
+		This xml deployment descriptor shows how to deploy the Penguin application on several places. Two Nodes will be created locally. We can see that with the definition of <b>Jvm1</b> and <b>Jvm2</b>. These JVMs will be created locally since they reference directly the process defined by <b>jvmProcess</b>. <b>Jvm3</b> will be created on the cluster using <b>ssh</b> to log on galere1(cluster entry point). Two nodes will then be created on galere10.inria.fr since processor tag is set to 2, and the hoslist tag gives galere10.inria.fr as the only one candidate. At Last <b>Jvm4</b> will be created using globus It will access cluster.inria.fr and request 10 processors. We can notice that two local processes were defined, the reason is that the first one <b>jvmProcess</b> will use default value for the classpath, java path and policyfile path, whereas for the second one <b>jvmProcess1</b> , we need to define these value, since the home directory is different between the local machine, and globus and the cluster(home dir is the same on globus machines and on the cluster, that is why both processes reference the same local process : <b>jvmProcess1</b>).<br></br>
 
-Even if quite a lot of things can be configured in the xml files, sometimes you will have to perform additional steps to get everything working properly, it is the case when using ssh, or globus as seen before. In this example, DISPLAY variable is defined for the globus process, that means that we want the penguin icon to appears on the local machine, be carefull to authorize your X server to display such icons by running the following command before launching the application: xhost +globus1.inria.fr. If you want to do the same for the cluster machine, that you plan to access with ssh you must run xhost +galere10.inria.fr, and on the cluster side you need to create under ~/.ssh a file called environment where you define the DISPLAY variable. If you are not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a>
+Even if quite a lot of things can be configured in the xml files, sometimes you will have to perform additional steps to get everything working properly, it is the case when using ssh, or globus as seen before. In this example, DISPLAY variable is defined for the globus process, that means that we want the penguin icon to appears on the local machine, be carefull to authorize your X server to display such icons by running the following command before launching the application: xhost +cluster.inria.fr. If you want to do the same for the cluster machine, that you plan to access with ssh you must run xhost +galere10.inria.fr, and on the cluster side you need to create under ~/.ssh a file called environment where you define the DISPLAY variable. If you are not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a>
 </ul></ul>
 
 <h2>Killing the application</h2>
-ProActive gives the ability to kill all JVMs and Nodes deployed with an XML descriptor with the method: killall in class <a href="../core/descriptor/data/ProActiveDescriptor.html">ProActiveDescriptor</a>:
+ProActive gives the ability to kill all JVMs and Nodes deployed with an XML descriptor with the method: killall(boolean softly) in class <a href="../core/descriptor/data/ProActiveDescriptor.html">ProActiveDescriptor</a>:
 <blockquote><pre>
 	ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String xmlFileLocation);   //----------- Returns a ProActiveDescriptor object from the xml file
 	pad.activateMappings();
 	--------------------------------------------
 	--------------------------------------------
 	--------------------------------------------
-	pad.killall(); //----------- Kills every jvms deployed with the descriptor
+	pad.killall(false); //----------- Kills every jvms deployed with the descriptor
 </pre></blockquote>
-
+If <b>softly</b> is set to false, all jvms created when activating the descriptor are killed abruptely. If true a jvm that originates the creation of  a rmi registry waits until registry is empty before dying. To be more precise a thread is created to ask periodically the registry if objects are still registered.
 <h2>Processes</h2>
 There is the possiblity to use only the infrastructure part in order to create processes. A Schema called ProcessSchema located in the examples directory allows to validate XML files for processes.
 ProActive provides also the ability to use all processes defined above without using XML Deployment Descriptor. You can programmatically create such processes.<br>
