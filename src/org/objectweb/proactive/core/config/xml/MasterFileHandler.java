@@ -19,7 +19,7 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
 
     public MasterFileHandler() {
         addHandler(PROPERTIES_TAG, new PropertiesHandler(MasterFileHandler.config));
-		addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
+		//addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
     }
 
     /**

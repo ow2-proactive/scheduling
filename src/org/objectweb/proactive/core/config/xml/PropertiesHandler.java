@@ -30,14 +30,12 @@
 */
 package org.objectweb.proactive.core.config.xml;
 
-import org.apache.log4j.Logger;
+import java.util.Properties;
 
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
-import java.util.Properties;
 
 
 /**
@@ -46,7 +44,7 @@ import java.util.Properties;
  */
 public class PropertiesHandler extends AbstractUnmarshallerDecorator
     implements MasterFileConstants {
-    protected static Logger logger = Logger.getLogger(PropertiesHandler.class.getName());
+    //protected static Logger logger = Logger.getLogger(PropertiesHandler.class.getName());
     private Properties properties = null;
 
     public PropertiesHandler(ProActiveConfiguration config) {
