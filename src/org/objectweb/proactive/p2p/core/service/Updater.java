@@ -39,6 +39,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.p2p.core.info.Info;
 import org.objectweb.proactive.p2p.core.service.KnownTable.KnownTableElement;
 
 /**
@@ -70,7 +71,9 @@ public class Updater implements RunActive, Serializable {
      */
     public void runActivity(Body body) {
         while (true) {
+            
             Object[] table = this.knownTable.toArray();
+            
             for (int i = 0; i < table.length; i++) {
                 KnownTableElement element = (KnownTableElement) table[i];
 
@@ -79,17 +82,17 @@ public class Updater implements RunActive, Serializable {
                     if (logger.isInfoEnabled()) {
                         logger.info("No reply from "+element.getKey());
                     }
-                    this.service
-                            .unregisterP2PService((String) element.getKey());
+                    this.service.unregisterP2PService((String) element.getKey());
                     continue;
                 }
 
                 long currentTime = System.currentTimeMillis();
                 if ((currentTime + P2PService.TTU) >= element.getLastUpdate()) {
                     // Register
-                    element.getP2PService().registerP2PService(
-                            this.service.getServiceName(), this.service,
-                            this.service.getLoad(), false);
+                   Info info =  this.service.getInfo();
+                   
+                    element.getP2PService().registerP2PService(info.getKey(), info, false);
+
                 } else {
                     // Unregister
                     if (logger.isInfoEnabled()) {
@@ -107,13 +110,11 @@ public class Updater implements RunActive, Serializable {
 
                     for (int i = 0; i < newFriends.length; i++) {
                         String url = newFriends[i].getURL();
-                        P2PService remote = P2PServiceImpl
-                                .getRemoteP2PService(url.replaceFirst(
-                                        "PA_JVM.*", ""));
+                        P2PService remote = P2PServiceImpl .getRemoteP2PService(url.replaceFirst( "PA_JVM.*", ""));
+                                               
                         if (url.compareTo(this.serviceName) != 0) {
-                            int load = remote.getLoad();
-                            this.service.registerP2PService(url, remote, load,
-                                    false);
+                                                      
+                            this.service.registerP2PService(url, remote.getInfo() ,false);
                         }
                     }
                 } catch (NodeException e) {
@@ -124,7 +125,7 @@ public class Updater implements RunActive, Serializable {
                     logger.warn("Could't connect to the remote service", e);
                 }
             }
-
+            
             try {
                 // waiting
                 Thread.sleep(P2PService.TTU);
