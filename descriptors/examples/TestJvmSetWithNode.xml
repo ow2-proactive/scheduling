@@ -16,7 +16,6 @@
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1" nodeNumber="3">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="linuxJVM"/>
 				</creation>

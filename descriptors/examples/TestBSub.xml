@@ -22,7 +22,6 @@
 		</mapping>
 		<jvms>
 			<jvm name="jvmClusterInria">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rloginInriaCluster"/>
 				</creation>
@@ -34,20 +33,20 @@
 			<processDefinition id="linuxJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<policyFile>
-						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
+						<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="linuxJVM1">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/classes"/>
+						<absolutePath value="/net/home/rquilici/ProActive/classes"/>
 					</classpath>
 					<javaPath>
-						<absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
+						<absolutePath value="/usr/local/jdk1.4.0/bin/java"/>
 					</javaPath>
 					<policyFile>
-						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
+						<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>
@@ -57,7 +56,7 @@
 					<bsubOption>
 						<processor>4</processor>
 						<scriptPath>
-							<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
+							<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
 						</scriptPath>
 					</bsubOption>
 				</bsubProcess>

@@ -18,25 +18,21 @@
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rshProcess"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rloginProcess"/>
 				</creation>
@@ -45,17 +41,17 @@
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="linuxJVM">
+			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 			<processDefinition id="rshProcess">
 				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="ornata.inria.fr">
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rloginProcess">
 				<rloginProcess class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="wapiti.inria.fr">
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</rloginProcess>
 			</processDefinition>
 		</processes>

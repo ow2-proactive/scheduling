@@ -1,65 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../DescriptorSchema.xsd">
-    <componentDefinition>
-        <virtualNodesDefinition>
-            <virtualNode name="prunNode"/>
-        </virtualNodesDefinition>
-    </componentDefinition>
-    <deployment>
-        <mapping>
-            <map virtualNode="prunNode">
-                <jvmSet>
-                    <vmName value="Jvm1"/>
-                </jvmSet>
-            </map>
-        </mapping>
-        <jvms>
-            <jvm name="Jvm1">
-                <acquisition method="ibis"/>
-                <creation>
-                    <processReference refid="prunCluster"/>
-                </creation>
-            </jvm>
-        </jvms>
-    </deployment>
-    <infrastructure>
-        <processes>
-            <processDefinition id="linuxJVM1">
-                 <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-                    <bootclasspath>
-                        <absolutePath type="absolute" value="/home1/fabrice/IOFAb/Ibis/"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/IOFAb/classlibs/jdk"/>                     
-                    </bootclasspath>
-                    <classpath>
-                        <absolutePath type="absolute" value="/home1/fabrice/IOFAb/ProActive/"/>
-                        <absolutePath type="absolute" value="/home1/fabrice/IOFAb/classlibs/lib"/>
-                    </classpath>
-                    <javaPath>
-                        <absolutePath type="absolute" value="/usr/local/sun-java/jdk1.4/bin/java"/>
-                    </javaPath>
-                    <policyFile>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy"/>
-                    </policyFile>
-                      <log4jpropertiesFile>
-                        <absolutePath type="absolute" value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j"/>
-                    </log4jpropertiesFile>
-                    <jvmParameters>
-                        <parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/>
-                        <parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386"/>
-                        <parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
-                    </jvmParameters>             
-                </jvmProcess>
-            </processDefinition>
-            <processDefinition id="prunCluster">
-                <prunProcess class="org.objectweb.proactive.core.process.prun.PrunSubProcess">
-                    <processReference refid="linuxJVM1"/>
-                    <prunOption>
-                        <hostsNumber>4</hostsNumber>
-                        <processorPerNode>1</processorPerNode>
-                        <bookingDuration>00:01:00</bookingDuration>
-                    </prunOption>
-                </prunProcess>
-            </processDefinition>
-        </processes>
-    </infrastructure>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="prunNode"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="prunNode">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="prunCluster"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<bootclasspath>
+						<absolutePath  value="/home1/fabrice/IOFAb/Ibis/"/>
+						<absolutePath  value="/home1/fabrice/IOFAb/classlibs/jdk"/>
+					</bootclasspath>
+					<classpath>
+						<absolutePath  value="/home1/fabrice/IOFAb/ProActive/"/>
+						<absolutePath  value="/home1/fabrice/IOFAb/classlibs/lib"/>
+					</classpath>
+					<javaPath>
+						<absolutePath  value="/usr/local/sun-java/jdk1.4/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath  value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath  value="/home1/fabrice/workProActive/ProActive/scripts/unix/proactive-log4j"/>
+					</log4jpropertiesFile>
+					<jvmParameters>
+						<parameter value="-Djava.library.path=/home1/fabrice/workProActive/ProActive/lib"/>
+						<parameter value="-Dsun.boot.library.path=/home1/fabrice/workProActive/ProActive/lib://usr/local/sun-java/jdk1.4/jre/lib/i386"/>
+						<parameter value="-Dproactive.configuration=/home1/fabrice/workProActive/ProActive/modelisation/scripts/mixed/proactiveConfiguration.xml"/>
+					</jvmParameters>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="prunCluster">
+				<prunProcess class="org.objectweb.proactive.core.process.prun.PrunSubProcess">
+					<processReference refid="linuxJVM1"/>
+					<prunOption>
+						<hostsNumber>4</hostsNumber>
+						<processorPerNode>1</processorPerNode>
+						<bookingDuration>00:01:00</bookingDuration>
+					</prunOption>
+				</prunProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
 </ProActiveDescriptor>

@@ -20,7 +20,7 @@
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="linuxJVM">
+			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 		</processes>

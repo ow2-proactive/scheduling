@@ -184,6 +184,7 @@ The following element ProActiveDescriptor defines the root of the schema
 					</xs:simpleType>
 				</xs:attribute>
 				<xs:attribute name="timeout" type="xs:positiveInteger" use="optional"/>
+				<xs:attribute name="waitForTimeout" type="xs:boolean" use="optional" default="false"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -278,14 +279,14 @@ The following element ProActiveDescriptor defines the root of the schema
 							    nodeNumber which is optionnal and represents the number of nodes that will be created on the enclosing jvm. Default is one-->
 	<xs:complexType name="JvmType">
 		<xs:sequence>
-			<xs:element name="acquisition" type="AcquisitionType"/>
 			<xs:element name="creation" type="CreationType"/>
+			<!--<xs:element name="acquisition" type="AcquisitionType"/>-->
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="nodeNumber" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
 	<!--acquisition element has one attribute: method that must appear once and only one. It can takes three value: rmi, jini or ibis. It represents the protocol to use to acquire the  ProActiveRuntime on the jvm to be created. -->
-	<xs:complexType name="AcquisitionType">
+	<!--<xs:complexType name="AcquisitionType">
 		<xs:attribute name="method" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -295,7 +296,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
-	</xs:complexType>
+	</xs:complexType>-->
 	<!--creation element has one child: processReference element defined as global element. This element must occur once and only once. The reference is used to map the jvm with a process defined in infrastructure section. This process will originate jvm's creation. Hence such process must exist in the infrastructure section. -->
 	<xs:complexType name="CreationType">
 		<xs:sequence>
@@ -336,6 +337,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="log4jpropertiesFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="proActivePropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
@@ -356,13 +358,12 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!-- path element of type RelativePathType has three attributes:type which is fixed with value relative, origin which can take three values, and value.  -->
 	<xs:complexType name="RelativePathType">
-		<xs:attribute name="type" type="xs:string" use="required" fixed="relative"/>
 		<xs:attribute name="origin" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="userHome"/>
-					<xs:enumeration value="workingDirectory"/>
-					<xs:enumeration value="fromClasspath"/>
+					<xs:enumeration value="user.home"/>
+					<xs:enumeration value="user.dir"/>
+					<xs:enumeration value="user.classpath"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -370,7 +371,6 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<!-- path element of type AbsolutePathType has two attributes:type which is fixed with value absolute and value which is required.  -->
 	<xs:complexType name="AbsolutePathType">
-		<xs:attribute name="type" type="xs:string" use="required" fixed="absolute"/>
 		<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--jvmParameters represents options to be passed to the jvm. It has one child : parameter -->
@@ -523,7 +523,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="count" type="xs:positiveInteger" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType  name="SecurityType">
+	<xs:complexType name="SecurityType">
 		<xs:attribute name="file" type="xs:string"/>
-	</xs:complexType >
+	</xs:complexType>
 </xs:schema>

@@ -2,7 +2,7 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="penguinNode" property="multiple"/>
+			<virtualNode name="penguinNode" property="multiple" timeout="200" waitForTimeout="true"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -18,34 +18,30 @@
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
-				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="localJVM"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<processDefinition id="linuxJVM">
+			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 				</jvmProcess>
 			</processDefinition>
