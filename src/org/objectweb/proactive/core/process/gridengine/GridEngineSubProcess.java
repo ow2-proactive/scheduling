@@ -217,7 +217,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         //To be modified for SGE, does not work with the present code
         String result = new String();
         if (logger.isDebugEnabled()) {
-            logger.info("parseHostname() analyzing " + message);
+            logger.debug("parseHostname() analyzing " + message);
         }
         java.util.StringTokenizer st = new java.util.StringTokenizer(message);
         if (st.countTokens() < 2) {

@@ -224,7 +224,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     protected String parseHostname(String message) {
         String result = new String();
         if (logger.isDebugEnabled()) {
-            logger.info("parseHostname() analyzing " + message);
+            logger.debug("parseHostname() analyzing " + message);
         }
         java.util.StringTokenizer st = new java.util.StringTokenizer(message);
         if (st.countTokens() < 2) {

@@ -301,7 +301,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    *    Job <...>
    */
   protected int parseJobID(String message) {
-    logger.info("parseJobID analyzing "+message);
+    if (logger.isDebugEnabled()) {
+        logger.debug("parseJobID analyzing "+message);
+    }
     String beginJobIDMarkup = "Job <";
     String endJobIDMarkup = ">";
     int n1 = message.indexOf(beginJobIDMarkup);
@@ -309,7 +311,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     int n2 = message.indexOf(endJobIDMarkup, n1+beginJobIDMarkup.length());
     if (n2 == -1) return 0;
     String id = message.substring(n1+beginJobIDMarkup.length(), n2);
-   logger.info("!!!!!!!!!!!!!! JOBID = "+id);
+    if (logger.isDebugEnabled()) {
+        logger.debug("!!!!!!!!!!!!!! JOBID = "+id);
+    }
     try {
       return Integer.parseInt(id);
     } catch (NumberFormatException e) {
@@ -333,7 +337,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    * hostname if it is found.
    */
   protected String parseHostname(String message) {
-    logger.info("parseHostname analyzing "+message);
+      if (logger.isDebugEnabled()) {
+          logger.debug("parseHostname analyzing "+message);
+      }
     java.util.StringTokenizer st = new java.util.StringTokenizer(message);
     if (st.countTokens() < 6) return null; // we expect at least 6 tokens
     try {
@@ -350,7 +356,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     st.nextToken(); // ignore queue
     st.nextToken(); // ignore fromHost
     String hostname = st.nextToken();
-    logger.info("!!!!!!!!!!!!!! hostname = "+hostname);
+    if (logger.isDebugEnabled()) {
+        logger.debug("!!!!!!!!!!!!!! hostname = "+hostname);
+    }
     logger.info("token "+st.countTokens());
     return hostname;
   }
