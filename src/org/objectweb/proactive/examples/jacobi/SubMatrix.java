@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
+import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 
 /**
@@ -75,6 +76,9 @@ public class SubMatrix {
 
 	/** A ProActive reference to this */
 	private SubMatrix me;
+
+	/** The neighbors submatix */
+	private SubMatrix neighbors;
 
 	/** The whole matrix */
 	private SubMatrix matrix;
@@ -297,31 +301,47 @@ public class SubMatrix {
 		this.south = (SubMatrix) topology.down(me);
 		this.west = (SubMatrix) topology.left(me);
 		this.east = (SubMatrix) topology.right(me);
+		
+		try {
+			this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName()); }
+		catch (ClassNotReifiableException e) {
+			System.err.println("** ClassNotReifiableException ** - Unable to build the neighbors group");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			System.err.println("** ClassNotFoundException ** - Unable to build the neighbors group");
+			e.printStackTrace();
+		}
+		Group neighborsGroup = ProActiveGroup.getGroup(this.neighbors);
 
 		if (this.north == null) {
 			this.northNeighborBorder = this.buildFakeBorder(this.width);
 		}
 		else {
+			neighborsGroup.add(this.north);
 			this.north.setSouthBorder(this.buildNorthBorder());
 		}
 		if (this.south == null) {
 			this.southNeighborBorder = this.buildFakeBorder(this.width);
 		}
 		else {
+			neighborsGroup.add(this.south);
 			this.south.setNorthBorder(this.buildSouthBorder());
 		}
 		if (this.west == null) {
 			this.westNeighborBorder = this.buildFakeBorder(this.height);
 		}
 		else {
+			neighborsGroup.add(this.west);
 			this.west.setEastBorder(this.buildWestBorder());
 		}
 		if (this.east == null) {
 			this.eastNeighborBorder = this.buildFakeBorder(this.height);
 		}
 		else {
+			neighborsGroup.add(this.east);
 			this.east.setWestBorder(this.buildEastBorder());
 		}
+		neighborsGroup.add(this.me);
 	}
 
 	/**
@@ -454,10 +474,11 @@ public class SubMatrix {
 	 * Launch the main loop  
 	 */
 	public void loop () {
+		// System.out.println("iterations : " + this.iterationsToStop);
 		// compute the internal values
 		this.internalCompute();
 		// synchronization to be sure that all submatrix have exchanged borders
-		ProSPMD.barrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders"+this.iterationsToStop);
+		ProSPMD.barrier("SynchronizationWithNeighbors"+this.iterationsToStop, this.neighbors);
 		// compute the border values
 		this.me.borderCompute();
 		// decrement the iteration counter
@@ -496,5 +517,4 @@ public class SubMatrix {
 	public void stop () {
 		this.iterationsToStop = 0;
 	}
-
 }

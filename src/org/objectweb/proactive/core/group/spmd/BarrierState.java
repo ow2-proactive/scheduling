@@ -37,30 +37,63 @@ import java.io.Serializable;
  */
 public class BarrierState implements Serializable {
 
-	private int awaitedCalls;
+	/** The number of calls awaited to finish the barrier */
+	private int awaitedCalls = 0;
+	/** The number of calls already received */
+	private int receivedCalls = 0;
+	/** The local call is arrived ? */
 	private boolean localyCalled = false;
 
-	public BarrierState(int awaitedCalls) {
-		this.awaitedCalls = awaitedCalls; 
-	}
+	/**
+	 * Constructor
+	 */
+	public BarrierState() {}
 
+	/**
+	 * Returns the number of awaited calls to finish the barrier
+	 * @return the number of awaited calls to finish the barrier
+	 */
 	public int getAwaitedCalls() {
 		return this.awaitedCalls;
 	}
 
-	public void decrementAwaitedCalls() {
-		this.awaitedCalls--;
+	/**
+	 * Returns the number of received calls to finish the barrier
+	 * @return the number of received calls to finish the barrier
+	 */
+	public int getReceivedCalls() {
+		return this.receivedCalls;
 	}
-	
 
+	/**
+	 * Sets the number of calls need to finish the barrier
+	 * @param nbCalls the number of calls need to finish the barrier
+	 */
+	public void setAwaitedCalls(int nbCalls) {
+		this.awaitedCalls = nbCalls;
+	}
+
+	/**
+	 * Increments the number of received calls to finish the barrier
+	 */
+	public void incrementReceivedCalls() {
+		this.receivedCalls++;
+	}
+
+	
+	/**
+	 * Set the localy call state to <code>true</code>
+	 */
 	public void tagLocalyCalled() {
 		this.localyCalled = true;
 	}
 
-
+	/**
+	 * Return <code>true</code> if the local barrier call was performed 
+	 * @return <code>true</code> if the local barrier call was performed, else return <code>false</code>
+	 */
 	public boolean isLocalyCalled () {
 		return this.localyCalled;
 	}
-
 
 }

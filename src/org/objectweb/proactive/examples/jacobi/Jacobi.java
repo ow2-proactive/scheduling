@@ -69,9 +69,8 @@ public class Jacobi {
 	 */
 	public static final double DEFAULT_BORDER_VALUE = 0;
 
-	
-	public static void main (String[] args) {
 
+	public static void main (String[] args) {
 		
 		ProActiveDescriptor proActiveDescriptor=null;
 		String[] nodes = null;
@@ -105,5 +104,6 @@ public class Jacobi {
 		catch (NodeException e) { System.out.println("** NodeException **"); }
 
 		matrix.compute();
-	}	
+	}
+
 }

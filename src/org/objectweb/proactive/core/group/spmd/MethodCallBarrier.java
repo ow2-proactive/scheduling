@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 
 
@@ -40,22 +42,42 @@ import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 public class MethodCallBarrier extends MethodCallControlForGroup {
 
 	private String IDName;
+	private int awaitedCalls;
 
 	/**
 	 * Constructor
-	 * @param name - the id name of the barrier 
+	 * @param idname - the id name of the barrier 
+	 * @param group - the objects to send a barrier call 
+	 */
+	public MethodCallBarrier(String idname, int nbCalls) {
+		this.IDName = idname;
+		this.awaitedCalls = nbCalls;
+	}
+
+	/**
+	 * Constructor
+	 * @param idname - the id name of the barrier 
 	 */
     public MethodCallBarrier(String idname) {
     	this.IDName = idname;
+    	this.awaitedCalls = ((AbstractBody) ProActive.getBodyOnThis()).getSPMDGroupSize();
     }
 
-    /**
-     * Returns the name of the call
-     * @return the String "MethodCallBarrier";
-     */
-    public String getName() {
-        return "MethodCallBarrier";
-    }
+	/**
+	 * Returns the name of the call
+	 * @return the String "MethodCallBarrier"
+	 */
+	public String getName() {
+		return "MethodCallBarrier";
+	}
+
+	/**
+	 * Returns the number of awaited call for this barrier
+	 * @return the number of awaited call for this barrier
+	 */
+	public int getAwaitedCalls() {
+		return this.awaitedCalls;
+	}
     
     /**
      * Returns the ID name of the barrier

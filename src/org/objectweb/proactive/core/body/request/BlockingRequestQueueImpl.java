@@ -35,7 +35,6 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
 import org.objectweb.proactive.core.group.spmd.BarrierState;
@@ -81,95 +80,6 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     return ! shouldWait;
   }
 
-//  public synchronized void add(Request r) {
-//    super.add(r);
-//    if (logger.isDebugEnabled()) {
-//    	logger.debug("Adding request " + r.getMethodName());
-//    }
-//	if (r.getMethodCall() instanceof MethodCallBarrier) {
-//		System.out.println("Je recois un appel barrier !");
-//		if (!this.suspended) {
-//			System.out.println("Premiere barriere");
-//			this.firstBarrierCallEncountered = true;
-//			this.suspended = true;
-//			this.awaitedBarrierCall = ((AbstractBody) this.body).getSPMDGroupSize();
-//			System.out.println("   this.firstBarrierCallEncountered = " + this.firstBarrierCallEncountered);
-//			System.out.println("   this.suspended = " + this.suspended);
-//			System.out.println("   this.awaitedBarrierCall = " + this.awaitedBarrierCall);
-//		}
-//		else {
-//			this.awaitedBarrierCall--;
-//			System.out.println("Nouvelle barriere");
-//			System.out.println("   this.firstBarrierCallEncountered = " + this.firstBarrierCallEncountered);
-//			System.out.println("   this.suspended = " + this.suspended);
-//			System.out.println("   this.awaitedBarrierCall = " + this.awaitedBarrierCall);
-//			if (this.awaitedBarrierCall == 0) {
-//				this.firstBarrierCallEncountered = false;
-//				this.suspended = false;
-//				System.out.println("Fin de la barriere");
-//			}
-//		}
-//	}
-//    this.notifyAll();
-//  }
-
-//	public synchronized void add(Request r) {
-//	  super.add(r);
-//	  logger.debug("Adding request " + r.getMethodName());
-//
-//	  // if barrier call => special treatement
-//	  if (r.getMethodCall() instanceof MethodCallBarrier) {
-//
-//		System.out.println("    BARRIER CALL\n          Source: " + r.getSourceBodyID() + "\n          Body:   " + this.body.getID());
-//
-//
-//	  	  MethodCallBarrier mcb = (MethodCallBarrier)r.getMethodCall();
-//		  //System.out.println("Je recois un appel barrier : \"" + mcb.getIDName() + "\" !");
-//		  // search the state of the barrier for the barrier ID name
-//		  BarrierState bs = (BarrierState) this.currentBarriers.get(mcb.getIDName());
-//		  // bs == null  =>  state not found  =>  first barrier encountered for ID name
-//		  if (bs == null) { 
-//			  System.out.println("Premiere barriere : \"" + mcb.getIDName() + "\" !");
-//		  	  // build and add infos about new barrier
-//		  	  bs = new BarrierState(((AbstractBody) this.body).getSPMDGroupSize()-1);
-//		  	  this.currentBarriers.put(mcb.getIDName(), bs);
-//			  // if this object is the sender of the barrier : tag and suspend
-//			  if (r.getSourceBodyID().equals(this.body.getID())) {
-//				System.out.println("C'est MON appel barrier \"" + mcb.getIDName() + "\" : je bloque !");
-//				bs.tagLocalyCalled();
-//				this.suspended = true;
-//			  }
-//		  }
-//		  // bs != null  =>  state found  =>  this is not the first call to this barrier
-//		  else {
-//				// check if local call
-//				if (r.getSourceBodyID().equals(this.body.getID())) {
-//					bs.tagLocalyCalled();
-//				}
-//		  		int calls = bs.getAwaitedCalls() -1;
-//				// if there is others waiting calls, decrement
-//		  		if (calls != 0) {
-//					System.out.println("Barriere \"" + mcb.getIDName() + "\"  (" + (bs.getAwaitedCalls()-1) + ") toujours attendues");
-//			  		bs.decrementAwaitedCalls();
-//		  		}
-//		  		// calls == 0  =>  this is the last awaited call to this barrier 
-//		  		else {
-//		  			// if there is no other barrier in action  =>  resume
-//					boolean resume = true;
-//		  			Iterator it = this.currentBarriers.values().iterator();
-//		  			while (it.hasNext() && resume) {
-//		  				resume = ! ((BarrierState) it.next()).isLocalyCalled();
-//		  			}
-//		  			if (resume) {
-//						System.out.println("Fin de la barriere \"" + mcb.getIDName() + "\"");
-//			  			this.suspended = false;
-//					}
-//		  		}
-//		  }
-//	  }
-//	  this.notifyAll();
-//	}
-
 	public synchronized void add(Request r) {
 	  super.add(r);
 	  logger.debug("Adding request " + r.getMethodName());
@@ -183,28 +93,29 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 		  BarrierState bs = (BarrierState) this.currentBarriers.get(mcb.getIDName());
 		  // bs == null  =>  state not found  =>  first barrier encountered for ID name
 		  if (bs == null) { 
-			  //System.out.println("First barrier \"" + mcb.getIDName() + "\" encountered !");
+			  // System.out.println("First barrier \"" + mcb.getIDName() + "\" encountered !");
 			  // build and add infos about new barrier
-			  bs = new BarrierState(((AbstractBody) this.body).getSPMDGroupSize());
+			  bs = new BarrierState();
 			  this.currentBarriers.put(mcb.getIDName(), bs);
 		  }
 		  // if this object is the sender of the barrier : tag and suspend
 		  if (r.getSourceBodyID().equals(this.body.getID())) {
-				//System.out.println("This is MY call to barrier \"" + mcb.getIDName() + "\" : I stop !");
+				// System.out.println("This is MY call to barrier \"" + mcb.getIDName() + "\" : I fix the awaited number to " + mcb.getAwaitedCalls() + " and I stop !");
+				bs.setAwaitedCalls(mcb.getAwaitedCalls());
 				bs.tagLocalyCalled();
 				this.suspended = true;
 		  }
-		  int calls = bs.getAwaitedCalls() -1;
+		  int calls = bs.getAwaitedCalls() - (bs.getReceivedCalls()+1);
 		  // if there is others waiting calls, decrement
 		  if (calls != 0) {
-			  //System.out.println("Barrier \"" + mcb.getIDName() + "\"  (" + (bs.getAwaitedCalls()-1) + ") still awaited");
-			  bs.decrementAwaitedCalls();
+			  // System.out.println("Barrier \"" + mcb.getIDName() + "\"  (" + calls + ") still awaited");
+			  bs.incrementReceivedCalls();
 		  }
 		  // calls == 0  =>  this is the last awaited call to this barrier 
 		  else {
 		  	  this.currentBarriers.remove(mcb.getIDName());
 			  // if there is no other barrier in action  =>  resume
-			  //System.out.println("End of  barrier \"" + mcb.getIDName() + "\"");
+			  // System.out.println("Barrier \"" + mcb.getIDName() + "\" released !");
 			  this.suspended = false;
 		  }
 	  }
@@ -370,24 +281,15 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
   }
 
 
-	/**
-	 * 
-	 * @return
-	 */
   public synchronized Request barrierRemoveOldest() {
 	  if (this.requestQueue.isEmpty()) {
 	  	return null;
 	  } 
 	  Request r = (Request) requestQueue.remove(0);
-//	  if (r.getMethodCall() instanceof MethodCallBarrier) {
-//		  r = (Request) requestQueue.remove(0);
-//	  }
 	  if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
 		  this.notifyAllListeners(new RequestQueueEvent(this.ownerID, RequestQueueEvent.REMOVE_REQUEST));
 	  }
 	  return r;
   }
-
-
 
 }

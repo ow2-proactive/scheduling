@@ -632,13 +632,14 @@ public class ProActiveGroup {
      * Throws an IllegalArgumentException if <code>o</code> doesn't represent a Group.
 	 * @param <code>o</code> a typed group.
 	 * @return the number of member of the typed group <code>o</code>.
+	 * @throws IllegalArgumentException if the parameter doesn't represent a group
      */
     public static int size (Object o) {
-    	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
+    	ProxyForGroup theProxy = ProActiveGroup.findProxyForGroup(o);
 		if (theProxy == null)
 		    throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
 		else
-			return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).size();
+			return theProxy.size();
     }
     
 

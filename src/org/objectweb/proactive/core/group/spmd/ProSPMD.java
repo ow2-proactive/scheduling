@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -202,11 +204,25 @@ public class ProSPMD {
 
 	/**
 	 * Strongly synchronizes all the members of the spmd group
-	 * @param barrierName the name of the barrier (used as  unique identifier)
+	 * @param barrierName the name of the barrier (used as unique identifier)
 	 */
 	public static void barrier (String barrierName) {
 		((AbstractBody) ProActive.getBodyOnThis()).sendSPMDGroupCall(new MethodCallBarrier(barrierName));
 	}
 
+	/**
+	 * Strongly synchronizes all the members of the group.
+	 * Beware ! The caller object HAVE TO BE IN THE GROUP <code>group</code>
+	 * @param barrierName the name of the barrier (used as unique identifier)
+	 * @param group the typed group the barrier is invoked on 
+	 */
+	public static void barrier (String barrierName, Object group) {
+		try {
+			((ProxyForGroup) ProActiveGroup.getGroup(group)).reify(new MethodCallBarrier(barrierName,ProActiveGroup.size(group))); }
+		catch (InvocationTargetException e) {
+			System.err.println("Unable to invoke a method call to control groups");
+			e.printStackTrace();
+		}
+	}
 
 }
