@@ -84,11 +84,11 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   public Main() {
   }
   
-  public Main(String xmlDescriptor, boolean gui) throws ProActiveException {
+  public Main(String xmlDescriptor, Boolean gui) throws ProActiveException {
   	// read XML Descriptor
   	if (xmlDescriptor.length() > 0)
       pad = ProActive.getProactiveDescriptor(xmlDescriptor);   
-    this.gui = gui;
+    this.gui = gui.booleanValue();
   }
 
   /** Creates a new ActivePrimeContainer starting with number n */

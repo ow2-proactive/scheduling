@@ -69,12 +69,12 @@ public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable, 
    *  @param previous the container or source that sends requests to this container 
    * */
   public ActivePrimeContainer(ActivePrimeContainerCreator creator, PrimeOutputListener listener,
-                               int maxSize, long n, Slowable previous) {
+                               Integer  maxSize, Long n, Slowable previous) {
     super();
-    this.maxSize = maxSize;
+    this.maxSize = maxSize.intValue();
     this.activePrimeContainerCreator = creator;
     this.outputListener = listener;    
-    this.first = newPrimeNumber(n);
+    this.first = newPrimeNumber(n.longValue());
     this.previous = previous;
   }
 
