@@ -624,7 +624,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //Check if the virtualNode that originates the process is among awaited VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
             //gets the registered runtime
-            System.out.println("Virtual Node ready to create node" + event.getRegisteredRuntimeName());
             proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
