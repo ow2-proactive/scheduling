@@ -220,6 +220,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String jobId) throws NodeException {
         //Node node = new NodeImpl(this,nodeName);
         //System.out.println("node created with name "+nodeName+"on proActiveruntime "+this);
+        
         if (replacePreviousBinding) {
             if (nodeMap.get(nodeName) != null) {
                 nodeMap.remove(nodeName);
@@ -326,8 +327,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //System.out.println(vmInformation.getVMID().toString());
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
-            proActiveRuntimeName, creatorID, creationProtocol, vmName);
-        
+            proActiveRuntimeDist, creatorID, creationProtocol, vmName);
     }
 
     /**
@@ -674,7 +674,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             //                Integer.toString(new java.security.SecureRandom().nextInt()) +
             //                "_" + hostName;
             String random = Integer.toString(ProActiveRuntimeImpl.getNextInt());
-            this.name = "PA_JVM" + random + "_" + hostName;
+            if (System.getProperty("proactive.runtime.name") != null) {
+                this.name = System.getProperty("proactive.runtime.name");
+                if (this.name.indexOf("PA_JVM") < 0) {
+                    logger.warn(
+                        "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
+                        "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
+                }
+            } else {
+                this.name = "PA_JVM" + random + "_" + hostName;
+            }
             if (System.getProperty("proactive.jobid") != null) {
                 this.jobId = System.getProperty("proactive.jobid");
             } else {
