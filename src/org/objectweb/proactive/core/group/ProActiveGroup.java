@@ -131,7 +131,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitAll();
+		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAll();
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
 	}
     }
@@ -146,7 +146,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitOne();
+		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOne();
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
 	}
     }
@@ -161,7 +161,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitN(n);
+		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitN(n);
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
 	}
     }
@@ -180,7 +180,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.allAwaited();
+		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allAwaited();
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
 	    else
 		return false;
@@ -200,7 +200,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.allArrived();
+		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).allArrived();
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived
 	    else
 		return true;
@@ -216,7 +216,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
 	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitAndGetOne();
+		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOne();
 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
 	    else
 		return o;
@@ -235,7 +235,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy  = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
  	    if (theProxy != null)
-		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitTheNth(n);
+		((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitTheNth(n);
  	    // Else the "standard waitFor" method has been used in the findProxyForGroup method
 	}
     }
@@ -250,7 +250,7 @@ public class ProActiveGroup {
 	    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
 	    // If the object represents a group, we use the proxyForGroup's method
 	    if (theProxy != null)
-		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).futureList.waitAndGetTheNth(n);
+		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetTheNth(n);
 	    // Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
 	    else
 		return o;

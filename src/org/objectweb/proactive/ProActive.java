@@ -502,8 +502,7 @@ public class ProActive {
 				fp.waitForReply();
 			}
 		}
-	}
-	
+	}		
 	
 	/**
 	 * Blocks the calling thread until all futures in the vector are available.
@@ -527,9 +526,25 @@ public class ProActive {
 					fp.waitForReply();
 				}
 			}	
-		}
-	
+		}	
 	}
+
+
+	/**
+	 * Blocks the calling thread until the N-th of the futures in the vector is available.
+	 * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+	 * @param futures vector of futures
+	 */
+	public static void waitForTheNth(java.util.Vector futures, int n) {
+		FuturePool fp = getBodyOnThis().getFuturePool();
+		synchronized (fp) {
+			Object current = futures.get(n);
+			if (isAwaited(current)) {
+				waitFor(current);
+			}
+		}
+	}	
+
 
 
 	/**

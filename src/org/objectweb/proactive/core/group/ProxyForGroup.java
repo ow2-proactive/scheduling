@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -40,7 +41,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/** Number of awaited call of method on the group's member : The Semantic is that we wait all call are done before continuing */
 	protected int waited = 0;
 	/** Use to monitor futures */
-	protected FutureListGroup futureList;
+	//protected FutureListGroup futureList;
 	/** Flag to deternime the semantic of communication (broadcast or dispatching) */
 	protected boolean dispatching = false;
 
@@ -49,7 +50,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		className = nameOfClass;
 		memberListStub = Collections.synchronizedList(new ArrayList());
 		memberListProxy = Collections.synchronizedList(new ArrayList());
-		futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
+	//	futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
 		proxyForGroupID = new UniqueID();
 	}
 
@@ -61,21 +62,21 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			memberListStub.add(null);
 			memberListProxy.add(null);
 		}
-		futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
+	//	futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
 		proxyForGroupID = new UniqueID();
 	}
 
 	public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
 		memberListStub = Collections.synchronizedList(new ArrayList());
 		memberListProxy = Collections.synchronizedList(new ArrayList());
-		futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
+	//	futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
 		proxyForGroupID = new UniqueID();
 	}
 
 	public ProxyForGroup(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
 		memberListStub = Collections.synchronizedList(new ArrayList());
 		memberListProxy = Collections.synchronizedList(new ArrayList());
-		futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
+	//	futureList = new FutureListGroup(memberListStub, ((AbstractBody) ProActive.getBodyOnThis()).getFuturePool());
 		proxyForGroupID = new UniqueID();
 	}
 
@@ -395,6 +396,55 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			System.out.println(i + " : " + memberListStub.get(i).getClass().getName());
 		}
 	}
+
+	protected void waitAll() {
+		Vector temp = new Vector(memberListStub);
+		ProActive.waitForAll(temp);
+	}
+	
+	protected void waitOne() {
+		Vector temp = new Vector(memberListStub);
+		ProActive.waitForAny(temp);
+	}
+
+	protected void waitTheNth(int n) {
+		Vector temp = new Vector(memberListStub);
+		ProActive.waitFor(temp.get(n));
+	}
+
+	protected void waitN(int n) {
+		Vector temp = new Vector(memberListStub);
+		for (int i = 0; i < n ; i++) {
+			int index = ProActive.waitForAny(temp);
+			temp.remove(index);
+		}
+	}
+
+	protected Object waitAndGetOne() {
+		Vector temp = new Vector(memberListStub);
+		return memberListStub.get(ProActive.waitForAny(temp));
+	}
+
+	protected Object waitAndGetTheNth(int n) {
+		Vector temp = new Vector(memberListStub);
+		ProActive.waitForTheNth(temp,n);
+		return memberListStub.get(n);
+	}
+
+	protected boolean allAwaited() {
+		for (int i = 0 ; i < memberListStub.size() ; i++)
+			if (!(ProActive.isAwaited(memberListStub.get(i))))
+				return false;
+		return true;
+	}
+
+	protected boolean allArrived() {
+		for (int i = 0 ; i < memberListStub.size() ; i++)
+			if (ProActive.isAwaited(memberListStub.get(i)))
+				return false;
+		return true;
+	}
+
 
 	/* ------------------------ METHODS FOR SYNCHRONOUS CREATION OF A TYPED GROUP ------------------------ */
 
