@@ -7,28 +7,28 @@ import java.util.Vector;
 public class SwitcherModel
 {
 	private List labels;
-	private List classes;
+	private List keys;
 	private boolean [] states;
 	
 	private Vector listeners;
 	
-	public SwitcherModel (String [] _labels, Class [] _classes) throws RuntimeException
+	public SwitcherModel (String [] _labels, String [] _keys) throws RuntimeException
 	{
-		if (_labels.length != _classes.length)
+		if (_labels.length != _keys.length)
 			throw new RuntimeException ("Trying to create a SwitcherModel with different array sizes");
 		
 		labels = Arrays.asList (_labels);
-		classes = Arrays.asList (_classes);
+		keys = Arrays.asList (_keys);
 		
 		states = new boolean [labels.size()];
 		for (int i = 0; i < states.length; ++i)
 			states [i] = true;
 	}
 
-	public Class get (String label)
+	public String get (String label)
 	{
 		int i = labels.indexOf (label);
-		return getSwitchClass (i);
+		return getSwitchKey (i);
 	}
 	
 	public int size()
@@ -69,15 +69,15 @@ public class SwitcherModel
 		return (listeners == null ? new SwitchListener [] {} : (SwitchListener []) listeners.toArray (new SwitchListener[]{}));
 	}
 
-	public boolean isStateON (String label)
+	public boolean isStateONLabel (String label)
 	{
 		int i = labels.indexOf (label);
 		return getStateAt (i);
 	}
 
-	public boolean isStateON (Class c)
+	public boolean isStateONKey (String key)
 	{
-		int i = classes.indexOf (c);
+		int i = keys.indexOf (key);
 		return getStateAt (i);
 	}
 
@@ -89,7 +89,7 @@ public class SwitcherModel
 		return states [i];
 	}
 
-	public boolean switchState (String label)
+	public boolean switchStateLabel (String label)
 	{
 		int i = labels.indexOf (label);
 		return switchAndNotify (i);
@@ -108,9 +108,9 @@ public class SwitcherModel
 		return true;
 	}
 
-	public boolean switchState (Class _class)
+	public boolean switchStateKey (String _key)
 	{
-		int i = classes.indexOf (_class);
+		int i = keys.indexOf (_key);
 		return switchAndNotify (i);
 	}
 
@@ -118,7 +118,7 @@ public class SwitcherModel
 	{
 		int i = labels.indexOf (label);
 
-		return (isNewStateON ? SwitchEvent.getONEvent (label, getSwitchClass (i)) : SwitchEvent.getOFFEvent (label, getSwitchClass (i)));
+		return (isNewStateON ? SwitchEvent.getONEvent (label, getSwitchKey (i)) : SwitchEvent.getOFFEvent (label, getSwitchKey (i)));
 	}
 
 	public String getLabel (int i)
@@ -129,11 +129,11 @@ public class SwitcherModel
 		return (String) labels.get (i);
 	}
 
-	public Class getSwitchClass (int i)
+	public String getSwitchKey (int i)
 	{
 		if (i < 0 || i >= size())
 			return null;
 			
-		return (Class) classes.get (i);
+		return (String) keys.get (i);
 	}
 }

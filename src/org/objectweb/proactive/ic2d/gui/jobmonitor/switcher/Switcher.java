@@ -50,7 +50,7 @@ public class Switcher extends JPanel implements SwitchListener
 					{
 						public void actionPerformed (ActionEvent e)
 						{
-							System.out.println ("highlight: " + e.getActionCommand());
+//							System.out.println ("highlight: " + e.getActionCommand());
 						}
 					});
 					
@@ -106,7 +106,7 @@ public class Switcher extends JPanel implements SwitchListener
 
 	private void updateModel (String label)
 	{
-		model.switchState (label);
+		model.switchStateLabel (label);
 	}
 	
 	public void switchPerformed (SwitchEvent e)

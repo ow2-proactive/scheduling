@@ -86,8 +86,8 @@ public class DataModelNode extends DefaultMutableTreeNode
 	{
 		if (! hasChild (child))
 			add (child.getKey(), child);
-		else
-			System.out.println ("Node [" + getName() + "] has already the child named [" + child.getName() + "] on its key [" + child.getKey() + "]" );
+//		else
+//			System.out.println ("Node [" + getName() + "] has already the child named [" + child.getName() + "] on its key [" + child.getKey() + "]" );
 	}
 	
 	public void add (String key, Object child)
@@ -144,21 +144,94 @@ public class DataModelNode extends DefaultMutableTreeNode
 		return s;
 	}
 	
-	public DataModelNode getChildAt (String key, int index)
+	public DataModelNode getChildAt (String key, int index, DataModelTraversal traversal, NodeHelper helper)
+	{
+		int nbRealChild = getRealChildCount (key);
+		if (getVisibleChildCount (key, traversal, helper, false) == nbRealChild)
+		{
+			// Il n'y a a aucun fils cache, les indices ne sont pas modifies
+			return getRealChildAt (key, index);
+		}
+		else
+		{
+//			System.out.println("Index: " + index);
+			
+			for (int i = 0, childCount = 0; i < nbRealChild; ++i)
+			{
+				DataModelNode node = (DataModelNode) getRealChildAt (key, i);
+//				System.out.println ("node " + node + ": " + node.getRealChildCount() + " real children - " + node.getChildCount() + " visible children");
+				String nextKey = traversal.getFollowingKey (key);
+				childCount = node.getChildCount (nextKey, traversal, helper);
+				if (index < childCount)
+				{
+//					System.out.println("Parent should be node: " + node);						
+					return node.getChildAt (nextKey, index, traversal, helper);
+				}
+				else
+					index -= childCount;
+			}
+			
+//			System.out.println ("key: " + getKey() + " , name: " + getName() +
+//					" -  did not find child - key:" + key + " , index: " + index + " out of " + getChildCount (key, traversal, helper) + " visible children");
+			
+			return null;
+		}
+		
+//		return getRealChildAt (key, index);
+	}
+	
+	
+	public DataModelNode getRealChildAt (String key, int index)
 	{
 //		System.out.println("Node " + name + " - key " + key);
 		return (DataModelNode) getChildren (key).get (index);
 	}
 
-	public int getChildCount (String key)
+	public int getChildCount (String key, DataModelTraversal traversal, NodeHelper helper)
+	{
+//		if (getRealChildCount (key) != getVisibleChildCount (key, traversal, helper, true))
+//			System.out.println ("key: " + getKey() + " , name: " + getName() + " - real child count:" + getRealChildCount (key)
+//				+ ", visible child count: " + getVisibleChildCount (key, traversal, helper, true));
+		
+//		return getRealChildCount (key);
+		return getVisibleChildCount (key, traversal, helper, true);
+	}
+	
+	public int getRealChildCount (String key)
 	{
 //		System.out.println("Node " + name + " - key " + key + " - nb sons: " + getChildren (key).size());
 		return getChildren (key).size();
 	}
 
-	public boolean isLeaf (String key)
+	public int getVisibleChildCount (String key, DataModelTraversal traversal, NodeHelper helper, boolean countHiddenSonsChildren)
 	{
-		return (getChildCount (key) == 0);
+		int visible = 0;
+		for (int i = 0, size = getRealChildCount (key); i < size; ++i)
+		{
+			DataModelNode node = getRealChildAt (key, i);
+			if (node.isVisible (helper))
+				visible++;
+			else if (countHiddenSonsChildren)
+			{
+				if (!traversal.hasFollowingKey (key))
+					continue;
+				
+				String nextKey = traversal.getFollowingKey (key);
+				visible += node.getChildCount (nextKey, traversal, helper);
+			}
+		}
+		
+		return visible;
+	}
+	
+	public boolean isVisible (NodeHelper helper)
+	{
+		return helper.isNodeDisplayed (this);
+	}
+	
+	public boolean isLeaf (String key, DataModelTraversal traversal, NodeHelper helper)
+	{
+		return (getChildCount (key, traversal, helper) == 0);
 	}
 	
 	public int getIndex (String key, DataModelNode node)

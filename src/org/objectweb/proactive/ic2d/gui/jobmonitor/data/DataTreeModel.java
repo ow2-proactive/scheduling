@@ -6,15 +6,27 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitchEvent;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitchListener;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
-public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstants
+public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstants, SwitchListener
 {
 	private DataModelTraversal traversal;
+	private SwitcherModel smodel;
+	private NodeHelper helper;
 	
-	public DataTreeModel (DataModelRoot root, DataModelTraversal _traversal)
+	public DataTreeModel (DataModelRoot root, SwitcherModel _smodel, DataModelTraversal _traversal, NodeHelper _helper)
 	{
 		super (root);
+		
 		traversal = _traversal;
+		
+		smodel = _smodel;
+		
+		helper = _helper;
+		
+		smodel.addSwitchListener (this);
 	}
 		
 	public Object getChild (Object _parent, int index)
@@ -22,7 +34,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 //		System.out.println("getChild: " + _parent.hashCode() + " - parent == root: " + (_parent == root));
 		DataModelNode parent = (DataModelNode) _parent;
 		String nextKey = traversal.getFollowingKey (parent.getKey());
-		return parent.getChildAt (nextKey, index);
+		return parent.getChildAt (nextKey, index, traversal, helper);
 	}
 
 	public int getChildCount (Object _parent)
@@ -34,7 +46,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		if (!traversal.hasFollowingKey (parentKey))
 			return 0;
 		
-		return parent.getChildCount (traversal.getFollowingKey (parentKey));
+		return parent.getChildCount (traversal.getFollowingKey (parentKey), traversal, helper);
 	}
 
 	public int getIndexOfChild (Object _parent, Object _child)
@@ -56,7 +68,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		if (!traversal.hasFollowingKey (key))
 			return true;
 		
-		return node.isLeaf (traversal.getFollowingKey (key));
+		return node.isLeaf (traversal.getFollowingKey (key), traversal, helper);
 	}
 	
 	public void update ()
@@ -105,5 +117,15 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 				}			
 			}
 		}
+	}
+	
+	public void switchPerformed (SwitchEvent e)
+	{
+		nodeStructureChanged (root);
+	}
+	
+	public SwitcherModel getSwitcherModel ()
+	{
+		return smodel;
 	}
 }

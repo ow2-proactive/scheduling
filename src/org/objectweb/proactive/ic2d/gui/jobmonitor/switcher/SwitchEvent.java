@@ -7,28 +7,28 @@ public class SwitchEvent
 	
 	private int type;
 	private String label;
-	private Class switchedClass;
+	private String switchedKey;
 	
-	private SwitchEvent (int _type, String _label, Class _switchedClass)
+	private SwitchEvent (int _type, String _label, String _switchedKey)
 	{
 		type = _type;
 		label = _label;
-		switchedClass = _switchedClass;
+		switchedKey = _switchedKey;
 	}
 	
-	public static SwitchEvent getONEvent (String label, Class _class)
+	public static SwitchEvent getONEvent (String label, String key)
 	{
-		return new SwitchEvent (ON, label, _class);
+		return new SwitchEvent (ON, label, key);
 	}
 	
-	public static SwitchEvent getOFFEvent (String label, Class _class)
+	public static SwitchEvent getOFFEvent (String label, String key)
 	{
-		return new SwitchEvent (OFF, label, _class);
+		return new SwitchEvent (OFF, label, key);
 	} 
 	
-	public Class getSwitchedClass()
+	public String getSwitchedKey()
 	{
-		return switchedClass;
+		return switchedKey;
 	}
 	
 	public String getLabel()
@@ -46,7 +46,7 @@ public class SwitchEvent
 		String s = "<switchevent>";
 		
 		s += "<label>" + label + "</label>";
-		s += "<switchedClass>" + switchedClass.getName() + "</switchedClass>";
+		s += "<switchedKey>" + switchedKey + "</switchedKey>";
 		s += "</switchEvent>";
 		return s;
 	}

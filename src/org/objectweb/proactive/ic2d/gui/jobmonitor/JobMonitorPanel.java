@@ -32,9 +32,16 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private static final String JOB_VIEW_LABEL = "Job view / Hosts";
 	private static final String HOST_VIEW_LABEL = "Host view";
 	
+	private static final String JOB_VIEW_ROOT = "Jobs";
+	private static final String HOST_VIEW_ROOT = "Hosts";
+	
 	private static final int DEFAULT_RMI_PORT = Registry.REGISTRY_PORT;
 	
 	private static final String EXTRACT_MENU_LABEL = "Extract view to a new window";
+	
+	private static final String [] JOB_VIEW_KEYS 	= {JOB, HOST, JVM, VN, NODE, AO};
+	private static final String [] HOST_VIEW_KEYS = {HOST, JOB, JVM, VN, NODE, AO};
+	private static final String [] VN_VIEW_KEYS	 	= {JOB, VN, HOST, JVM, NODE, AO};
 	
 	private IC2DGUIController controller;
 	
@@ -50,11 +57,20 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private Vector monitoredHosts;
 	private Vector filteredJobs;
 	
+	private JPopupMenu popupmenu;
+	
+	private Thread refresher;
+	private volatile boolean refresh = true;
+	
+	private int ttr = 60;
+	
 	public JobMonitorPanel (IC2DGUIController _controller)
 	{		
 		setLayout (new GridLayout (1, 1));
 		
 		controller = _controller;
+		
+		createRefresher ();
 		
 		aos = new HashMap();
 		monitoredHosts = new Vector();
@@ -69,34 +85,33 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		final JPopupMenu extractMenu = new JPopupMenu();
 		JMenuItem extract = new JMenuItem (EXTRACT_MENU_LABEL);
 		extract.addActionListener (new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
 			{
-				public void actionPerformed(ActionEvent e)
+				final Component tab = tabs.getSelectedComponent();
+				final String title = tabs.getTitleAt (tabs.getSelectedIndex());
+				
+				final JFrame f = new JFrame (title);
+				f.setSize (tab.getSize());
+				Container c = f.getContentPane();
+				c.setLayout (new GridLayout (1, 1));
+				c.add (tab);
+				
+				f.addWindowListener (new WindowAdapter()
 				{
-					final Component tab = tabs.getSelectedComponent();
-					final String title = tabs.getTitleAt (tabs.getSelectedIndex());
-					
-					final JFrame f = new JFrame (title);
-					f.setSize (tab.getSize());
-					Container c = f.getContentPane();
-					c.setLayout (new GridLayout (1, 1));
-					c.add (tab);
-					
-					f.addWindowListener (new WindowAdapter()
-						{
-							public void windowClosing (WindowEvent e)
-							{
-								tabs.addTab (title, tab);
-								frames.remove (f);
-							}
-						}
-					);
-					
-					frames.add (f);
-					
-					f.show();
-				}
+					public void windowClosing (WindowEvent e)
+					{
+						tabs.addTab (title, tab);
+						frames.remove (f);
+					}
+				});
+				
+				frames.add (f);
+				
+				f.show();
 			}
-		);
+		});
+		
 		extractMenu.add (extract);
 		
 		tabs.addTab (JOB_VIEW_LABEL, createJobView());
@@ -104,57 +119,120 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		tabs.addTab (HOST_VIEW_LABEL, createHostView());
 
 		tabs.addMouseListener (new MouseAdapter()
+		{
+			public void mousePressed(MouseEvent e)
 			{
-				public void mousePressed(MouseEvent e)
+				if (e.isPopupTrigger())
 				{
-					if (e.isPopupTrigger())
+					Component menu = extractMenu.getComponent(0); 
+					if (tabs.getTabCount() > 1)
 					{
-						Component menu = extractMenu.getComponent(0); 
-						if (tabs.getTabCount() > 1)
-						{
-							if (! menu.isEnabled())
-								menu.setEnabled (true);
-						}
-						else
-						{
-							if (menu.isEnabled())
-								menu.setEnabled (false);
-						}
-						
-						extractMenu.show (tabs, e.getX(), e.getY());
+						if (! menu.isEnabled())
+							menu.setEnabled (true);
 					}
+					else
+					{
+						if (menu.isEnabled())
+							menu.setEnabled (false);
+					}
+					
+					extractMenu.show (tabs, e.getX(), e.getY());
 				}
 			}
-		);	
+		});	
+	}
+	
+	private void createRefresher ()
+	{
+		refresh = true;
+		refresher = new Thread (new Runnable()
+		{
+			public void run ()
+			{
+//				System.out.println ("Start of refresher thread");
+				while (refresh)
+				{
+					try
+					{		
+//						System.out.println ("Waiting for refresh - ttr = " + ttr + " seconds");
+						Thread.sleep (ttr * 1000);
+//						System.out.println ("Automatic refresh starting");
+						handleHosts();
+					}
+					catch (InterruptedException e)
+					{
+//						e.printStackTrace();
+					}
+				}
+//				System.out.println ("Stop of refresher thread");
+			}
+		});
+	}
+
+	protected void finalize () throws Throwable
+	{
+		stopRefreshing ();
+		super.finalize ();
+	}
+	
+	private void stopRefreshing ()
+	{
+		if (refresh)
+		{
+//			System.out.println ("Stoppping refresher thread");
+			refresh = false;
+			refresher.interrupt();
+		}
+	}
+
+	public int getTtr ()
+	{
+		return ttr;
+	}
+	
+	public void setTtr (int _ttr)
+	{
+		ttr = _ttr;
 	}
 	
 	public void addMonitoredHost (String host)
 	{
 		if (! monitoredHosts.contains (host))
+		{
 			monitoredHosts.add (host);
-		System.out.println ("There are now " + monitoredHosts.size() + " monitored hosts");
+			if (monitoredHosts.size() == 1)
+				refresher.start();
+		}
+		
+//		System.out.println ("There are now " + monitoredHosts.size() + " monitored hosts");
 	}
 
 	public void updateHosts ()
 	{
 		new Thread (new Runnable()
+		{
+			public void run ()
 			{
-				public void run ()
-				{
-					handleHosts ();
-				}
-			}).start();
+				handleHosts ();
+			}
+		}).start();
 	}
 	
 	void hideOwnedFrames()
 	{
 //		System.out.println("Hiding frames: " + frames.size());
 		hideOrShow (true);
+		stopRefreshing ();
 	}
 
 	void showOwnedFrames()
 	{
 //		System.out.println("Showing frames: " + frames.size());
+		if (! monitoredHosts.isEmpty())
+		{
+			createRefresher ();
+			refresher.start();
+		}
 		hideOrShow (false);
 	}	
 	
@@ -169,12 +247,11 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			for (int i = 0, size = monitoredHosts.size(); i < size; ++i)
 			{
 				String host = (String) monitoredHosts.get (i);
-				System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
+//				System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
 				handleHost (host);
 			}
 		}
 	
-		
 		vnViewModel.update();
         jobViewModel.update();
         hostViewModel.update();
@@ -235,7 +312,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				if (id.indexOf (PA_JVM) != -1)
 				{
 					RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup (id);
-					System.out.println("Found runtime id: " + id);
+//					System.out.println("Found runtime id: " + id);
 
 					List x = new ArrayList();
 					try
@@ -246,36 +323,36 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 						ProActiveRuntime [] runtimes = r.getProActiveRuntimes();
 						x.addAll (Arrays.asList (runtimes));
 						
-						System.out.println ("Found " + runtimes.length + " ProActiveRuntimes in this RemoteProActiveRuntime");
+//						System.out.println ("Found " + runtimes.length + " ProActiveRuntimes in this RemoteProActiveRuntime");
 						
 						for (int i = 0, size = x.size(); i < size; ++i)
 						{
-							System.out.println ("\nRuntime " + (i + 1) + " / " + size);
+//							System.out.println ("\nRuntime " + (i + 1) + " / " + size);
 							handleProActiveRuntime ((ProActiveRuntime) x.get (i));
 						}
 					}
 					catch (ProActiveException e)
 					{
-						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance: " + e);
-						e.printStackTrace();
+//						System.out.println ("Unexpected ProActive exception caught while obtaining runtime reference from the RemoteProActiveRuntime instance - The RMI reference might be dead: " + e);
+//						e.printStackTrace();
 					}
 					catch (RemoteException e)
 					{
-						System.out.println ("Unexpected remote exception caught while getting proactive runtimes: " + e);
-						e.printStackTrace();
+//						System.out.println ("Unexpected remote exception caught while getting proactive runtimes: " + e);
+//						e.printStackTrace();
 					}
 				}
 			}
 		}
 		catch (RemoteException e)
 		{
-			System.out.println("Unexpected exception caught while getting registry reference: " + e);
-			e.printStackTrace();
+//			System.out.println("Unexpected exception caught while getting registry reference: " + e);
+//			e.printStackTrace();
 		}
 		catch (NotBoundException e)
 		{
-			System.out.println("Unexpected not bound exception caught while looking up object reference: " + e);
-			e.printStackTrace();
+//			System.out.println("Unexpected not bound exception caught while looking up object reference: " + e);
+//			e.printStackTrace();
 		}
 	}
 
@@ -296,10 +373,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		if (isJobFiltered (pr.getJobID()))
 			return;
 		
-		System.out.println ("Runtimes: " + pr.getProActiveRuntimes().length);
+//		System.out.println ("Runtimes: " + pr.getProActiveRuntimes().length);
 		
-		System.out.println ("Job id: " + pr.getJobID() + " - vm info [job id: " + pr.getVMInformation().getJobID()
-				+ ", vm name: " + pr.getVMInformation().getName() + "]");
+//		System.out.println ("Job id: " + pr.getJobID() + " - vm info [job id: " + pr.getVMInformation().getJobID()
+//				+ ", vm name: " + pr.getVMInformation().getName() + "]");
 	
 		String jobId = pr.getJobID();
 		String hostname = pr.getVMInformation().getInetAddress().getCanonicalHostName();
@@ -328,7 +405,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		String vmName = pr.getVMInformation().getName();
 		
 		String [] nodes = pr.getLocalNodeNames();
-		System.out.println ("Found " + nodes.length + " nodes on this runtime");
+//		System.out.println ("Found " + nodes.length + " nodes on this runtime");
 		for (int i = 0; i < nodes.length; ++i)
 		{
 			String nodeName = nodes [i];
@@ -337,7 +414,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			if (vnName == null)
 				vnName = "NoVirtualNodeName";
 
-			System.out.println ("node " + (i + 1) + " / " + nodes.length + ": " + nodes [i] + 	" - vn name: " + vnName);
+//			System.out.println ("node " + (i + 1) + " / " + nodes.length + ": " + nodes [i] + 	" - vn name: " + vnName);
 			
 			ArrayList activeObjects = null;
 			try
@@ -386,7 +463,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			ArrayList aoWrapper = (ArrayList) activeObjects.get (i);
 			RemoteBodyAdapter rba = (RemoteBodyAdapter) aoWrapper.get (0);					
 			
-			System.out.println ("Active object " + (i + 1) + " / " + size + " class: " + aoWrapper.get (1));
+//			System.out.println ("Active object " + (i + 1) + " / " + size + " class: " + aoWrapper.get (1));
 			
 			String className = (String) aoWrapper.get (1);
 			if (className.equalsIgnoreCase ("org.objectweb.proactive.ic2d.spy.Spy"))
@@ -423,8 +500,78 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				f.show();
 		}
 	}
-
-	private Container createContent (String [] labels, Class [] classes, DataTreeModel model)
+	
+	private boolean constructPopupMenu (final DataModelNode node)
+	{
+		boolean showMenu = false;
+		
+		if (popupmenu == null)
+			popupmenu = new JPopupMenu ();
+	    	
+	    popupmenu.removeAll();
+	    
+	    if (node == null)
+	    {
+	    	
+	    	AbstractAction a = new AbstractAction ("Refresh monitoring tree")
+			{
+	    		public void actionPerformed (ActionEvent e)
+				{
+//	    			System.out.println("Asking for a global refresh");
+	    			updateHosts();
+				}
+			};
+	    	
+	    	JMenuItem treeMenu = new JMenuItem (a);
+	    	treeMenu.setEnabled (monitoredHosts.size() > 0);
+	    	popupmenu.add (treeMenu);
+	    	
+	    	showMenu = true;
+	    }
+	    else
+	    {
+	    	String key = node.getKey();
+	    	
+	    	AbstractAction a = null;
+	    	if (key == HOST)
+	    	{
+	    		a = new AbstractAction ("Refresh host")
+				{
+					public void actionPerformed (ActionEvent e)
+					{
+//						System.out.println ("Asking for a host refresh: " + node.getName());
+						updateHost (node.getName());
+					}
+				};
+	    	}
+	    	else if (key == JOB)
+	    	{
+	    		a = new AbstractAction ("Stop monitoring this job")
+				{
+					public void actionPerformed (ActionEvent e)
+					{
+						String job = node.getName();
+//						System.out.println ("Asking for a job to be added to the filtered jobs list: " + job);
+						filteredJobs.add (job);
+						
+						// remove job from tree
+					}
+				};
+	    	}
+	    	
+	    	if (a != null)
+	    	{
+	    		JMenuItem nodeMenu = new JMenuItem (a);
+	    		popupmenu.add (nodeMenu);
+	    		
+	    		showMenu = true;
+	    	}
+	    }
+	    
+	    return showMenu;
+	}
+	
+	private Container createContent (DataTreeModel model)
 	{
 		//JSplitPane sp = new JSplitPane ();
 		//sp.setOneTouchExpandable (true);
@@ -435,7 +582,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		//sp.setLeftComponent (left);
 		//sp.setRightComponent (right);
 			
-		Switcher s = createSwitcher (labels, classes);
+		Switcher s = new Switcher (model.getSwitcherModel());
 		JPanel switcher = new JPanel (new GridLayout (1, 1));
 		switcher.add (s);
 		switcher.setBorder (BorderFactory.createEtchedBorder());
@@ -479,129 +626,49 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 		return left;
 	}
 	
-	private JPopupMenu popupmenu;
-
-	private boolean constructPopupMenu (final DataModelNode node)
-	{
-		boolean showMenu = false;
-		
-		if (popupmenu == null)
-			popupmenu = new JPopupMenu ();
-	    	
-	    popupmenu.removeAll();
-	    
-	    if (node == null)
-	    {
-	    	
-	    	AbstractAction a = new AbstractAction ("Refresh monitoring tree")
-			{
-	    		public void actionPerformed (ActionEvent e)
-				{
-	    			System.out.println("Asking for a global refresh");
-	    			updateHosts();
-				}
-			};
-	    	
-	    	JMenuItem treeMenu = new JMenuItem (a);
-	    	treeMenu.setEnabled (monitoredHosts.size() > 0);
-	    	popupmenu.add (treeMenu);
-	    	
-	    	showMenu = true;
-	    }
-	    else
-	    {
-	    	String key = node.getKey();
-	    	
-	    	AbstractAction a = null;
-	    	if (key == HOST)
-	    	{
-	    		a = new AbstractAction ("Refresh host")
-				{
-					public void actionPerformed (ActionEvent e)
-					{
-						System.out.println ("Asking for a host refresh: " + node.getName());
-						updateHost (node.getName());
-					}
-				};
-	    	}
-	    	else if (key == JOB)
-	    	{
-	    		a = new AbstractAction ("Stop monitoring this job")
-				{
-					public void actionPerformed (ActionEvent e)
-					{
-						System.out.println ("Asking for a job to be added to the filtered jobs list: " + node.getName());
-						filteredJobs.add (node.getName());
-						// remove job from tree
-					}
-				};
-	    	}
-	    	
-	    	if (a != null)
-	    	{
-	    		JMenuItem nodeMenu = new JMenuItem (a);
-	    		popupmenu.add (nodeMenu);
-	    		
-	    		showMenu = true;
-	    	}
-	    }
-	    
-	    return showMenu;
-	}
-	
-	private JPanel createPanel (String [] labels, Class [] classes, DataTreeModel model)
+	private JPanel createPanel (DataTreeModel model)
 	{
 		JPanel p = new JPanel (new GridLayout (1, 1));
-		p.add (createContent (labels, classes, model));
+		p.add (createContent (model));
 		return p;
 	}
 	
 	private JPanel createJobView ()
 	{
-		DataModelTraversal traversal = new DataModelTraversal (new String [] {JOB, HOST, JVM, VN, NODE, AO});
-		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, modelRoot);	
-		jobViewModel = new DataTreeModel (root, traversal);
+		SwitcherModel jobSwitchModel = new SwitcherModel (new String [] {"Job", "Host", "JVM", "VN", "Node", "AO"}, JOB_VIEW_KEYS);
+		NodeHelper helper = new NodeHelper (jobSwitchModel);
 		
-		return createPanel (LABELS, CLASSES, jobViewModel);
+		DataModelTraversal traversal = new DataModelTraversal (JOB_VIEW_KEYS);
+		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, helper, modelRoot);	
+		
+		jobViewModel = new DataTreeModel (root, jobSwitchModel, traversal, helper);
+		
+		return createPanel (jobViewModel);
 	}
 	
 	private JPanel createHostView ()
 	{
-		DataModelTraversal traversal = new DataModelTraversal (new String [] {HOST, JOB, JVM, VN, NODE, AO});
-		DataModelRoot root = new DataModelRoot (HOST_VIEW_ROOT, traversal, modelRoot);
-		hostViewModel = new DataTreeModel (root, traversal);
+		SwitcherModel hostSwitchModel = new SwitcherModel (new String [] {"Host", "Job", "JVM", "VN", "Node", "AO"}, HOST_VIEW_KEYS);
+		NodeHelper helper = new NodeHelper (hostSwitchModel);
+		
+		DataModelTraversal traversal = new DataModelTraversal (HOST_VIEW_KEYS);
+		DataModelRoot root = new DataModelRoot (HOST_VIEW_ROOT, traversal, helper, modelRoot);
+		
+		hostViewModel = new DataTreeModel (root, hostSwitchModel, traversal, helper);
 
-		return createPanel (LABELS2, CLASSES2, hostViewModel);
+		return createPanel (hostViewModel);
 	}
 	
 	private JPanel createVNView ()
 	{
-		DataModelTraversal traversal = new DataModelTraversal (new String [] {JOB, VN, HOST, JVM, NODE, AO});
-		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, modelRoot);		
-		vnViewModel = new DataTreeModel (root, traversal);
+		SwitcherModel vnSwitchModel = new SwitcherModel (new String [] {"Job", "VN", "Host", "JVM", "Node", "AO"}, VN_VIEW_KEYS);
+		NodeHelper helper = new NodeHelper (vnSwitchModel);
+		
+		DataModelTraversal traversal = new DataModelTraversal (VN_VIEW_KEYS);
+		DataModelRoot root = new DataModelRoot (JOB_VIEW_ROOT, traversal, helper, modelRoot);
+		
+		vnViewModel = new DataTreeModel (root, vnSwitchModel,  traversal, helper);
 
-		return createPanel (LABELS3, CLASSES3, vnViewModel);
-	}
-	
-	private static final String [] LABELS = {"Job", "Host", "JVM", "VN", "Node", "AO"};
-	private static final Class [] CLASSES = {String.class, Integer.class, Double.class, Float.class, Object.class, Long.class};
-
-	private static final String [] LABELS2 = {"Host", "Job", "JVM", "VN", "Node", "AO"};
-	private static final Class [] CLASSES2 = {String.class, Integer.class, Double.class, Float.class, Object.class, Long.class};
-	
-	private static final String [] LABELS3 = {"Job", "VN", "Host", "JVM", "Node", "AO"};
-	private static final Class [] CLASSES3 = {String.class, Integer.class, Double.class, Float.class, Object.class, Long.class};
-
-	private static final String JOB_VIEW_ROOT = "Jobs";
-	private static final String HOST_VIEW_ROOT = "Hosts";
-	
-	public static SwitcherModel getSwitcherModel (String [] labels, Class [] classes)
-	{
-		return new SwitcherModel (labels, classes);
-	}
-
-	public static Switcher createSwitcher (String [] labels, Class [] classes)
-	{
-		return new Switcher (getSwitcherModel (labels, classes));
-	}
+		return createPanel (vnViewModel);
+	}	
 }

@@ -32,9 +32,7 @@ public class JobMonitorFrame extends JFrame
 	private javax.swing.JMenuBar createMenuBar()
 	{
 	    javax.swing.JMenuBar menuBar = new javax.swing.JMenuBar();
-	    
-	    
-	    // monitoring menu
+	    	    
 	    javax.swing.JMenu monitoringMenu = new javax.swing.JMenu("Monitoring");
 
 	    javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor a new RMI host");
@@ -73,9 +71,30 @@ public class JobMonitorFrame extends JFrame
 	    b = new javax.swing.JMenuItem ("Set Time-To-Refresh");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
-	        public void actionPerformed(java.awt.event.ActionEvent e)
+	        public void actionPerformed (java.awt.event.ActionEvent e)
 	        {
-	        	System.out.println ("Set time to refresh asked");
+	        	String initialValue = "" + panel.getTtr();
+			    Object result = javax.swing.JOptionPane.showInputDialog(panel, // Component parentComponent,
+			        "Please enter the time to refresh, in seconds :", // Object message,
+			        "Setting the time to refresh", // String title,
+			        javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+			        null, // Icon icon,
+			        null, // Object[] selectionValues,
+			        initialValue // Object initialSelectionValue)
+			      );
+			    if (result == null || (!(result instanceof String)))
+			      return;
+			    
+			    try
+				{
+					int ttr = Integer.parseInt ((String) result);
+					panel.setTtr (ttr);
+				}
+				catch (NumberFormatException exc)
+				{
+//					System.out.println ("The ttr number is invalid !");
+					return;
+				}
 	        }
 	    });
 	    controlMenu.add(b);
@@ -85,7 +104,7 @@ public class JobMonitorFrame extends JFrame
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
 	        {
-	        	System.out.println ("Set depth control asked");
+//	        	System.out.println ("Set depth control asked");
 	        }
 	    });
 	    controlMenu.add(b);
