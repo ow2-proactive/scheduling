@@ -418,7 +418,7 @@ public class ProActive {
 				return cf.newFcInstance(componentParameters.getComponentType(),
 					new ControllerDescription(componentParameters.getName(),
 						componentParameters.getHierarchicalType()),
-					new ContentDescription(classname, constructorParameters, vn));
+					new ContentDescription(className, constructorParameters, vn));
 			} catch (NoSuchInterfaceException e) {
 				throw new ActiveObjectCreationException(e);
 			} catch (InstantiationException e) {
