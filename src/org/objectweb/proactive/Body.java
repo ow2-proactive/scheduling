@@ -100,14 +100,6 @@ public interface Body extends UniversalBody, MessageEventProducer {
 
 
   /**
-   * Returns the url of the node this body is associated to
-   * The url of the node can change if the active object migrates
-   * @return the url of the node this body is associated to
-   */
-  public String getNodeURL();
-
-
-  /**
    * Tries to find a local version of the body of id uniqueID. If a local version
    * is found it is returned. If not, tries to find the body of id uniqueID in the 
    * known body of this body. If a body is found it is returned, else null is returned.

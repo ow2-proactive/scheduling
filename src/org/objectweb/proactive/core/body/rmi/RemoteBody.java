@@ -69,10 +69,10 @@ public interface RemoteBody extends java.rmi.Remote {
   /**
    * Returns the url of the node this body is associated to
    * The url of the node can change if the active object migrates
-   * @exception java.io.IOException if an exception occured during the remote communication
+   * @exception java.rmi.RemoteException if an exception occured during the remote communication
    * @return the url of the node this body is associated to
    */
-  public String getNodeURL() throws java.io.IOException;
+  public String getNodeURL() throws java.rmi.RemoteException;
 
 
   /**

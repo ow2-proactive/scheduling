@@ -19,7 +19,7 @@
 		<BookTitle>"ProActive PDC"</BookTitle>
 		<BookSubTitle>"The ProActive Java Library for Parallel, Distributed, and Concurrent Computing"</BookSubTitle>
 		<BookAuthor>"ProActive Team"</BookAuthor>
-		<BookVersion>"Version 0.91"</BookVersion>
+		<BookVersion>"Version 0.9.1"</BookVersion>
 		<BookCopyright>"Copyright \xa9 2002 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
 		<BookPublisher>"INRIA Sophia Antipolis"</BookPublisher>
 		<!-- CHAPTER OPTIONS -->

@@ -172,8 +172,12 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
   }
 
 
-  public String getNodeURL() throws java.io.IOException {
-    return proxiedJiniBody.getNodeURL();
+  public String getNodeURL() {
+    try {
+      return proxiedJiniBody.getNodeURL();
+    } catch (java.rmi.RemoteException e) {
+      return "cannot contact the body to get the nodeURL";
+    }
   }
 
 

@@ -93,7 +93,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
   }
 
 
-  public String getNodeURL() throws java.io.IOException {
+  public String getNodeURL() {
     return body.getNodeURL();
   }
 

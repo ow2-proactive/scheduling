@@ -533,11 +533,7 @@ public class ProActive {
     //now we get a reference on the remoteBody of this guy
     BodyProxy destProxy = (BodyProxy)((org.objectweb.proactive.core.mop.StubObject)o).getProxy();
     String nodeURL = null;
-    try {
-      return destProxy.getBody().getNodeURL();
-    } catch (java.io.IOException e) {
-      throw new MigrationException("Cannot get the name of the node where is the remote object", e);
-    }
+    return destProxy.getBody().getNodeURL();
   }
   
   private static Node getNodeFromURL(String url) throws MigrationException {

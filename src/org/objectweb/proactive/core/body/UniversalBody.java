@@ -1,33 +1,33 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.core.UniqueID;
@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.body.request.Request;
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter
  */
-public interface UniversalBody  {  
+public interface UniversalBody  {
 
   /**
    * Receives a request for later processing. The call to this method is non blocking
@@ -69,9 +69,8 @@ public interface UniversalBody  {
    * Returns the url of the node this body is associated to
    * The url of the node can change if the active object migrates
    * @return the url of the node this body is associated to
-   * @exception java.io.IOException if the nodeURL cannot be fetched
    */
-  public String getNodeURL() throws java.io.IOException;
+  public String getNodeURL();
 
 
   /**
@@ -85,7 +84,7 @@ public interface UniversalBody  {
   /**
    * Signals to this body that the body identified by id is now to a new
    * remote location. The body given in parameter is a new stub pointing
-   * to this new location. This call is a way for a body to signal to his 
+   * to this new location. This call is a way for a body to signal to his
    * peer that it has migrated to a new location
    * @param id the id of the body
    * @param body the stub to the new location

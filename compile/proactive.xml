@@ -6,7 +6,7 @@
 	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
 	<property name="classes.dir" value="${base}/classes"/>
-	<property name="basedist.dir" value="${base}/dist"/>
+	<property name="dist.dir" value="${base}/dist"/>
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
         <property name="debug" value="on"/>
@@ -247,7 +247,7 @@
 	-->
 	<target name="clean">
 		<delete dir="${classes.dir}"/>
-		<delete dir="${basedist.dir}"/>
+		<delete dir="${dist.dir}"/>
 		<delete dir="${docs.dir}"/>
 	</target>
 	<!--
@@ -259,47 +259,61 @@
 	-->
 	<target name="dist" depends="all">
 		<!-- Create the distribution directory -->
-		<delete dir="${basedist.dir}"/>
-		<mkdir dir="${basedist.dir}"/>
-		<property name="dist.dir" value="${basedist.dir}/ProActive"/>
+		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
+		<property name="PAdist.dir" value="${dist.dir}/ProActive"/>
+		<mkdir dir="${PAdist.dir}"/>
 		<!-- Put everything in ${classes} into the ProActive-${DSTAMP}.jar file -->
-		<jar jarfile="${dist.dir}/ProActive.jar">
+		<jar jarfile="${PAdist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
 			</fileset>
 		</jar>
-		<jar jarfile="${dist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**"/>
-		<jar jarfile="${dist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**"/>
-		<!-- copy docs / scripts / src / compile / lib -->
-		<copy todir="${dist.dir}" includeEmptyDirs="no">
+		<jar jarfile="${PAdist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**"/>
+		<jar jarfile="${PAdist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**"/>
+		<!-- 
+			copy docs / scripts / src / compile / lib 
+		-->
+		<copy todir="${PAdist.dir}" includeEmptyDirs="no">
 			<fileset dir="${base}">
-				<include name="docs/**"/>
+				<include name="docs/api/**"/>
+				<!--include name="docs/ic2d-api/**"/-->
 				<include name="scripts/**"/>
 				<include name="src/org/**"/>
 				<include name="compile/**"/>
 				<include name="lib/**"/>
 			</fileset>
 		</copy>
-	</target>
-	<!--
-	   ================================================================
-	   ==
-      ==  Export all source
-      ==
-      ================================================================
-	-->
-	<target name="export">
-		<!-- Delete stuff in the export -->
-		<delete dir="${base}/../OW_ProActive"/>
-		<!-- Create the export directory -->
-		<mkdir dir="${base}/../OW_ProActive"/>
-		<!-- copy examples src -->
-		<copy todir="${base}/../OW_ProActive" includeEmptyDirs="no">
-			<fileset dir="${base}"/>
-		</copy>
+		<!-- 
+			create zip version of ProActive without source
+		-->
+		<zip zipfile="${dist.dir}/ProActive_0_9_1.zip">
+			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
+			<zipfileset dir="${PAdist.dir}/scripts" prefix="ProActive/scripts"/>
+			<zipfileset dir="${PAdist.dir}/lib" prefix="ProActive/lib"/>
+		</zip>
+		<!-- 
+			create zip version of ProActive with source
+		-->
+		<zip zipfile="${dist.dir}/ProActive-src_0_9_1.zip">
+			<zipfileset dir="${PAdist.dir}" prefix="ProActive"/>
+		</zip>
+		<!-- 
+			copy PDF Manual 
+		-->
+		<copy file="${base}/docs/ProActiveManual.pdf" todir="${dist.dir}"/>
+		<!--
+			create zip version of ProActive Manual 
+		-->
+		<zip zipfile="${dist.dir}/ProActiveManual.zip" basedir="${dist.dir}" includes="ProActiveManual.pdf"/>
+		<!-- 
+			create zip version of ProActive doc 
+		-->
+		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
+			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
+		</zip>
 	</target>
 	<!--
 	   ================================================================
@@ -321,7 +335,6 @@
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
-			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
 		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 0.9.1 - IC2D" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
 			<classpath refid="project.classpath"/>

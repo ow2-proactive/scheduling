@@ -1,52 +1,48 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.proxy;
 
-import org.objectweb.proactive.Body;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 public abstract class AbstractBodyProxy extends AbstractProxy implements BodyProxy, java.io.Serializable  {
 
@@ -83,7 +79,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
   public UniqueID getBodyID() {
     return bodyID;
   }
-  
+
   //
   // -- implements Proxy -----------------------------------------------
   //
@@ -125,8 +121,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     }
     return reifyAsSynchronous(methodCall);
   }
-  
- 
+
+
   /**
    *
    */
@@ -176,15 +172,15 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
       return f.getResult();
     }
   }
-  
+
 
   protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException;
-  
+
 
   //
   // -- PROTECTED STATIC UTILITY METHODS -----------------------------------------------
   //
- 
+
   protected static ConstructorCall findBodyConstructorCall(Class bodyClass, String nodeURL, ConstructorCall reifiedObjectConstructorCall) throws ProActiveException {
     // Determines the constructor of the body object: it is the constructor that
     // has only one argument, this argument being of type ConstructorCall
@@ -200,6 +196,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     } catch (NoSuchMethodException e) {
       throw new ProActiveException("Class " + bodyClass.getName() + " has no constructor matching ", e);
     }
-  } 
-  
+  }
+
 }

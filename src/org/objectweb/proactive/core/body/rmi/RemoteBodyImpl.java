@@ -93,7 +93,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject implemen
   }
 
 
-  public String getNodeURL() throws java.io.IOException {
+  public String getNodeURL() {
     return body.getNodeURL();
   }
 

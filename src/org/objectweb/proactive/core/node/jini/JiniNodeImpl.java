@@ -1,82 +1,71 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.node.jini;
 
+import java.rmi.RemoteException;
+
+import net.jini.core.entry.Entry;
+import net.jini.core.lease.Lease;
+import net.jini.core.lookup.ServiceItem;
+import net.jini.core.lookup.ServiceRegistrar;
+import net.jini.core.lookup.ServiceRegistration;
+import net.jini.discovery.DiscoveryEvent;
+import net.jini.lease.LeaseRenewalEvent;
+import net.jini.lookup.entry.Name;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyMap;
+import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 
-import java.rmi.RemoteException;
-import java.rmi.RMISecurityManager;
-import net.jini.discovery.LookupDiscovery;
-import net.jini.discovery.DiscoveryEvent;
-import net.jini.core.lookup.ServiceRegistrar;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceRegistration;
-import net.jini.core.lease.Lease;
-import net.jini.core.entry.Entry;
-import net.jini.lookup.entry.Name;
-import net.jini.discovery.DiscoveryListener;
-import net.jini.lease.LeaseRenewalManager;
-import net.jini.lease.LeaseRenewalEvent;
-import net.jini.lease.LeaseListener;
+public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject implements JiniNode, java.io.Serializable,
+                                                  net.jini.discovery.DiscoveryListener, net.jini.lease.LeaseListener {
 
-public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
-  implements JiniNode,
-	     java.io.Serializable,
-	     DiscoveryListener,
-	     LeaseListener
-{
-  
   private static String[] LOCAL_URLS = { "///", "//localhost/", "//127.0.0.1/" };
   protected NodeInformation nodeInformation;
   // objet pas serializable donc on le met transient
-  transient LeaseRenewalManager leaseManager = new LeaseRenewalManager();
+  transient net.jini.lease.LeaseRenewalManager leaseManager = new net.jini.lease.LeaseRenewalManager();
 
 
   //
   // -- Constructors -----------------------------------------------
   //
-  
+
   public JiniNodeImpl() throws java.rmi.RemoteException {
   }
-  
-  
+
+
   public JiniNodeImpl(String url) throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
     this(url, false);
   }
@@ -92,10 +81,10 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
     } catch (java.net.UnknownHostException e) {
       throw new RemoteException("Host unknown in "+url, e);
     }
-    
-    LookupDiscovery discover = null;
+
+    net.jini.discovery.LookupDiscovery discover = null;
     try{
-      discover = new LookupDiscovery(LookupDiscovery.ALL_GROUPS);
+      discover = new net.jini.discovery.LookupDiscovery(net.jini.discovery.LookupDiscovery.ALL_GROUPS);
     }
     catch (Exception e){
       System.err.println(e.toString());
@@ -107,10 +96,10 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
-  
 
-  
-  
+
+
+
   //
   // -- Implements JiniNode -----------------------------------------------
   //
@@ -127,7 +116,7 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
     System.out.println ("JiniNodeImpl.receiveBody "+nodeInformation.getURL());
     long startTime = System.currentTimeMillis();
     System.out.println(" --------- JiniNodeImpl: receiveBody() name set ");
-    UniversalBody boa = b.getRemoteAdapter(); 
+    UniversalBody boa = b.getRemoteAdapter();
     long endTime = System.currentTimeMillis();
       System.out.println(" --------- JiniNodeImpl: receiveBody() finished after " + (endTime-startTime));
     return boa;
@@ -172,14 +161,14 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
       ServiceRegistrar registrar = registrars[n];
       ServiceRegistration reg = null;
       try {
-	// construction du service
-	ServiceItem item = new ServiceItem(null,
-					   this,
-					   new Entry[] { new Name(nodeInformation.getURL())});
-	reg = registrar.register(item, Lease.FOREVER);
+  // construction du service
+  ServiceItem item = new ServiceItem(null,
+             this,
+             new Entry[] { new Name(nodeInformation.getURL())});
+  reg = registrar.register(item, Lease.FOREVER);
       } catch (Exception e) {
-	System.out.println("register exception "+e.toString());
-	continue;
+  System.out.println("register exception "+e.toString());
+  continue;
       }
       System.out.println(" service JiniNode Registered");
       // on lance le lease manager pour que l'objet puisse se reenregistrer
@@ -189,17 +178,17 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
 
   public void discarded(DiscoveryEvent evt){
   }
-  
-  
+
+
   public void notify(LeaseRenewalEvent evt){
     System.out.println("Lease expired "+evt.toString());
   }
 
-  
+
   //
   // -- PROTECTED METHODS -----------------------------------------------
-  // 
-  
+  //
+
   protected String checkURL(String url) throws java.rmi.RemoteException {
     String noProtocolURL = removeProtocol(url);
     if (noProtocolURL.charAt(noProtocolURL.length()-1) == '/')
@@ -230,31 +219,31 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
   //
   // -- INNER CLASSES  -----------------------------------------------
   //
-  
+
   protected static class NodeInformationImpl implements NodeInformation, java.io.Serializable {
-  
+
     private String nodeName;
     private String nodeURL;
       private int portNumber;
     //private String codebase;
     private java.net.InetAddress hostInetAddress;
     private java.rmi.dgc.VMID hostVMID;
-    
+
     public NodeInformationImpl(String nodeURL) throws java.net.UnknownHostException {
       readHostAndNodeName(nodeURL);
       if (portNumber>0) {
-	  this.nodeURL = "//"+hostInetAddress.getHostName()+":"+portNumber+"/"+nodeName;
+    this.nodeURL = "//"+hostInetAddress.getHostName()+":"+portNumber+"/"+nodeName;
       } else {
-	  this.nodeURL = "//"+hostInetAddress.getHostName()+"/"+nodeName;
-      } 
-      
-      
-    
+    this.nodeURL = "//"+hostInetAddress.getHostName()+"/"+nodeName;
+      }
+
+
+
       this.hostVMID = UniqueID.getCurrentVMID();
       //this.codebase = System.getProperty("java.rmi.server.codebase");
     }
-    
-    
+
+
     //
     // -- PUBLIC METHODS  -----------------------------------------------
     //
@@ -272,13 +261,13 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
     public String getName() {
       return nodeName;
     }
-    
+
     public String getProtocol() {
       return "jini";
     }
 
     public String getURL() {
-	return nodeURL;
+  return nodeURL;
     }
 
 
@@ -310,12 +299,12 @@ public class JiniNodeImpl extends java.rmi.server.UnicastRemoteObject
       // end inner class NodeInformationImpl
 
       private String removePortNumber(String url) {
-	  int index = url.indexOf(":");
-	  if (index > -1) {
-	      this.portNumber=Integer.parseInt(url.substring(index+1,url.length()));
-	      return url.substring(0,index);
-	  }
-	  return url;
+    int index = url.indexOf(":");
+    if (index > -1) {
+        this.portNumber=Integer.parseInt(url.substring(index+1,url.length()));
+        return url.substring(0,index);
+    }
+    return url;
       }
   }
 }

@@ -1,70 +1,68 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.proxy;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.future.Future;
-import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
+import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.lang.reflect.InvocationTargetException;
+import org.objectweb.proactive.core.node.NodeFactory;
 
 public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Serializable {
 
   // note that we do not want to serialize this member but rather handle
   // the serialization by ourselve
   protected transient UniversalBody universalBody;
-  
+
   protected transient boolean isLocal;
-  
+
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
- 
+
   /**
    * Empty, no args constructor
    */
   public UniversalBodyProxy() {
   }
-  
-  
+
+
   /**
    * Instantiates an object of class BodyProxy, creates a body object
    * (referenced either via the instance variable <code>localBody</code>
@@ -73,7 +71,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
    * the creation of the reified object (That's it !).
    * parameter contains either :
    *    &lt;bodyClass, Node>
-   * or 
+   * or
    *    &lt;universal body>
    */
   public UniversalBodyProxy(ConstructorCall constructorCall, Object[] parameters) throws ProActiveException {
@@ -101,18 +99,18 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       //System.out.println("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
     }
   }
-  
-  
+
+
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
-  
+
   public boolean equals(Object o) {
     if (! (o instanceof UniversalBodyProxy)) return false;
     UniversalBodyProxy proxy = (UniversalBodyProxy) o;
     return universalBody.equals(proxy.universalBody);
   }
-  
+
   public int hashCode() {
     return universalBody.hashCode();
   }
@@ -130,7 +128,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-  
+
   protected UniversalBody createLocalBody(ConstructorCall reifiedObjectConstructorCall, Class bodyClass, Node node) throws ProActiveException {
     try {
       ConstructorCall bodyConstructorCall = findBodyConstructorCall(bodyClass, node.getNodeInformation().getURL(), reifiedObjectConstructorCall);
@@ -145,7 +143,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       throw new ProActiveException("Error in the copy of the arguments of the constructor", e);
     }
   }
-  
+
   protected UniversalBody createRemoteBody(ConstructorCall reifiedObjectConstructorCall, Class bodyClass, Node node) throws ProActiveException {
     try {
       ConstructorCall bodyConstructorCall = findBodyConstructorCall(bodyClass, node.getNodeInformation().getURL(), reifiedObjectConstructorCall);
@@ -160,7 +158,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       throw new ProActiveException(e);
     }
   }
-  
+
   protected void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException {
     // Determines the body that is at the root of the subsystem from which the
     // call was sent.
@@ -194,11 +192,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
-  
+
   //
   // -- SERIALIZATION -----------------------------------------------
   //
-  
+
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     out.writeObject(universalBody.getRemoteAdapter());
   }
@@ -219,4 +217,4 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 }
 
 
-  
+

@@ -1,46 +1,43 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.migration.AbstractMigratableBody;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.mop.ConstructorCall;
-import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 
 
@@ -58,16 +55,16 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
  *
  */
 public class BodyImpl extends AbstractMigratableBody implements Runnable, java.io.Serializable {
-  
+
   //
   // -- STATIC MEMBERS -----------------------------------------------
   //
- 
+
 
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
   //
-  
+
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
@@ -103,9 +100,9 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   //
   // -- implements Runnable -----------------------------------------------
   //
-  
+
   /**
-   * The method executed by the active thread that will eventually launch the live 
+   * The method executed by the active thread that will eventually launch the live
    * method of the active object of the default live method of this body.
    */
   public void run() {
@@ -113,9 +110,9 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     // find out the live method to run
     // try to find live(Body body)
     java.lang.reflect.Method liveMethod = locateLiveRoutine(Constants.DEFAULT_BODY_INTERFACE);
-    // then try to find a method live(<specific type of body)  
+    // then try to find a method live(<specific type of body)
     if (liveMethod == null) liveMethod = locateLiveRoutine(this.getClass());
-    try {  
+    try {
       if (liveMethod == null) {
         // no live method found : default to fifoPolicy
         fifoPolicy();
@@ -139,8 +136,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     }
   }
 
-    
-  
+
+
   //
   // -- implements Body -----------------------------------------------
   //
@@ -155,12 +152,12 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
       serve(requestQueue.blockingRemoveOldest());
     }
   }
-  
-  
+
+
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-  
+
   /**
    * Creates the component in charge of storing incoming requests.
    * @return the component in charge of storing incoming requests.
@@ -168,8 +165,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   protected BlockingRequestQueue createRequestQueue() {
     return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(bodyID);
   }
-  
-  
+
+
   /**
    * Creates the component in charge of receiving incoming requests.
    * @return the component in charge of receiving incoming requests.
@@ -177,8 +174,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   protected RequestReceiver createRequestReceiver() {
     return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
   }
-  
-  
+
+
   /**
    * Creates the component in charge of receiving incoming replies.
    * @return the component in charge of receiving incoming replies.
@@ -186,8 +183,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   protected ReplyReceiver createReplyReceiver() {
     return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
   }
-  
-  
+
+
   /**
    * Creates the component in charge of migration.
    * @return the component in charge of migration.
@@ -195,8 +192,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   protected MigrationManager createMigrationManager() {
     return MetaObjectFactory.createMigrationManager();
   }
-  
-  
+
+
   /**
    * Launches the proper live method on the reified object if one is defined.
    * This method is called automagically by the constructor,
@@ -218,14 +215,14 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
       throw new ProActiveRuntimeException("live method "+liveMethod+" is not accessible", e);
     }
   }
-  
-  
+
+
   /**
    * Locates the live method on the reified object. The live method
    * searched is the one taking an object of class <code>aClass</code>
    * in parameter
    * @param aClass the class of the argument of the live method to look for.
-   * @return the live method on the reified object taking an object of class 
+   * @return the live method on the reified object taking an object of class
    * <code>aClass</code> in paramter or null if such a method cannot be found.
    */
   protected java.lang.reflect.Method locateLiveRoutine(Class aClass) {
@@ -242,7 +239,7 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     //System.err.println(">>>>>>>>>> Finalizing Body");
   }
 
-  
+
   /**
    * Creates the active thread and start it using this runnable body.
    */
@@ -250,7 +247,7 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     Thread t = new Thread(this, shortClassName(getName())+" on "+getNodeURL());
     t.start();
   }
- 
+
 
   //
   // -- PRIVATE METHODS -----------------------------------------------
@@ -260,8 +257,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     if (n == -1 || n == fqn.length()-1) return fqn;
     return fqn.substring(n+1);
   }
-  
-  
+
+
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     out.defaultWriteObject();
   }

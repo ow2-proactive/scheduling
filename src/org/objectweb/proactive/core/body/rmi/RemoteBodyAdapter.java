@@ -172,8 +172,12 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
   }
 
 
-  public String getNodeURL() throws java.io.IOException {
-    return proxiedRemoteBody.getNodeURL();
+  public String getNodeURL() {
+    try {
+      return proxiedRemoteBody.getNodeURL();
+    } catch (java.rmi.RemoteException e) {
+      return "cannot contact the body to get the nodeURL";
+    }
   }
 
 
