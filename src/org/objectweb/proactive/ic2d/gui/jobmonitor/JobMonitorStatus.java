@@ -12,7 +12,6 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreeSelectionModel;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
@@ -59,14 +58,33 @@ class StatusCell extends JPanel implements JobMonitorConstants {
         this.name.setText(name);
     }
 
+    private static String timeDiff(Calendar d1, Calendar d2) {
+    	long d1Sec = d1.getTimeInMillis() / 1000;
+    	long d2Sec = d2.getTimeInMillis() / 1000;
+
+    	long diff = d1Sec - d2Sec;
+    	if (diff < 120)
+    		return diff + " seconds";
+    	
+    	diff /= 60;
+    	if (diff < 120)
+    		return diff + " minutes";
+    	
+    	diff /= 60;
+    	if (diff < 120)
+    		return diff + " hours";
+
+    	diff /= 24;
+    	return diff + " days";
+    }
+    
     public void updateDeleted(GregorianCalendar deletedSince) {
         if (deletedSince == null) {
             state.setText("Alive");
         } else {
             GregorianCalendar now = new GregorianCalendar();
-            int diff = now.get(Calendar.SECOND) -
-                deletedSince.get(Calendar.SECOND);
-            state.setText("Unresponding since " + diff + " seconds");
+            String diff = timeDiff(now, deletedSince);
+            state.setText("Unresponding for " + diff);
         }
     }
 

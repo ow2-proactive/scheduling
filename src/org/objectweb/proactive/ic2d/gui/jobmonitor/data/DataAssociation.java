@@ -69,7 +69,6 @@ public class DataAssociation implements JobMonitorConstants {
 	
 	private BasicMonitoredObject addToSet(BasicMonitoredObject value) {
 		int key = value.getKey();
-		int index = KEY2INDEX[key];
 		MonitoredObjectSet set = getSetForKey(key);
 		BasicMonitoredObject orig = set.get(value); 
 		if (orig == null) {
