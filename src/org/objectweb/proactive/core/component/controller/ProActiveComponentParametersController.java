@@ -35,9 +35,13 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.TypeFactory;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
@@ -57,7 +61,16 @@ public class ProActiveComponentParametersController extends ProActiveController
 	 * @param owner the super controller
 	 */
     public  ProActiveComponentParametersController(Component owner) {
-        super(owner, Constants.COMPONENT_PARAMETERS_CONTROLLER);
+        super(owner);
+		try {
+			setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
+										ProActiveContentController.class.getName(),
+								TypeFactory.SERVER, TypeFactory.MANDATORY,
+								TypeFactory.SINGLE));
+		} catch (InstantiationException e) {
+			throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
+		}
+
     }
 
 	/**
@@ -77,8 +90,16 @@ public class ProActiveComponentParametersController extends ProActiveController
     /**
      * see {@link ComponentParametersController#setComponentName(String)}
      */
-    public void setComponentName(String componentName) {
+    public void setFcName(String componentName) {
     	componentParameters.setName(componentName);
     }
     
+    
+	/**
+	 * see {@link org.objectweb.fractal.api.control.NameController#getFcName()}
+	 */
+	public String getFcName() {
+		return componentParameters.getName();
+	}
+
 }
