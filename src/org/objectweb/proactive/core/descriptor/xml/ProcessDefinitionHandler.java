@@ -526,10 +526,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
                     String pathSeparator = System.getProperty("path.separator");
-                    sb.append(paths[0]);
+                    sb.append(paths[0].trim());
+                    //we call trim method to avoid whitespace at the beginning or end of a path
                     for (int i = 1; i < paths.length; i++) {
                         sb.append(pathSeparator);
-                        sb.append(paths[i]);
+                        sb.append(paths[i].trim());
                     }
                     jvmProcess.setClasspath(sb.toString());
                 }
@@ -538,10 +539,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 if (paths.length > 0) {
                     StringBuffer sb = new StringBuffer();
                     String pathSeparator = System.getProperty("path.separator");
-                    sb.append(paths[0]);
+                    sb.append(paths[0].trim());
                     for (int i = 1; i < paths.length; i++) {
                         sb.append(pathSeparator);
-                        sb.append(paths[i]);
+                        sb.append(paths[i].trim());
                     }
                     jvmProcess.setBootClasspath(sb.toString());
                 }
@@ -559,11 +560,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 }
             } else if (name.equals(JAVA_PATH_TAG)) {
                 String jp = (String) activeHandler.getResultObject();
-                jvmProcess.setJavaPath(jp);
+                jvmProcess.setJavaPath(jp.trim());
             } else if (name.equals(POLICY_FILE_TAG)) {
-                jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
+                jvmProcess.setPolicyFile(((String) activeHandler.getResultObject()).trim());
             } else if (name.equals(LOG4J_FILE_TAG)) {
-                jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
+                jvmProcess.setLog4jFile(((String) activeHandler.getResultObject()).trim());
             } else if (name.equals(PROACTIVE_PROPS_FILE_TAG)) {
                 jvmProcess.setJvmOptions("-Dproactive.configuration=" +
                     (String) activeHandler.getResultObject());
