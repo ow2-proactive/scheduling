@@ -30,9 +30,13 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 /**
@@ -43,6 +47,9 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     private String IDName;
     private int awaitedCalls;
 
+    private BlockingRequestQueue queueRef = null;
+    private BarrierState barrierState = null;
+    
     /**
      * Constructor
      * @param idname - the id name of the barrier
@@ -85,4 +92,39 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     public String getIDName() {
         return this.IDName;
     }
+
+    /**
+     * Returns true if the barrier is immediate
+     * @return false - by default barrier are not immediate
+     */
+    public boolean isImmediate() {
+    	return false;
+    }
+    
+    
+	/**
+	 * Execution of a barrier call is to block the service of request if the method is sent by the object itself
+	 */
+	public Object execute(Object target) throws InvocationTargetException, MethodCallExecutionFailedException {
+		if (this.queueRef != null) {
+			barrierState.setAwaitedCalls(this.getAwaitedCalls());
+			barrierState.tagLocalyCalled();
+			//check if this call is the last one for the barrier described in the barrierState  
+			int calls = barrierState.getAwaitedCalls() - (barrierState.getReceivedCalls()+1);
+			//if it is, do not block, the barrier is instantly released
+			if (calls != 0) {
+				queueRef.suspend();
+			}
+		}
+		return null;
+	}
+	
+	public void setQueue(BlockingRequestQueue b) {
+		this.queueRef = b;
+	}
+	
+	public void setBarrierState(BarrierState bs) {
+		this.barrierState = bs;
+	}
+
 }

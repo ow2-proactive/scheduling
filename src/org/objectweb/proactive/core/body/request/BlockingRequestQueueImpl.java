@@ -114,7 +114,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  			if (mb.barrierOver()) {
 	  				it.remove();
 	  				if (this.methodBarriers.size() == 0) {
-	  					this.suspended = false;
+	  					this.resume();
 	  				}
 	  			}
 	  			this.specialMethod = r.getMethodName();
@@ -126,22 +126,21 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  if (r.getMethodCall() instanceof MethodCallBarrier) {
 		  //System.out.println("    BARRIER CALL\n          Source: " + r.getSourceBodyID() + "\n          Body:   " + this.body.getID());
 		  MethodCallBarrier mcb = (MethodCallBarrier)r.getMethodCall();
-		  //System.out.println("Je recois un appel barrier : \"" + mcb.getIDName() + "\" !");
+		  //System.out.println("I receive a barrier call: \"" + mcb.getIDName() + "\" !");
 		  // search the state of the barrier for the barrier ID name
 		  BarrierState bs = (BarrierState) this.currentBarriers.get(mcb.getIDName());
 		  // bs == null  =>  state not found  =>  first barrier encountered for ID name
 		  if (bs == null) { 
-			  // System.out.println("First barrier \"" + mcb.getIDName() + "\" encountered !");
+			  //System.out.println("First barrier \"" + mcb.getIDName() + "\" encountered !");
 			  // build and add infos about new barrier
 			  bs = new BarrierState();
 			  this.currentBarriers.put(mcb.getIDName(), bs);
 		  }
 		  // if this object is the sender of the barrier : tag and suspend
 		  if (r.getSourceBodyID().equals(this.body.getID())) {
-				// System.out.println("This is MY call to barrier \"" + mcb.getIDName() + "\" : I fix the awaited number to " + mcb.getAwaitedCalls() + " and I stop !");
-				bs.setAwaitedCalls(mcb.getAwaitedCalls());
-				bs.tagLocalyCalled();
-				this.suspended = true;
+				// System.out.println("This is MY call to barrier \"" + mcb.getIDName() + "\" : I set the awaited number to " + mcb.getAwaitedCalls());
+		  		mcb.setBarrierState(bs);
+		  		mcb.setQueue(this);
 		  }
 		  int calls = bs.getAwaitedCalls() - (bs.getReceivedCalls()+1);
 		  // if there is others waiting calls, decrement
@@ -154,14 +153,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 		  	  this.currentBarriers.remove(mcb.getIDName());
 			  // if there is no other barrier in action  =>  resume
 			  // System.out.println("Barrier \"" + mcb.getIDName() + "\" released !");
-			  this.suspended = false;
+			  this.resume();
 		  }
 	  }
 	  // a "method based barrier" => stop the activity of this AO
 	  else if (r.getMethodCall() instanceof MethodCallBarrierWithMethodName) {
 	  		MethodCallBarrierWithMethodName mcbwmn = (MethodCallBarrierWithMethodName)r.getMethodCall();
 	  		this.methodBarriers.add(new MethodBarrier(mcbwmn.getMethodNames()));
-			this.suspended = true;
+			this.suspend();
 	  }
 	  this.notifyAll();	  
 	  return ftres;
@@ -344,5 +343,19 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  }
 	  return r;
   }
+  
+  /**
+   * Blocks the service of requests.
+   * Incoming requests are still added in queue.
+   */
+  public void suspend () {
+  	this.suspended = true;
+  }
 
+  /**
+   * Resumes the service of requests.
+   */
+  public void resume () {
+  	this.suspended = false;
+  }
 }

@@ -125,4 +125,16 @@ public interface BlockingRequestQueue extends RequestQueue {
    * Returns immediately if there is already one.
    */
     public void waitForRequest();
+
+
+    /**
+     * Blocks the service of requests.
+     * Incoming requests are still added in queue.
+     */
+    public void suspend ();
+    
+    /**
+     * Resumes the service of requests.
+     */
+    public void resume ();
 }
