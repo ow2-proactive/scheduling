@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.node;
 
+import org.objectweb.proactive.core.runtime.VMInformation;
+
 /**
  * <p>
  * A class implementing this interface provides information about the node it is attached to.
