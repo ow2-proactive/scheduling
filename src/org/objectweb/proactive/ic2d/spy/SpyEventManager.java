@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEvent;
 import org.objectweb.proactive.core.event.BodyEventListener;
 import org.objectweb.proactive.core.event.FutureEvent;

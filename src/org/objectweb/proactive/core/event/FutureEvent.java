@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.event;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 
 /**
  * <p>

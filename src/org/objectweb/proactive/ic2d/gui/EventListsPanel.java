@@ -31,17 +31,13 @@
 package org.objectweb.proactive.ic2d.gui;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
-import org.objectweb.proactive.ic2d.spy.SpyEvent;
-import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
-import org.objectweb.proactive.ic2d.spy.SpyFutureEvent;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
 import org.objectweb.proactive.ic2d.gui.data.UniqueIDDropTargetListener;
 import org.objectweb.proactive.ic2d.gui.recording.PlayerFrameTimeLine;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyFutureEvent;
 import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 
 
