@@ -42,7 +42,7 @@ import java.io.IOException;
  * @author vlegrand
  *
  */
-public class FileProcess implements ServerProcess {
+public class FileProcess  {
     protected static Logger logger = Logger.getLogger(FileProcess.class.getName());
     private java.io.File[] codebases;
     protected RequestInfo info;

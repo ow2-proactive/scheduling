@@ -48,10 +48,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public HttpRuntimeAdapter() {
         runtimestrategyadapter = ProActiveRuntimeImpl.getProActiveRuntime();
 
-        String host = getVMInformation().getInetAddress().getCanonicalHostName();
-
-        //runtimeadapter.url = "http://"+host+":"+runtimeadapter.port;
-        url = UrlBuilder.buildUrl(host, "", "http:", port);
+        url = ClassServer.getUrl(); 
         logger.debug("url de l adapter runtime = " + url);
     }
 

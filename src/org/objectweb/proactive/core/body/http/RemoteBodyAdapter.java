@@ -104,9 +104,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         this.bodyID = body.getID();
         this.url = ClassServer.getUrl();
         this.port = ClassServer.getServerSocketPort();
-
-        this.url = this.url + ":" + this.port;
-
+        
         remoteBodyStrategy = body;
     }
 
@@ -372,16 +370,13 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     	return this.bodyID;
     }
       
-    public int getPort() {
-        return this.port;
-    }
 
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.remoteBodyStrategy = new HttpRemoteBodyImpl(this);
     }
-    
+     
     
     public int hashCode() {
         //return bodyID.hashCode();//jobID
