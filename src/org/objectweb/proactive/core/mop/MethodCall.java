@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -42,32 +40,15 @@ import java.lang.reflect.Method;
  *
  * @author Julien Vayssi&egrave;re
  */
-public final class MethodCall extends Object implements Serializable {
+public final class MethodCall implements java.io.Serializable {
 
-  /**
-   * The array holding the argments of the method call
-   */
-  private Object[] effectiveArguments;
-  
-  /**
-   * The method corresponding to the call
-   */
-  private Method reifiedMethod;
-  
-  /**
-   * The hypothetic result
-   */
-  private Object res;
-  
-  /**
-   * The internal ID of the methodcall
-   */
-  private long id;
+  //
+  // --- STATIC MEMBERS -----------------------------------------------------------------------
+  //
 
   /**
    *	The size of the pool we use for recycling MethodCall objects.
    */
-  //MODIFIE LE 25/10/99
   private static int RECYCLE_POOL_SIZE = 30;
   
   /**
@@ -86,18 +67,40 @@ public final class MethodCall extends Object implements Serializable {
   private static boolean recycleMethodCallObject;
 
 
-  private static java.util.Hashtable table = new java.util.Hashtable();
+  private static java.util.Hashtable reifiedMethodsTable = new java.util.Hashtable();
  
 
   /**
    * Initializes the recycling of MethodCall objects to be enabled by default.
-   */
-  
+   */  
   static {
     MethodCall.setRecycleMethodCallObject(true);
   }
 
 
+  //
+  // --- PRIVATE MEMBERS -----------------------------------------------------------------------
+  //
+
+  /**
+   * The array holding the argments of the method call
+   */
+  private Object[] effectiveArguments;
+  
+  /**
+   * The method corresponding to the call
+   */
+  private Method reifiedMethod;
+  
+  /**
+   * The hypothetic result
+   */
+  private Object methodCallResult;
+  
+  /**
+   * The internal ID of the methodcall
+   */
+  private long methodCallID;
 
   /**
    * Sets recycling of MethodCall objects on/off. Note that turning the recycling
@@ -164,7 +167,7 @@ public final class MethodCall extends Object implements Serializable {
         // Refurbishes the object
         result.reifiedMethod = reifiedMethod;
         result.effectiveArguments = effectiveArguments;
-        result.res = null;
+        result.methodCallResult = null;
 
         return result;
       } else
@@ -191,7 +194,7 @@ public final class MethodCall extends Object implements Serializable {
         // garbage-collecting the objects referenced in here
         mc.reifiedMethod = null;
         mc.effectiveArguments = null;
-        mc.res = null;
+        mc.methodCallResult = null;
         // Inserts the object in the pool
         MethodCall.recyclePool[MethodCall.index] = mc;
         MethodCall.index++;
@@ -211,7 +214,7 @@ public final class MethodCall extends Object implements Serializable {
   private MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
     this.reifiedMethod = reifiedMethod;
     this.effectiveArguments = effectiveArguments;
-    this.res = null;
+    this.methodCallResult = null;
   }
 
 
@@ -273,14 +276,17 @@ public final class MethodCall extends Object implements Serializable {
   }
 
 
+  //
+  // --- PRIVATE METHODS -----------------------------------------------------------------------
+  //
+
+
   private Class[] fixBugRead(FixWrapper[] para) {
     Class[] tmp = new Class[para.length];
-    //	System.out.println("--- fixBugRead started for " +  para.length +" values");
     for (int i = 0; i < para.length; i++) {
       //	System.out.println("fixBugRead for " + i + " value is " +para[i]);
       tmp[i] = para[i].getWrapped();
     }
-    //	System.out.println("--- fixBugRead over");
     return tmp;
   }
 
@@ -291,42 +297,33 @@ public final class MethodCall extends Object implements Serializable {
       //	System.out.println("fixBugWrite for " + i + " out of " + para.length + " value is " +para[i] );	
       tmp[i] = new FixWrapper(para[i]);
     }
-    //	System.out.println("fixBugWrite over");
     return tmp;
   }
 
 
+
   //
-  // PRIVATE METHODS -----------------------------------------------------------------------
+  // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
   //
 
 
   // This method needs to be rewritten with Class being now serializable (as of Java 2)
-  private void writeObject(java.io.ObjectOutputStream out) throws IOException {
-    Class declaringClass;
-    String simpleName;
-    Class[] parameters;
-
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
     out.writeObject(this.effectiveArguments);
-
-      
     // The Method object needs to be converted
-    declaringClass = this.reifiedMethod.getDeclaringClass();
+    Class declaringClass = this.reifiedMethod.getDeclaringClass();
     out.writeObject(declaringClass);
-
-    simpleName = this.reifiedMethod.getName();
-    out.writeObject(simpleName);
-    out.writeObject(this.fixBugWrite(this.reifiedMethod.getParameterTypes()));
-    out.writeObject(this.res);
-    out.writeLong(this.id);
+    out.writeObject(reifiedMethod.getName());
+    out.writeObject(fixBugWrite(this.reifiedMethod.getParameterTypes()));
+    out.writeObject(methodCallResult);
+    out.writeLong(methodCallID);
   }
 
 
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     Class declaringClass;
     String simpleName;
     Class[] parameters;
-
     // Reads the effective arguments
     this.effectiveArguments = (Object[])in.readObject();
 
@@ -337,28 +334,99 @@ public final class MethodCall extends Object implements Serializable {
     parameters = this.fixBugRead((FixWrapper[])in.readObject());
 
   
-    // Reads the res instance variable
-    this.res = (Object)in.readObject();
-    this.id = in.readLong();
+    // Reads the methodCallResult instance variable
+    this.methodCallResult = (Object)in.readObject();
+    this.methodCallID = in.readLong();
         
     //this.forwarded=in.readBoolean();
 
     // Builds a key
-    String key = declaringClass.getName() + simpleName;
+    StringBuffer sb = new StringBuffer();
+    sb.append(declaringClass.getName());
+    sb.append(simpleName);
     for (int i = 0; i < parameters.length; i++) {
-      key = key + parameters[i].getName();
+      sb.append(parameters[i].getName());
     }
+    String key = sb.toString();
 
-    this.reifiedMethod = (Method)table.get(key);
+    this.reifiedMethod = (Method)reifiedMethodsTable.get(key);
     if (this.reifiedMethod == null) {
       // Looks up the method
       try {
+        System.out.println("------> simpleName="+simpleName);
+        for (int i = 0; i<parameters.length; i++) {
+          System.out.println("------> parameters["+i+"]="+parameters[i]);
+        }
         this.reifiedMethod = declaringClass.getMethod(simpleName, parameters);
-        table.put(key, this.reifiedMethod);
+        reifiedMethodsTable.put(key, this.reifiedMethod);
       } catch (NoSuchMethodException e) {
         throw new InternalException("Lookup for method failed: " + e + ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
       }
     }
   }
+
+
+
+  //
+  // --- INNER CLASSES -----------------------------------------------------------------------
+  //
+
+  public class FixWrapper implements java.io.Serializable {
+
+    public boolean isPrimitive;
+    public Class encapsulated;
+
+    public FixWrapper() {}
+
+    /**
+     * Encapsulate primitives types into Class 
+     */
+    public FixWrapper(Class c) {
+      if (! c.isPrimitive()) {
+        encapsulated = c;
+        return;
+      }
+      isPrimitive = true;
+      if (c.equals(Boolean.TYPE)) {
+        encapsulated = Boolean.class;
+      } else if (c.equals(Byte.TYPE)) {
+        encapsulated = Byte.class;
+      } else if (c.equals(Character.TYPE)) {
+        encapsulated = Character.class;
+      } else if (c.equals(Double.TYPE)) {
+        encapsulated = Double.class;
+      } else if (c.equals(Float.TYPE)) {
+        encapsulated = Float.class;
+      } else if (c.equals(Integer.TYPE)) {
+        encapsulated = Integer.class;
+      } else if (c.equals(Long.TYPE)) {
+        encapsulated = Long.class;
+      } else if (c.equals(Short.TYPE)) {
+        encapsulated = Short.class;
+      }
+    }
+
+    /**
+     * Give back the original class
+     *
+     */
+    public Class getWrapped() {
+      if (! isPrimitive) return encapsulated;
+      if (encapsulated.equals(Boolean.class)) return Boolean.TYPE;
+      if (encapsulated.equals(Byte.class)) return Byte.TYPE;
+      if (encapsulated.equals(Character.class)) return Character.TYPE;
+      if (encapsulated.equals(Double.class)) return Double.TYPE;
+      if (encapsulated.equals(Float.class)) return Float.TYPE;
+      if (encapsulated.equals(Integer.class)) return Integer.TYPE;
+      if (encapsulated.equals(Long.class)) return Long.TYPE;
+      if (encapsulated.equals(Short.class)) return Short.TYPE;
+      throw new RuntimeException("FixWrapper encapsulated class unkown "+encapsulated);
+    }
+
+
+    public String toString() {
+      return "FixWrapper: " + encapsulated.toString();
+    }
+  } // end inner class FixWrapper
 
 }
