@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.core.component;
 
-import java.util.Hashtable;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -43,6 +39,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -60,6 +57,10 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.ProActiveLogger;
+
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -70,7 +71,6 @@ import org.objectweb.proactive.core.node.NodeException;
  * 3. a utility class providing static methods to create collective interfaces and retreive references to ComponentParametersController<br>
  */
 public class Fractive implements GenericFactory, Component, Factory {
-    private static Logger logger = Logger.getLogger(Fractive.class.getName());
     private static Fractive instance = null;
     private TypeFactory typeFactory = (TypeFactory) ProActiveTypeFactory.instance();
     private Type type = null;
@@ -152,7 +152,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                         "Cannot create component on virtual node as no node is associated with this virtual node");
                 }
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
-                if (nodes.length > 1) { // cyclic node
+                if ((nodes.length > 1) && !contentDesc.uniqueInstance()) { // cyclic node + 1 instance per node
                     //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
                     Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType());
                     Group group_of_components = ProActiveGroup.getGroup(components);
@@ -186,6 +186,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                     }
                 } else {
                     // this is the case where contentDesc.getVirtualNode().getNodeCount() == 1) {
+                    // or when virtual node is multiple but only 1 component should be instantiated on the virtual node 
                     // create the component on the first node retreived from the virtual node
                     ao = ProActive.newActive(contentDesc.getClassName(),
                             contentDesc.getConstructorParameters(),
@@ -250,8 +251,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                 // for compatibility with the new org.objectweb.fractal.util.Fractal class
                 return this;
             }
-            if ((arg0 instanceof Type) &&
-                    (arg1 instanceof ControllerDescription) &&
+            if ((arg1 instanceof ControllerDescription) &&
                     ((arg2 instanceof String) || (arg2 == null))) {
                 // for the ADL, when only type and ControllerDescription are given
                 return newFcInstance(arg0, arg1,
@@ -318,7 +318,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                 TypeFactory.class.getName(), false, false, false)
                         });
             } catch (InstantiationException e) {
-                logger.error(e.getMessage());
+                ProActiveLogger.getLogger("components").error(e.getMessage());
                 return null;
             }
         } else {
