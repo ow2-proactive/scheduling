@@ -165,7 +165,7 @@ public class ClassServer implements Runnable {
             e.printStackTrace();
         }
 
-        return null;
+        return UrlBuilder.buildUrl("localhost", "", "http:", port);
     }
 
     /**
