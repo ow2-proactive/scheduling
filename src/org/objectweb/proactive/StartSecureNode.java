@@ -117,7 +117,7 @@ public class StartSecureNode extends StartNode {
    * Associates the secure RMI node factory to the RMI protocol
    */
   protected void setNodeFactory() throws java.io.IOException,NodeException {
-    NodeFactory.setFactory(org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER, new SecureRemoteNodeFactory(publicCertificateFilename, privateCertificateFilename, acPublicKeyFilename));
+    //NodeFactory.setFactory(org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER, new SecureRemoteNodeFactory(publicCertificateFilename, privateCertificateFilename, acPublicKeyFilename));
   }
   
   
