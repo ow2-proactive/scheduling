@@ -45,7 +45,9 @@ public class RMIHostDialog extends javax.swing.JDialog {
        jButtonOK = new javax.swing.JButton();
        jButtonCancel = new javax.swing.JButton();
        jLabel3 = new javax.swing.JLabel();
-
+       
+       jButtonOK.setMnemonic(java.awt.event.KeyEvent.VK_ENTER);
+       getRootPane().setDefaultButton(jButtonOK);
        setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
        setTitle("Adding host and assoc to monitor");
        setModal(true);
