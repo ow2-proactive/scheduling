@@ -2,18 +2,21 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="Agent" property="unique"/>
+			<virtualNode name="AgentClient" property="unique"/>
 		</virtualNodesDefinition>
+		<virtualNodesAcquisition>
+			<virtualNode name="Agent"/>
+		</virtualNodesAcquisition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="Agent" protocol="rmi"/>
 		<mapping>
-			<map virtualNode="Agent">
+			<map virtualNode="AgentClient">
 				<jvmSet>
 					<currentJVM protocol="rmi"/>
 				</jvmSet>
 			</map>
 		</mapping>
+		<lookup virtualNode="Agent" host="localhost" protocol="rmi"/>
 	</deployment>
 	<infrastructure>
 		<processes>
