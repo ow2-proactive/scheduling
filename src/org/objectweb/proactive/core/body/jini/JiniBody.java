@@ -101,4 +101,11 @@ public interface JiniBody extends java.rmi.Remote {
 	*/
 	public void disableAC() throws java.io.IOException;
 
+	/**
+	 * For setting an immediate service for this body.
+	 * An immediate service is a method that will bw excecuted by the calling thread.
+	 */
+	public void setImmediateService (String methodName) throws java.io.IOException ;
+  	
+
 }

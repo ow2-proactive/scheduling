@@ -203,6 +203,9 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
   	proxiedRemoteBody.disableAC();
   }
   
+  public void setImmediateService (String methodName) throws java.io.IOException {
+  	proxiedRemoteBody.setImmediateService(methodName);
+  }
 
   //
   // -- PRIVATE METHODS -----------------------------------------------

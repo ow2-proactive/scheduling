@@ -50,4 +50,7 @@ public class BouncingRequestReceiver implements RequestReceiver {
   public void removeMessageEventListener(MessageEventListener listener) {
   }
 
+  public void setImmediateService(String methodName) {
+  }
+
 }

@@ -44,4 +44,10 @@ public class RequestReceiverForwarder implements RequestReceiver {
   public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
     request.send(remoteBody);
   }
+
+  public void setImmediateService(String methodName) throws java.io.IOException {
+  	remoteBody.setImmediateService(methodName);
+  }	
 }
+
+

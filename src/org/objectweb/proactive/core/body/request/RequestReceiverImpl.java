@@ -35,7 +35,14 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 
 public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
 
+	//list of immediate services (method names)
+	private java.util.Vector immediateServices;
+	
+
 	public RequestReceiverImpl() {
+		this.immediateServices = new java.util.Vector(2);
+		this.immediateServices.add("toString");
+		this.immediateServices.add("hashCode");
 	}
 
 	public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
@@ -48,11 +55,16 @@ public class RequestReceiverImpl implements RequestReceiver, java.io.Serializabl
 	}
 
 	private boolean immediateExecution(String methodName) {
-		if (methodName.equals("toString") || methodName.equals("hashCode")) {
+		if (immediateServices.contains(methodName)) 
 			return true;
-		}
-		return false;
+		else
+			return false;
 	}
+
+	public void setImmediateService(String methodName){
+		this.immediateServices.add(methodName);
+	}
+	
 
 
 }

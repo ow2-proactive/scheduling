@@ -180,6 +180,11 @@ public abstract class BodyImpl extends AbstractBody
 		setLocalBodyImpl(new InactiveLocalBodyStrategy());
 	}
 
+
+	public void setImmediateService(String methodName) throws java.io.IOException {
+		this.requestReceiver.setImmediateService(methodName);
+	}
+
 	//
 	// -- PRIVATE METHODS -----------------------------------------------
 	//

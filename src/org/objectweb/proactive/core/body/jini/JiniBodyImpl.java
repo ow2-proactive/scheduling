@@ -112,6 +112,10 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
 	public void disableAC() throws java.io.IOException {
 		body.disableAC();
 	}
+	
+	public void setImmediateService (String methodName) throws java.io.IOException {
+  		body.setImmediateService(methodName);
+ 	}
 
   public void unreferenced() {
     System.out.println("JiniBodyImpl: unreferenced()");      

@@ -108,6 +108,11 @@ public class HalfBody extends AbstractBody {
 		replyReceiver.receiveReply(reply, this, getFuturePool());
 	}
 
+
+	public void setImmediateService(String methodName){
+		throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+	}
+
 	//
 	// -- inner classes -----------------------------------------------
 	//

@@ -204,6 +204,10 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
   	proxiedJiniBody.disableAC();
   }
 
+  public void setImmediateService (String methodName) throws java.io.IOException {
+  	proxiedJiniBody.setImmediateService(methodName);
+  }
+
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //

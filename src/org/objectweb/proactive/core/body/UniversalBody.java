@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
@@ -102,5 +104,11 @@ public interface UniversalBody {
 	 * Disables automatic continuation mechanism for this body
 	 */
 	public void disableAC() throws java.io.IOException;
+
+	/**
+	 * For setting an immediate service for this body.
+	 * An immediate service is a method that will bw excecuted by the calling thread.
+	 */
+	public void setImmediateService(String methodName) throws IOException;
 
 }

@@ -630,6 +630,28 @@ public class ProActive {
 	}
 
 	/**
+	 * Set an immmediate execution for the active object obj, ie request of name methodName
+	 * will be executed by the calling thread, and not add in the request queue.
+	 * BE CAREFULL : for the first release of this method, do not make use of getCurrentThreadBody nor 
+	 * getStubOnThis in the method defined by methodName !!
+	 */
+	public static void setImmediateService(Object obj, String methodName) throws java.io.IOException{
+		 // Check if obj is really a reified object
+		if (!(MOP.isReifiedObject(obj))) {
+			throw new ProActiveRuntimeException("The given object " + obj + " is not a reified object");
+		}
+		// Find the appropriate remoteBody
+		org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+		if (myProxy == null)
+			throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + obj);
+		BodyProxy myBodyProxy = (BodyProxy) myProxy;
+		UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+		body.setImmediateService(methodName);
+	}
+
+
+
+	/**
 	 * When an active object is created, it is associated with a Body that takes care
 	 * of all non fonctionnal properties. Assuming that the active object is only 
 	 * accessed by the different Stub objects, all method calls end-up as Requests sent

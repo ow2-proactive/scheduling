@@ -76,6 +76,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     public void disableAC() throws java.io.IOException {
     	this.wrappedBody.disableAC();
     }
+    
+    public void setImmediateService(String methodName) throws java.io.IOException {
+    	this.wrappedBody.setImmediateService(methodName);
+    }
 
     protected void updateServer() {
         System.out.println("UniversalBodyWrapper.updateServer");

@@ -35,5 +35,7 @@ import org.objectweb.proactive.Body;
 public interface RequestReceiver {
 
   public void receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException;
+  
+  public void setImmediateService(String methodName) throws java.io.IOException ;
 
 }
