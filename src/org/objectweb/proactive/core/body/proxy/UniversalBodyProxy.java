@@ -34,6 +34,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
@@ -73,7 +74,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
    * object <code>c</code> to the body, which will then handle
    * the creation of the reified object (That's it !).
    * parameter contains either :
-   *    &lt;MetaObjectFactory, Node>
+   *    &lt;Node, Active, MetaObjectFactory>
    * or
    *    &lt;UniversalBody>
    */
@@ -89,10 +90,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     } else {
       // instantiate the body locally or remotely
       Class bodyClass = Constants.DEFAULT_BODY_CLASS;
-      MetaObjectFactory factory = (MetaObjectFactory) p0;
-      Node node = (Node) parameters[1];
-      Class[] argsClass = new Class[] { ConstructorCall.class, String.class, MetaObjectFactory.class };
-      Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), factory };
+      Node node = (Node) p0;
+      Active activity = (Active) parameters[1];
+      MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
+      Class[] argsClass = new Class[] { ConstructorCall.class, String.class, Active.class, MetaObjectFactory.class };
+      Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
       ConstructorCall bodyConstructorCall = buildBodyConstructorCall(bodyClass, argsClass, args);
       if (NodeFactory.isNodeLocal(node)) {
         // the node is local

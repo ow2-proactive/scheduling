@@ -28,29 +28,32 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.examples.futurelist;
+package org.objectweb.proactive;
 
-public class BlockedObject implements org.objectweb.proactive.RunActive, java.io.Serializable {
+/**
+ * <P>
+ * Active is the root of the all interfaces related to the activity of an 
+ * active object. It is a convenience for having a common interface that 
+ * can be used to type objects implementing one or more of the others.
+ * </P><P>
+ * So far we considered three steps in the lifecycle of an active object.
+ * </P>
+ * <ul>
+ * <li> the initialization of the activity (done only once)</li>
+ * <li> the activity itself</li>
+ * <li> the end of the activity (unique event)</li>
+ * </ul>
+ * <P>
+ * In case of a migration, an active object stops and restarts its activity
+ * automatically without invoking the init or ending phases. Only the
+ * activity itself is restarted.
+ * </P>
+ * 
+ * @author  ProActive Team
+ * @version 1.0,  2002/06
+ * @since   ProActive 0.9.3
+ */
+public interface Active {
 
-  public BlockedObject() {
-  }
-
-  public void runActivity(org.objectweb.proactive.Body body) {
-    //first we wait to allow the caller to migrate with its futures
-    body.getRequestQueue().blockingRemoveOldest("go");
-    System.out.println("BlockedObject: Now in service");
-    body.fifoPolicy();
-  }
-
-
-  //unblock the live method
-  public void go() {
-    System.out.println("BlockedObject: go()");
-  }
-
-
-  public EmptyFuture createFuture() {
-    return new EmptyFuture();
-
-  }
 }
+

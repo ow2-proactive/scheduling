@@ -35,6 +35,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.security.PublicKey;
 
+import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.BodyImpl;
@@ -89,18 +90,19 @@ public class SecureBody extends BodyImpl implements SessionsManagerInt {
   public SecureBody(
     ConstructorCall c,
     String nodeURL,
+    Active activity,
     MetaObjectFactory factory,
     PublicCertificate publicCertificate,
     PrivateCertificate privateCertificate,
     PublicKey publicKey)
     throws java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException {
-    super(c, nodeURL, factory);
+    super(c, nodeURL, activity, factory);
     setCertificate(publicCertificate, privateCertificate, publicKey);
   }
 
-  public SecureBody(ConstructorCall c, String nodeURL, MetaObjectFactory factory)
+  public SecureBody(ConstructorCall c, String nodeURL, Active activity, MetaObjectFactory factory)
     throws java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException {
-    super(c, nodeURL, factory);
+    super(c, nodeURL, activity, factory);
     setCertificate();
   }
 

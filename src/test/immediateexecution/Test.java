@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.util.Vector;
 
-public class Test {
+public class Test implements org.objectweb.proactive.RunActive {
 
   public Test() {
 
@@ -18,7 +18,7 @@ public class Test {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     System.out.println("Live() method started");
     System.out.println("Live() won't do anything");
     while (body.isActive()) {

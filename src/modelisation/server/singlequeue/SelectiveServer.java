@@ -11,7 +11,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 import util.timer.MicroTimer;
 
-public class SelectiveServer extends SimpleLocationServer {
+public class SelectiveServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
 
     protected MicroTimer microtimer;
@@ -32,7 +32,7 @@ public class SelectiveServer extends SimpleLocationServer {
      * First register with the specified url
      * Then wait for request
      */
-    public void live(Body body) {
+    public void runActivity(Body body) {
         Request request = null;
         System.out.println("SelectiveServer.live");
         this.register();

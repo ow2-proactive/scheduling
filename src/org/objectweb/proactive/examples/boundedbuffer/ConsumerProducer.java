@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.boundedbuffer;
 /**
  * Simple Active consumer
  */
-public abstract class ConsumerProducer {
+public abstract class ConsumerProducer implements org.objectweb.proactive.RunActive {
 
   protected String name;
   protected ConsumerProducerListener listener;
@@ -82,7 +82,7 @@ public abstract class ConsumerProducer {
   /**
    * The only synchronization method
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (isActive) {
       // Allow the display to toggle or kill the consumer

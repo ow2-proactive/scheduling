@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
  * a ProStream N server
  * @see ProStream
  */
-public class Server extends StreamServer {
+public class Server extends StreamServer implements org.objectweb.proactive.RunActive {
   /**chunk provider*/
   //AnimatedGIF producer;
   private int L,W,PPS,index,cpt,bufferSize,endHead,i;
@@ -164,7 +164,7 @@ public class Server extends StreamServer {
   }
 
   /**the live method @param body this Active object's body*/
-  public void live(Body body) {
+  public void runActivity(Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
 
     /**wait for a registerClient*/

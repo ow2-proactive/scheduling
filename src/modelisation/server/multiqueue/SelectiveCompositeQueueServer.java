@@ -10,7 +10,7 @@ import modelisation.server.singlequeue.SelectiveServer;
 import modelisation.multiqueueserver.CompositeQueueMetaObjectFactory;
 
 
-public class SelectiveCompositeQueueServer extends SelectiveServer {
+public class SelectiveCompositeQueueServer extends SelectiveServer implements org.objectweb.proactive.RunActive {
 
   public SelectiveCompositeQueueServer() {}
 
@@ -18,7 +18,7 @@ public class SelectiveCompositeQueueServer extends SelectiveServer {
     super(url);
   }
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     System.out.println("SelectiveServer.live");
     Request request = null;
     this.register();
@@ -62,9 +62,9 @@ public class SelectiveCompositeQueueServer extends SelectiveServer {
     SelectiveServer server = null;
     try {
       if (args.length == 2)
-        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, CompositeQueueMetaObjectFactory.newInstance(), NodeFactory.getNode(args[1]));
+        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, NodeFactory.getNode(args[1]), null, CompositeQueueMetaObjectFactory.newInstance());
       else
-        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, CompositeQueueMetaObjectFactory.newInstance(), null);
+        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, null, null, CompositeQueueMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 
-public class Test {
+public class Test implements org.objectweb.proactive.RunActive {
 
   private DummyObject other;
 
@@ -36,7 +36,7 @@ public class Test {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     System.out.println("Test: starting custom live()");
     body.addMessageEventListener(new MyListener());
     body.fifoPolicy();

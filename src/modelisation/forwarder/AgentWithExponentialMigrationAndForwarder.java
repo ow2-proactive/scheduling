@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import modelisation.statistics.ExponentialLaw;
 
-public class AgentWithExponentialMigrationAndForwarder implements java.io.Serializable {
+public class AgentWithExponentialMigrationAndForwarder implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   protected ExponentialLaw expo;
   protected Node[] nodes;
@@ -47,7 +47,7 @@ public class AgentWithExponentialMigrationAndForwarder implements java.io.Serial
   //     }
   //   }
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     System.out.println("live started");
     if (checkTerminate(body)) {
       body.terminate();

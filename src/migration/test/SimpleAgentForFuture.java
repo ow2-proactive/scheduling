@@ -7,7 +7,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 import java.io.IOException;
 import java.io.Serializable;
 
-public class SimpleAgentForFuture implements Serializable {
+public class SimpleAgentForFuture implements org.objectweb.proactive.RunActive, Serializable {
 
   AgentForThread agent = null; //to test the equality between stubs
 
@@ -15,7 +15,7 @@ public class SimpleAgentForFuture implements Serializable {
   }
 
 
-  public void live(org.objectweb.proactive.Body b) {
+  public void runActivity(org.objectweb.proactive.Body b) {
     System.out.println("SimpleAgentForFuture: Now calling custom live");
     //first we wait to allow the caller to migrate with its futures
     b.getRequestQueue().blockingRemoveOldest("go");

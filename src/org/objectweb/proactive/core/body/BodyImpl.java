@@ -30,6 +30,11 @@
 */
 package org.objectweb.proactive.core.body;
 
+import org.objectweb.proactive.Active;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.AbstractMigratableBody;
@@ -63,6 +68,9 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
+  
+  private RunActive runActive;
+  private EndActive endActive;
 
 
   //
@@ -79,9 +87,42 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   /**
    * Build the body object, then fires its service thread
    */
-  public BodyImpl(ConstructorCall c, String nodeURL, MetaObjectFactory factory) throws java.lang.reflect.InvocationTargetException, ConstructorCallExecutionFailedException {
+  public BodyImpl(ConstructorCall c, String nodeURL, Active activity, MetaObjectFactory factory) throws java.lang.reflect.InvocationTargetException, ConstructorCallExecutionFailedException {
     // Creates the reified object
     super(c.execute(), nodeURL, factory);
+    
+    // InitActive
+    InitActive initActive = null;
+    if (activity != null && activity instanceof InitActive) {
+      initActive = (InitActive) activity;
+    } else if (reifiedObject instanceof InitActive) {
+      initActive = (InitActive) reifiedObject;
+    }
+    
+    // RunActive
+    if (activity != null && activity instanceof RunActive) {
+      runActive = (RunActive) activity;
+    } else if (reifiedObject instanceof RunActive) {
+      runActive = (RunActive) reifiedObject;
+    } else {
+      runActive = new RunActive() {
+          public void runActivity(Body body) {
+            fifoPolicy();
+          }
+        };
+    }
+    
+    // EndActive
+    if (activity != null && activity instanceof EndActive) {
+      endActive = (EndActive) activity;
+    } else if (reifiedObject instanceof EndActive) {
+      endActive = (EndActive) reifiedObject;
+    } else {
+      endActive = null;
+    }
+
+    // execute the initialization if needed
+    if (initActive != null) initActive.initActivity(this);
     startBody();
   }
 
@@ -102,17 +143,9 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
    */
   public void run() {
     activityStarted();
-    // find out the live method to run
-    // try to find live(Body body)
-    java.lang.reflect.Method liveMethod = locateLiveRoutine(Constants.DEFAULT_BODY_INTERFACE);
+    // run the activity of the body
     try {
-      if (liveMethod == null) {
-        // no live method found : default to fifoPolicy
-        fifoPolicy();
-      } else {
-        // run the custom live method
-        launchLive(liveMethod);
-      }
+      runActive.runActivity(this);
       // the body terminate its activity
       if (isAlive()) {
         // serve remaining requests if non dead
@@ -126,6 +159,8 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
       terminate();
     } finally {
       if (isActive()) activityStopped();
+      // execute the end of activity
+      if (endActive != null) endActive.endActivity(this);
     }
   }
 
@@ -150,47 +185,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-
-  /**
-   * Launches the proper live method on the reified object if one is defined.
-   * This method is called automagically by the constructor,
-   * and should <b>only</b> be called by subclasses.
-   * @param liveMethod the live method to launch on the reified object.
-   */
-  protected void launchLive(java.lang.reflect.Method liveMethod) {
-    Object[] o = new Object[] { this };
-    try {
-      //  System.out.println("Invoking live routine in the reified Object");
-      liveMethod.invoke(this.reifiedObject, o);
-    } catch (java.lang.reflect.InvocationTargetException e) {
-      throw new ProActiveRuntimeException("Exception in the live method "+liveMethod+" invoked", e);
-    } catch (NullPointerException e) {
-      throw new ProActiveRuntimeException("liveMethod "+liveMethod+" is null ?", e);
-    } catch (IllegalArgumentException e) {
-      throw new ProActiveRuntimeException("Wrong parameter to the live method "+liveMethod, e);
-    } catch (IllegalAccessException e) {
-      throw new ProActiveRuntimeException("live method "+liveMethod+" is not accessible", e);
-    }
-  }
-
-
-  /**
-   * Locates the live method on the reified object. The live method
-   * searched is the one taking an object of class <code>aClass</code>
-   * in parameter
-   * @param aClass the class of the argument of the live method to look for.
-   * @return the live method on the reified object taking an object of class
-   * <code>aClass</code> in paramter or null if such a method cannot be found.
-   */
-  protected java.lang.reflect.Method locateLiveRoutine(Class aClass) {
-    try {
-      Class[] liveargstype = new Class[] { aClass };
-      return reifiedObject.getClass().getMethod("live", liveargstype);
-    } catch (NoSuchMethodException e) {
-      return null;
-    }
-  }
-
 
   protected void finalize() throws Throwable {
     //System.err.println(">>>>>>>>>> Finalizing Body");

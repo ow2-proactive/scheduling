@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.NotBoundException;
 
-public class TalkativeAgent implements Serializable {
+public class TalkativeAgent implements org.objectweb.proactive.RunActive, Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
 
@@ -54,7 +54,7 @@ public class TalkativeAgent implements Serializable {
   }
 
 
-  public void live(org.objectweb.proactive.Body b) {
+  public void runActivity(org.objectweb.proactive.Body b) {
     b.fifoPolicy();
   }
 

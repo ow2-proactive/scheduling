@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.Constants;
@@ -57,6 +57,83 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * this class to create active object, to migrate them or to register them to the
  * RMI Registry.
  * </p><p>
+ * The main role of <code>ProActive</code> is to provides methods to create active objects.
+ * It is possible to create an active object through instantiation using one of the version
+ * of <code>newActive</code>. It is also possible to create an active object from an existing
+ * object using one of the version of <code>turnActive</code>.
+ * </p>
+ * <h2>Defining Active Object Activity</h2>
+ * <p>
+ * When an active object is created from a given object, all method calls are sent as requests 
+ * to the body (automatically associated to the active object). Those requests are stored in a
+ * queue waiting to be served. Serving those requests as well as performing some 
+ * other work represent the activity of this active object. One can completely specify what will
+ * be this activity. The standard behavior is to serve all incoming requests one by one in a FIFO
+ * order.
+ * </p><p>
+ * In addition to the activity, it is possible to specify what to do before the activity starts,
+ * and after it ends. The three steps are :
+ * <ul>
+ * <li>the initialization of the activity (done only once)</li>
+ * <li>the activity itself</li>
+ * <li>the end of the activity (done only once)</li>
+ * </ul>
+ * </p><p>
+ * Three interfaces are used to define and implements each step :
+ * <ul>
+ * <li><a href="InitActive.html">InitActive</a></li>
+ * <li><a href="RunActive.html">RunActive</a></li>
+ * <li><a href="EndActive.html">EndActive</a></li>
+ * </ul>
+ * </p><p>
+ * In case of a migration, an active object stop and restart its activity
+ * automatically without invoking the init or ending phases. Only the
+ * activity itself is restarted.
+ * </p>
+ * <h2>Setting Active Object Activity</h2>
+ * <p>
+ * Two ways are possible to define each of the three phases of an active object.
+ * </p>
+ * <ul>
+ * <li>Implementing one or more of the three interfaces directly in the class used to create
+ * the active object</li>
+ * <li>Passing an object implementing one or more of the three interfaces in parameter to the method
+ * <code>newActive</code> or <code>turnActive</code> (parameter active in those methods)</li>
+ * </ul>
+ * </p><p>
+ * The algorithms that decide for each phase what to do are the following (<code>activity</code> is 
+ * the eventual object passed as a parameter to <code>newActive</code> or <code>turnActive</code>) :
+ * 
+ * <h3>InitActive</h3>
+ * <pre>
+ * if activity is non null and implements InitActive
+ *   we invoke the method initActivity defined in the object activity
+ * else if the class of the reified object implements InitActive
+ *   we invoke the method initActivity of the reified object
+ * else
+ *   we don't do any initialization
+ * </pre>
+ * 
+ * <h3>RunActive</h3>
+ * <pre>
+ * if activity is non null and implements RunActive
+ *   we invoke the method runActivity defined in the object activity
+ * else if the class of the reified object implements RunActive
+ *   we invoke the method runActivity of the reified object
+ * else
+ *   we run the standard FIFO activity
+ * </pre>
+ * 
+ * <h3>EndActive</h3>
+ * <pre>
+ * if activity is non null and implements EndActive
+ *   we invoke the method endActivity defined in the object activity
+ * else if the class of the reified object implements EndActive
+ *   we invoke the method endActivity of the reified object
+ * else
+ *   we don't do any cleanup
+ * </pre>
+ * </p><p>
  * <b>see <a href="doc-files/ActiveObjectCreation.html">active object creation doumentation</a></b>
  * </p>
  *
@@ -66,11 +143,11 @@ import org.objectweb.proactive.core.node.NodeFactory;
  *
  */
 public class ProActive {
-  
+
   //
   // -- STATIC MEMBERS -----------------------------------------------
   //
-  
+
   static {
     Class c = org.objectweb.proactive.core.node.NodeFactory.class;
   }
@@ -78,68 +155,60 @@ public class ProActive {
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-  
-  private ProActive() {}
-  
-  
-  
+
+  private ProActive() {
+  }
+
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
   /**
    * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
-   * @param classname the fully qualified name of the class to instantiate as an active object
-   * @param constructorParameters the parameters of the constructor of the object
-   *    to instantiate as active. If some parameters are primitive types, the wrapper 
-   *    class types should be given here.
+   * @param classname the name of the class to instanciate as active
+   * @param constructorParameters the parameters of the constructor.
    * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the DefaultNode cannot be created
    */
-  public static Object newActive(String classname, Object[] constructorParameters) throws ActiveObjectCreationException, NodeException {
-    return newActive(classname, constructorParameters, (Node) null);
+  public static Object newActive(String classname, Object[] constructorParameters)
+    throws ActiveObjectCreationException, NodeException {
+    return newActive(classname, constructorParameters, null, null, null);
   }
-
 
   /**
    * Creates a new ActiveObject based on classname attached to the node of the given URL.
-   * @param classname the fully qualified name of the class to instantiate as an active object
-   * @param constructorParameters the parameters of the constructor of the object
-   *    to instantiate as active. If some parameters are primitive types, the wrapper 
-   *    class types should be given here.
-   * @param nodeURL the URL of the node where to create the active object on. If null, the active object 
+   * @param classname the name of the class to instanciate as active
+   * @param constructorParameters the parameters of the constructor.
+   * @param nodeURL the URL of the node where to create the active object. If null, the active object 
    *       is created localy on a default node 
    * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node URL cannot be resolved as an existing Node
    */
-  public static Object newActive(String classname, Object[] constructorParameters, String nodeURL) throws ActiveObjectCreationException, NodeException {
+  public static Object newActive(String classname, Object[] constructorParameters, String nodeURL)
+    throws ActiveObjectCreationException, NodeException {
     if (nodeURL == null) {
-      return newActive(classname, constructorParameters, (Node) null);
+      return newActive(classname, constructorParameters, null, null, null);
     } else {
-      return newActive(classname, constructorParameters, NodeFactory.getNode(nodeURL));
+      return newActive(classname, constructorParameters, NodeFactory.getNode(nodeURL), null, null);
     }
   }
-
 
   /**
    * Creates a new ActiveObject based on classname attached to the given node or on
    * a default node in the local JVM if the given node is null.
    * @param classname the name of the class to instanciate as active
-   * @param constructorParameters the parameters of the constructor of the object
-   *    to instantiate as active. If some parameters are primitive types, the wrapper 
-   *    class types should be given here.
-   * @param node the possibly null node where to create the active object on. If null, the active object 
-   *       is created localy on a default node 
+   * @param constructorParameters the parameters of the constructor.
+   * @param node the possibly null node where to create the active object.
    * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object newActive(String classname, Object[] constructorParameters, Node node) throws ActiveObjectCreationException, NodeException {
-    return newActive(classname, constructorParameters, null, node);
+  public static Object newActive(String classname, Object[] constructorParameters, Node node)
+    throws ActiveObjectCreationException, NodeException {
+    return newActive(classname, constructorParameters, node, null, null);
   }
-
 
   /**
    * Creates a new ActiveObject based on classname attached to the given node or on
@@ -152,16 +221,25 @@ public class ProActive {
    * @param classname the name of the class to instanciate as active
    * @param constructorParameters the parameters of the constructor of the object
    *    to instantiate as active. If some parameters are primitive types, the wrapper 
-   *    class types should be given here.
+   *    class types should be given here. null can be used to specify that no parameter
+   *    are passed to the constructor.
+   * @param node the possibly null node where to create the active object. If null, the active object 
+   *       is created localy on a default node 
+   * @param activity the possibly null activity object defining the different step in the activity of the object.
+   *               see the definition of the activity in the javadoc of this classe for more information. 
    * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
    *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-   * @param node the possibly null node where to create the active object on. If null, the active object 
-   *       is created localy on a default node 
    * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object newActive(String classname, Object[] constructorParameters, MetaObjectFactory factory, Node node) throws ActiveObjectCreationException, NodeException {
+  public static Object newActive(
+    String classname,
+    Object[] constructorParameters,
+    Node node,
+    Active activity,
+    MetaObjectFactory factory)
+    throws ActiveObjectCreationException, NodeException {
     //using default proactive node
     if (node == null) {
       node = NodeFactory.getDefaultNode();
@@ -170,14 +248,14 @@ public class ProActive {
       factory = ProActiveMetaObjectFactory.newInstance();
     }
     try {
-      return createStubObject(classname, constructorParameters, factory, node);
+      return createStubObject(classname, constructorParameters, node, activity, factory);
     } catch (MOPException e) {
       Throwable t = e;
-      if (e.getTargetException() != null) t = e.getTargetException();
+      if (e.getTargetException() != null)
+        t = e.getTargetException();
       throw new ActiveObjectCreationException(t);
     }
   }
-
 
   /**
    * Turns the target object into an ActiveObject attached to a default node in the local JVM.
@@ -190,7 +268,6 @@ public class ProActive {
   public static Object turnActive(Object target) throws ActiveObjectCreationException, NodeException {
     return turnActive(target, (Node) null);
   }
-
 
   /**
    * Turns the target object into an Active Object and send it to the Node
@@ -205,12 +282,11 @@ public class ProActive {
    */
   public static Object turnActive(Object target, String nodeURL) throws ActiveObjectCreationException, NodeException {
     if (nodeURL == null) {
-      return turnActive(target, (Node) null);
+      return turnActive(target, target.getClass().getName(), null, null, null);
     } else {
-      return turnActive(target, NodeFactory.getNode(nodeURL));
+      return turnActive(target, target.getClass().getName(), NodeFactory.getNode(nodeURL), null, null);
     }
   }
-
 
   /**
    * Turns the target object into an Active Object and send it to the given Node
@@ -224,45 +300,48 @@ public class ProActive {
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
   public static Object turnActive(Object target, Node node) throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, node, target.getClass().getName());
+    return turnActive(target, target.getClass().getName(), node, null, null);
   }
-
 
   /**
    * Turns the target object into an Active Object and send it to the given Node
    * or to a default node in the local JVM if the given node is null.
    * The type of the stub is is the type of the target object.
    * @param target The object to turn active
-   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
    * @param node The Node the object should be sent to or null to create the active 
    *       object in the local JVM
+   * @param activity the possibly null activity object defining the different step in the activity of the object.
+   *               see the definition of the activity in the javadoc of this classe for more information. 
+   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
    * @return a reference (possibly remote) on a Stub of the target object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object turnActive(Object target, MetaObjectFactory factory, Node node) throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, factory, node, target.getClass().getName());
+  public static Object turnActive(Object target, Node node, 
+      Active activity,
+      MetaObjectFactory factory)
+    throws ActiveObjectCreationException, NodeException {
+    return turnActive(target, target.getClass().getName(), node, activity, factory);
   }
-
 
   /**
    * Turns a Java object into an Active Object and send it to a remote Node or to a 
    * local node if the given node is null.
    * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
    * @param target The object to turn active
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
    * @param nameOfTargetType the fully qualified name of the type the stub class should
    * inherit from. That type can be less specific than the type of the target object.
+   * @param node The Node the object should be sent to or null to create the active 
+   *       object in the local JVM
    * @return a reference (possibly remote) on a Stub of the target object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object turnActive(Object target, Node node, String nameOfTargetType) throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, null, node, nameOfTargetType);
+  public static Object turnActive(Object target, String nameOfTargetType, Node node)
+    throws ActiveObjectCreationException, NodeException {
+    return turnActive(target, nameOfTargetType, node, null, null);
   }
-
 
   /**
    * Turns a Java object into an Active Object and send it to a remote Node or to a 
@@ -273,17 +352,22 @@ public class ProActive {
    * to the body object pointing to the existing object. The body can be remote 
    * or local depending if the existing is sent remotely or not.
    * @param target The object to turn active
-   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
    * @param nameOfTargetType the fully qualified name of the type the stub class should
    * inherit from. That type can be less specific than the type of the target object.
+   * @param node The Node the object should be sent to or null to create the active 
+   *       object in the local JVM
+   * @param activity the possibly null activity object defining the different step in the activity of the object.
+   *               see the definition of the activity in the javadoc of this classe for more information. 
+   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
    * @return a reference (possibly remote) on a Stub of the target object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object turnActive(Object target, MetaObjectFactory factory, Node node, String nameOfTargetType) throws ActiveObjectCreationException, NodeException {
+  public static Object turnActive(Object target, String nameOfTargetType, Node node, 
+      Active activity,
+      MetaObjectFactory factory)
+    throws ActiveObjectCreationException, NodeException {
     if (node == null) {
       //using default proactive node
       node = NodeFactory.getDefaultNode();
@@ -292,14 +376,14 @@ public class ProActive {
       factory = ProActiveMetaObjectFactory.newInstance();
     }
     try {
-      return createStubObject(target, factory, node, nameOfTargetType);
+      return createStubObject(target, nameOfTargetType, node, activity, factory );
     } catch (MOPException e) {
       Throwable t = e;
-      if (e.getTargetException() != null) t = e.getTargetException();
+      if (e.getTargetException() != null)
+        t = e.getTargetException();
       throw new ActiveObjectCreationException(t);
     }
   }
-
 
   /**
    * Registers an active object into a RMI registry. In fact it is the
@@ -312,13 +396,13 @@ public class ProActive {
   public static void register(Object obj, String url) throws java.io.IOException {
     // Check if obj is really a reified object
     if (!(MOP.isReifiedObject(obj))) {
-      throw new java.io.IOException("The given object "+obj+" is not a reified object");
+      throw new java.io.IOException("The given object " + obj + " is not a reified object");
     }
     // Find the appropriate remoteBody
-    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject)obj).getProxy();
+    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
     if (myProxy == null)
       throw new java.io.IOException("Cannot find a Proxy on the stub object: " + obj);
-    BodyProxy myBodyProxy = (BodyProxy)myProxy;
+    BodyProxy myBodyProxy = (BodyProxy) myProxy;
     UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
     if (body instanceof RemoteBodyAdapter) {
       RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
@@ -327,7 +411,6 @@ public class ProActive {
       throw new java.io.IOException("Cannot reconize the type of this UniversalBody: " + body.getClass().getName());
     }
   }
-
 
   /**
    * Unregisters an active object previously registered into a RMI registry.
@@ -338,7 +421,6 @@ public class ProActive {
     RemoteBodyAdapter.unregister(url);
     System.out.println("Success at unbinding url " + url);
   }
-
 
   /**
    * Looks-up an active object previously registered in a RMI registry. In fact it is the
@@ -353,17 +435,18 @@ public class ProActive {
    *      or if the object found is not of type RemoteBody
    * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
    */
-  public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException, java.io.IOException {
+  public static Object lookupActive(String classname, String url)
+    throws ActiveObjectCreationException, java.io.IOException {
     UniversalBody b = RemoteBodyAdapter.lookup(url);
     try {
       return createStubObject(classname, b);
     } catch (MOPException e) {
       Throwable t = e;
-      if (e.getTargetException() != null) t = e.getTargetException();
+      if (e.getTargetException() != null)
+        t = e.getTargetException();
       throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
     }
   }
-
 
   /**
    * Blocks the calling thread until the object <code>future</code>
@@ -377,16 +460,15 @@ public class ProActive {
     if ((MOP.isReifiedObject(future)) == false) {
       return;
     } else {
-      org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject)future).getProxy();
+      org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
       // If it is reified but its proxy is not of type future, we cannot wait
-      if (! (theProxy instanceof Future)) {
+      if (!(theProxy instanceof Future)) {
         return;
       } else {
-        ((Future)theProxy).waitFor();
+        ((Future) theProxy).waitFor();
       }
     }
   }
-
 
   /**
    * When an active object is created, it is associated with a Body that takes care
@@ -406,7 +488,6 @@ public class ProActive {
     return AbstractBody.getCurrentThreadBody();
   }
 
-
   /**
    * Returns a Stub-Proxy couple pointing to the local body associated to the active
    * object whose active thread is calling this method.
@@ -416,11 +497,11 @@ public class ProActive {
   public static StubObject getStubOnThis() {
     Body body = getBodyOnThis();
     //System.out.println("ProActive: getStubOnThis() returns " + body);
-    if (body == null) return null;
+    if (body == null)
+      return null;
     return getStubForBody(body);
   }
-  
-  
+
   /**
    * Migrates the active object whose active thread is calling this method to the 
    * same location as the active object given in parameter.
@@ -434,7 +515,6 @@ public class ProActive {
   public static void migrateTo(Object activeObject) throws MigrationException {
     migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
   }
-  
 
   /**
    * Migrates the active object whose active thread is calling this method to the 
@@ -450,7 +530,6 @@ public class ProActive {
     ProActive.migrateTo(getNodeFromURL(nodeURL));
   }
 
-
   /**
    * Migrates the active object whose active thread is calling this method to the 
    * given node.
@@ -462,12 +541,11 @@ public class ProActive {
    */
   public static void migrateTo(Node node) throws MigrationException {
     Body bodyToMigrate = getBodyOnThis();
-    if (! (bodyToMigrate instanceof Migratable)) {
+    if (!(bodyToMigrate instanceof Migratable)) {
       throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
     }
     ((Migratable) bodyToMigrate).migrateTo(node);
   }
-  
 
   /**
    * Migrates the given body to the same location as the active object given in parameter.
@@ -487,7 +565,6 @@ public class ProActive {
   public static void migrateTo(Body bodyToMigrate, Object activeObject, boolean priority) throws MigrationException {
     migrateTo(bodyToMigrate, getNodeFromURL(getNodeURLFromActiveObject(activeObject)), priority);
   }
-  
 
   /**
    * Migrates the given body to the node caracterized by the given url.
@@ -508,7 +585,6 @@ public class ProActive {
     ProActive.migrateTo(bodyToMigrate, getNodeFromURL(nodeURL), priority);
   }
 
-
   /**
    * Migrates the body <code>bodyToMigrate</code> to the given node.
    * This method can be called from any object and does not perform the migration. 
@@ -525,21 +601,22 @@ public class ProActive {
    * @exception MigrationException if the migration fails
    */
   public static void migrateTo(Body bodyToMigrate, Node node, boolean priority) throws MigrationException {
-    if (! (bodyToMigrate instanceof Migratable)) {
+    if (!(bodyToMigrate instanceof Migratable)) {
       throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
     }
     Object[] arguments = { node };
     try {
-      BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo", new Class[] {Node.class}, arguments, priority);
+      BodyRequest request =
+        new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class }, arguments, priority);
       request.send(bodyToMigrate);
     } catch (NoSuchMethodException e) {
-      throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",e);
+      throw new MigrationException(
+        "Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
+        e);
     } catch (java.io.IOException e) {
-      throw new MigrationException("Cannot send the request to migrate",e);
+      throw new MigrationException("Cannot send the request to migrate", e);
     }
   }
-
-
 
   //
   // -- PRIVATE METHODS -----------------------------------------------
@@ -551,66 +628,78 @@ public class ProActive {
       throw new MigrationException("The parameter is not an active object");
     }
     //now we get a reference on the remoteBody of this guy
-    BodyProxy destProxy = (BodyProxy)((org.objectweb.proactive.core.mop.StubObject)o).getProxy();
+    BodyProxy destProxy = (BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) o).getProxy();
     return destProxy.getBody().getNodeURL();
   }
-  
+
   private static Node getNodeFromURL(String url) throws MigrationException {
     try {
       return NodeFactory.getNode(url);
     } catch (NodeException e) {
-      throw new MigrationException("The node of given URL "+url+" cannot be localized", e);
+      throw new MigrationException("The node of given URL " + url + " cannot be localized", e);
     }
   }
-
-
 
   // -------------------------------------------------------------------------------------------
   // 
   // STUB CREATION
   // 
   // -------------------------------------------------------------------------------------------
-  
 
   private static StubObject getStubForBody(Body body) {
-    try  {
-      return createStubObject(body.getReifiedObject(), new Object[] { body }, body.getReifiedObject().getClass().getName());
+    try {
+      return createStubObject(
+        body.getReifiedObject(),
+        new Object[] { body },
+        body.getReifiedObject().getClass().getName());
     } catch (MOPException e) {
-      throw new ProActiveRuntimeException("Cannot create Stub for this Body e="+e);
+      throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
     }
   }
-  
+
   private static Object createStubObject(String className, UniversalBody body) throws MOPException {
     return createStubObject(className, null, new Object[] { body });
   }
-  
-  private static Object createStubObject(String className, Object[] constructorParameters, MetaObjectFactory factory, Node node) throws MOPException {
-    return createStubObject(className, constructorParameters, new Object[] { factory, node});
+
+  private static Object createStubObject(
+    String className,
+    Object[] constructorParameters,
+    Node node,
+    Active activity,
+    MetaObjectFactory factory)
+    throws MOPException {
+    return createStubObject(className, constructorParameters, new Object[] { node, activity, factory });
   }
-  
-  private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters) throws MOPException {
+
+  private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters)
+    throws MOPException {
     try {
-      return MOP.newInstance(className, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+      return MOP.newInstance(
+        className,
+        constructorParameters,
+        Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+        proxyParameters);
     } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
+      throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
     }
   }
-  
 
-
-  private static Object createStubObject(Object target, MetaObjectFactory factory, Node node, String nameOfTargetType) throws MOPException {
-    return createStubObject(target, new Object[] { factory, node}, nameOfTargetType);
+  private static Object createStubObject(Object target, String nameOfTargetType, Node node, Active activity, MetaObjectFactory factory)
+    throws MOPException {
+    return createStubObject(target, new Object[] { node, activity, factory }, nameOfTargetType);
   }
-  
 
- private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType) throws MOPException {
-   try {
-     return (StubObject) MOP.turnReified(nameOfTargetType, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
-   } catch (ClassNotFoundException e) {
-     throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
-   }
- }
- 
-  
+  private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType)
+    throws MOPException {
+    try {
+      return (StubObject) MOP.turnReified(
+        nameOfTargetType,
+        Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
+        proxyParameters,
+        object);
+    } catch (ClassNotFoundException e) {
+      throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
+    }
+  }
+
 }
-

@@ -10,7 +10,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Serializable {
+public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
   private MigrationStrategyManager migrationStrategyManager;
   private MigrationStrategy migrationStrategy;
@@ -47,7 +47,7 @@ public class Test implements Serializable {
   }
 */
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     if (etape == 0) {
       try {
         migrationStrategyManager = new MigrationStrategyManagerImpl((Migratable) body);

@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Vector;
 
-public class Bench {
+public class Bench implements org.objectweb.proactive.RunActive {
 
 	protected static NodeControler auto;
 
@@ -33,9 +33,8 @@ System.out.println("NODES SIZE = " + nodes.length);
 			agent =
 				(AgentWithExponentialMigrationAndServer) ProActive.newActive(
 					AgentWithExponentialMigrationAndServer.class.getName(),
-					args,
-					TimedLocationServerMetaObjectFactory.newInstance(),
-					NodeFactory.getNode(nodeName));
+					args, NodeFactory.getNode(nodeName), null,
+					TimedLocationServerMetaObjectFactory.newInstance());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -104,7 +103,7 @@ System.out.println("NODES SIZE = " + nodes.length);
 		this.benchTime = time.longValue();
 	}
 
-	public void live(Body b) {
+	public void runActivity(Body b) {
 		long startTimeSleep = 0;
 		long endTimeSleep = 0;
 		int waittime;
@@ -212,11 +211,7 @@ System.out.println("NODES SIZE = " + nodes.length);
 		Object[] param = new Object[] { agent, expo, benchTime };
 		try {
 			bench =
-				(Bench) ProActive.newActive(
-					Bench.class.getName(),
-					param,
-					TimedLocationServerMetaObjectFactory.newInstance(),
-					null);
+				(Bench) ProActive.newActive(Bench.class.getName(), param, null, null, TimedLocationServerMetaObjectFactory.newInstance());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

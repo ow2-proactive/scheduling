@@ -24,8 +24,8 @@ public class Test {
     System.out.println("== Test: creating an ObjectWithLocationServer");
     ObjectWithLocationServer obj1 = null;
     try {
-      obj1 = (ObjectWithLocationServer)ProActive.newActive("test.locationserver.ObjectWithLocationServer", null, 
-                                                           LocationServerMetaObjectFactory.newInstance(), null);
+      obj1 = (ObjectWithLocationServer)ProActive.newActive("test.locationserver.ObjectWithLocationServer", null, null, null, 
+                                                           LocationServerMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -36,7 +36,7 @@ public class Test {
     System.out.println("== Test: creating active object Test");
     Test test = null;
     try {
-      test = (Test)ProActive.newActive("test.locationserver.Test", null, LocationServerMetaObjectFactory.newInstance(), null);
+      test = (Test)ProActive.newActive("test.locationserver.Test", null, null, null, LocationServerMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -43,14 +43,14 @@ import org.objectweb.proactive.core.body.request.RequestProcessor;
  * object in order to be used for serving requests. For instance :
  * </P><P>
  * <pre>
- * public void live(org.objectweb.proactive.Body body) {
+ * public void runActivity(org.objectweb.proactive.Body body) {
  *   org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
  * ...
  * }
  * </pre>
  * For intance the live method of the bounded buffer example :
  * <pre>
- *  public void live(org.objectweb.proactive.Body body) {
+ *  public void runActivity(org.objectweb.proactive.Body body) {
  *    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
  *    while (body.isActive()) {
  *      if (count == 0) {

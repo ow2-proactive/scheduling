@@ -13,7 +13,7 @@ import java.util.Enumeration;
  * Client generating a ProStream
  * @see StreamClient
  */
-public class Client extends StreamClient {
+public class Client extends StreamClient implements org.objectweb.proactive.RunActive {
 
 
   /**no arg constructor -specific to ProActive*/
@@ -71,7 +71,7 @@ public class Client extends StreamClient {
 
 
   /**The live method*/
-  public void live(Body body) {
+  public void runActivity(Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     service.blockingServeOldest("registerSelf");
     while (true) {

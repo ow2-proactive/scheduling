@@ -27,7 +27,7 @@ public class Test {
     param[0] = stringParam;
 
     try {
-      obj1 = (ObjectWithLocationServer) ProActive.newActive(Test.class.getName(), param, LocationServerMetaObjectFactory.newInstance(), null);
+      obj1 = (ObjectWithLocationServer) ProActive.newActive(Test.class.getName(), param, null, null, LocationServerMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -36,7 +36,7 @@ public class Test {
 
     Test test = null;
     try {
-      test = (Test) ProActive.newActive(Test.class.getName(), null, LocationServerMetaObjectFactory.newInstance(), null);
+      test = (Test) ProActive.newActive(Test.class.getName(), null, null, null, LocationServerMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -38,7 +38,7 @@ import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
 
 
-public class Penguin implements java.io.Serializable {
+public class Penguin implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   private boolean onItinerary,initialized;
   private transient PenguinFrame myFrame;
@@ -134,7 +134,7 @@ public class Penguin implements java.io.Serializable {
   }
 
 
-  public void live(Body b) {
+  public void runActivity(Body b) {
     Service service = new Service(b);
     if (!initialized) {
       service.blockingServeOldest();

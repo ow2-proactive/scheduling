@@ -3,12 +3,12 @@ package test.terminate;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
-public class Test {
+public class Test implements org.objectweb.proactive.RunActive {
 
     public Test() {}
 
 
-    public void live(Body body) {
+    public void runActivity(Body body) {
 	//	b.fifoPolicy();
 	body.serve(body.getRequestQueue().blockingRemoveOldest());
 	body.terminate();

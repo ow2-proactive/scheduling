@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.philosophers;
 
-public class Philosopher {
+public class Philosopher implements org.objectweb.proactive.RunActive {
 
   /**
    * The philosopher's ID
@@ -100,7 +100,7 @@ public class Philosopher {
   /**
    * The live method
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {
       // Check wether the philosopher is UI-driven or not

@@ -37,7 +37,7 @@ package org.objectweb.proactive.examples.readers;
 
 import org.objectweb.proactive.ObjectForSynchronousCall;
 
-public class ReaderWriter {
+public class ReaderWriter implements org.objectweb.proactive.RunActive {
 
   private int readCount;
   private int writeCount;
@@ -148,7 +148,7 @@ public class ReaderWriter {
   /**
    * The main synchronization method
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     // Loops over lifetime...
     while (!done) {

@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.cruisecontrol;
 /**
  * The class representing the current road
  */
-public class CarModel {
+public class CarModel implements org.objectweb.proactive.RunActive {
 
   /** constants representing the ACTIVE state of the car */
   final static int ACTIVE = 1;
@@ -183,7 +183,7 @@ public class CarModel {
   
 
   /** the current policy of the active object */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     //father.displayMessage ("Starts live in object ActiveSpeed");
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {

@@ -63,7 +63,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.examples.c3d.C3DDispatcher.C3DDispatcherFrame.MyWindowListener;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
@@ -71,7 +70,7 @@ import org.objectweb.proactive.examples.c3d.prim.Sphere;
 /**
  * This class decouples the set of user frames from the set of rendering
  */
-public class C3DDispatcher {
+public class C3DDispatcher implements org.objectweb.proactive.RunActive {
 
   public static final String C3D_DISPATCHER_BIND_NAME = "C3DDispatcher";
   /**
@@ -530,7 +529,7 @@ public class C3DDispatcher {
    * Java// object life routine
    * To be remdelled..
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     registerDispatcher(body.getNodeURL());
     /* Creates the rendering engines */
     init();

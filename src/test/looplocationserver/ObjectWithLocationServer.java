@@ -3,7 +3,7 @@ package test.looplocationserver;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
-public class ObjectWithLocationServer implements java.io.Serializable {
+public class ObjectWithLocationServer implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   private String[] destinations;
   int index;
@@ -23,7 +23,7 @@ public class ObjectWithLocationServer implements java.io.Serializable {
     }
   }
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     try {
       while (body.isActive()) {
         if (index < destinations.length) {

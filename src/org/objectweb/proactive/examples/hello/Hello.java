@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.hello;
 /**
  * Our hello server
  */
-public class Hello implements java.io.Serializable {
+public class Hello implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   private String name;
   private String nodeURL;
@@ -55,7 +55,7 @@ public class Hello implements java.io.Serializable {
   }
 
   
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     nodeURL = body.getNodeURL();
     body.fifoPolicy();
   }

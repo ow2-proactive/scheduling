@@ -96,7 +96,7 @@ public class FakeBench2 {
 
     }
 
-    static public class DummyObject {
+    static public class DummyObject implements org.objectweb.proactive.RunActive {
         protected UniqueID id;
         protected UniversalBody body;
 
@@ -111,7 +111,7 @@ public class FakeBench2 {
             return this.body;
         }
 
-        public void live(Body b) {
+        public void runActivity(Body b) {
             this.id = b.getID();
             this.body = b.getRemoteAdapter();
             b.fifoPolicy();

@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
 
-public class PenguinControler implements PenguinMessageReceiver, java.io.Serializable {
+public class PenguinControler implements org.objectweb.proactive.RunActive, PenguinMessageReceiver, java.io.Serializable {
 
   //The image panel
   private transient PenguinApplet display;
@@ -90,11 +90,12 @@ public class PenguinControler implements PenguinMessageReceiver, java.io.Seriali
   }
 
 
-  public void live(Body b) {
+  public void runActivity(Body b) {
     myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) b);
     myStrategyManager.onDeparture("clean");
     rebuild();
     b.fifoPolicy();
+    clean();
   }
 
 

@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.Vector;
 
-public class Agent implements Serializable {
+public class Agent implements org.objectweb.proactive.RunActive, Serializable {
 
   public static int MAXINTVALUE = 100;
   private int id;
@@ -135,7 +135,7 @@ public class Agent implements Serializable {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {
       //		System.out.println("Live started for agent " +id);

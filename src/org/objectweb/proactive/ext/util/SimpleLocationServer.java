@@ -42,7 +42,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 /**
  * An implementation of a Location Server
  */
-public class SimpleLocationServer implements LocationServer {
+public class SimpleLocationServer implements org.objectweb.proactive.RunActive, LocationServer {
 
   private BodyMap table;
   private String url;
@@ -82,7 +82,7 @@ public class SimpleLocationServer implements LocationServer {
    * First register with the specified url
    * Then wait for request
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     this.register();
     body.fifoPolicy();
   }

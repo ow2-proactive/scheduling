@@ -5,7 +5,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
 
-public class Test implements java.io.Serializable {
+public class Test implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   private Test myPeer;
   private java.util.Random random;
@@ -41,7 +41,7 @@ public class Test implements java.io.Serializable {
     return ProActive.getBodyOnThis().getNodeURL();
   }
   
-  public void live(Body body) {
+  public void runActivity(Body body) {
     int counter = 0;
     Service service = new Service(body);
     while (body.isActive()) {

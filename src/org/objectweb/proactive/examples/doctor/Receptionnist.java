@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.doctor;
 
-public class Receptionnist {
+public class Receptionnist implements org.objectweb.proactive.RunActive {
 
   public final static int NO_ONE = -1;
   int pat_id;
@@ -84,7 +84,7 @@ public class Receptionnist {
   }
 
 
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {
       if (doctorWaiting())

@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.cruisecontrol;
 /** The active object for the controller,
  * checks the speed of the car when it is on
  */
-public class CruiseControl {
+public class CruiseControl implements org.objectweb.proactive.RunActive {
 
   /** */
   final static int ACTIVE = 1;
@@ -194,7 +194,7 @@ public class CruiseControl {
 
   
   /** the routine Live which runs only the most recent call */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     //System.out.println ("Starts live in object ActiveCruise");
     while (body.isActive()) {

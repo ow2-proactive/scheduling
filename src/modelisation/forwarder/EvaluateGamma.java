@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class EvaluateGamma implements Serializable {
+public class EvaluateGamma implements org.objectweb.proactive.RunActive, Serializable {
 
     private String[] destinations;
     int index;
@@ -40,7 +40,7 @@ public class EvaluateGamma implements Serializable {
         this.running = true;
     }
 
-    public void live(Body body) {
+    public void runActivity(Body body) {
         try {
             while (body.isActive()) {
                 while (!this.running) {

@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.boundedbuffer;
 /**
  * Active BoundedBuffer
  */
-public class BoundedBuffer {
+public class BoundedBuffer implements org.objectweb.proactive.RunActive {
 
   private String buffer[];   // The buffer containing the datas
   private int size;          // The buffer's capacity
@@ -96,7 +96,7 @@ public class BoundedBuffer {
   /**
    * The only synchronization method
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {
       if (count == 0) {

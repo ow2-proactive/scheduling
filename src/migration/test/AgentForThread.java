@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 
-public class AgentForThread implements Serializable {
+public class AgentForThread implements org.objectweb.proactive.RunActive, Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
 
@@ -17,7 +17,7 @@ public class AgentForThread implements Serializable {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     org.objectweb.proactive.core.body.request.BlockingRequestQueue requestQueue = body.getRequestQueue();
     try {
 

@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Serializable {
+public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
     private String[] destinations;
     int index;
@@ -32,7 +32,7 @@ public class Test implements Serializable {
         }
     }
 
-    public void live(Body body) {
+    public void runActivity(Body body) {
         try {
             if (index < destinations.length) {
                 org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;

@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.readers;
 
 import org.objectweb.proactive.ProActive;
 
-public class Writer {
+public class Writer implements org.objectweb.proactive.RunActive {
 
   private ReaderDisplay display;
   private ReaderWriter rw;
@@ -87,7 +87,7 @@ public class Writer {
    * The live method.
    * @param body the body of the Active object
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (!done) {
       service.serveOldest();

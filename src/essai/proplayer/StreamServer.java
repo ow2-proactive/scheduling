@@ -7,7 +7,7 @@ import org.objectweb.proactive.Body;
  * a ProStream server
  * @see ProStream
  */
-public abstract class StreamServer {
+public abstract class StreamServer implements org.objectweb.proactive.RunActive {
 
   /**reference to the client*/
   protected StreamClient client;
@@ -66,7 +66,7 @@ public abstract class StreamServer {
 
 
   /**the live method @param body this Active objects body*/
-  public void live(Body body) {
+  public void runActivity(Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     service.blockingServeOldest("registerClient");
     System.out.println("Blocking the RequestQueue");

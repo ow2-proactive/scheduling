@@ -36,7 +36,7 @@ import org.objectweb.proactive.ProActive;
 /**
  * This class implements the behaviors of the table and the storage of the forks
  */
-public class Table {
+public class Table implements org.objectweb.proactive.RunActive {
 
   /**
    * The array containing the forks
@@ -108,7 +108,7 @@ public class Table {
    * The live method
    * @param body The active object's body
    */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     GetForkRequestFilter  getForkRequestFilter = new GetForkRequestFilter();
     while (body.isActive()) {

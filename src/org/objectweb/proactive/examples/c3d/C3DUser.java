@@ -30,12 +30,27 @@
 */ 
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.examples.c3d.prim.Light;
-import org.objectweb.proactive.examples.c3d.prim.Primitive;
-import org.objectweb.proactive.examples.c3d.prim.Sphere;
-
-import java.awt.*;
+import java.awt.Button;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.Insets;
+import java.awt.Label;
+import java.awt.List;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
+import java.awt.Panel;
+import java.awt.TextArea;
+import java.awt.TextField;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -49,7 +64,12 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
-public class C3DUser implements java.io.Serializable {
+import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.c3d.prim.Light;
+import org.objectweb.proactive.examples.c3d.prim.Primitive;
+import org.objectweb.proactive.examples.c3d.prim.Sphere;
+
+public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   /**
    * Uses active objects if set to true
@@ -169,7 +189,7 @@ public class C3DUser implements java.io.Serializable {
   }
 
 
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     System.out.println("Starting custom live in C3DUser");
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (body.isActive()) {

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.cruisecontrol;
 
 /** Models the current road and incline of the road */
-public class RoadModel {
+public class RoadModel implements org.objectweb.proactive.RunActive {
 
   // Fields 
   final static int ACTIVE = 1;
@@ -113,7 +113,7 @@ public class RoadModel {
   ////////////////////////////////////////////////////////////
 
   /** Routine which computes the new random incline and sleeds for a time msec */
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     //System.out.println ("Starts live in object RoadModel");
     while (body.isActive()) {

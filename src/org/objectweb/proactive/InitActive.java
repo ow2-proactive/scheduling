@@ -28,29 +28,37 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.examples.futurelist;
+package org.objectweb.proactive;
 
-public class BlockedObject implements org.objectweb.proactive.RunActive, java.io.Serializable {
+/**
+ * <P>
+ * InitActive is related to the initialization of the activity of an 
+ * active object. The initialization of the activity is done only once.
+ * In case of a migration, an active object restarts its activity
+ * automatically without reinitializing.
+ * </P><P>
+ * An object implementing this interface can be invoked to perform the 
+ * initialization work before the activity is started. The object being
+ * reified as an active object can implement this interface or an external
+ * class can also be used.
+ * </P>
+ * <P>
+ * It is generally the role of the body of the active object to perform the 
+ * call on the object implementing this interface.
+ * </P>
+ * 
+ * @author  ProActive Team
+ * @version 1.0,  2002/06
+ * @since   ProActive 0.9.3
+ */
+public interface InitActive extends Active {
+  
+  /**
+   * Initializes the activity of the active object.
+   * @param <code>body</code> the body of the active object being initialized
+   */
+  public void initActivity(Body body);
 
-  public BlockedObject() {
-  }
-
-  public void runActivity(org.objectweb.proactive.Body body) {
-    //first we wait to allow the caller to migrate with its futures
-    body.getRequestQueue().blockingRemoveOldest("go");
-    System.out.println("BlockedObject: Now in service");
-    body.fifoPolicy();
-  }
-
-
-  //unblock the live method
-  public void go() {
-    System.out.println("BlockedObject: go()");
-  }
-
-
-  public EmptyFuture createFuture() {
-    return new EmptyFuture();
-
-  }
 }
+
+

@@ -36,8 +36,8 @@ public class Test implements Serializable {
         arg[0] = args;
 
         try {
-            t = (Test) ProActive.newActive(Test.class.getName(), null, MixedLocationMetaObjectFactory.newInstance(), null);
-            s = (Source) ProActive.newActive(Source.class.getName(), arg, MixedLocationMetaObjectFactory.newInstance(), null);
+            t = (Test) ProActive.newActive(Test.class.getName(), null, null, null, MixedLocationMetaObjectFactory.newInstance());
+            s = (Source) ProActive.newActive(Source.class.getName(), arg, null, null, MixedLocationMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }

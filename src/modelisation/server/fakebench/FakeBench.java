@@ -37,7 +37,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 import modelisation.server.TimedLocationServerMetaObjectFactory;
 
-public class FakeBench {
+public class FakeBench implements org.objectweb.proactive.RunActive {
 
     protected LocationServer l;
     protected long delay;
@@ -49,7 +49,7 @@ public class FakeBench {
         this.delay = delay.longValue();
     }
 
-    public void live(Body b) {
+    public void runActivity(Body b) {
         l = LocationServerFactory.getLocationServer();
         BlockingRequestQueue queue = b.getRequestQueue();
         while (b.isActive()) {
@@ -93,7 +93,7 @@ public class FakeBench {
         Object[] param = new Object[]{new Long(args[1])};
         try {
             for (int i = 0; i < max; i++) {
-                ProActive.newActive("modelisation.server.fakebench.FakeBench", param, TimedLocationServerMetaObjectFactory.newInstance(), null);
+                ProActive.newActive("modelisation.server.fakebench.FakeBench", param, null, null, TimedLocationServerMetaObjectFactory.newInstance());
             }
         } catch (Exception e) {
             e.printStackTrace();

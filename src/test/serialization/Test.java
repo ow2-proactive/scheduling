@@ -8,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Vector;
 
-public class Test implements Serializable {
+public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
   Vector v = new Vector();
   transient java.io.ObjectOutputStream oos;
@@ -19,7 +19,7 @@ public class Test implements Serializable {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     //TEMPORARY
     long startTime = System.currentTimeMillis();
     long startTime2 = 0;

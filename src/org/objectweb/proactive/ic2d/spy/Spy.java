@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 /**
  * The master Spy class
  */
-public class Spy {
+public class Spy implements org.objectweb.proactive.RunActive {
 
 
   
@@ -134,7 +134,7 @@ public class Spy {
   }
 
 
-  public void live(org.objectweb.proactive.Body body) {
+  public void runActivity(org.objectweb.proactive.Body body) {
     spyEventManager = new SpyEventManager(body.getID());
     spyEventManager.addBodyEventListener();
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);

@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import modelisation.statistics.ExponentialLaw;
 
-public class AgentWithExponentialMigrationAndServer implements java.io.Serializable {
+public class AgentWithExponentialMigrationAndServer implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
     protected ExponentialLaw expo;
     protected Node[] nodes;
@@ -19,8 +19,7 @@ public class AgentWithExponentialMigrationAndServer implements java.io.Serializa
 
     }
 
-    public AgentWithExponentialMigrationAndServer(Double nu, Node[] array,
-                                                  Long lifeTime)
+    public AgentWithExponentialMigrationAndServer(Double nu, Node[] array, Long lifeTime)
             throws IllegalArgumentException {
         this.expo = new ExponentialLaw(nu.doubleValue());
         nodes = array;
@@ -56,7 +55,7 @@ public class AgentWithExponentialMigrationAndServer implements java.io.Serializa
     }
 
 
-    public void live(Body body) {
+    public void runActivity(Body body) {
         long startTime = 0;
         long endTime = 0;
         while (body.isActive() && (!this.stop())) {

@@ -5,7 +5,7 @@ import org.objectweb.proactive.Body;
 
 import java.io.Serializable;
 
-public class Test implements Serializable {
+public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
   private String[] destinations;
   int index;
@@ -28,7 +28,7 @@ public class Test implements Serializable {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     try {
       while (body.isActive()) {
         if (index < destinations.length) {

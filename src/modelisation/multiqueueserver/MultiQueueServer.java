@@ -5,7 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
-public class MultiQueueServer extends SimpleLocationServer {
+public class MultiQueueServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
   public MultiQueueServer() {}
 
@@ -17,10 +17,9 @@ public class MultiQueueServer extends SimpleLocationServer {
     System.out.println("MultiQueueServer: echo()");
   }
 
-  public void live(Body b) {
+  public void runActivity(Body b) {
     System.out.println("Server is alive");
-
-    super.live(b);
+    super.runActivity(b);
   }
 
   public static void main(String args[]) {
@@ -33,9 +32,13 @@ public class MultiQueueServer extends SimpleLocationServer {
     MultiQueueServer server = null;
     try {
       if (args.length == 2)
-        server = (MultiQueueServer) ProActive.newActive(MultiQueueServer.class.getName(), arg, CompositeQueueMetaObjectFactory.newInstance(), NodeFactory.getNode(args[1]));
+        server = (MultiQueueServer) ProActive.newActive(MultiQueueServer.class.getName(), arg, 
+                      NodeFactory.getNode(args[1]),
+                      null,
+                      CompositeQueueMetaObjectFactory.newInstance());
       else
-        server = (MultiQueueServer) ProActive.newActive(MultiQueueServer.class.getName(), arg, CompositeQueueMetaObjectFactory.newInstance(), null);
+        server = (MultiQueueServer) ProActive.newActive(MultiQueueServer.class.getName(), arg, 
+                      null, null, CompositeQueueMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

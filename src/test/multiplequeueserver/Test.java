@@ -5,7 +5,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
 
-public class Test {
+public class Test implements org.objectweb.proactive.RunActive {
     protected MultiQueueServer l;
  
     public Test() {}
@@ -29,7 +29,7 @@ public class Test {
 // 	System.out.println("updateLocation() done");
 //     }
 
-    public void live(Body b) {
+    public void runActivity(Body b) {
 	System.out.println("live()");
 	l.updateLocation(b.getID(), b.getRemoteAdapter());
 	try {

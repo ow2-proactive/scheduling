@@ -156,7 +156,6 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
 
     // Cells panel
     javax.swing.JPanel cellsPanel = new javax.swing.JPanel();
-    System.out.println(" max="+max);
     cells = new CellPanel[max];
     for (int i = 0; i < max; i++) {
       cells[i] = new CellPanel();

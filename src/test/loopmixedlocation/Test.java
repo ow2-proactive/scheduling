@@ -6,7 +6,7 @@ import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 
 import java.io.Serializable;
 
-public class Test implements Serializable {
+public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
   protected int index;
   protected String[] destinations;
@@ -19,7 +19,7 @@ public class Test implements Serializable {
     destinations = nodes;
   }
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     try {
       while (body.isActive()) {
         System.out.println("Test pending requests = " + body.getRequestQueue().size());
@@ -70,8 +70,8 @@ public class Test implements Serializable {
     arg[0] = args;
 
     try {
-      t = (Test) ProActive.newActive(Test.class.getName(), arg, MixedLocationMetaObjectFactory.newInstance(), null);
-      s = (Source) ProActive.newActive(Source.class.getName(), null, MixedLocationMetaObjectFactory.newInstance(), null);
+      t = (Test) ProActive.newActive(Test.class.getName(), arg, null, null, MixedLocationMetaObjectFactory.newInstance());
+      s = (Source) ProActive.newActive(Source.class.getName(), null, null, null, MixedLocationMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

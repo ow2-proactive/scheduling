@@ -3,7 +3,7 @@ package test.blockrequest;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
-public class Test {
+public class Test implements org.objectweb.proactive.RunActive {
 
   private int counter = 0;
 
@@ -24,7 +24,7 @@ public class Test {
   }
 
 
-  public void live(Body body) {
+  public void runActivity(Body body) {
     System.out.println("----- Test: blocking requests");
     body.blockCommunication();
     try {

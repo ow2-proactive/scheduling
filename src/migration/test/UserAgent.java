@@ -7,7 +7,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManager;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.body.migration.Migratable;
 
-public class UserAgent implements java.io.Serializable {
+public class UserAgent implements org.objectweb.proactive.RunActive, java.io.Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
   MigrationStrategyManager migrationStrategyManager;
@@ -44,7 +44,7 @@ public class UserAgent implements java.io.Serializable {
   }
 
 
-  public void live(org.objectweb.proactive.Body b) {
+  public void runActivity(org.objectweb.proactive.Body b) {
     if (etape == 0) {
       // Destination r;  
       //  b.migrationStrategy = new MigrationStrategyImpl();

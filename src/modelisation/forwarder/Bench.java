@@ -13,7 +13,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-public class Bench {
+public class Bench implements org.objectweb.proactive.RunActive {
 
   protected static NodeControler auto;
 
@@ -30,8 +30,8 @@ public class Bench {
         (AgentWithExponentialMigrationAndForwarder) ProActive.newActive(
           "modelisation.forwarder.AgentWithExponentialMigrationAndForwarder",
           args,
-          FowarderMetaObjectFactory.newInstance(),
-          NodeFactory.getNode(nodeName));
+          NodeFactory.getNode(nodeName), null, 
+          FowarderMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -97,7 +97,7 @@ public class Bench {
     this.expo = e;
   }
 
-  public void live(Body b) {
+  public void runActivity(Body b) {
     int waittime;
     for (int i = 0; i < 20; i++) {
       waittime = (int) (expo.next() * 1000);
@@ -182,7 +182,7 @@ public class Bench {
     Bench bench = null;
     Object[] param = new Object[] { agent, expo };
     try {
-      bench = (Bench) ProActive.newActive(Bench.class.getName(), param, FowarderMetaObjectFactory.newInstance(), null);
+      bench = (Bench) ProActive.newActive(Bench.class.getName(), param, null, null, FowarderMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

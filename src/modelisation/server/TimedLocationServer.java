@@ -16,7 +16,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 import util.timer.MicroTimer;
 
-public class TimedLocationServer extends SimpleLocationServer {
+public class TimedLocationServer extends SimpleLocationServer implements org.objectweb.proactive.RunActive {
 
     protected MicroTimer microtimer;
 
@@ -29,7 +29,7 @@ public class TimedLocationServer extends SimpleLocationServer {
         this.microtimer = new MicroTimer();
     }
 
-    public void live(Body body) {
+    public void runActivity(Body body) {
         System.out.println("TimedLocationServer: live()");
         this.register();
         while (body.isActive()) {

@@ -45,7 +45,7 @@ public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFac
   // -- PUBLICS METHODS -----------------------------------------------
   //
 
-  public static MetaObjectFactory newInstance() {
+  public synchronized static MetaObjectFactory newInstance() {
   	if (instance == null) {
   		instance = new TimedLocationServerMetaObjectFactory();
   	}

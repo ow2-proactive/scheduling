@@ -4,7 +4,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class LiveAgent implements Serializable {
+public class LiveAgent implements org.objectweb.proactive.RunActive, Serializable {
 
   int etape = 0;
 
@@ -14,7 +14,7 @@ public class LiveAgent implements Serializable {
   }
 
 
-  public void live(org.objectweb.proactive.Body b) {
+  public void runActivity(org.objectweb.proactive.Body b) {
     System.out.println("LiveAgent: I have my own live method");
     if (etape == 0) {
       etape++;
