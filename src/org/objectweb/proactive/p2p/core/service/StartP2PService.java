@@ -1,5 +1,4 @@
 /*
-   /*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -185,6 +184,19 @@ public class StartP2PService {
         //                }
     }
 
+    private void addDefaults() {
+    	int nbUrls = serverList.size();
+    	for (int i = 0; i < nbUrls; i++) {
+    		String url = (String) serverList.get(i);
+    		if (url.indexOf("//") < 0)
+    			url = DEFAULT_ACQUISITION_METHOD + "//" + url;
+    		if (!url.matches(".*:[0-9]+$"))
+    			url += ":" + DEFAULT_PORT_NUMBER;
+    		
+    		serverList.set(i, url);
+    	}
+    }
+    
     /**
      * <p>
      * Start the P2P service.
@@ -223,6 +235,7 @@ public class StartP2PService {
 
             // Record the ProActiveRuntime in other from Servers List File
             if (!serverList.isEmpty()) {
+            	addDefaults();
                 ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
             }
         } catch (NodeException e) {
