@@ -116,7 +116,7 @@ public interface VirtualMachine {
 
     /**
      * Sets the creatorId field to the given value
-     * @param value The Id of the VirtualNode that created this VirtualMachine
+     * @param creatorId The Id of the VirtualNode that created this VirtualMachine
      */
     public void setCreatorId(String creatorId);
 

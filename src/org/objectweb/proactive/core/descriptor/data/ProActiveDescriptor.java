@@ -104,8 +104,7 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   /**
    * Creates an ExternalProcess of the given className with the specified ProcessID
    * @param processID
-   * @param processClassName.
-   * @return ExternalProcess
+   * @param processClassName
    * @throws ProActiveException if a problem occurs during process creation
    */
   public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException;
@@ -114,7 +113,6 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   /**
    * Returns a new instance of ExternalProcess from processClassName
    * @param processClassName
-   * @return ExternalProcess
    * @throws ProActiveException if a problem occurs during process creation
    */
   public ExternalProcess createProcess(String processClassName) throws ProActiveException;

@@ -147,7 +147,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
     /**
      * Returns the node of the given url among nodes mapped to this VirtualNode in the xml
      * descriptor or null if such node does not exist.
-     * @param name
+     * @param url
      * @return Node the node of the given url or null if such node does not exist
      */
     public Node getNode(String url) throws NodeException;
