@@ -22,7 +22,7 @@ public class NodeControler {
     protected static final String JAVA_BIN = "/usr/local/jdk1.4.0/bin/java ";
     protected static final String OPTIONS =
         "-Djava.library.path=/net/home/fhuet/workProActive/ProActive/classes/  " +
-        //       "-Dproactive.rmi=ibis " +
+        //       "-Dproactive.protocol=ibis " +
         "-Dibis.serialization=sun " +
         "-Dproactive.migrationmanager=modelisation.TimedMigrationManager" +
         "-Dmodelisation.maxMigrations=5 -Dproactive.locationserver.rmi=//satura.inria.fr:35690/LocationServer " +

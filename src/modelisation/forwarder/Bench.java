@@ -27,7 +27,7 @@ public class Bench extends ModelisationBench
 //        args[1] = nodes;
 //        args[2] = new Long(lifeTime);
 //        try {
-//            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+//            if ("ibis".equals(System.getProperty("proactive.protocol"))) {
 //                System.out.println(" USING IBIS");
 //                agent = (Agent) ProActive.newActive(Agent.class.getName(),
 //                        args, NodeFactory.getNode(nodeName), null,
@@ -52,7 +52,7 @@ public class Bench extends ModelisationBench
         args[2] = new Long(lifeTime);
         System.out.println("NODES SIZE = " + nodes.length);
         try {
-            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+            if ("ibis".equals(System.getProperty("proactive.protocol"))) {
                 System.out.println(" USING IBIS");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
                         args, Bench.StartNode, null,
@@ -153,7 +153,7 @@ public class Bench extends ModelisationBench
         Bench bench = null;
         Object[] param = new Object[] { agent, expo };
         try {
-            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+            if ("ibis".equals(System.getProperty("proactive.protocol"))) {
                 System.out.println(" USING IBIS");
                 bench = (Bench) ProActive.newActive(Bench.class.getName(),
                         param, (Node) null, null, new ForwarderIbisMetaObjectFactory());

@@ -197,7 +197,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
         try {
             Agent agent = null;
 
-            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+            if ("ibis".equals(System.getProperty("proactive.protocol"))) {
                 System.out.println(" USING IBIS");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
                         args, (Node) null, null, new NoForwarderIbisMetaObjectFactory());
