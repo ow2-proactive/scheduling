@@ -181,7 +181,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public long getSequenceNumber() {
-        return wrappedRequest.getSequenceNumber();
+    	if (!this.isArrived) {
+           return 0;
+        } else {
+            return wrappedRequest.getSequenceNumber();
+        }
     }
 
     public void setMessageInfo(char[] mi) {
