@@ -479,9 +479,10 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         if (eventListsFrame.isVisible()) {
-                            eventListsFrame.hide();
+                            eventListsFrame.setVisible(false);
+
                         } else {
-                            eventListsFrame.show();
+                            eventListsFrame.setVisible(true);
                         }
                     }
                 });
@@ -494,9 +495,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         if (processesFrame.isVisible()) {
-                            processesFrame.hide();
+                            processesFrame.setVisible(false);
                         } else {
-                            processesFrame.show();
+                            processesFrame.setVisible(true);
                         }
                     }
                 });
@@ -509,9 +510,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
             b.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent e) {
                         if (jobMonitorFrame.isVisible()) {
-                            jobMonitorFrame.hide();
+                            jobMonitorFrame.setVisible(false);
                         } else {
-                            jobMonitorFrame.show();
+                            jobMonitorFrame.setVisible(true);
                         }
                     }
                 });

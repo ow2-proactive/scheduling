@@ -110,7 +110,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
                     frames.add(f);
 
-                    f.show();
+                    f.setVisible(true);
                 }
             });
 
@@ -288,9 +288,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         for (int i = 0, size = frames.size(); i < size; ++i) {
             JFrame f = (JFrame) frames.get(i);
             if (hide) {
-                f.hide();
+                f.setVisible(false);
             } else {
-                f.show();
+                f.setVisible(true);
             }
         }
     }

@@ -369,7 +369,7 @@ public class EventListsPanel extends javax.swing.JPanel
                 "Eventslist Legend");
         legendFrame.getContentPane().add(new LegendPanel());
         legendFrame.setSize(400, 600);
-        legendFrame.show();
+        legendFrame.setVisible(true);
     }
 
     /** Colors the events correctly. <br>Possible modes:<br><ul>

@@ -232,7 +232,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   	  exitButton.addActionListener(this);
   	  getContentPane().add(pauseButton);
   	  getContentPane().add(exitButton);
-  	  show();
+  	  setVisible(true);
   	}
   	public void actionPerformed(ActionEvent e) {
   		if (e.getSource() == exitButton) {

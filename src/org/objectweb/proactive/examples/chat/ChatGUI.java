@@ -118,7 +118,7 @@ public class ChatGUI extends JFrame {
 		});
 
 	  pack();
-	  show();
+	  setVisible(true);
 
 	}
 

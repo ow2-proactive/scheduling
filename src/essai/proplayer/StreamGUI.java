@@ -69,7 +69,7 @@ public class StreamGUI extends JFrame implements WindowListener,
 
   /**To init a JFrame*/
   public void init() {
-    show();
+  	setVisible(true);
   }
 
 

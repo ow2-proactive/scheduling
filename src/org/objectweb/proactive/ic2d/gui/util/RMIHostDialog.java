@@ -109,7 +109,7 @@ public class RMIHostDialog extends javax.swing.JDialog {
     * @param args the command line arguments
     */
    public static void main(String args[]) {
-       new RMIHostDialog(new javax.swing.JFrame(), true).show();
+       new RMIHostDialog(new javax.swing.JFrame(), true).setVisible(true);
    }
 
    // Variables declaration - do not modify
@@ -159,7 +159,7 @@ static public RMIHostDialog showRMIHostDialog(javax.swing.JFrame parentComponent
 		}
 	jTextFieldHostIp.setText(initialhostvalue);
 	_singleton.setLocationRelativeTo(parentComponent);
-	_singleton.show();
+	_singleton.setVisible(true);
 	return _singleton;
 	}
 

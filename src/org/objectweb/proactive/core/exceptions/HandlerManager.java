@@ -124,7 +124,7 @@ public class HandlerManager {
         Object info) {
         //System.out.println("*** CREATING HANDLER WINDOW !");
         HandlerWindow win = new HandlerWindow(nfe, h, info);
-        win.show();
+        win.setVisible(true);
     }
 
     /**

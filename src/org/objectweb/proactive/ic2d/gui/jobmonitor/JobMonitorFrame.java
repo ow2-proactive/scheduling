@@ -157,13 +157,13 @@ public class JobMonitorFrame extends JFrame {
     }
 
     public void hide() {
-        super.hide();
+        super.setVisible(false);
 
         panel.hideOwnedFrames();
     }
 
     public void show() {
-        super.show();
+        super.setVisible(true);
 
         panel.showOwnedFrames();
     }

@@ -80,7 +80,7 @@ public class OfficeWindow extends javax.swing.JFrame implements java.awt.event.A
       if (legendDlg.isVisible())
         legendDlg.setVisible(false);
       else
-        legendDlg.show();
+        legendDlg.setVisible(true);
     }
   }
 

@@ -81,7 +81,7 @@ public class Office {
     win = new OfficeWindow();
     win.pack();
     win.setTitle("The Salishan problems (3)");
-    win.show();
+    win.setVisible(true);
 
     display = win.getDisplay();
   }

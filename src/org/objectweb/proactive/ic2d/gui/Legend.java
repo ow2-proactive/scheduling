@@ -354,6 +354,6 @@ public class Legend extends JFrame {
     }
 
     public static void main(String[] argv) {
-        Legend.uniqueInstance().show();
+        Legend.uniqueInstance().setVisible(true);
     }
 }
