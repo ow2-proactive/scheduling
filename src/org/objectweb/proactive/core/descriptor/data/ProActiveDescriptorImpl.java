@@ -145,7 +145,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
     if (process == null) {
       process = createProcess(processClassName);
       addExternalProcess(processID, process);
-      //System.out.println("created Process="+process.toString());
     }
     return process;
   }
