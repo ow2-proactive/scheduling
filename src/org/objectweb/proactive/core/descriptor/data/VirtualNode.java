@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -48,129 +48,121 @@ import org.objectweb.proactive.core.node.NodeException;
 public interface VirtualNode extends java.io.Serializable
 {
 
- 
 	/**
 	 * Method setProperty.
 	 * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
 	 */
-  public void setProperty(String property);
-  
-  
+	public void setProperty(String property);
+	
+
 	/**
 	 * Returns the value of property attribute.
 	 * @return String
 	 */
-  public String getProperty();
+	public String getProperty();
+	
+	
 
- 
- 
 	/**
 	 * Method setName.
 	 * @param s
 	 */
-  public void setName(String s);
-  
-  
+	public void setName(String s);
+	
+
 	/**
 	 * Returns the name of this VirtualNode
 	 * @return String
 	 */
-  public String getName();
-  
-  
+	public String getName();
+	
+
 	/**
 	 * Adds a VirtualMachine entity to this VirtualNode
 	 * @param virtualMachine
 	 */
-  public void addVirtualMachine(VirtualMachine virtualMachine);
-  
-  
+	public void addVirtualMachine(VirtualMachine virtualMachine);
+	
+
 	/**
 	 * Returns the virtualMachine entity linked to this VirtualNode or if cyclic, returns
 	 * one of the VirtualMachines linked to this VirtualNode with a cyclic manner(internal count incremented each time this method is called). 
 	 * @return VirtualMachine
 	 */
-  public VirtualMachine getVirtualMachine() ;
-  
-  
-  /**
-   * Activates all the Nodes mapped to this VirtualNode in the XML Descriptor
-   */
-  public void activate();
-  
-  
-//  /**
-//   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
-//   */
-//  public void desactivate();
-  
-  
-  /**
-   * Returns the number of Nodes mapped to this VirtualNode in the XML Descriptor
-   * @return int
-   */
-  public int getNodeCount();
-  
-  
-  /**
-   * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
-   * @return int
-   */
-  public int createdNodeCount();
-  
-  
-  
-  /**
-   * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor 
-   * Another call to this method will return the following created node if any. Note that the order
-   * in which Nodes are created has nothing to do with the order defined in the XML descriptor.
-   * @return Node 
-   */
-  public Node getNode() throws NodeException;
+	public VirtualMachine getVirtualMachine();
+	
 
-  
-  
-  /**
-   * Returns the Node mapped to this VirtualNode with the specified index. There is no relationship between,
-   * the order in the xml descriptor and the order in the array.
-   * @param index
-   * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
-   */
-  public Node getNode(int index) throws NodeException;;
-  
-  
+	/**
+	 * Activates all the Nodes mapped to this VirtualNode in the XML Descriptor
+	 */
+	public void activate();
+
+	
+	/**
+	 * Returns the number of Nodes mapped to this VirtualNode in the XML Descriptor
+	 * @return int
+	 */
+	public int getNodeCount();
+	
+
+	/**
+	 * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
+	 * @return int
+	 */
+	public int createdNodeCount();
+	
+
+	/**
+	 * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor 
+	 * Another call to this method will return the following created node if any. Note that the order
+	 * in which Nodes are created has nothing to do with the order defined in the XML descriptor.
+	 * @return Node 
+	 */
+	public Node getNode() throws NodeException;
+	
+
+	/**
+	 * Returns the Node mapped to this VirtualNode with the specified index. There is no relationship between,
+	 * the order in the xml descriptor and the order in the array.
+	 * @param index
+	 * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
+	 */
+	public Node getNode(int index) throws NodeException;
+	
+
 	/**
 	 * Returns all nodes url mapped to this VirualNode
 	 * @return String[]. An array of string containing the url of all nodes mapped to
 	 * this VirtualNode in the XML descriptor.
 	 */
-  public String[] getNodesURL() throws NodeException;
-  
-  
+	public String[] getNodesURL() throws NodeException;
+	
+
 	/**
 	 * Returns all nodes mapped to this VirtualNode
 	 * @return Node[] An array of Node conataining all the nodes mapped to this
 	 * VirtualNode in the XML descriptor
 	 */
-  public Node[] getNodes() throws NodeException;
-  
-  
+	public Node[] getNodes() throws NodeException;
+	
+
 	/**
 	 * Returns the node of the given url among nodes mapped to this VirtualNode in the xml
 	 * descriptor or null if such node does not exist.
 	 * @param name
 	 * @return Node the node of the given url or null if such node does not exist
 	 */
-  public Node getNode(String url) throws NodeException;
-  
-  
+	public Node getNode(String url) throws NodeException;
+	
+
 	/**
-	 * Creates a node with the given protocol on the current jvm, i.e the jvm that originates the creation of this VirtualNode.
-	 *  This newly created node will is mapped on this VirtualNode
+	 * Creates a node with the given protocol on the current jvm, ie the jvm that originates the creation of this VirtualNode.
+	 * This newly created node will is mapped on this VirtualNode
 	 * @param protocol the protocol to create the node. It has to be rmi or jini.
 	 */
-  public void createNodeOnCurrentJvm(String protocol);
-  
+	public void createNodeOnCurrentJvm(String protocol);
+	
+
 	/**
 	 * Returns the unique active object created on the unique node mapped to this VirtualNode.
 	 * This method should be called on a virtualNode, with unique_singleAO property defined in the XML descriptor. If more than one active object are found, a 
@@ -178,9 +170,9 @@ public interface VirtualNode extends java.io.Serializable
 	 * @return Object the unique active object created on the unique node mapped to this VirtualNode. If many active objects are found, the first one is returned
 	 * @throws ProActiveException if no active objects are created on this VirtualNode.
 	 */
-  public Object getUniqueAO()throws ProActiveException;
-  
-  
+	public Object getUniqueAO() throws ProActiveException;
+	
+
 	/**
 	 * Allows to set runtime informations for this VirtualNode activation.
 	 * This method allows to give to this VirtualNode some informations retrieved at runtime and 
@@ -189,18 +181,16 @@ public interface VirtualNode extends java.io.Serializable
 	 * one information that can be set is LOOKUP_HOST. This information has a sense if in the XML descriptor
 	 * this VirtualNode is defined with the line:
 	 * <pre>
- 	 * lookup virtualNode="vnName" host="*" protocol="rmi or jini", ie the name of the host where to perform the lookup 
- 	 * will be known at runtime.
- 	 * </pre>
- 	 * We expect to implement several runtime informations.
- 	 * If this method fails, for instance, if the property does not exist or has already been set, or is performed on a VirtualNode not resulting 
- 	 * from a lookup, an exception will be thrown but the application will carry on.
+	 * lookup virtualNode="vnName" host="*" protocol="rmi or jini", ie the name of the host where to perform the lookup 
+	 * will be known at runtime.
+	 * </pre>
+	 * We expect to implement several runtime informations.
+	 * If this method fails, for instance, if the property does not exist or has already been set, or is performed on a VirtualNode not resulting 
+	 * from a lookup, an exception will be thrown but the application will carry on.
 	 * @param information the information to be set at runtime
 	 * @param value the value of the information
 	 * @throws ProActiveException if the given information does not exist or has alredy been set
 	 */
-  public void setRuntimeInformations(String information, String value) throws ProActiveException;
-  
-  	
- 
+	public void setRuntimeInformations(String information, String value) throws ProActiveException;
+
 }
