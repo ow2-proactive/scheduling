@@ -41,6 +41,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
@@ -62,20 +64,8 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
-import org.objectweb.proactive.core.exceptions.creation.ProActiveCreationException;
-import org.objectweb.proactive.core.exceptions.group.ProActiveGroupException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerCommunicationException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerCreationException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerGroupException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerMigrationException;
+import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.exceptions.handler.HandlerNonFunctionalException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerSecurityException;
-import org.objectweb.proactive.core.exceptions.handler.HandlerServiceException;
-import org.objectweb.proactive.core.exceptions.handler.IHandler;
-import org.objectweb.proactive.core.exceptions.migration.ProActiveMigrationException;
-import org.objectweb.proactive.core.exceptions.security.ProActiveSecurityException;
-import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -119,33 +109,18 @@ public class ProActive {
     static public HashMap codeLevel = null;
 
     static {
-		ProActiveConfiguration.load();
-		Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
+        ProActiveConfiguration.load();
+        Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
 
-        // Creation of lower levels of exception handling
+        // Creation of the default level which contains standard exception handlers
         defaultLevel = new HashMap();
-        VMLevel = new HashMap();
-        codeLevel = new HashMap();
 
-        // We create default handler and add them to default level
+        // We add handler to default level
         if (logger.isDebugEnabled()) {
-            logger.debug("Initialization of default level handlers");
+            //logger.debug("*** Initialization of default level handlers");
         }
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerNonFunctionalException.class, NonFunctionalException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerCommunicationException.class,
-            ProActiveCommunicationException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerCreationException.class, ProActiveCreationException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerGroupException.class, ProActiveGroupException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerMigrationException.class, ProActiveMigrationException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerSecurityException.class, ProActiveSecurityException.class);
-        setExceptionHandler(IHandler.ID_defaultLevel, null,
-            HandlerServiceException.class, ProActiveServiceException.class);
+        setExceptionHandler(HandlerNonFunctionalException.class,
+            NonFunctionalException.class, Handler.ID_Default, null);
 
         //ProActiveConfiguration.load();
     }
@@ -299,7 +274,6 @@ public class ProActive {
      *
      */
     public static Object newActive(String classname,
-
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
@@ -410,23 +384,23 @@ public class ProActive {
         Object[] constructorParameters, VirtualNode vn,
         ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
-			// COMPONENTS
-			try {
-				Component boot = Fractal.getBootstrapComponent();
-				GenericFactory cf = Fractal.getGenericFactory(boot);
-				return cf.newFcInstance(componentParameters.getComponentType(),
-					new ControllerDescription(componentParameters.getName(),
-						componentParameters.getHierarchicalType()),
-					new ContentDescription(className, constructorParameters, vn));
-			} catch (NoSuchInterfaceException e) {
-				throw new ActiveObjectCreationException(e);
-			} catch (InstantiationException e) {
-				if (e.getCause() instanceof NodeException) {
-					throw new NodeException(e);
-				} else {
-					throw new ActiveObjectCreationException(e);
-				}
-			}
+        // COMPONENTS
+        try {
+            Component boot = Fractal.getBootstrapComponent();
+            GenericFactory cf = Fractal.getGenericFactory(boot);
+            return cf.newFcInstance(componentParameters.getComponentType(),
+                new ControllerDescription(componentParameters.getName(),
+                    componentParameters.getHierarchicalType()),
+                new ContentDescription(className, constructorParameters, vn));
+        } catch (NoSuchInterfaceException e) {
+            throw new ActiveObjectCreationException(e);
+        } catch (InstantiationException e) {
+            if (e.getCause() instanceof NodeException) {
+                throw new NodeException(e);
+            } else {
+                throw new ActiveObjectCreationException(e);
+            }
+        }
     }
 
     /**
@@ -739,7 +713,7 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
-       RuntimeFactory.getDefaultRuntime();
+        RuntimeFactory.getDefaultRuntime();
         if (!xmlDescriptorUrl.startsWith("file:")) {
             xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
         }
@@ -1212,71 +1186,127 @@ public class ProActive {
     }
 
     /**
-     * Search an appropriate handler for a given non functional exception.
-     * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
-     * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
-     * @param ex Exception for which we search a handler.
-     * @return A reliable handler or null if no handler is available
-     */
-
-    public static IHandler searchExceptionHandler(NonFunctionalException ex) {
-        // an handler
-        IHandler handler = null;
-
+       * Search an appropriate handler for a given non functional exception.
+       * The search starts in the highest level and continue in lower levels. When no
+       * handler is available in one level, the search steps down into the hierarchy.
+       * @param ex Exception for which we search a handler.
+       * @param target An object which contains its own level.
+       * @return A reliable handler or null if no handler is available
+       */
+    public static Handler searchExceptionHandler(NonFunctionalException ex,
+        Object target) {
         // Try to get an handler from code level
-        if ((handler = searchExceptionHandler(ex, codeLevel,
-                        IHandler.ID_codeLevel)) != null) {
+        Handler handler = null;
+        if ((handler = searchExceptionHandler(ex.getClass(), codeLevel,
+                        Handler.ID_Code)) != null) {
             return handler;
         }
 
-        // Try to get an handler from object level (active object, future, proxy)
-        // if (obj & (handler = searchExceptionHandler(ex, obj.getHandlerLevel())) != null) return handler;
+        // Try to get a handler from object level (active object = body or proxy)
+        if (target != null) {
+            //	Get the body of the target object
+            UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+
+            // target is local body (i.e. active object level) ?			
+            if (target instanceof ActiveBody) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCH HANDLER IN LOCAL BODY");
+                }
+                try {
+                    HashMap map = ((UniversalBody) body).getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Body)) != null) {
+                        return handler;
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
+
+            // target is remote body (i.e. active object level) ?
+            if (target instanceof RemoteBodyAdapter) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** SEARCH HANDLER IN REMOTE BODY");
+                }
+                try {
+                    HashMap map = ((UniversalBody) body).getRemoteAdapter()
+                                   .getHandlersLevel();
+                    if ((handler = searchExceptionHandler(ex.getClass(), map,
+                                    Handler.ID_Body)) != null) {
+                        return handler;
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR : " + e.getMessage());
+                    }
+                }
+            }
+
+            //	target is a proxy (i.e. a ref. to a body) ?			
+
+            /*if (target instanceof AbstractProxy) {
+                    try {
+                            HashMap map= ((AbstractProxy) target).getHandlersLevel();
+                                    if ((handler = searchExceptionHandler(ex.getClass(), map, Handler.ID_Proxy)) != null) {
+                                            return handler;
+                                    }
+                    } catch (ProActiveException e) {
+                            if (logger.isDebugEnabled()) {
+                                    logger.debug("*** ERROR : " + e.getMessage());
+                            }
+                    }
+            }*/
+        }
+
         // Try to get an handler from VM level
-        if ((handler = searchExceptionHandler(ex, VMLevel, IHandler.ID_VMLevel)) != null) {
+        if ((handler = searchExceptionHandler(ex.getClass(), VMLevel,
+                        Handler.ID_VM)) != null) {
             return handler;
         }
 
-        // Try to get an handler from default level or return null
-        return searchExceptionHandler(ex, defaultLevel, IHandler.ID_defaultLevel);
+        // At the end, get an handler from default level or return null
+        return searchExceptionHandler(ex.getClass(), defaultLevel,
+            Handler.ID_Default);
     }
 
     /**
      * Search an appropriate handler for a given non functional exception.
      * We first search in the highest level a handler for the real class of the exception. If the search fails, we try
      * with mother classes. When no handler is available in this level, we go down into the hierarchy of levels.
-     * @param ex Exception for which we search a handler.
+     * @param NFEClass Class of the non-functional exception for which a handler is searched.
      * @param level The level where handlers are searched
+     * @param levelID Identificator of the level
      * @return A reliable handler or null if no handler is available
      */
-    public static IHandler searchExceptionHandler(NonFunctionalException ex,
-        HashMap level, int levelID) {
-        // Test the capacity of the level
-        if (level.isEmpty()) {
+    public static Handler searchExceptionHandler(Class NFEClass, HashMap level,
+        int levelID) {
+        // Test level capacity
+        if ((level == null) || level.isEmpty()) {
             return null;
         }
 
-        // We get the class of the raised exception
-        Class exClass = ex.getClass();
-        IHandler handler = null;
-
-        // Then we search if a handler exists in the given level
-        // We stop when we find either right handler or none
+        // Retrieve an handler in the given level
+        Handler handler = null;
         while ((handler == null) &&
-                (exClass.getName().compareTo(NonFunctionalException.class.getName()) != 0)) {
+                (NFEClass.getName().compareTo(ProActiveException.class.getName()) != 0)) {
             // Information
             if (logger.isDebugEnabled()) {
-                // logger.debug("*** SEARCHING HANDLER FOR " + exClass.getName() + " IN LEVEL " + levelID);
+                logger.debug("*** SEARCHING HANDLER FOR " + NFEClass.getName() +
+                    " IN LEVEL " + levelID);
             }
 
             // Research algorithm
-            if (level.containsKey(exClass)) {
+            if (level.containsKey(NFEClass)) {
                 try {
-                    handler = (IHandler) Class.forName(((Class) level.get(
-                                exClass)).getName()).newInstance();
+                    handler = (Handler) Class.forName(((Class) level.get(
+                                NFEClass)).getName()).newInstance();
                 } catch (Exception e) {
                     if (e instanceof ClassNotFoundException) {
                         if (logger.isDebugEnabled()) {
-                            // logger.debug("*** Handler for " + exClass.getName() + " is invalid");
+                            logger.debug("*** HANDLER FOR " +
+                                NFEClass.getName() + " IS INVALID");
                         }
                         break;
                     } else {
@@ -1284,7 +1314,7 @@ public class ProActive {
                     }
                 }
             } else {
-                exClass = exClass.getSuperclass();
+                NFEClass = NFEClass.getSuperclass();
             }
         }
 
@@ -1293,110 +1323,176 @@ public class ProActive {
     }
 
     /**
-     * Add a new handler to a specific level.
-     * Any existing handler is overwritten except at default level.
-     * @param level ID representating the level where handlers are added.
-     * @param obj The object containing a level. It is set to null if the <code>ID_level</code> represents default or VM level.
-     * @param hName The handler associated to a non functional exception.
-     * @param exName The class of the non functional exception which require a handler. It must be a subclass of <code>NonFunctionalException</code>.
+     * Add one handler of Non Functional Exception (nfe) to a specific level.
+     * Similar handlers are overwritten except those at default level.
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param levelID An identificator for the level where the handler is added.
+     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
      */
-    public static void setExceptionHandler(int ID_level, Object obj,
-        Class hName, Class exName) {
+    public static void setExceptionHandler(Class handler, Class exception,
+        int levelID, Object target) {
         // Information
-        // System.out.print("*** SET [" +hName.getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level + " ");
-        // The correct level is identified
-        HashMap level = null;
-        switch (ID_level) {
-        case (IHandler.ID_defaultLevel):
-            level = defaultLevel;
-            break;
-        case (IHandler.ID_VMLevel):
-            level = VMLevel;
-            break;
-        case (IHandler.ID_activeObjectLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_proxyLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_futureLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_codeLevel): // level = codeLevel;
-            break;
+        if (logger.isDebugEnabled()) {
+            logger.debug("*** SETTING " + handler.getName() + " FOR " +
+                exception.getName() + " AT " + levelID + "  LEVEL");
         }
 
-        // We don't want to modify the default level except if no handler exists
-        if (level == defaultLevel) {
-            if (level.get(exName) == null) {
-                level.put(exName, hName);
-                if (logger.isDebugEnabled()) {
-                    // logger.debug("...OK");
-                }
-            } else {
-                if (logger.isDebugEnabled()) {
-                    // logger.debug("...FAILED");
+        // To minimize overall cost, level are created during the association of the first handler
+        switch (levelID) {
+        case (Handler.ID_Default):
+            if (defaultLevel.get(exception) == null) {
+                defaultLevel.put(exception, handler);
+            }
+            break;
+        case (Handler.ID_VM):
+            if (VMLevel == null) {
+                VMLevel = new HashMap();
+            }
+            VMLevel.put(exception, handler);
+            break;
+        case (Handler.ID_Body):
+            // The target object must be a body
+            if (target != null) {
+                //	Get the body of the target object
+                UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                try {
+                    if (body instanceof ActiveBody) {
+                        // Local body
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("*** SET " + handler.getName() +
+                                " IN LOCAL BODY");
+                        }
+                        body.setExceptionHandler(handler, exception);
+                    } else if (body instanceof RemoteBodyAdapter) {
+                        // Remote body
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("*** SET " + handler.getName() +
+                                " HANDLER IN REMOTE BODY");
+                        }
+                        body.getRemoteAdapter().setExceptionHandler(handler,
+                            exception);
+                    }
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while SETTING handler " +
+                            handler.getName() + " in BODY LEVEL");
+                    }
                 }
             }
-        } else {
-            level.put(exName, hName);
-            if (logger.isDebugEnabled()) {
-                //logger.debug("...OK");
+            break;
+        case (Handler.ID_Proxy):
+            // The target object must be a proxy
+            if (((target != null) && target instanceof AbstractProxy)) {
+                try {
+                    ((AbstractProxy) target).setExceptionHandler(handler,
+                        exception);
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while SETTNG handler " +
+                            handler.getName() + " in PROXY LEVEL");
+                    }
+                }
             }
+            break;
+        case (Handler.ID_Future):
+            break;
+        case (Handler.ID_Code):
+            if (codeLevel == null) {
+                codeLevel = new HashMap();
+            }
+            codeLevel.put(exception, handler);
+            break;
         }
     }
 
     /**
-     * Remove the handler associated to a non functional exception.
-     * @param level ID representating the level from where handlers are deleted.
-     * @param obj The object containing a level. It is set to null if the <code>ID_level</code> represents default or VM level.
-     * @param exName A non functional exception whoch does not require handler anymore at the given level.
+     * Remove a handler associated to a class of non functional exceptions.
+     * @param exception A class of non functional exception which does not require the given handler anymore.
+     * @param levelID An identificator for the level where the handler is removed.
+     * @param target An object which contains its own level. It is null if  <code>level</code> is default or VM level.
      */
-    public static IHandler unsetExceptionHandler(int ID_level, Object obj,
-        Class exName) {
-        // We keep a trace of the deleted handler
-        IHandler handler = null;
+    public static Handler unsetExceptionHandler(Class exception, int levelID,
+        Object target) {
+        // We keep a trace of the removed handler
+        Class handlerClass = null;
+        Handler handler = null;
 
         // The correct level is identified
         HashMap level = null;
-        switch (ID_level) {
-        case (IHandler.ID_defaultLevel):
-            level = defaultLevel;
+        switch (levelID) {
+        // Default level must not be modified !
+        case (Handler.ID_Default):
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "*** ERROR : CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+            }
+            return null;
+        case (Handler.ID_VM):
+            if (VMLevel != null) {
+                handlerClass = (Class) level.remove(exception);
+            }
             break;
-        case (IHandler.ID_VMLevel):
-            level = VMLevel;
-            break;
-        case (IHandler.ID_activeObjectLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_proxyLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_futureLevel): // level = obj.getHandlerLevel();
-            break;
-        case (IHandler.ID_codeLevel): // level = codeLevel;
-            break;
-        }
-
-        // We don't want to modify default level
-        if (level != defaultLevel) {
-            try {
-                String hName = (String) ((Class) level.remove(exName)).getName();
-                if (hName != null) {
-                    handler = (IHandler) Class.forName(hName).newInstance();
-                    if (logger.isDebugEnabled()) {
-                        // logger.debug("*** REMOVE [" + handler.getClass().getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level);
+        case (Handler.ID_Body):
+            // The target object must be a body
+            if (((target != null) && target instanceof UniversalBody)) {
+                //	Get the body of the target object
+                UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy()).getBody();
+                try {
+                    if (body instanceof ActiveBody) {
+                        // Local body
+                        body.unsetExceptionHandler(exception);
+                    } else if (body instanceof RemoteBodyAdapter) {
+                        // Remote body
+                        body.getRemoteAdapter().unsetExceptionHandler(exception);
                     }
-                } else {
+                } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
-                        //logger.debug("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+                        logger.debug("*** ERROR while UNSETTING handler for " +
+                            exception.getName() + " in BODY LEVEL");
                     }
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        } else {
-            if (logger.isDebugEnabled()) {
-                // logger.debug("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !"); 
+            break;
+        case (Handler.ID_Proxy):
+            // The target object must be a proxy
+            if (((target != null) && target instanceof AbstractProxy)) {
+                // Create a request to associate handler to the distant body
+                try {
+                    handler = ((AbstractProxy) target).unsetExceptionHandler(exception);
+                    return handler;
+                } catch (ProActiveException e) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("*** ERROR while UNSETTING handler for " +
+                            exception.getName() + " in PROXY LEVEL");
+                    }
+                }
+            }
+            break;
+        case (Handler.ID_Future):
+            break;
+        case (Handler.ID_Code):
+            if (codeLevel != null) {
+                handlerClass = (Class) level.remove(exception);
             }
         }
 
-        // We return the deleted handler
+        // Instantiation of the removed handler
+        if (handlerClass != null) {
+            try {
+                handler = (Handler) handlerClass.newInstance();
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** REMOVE [" + handler.getClass().getName() +
+                        "] FOR [" + exception.getName() + "] AT LEVEL " +
+                        levelID);
+                }
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("*** ERROR during class [" +
+                        handlerClass.getName() + "] instantiation");
+                }
+            }
+        }
         return handler;
     }
 
