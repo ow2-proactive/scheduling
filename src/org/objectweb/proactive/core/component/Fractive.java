@@ -33,14 +33,18 @@ package org.objectweb.proactive.core.component;
 import org.apache.log4j.Logger;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.Factory;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -55,7 +59,6 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
@@ -115,7 +118,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                                          .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     TypeFactory.COLLECTION);
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newActiveComponentInterfaceGroup(itf_type);
+            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type);
             return itf_ref_group;
         } catch (Exception e) {
             throw new ProActiveRuntimeException("Impossible to create a collective client interface ",
@@ -156,7 +159,8 @@ public class Fractive implements GenericFactory, Component, Factory {
                 }
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if (nodes.length > 1) { // cyclic node
-                    Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
+                    //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType());
                     Group group_of_components = ProActiveGroup.getGroup(components);
                     Proxy proxy = null;
 
@@ -203,7 +207,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                     "Cannot find a Proxy on the stub object: " + ao);
             }
             ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
-                                                                                                     .createComponentRepresentative(componentParameters,
+                                                                                                     .createComponentRepresentative(componentParameters.getComponentType(),
                     myProxy);
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;
@@ -211,9 +215,10 @@ public class Fractive implements GenericFactory, Component, Factory {
             throw new InstantiationException(e.getMessage());
         } catch (NodeException e) {
             throw new InstantiationException(e.getMessage());
-        } catch (ClassNotReifiableException e) {
-            throw new InstantiationException(e.getMessage());
         } catch (ClassNotFoundException e) {
+            throw new InstantiationException(e.getMessage());
+        } catch (java.lang.InstantiationException e) {
+            e.printStackTrace();
             throw new InstantiationException(e.getMessage());
         }
     }
@@ -250,6 +255,14 @@ public class Fractive implements GenericFactory, Component, Factory {
             if ((arg0 == null) && (arg1 == null) && (arg2 instanceof Map)) {
                 // for compatibility with the new org.objectweb.fractal.util.Fractal class
                 return this;
+            }
+            if ((arg0 instanceof Type) &&
+                    (arg1 instanceof ControllerDescription) &&
+                    ((arg2 instanceof String) || (arg2 == null))) {
+                // for the ADL, when only type and ControllerDescription are given
+                return newFcInstance(arg0, arg1,
+                    (arg2 == null) ? null : new ContentDescription(
+                        (String) arg2));
             }
 
             // code compatibility with Julia
