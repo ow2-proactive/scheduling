@@ -37,7 +37,7 @@ public class ProActiveConfiguration {
         } else {
             System.out.println("******** No proactive.configuration");
             filename = ProActiveConfiguration.class.getResource(
-                    "proactiveConfiguration.xml").toString();
+                    "ProActiveConfiguration.xml").toString();
         }
         System.out.println("****** Reading configuration from " + filename);
         ProActiveConfiguration.load(filename);
