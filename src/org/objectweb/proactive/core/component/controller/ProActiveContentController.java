@@ -9,9 +9,10 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 
 import java.io.Serializable;
+
+import java.util.Vector;
 
 
 /**
@@ -23,13 +24,14 @@ import java.io.Serializable;
 public class ProActiveContentController extends ProActiveController
     implements ContentController, Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveContentController.class.getName());
-    Component[] fcSubComponents;
+    Vector fcSubComponents;
 
     /**
      * Constructor for ProActiveContentController.
      */
     public ProActiveContentController(Component owner) {
         super(owner, Constants.CONTENT_CONTROLLER);
+        fcSubComponents = new Vector();
     }
 
     /**
@@ -55,7 +57,15 @@ public class ProActiveContentController extends ProActiveController
      * @see org.objectweb.fractal.api.control.ContentController#getFcSubComponents()
      */
     public Component[] getFcSubComponents() {
-        return fcSubComponents;
+        if (fcSubComponents.size() > 0) {
+            return (Component[]) fcSubComponents.toArray(new Component[fcSubComponents.size()]);
+        } else {
+            return null;
+        }
+    }
+
+    public boolean isSubComponent(Component component) {
+        return fcSubComponents.contains(component);
     }
 
     /**
@@ -78,22 +88,21 @@ public class ProActiveContentController extends ProActiveController
         //					}
         //				}
         // check whether already a sub component
-        if (fcSubComponents != null) {
-            for (int i = 0; i < fcSubComponents.length; i++) {
-                if (fcSubComponents[i].equals(subComponent)) {
-                    String name = null;
-                    try {
-                        name = ((ComponentParametersController) subComponent
-                                .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                                .getName();
-                    } catch (NoSuchInterfaceException nsie) {
-                        throw new ProActiveRuntimeException(
-                            "cannot access the component parameters controller");
-                    }
-                    throw new IllegalArgumentException(
-                        "already a sub component : " + name);
-                }
+        // TODO check in the case of multiple references to the same component
+        if (fcSubComponents.contains(subComponent)) {
+            String name;
+            try {
+                name = ((ComponentParametersController) subComponent
+                        .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                        .getName();
+            } catch (NoSuchInterfaceException nsie) {
+                throw new ProActiveRuntimeException(
+                    "cannot access the component parameters controller");
             }
+            throw new IllegalArgumentException("already a sub component : " +
+                name);
+        } else {
+            fcSubComponents.addElement(subComponent);
         }
 
         // FIXME : pb with component cycle checking
@@ -111,14 +120,14 @@ public class ProActiveContentController extends ProActiveController
         //						+ " ; \nthis operation would create a cycle in the component hierarchy");
         //			}
         //		}
-        int length = (fcSubComponents == null) ? 0 : fcSubComponents.length;
-        Component[] oldSubComponents = fcSubComponents;
-        Component[] subComponents = new Component[length + 1];
-        if (fcSubComponents != null) {
-            System.arraycopy(fcSubComponents, 0, subComponents, 0, length);
-        }
-        subComponents[length] = subComponent;
-        fcSubComponents = subComponents;
+        //		int length =
+        //			(fcSubComponents == null) ? 0 : fcSubComponents.length;
+        //			Component[] oldSubComponents = fcSubComponents;
+        //			Component[] subComponents = new Component[length + 1];
+        //			if (fcSubComponents != null) {
+        //			System.arraycopy(fcSubComponents, 0, subComponents, 0, length); }
+        //		subComponents[length] = subComponent;
+        //			fcSubComponents = subComponents;
     }
 
     /**
@@ -127,17 +136,7 @@ public class ProActiveContentController extends ProActiveController
     public void removeFcSubComponent(Component subComponent)
         throws IllegalLifeCycleException {
         checkLifeCycleIsStopped();
-
-        boolean ok = false;
-        if (fcSubComponents != null) {
-            for (int i = 0; i < fcSubComponents.length; i++) {
-                if (fcSubComponents[i].equals(subComponent)) {
-                    ok = true;
-                    break;
-                }
-            }
-        }
-        if (!ok) {
+        if (!fcSubComponents.removeElement(subComponent)) {
             throw new IllegalArgumentException("not a sub component : " +
                 subComponent);
         }
@@ -148,11 +147,10 @@ public class ProActiveContentController extends ProActiveController
     }
 
     /**
-     * NOT IMPLEMENTED YET !
-     * @see org.objectweb.fractal.api.control.ContentController#checkFc()
-     */
-
-    // TODO : To implement!
+    * NOT IMPLEMENTED YET !
+    * @see org.objectweb.fractal.api.control.ContentController#checkFc()
+    */
+	// TODO : To implement!
     public void checkFc() {
         throw new ProActiveRuntimeException("not yet implemented");
     }
