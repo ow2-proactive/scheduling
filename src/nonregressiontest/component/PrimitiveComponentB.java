@@ -4,14 +4,12 @@
   */
 package nonregressiontest.component;
 
-import org.apache.log4j.Logger;
 
 /**
  * @author Matthieu Morel
  */
 public class PrimitiveComponentB implements I2 {
-	static Logger logger = Logger.getLogger(PrimitiveComponentB.class.getName());
-	public final static String MESSAGE="-->PrimitiveComponentB";
+	public final static String MESSAGE="-->b";
 
 
 	/**
