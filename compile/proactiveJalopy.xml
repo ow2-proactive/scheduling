@@ -5,8 +5,8 @@
             <version>14</version>
         </compliance>
         <style>
-            <description>Sun Java Coding Convention</description>
-            <name>Sun</name>
+            <description>ProActive Java Coding Convention</description>
+            <name>ProActive</name>
         </style>
     </general>
     <inspector>
