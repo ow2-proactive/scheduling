@@ -12,8 +12,13 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
+if [ -z "$PROACTIVE" ]
+then
 workingDir=`dirname $0`
-. $workingDir/envWS.sh
+PROACTIVE=$workingDir/../../../.
+CLASSPATH=.
+fi
+. $PROACTIVE/scripts/unix/env.sh
 export XMLDESCRIPTOR=$workingDir/../../../descriptors/C3D_Dispatcher_Renderer.xml
 $JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR $1 $2
 echo

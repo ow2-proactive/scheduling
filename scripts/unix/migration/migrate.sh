@@ -14,8 +14,13 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
+if [ -z "$PROACTIVE" ]
+then
 workingDir=`dirname $0`
-. $workingDir/env.sh
+PROACTIVE=$workingDir/../../../.
+CLASSPATH=.
+fi
+. $PROACTIVE/scripts/unix/env.sh
 $JAVACMD org.objectweb.proactive.examples.migration.SimpleObjectMigration $1 $2
 echo
 echo ---------------------------------------------------------

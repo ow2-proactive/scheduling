@@ -3,8 +3,13 @@
 echo
 echo --- Fractal Helloworld example ---------------------------------------------
 
+if [ -z "$PROACTIVE" ]
+then
 workingDir=`dirname $0`
-. $workingDir/env.sh
+PROACTIVE=$workingDir/../../../.
+CLASSPATH=.
+fi
+. $PROACTIVE/scripts/unix/env.sh
 
 #if [ $# -lt 1 ]; then
 #    echo "

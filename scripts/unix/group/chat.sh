@@ -3,8 +3,13 @@
 echo
 echo --- Chat with ProActive ---------------------------------
 
+if [ -z "$PROACTIVE" ]
+then
 workingDir=`dirname $0`
-. $workingDir/env.sh
+PROACTIVE=$workingDir/../../../.
+CLASSPATH=.
+fi
+. $PROACTIVE/scripts/unix/env.sh
 
 $JAVACMD org.objectweb.proactive.examples.chat.Chat $1 $2 $3
 

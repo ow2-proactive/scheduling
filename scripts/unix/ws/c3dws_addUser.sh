@@ -3,8 +3,13 @@
 echo
 echo --- C3D ---------------------------------------------
 
+if [ -z "$PROACTIVE" ]
+then
 workingDir=`dirname $0`
-. $workingDir/envWS.sh
+PROACTIVE=$workingDir/../../../.
+CLASSPATH=.
+fi
+. $PROACTIVE/scripts/unix/env.sh
 
 export XMLDESCRIPTOR=$workingDir/../../../descriptors/C3D_User.xml
 $JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DUser $XMLDESCRIPTOR
