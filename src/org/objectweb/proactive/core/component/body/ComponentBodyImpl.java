@@ -7,7 +7,6 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-// COMPONENTS
 
 /**
  * This class is placed in the hierarchy of bodies in order to provide access to the
