@@ -4,7 +4,9 @@ echo
 echo --- Hello World Web Service Call ---------------------------------------------
 
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/envWS.sh
+. $workingDir/../env.sh
+
 $JAVACMD org.objectweb.proactive.examples.webservices.helloWorld.WSClient
 
 echo

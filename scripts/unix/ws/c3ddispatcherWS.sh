@@ -13,7 +13,9 @@ if [ $# -lt 1 ]; then
 fi
 
 workingDir=`dirname $0`
-. $workingDir/env.sh
+. $workingDir/envWS.sh
+. $workingDir/../env.sh
+
 export XMLDESCRIPTOR=$workingDir/../../descriptors/C3D_Dispatcher_Renderer.xml
 $JAVACMD org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher $XMLDESCRIPTOR $1 $2
 echo
