@@ -614,7 +614,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	public Object getGroupByType() {
 		Object result;
 		try { // a new proxy is generated
-			result = MOP.newInstance(this.className, null, "org.objectweb.proactive.group.ProxyForGroup", null);
+			result = MOP.newInstance(this.className, null, "org.objectweb.proactive.core.group.ProxyForGroup", null);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -720,6 +720,18 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return true;
 	}
 
+	/**
+	 * Waits that at least one member is arrived and returns its index.
+	 * @return the index of a non-awaited member of the Group.
+	 */
+	public int waitOneAndGetIndex() {
+		int index = 0;
+		this.memberList.get(ProActive.waitForAny(this.memberList));
+		while (ProActive.isAwaited(this.memberList.get(index))) {
+			index++;
+		}
+		return index;
+	}
 
 	/* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 

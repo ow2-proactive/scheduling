@@ -382,6 +382,26 @@ public class ProActiveGroup {
 	    	return o;
     }
 
+	/**
+	 * Waits that at least one member is arrived and returns its index.
+	 * @param <code>o</code> a typed group.
+	 * @return the index of a non-awaited member of the Group, -1 if <code>o</code> is not a reified object.
+	 */
+	public int waitOneAndGetIndex(Object o) {
+		if (MOP.isReifiedObject (o)) {
+			org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(o);
+			// If the object represents a group, we use the proxyForGroup's method
+			if (theProxy != null)
+				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitOneAndGetIndex();
+			// Else return 0
+			else
+				return 0;
+	}
+	// if o is not a reified object, return -1
+	else
+		return -1;
+	}
+
 		
     /**
      * Returns the number of members of the object representing a Group.

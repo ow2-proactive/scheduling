@@ -62,6 +62,11 @@ public interface Group extends java.util.Collection {
 
 
     
+	/**
+	 * Returns the object at the specified index.
+	 */
+	public Object get(int index);
+
     /**
      * Merges a group into the group.
      */
@@ -117,8 +122,14 @@ public interface Group extends java.util.Collection {
 	 * @param <code>n</code> the rank of the wanted member.
 	 * @return the member (non-awaited) at the rank <code>n</code> in the Group.
 	 */
-
 	public Object waitAndGetTheNth(int n);
+
+	/**
+	 * Waits that at least one member is arrived and returns its index.
+	 * @return the index of a non-awaited member of the Group.
+	 */
+	public int waitOneAndGetIndex();
+
 
 	/**
 	 * Checks if all the members of the Group are awaited.
