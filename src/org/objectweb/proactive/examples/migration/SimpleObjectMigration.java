@@ -54,11 +54,6 @@ public class SimpleObjectMigration implements Serializable {
 
   private static final int SLEEP_TIME = 9000; 
 
-  private static final String RMI_CLASS = 
-    "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory";
-  private static final String JINI_CLASS = 
-    "org.objectweb.proactive.core.node.jini.JiniNodeFactory";
-  
   private String name;		// The name of the instance
   private String hi = " say hello from "; // The 'hello' sentence
   
@@ -137,23 +132,6 @@ public class SimpleObjectMigration implements Serializable {
    * @param args the 2 parameters in an array
    */
   public static void main(String[] args) {
-   
-    // set the class to use ...
-    try {
-      
-      // .. for the RMI protocol
-      NodeFactory.setFactory(Constants.RMI_PROTOCOL_IDENTIFIER, RMI_CLASS);
-      
-      // .. for the JINI protocol
-      NodeFactory.setFactory(Constants.JINI_PROTOCOL_IDENTIFIER, JINI_CLASS);
-      
-    } catch (NodeException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the setting of "
-			 +" the protocol class to use ("+e.getMessage()+")");
-      e.printStackTrace();
-    }
-
     // The source node
     String urlSourceNode = "";	
     Node sourceNode = null;

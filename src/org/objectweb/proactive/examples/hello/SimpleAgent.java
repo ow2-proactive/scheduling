@@ -62,18 +62,6 @@ public class SimpleAgent implements java.io.Serializable {
       System.exit(-1);
     }
  
-    try {
-      org.objectweb.proactive.core.node.NodeFactory.setFactory(org.objectweb.proactive.core.Constants.RMI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory");
-      org.objectweb.proactive.core.node.NodeFactory.setFactory(org.objectweb.proactive.core.Constants.JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
-      
-    } catch (Exception exp) {
-      System.out.println(exp.getMessage());
-      exp.printStackTrace();
-    }
-
-
-
-
     SimpleAgent t = null;
     try {
       // create the SimpleAgent in this JVM

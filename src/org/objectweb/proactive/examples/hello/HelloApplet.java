@@ -30,50 +30,52 @@
 */ 
 package org.objectweb.proactive.examples.hello;
 
+import org.objectweb.proactive.ProActive;
+
 public class HelloApplet extends org.objectweb.proactive.examples.AppletWrapper {
 
-  /**
-   * The active Hello object
-   */
+  /** The active Hello object */
   private Hello activeHello;
-  private boolean shouldRun = true;
-  /**
-   * The remote node locator if runnning over the network
-   */
+  
+  /** The remote node locator if runnning over the network */
   private org.objectweb.proactive.core.node.Node node;
-  /**
-   * The label 
-   */
-  private javax.swing.JLabel lMessage;
 
+  /** The label  */
+  private javax.swing.JTextArea lMessage;
+  
+  private boolean shouldRun = true;
+  
 
-  public HelloApplet(String name, int width, int height) {
+  public HelloApplet(String name, int width, int height, String nodeURL) {
     super(name, width, height);
-  }
-
-
-  public static void main(String arg[]) {
-    HelloApplet applet = new HelloApplet("Hello applet", 300, 200);
-  }
-
-
-  public void init() {
-    String nodeUrl = (isApplet) ? getParameter("node") : null;
-    try {
-      if (nodeUrl == null)
-        node = null; // We'll create the objects locally
-      else
-        node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeUrl); // We'll create the objects on the specified node
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (nodeURL == null)
+      node = null; // We'll create the objects locally
+    else {
+      try {
+        node = org.objectweb.proactive.core.node.NodeFactory.getNode(nodeURL); // We'll create the objects on the specified node
+      } catch (org.objectweb.proactive.core.node.NodeException e) {
+        node = null;
+      }
     }
+  }
+
+
+  public static void main(String args[]) {
+    // checks for the server's URL
+    String nodeURL = null;
+    if (args.length > 0) {
+      // Lookups the server object
+      nodeURL = args[0];
+    }
+    new HelloApplet("Hello applet", 300, 200, nodeURL);
   }
 
 
   public void start() {
     displayMessage("Applet creating active objects");
+    displayMessage("on node "+(node == null ? "local" : node.getNodeInformation().getURL()));
     try {
-      activeHello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), null);
+      activeHello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), null, node);
     } catch (Exception e) {
       // There has been a problem...
       displayMessage("Error while initializing");
@@ -82,7 +84,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.AppletWrapper 
       return;
     }
     displayMessage("Ok");
-    Thread t = new Thread(new Dummy(), "Dummy Hello clock");
+    Thread t = new Thread(new HelloTimer(), "Hello clock");
     t.start();
   }
 
@@ -99,21 +101,20 @@ public class HelloApplet extends org.objectweb.proactive.examples.AppletWrapper 
     // Layout 
     rootPanel.setBackground(java.awt.Color.white);
     rootPanel.setForeground(java.awt.Color.blue);
-    lMessage = new javax.swing.JLabel("Please wait...........");
+    lMessage = new javax.swing.JTextArea("Please wait...........");
     rootPanel.add(lMessage);
     return rootPanel;
   }
 
 
-  private class Dummy implements Runnable {
+  private class HelloTimer implements Runnable {
 
     public void run() {
       while (shouldRun) {
         lMessage.setText(activeHello.sayHello());
         try {
           Thread.currentThread().sleep(1000);
-        } catch (InterruptedException e) {
-        }
+        } catch (InterruptedException e) {}
       }
     }
   }

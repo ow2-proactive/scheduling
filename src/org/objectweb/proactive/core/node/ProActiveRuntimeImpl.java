@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -169,13 +170,12 @@ public class ProActiveRuntimeImpl implements ProActiveRuntime {
     private String name;
 
     public VMInformationImpl() throws java.net.UnknownHostException {
-      this.uniqueVMID = new java.rmi.dgc.VMID();
+      this.uniqueVMID = UniqueID.getCurrentVMID();
       hostInetAddress = java.net.InetAddress.getLocalHost();
       String hostname = hostInetAddress.getHostName();
       this.name = "PA_RT"+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt())+"_"+hostname;
     }
-    
-
+        
     //
     // -- PUBLIC METHODS  -----------------------------------------------
     //
@@ -187,7 +187,6 @@ public class ProActiveRuntimeImpl implements ProActiveRuntime {
     public java.rmi.dgc.VMID getVMID() {
       return uniqueVMID;
     }
-
 
     public String getName() {
       return name;

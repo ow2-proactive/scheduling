@@ -35,7 +35,6 @@ import java.util.Properties;
 
 public final class ProActiveProperties {
 
-    public static final String PROACTIVE_DEFAULT_NODEFACTORY = "proactive.defaultnodefactory";
     public static final String PROACTIVE_DEFAULT_REQUESTRECEIVER = "proactive.requestreceiver";  
     public static final String PROACTIVE_DEFAULT_MIGRATIONMANAGER = "proactive.migrationmanager";
     public static final String PROACTIVE_DEFAULT_LOCATIONSERVER = "proactive.locationserver";
@@ -53,8 +52,6 @@ public final class ProActiveProperties {
 
 
   public static void loadDefaultProperties() {
-    System.out.println("ProActiveProperties: loading default properties");
-    defaultProperties.setProperty(PROACTIVE_DEFAULT_NODEFACTORY, "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_REQUESTRECEIVER, "org.objectweb.proactive.core.body.request.RequestReceiverImpl"); 
     defaultProperties.setProperty(PROACTIVE_DEFAULT_MIGRATIONMANAGER, "org.objectweb.proactive.core.body.migration.MigrationManagerImpl");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER, "org.objectweb.proactive.ext.locationserver.LocationServer");
@@ -72,7 +69,6 @@ public final class ProActiveProperties {
   protected static void addPropertiesToSystem(Properties p) {
     for (Enumeration e = p.propertyNames(); e.hasMoreElements();) {
       String s = (String)e.nextElement();
-      //System.out.println("XXXX Adding property " +  s + " to the system");
       //we don't override existing value
       if (System.getProperty(s) == null) {
         System.setProperty(s, p.getProperty(s));
@@ -81,18 +77,11 @@ public final class ProActiveProperties {
   }
 
 
-  public static String getNodeFactory() {
-    //System.out.println("ProActiveProperties: returning " + System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_NODEFACTORY));
-    return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_NODEFACTORY);
-  }
-
-
   public static String getRequestReceiverClass() {
     return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_REQUESTRECEIVER);
   }
 
   public static String getMigrationManagerClass() {
-    // System.out.println("ProActiveProperties: returning " +System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_MIGRATIONMANAGER));
     return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_MIGRATIONMANAGER);
   }
 

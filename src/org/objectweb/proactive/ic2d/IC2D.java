@@ -73,13 +73,7 @@ public class IC2D {
       System.out.println("Globus not installed !");
     }
     */
-    try{
-    NodeFactory.setFactory(org.objectweb.proactive.core.Constants.JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
-    } catch (org.objectweb.proactive.core.node.NodeException e){
-      System.out.println("Can't create JiniFactory e="+e);
-    } 
     
-    NodeFactory.createDefaultFactory();
     IC2DObject ic2dObject = new IC2DObject();
     IC2DFrame ic2dFrame = new IC2DFrame(ic2dObject, options);
     if (hosts != null) {

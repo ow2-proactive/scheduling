@@ -36,6 +36,7 @@ package org.objectweb.proactive.examples.hello;
 public class Hello implements java.io.Serializable {
 
   private String name;
+  private String nodeURL;
   private String hi = "Hello world";
   private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
@@ -50,10 +51,16 @@ public class Hello implements java.io.Serializable {
 
 
   public String sayHello() {
-    return hi + " at " + dateFormat.format(new java.util.Date());
+    return hi + " at " + dateFormat.format(new java.util.Date()) + "\n from \n" + nodeURL;
   }
 
+  
+  public void live(org.objectweb.proactive.Body body) {
+    nodeURL = body.getNodeURL();
+    body.fifoPolicy();
+  }
 
+  /*
   public static void main(String[] args) {
     // Registers it with an URL
     try {
@@ -66,4 +73,5 @@ public class Hello implements java.io.Serializable {
       e.printStackTrace();
     }
   }
+  */
 }

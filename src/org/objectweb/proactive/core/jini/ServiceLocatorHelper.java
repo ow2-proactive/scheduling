@@ -48,9 +48,6 @@ import net.jini.discovery.DiscoveryEvent;
 import java.net.InetAddress;
 import java.io.File;
 
-import org.objectweb.proactive.core.rmi.ClassServerHelper;
-
-
 
 public class ServiceLocatorHelper  implements DiscoveryListener {
 
@@ -59,7 +56,6 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
 
   protected static LookupLocator lookup = null;
   protected static ServiceRegistrar registrar = null;
-  protected static ClassServerHelper classServerHelper = null;
 
 
   /**
@@ -84,26 +80,14 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
     } catch(java.net.UnknownHostException  e) {
       System.err.println("Lookup failed: " + e.getMessage());
       e.printStackTrace();
-    } catch(java.lang.SecurityException e) {
-      System.err.println("Lookup failed: " + e.getMessage());
-      e.printStackTrace();
+      System.exit(1);
     }
   }
 
   private static String grpName = "public";
 
-  private static String tmpDir;
-  static {
-    try {
-      File fTmp = File.createTempFile("proactive-","-"+host);
-      tmpDir =  fTmp.getAbsolutePath(); 
-      System.out.println(">> TEMP directory = "+tmpDir);
-    } catch(Exception e) {
-      System.err.println("Cannot create the TEMP directory : "+e.toString());
-      e.printStackTrace();
-      System.exit(1);
-    }
-  }
+  private static final String tmpDir = createTempDirectory(host);
+  
 
 
   //
@@ -112,7 +96,6 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
   
   public ServiceLocatorHelper() {
     System.out.println("ServiceLocatorHelper() constructor");
-
   }
   
   
@@ -154,49 +137,55 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
   // -- PRIVATE METHODS -----------------------------------------------
   // 
   
+  private static String createTempDirectory(String host) {
+    try {
+      File fTmp = File.createTempFile("proactive-","-"+host);
+      String tmpDirPath = fTmp.getAbsolutePath();
+      System.out.println(">> TEMP directory = "+tmpDirPath);
+      return tmpDirPath;
+    } catch(Exception e) {
+      System.err.println("Cannot create the TEMP directory : "+e.toString());
+      e.printStackTrace();
+      System.exit(1);
+      return null;
+    }
+  }
+
   
   /**
    * Try to get the Service Locator on the local host (unicast search)
    * Create it if it doesn't exist 
    */
-  private void getOrCreateServiceLocator() {
-  
-    
-    
+  private void getOrCreateServiceLocator() {    
     if (System.getSecurityManager() == null) {
       System.setSecurityManager(new java.rmi.RMISecurityManager());
-    }
-    
-
-    
+    }    
     if (multicastLocator) {
       // For multicast
 
       LookupDiscovery discover = null;
       try {
-	System.out.println(">> Start LookupDiscovery ...");
-	discover = new LookupDiscovery(LookupDiscovery.ALL_GROUPS);
-	System.out.println(">> Stop LookupDiscovery ...");
+	      System.out.println(">> Start LookupDiscovery ...");
+	      discover = new LookupDiscovery(LookupDiscovery.ALL_GROUPS);
+	      System.out.println(">> Stop LookupDiscovery ...");
       } catch(Exception e) {
-	System.err.println(e.toString());
-	e.printStackTrace();
-	System.exit(1);
+	      System.err.println(e.toString());
+	      e.printStackTrace();
+	      System.exit(1);
       }
-
       discover.addDiscoveryListener(this);
-      
 
       // stay around long enough to receive replies
       try {
-	System.out.println(">> Start waiting Thread ...");
-	Thread.currentThread().sleep(MAX_WAIT);
+	      System.out.println(">> Start waiting Thread ...");
+	      Thread.currentThread().sleep(MAX_WAIT);
 	
-	if (this.registrar == null) {
-	  createServiceLocator();
-	}
-	System.out.println(">> Stop waiting Thread ...");
+	      if (this.registrar == null) {
+	        createServiceLocator();
+	      }
+	      System.out.println(">> Stop waiting Thread ...");
       } catch(java.lang.InterruptedException e) {
-	// do nothing
+	      // do nothing
       }
       
     } else {
@@ -229,24 +218,23 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
     }  
   }
 
-    /**
-     * Create a new Service Locator on the local host
-     */
-    private static void createServiceLocator() {
-      System.out.println("No ServiceLocator founded ...  we lauch a ServiceLocator on "+host);
-      String reggieTmpDir = tmpDir + System.getProperty("file.separator") + "reggie_log";
-      delDirectory(new java.io.File(tmpDir));
-      java.io.File directory = new java.io.File(tmpDir);
-      directory.mkdirs();
-   
-      //System.out.println("We use the ClassServer : "+httpserver);
-      System.out.println("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
+  /**
+   * Create a new Service Locator on the local host
+   */
+  private static void createServiceLocator() {
+    System.out.println("No ServiceLocator founded ...  we lauch a ServiceLocator on "+host);
+    String reggieTmpDir = tmpDir + System.getProperty("file.separator") + "reggie_log";
+    delDirectory(new java.io.File(tmpDir));
+    java.io.File directory = new java.io.File(tmpDir);
+    directory.mkdirs();
+ 
+    //System.out.println("We use the ClassServer : "+httpserver);
+    System.out.println("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
 
-      //String[] args = { httpserver , policy , reggieTmpDir,};
-      String[] args = { "" , policy , reggieTmpDir,};
-      ServiceStarter.create(args , starterClass, implClass, resourcename);
-    
-    }
+    //String[] args = { httpserver , policy , reggieTmpDir,};
+    String[] args = { "" , policy , reggieTmpDir,};
+    ServiceStarter.create(args , starterClass, implClass, resourcename);
+  }
   
     /**
      * Display all services on this registrar
@@ -307,10 +295,7 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
 	      System.out.println("... You should delete it before running a new ServiceLocator ...");
       }
     }
-
-
-
-
+    
 
     /**
      * for multicast discover
@@ -322,20 +307,18 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
     
       System.out.println(">> > "+registrars.length+" registrars : ");
       for (int n = 0; n < registrars.length; n++) {
-	this.registrar = registrars[n];
-	
-	displayServices(); // just for test
-    
+	      this.registrar = registrars[n];
+	      displayServices(); // just for test
       }
       System.out.println(">> Stop  discover...");
     }
+
 
     /**
      * for multicast discover
      */
     public void discarded(DiscoveryEvent evt) {
       System.out.println(">> discarded ...");
-
     }
 
   }

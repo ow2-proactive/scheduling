@@ -87,12 +87,12 @@ public class RemoteNodeFactory extends NodeFactory {
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
-  protected Node _createNode(String s, boolean replacePreviousBinding) throws NodeException {
+  protected Node createNodeImpl(String s, boolean replacePreviousBinding) throws NodeException {
     return createNodeAdapter(s, replacePreviousBinding);
   }
 
 
-  protected Node _createDefaultNode(String baseName) throws NodeException {
+  protected Node createDefaultNodeImpl(String baseName) throws NodeException {
     int i = 0;
     while (true) {
       try {
@@ -105,7 +105,7 @@ public class RemoteNodeFactory extends NodeFactory {
   }
 
 
-  protected Node _getNode(String s) throws NodeException {
+  protected Node getNodeImpl(String s) throws NodeException {
     if (s == null) return null;
     try {
       RemoteNode remoteNode = (RemoteNode)java.rmi.Naming.lookup(s);

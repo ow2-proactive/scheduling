@@ -69,7 +69,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
   public static void main(String[] args) throws java.io.IOException {
     InitialHandler h = new InitialHandler();
-    String uri = "file:///D:/cygwin/home/lmestre/ProActive/ProActiveDescriptor2.xml";
+    String uri = "file:///D:/cygwin/home/lmestre/ProActiveDescriptor2.xml";
     org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
     sr.read();
   }

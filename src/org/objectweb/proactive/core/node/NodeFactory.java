@@ -72,39 +72,24 @@ public abstract class NodeFactory {
   //private static final ClassLoader myClassLoader = new NodeClassLoader();
 
   /** the table where associations Protocol - Factory are kept */
-  private static java.util.Hashtable protocolFactoryMapping = new java.util.Hashtable();
-  private static java.util.Hashtable instanceFactoryMapping = new java.util.Hashtable();
+  private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
+  private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();
   private static Node defaultNode = null;
 
   private static NodeFactory defaultNodeFactory;
 
-
+  public static boolean JINI_ENABLED;
+ 
   static {
-    try {
-      classServerHelper.initializeClassServer();
-    } catch (Exception e) {
-      System.out.println("Error with the ClassServer : "+e.getMessage());
-      e.printStackTrace();
-    }
+    JINI_ENABLED = isJiniEnabled();
+    registerProtocolFactories();
+    createClassServer();
   }
-
+  
 
   //
   // -- PUBLIC METHODS - STATIC -----------------------------------------------
   //
-
-  /**
-   * Creates the factory for the default protocol. This call is useful in order to
-   * pre-initialized the factory asssociated to the default protocol.
-   */
-  public static void createDefaultFactory() {
-    try {
-      defaultNodeFactory = createNodeFactory(ProActiveProperties.getNodeFactory());
-    } catch (NodeException e) {
-    }
-  }
-
-
 
   /**
    * Associates the factory of class <code>factoryClassName</code> as the factory to create
@@ -112,14 +97,9 @@ public abstract class NodeFactory {
    * @param <code>protocol</code> the protocol to associate the factory to
    * @param <code>factoryClassName</code> the fully qualified name of the class of the factory
    * responsible of creating the nodes for that protocol
-   * @exception NodeException if a problem occurs while loading or instantiating the class
    */
-  static public void setFactory(String protocol, String factoryClassName) throws NodeException {
-    try {
-      protocolFactoryMapping.put(protocol, Class.forName(factoryClassName));
-    } catch (Exception e) {
-      throw new NodeException("Error while getting the NodeFactory e="+e);
-    }
+  public static synchronized void setFactory(String protocol, String factoryClassName) {
+    protocolFactoryMapping.put(protocol, factoryClassName);
   }
 
 
@@ -129,17 +109,12 @@ public abstract class NodeFactory {
    * @param <code>protocol</code> the protocol to associate the factory to
    * @param <code>factoryObject</code> the class of the factory
    * responsible of creating the nodes for that protocol
-   * @exception NodeException if a problem occurs while loading or instantiating the class
    */
-  static public void setFactory(String protocol, NodeFactory factoryObject) throws NodeException {
-    try {
-      String factoryName = factoryObject.getClass().getName();
-      protocolFactoryMapping.put(protocol, factoryName);
-      instanceFactoryMapping.put(factoryName, factoryObject);
-    } catch (Exception e) {
-      throw new NodeException("Error while getting the  NodeFactory e="+e);
-    }
+  public static synchronized void setFactory(String protocol, NodeFactory factoryObject) {
+    protocolFactoryMapping.put(protocol, factoryObject.getClass().getName());
+    instanceFactoryMapping.put(protocol, factoryObject);
   }
+
 
   /**
    * Returns the reference to the default node associated to the current JVM
@@ -179,7 +154,7 @@ public abstract class NodeFactory {
    * @return the newly created node on the local JVM
    * @exception NodeException if the node cannot be created
    */
-  static synchronized public Node createNode(String nodeURL) throws NodeException {
+  public static Node createNode(String nodeURL) throws NodeException {
     return createNode(nodeURL, false);
   }
 
@@ -197,25 +172,25 @@ public abstract class NodeFactory {
    * @return the newly created node on the local JVM
    * @exception NodeException if the node cannot be created
    */
-  static synchronized public Node createNode(String nodeURL, boolean replacePreviousBinding) throws NodeException {
+  public static Node createNode(String nodeURL, boolean replacePreviousBinding) throws NodeException {
     //System.out.println("NodeFactory: createNode(" + nodeURL+ ")");
     //first look for the factory
     String protocol = getProtocol(nodeURL);
     NodeFactory factory = getFactory(protocol);
     //then create a node
-    Node node = factory._createNode(removeProtocol(nodeURL,protocol), replacePreviousBinding);
+    Node node = factory.createNodeImpl(removeProtocol(nodeURL,protocol), replacePreviousBinding);
     if (node == null) throw new NodeException("Cannot create a Node based on "+nodeURL);
     return node;
   }
 
 
-  static public Node getNode(String nodeURL) throws NodeException {
+  public static Node getNode(String nodeURL) throws NodeException {
     // System.out.println("NodeFactory: getNode() for " + nodeURL);
     //do we have any association for this node?
     String protocol = getProtocol(nodeURL);
     NodeFactory factory = getFactory(protocol);
     //		System.out.println("NodeFactory: getNode " + s + " got factory " + tmp);
-    return factory._getNode(removeProtocol(nodeURL, protocol));
+    return factory.getNodeImpl(removeProtocol(nodeURL, protocol));
   }
 
 
@@ -238,7 +213,7 @@ public abstract class NodeFactory {
    * @return the newly created node on the local JVM
    * @exception NodeException if the node cannot be created
    */
-  protected abstract Node _createNode(String nodeURL, boolean replacePreviousBinding) throws NodeException;
+  protected abstract Node createNodeImpl(String nodeURL, boolean replacePreviousBinding) throws NodeException;
 
 
   /**
@@ -246,13 +221,13 @@ public abstract class NodeFactory {
    * @return the newly created default node on the local JVM
    * @exception NodeException if the default node cannot be created
    */
-  protected abstract Node _createDefaultNode(String baseName) throws NodeException;
+  protected abstract Node createDefaultNodeImpl(String baseName) throws NodeException;
 
 
   /**
    * Returns the reference to the node located at s
    */
-  protected abstract Node _getNode(String s) throws NodeException;
+  protected abstract Node getNodeImpl(String s) throws NodeException;
 
 
 
@@ -260,57 +235,77 @@ public abstract class NodeFactory {
   // -- PRIVATE METHODS - STATIC -----------------------------------------------
   //
 
-  static synchronized private Node createDefaultNode(String nodeURL) throws NodeException {
+  private static void createClassServer() {
+    try {
+      classServerHelper.initializeClassServer();
+    } catch (Exception e) {
+      System.out.println("Error with the ClassServer : "+e.getMessage());
+    }
+  }
+  
+  
+  private static void registerProtocolFactories() {
+    if (JINI_ENABLED) {
+      setFactory(Constants.JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
+    }
+    setFactory(Constants.RMI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory");
+  }
+  
+
+  private static boolean isJiniEnabled() {
+    try {
+      // test if Jini is available
+      Class.forName("net.jini.discovery.DiscoveryManagement");
+      System.out.println("Jini enabled");
+      return true;
+    } catch (ClassNotFoundException e) {
+      System.out.println("Jini disabled");
+      return false;
+    }
+  }
+
+
+  private static Node createDefaultNode(String nodeURL) throws NodeException {
     //first look for the factory
     String protocol = getProtocol(nodeURL);
     NodeFactory factory = getFactory(protocol);
     //then create the default node
-    Node node = factory._createDefaultNode(removeProtocol(nodeURL,protocol));
+    Node node = factory.createDefaultNodeImpl(removeProtocol(nodeURL,protocol));
     if (node == null) throw new NodeException("Cannot create a DefaultNode based on "+nodeURL);
     return node;
   }
 
 
-  static private NodeFactory createNodeFactory(Class factoryClass) throws NodeException {
+  private static NodeFactory createNodeFactory(Class factoryClass, String protocol) throws NodeException {
     try {
-      String factoryName = factoryClass.getName();
-      NodeFactory nf = null;
-      if ((nf = (NodeFactory)instanceFactoryMapping.get(factoryName)) == null) {
-        nf =  (NodeFactory)factoryClass.newInstance();
-        instanceFactoryMapping.put(factoryName, nf);
-      }
+      NodeFactory nf = (NodeFactory) factoryClass.newInstance();
+      instanceFactoryMapping.put(protocol, nf);
       return nf;
     } catch (Exception e) {
-      throw new NodeException("Error while getting the default NodeFactory e="+e);
+      throw new NodeException("Error while creating the factory "+factoryClass.getName()+" for the protocol "+protocol);
     }
   }
 
-  static private NodeFactory createNodeFactory(String factoryName) throws NodeException {
+  private static NodeFactory createNodeFactory(String factoryClassName, String protocol) throws NodeException {
+    Class factoryClass = null;
     try {
-      NodeFactory nf = null;
-      if ((nf = (NodeFactory)instanceFactoryMapping.get(factoryName)) == null) {
-        Class factoryClass = Class.forName(factoryName);
-         nf =  (NodeFactory)factoryClass.newInstance();
-        instanceFactoryMapping.put(factoryName, nf);
-      }
-      return nf;
-    } catch (Exception e) {
-      throw new NodeException("Error while getting the default NodeFactory e="+e);
+      factoryClass = Class.forName(factoryClassName);
+    } catch (ClassNotFoundException e) {
+      throw new NodeException("Error while getting the class of the factory "+factoryClassName+" for the protocol "+protocol);
     }
+    return createNodeFactory(factoryClass, protocol);
   }
 
 
-  static private NodeFactory getFactory(String protocol) throws NodeException {
+  private static synchronized NodeFactory getFactory(String protocol) throws NodeException {
     //System.out.println("NodeFactory: Protocol is " + protocol);
-    Class factoryClass =  (Class)protocolFactoryMapping.get(protocol);
-
-
-    if (factoryClass != null) {
-      return createNodeFactory(factoryClass);
+    NodeFactory factory = (NodeFactory) instanceFactoryMapping.get(protocol);
+    if (factory != null) return factory;
+    String factoryClassName = (String) protocolFactoryMapping.get(protocol);
+    if (factoryClassName != null) {
+      return createNodeFactory(factoryClassName, protocol);
     }
-    //no factory matches the protocol : used default one
-    if (defaultNodeFactory == null) defaultNodeFactory = createNodeFactory(ProActiveProperties.getNodeFactory());
-    return defaultNodeFactory;
+    throw new NodeException("No NodeFactory is registered for the protocol "+protocol);
   }
 
 
@@ -318,7 +313,7 @@ public abstract class NodeFactory {
    * Return the protocol specified in the string
    * The same convention as in URL is used
    */
-  static private String getProtocol(String nodeURL) {
+  private static String getProtocol(String nodeURL) {
     if (nodeURL == null) return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
     int n = nodeURL.indexOf("://");
     if (n <= 0) return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
@@ -328,7 +323,7 @@ public abstract class NodeFactory {
 
   /**
    */
-  static private String removeProtocol(String url, String protocol) {
+  private static String removeProtocol(String url, String protocol) {
     if (url.startsWith(protocol)) return url.substring(protocol.length());
     return url;
   }

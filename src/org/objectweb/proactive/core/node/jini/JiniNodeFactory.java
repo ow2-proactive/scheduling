@@ -78,12 +78,12 @@ public class JiniNodeFactory extends NodeFactory {
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
-  protected Node _createNode(String s, boolean replacePreviousBinding) throws NodeException {
+  protected Node createNodeImpl(String s, boolean replacePreviousBinding) throws NodeException {
     return createNodeAdapter(s, replacePreviousBinding);
   }
 
 
-  protected Node _createDefaultNode(String baseName) throws NodeException {
+  protected Node createDefaultNodeImpl(String baseName) throws NodeException {
     int i = 0;
     while (true) {
       try {
@@ -97,8 +97,8 @@ public class JiniNodeFactory extends NodeFactory {
 
 
 
-  protected Node _getNode(String s) throws NodeException {
-    System.out.println("> JiniNodeFactory._getNode("+s+")");
+  protected Node getNodeImpl(String s) throws NodeException {
+    System.out.println("> JiniNodeFactory.getNodeImpl("+s+")");
 
     ServiceDiscoveryManager clientMgr = null;
     JiniNode jiniNode  = null;

@@ -28,39 +28,38 @@
 <img src="ProActiveLogo.gif"/>
 <h3>version 0.9.1 (April 2002)</h3>
 <p class="textNormal">
-ProActive is a Java library for Parallel, Distributed, and Concurrent computing. In the framework of an
-active object model (an actor like model but with full control over the granularity of parallelism), from a reduced set of rather
-simple primitives, a comprehensive and versatile library is proposed for parallel, distributed, and concurrent programming,
-including mobility of computations.
-</p><p class="textNormal">
-In the absence of any syntactical extension, ProActive programmers write
-standard code. The library is itself extensible by the programmers, making the
-system open for adaptations and optimizations.
-</p><p class="textNormal">
-ProActive is only made of standard Java classes, and requires no changes to the Java Virtual Machine, no preprocessing or compiler modification. It is based on the RMI Java standard library (for the sake of portability), but offers many added features:
-</p>
+<b>ProActive</b> is a Java library for <b>parallel</b>, <b>distributed</b>, and
+<b>concurrent</b> computing, also featuring <b>mobility</b> and <b>security</b>
+in a uniform framework.
+With a reduced set of simple primitives, <b>ProActive</b> provides a comprehensive API allowing to simplify the
+programming of applications that are distributed on <b>Local Area Network (LAN)</b>,
+on <b>cluster of workstations</b>, or on <b>Internet Grids</b>.
+The library is based on an Active Object pattern that is a uniform way to encapsulate:
 <ul class="listWithSpace">
-	<li class="textNormal">Active objects, Asynchronous calls, Messages (Request and Reply)</li>
-	<li class="textNormal">Migration, Mobile Agents</li>
-	<li class="textNormal">Seamless sequential, multi-threaded, and distributed programming (no need to derive from a library class to implement remotely accessible objects)</li>
-	<li class="textNormal">Reuse: polymorphism between standard object and Active objects</li>
-	<li class="textNormal">Automatic future-based synchronization (wait-by-necessity)</li>
-	<li class="textNormal">Libraries for sophisticated synchronization, and collaborative applications</li>
-	<li class="textNormal">Interfaced with RMI registry, and Jini</li>
-	<li class="textNormal">Compatible with Swing and AWT</li>
+<li>a <b>remotely</b> accessible object,</li>
+<li>a <b>thread</b> as an asynchronous activity,</li>
+<li>an <b>actor</b> with its own script,</li>
+<li>a <b>server</b> of incoming requests,</li>
+<li>a <b>mobile</b> and potentially secure entity.</li>
 </ul>
+</p>
 <p class="textNormal">
-Moreover, the library features several optimizations
-improving performances. For instance, whenever two active objects
-are located within the same virtual machine, a direct
-communication is always achieved, without going through the
-network stack. Furthermore, this optimization is ensured even when
-the co-location occurs after a migration of one or both of the active objects.
-<br></br>
+<b>ProActive</b> is only made of standard Java classes, and requires <b>no changes
+to the Java Virtual Machine</b>, no preprocessing or compiler modification; programmers write
+standard Java code.
+Based on a simple Meta-Object Protocol, the library is itself extensible, making the system open for
+adaptations and optimizations. <b>ProActive</b> currently uses the <b>RMI</b> Java
+standard library as a portable transport layer.
+</p>
+<p class="textNormal">
+<b>ProActive</b> features several optimizations improving performances. For instance, whenever two active objects
+are located within the same virtual machine, a direct communication is always achieved, without going through the
+network stack. This optimization is ensured even when the co-location occurs after a migration of one or both of the active objects.
+</p>
+<p class="textNormal">
 Please send us comments, suggestions, bug reports at <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
 Your input will be greatly appreciated.
 </p>
-
 <!--
  Table of Contents : start 
 ~~~ -->
@@ -111,9 +110,9 @@ CREDIT
 <p>
 <b>Credits :</b><br>
 <ul>
-	<li>ProActive is using <a href="http://jakarta.apache.org/bcel/">Byte Code Engineering Library (BCEL)</a> to dynamically generate the java bytecode of the Stubs.</li>
-	<li>ProActive is using <a href="http://jakarta.apache.org/ant/">Apache Ant</a> to compile.</li>
-	<li>ProActive is using <a href="http://xml.apache.org/xerces2-j/index.html">Apache Xerces2</a> to parse XML.</li>
+	<li class="textNormal">ProActive is using <a href="http://jakarta.apache.org/bcel/">Byte Code Engineering Library (BCEL)</a> to dynamically generate the java bytecode of the Stubs.</li>
+	<li class="textNormal">ProActive is using <a href="http://jakarta.apache.org/ant/">Apache Ant</a> to compile.</li>
+	<li class="textNormal">ProActive is using <a href="http://xml.apache.org/xerces2-j/index.html">Apache Xerces2</a> to parse XML.</li>
 </ul>
 
 </p>

@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -60,7 +61,7 @@ import org.objectweb.proactive.core.node.rmi.RemoteNodeFactory;
  * @since   ProActive 0.9
  *
  */
-public class StartNode implements org.objectweb.proactive.core.Constants {
+public class StartNode {
   
   public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
   
@@ -82,19 +83,6 @@ public class StartNode implements org.objectweb.proactive.core.Constants {
   protected String classpath;
   protected String nodeURL;
   
-  public static boolean JINI_ENABLED;
-  static  {
-    try {
-      // test if Jini is available
-      Class.forName("net.jini.discovery.DiscoveryManagement");
-      JINI_ENABLED = true;
-      System.err.println("Jini enabled");
-    } catch (ClassNotFoundException e) {
-      JINI_ENABLED = false;
-      System.err.println("Jini disabled");
-    }
-  }
- 
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -187,18 +175,6 @@ public class StartNode implements org.objectweb.proactive.core.Constants {
   
   /**
    * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-   * Associates the JINI node factory to the JINI protocol
-   */
-  protected void setNodeFactory() throws java.io.IOException, NodeException {
-    if (JINI_ENABLED) {
-      NodeFactory.setFactory(JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.jini.JiniNodeFactory");
-    }
-    NodeFactory.setFactory(RMI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.node.rmi.RemoteNodeFactory");
-  }
-  
-  
-  /**
-   * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
    * sets the properties needed for the node creation
    */
   protected void setProperties() {
@@ -251,11 +227,9 @@ public class StartNode implements org.objectweb.proactive.core.Constants {
     RemoteNodeFactory.setShouldCreateClassServer(!noClassServer);
     RemoteNodeFactory.setShouldCreateRegistry(!noRegistry);
     RemoteNodeFactory.setRegistryPortNumber(registryPortNumber);
-    if (JINI_ENABLED) {
+    if (NodeFactory.JINI_ENABLED) {
       JiniNodeFactory.setMulticastLocator(multicastLocator);
     }
-    // create factory
-    setNodeFactory();
     // create node
     createNode(nodeURL, noRebind);
   }
@@ -321,10 +295,10 @@ public class StartNode implements org.objectweb.proactive.core.Constants {
     System.out.println("     "+NO_REBIND_OPTION_NAME+"      : indicates not to use rebind when registering the");
     System.out.println("                      node to the RMIRegistry. If a node of the same name");
     System.out.println("                      already exists, the creation of the new node will fail.");
-    System.out.println("  for instance: java "+StartNode.class.getName()+" "+RMI_PROTOCOL_IDENTIFIER+"//"+localhost+"/node1");
-    System.out.println("                java "+StartNode.class.getName()+" "+RMI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
-    System.out.println("                java "+StartNode.class.getName()+" "+JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
-    System.out.println("                java "+StartNode.class.getName()+" "+JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
+    System.out.println("  for instance: java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"//"+localhost+"/node1");
+    System.out.println("                java "+StartNode.class.getName()+" "+Constants.RMI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node2  "+NO_CLASS_SERVER_OPTION_NAME+" "+NO_REBIND_OPTION_NAME);
+    System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
+    System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
   }
   
   
