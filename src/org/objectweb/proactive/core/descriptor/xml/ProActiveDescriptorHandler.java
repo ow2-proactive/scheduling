@@ -66,7 +66,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
     PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
     PassiveCompositeUnmarshaller vNodesAcqHandler = new PassiveCompositeUnmarshaller();
-    vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler());
+    vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler(proActiveDescriptor));
     vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeLookupHandler());
     compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG, vNodesDefHandler);
     compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG, vNodesAcqHandler);
@@ -168,7 +168,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
    * This class receives virtualNode events
    */
   private class VirtualNodeHandler extends BasicUnmarshaller {
-    private VirtualNodeHandler() {
+      private ProActiveDescriptor pad;
+    private VirtualNodeHandler(ProActiveDescriptor pad) {
+        this.pad = pad;
     }
     public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
       // create and register a VirtualNode
@@ -194,6 +196,11 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       if (checkNonEmpty(minNodeNumber)){
           vn.setMinNumberOfNodes((new Integer(minNodeNumber).intValue()));
       }
+      String serviceId = attributes.getValue("ftserviceId");
+      if (checkNonEmpty(serviceId)) {
+       pad.registerService(vn, serviceId);
+      }
+      
 
     }
   } // end inner class VirtualNodeHandler
