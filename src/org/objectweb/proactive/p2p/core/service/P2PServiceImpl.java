@@ -110,6 +110,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             // URL
             String url = InetAddress.getLocalHost().getCanonicalHostName();
             this.peerHostname = url;
+            
 
             if (url.endsWith("/")) {
                 url.replace('/', ' ');
@@ -246,10 +247,13 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @param remoteUrl A remote url.
      */
     public void registerP2PService(String remoteUrl) {
+        int port = new Integer(this.portNumber).intValue();
+
         // 	we should find an hostname matching this kind of pattern : hostname.inria.fr:PORT
         try {
-            if (this.peerHostname.compareTo(UrlBuilder.removePortFromHost(
-                            UrlBuilder.getHostNameFromUrl(remoteUrl))) != 0) {
+            if ((this.peerHostname.compareTo(UrlBuilder.removePortFromHost(
+                            UrlBuilder.getHostNameFromUrl(remoteUrl))) != 0) ||
+                    (port != UrlBuilder.getPortFromUrl(remoteUrl))) {
                 P2PService dist;
                 Node remoteP2PNode = P2PServiceImpl.getRemoteNode(remoteUrl);
 
@@ -319,7 +323,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             } catch (ActiveObjectCreationException e) {
                 logger.error("No P2P Service was found in: " + peerUrl);
             } catch (UnknownHostException e) {
-                logger.error("Cannot get the host from: " + remoteProActiveRuntimeURL);
+                logger.error("Cannot get the host from: " +
+                    remoteProActiveRuntimeURL);
             }
         }
     }
