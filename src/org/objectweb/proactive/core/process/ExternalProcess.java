@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.MessageLogger;
  * A class implementing this interface is able to start a UniversalProcess and to connect 
  * its input/output to handlers.
  */
-public interface ExternalProcess extends UniversalProcess {
+public interface ExternalProcess extends UniversalProcess{
 
   /**
    * Returns the MessageLogger handling the input stream of the process

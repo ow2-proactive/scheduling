@@ -47,6 +47,13 @@ public interface ExternalProcessDecorator extends ExternalProcess {
    */
   public static final int SEND_TO_OUTPUT_STREAM_COMPOSITION = 2;
   
+  
+  /**
+   * Composition in which the command of the target process is given as parameter 
+   * of the command of this process.
+   */
+  public static final int GIVE_COMMAND_AS_PARAMETER = 3;
+  
  
   /**
    * Returns the process target of this process. The target process is embedded

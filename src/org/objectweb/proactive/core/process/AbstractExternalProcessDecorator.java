@@ -105,7 +105,7 @@ public abstract class AbstractExternalProcessDecorator extends AbstractExternalP
 
 
   protected String buildCommand() {
-    if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) {
+    if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION || compositionType == GIVE_COMMAND_AS_PARAMETER) {
       return internalBuildCommand();
     } else {
       if (targetProcess != null) {
@@ -121,10 +121,12 @@ public abstract class AbstractExternalProcessDecorator extends AbstractExternalP
 
 
   protected void internalStartProcess(String command) throws java.io.IOException {
+  	//System.out.println("---------------Internal start process of AbstractExternalProcessDecorator "+command);
     super.internalStartProcess(command);
     if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) {
       try {
-        Thread.currentThread().sleep(300);
+        Thread.currentThread().sleep(3000);
+        //System.out.println("---------------Internal start process of AbstractExternalProcessDecorator");
       } catch (InterruptedException e) {}
       // the masterProcess is started, now we feed the output with the slave command
       outputMessageSink.setMessage(targetProcess.getCommand());
@@ -153,7 +155,7 @@ public abstract class AbstractExternalProcessDecorator extends AbstractExternalP
   /**
    * Implementation of a MessageLogger that feeds two MessageLoggers
    */
-  public static class CompositeMessageLogger implements MessageLogger {
+  public static class CompositeMessageLogger implements MessageLogger,java.io.Serializable {
 
     private MessageLogger messageLogger1;
     private MessageLogger messageLogger2;
