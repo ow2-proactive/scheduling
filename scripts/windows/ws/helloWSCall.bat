@@ -14,7 +14,7 @@ IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 SETLOCAL
 call %PROACTIVE%\scripts\windows\init.bat
 
-%JAVA_CMD% org.objectweb.proactive.examples.webservices.helloWorld.WSClient
+%JAVA_CMD% org.objectweb.proactive.examples.webservices.helloWorld.WSClient %1
 ENDLOCAL
 
 :end
