@@ -1,0 +1,294 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/ 
+package org.objectweb.proactive.core.runtime;
+
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.rmi.ClassServerHelper;
+
+/**
+ * <p>
+ * The <code>RuntimeFactory</code> provides a generic way to create and lookup <code>ProActiveRuntime</code>
+ * without protocol specific code (such as RMI or Jini).
+ * </p><p>
+ * <code>RuntimeFactory</code> provides a set of static methods to create and lookup <code>ProActiveRuntime</code>
+ * and to associate protocol specific factory to concrete protocols. To create a proActiveRuntime it is only
+ * necessary to associate the protocol as parameter. For instance :
+ * </p>
+ * <pre>
+ * 		RuntimeFactory.getProtocolSpecificRuntime("rmi");
+ * 		RuntimeFactory.getProtocolSpecificRuntime("jini");
+ * </pre>
+ * <p>
+ * As long as a protocol specific factory has been registered to this <code>RuntimeFactory</code> for the
+ * given protocol, the creation of the ProActiveRuntime will be delegated to the right factory.
+ * </p><p>
+ * This class also provide the concept of default protocol and default ProActiveRuntime. When an active object is created 
+ * in the local JVM but without being attached to any node , a default node is created in the default ProActiveRuntime(with the default protocol) 
+ * associated with the JVM to hold that active object.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/08/28
+ * @since   ProActive 0.9
+ *
+ */
+public abstract class RuntimeFactory {
+
+  
+  // test with class loader
+  //private static final ClassLoader myClassLoader = new NodeClassLoader();
+
+  /** the table where associations Protocol - Factory are kept */
+  private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
+  private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();
+  //private static ProActiveRuntime defaultRuntime = null;
+
+  //private static RuntimeFactory defaultRuntimeFactory;
+
+  public static boolean JINI_ENABLED;
+ 
+  static {
+    createClassServer();
+    JINI_ENABLED = isJiniEnabled();
+    registerProtocolFactories();
+    //getLocalRuntime();
+  }
+  
+
+  //
+  // -- PUBLIC METHODS - STATIC -----------------------------------------------
+  //
+
+  /**
+   * Associates the factory of class <code>factoryClassName</code> as the factory to create
+   * proactiveRuntime for the given protocol. Replaces any previous association.
+   * @param <code>protocol</code> the protocol to associate the factory to
+   * @param <code>factoryClassName</code> the fully qualified name of the class of the factory
+   * responsible of creating the proActiveRuntime for that protocol
+   */
+  public static synchronized void setFactory(String protocol, String factoryClassName) {
+    protocolFactoryMapping.put(protocol, factoryClassName);
+  }
+
+
+  /**
+   * Associates the factory of class <code>factoryClassName</code> as the factory to create
+   * proactiveRuntime for the given protocol. Replaces any previous association.
+   * @param <code>protocol</code> the protocol to associate the factory to
+   * @param <code>factoryObject</code> the class of the factory
+   * responsible of creating the proactiveRuntime for that protocol
+   */
+  public static synchronized void setFactory(String protocol, RuntimeFactory factoryObject) {
+    protocolFactoryMapping.put(protocol, factoryObject.getClass().getName());
+    instanceFactoryMapping.put(protocol, factoryObject);
+  }
+
+
+  
+
+  /**
+   * Returns true if the given proActiveRuntime belongs to this JVM false else.
+   * @return true if the given proActiveRuntime belongs to this JVM false else
+   */
+  public static boolean isRuntimeLocal(ProActiveRuntime proActiveRuntime) {
+    return proActiveRuntime.getVMInformation().getVMID().equals(UniqueID.getCurrentVMID());
+  }
+  
+  /**
+   * Returns the reference of the only one instance of the default ProActiveRuntime associated with the local JVM.
+   * If this runtime does not yet exist, it creates it with the default protocol.
+   * @return The only one ProActiveRuntime associated with the local JVM
+   * @throws ProActiveException if the default runtime cannot be created
+   */
+  public static synchronized ProActiveRuntime getDefaultRuntime() throws ProActiveException{
+  	ProActiveRuntime defaultRuntime = null;
+			try
+			{
+    			defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+					//defaultRuntime = createRuntime();
+				//System.out.println("in");
+			}
+			catch (ProActiveException e)
+			{
+				//e.printStackTrace();
+				System.out.println("Error with the default ProActiveRuntime");
+				throw new ProActiveException("Error when getting the default ProActiveRuntime",e);
+			}
+	return defaultRuntime;
+  }
+  
+	/**
+	 * Returns the reference of the only one instance of the ProActiveRuntime 
+	 * created with the given protocol, associated with the local JVM.
+	 * If this runtime does not yet exist, it creates it with the given protocol.
+	 * @param protocol
+	 * @return ProActiveRuntime
+	 * @throws ProActiveException if this ProActiveRuntime cannot be created
+	 */
+  public static ProActiveRuntime getProtocolSpecificRuntime(String protocol) throws ProActiveException{
+  	RuntimeFactory factory = getFactory(protocol);
+  	ProActiveRuntime proActiveRuntime =  factory.getProtocolSpecificRuntimeImpl();
+  	if (proActiveRuntime == null) throw new ProActiveException("Cannot create a ProActiveRuntime based on " + protocol);
+    return proActiveRuntime;
+  }
+
+  
+	/**
+	 * Returns a reference to the ProActiveRuntime created with the given protocol and
+	 * located at the given url.This url can be either local or remote
+	 * @param proActiveRuntimeURL
+	 * @param protocol
+	 * @return ProActiveRuntime
+	 * @throws ProActiveException if the runtime cannot be found
+	 */
+  public static ProActiveRuntime getRuntime(String proActiveRuntimeURL,String protocol) throws ProActiveException {
+     //System.out.println("RuntimeFactory: getRuntime() for " + proActiveRuntimeURL);
+    //do we have any association for this node?
+    //String protocol = getProtocol(proActiveRuntimeURL);
+    RuntimeFactory factory = getFactory(protocol);
+    //		System.out.println("NodeFactory: getNode " + s + " got factory " + tmp);
+    return factory.getRemoteRuntimeImpl(proActiveRuntimeURL);
+  }
+
+
+  //
+  // -- PROTECTED METHODS -----------------------------------------------
+  //
+
+
+
+  /**
+	 * Returns the reference of the only one instance of the ProActiveRuntime 
+	 * associated with the local JVM.
+	 * If this runtime does not yet exist, it creates it with the associated protocol.
+	 * @return ProActiveRuntime
+	 * @throws ProActiveException if this ProActiveRuntime cannot be created
+	 */
+  protected abstract ProActiveRuntime getProtocolSpecificRuntimeImpl() throws ProActiveException;
+
+
+  /**
+   * Returns the reference to the proActiveRuntime located at s
+   */
+  protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s) throws ProActiveException;
+
+
+
+  //
+  // -- PRIVATE METHODS - STATIC -----------------------------------------------
+  //
+
+  private static void createClassServer() {
+    try {
+      new ClassServerHelper().initializeClassServer();
+    } catch (Exception e) {
+      System.out.println("Error with the ClassServer : "+e.getMessage());
+    }
+  }
+  
+  
+  private static void registerProtocolFactories() {
+    if (JINI_ENABLED) {
+      setFactory(Constants.JINI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory");
+    }
+    setFactory(Constants.RMI_PROTOCOL_IDENTIFIER, "org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory");
+  }
+  
+
+  private static boolean isJiniEnabled() {
+    try {
+      // test if Jini is available
+      Class.forName("net.jini.discovery.DiscoveryManagement");
+      System.out.println("Jini enabled");
+      return true;
+    } catch (ClassNotFoundException e) {
+      System.out.println("Jini disabled");
+      return false;
+    }
+  }
+
+
+  private static RuntimeFactory createRuntimeFactory(Class factoryClass, String protocol) throws ProActiveException {
+    try {
+      RuntimeFactory nf = (RuntimeFactory) factoryClass.newInstance();
+      instanceFactoryMapping.put(protocol, nf);
+      return nf;
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new ProActiveException("Error while creating the factory "+factoryClass.getName()+" for the protocol "+protocol);
+    }
+  }
+
+  private static RuntimeFactory createRuntimeFactory(String factoryClassName, String protocol) throws ProActiveException {
+    Class factoryClass = null;
+    try {
+      factoryClass = Class.forName(factoryClassName);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      throw new ProActiveException("Error while getting the class of the factory "+factoryClassName+" for the protocol "+protocol);
+    }
+    return createRuntimeFactory(factoryClass, protocol);
+  }
+
+
+  private static synchronized RuntimeFactory getFactory(String protocol) throws ProActiveException {
+    //System.out.println("NodeFactory: Protocol is " + protocol);
+    RuntimeFactory factory = (RuntimeFactory) instanceFactoryMapping.get(protocol);
+    if (factory != null) return factory;
+    String factoryClassName = (String) protocolFactoryMapping.get(protocol);
+    if (factoryClassName != null) {
+      return createRuntimeFactory(factoryClassName, protocol);
+    }
+    throw new ProActiveException("No RuntimeFactory is registered for the protocol "+protocol);
+  }
+
+
+  /**
+   * Return the protocol specified in the string
+   * The same convention as in URL is used
+   */
+  private static String getProtocol(String proActiveRuntimeURL) {
+    if (proActiveRuntimeURL == null) return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+    int n = proActiveRuntimeURL.indexOf("://");
+    if (n <= 0) return Constants.DEFAULT_PROTOCOL_IDENTIFIER;
+    return proActiveRuntimeURL.substring(0, n+1);
+  }
+
+
+  /**
+   */
+  private static String removeProtocol(String url, String protocol) {
+    if (url.startsWith(protocol)) return url.substring(protocol.length());
+    return url;
+  }
+}
