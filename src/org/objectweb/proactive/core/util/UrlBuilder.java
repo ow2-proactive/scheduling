@@ -130,6 +130,31 @@ public class UrlBuilder {
         String name = url.substring(n + 1);
         return name;
     }
+	
+    /**
+     * Returns the name included in the url without the port if it is included.
+	 * @param url
+	 * @return the name included in the url
+	 */
+	public static String getNameFromUrlWithoutPort(String url) {
+	    String hostname = UrlBuilder.getNameFromUrl(url);
+	    int portIndex = hostname.lastIndexOf(":");
+	    
+        if (portIndex != -1)
+            return hostname.substring(0,portIndex);
+        else
+            return hostname.substring(2);
+    }
+	
+    /**
+     * Returns the name included in the url
+	 * @param url
+	 * @return the name included in the url
+	 */
+	public static String getNameFromPARUrl(String url) {
+        int m = url.indexOf("/", 2);
+        return url.substring(2, m);
+    }
 
     /**
      * Return the protocol specified in the string
