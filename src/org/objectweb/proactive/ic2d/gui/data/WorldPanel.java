@@ -80,15 +80,80 @@ public class WorldPanel extends AbstractDataObjectPanel implements WorldObjectLi
 	}
       });
     popup.addSeparator();
-    javax.swing.JCheckBoxMenuItem check = new javax.swing.JCheckBoxMenuItem("Manual Layout", false);
-    check.addActionListener(new java.awt.event.ActionListener() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  controller.setAutomaticLayout(! controller.isLayoutAutomatic());
-	  revalidate();
-	  repaint();
-	}
-      });
-    popup.add(check);
+    
+    /*** modifying automatic Hostlayout menu item rb automatic / Manual ebe 06-2004 ***/
+//    javax.swing.JCheckBoxMenuItem check = new javax.swing.JCheckBoxMenuItem("Manual Layout", false);
+//    check.addActionListener(new java.awt.event.ActionListener() {
+//	public void actionPerformed(java.awt.event.ActionEvent e) {
+//	  controller.setAutomaticLayout(! controller.isLayoutAutomatic());
+//	  revalidate();
+//	  repaint();
+//	}
+//      });
+//    popup.add(check);
+      
+    javax.swing.JMenu LayoutJmenu = new javax.swing.JMenu("Layout"); 
+    popup.add(LayoutJmenu);
+        
+    javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemOn = new javax.swing.JRadioButtonMenuItem("Automatic");
+    JRadioButtonMenuItemOn.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            controller.setAutomaticLayout(! controller.isLayoutAutomatic());
+      	  revalidate();
+      	  repaint();
+        }
+    });
+    
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemOff = new javax.swing.JRadioButtonMenuItem("Manual");
+    JRadioButtonMenuItemOff.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            controller.setAutomaticLayout(! controller.isLayoutAutomatic());
+      	  revalidate();
+      	  repaint();
+        }
+    });
+    
+    JRadioButtonMenuItemOn.setSelected(true);
+    group.add(JRadioButtonMenuItemOn);
+    popup.add(JRadioButtonMenuItemOn);
+    group.add(JRadioButtonMenuItemOff);
+    popup.add(JRadioButtonMenuItemOff);
+
+    LayoutJmenu.add(JRadioButtonMenuItemOn);
+    LayoutJmenu.add(JRadioButtonMenuItemOff);
+   /***********************************************************/
+    
+    /*** adding Horizontal/vertical Hostlayout radio button menu item ebe 06-2004 ***/
+    javax.swing.JMenu hostLayoutJmenu = new javax.swing.JMenu("HostsLayout"); 
+    popup.add(hostLayoutJmenu);
+    
+    //menu rb Horiz
+    javax.swing.ButtonGroup group2 = new javax.swing.ButtonGroup();
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemHoriz = new javax.swing.JRadioButtonMenuItem("Horizontal");
+    JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            setAlignLayout(false);
+        }
+    });
+    //menu rb Vertic
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemVertic = new javax.swing.JRadioButtonMenuItem("Vertical");
+    JRadioButtonMenuItemVertic.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            setAlignLayout(true);
+        }
+    });
+    
+    JRadioButtonMenuItemHoriz.setSelected(true);
+    group2.add(JRadioButtonMenuItemHoriz);
+    popup.add(JRadioButtonMenuItemHoriz);
+    group2.add(JRadioButtonMenuItemVertic);
+    popup.add(JRadioButtonMenuItemVertic);
+
+    hostLayoutJmenu.add(JRadioButtonMenuItemHoriz);
+    hostLayoutJmenu.add(JRadioButtonMenuItemVertic);
+   /***********************************************************/
+    
     addMouseListener(popup.getMenuMouseListener());
   }
 
@@ -102,7 +167,13 @@ public class WorldPanel extends AbstractDataObjectPanel implements WorldObjectLi
     if (communicationRecorder.isEnabled()) communicationRecorder.drawAllLinks(g, this.getLocationOnScreen());
   }
 
-
+  // Set hosts child Alignement H  / V 
+  public void setAlignLayout(boolean align){
+      java.util.Iterator iterator = childsIterator();
+      while (iterator.hasNext()) {
+          ((HostPanel) iterator.next()).setAlignLayout(align);}
+ }
+  
   //
   // -- implements WorldObjectListener -----------------------------------------------
   //
