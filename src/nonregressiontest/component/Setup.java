@@ -1,5 +1,7 @@
 package nonregressiontest.component;
 
+import nonregressiontest.descriptor.defaultnodes.TestNodes;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -134,6 +136,14 @@ public class Setup {
                 new Object[] {  }));
     }
 
+    public static Component createRemotePrimitiveB1() throws Exception {
+        createTypeB();
+        return CF.newFcInstance(B_TYPE,
+            new ControllerDescription("primitiveB1", Constants.PRIMITIVE),
+            new ContentDescription(PrimitiveComponentB.class.getName(),
+                new Object[] {  }, TestNodes.getLocalVMNode()));
+    }
+
     public static Component createPrimitiveA() throws Exception {
         createTypeA();
         return CF.newFcInstance(A_TYPE,
@@ -158,6 +168,15 @@ public class Setup {
                 new ControllerDescription("compositeB1", Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
+        return compositeB1;
+    }
+
+    public static Component createRemoteCompositeB1() throws Exception {
+        createTypeB();
+        Component compositeB1 = CF.newFcInstance(B_TYPE,
+                new ControllerDescription("compositeB1", Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }, TestNodes.getLocalVMNode()));
         return compositeB1;
     }
 
