@@ -188,6 +188,7 @@ public class DialogUtils {
     try {
       initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
     } catch (java.net.UnknownHostException e) {
+    	e.printStackTrace();
     }
     Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
         "Please enter the name or the IP of the Globus host to monitor :", // Object message,
@@ -206,5 +207,6 @@ public class DialogUtils {
     } catch (java.rmi.RemoteException e) {
       logger.log("Cannot create the Globus Host " + host, e);
     }
+	}
 
 }
