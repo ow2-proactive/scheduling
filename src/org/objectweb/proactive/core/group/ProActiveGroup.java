@@ -233,8 +233,11 @@ public class ProActiveGroup {
 	Object result = newGroup(className);
 	Group g = ProActiveGroup.getGroup(result);
 
+//	for (int i = 0 ; i < params.length ; i++)
+//		((org.objectweb.proactive.core.group.ProxyForGroup)g).add(null);
+
 	for (int i = 0 ; i < params.length ; i++)
-	    ((org.objectweb.proactive.core.group.ProxyForGroup)g).createThreadCreation(className, params[i], nodeList[i % nodeList.length]);
+	    ((org.objectweb.proactive.core.group.ProxyForGroup)g).createThreadCreation(className, params[i], nodeList[i % nodeList.length], i, params.length);
 
 	((org.objectweb.proactive.core.group.ProxyForGroup)g).waitForAllCallsDone();
 

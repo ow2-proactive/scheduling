@@ -318,6 +318,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 
+
 	/* ------------------- THE COLLECTION'S METHOD ------------------ */
 
 	/** 
@@ -741,9 +742,20 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @param <code>param</code> an array that contains the parameters for the constructor of member.
 	 * @param <code>node</code> the node where the member will be created.
 	 */
-	protected synchronized void createThreadCreation(String className, Object[] param, String node) {
-		new Thread(new ProcessForGroupCreation(this, className, param, node)).start();
+	protected synchronized void createThreadCreation(String className, Object[] param, String node, int index, int size) {
+		for (int i = 0 ; i < size ; i++)
+			this.memberList.add(null);
+		new Thread(new ProcessForGroupCreation(this, className, param, node, index)).start();
 		waited++;
+	}
+
+	/**
+	 * Adds an object to the specified position in the Group
+	 * @param index - the position
+	 * @param o - the object to add
+	 */
+	protected void add(int index, Object o) {
+		memberList.add(index,o);
 	}
 
 
