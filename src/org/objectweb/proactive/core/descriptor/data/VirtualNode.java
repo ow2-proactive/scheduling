@@ -93,6 +93,11 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * @return int
      */
     public int getNodeCount();
+    
+    /**
+     * @deprecated use {@link #getNumberOfCurrentlyCreatedNodes()} or {@link #getNumberOfCreatedNodesAfterDeployment()} instead
+     */
+    public int createdNodeCount();
 
     /**
      * Returns the number of Nodes already created (at the time of the reception of method call) among the Nodes mapped to this VirtualNode

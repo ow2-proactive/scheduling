@@ -328,6 +328,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /*
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#createdNodeCount()
+     */
+    public int createdNodeCount() {
+        throw new RuntimeException("This method is deprecated, use getNumberOfCurrentlyCreatedNodes() or getNumberOfCreatedNodesAfterDeployment()");
+    }
+    
+    /*
      *  (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
