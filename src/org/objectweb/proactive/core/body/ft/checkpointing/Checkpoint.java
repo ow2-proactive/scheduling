@@ -90,8 +90,8 @@ public class Checkpoint implements java.io.Serializable {
      * @param additionalCodebase the URL of the CheckpointServer classserver
      */
     public Checkpoint(Body bodyToCheckpoint, int index,
-        String additionalCodeBase) {
-        this(bodyToCheckpoint, additionalCodeBase);
+        String additionalCodebase) {
+        this(bodyToCheckpoint, additionalCodebase);
         this.index = index;
     }
 
