@@ -46,7 +46,6 @@ public class Group {
     /** All the tests of a group.
      */
     private ArrayList tests = new ArrayList();
-    private String packageName = null;
 
     /** To construct a new group with default params.
      */
@@ -91,8 +90,28 @@ public class Group {
         this.name = name;
         this.description = description;
 
-        addTests(directory, packageName, params, useInitFile);
+        addTests(directory, packageName, packageName, params, useInitFile);
     }
+
+    private static FileFilter dirFilter = new FileFilter() {
+            public boolean accept(File pathname) {
+                if (pathname.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+    private static FileFilter dirClassFilter = new FileFilter() {
+            public boolean accept(File pathname) {
+                if (pathname.getName().endsWith(".class") ||
+                        pathname.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
 
     /** Private method to construct group with tests from a package.
      * @param directory the root directory of a package.
@@ -101,78 +120,86 @@ public class Group {
      * @param useInitFile true if you want to init tests with their init file.
      * @throws BrowsePackageException if an error.
      */
-    private void addTests(File directory, String packageName, Object[] params,
-        boolean useInitFile) throws BrowsePackageException {
+    private void addTests(File directory, String packageName,
+        String parentPackage, Object[] params, boolean useInitFile)
+        throws BrowsePackageException {
         if (!directory.isDirectory()) {
             throw new BrowsePackageException(
                 "Directory is not a valid directory");
         }
-        if (this.packageName == null) {
-            this.packageName = packageName;
-        }
 
-        FileFilter filter = new FileFilter() {
-                public boolean accept(File pathname) {
-                    if (pathname.getName().endsWith(".class") ||
-                            pathname.isDirectory()) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            };
+        if ((packageName != null) && (packageName.length() != 0)) {
+            // Find files package
+            File[] files = directory.listFiles(dirFilter);
 
-        File[] files = directory.listFiles(filter);
-        String nextRep = null;
-        if ((packageName != null) && (packageName.length() != 0) &&
-                (packageName.indexOf('.') != -1)) {
-            nextRep = packageName.substring(0, packageName.indexOf('.'));
-        }
+            String nextRep = null;
+            if (packageName.indexOf('.') != -1) {
+                nextRep = packageName.substring(0, packageName.indexOf('.'));
+            } else {
+                nextRep = packageName;
+            }
 
-        Class[] parameterTypes = null;
-        if ((params != null) && (params.length != 0)) {
-            parameterTypes = new Class[params.length];
-            for (int j = 0; j < params.length; j++)
-                parameterTypes[j] = params[j].getClass();
-        }
-
-        for (int i = 0; i < files.length; i++) {
-            File file = files[i];
-            if ((packageName != null) && (packageName.length() != 0) &&
-                    (nextRep != null)) {
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
                 if (file.getName().compareTo(nextRep) == 0) {
-                    String nextPackageName = packageName.substring(packageName.indexOf(
-                                '.') + 1);
-                    addTests(file, nextPackageName, params, useInitFile);
+                    String nextPackageName = "";
+                    if (packageName.indexOf('.') != -1) {
+						nextPackageName =packageName.substring(packageName.indexOf('.') + 1);
+                    } else {
+                        nextPackageName = null;
+                    }
+                    addTests(file, nextPackageName, parentPackage, params,
+                        useInitFile);
                 } else {
                     continue;
                 }
-            } else if (file.isDirectory()) {
-                addTests(file, null, params, useInitFile);
-            } else if (file.getName().matches("AbstractTest.*") ||
-                    file.getName().matches("Bench.*")) {
-                try {
-                    String fileTest = this.packageName + "." +
-                        file.getName().replaceAll("\\.class", "");
-                    Class c = getClass().getClassLoader().loadClass(fileTest);
-                    AbstractTest test = null;
+            }
+        } else {
+            // Files package founded
+            File[] files = directory.listFiles(dirClassFilter);
 
-                    if (parameterTypes != null) {
-                        Constructor constructor = c.getConstructor(parameterTypes);
-                        test = (AbstractTest) constructor.newInstance(params);
-                    } else {
-                        test = (AbstractTest) c.newInstance();
-                    }
+            Class[] parameterTypes = null;
+            if ((params != null) && (params.length != 0)) {
+                parameterTypes = new Class[params.length];
+                for (int j = 0; j < params.length; j++)
+                    parameterTypes[j] = params[j].getClass();
+            }
 
-                    if (useInitFile) {
-                        test.loadAttributes();
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                if (file.isDirectory()) {
+                    addTests(file, null, parentPackage + "." + file.getName(),
+                        params, useInitFile);
+                } else if (file.getName().matches("Test.*") ||
+                        file.getName().matches("Bench.*")) {
+                    try {
+                        String fileTest = parentPackage + "." +
+                            file.getName().replaceAll("\\.class", "");
+                        Class c = getClass().getClassLoader().loadClass(fileTest);
+                        AbstractTest test = null;
+
+                        if (parameterTypes != null) {
+                            Constructor constructor = c.getConstructor(parameterTypes);
+                            test = (AbstractTest) constructor.newInstance(params);
+                        } else {
+                            test = (AbstractTest) c.newInstance();
+                        }
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(test.getName() + " added in group " +
+                                name);
+                        }
+
+                        if (useInitFile) {
+                            test.loadAttributes();
+                        }
+                        tests.add(test);
+                    } catch (Exception e) {
+                        throw new BrowsePackageException(e);
                     }
-                    tests.add(test);
-                } catch (Exception e) {
-                    throw new BrowsePackageException(e);
+                } else {
+                    continue;
                 }
-            } else {
-                continue;
             }
         }
     }
