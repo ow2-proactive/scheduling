@@ -153,8 +153,8 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (outputFile != null) {
             qsubCommand.append(" -o ").append(outputFile).append(" ");
         }
-        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\"")
-                   .append(targetProcess.getCommand()).append("\"");
+        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\'")
+                   .append(targetProcess.getCommand()).append("\' ");
         qsubCommand.append(scriptLocation);
 
         //	        
@@ -193,6 +193,14 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
      */
     public String getHostList() {
         return hostList;
+    }
+    
+    public String getHostsNumber() {
+        return this.hosts;
+    }
+
+    public String getProcessorPerNodeNumber() {
+        return this.processorPerNode;
     }
 
     /**
