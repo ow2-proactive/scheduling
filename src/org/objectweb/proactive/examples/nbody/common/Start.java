@@ -16,8 +16,9 @@ public class Start implements Serializable{
     
     private static ProActiveDescriptor staticPad; // is set as static, to use with quit() which calls killall
     /**
-     * Options should be "java Start xmlFile [-display] totalNbBodies maxIter"
-     * @param -display, which is not compulsory, specifies whether a graphic display is to be created.
+     * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"
+     * @param -nodisplay, which is not compulsory, specifies whether a graphic display is to be created.
+     * @param -displayft, which is not compulsory, specifies whether a fault-generating panel should be created.
      * @param xmlFile is the xml deployment file..
      * @param totalNbBodies  The number of Planets in the System.
      * @param maxIter The number of iterations before the program stops.
@@ -31,7 +32,7 @@ public class Start implements Serializable{
         boolean display = true;
         boolean displayft = false;
         int totalNbBodies = 4;
-        int maxIter = 1000;          
+        int maxIter = 10000;          
         String xmlFileName ;
         // Set arguments as read on command line
         switch (args.length){
@@ -40,8 +41,9 @@ public class Start implements Serializable{
             System.out.println("No xml descriptor specified - aborting");
             quit();
         case 2 :
-            if (args[1].equals("-display")){
-                System.out.println("        Running with options set to 4 bodies, 1000 iterations, display on");
+            if (args[1].equals("-nodisplay")){
+                display = false;
+                System.out.println("        Running with options set to 4 bodies, 1000 iterations, display off");
                 break;
             }
             else if (args[1].equals("-displayft")){
@@ -50,12 +52,12 @@ public class Start implements Serializable{
                 break;
             }
         case 3 :
-            display=false;
             totalNbBodies =  Integer.parseInt(args[1]);
             maxIter =  Integer.parseInt(args[2]);
             break;
         case 4 :
-            if (args[1].equals("-display")){
+            if (args[1].equals("-nodisplay")){
+                display = false;
                 totalNbBodies =  Integer.parseInt(args[2]);
                 maxIter =  Integer.parseInt(args[3]);
                 break;
@@ -72,7 +74,7 @@ public class Start implements Serializable{
         System.out.println("        Running with options set to 4 bodies, 1000 iterations, display on");
         }
         xmlFileName = args[0];
-        
+
         System.out.println(" 1 : Simplest version, one-to-one communication and master");
         System.out.println(" 2 : group communication and master");
         System.out.println(" 3 : group communication, odd-even-synchronization");
@@ -110,7 +112,7 @@ public class Start implements Serializable{
         if (display) {
             try {
                 displayer = (Displayer) (ProActive.newActive(
-                        Displayer.class.getName(), new Object[] { new Integer(totalNbBodies) , new Boolean (displayft) }));
+                        Displayer.class.getName(), new Object[] { new Integer(totalNbBodies) , new Boolean (displayft)}));
             }
             catch (ActiveObjectCreationException e) { abort (e);}
             catch (NodeException e) { abort (e);}
@@ -137,7 +139,7 @@ public class Start implements Serializable{
      * Shows what are the possible options to this program.
      */
     private static void usage() {
-        String options = "[-display | -displayft] totalNbBodies maxIter";
+        String options = "[-nodisplay | -displayft] totalNbBodies maxIter";
         System.out.println("        Usage : nbody.[bat|sh] " + options);
         System.out.println("        from the command line, it would be   java Start xmlFile " + options);
     }
