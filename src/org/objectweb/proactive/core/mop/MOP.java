@@ -558,9 +558,6 @@ public abstract class MOP {
       logFile = new java.io.File(directoryName, logFileName);
       sourceWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(sourceFile)));
       logWriter = new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream(logFile)));
-      //sourceWriter = new java.io.OutputStreamWriter(new java.io.FileOutputStream(sourceFile));
-      //logWriter = new java.io.OutputStreamWriter(new java.io.FileOutputStream(logFile));
-      
       ReifiedClassModel target;
       try {
         target = new ReifiedClassModel(nameOfClass, sourceWriter, logWriter);

@@ -158,7 +158,7 @@ public final class MOPProperties {
         }
       }
     } else {
-      System.err.println("Default properties file not found.");
+      //System.err.println("Default properties file not found.");
       theDefaultProperties = createDefaultProperties();
     }
     return theDefaultProperties;

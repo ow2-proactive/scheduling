@@ -166,7 +166,6 @@ public class ClassFileServer extends ClassServer {
       if (codebases == null) {
         // reading from resources in the classpath
         b = getBytesFromResource(path);
-        if (b != null) return b;
       } else {
         for (int i=0; i<codebases.length; i++) {
           try {
@@ -175,11 +174,14 @@ public class ClassFileServer extends ClassServer {
             } else {
               b = getBytesFromArchive(path, codebases[i]);
             }
-            if (b != null) return b;
           } catch (java.io.IOException e) {
           }
         }
       }
+      if (b != null) return b;
+      // try to get the class as a generated stub
+      b = org.objectweb.proactive.core.mop.MOPClassLoader.getClassData(path);
+      if (b != null) return b;
       throw new ClassNotFoundException("Cannot find class "+path);
     }
 
@@ -195,7 +197,6 @@ public class ClassFileServer extends ClassServer {
      * The <b>path</b> is a dot separated class name with
      * the ".class" extension removed.
      * @param path the fqn of the class
-     * @param codeBase the File that must be a jar or zip archive that may contain the class
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */

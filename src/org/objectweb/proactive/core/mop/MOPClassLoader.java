@@ -39,9 +39,9 @@ import java.util.Hashtable;
 public class MOPClassLoader extends URLClassLoader {
     protected static Hashtable classDataCache = new Hashtable ();
 
-    public byte[] getClassData (String classname)
+    public static byte[] getClassData(String classname)
     {
-	return (byte[]) classDataCache.get (classname);
+	return (byte[]) classDataCache.get(classname);
     }
 
 
@@ -128,14 +128,14 @@ public class MOPClassLoader extends URLClassLoader {
             // Test if the name of the class is actually a request for
             // a stub class to be created
             if (Utils.isStubClassName(name)) {
-	System.out.println ("Maybe I could generate this class: "+name);
+	              System.out.println ("Generating class: "+name);
                 String classname = Utils.convertStubClassNameToClassName(name);
                 //try
                 {
                     BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
                     byte[] data = bsb.create();
 
-		    MOPClassLoader.classDataCache.put (classname, data);
+		    MOPClassLoader.classDataCache.put(name, data);
 
 //		    System.out.println ("Classfile created with length "+data.length);
 
@@ -179,7 +179,7 @@ public class MOPClassLoader extends URLClassLoader {
                     return c;
                 }
             } else {
-	System.out.println ("I give up on this one: "+name);
+	System.out.println ("Cannot generate class "+name);
                 throw e;
             }
         }

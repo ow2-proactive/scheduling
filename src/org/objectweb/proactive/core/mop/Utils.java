@@ -43,66 +43,15 @@ abstract class Utils extends Object {
    * Static variables
    */
 
-  public static Class JAVA_LANG_NUMBER;
-  public static Class JAVA_LANG_CHARACTER;
-  public static Class JAVA_LANG_BOOLEAN;
-  public static Class JAVA_LANG_VOID;
-  public static Class JAVA_LANG_RUNTIMEEXCEPTION;
-  public static Class JAVA_LANG_EXCEPTION;
-  public static Class JAVA_LANG_THROWABLE;
-  public static String STUB_DEFAULT_PREFIX = "Stub_";
-
-
-  static {
-    try {
-      JAVA_LANG_NUMBER = MOP.forName("java.lang.Number");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_NUMBER = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_CHARACTER = MOP.forName("java.lang.Character");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_CHARACTER = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_BOOLEAN = MOP.forName("java.lang.Boolean");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_BOOLEAN = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_VOID = MOP.forName("java.lang.Void");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_VOID = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_RUNTIMEEXCEPTION = MOP.forName("java.lang.RuntimeException");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_RUNTIMEEXCEPTION = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_EXCEPTION = MOP.forName("java.lang.Exception");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_EXCEPTION = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-
-    try {
-      JAVA_LANG_THROWABLE = MOP.forName("java.lang.Throwable");
-    } catch (ClassNotFoundException e) {
-      JAVA_LANG_THROWABLE = null;
-      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classes in java.lang.*");
-    }
-  }
+  public static final Class JAVA_LANG_NUMBER = silentForName("java.lang.Number");
+  public static final Class JAVA_LANG_CHARACTER = silentForName("java.lang.Character");
+  public static final Class JAVA_LANG_BOOLEAN = silentForName("java.lang.Boolean");
+  public static final Class JAVA_LANG_VOID = silentForName("java.lang.Void");
+  public static final Class JAVA_LANG_RUNTIMEEXCEPTION = silentForName("java.lang.RuntimeException");
+  public static final Class JAVA_LANG_EXCEPTION = silentForName("java.lang.Exception");
+  public static final Class JAVA_LANG_THROWABLE = silentForName("java.lang.Throwable");
+  public static final String STUB_DEFAULT_PREFIX = "Stub_";
+  public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
 
   /**
    * Static methods
@@ -488,42 +437,12 @@ abstract class Utils extends Object {
 
   public static String convertClassNameToStubClassName (String classname)
   {
-      /* OLD VERSION
-	String packageName = Utils.getPackageName (classname);
-	String stubClassSimpleName =  Utils.STUB_DEFAULT_PREFIX + Utils.getSimpleName(classname);
-	return packageName + "." + stubClassSimpleName;
-      */
-
-	String packageName = "stubspa" + Utils.getPackageName (classname);
-	String stubClassSimpleName =  Utils.STUB_DEFAULT_PREFIX + Utils.getSimpleName(classname);
-	return packageName + "." + stubClassSimpleName;
+	return STUB_DEFAULT_PACKAGE + Utils.getPackageName(classname) + "." + STUB_DEFAULT_PREFIX + Utils.getSimpleName(classname);
   }
 
   public static boolean isStubClassName (String classname)
   {
-      /* OLD VERSION
-	 String simpleName;
-	 
-	 // Extracts the simple name from the fully-qualified class name
-	 int index = classname.lastIndexOf(".");
-	 if (index != -1)
-	 {
-	 simpleName = classname.substring (index+1);
-	 }
-	 else
-	 {
-	 simpleName = classname;
-	 }
-	 
-	 if (simpleName.startsWith (Utils.STUB_DEFAULT_PREFIX))
-	 {
-	 return true;
-	 }
-	 else
-	 {
-	 return false;
-	 }*/
-      if (classname.startsWith ("stubspa"))
+      if (classname.startsWith (STUB_DEFAULT_PACKAGE))
 	  {
 	     	 String simpleName;
 	 
@@ -531,21 +450,13 @@ abstract class Utils extends Object {
 		 int index = classname.lastIndexOf(".");
 		 if (index != -1)
 		     {
-			 simpleName = classname.substring (index+1);
+			 return classname.substring(index+1).startsWith(Utils.STUB_DEFAULT_PREFIX);
 		     }
 		 else
 		     {
-			 simpleName = classname;
+		     return classname.startsWith(Utils.STUB_DEFAULT_PREFIX);
 		     }
 		 
-		 if (simpleName.startsWith (Utils.STUB_DEFAULT_PREFIX))
-		     {
-			 return true;
-		     }
-		 else
-		     {
-			 return false;
-		     }	      
 	  }
       else
 	  {
@@ -555,18 +466,12 @@ abstract class Utils extends Object {
     
   public static String convertStubClassNameToClassName (String stubclassname)
   {
-      /* OLD VERSION
-	String packageName = Utils.getPackageName (stubclassname);
-	String stubClassSimpleName =  Utils.getSimpleName(stubclassname);	
-	String classsimplename = stubClassSimpleName.substring (Utils.STUB_DEFAULT_PREFIX.length());
-    return packageName + "." + classsimplename;
-      */
-     if (isStubClassName (stubclassname))
+     if (isStubClassName(stubclassname))
 	 {
-	     String temp = stubclassname.substring(7);
-	     String packageName = Utils.getPackageName (temp);
+	     String temp = stubclassname.substring(Utils.STUB_DEFAULT_PACKAGE.length());
+	     String packageName = Utils.getPackageName(temp);
 	     String stubClassSimpleName =  Utils.getSimpleName(temp);	
-	     String classsimplename = stubClassSimpleName.substring (Utils.STUB_DEFAULT_PREFIX.length());
+	     String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
 	     String result =  packageName + "." + classsimplename;
 //	     System.out.println ("CONVERT "+stubclassname+" -> "+result);
 	     return result;
@@ -576,6 +481,19 @@ abstract class Utils extends Object {
 	     return stubclassname;
 	 }
   }
+
+
+
+  private static final Class silentForName(String classname) {
+    try {
+      return MOP.forName(classname);
+    } catch (ClassNotFoundException e) {
+      System.err.println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load classe "+classname);
+      return null;
+    }
+  }
+
+
 }
 
 

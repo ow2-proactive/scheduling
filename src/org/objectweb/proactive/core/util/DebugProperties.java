@@ -86,7 +86,7 @@ public class DebugProperties extends java.util.Properties {
           }
         }
       } else {
-        System.err.println("Default properties file not found.");
+        //System.err.println("Default properties file not found.");
         //	theDefaultProperties = createDefaultProperties ();
       }
     } catch (ClassNotFoundException e) {
@@ -124,7 +124,7 @@ public class DebugProperties extends java.util.Properties {
           }
         }
       } else {
-        System.err.println("Default properties file not found.");
+        //System.err.println("Default properties file not found.");
         //	theDefaultProperties = createDefaultProperties ();
       }
     } catch (ClassNotFoundException e) {

@@ -60,17 +60,17 @@ if [ -d $PROACTIVE/classes ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes
 fi
-if [ -f $PROACTIVE/ProActive.jar ]
+if [ -f $PROACTIVE/lib/ProActive.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ProActive.jar
 fi
-if [ -f $PROACTIVE/ProActive_examples.jar ]
+if [ -f $PROACTIVE/lib/ProActive_examples.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ProActive_examples.jar
 fi
-if [ -f $PROACTIVE/ic2d.jar ]
+if [ -f $PROACTIVE/lib/ic2d.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ic2d.jar
 fi
 if [ -f $PROACTIVE/lib/jini-core.jar ]
 then
@@ -94,9 +94,3 @@ export CLASSPATH
 
 JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$workingDir/proactive.java.policy"
 export JAVACMD
-
-
-
-
-
-

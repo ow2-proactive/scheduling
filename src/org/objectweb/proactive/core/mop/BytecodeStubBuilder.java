@@ -30,9 +30,9 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
-import de.fub.bytecode.Constants;
-import de.fub.bytecode.classfile.JavaClass;
-import de.fub.bytecode.generic.*;
+import org.apache.bcel.Constants;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.generic.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -148,15 +148,13 @@ public class BytecodeStubBuilder {
 
         // Actually creates the class and returns the result
         JavaClass theClass = this.classGenerator.getJavaClass();
+        /*
         // Next few lines for debugging only
-        try
-        {
+        try {
           theClass.dump (theClass.getClassName()+".class");
-        }
-        catch (java.io.IOException e)
-        {
+        } catch (java.io.IOException e) {
           e.printStackTrace();
-        }
+        }*/
         return theClass.getBytes();
     }
 
@@ -715,7 +713,7 @@ public class BytecodeStubBuilder {
     }
 
     /**
-     * Converts a java.lang.Class object to its de.fub.bytecode.generic.Type equivalent
+     * Converts a java.lang.Class object to its org.apache.bcel.generic.Type equivalent
      */
 
     protected static Type convertClassToType(Class cl) {

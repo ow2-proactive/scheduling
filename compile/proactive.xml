@@ -7,9 +7,7 @@
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
 	<property name="classes.dir" value="${base}/classes"/>
 	<property name="basedist.dir" value="${base}/dist"/>
-	<property name="dist.dir" value="${basedist.dir}/ProActive"/>
-	<property name="docs.dir" value="${dist.dir}/docs"/>
-	<property name="javadocs.dir" value="${dist.dir}/docs/api"/>
+	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
         <property name="debug" value="on"/>
 	<!-- define the classpath -->
@@ -38,9 +36,9 @@
 		<echo message="  ------------------------------"/>
 		<echo message="         Utility builds"/>
 		<echo message="  ------------------------------"/>
+		<echo message="  docs     : creates the docs directory with javadoc + doc"/>
 		<echo message="  clean    : removes all build generated files"/>
 		<echo message="  dist     : creates the distribution directory and files"/>
-		<echo message="  javadoc  : creates the javadoc in the dist directory"/>
 		<echo message=""/>
 		<echo message="  ------------------------------"/>
 		<echo message="    Special source file builds"/>
@@ -142,11 +140,10 @@
       ================================================================
 	-->
 	<target name="examples" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" excludes="${proactive.dir}/examples/diva/**" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" debug="${debug}"/>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/examples">
 				<exclude name="**/*.java"/>
-				<exclude name="diva/**"/>
 			</fileset>
 		</copy>
 	</target>
@@ -251,24 +248,21 @@
 	<target name="clean">
 		<delete dir="${classes.dir}"/>
 		<delete dir="${basedist.dir}"/>
+		<delete dir="${docs.dir}"/>
 	</target>
 	<!--
 	   ================================================================
 	   ==
-      ==  Create distribution
+      ==  Create distribution bin
       ==
       ================================================================
 	-->
 	<target name="dist" depends="all">
 		<!-- Create the distribution directory -->
+		<delete dir="${basedist.dir}"/>
 		<mkdir dir="${basedist.dir}"/>
+		<property name="dist.dir" value="${basedist.dir}/ProActive"/>
 		<mkdir dir="${dist.dir}"/>
-		<!-- Delete stuff in the distribution -->
-		<delete>
-			<fileset dir="${dist.dir}" includes="*.jar"/>
-		</delete>
-		<delete dir="${dist.dir}/scripts"/>
-		<delete dir="${dist.dir}/src"/>
 		<!-- Put everything in ${classes} into the ProActive-${DSTAMP}.jar file -->
 		<jar jarfile="${dist.dir}/ProActive.jar">
 			<fileset dir="${classes.dir}">
@@ -279,23 +273,14 @@
 		</jar>
 		<jar jarfile="${dist.dir}/ProActive_examples.jar" basedir="${classes.dir}" includes="${proactive.dir}/examples/**"/>
 		<jar jarfile="${dist.dir}/ic2d.jar" basedir="${classes.dir}" includes="${proactive.dir}/ic2d/**"/>
-		<!-- copy scripts -->
+		<!-- copy docs / scripts / src / compile / lib -->
 		<copy todir="${dist.dir}" includeEmptyDirs="no">
 			<fileset dir="${base}">
+				<include name="docs/**"/>
 				<include name="scripts/**"/>
-			</fileset>
-		</copy>
-		<!-- copy Install class -->
-		<copy todir="${dist.dir}/scripts">
-			<fileset dir="${classes.dir}">
-				<include name="*.class"/>
-			</fileset>
-		</copy>
-		<!-- copy examples src -->
-		<copy todir="${dist.dir}" includeEmptyDirs="no">
-			<fileset dir="${base}">
-				<include name="src/${proactive.dir}/examples/**"/>
-				<include name="src/${proactive.dir}/ic2d/**"/>
+				<include name="src/org/**"/>
+				<include name="compile/**"/>
+				<include name="lib/**"/>
 			</fileset>
 		</copy>
 	</target>
@@ -323,19 +308,23 @@
       ==
       ================================================================
 	-->
-	<target name="javadoc">
+	<target name="docs">
 		<!-- Create the javadoc directory -->
-		<mkdir dir="${dist.dir}"/>
+		<delete dir="${docs.dir}"/>
 		<mkdir dir="${docs.dir}"/>
-		<delete dir="${javadocs.dir}"/>
-		<mkdir dir="${javadocs.dir}"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.rmi,org.objectweb.proactive.ic2d.*,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${javadocs.dir}" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 0.91&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
+		<mkdir dir="${docs.dir}/api"/>
+		<mkdir dir="${docs.dir}/ic2d-api"/>
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.rmi,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 0.91&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
 			<classpath refid="project.classpath"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive:org.objectweb.proactive.rmi"/>
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
+			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
+		</javadoc>
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 0.91 - IC2D" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
+			<classpath refid="project.classpath"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
 	</target>

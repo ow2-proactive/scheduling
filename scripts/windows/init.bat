@@ -19,14 +19,14 @@ rem Set up the classpath using classes dir or jar files
 rem 
 set CLASSPATH=.;%PROACTIVE_TMP%
 IF EXIST %PROACTIVE%\classes set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes
-IF EXIST %PROACTIVE%\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
-IF EXIST %PROACTIVE%\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
-IF EXIST %PROACTIVE%\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
+IF EXIST %PROACTIVE%\lib\ProActive.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ProActive.jar
+IF EXIST %PROACTIVE%\lib\ProActive_examples.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ProActive_examples.jar
+IF EXIST %PROACTIVE%\lib\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ic2d.jar
 
-IF EXIST %PROACTIVE%\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\jini-core.jar
-IF EXIST %PROACTIVE%\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\jini-ext.jar
-IF EXIST %PROACTIVE%\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\reggie.jar
-IF EXIST %PROACTIVE%\bcel.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\bcel.jar
+IF EXIST %PROACTIVE%\lib\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini-core.jar
+IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini-ext.jar
+IF EXIST %PROACTIVE%\lib\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\reggie.jar
+IF EXIST %PROACTIVE%\lib\bcel.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bcel.jar
 
 
 echo CLASSPATH=%CLASSPATH%

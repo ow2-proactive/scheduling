@@ -4,7 +4,7 @@ if NOT DEFINED JAVA_HOME goto javahome
 if "%JAVA_HOME%" == "" goto javahome
 
 SETLOCAL
-set CLASSPATH=mifdoclet.jar;..\classes;..\lib\bouncycastle.jar;..\lib\crimson.jar;..\lib\globus.jar;..\lib\javaxCrypto.jar;..\lib\jaxp.jar;..\lib\jini-core.jar;..\lib\jini-ext.jar;
+set CLASSPATH=mifdoclet.jar;..\classes;..\lib\bouncycastle.jar;..\lib\crimson.jar;..\lib\globus.jar;..\lib\javaxCrypto.jar;..\lib\jaxp.jar;..\lib\jini-core.jar;..\lib\jini-ext.jar;..\lib\reggie.jar;..\lib\bcel.jar;..\lib\sun-util.jar
 echo %CLASSPATH%
 
 echo Filtering html doc-files...
