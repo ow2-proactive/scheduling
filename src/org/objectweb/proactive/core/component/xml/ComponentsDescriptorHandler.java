@@ -50,7 +50,6 @@ public class ComponentsDescriptorHandler
 
 			logger.info("loading deployment description from file : " + deploymentDescriptorURL);
 			// read the deployment descriptor
-			// TODO : avoid redeploying nodes if already created
 			ProActiveDescriptor deploymentDescriptor = ProActive.getProactiveDescriptor(deploymentDescriptorURL);
 			deploymentDescriptor.activateMappings();
 
@@ -86,19 +85,6 @@ public class ComponentsDescriptorHandler
 		ProActiveDescriptor deploymentDescriptor)
 		throws IOException, SAXException, ProActiveException {
 		try {
-			// 1. deployment descriptor
-			deploymentDescriptor.activateMappings();
-
-//			// activate the virtual nodes (and underlying nodes)
-//			VirtualNode[] virtual_nodes = deploymentDescriptor.getVirtualNodes();
-//			for (int i = 0; i < virtual_nodes.length; i++) {
-//				VirtualNode vn = virtual_nodes[i];
-//				vn.activate();
-//				// TODO : consider the cyclic case
-//			}
-			logger.debug("virtual nodes activated");
-
-			//2. components descriptor
 			InitialHandler initial_handler = new InitialHandler(deploymentDescriptor);
 			String uri = componentsDescriptorURL;
 			StreamReader stream_reader = new StreamReader(new InputSource(uri), initial_handler);
@@ -168,22 +154,18 @@ public class ComponentsDescriptorHandler
 		ProActiveDescriptor deploymentDescriptor = null;
 		// read the deployment descriptor
 		try {
-			// TODO : avoid redeploying nodes if already created
 			deploymentDescriptor = ProActive.getProactiveDescriptor(deploymentDescriptorFileLocation);
-
 			//            descriptor.activateMappings();
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("could not read deployment descriptor file");
 		}
 
-		// active the virtual nodes (and underlying nodes)
+		// activate the virtual nodes (and underlying nodes)
 		VirtualNode[] virtual_nodes = deploymentDescriptor.getVirtualNodes();
 		for (int i = 0; i < virtual_nodes.length; i++) {
 			VirtualNode vn = virtual_nodes[i];
 			vn.activate();
-
-			// TODO : consider the cyclic case
 		}
 		logger.debug("virtual nodes activated");
 
