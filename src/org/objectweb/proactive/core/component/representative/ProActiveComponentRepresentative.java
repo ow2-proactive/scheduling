@@ -6,8 +6,8 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.mop.StubObject;
 
 
 /**
@@ -16,17 +16,9 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
  * @author Matthieu Morel
  *
  */
-public interface ProActiveComponentRepresentative extends ProActiveComponent {
+public interface ProActiveComponentRepresentative extends ProActiveComponent, StubObject {
 	
-	/**
-	 * @return configuration parameters of the component
-	 */
-	public ComponentParameters getComponentParameters();
 	
-//	/**
-//	 * @return a standard ProActive reference on the reified object
-//	 */
-//	public Object getStubOnReifiedObject();
 	
 
 }
