@@ -37,6 +37,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.group.ExceptionList;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -44,8 +45,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
-import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
@@ -99,7 +100,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     private P2PNodeManager nodeManager = null;
 
     /**
-     * A collection of not full <code>P2PNodesLookup</code>.
+     * A collection of not full <code>P2PNodeLookup</code>.
      */
     private Vector waitingNodesLookup = new Vector();
 
@@ -141,14 +142,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     }
 
     /**
-     * Add the remote P2P service in the local acquaintances group.
+     * Add the remote P2P service in the local acquaintances group if NOA is
+     * not yet reached.
      * @param service the remote P2P service.
      */
     public void register(P2PService service) {
+        // if (this.acquaintanceManager.size() < NOA) {
         this.acquaintanceManager.add(service);
-        logger.debug("Remote peer localy registered: " +
-            ProActive.getActiveObjectNodeUrl(service));
+        if (logger.isDebugEnabled()) {
+            logger.debug("Remote peer localy registered: " +
+                ProActive.getActiveObjectNodeUrl(service));
+        }
 
+        //}
         // Wake up all node accessor, because new peers are know
         this.wakeUpEveryBody();
     }
@@ -187,8 +193,12 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 logger.debug("Generating uuid for exploring message");
                 uuid = generateUuid();
             }
-            this.acquaintances.exploring(ttl, uuid, remoteService);
-            logger.debug("Broadcast exploring message with #" + uuid);
+            try {
+                this.acquaintances.exploring(ttl, uuid, remoteService);
+                logger.debug("Broadcast exploring message with #" + uuid);
+            } catch (ExceptionList e) {
+                // nothing to do
+            }
         }
 
         // Method code ---------------------------------------------------------
@@ -210,7 +220,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param Job ID.
      */
     public void askingNode(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, P2PNodesLookup lookup, String vnName,
+        P2PService remoteService, P2PNodeLookup lookup, String vnName,
         String jobId) {
         boolean broadcast;
         if (uuid != null) {
@@ -261,14 +271,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         }
     }
 
-    /** Put in a <code>P2PNodesLookup</code>, the number of asked nodes.
+    /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
      * @param vnName Virtual node name.
      * @param Job ID of the vn.
      * @return the number of asked nodes.
      */
-    public P2PNodesLookup getNodes(int numberOfNodes, String vnName,
-        String jobId) {
+    public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
         Object[] params = new Object[5];
         params[0] = new Integer(numberOfNodes);
         params[1] = ProActive.getStubOnThis();
@@ -276,9 +285,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         params[3] = vnName;
         params[4] = jobId;
 
-        P2PNodesLookup lookup = null;
+        P2PNodeLookup lookup = null;
         try {
-            lookup = (P2PNodesLookup) ProActive.newActive(P2PNodesLookup.class.getName(),
+            lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
             ProActive.enableAC(lookup);
             this.waitingNodesLookup.add(lookup);
@@ -305,13 +314,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     }
 
     /**
-     * Put in a <code>P2PNodesLookup</code> all available nodes during all the
+     * Put in a <code>P2PNodeLookup</code> all available nodes during all the
      * time where it is actived.
      * @param vnName Virtual node name.
      * @param Job ID.
      * @return an active object where nodes are received.
      */
-    public P2PNodesLookup getMaximunNodes(String vnName, String jobId) {
+    public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
         return this.getNodes(P2PConstants.MAX_NODE, vnName, jobId);
     }
 
@@ -320,7 +329,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * Remove a no more waiting nodes accessor.
      * @param accessorToRemove the accessor to remove.
      */
-    public void removeWaitingAccessor(P2PNodesLookup accessorToRemove) {
+    public void removeWaitingAccessor(P2PNodeLookup accessorToRemove) {
         this.waitingNodesLookup.remove(accessorToRemove);
         logger.debug("Accessor succefuly removed");
     }
@@ -435,7 +444,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      */
     private void wakeUpEveryBody() {
         for (int i = 0; i < this.waitingNodesLookup.size(); i++) {
-            ((P2PNodesLookup) this.waitingNodesLookup.get(i)).wakeUp();
+            ((P2PNodeLookup) this.waitingNodesLookup.get(i)).wakeUp();
         }
     }
 

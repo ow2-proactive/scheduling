@@ -94,4 +94,12 @@ public interface P2PConstants {
 
     /** Lookup frequency for nodes. */
     public static final String PROPERTY_LOOKUP_FREQ = "proactive.p2p.lookup_freq";
+    
+    /** If true deploying one shared nodes by CPU, else only one node is shared. */
+    public static final String PROPERTY_MULTI_PROC_NODES = "proactive.p2p.multi_proc_nodes";
+    
+    /**
+     * Path of the xml deployment descriptor, for deploying shared nodes.
+     */
+    public static final String PROPERPY_XML_PATH = "proactive.p2p.xml_path";
 }

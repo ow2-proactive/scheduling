@@ -413,11 +413,13 @@ The following element ProActiveDescriptor defines the root of the schema
 		port: the listeming port number,
 		NOA: the number of acquaintances,
 		TTU: time to update,
-		TTL: time to live.
+		TTL: time to live,
+		multi_proc_nodes: true for deploying 1 node / cpu,
+		xml_path: the xml deployment descriptor path.
 	-->
 	<xs:complexType name="P2PServiceType">
 		<xs:sequence>
-			<xs:element name="peerSet" type="peerSetType"/>
+			<xs:element name="peerSet" minOccurs="0" maxOccurs="1" type="peerSetType"/>
 		</xs:sequence>
 		<xs:attribute name="nodesAsked" use="required">
 			<xs:simpleType>
@@ -429,6 +431,8 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="TTL" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="acq" type="xs:string" use="optional"/>
 		<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="multi_proc_nodes" type="xs:boolean" use="optional" />
+		<xs:attribute name="xml_path" type="xs:string" use="optional" />
 	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">

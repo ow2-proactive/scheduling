@@ -76,7 +76,9 @@ public class StartP2PService implements P2PConstants {
         " -exploring Percentage of agree response to determine response to exploring messag\n" +
         " -booking Expiration time for booking without use a shared node\n" +
         " -node_acq Timeout for node acquisition\n" +
-        " -lookup Lookup frequency for nodes";
+        " -lookup Lookup frequency for nodes\n" +
+        " -no_multi_proc_nodes to share only a node. Otherwise, 1 node by CPU\n" +
+        " -xml_path Deployment descriptor path";
 
     private static class Args {
         private String acquisitionMethod = System.getProperty(PROPERTY_ACQUISITION);
@@ -89,6 +91,8 @@ public class StartP2PService implements P2PConstants {
         private String booking_max = System.getProperty(PROPERTY_BOOKING_MAX);
         private String nodes_acq_to = System.getProperty(PROPERTY_NODES_ACQUISITION_T0);
         private String lookup_freq = System.getProperty(PROPERTY_LOOKUP_FREQ);
+        private String multi_proc_nodes = System.getProperty(PROPERTY_MULTI_PROC_NODES);
+        private String xml_path = System.getProperty(PROPERPY_XML_PATH);
         private String peerListFile = null;
         private Vector peers = new Vector();
     }
@@ -215,6 +219,18 @@ public class StartP2PService implements P2PConstants {
                 parsed.lookup_freq = args[index];
                 index++;
                 continue;
+            } else if ("-xml_path".equalsIgnoreCase(argname)) {
+                index++;
+                if (index > args.length) {
+                    usage(argname);
+                }
+                parsed.xml_path = args[index];
+                index++;
+                continue;
+            } else if ("-no_multi_proc_nodes".equalsIgnoreCase(argname)) {
+                parsed.multi_proc_nodes = "false";
+                index++;
+                continue;
             }
 
             usage("Unknow argumnent " + argname);
@@ -238,6 +254,10 @@ public class StartP2PService implements P2PConstants {
         System.setProperty(PROPERTY_BOOKING_MAX, parsed.booking_max);
         System.setProperty(PROPERTY_NODES_ACQUISITION_T0, parsed.nodes_acq_to);
         System.setProperty(PROPERTY_LOOKUP_FREQ, parsed.lookup_freq);
+        System.setProperty(PROPERTY_MULTI_PROC_NODES, parsed.multi_proc_nodes);
+        if (parsed.xml_path != null) {
+            System.setProperty(PROPERPY_XML_PATH, parsed.xml_path);
+        }
     }
 
     // -------------------------------------------------------------------------

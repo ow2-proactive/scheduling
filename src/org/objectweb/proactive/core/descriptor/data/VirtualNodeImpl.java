@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
@@ -465,17 +465,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         	// Killing p2p nodes
         	if (this.p2pNodeslookupList.size() > 0) {
         		for (int index = 0 ; index < this.p2pNodeslookupList.size() ; index ++) {
-        			P2PNodesLookup currentNodesLookup = (P2PNodesLookup) this.p2pNodeslookupList.get(index);
+        			P2PNodeLookup currentNodesLookup = (P2PNodeLookup) this.p2pNodeslookupList.get(index);
         			currentNodesLookup.killAllNodes();
         		}
         	}
         	// Killing other nodes
             for (int i = 0; i < createdNodes.size(); i++) {
                 node = (Node) createdNodes.get(i);
+                part = node.getProActiveRuntime();
+                
                 if (this.p2pNodes.contains(node)) {
                 	continue;
                 }
-                part = node.getProActiveRuntime();
 
                 //we have to be carefull. Indeed if the node is local, we do not
                 // want to kill the runtime, otherwise the application is over
@@ -1235,7 +1236,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 	/**
 	 * @param nodesLookup
 	 */
-	public void addP2PNodesLookup(P2PNodesLookup nodesLookup) {
+	public void addP2PNodesLookup(P2PNodeLookup nodesLookup) {
 		this.p2pNodeslookupList.add(nodesLookup);
 		P2P_LOGGER.debug("A P2P nodes lookup added to the vn: "+this.name);
 	}

@@ -439,6 +439,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
         ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        if (bodyList == null) {
+        	// Probably the node is killed
+        	return localBodies;
+        }
         synchronized (bodyList) {
             for (int i = 0; i < bodyList.size(); i++) {
                 UniqueID bodyID = (UniqueID) bodyList.get(i);

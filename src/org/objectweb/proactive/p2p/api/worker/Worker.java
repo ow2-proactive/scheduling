@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.p2p.api.problem.Problem;
 import org.objectweb.proactive.p2p.api.problem.Result;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 import java.io.Serializable;
 
@@ -81,7 +81,7 @@ public class Worker implements Serializable, InitActive {
         return result;
     }
 
-    private P2PNodesLookup booking;
+    private P2PNodeLookup booking;
 
     public int getPeers(int n) throws ProActiveException {
         System.out.println("On cherche les peers");

@@ -186,6 +186,22 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     }
 
     /**
+     * Sharing 1 node /cpu or only 1 node.
+     * @param multi_proc_nodes true or flase.
+     */
+    public void setMultiProcNodes(String multi_proc_nodes) {
+        System.setProperty(PROPERTY_MULTI_PROC_NODES, multi_proc_nodes);
+    }
+
+    /**
+     * For sharing nodes which are deployed from xml.
+     * @param xml_path the file path.
+     */
+    public void setXmlPath(String xml_path) {
+        System.setProperty(PROPERPY_XML_PATH, xml_path);
+    }
+
+    /**
      * @param peerList
      */
     public void setPeerList(String[] peerList) {

@@ -2,15 +2,14 @@
 <html>
 <head>
   <meta name="Keywords"
- content="infrastructure, p2p, peer-to-peer,
-proactive, daemon, xml">
-  <title>ProActive P2P Infrastructure</title>
+ content="infrastructure, p2p, peer-to-peer, proactive, daemon, xml">
+  <title>ProActive P2P
+Infrastructure</title>
   <link rel="stylesheet" href="ProActive.css">
   <meta name="Author" content="Alexandre di Costanzo">
 </head>
 <body>
-<!--
-Header : start ~~~ -->
+S<!-- Header : start ~~~ -->
 <table width="100%">
   <tbody>
     <tr>
@@ -32,13 +31,14 @@ index</a>&nbsp;&nbsp;</td>
         </tbody>
       </table>
       </td>
-      <td align="right" valign="top"> <img
- src="ProActiveLogo200x34.gif"></td>
+      <td align="right" valign="top">
+      <img src="ProActiveLogo200x34.gif"></td>
     </tr>
   </tbody>
 </table>
 <hr><!-- Link to index : end -->
-<h1>ProActive Peer-to-Peer
+<h1><a class="mozTocH1" name="mozTocId874379"></a>ProActive
+Peer-to-Peer
 Infrastructure</h1>
 <p>Computational Peer-To-Peer
 (P2P) is becoming a key execution environment. The potential of 100,000
@@ -50,9 +50,11 @@ maybe nobody).</p>
 spare CPU cycles from organizations or institution's desktop
 workstations.</p>
 <p>This short document explains
-how to create a simple computational P2P network. This network is a
-dynamic JVMs network which works like, computational nodes.</p>
-<p>The P2P infrastructure works as
+how to create a simple computational P2P network. This network is a <b>dynamic
+JVMs network</b> which works like,
+computational nodes.</p>
+<p>The
+P2P infrastructure works as
 an overlay network. It works with a <b>P2P
 Service</b> which is a peer which in
 turn is computational node. The P2P Service is implemented with a
@@ -73,16 +75,97 @@ are available <a
 <p>The outline of this short
 handbook:</p>
 <ul>
-  <li><a href="#network">Create your P2P Network</a></li>
-  <li><a href="#appli">Launch your Application</a></li>
-  <li><a href="#limitations">Limitations</a></li>
+<!--<li><a href="#network">Create your P2P Network</a></li>
+<li><a href="#appli">Launch your Application</a></li>
+<li><a href="#infrastructure_model">The P2P Infrastructure Model</a></li>
+<li><a href="#implementation">The P2P Infrastructure
+Implementation</a></li>
+<li><a href="#limitations">Limitations</a></li>
+-->
+  <ol id="mozToc">
+<!--mozToc h1 1 h2 2 h3 3 h4 4 h5 5 h6 6--><li><a href="#mozTocId874379">ProActive
+Peer-to-Peer
+Infrastructure</a>
+      <ol>
+        <li><a href="#mozTocId765069">Create
+your P2P Network</a>
+          <ol>
+            <li><a href="#mozTocId117139">Quick
+Start Peer</a>
+              <ol>
+                <li><a href="#mozTocId979491">Usage
+Example</a></li>
+              </ol>
+            </li>
+            <li><a href="#mozTocId690540">The
+P2P Daemon</a>
+              <ol>
+                <li><a href="#mozTocId895651">Installation</a>
+                  <ol>
+                    <li><a href="#mozTocId806893">UNIX</a></li>
+                    <li><a href="#mozTocId112499">Microsoft
+Windows</a></li>
+                  </ol>
+                </li>
+                <li><a href="#mozTocId799743">Configuration</a></li>
+                <li><a href="#mozTocId994982">Control</a></li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li><a href="#mozTocId315155">Launch
+your Application</a>
+          <ol>
+            <li><a href="#mozTocId332532">Simple:
+Use ProActive
+XML
+Deployment Descriptors</a></li>
+            <li><a href="#mozTocId294040">Access
+from your
+Application
+to the P2P Infrastructure</a></li>
+          </ol>
+        </li>
+        <li><a href="#mozTocId1224">The
+P2P Infrastructure Model</a>
+          <ol>
+            <li><a href="#mozTocId356736">What
+is Peer-to-Peer?</a></li>
+            <li><a href="#mozTocId928306">The
+P2P
+Infrastructure in short</a>
+              <ol>
+                <li><a href="#mozTocId101413">Bootstrapping:
+First
+Contact</a></li>
+                <li><a href="#mozTocId290311">Creating
+a JVMs
+Overlay Network</a></li>
+                <li><a href="#mozTocId470123">Uncovering
+and
+Self-Organising in Continue</a></li>
+                <li><a href="#mozTocId299524">Asking
+Computational
+Nodes and Deploying Applications</a></li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li><a href="#mozTocId197757">The
+P2P Infrastructure
+Implementation</a></li>
+        <li><a href="#mozTocId789872">Limitations</a></li>
+      </ol>
+    </li>
+  </ol>
 </ul>
 <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-<h2><a name="network"></a>Create
+<h2><a class="mozTocH2" name="mozTocId765069"></a><a name="network"></a>Create
 your P2P Network</h2>
 <p>The P2P infrastructure is
 self-organized and configurable. When the infrastructure is running you
-have nothing to do to keep it up. There are 3 parameters to configure:</p>
+have nothing to do to keep it up. There are 3 main parameters to
+configure:</p>
 <ul type="disc">
   <li><b>Time
 To Update (TTU)</b>: each peer
@@ -108,7 +191,8 @@ supposed peers which are running in the p2p infrastructure. Next, we
 will explain how and where you can specify this list of peers.</p>
 <p>Now, you have just to start
 peers. There are two ways to do it:</p>
-<h3>Quick Start Peer</h3>
+<h3><a class="mozTocH3" name="mozTocId117139"></a>Quick
+Start Peer</h3>
 <p>This method explains how to
 rapidly launch a simple P2P Service on one host.</p>
 <p>ProActive provides a very
@@ -116,31 +200,33 @@ simple <i>script</i>
 to start a P2P Service on your local host. The name of this script is <b>startP2PService</b>.</p>
 <ul>
   <li> UNIX, GNU/Linux, BSD and
-MacOsX systems: the script is located in <code>ProActive/p2p/scripts/unix/startP2PService.sh</code>
+MacOsX systems: the script is located in <b>ProActive/p2p/scripts/unix/startP2PService.sh</b>
 file.</li>
   <li> Microsoft Windows system:
-the script is located in <code>
-ProActive/p2p/scripts/windows/startP2PService.bat</code>
+the script is located in <b>
+ProActive/p2p/scripts/windows/startP2PService.bat</b>
 file.</li>
 </ul>
 <p>Before launching this script,
 you have to specify some arguments to this command:</p>
-<p><b>startP2PService</b>
-<code>[-acq acquisitionMethod]
-[-port portNumber] [-s Peer ...] [-f PeersListFile]</code></p>
+<pre class="snippet">startP2PService [-acq acquisitionMethod] [-port portNumber] [-s Peer ...] [-f PeersListFile]</pre>
 <ul>
-  <li> <b>-acq acquisitionMethod</b>
+  <li> <b>-acq
+acquisitionMethod</b>
 the ProActive Runtime communication protocol used. Examples: rmi, http,
 ibis,
 ... By default it is <i>rmi</i>.</li>
-  <li> <b>-port portNumber</b>
+  <li> <b>-port
+portNumber</b>
 is the port number where the P2P Service will listen. By default it is <i>2410</i></li>
   <li> <b>-s
 Peer ...</b> specify addresses of
-peers which use to join the P2P infrastructure. Example: <code>rmi://applepie.proactive.org:8080</code></li>
+peers which use to join the P2P infrastructure. Example:
+    <pre class="snippet">rmi://applepie.proactive.org:8080</pre>
+  </li>
   <li> <b>-f
-PeersListFile</b> same of <code>-s</code>
-but peers are specified in file <code>ServerListFile</code>.
+PeersListFile</b> same of <b>-s</b>
+but peers are specified in file <b>ServerListFile</b>.
 One by line.</li>
 </ul>
 <p>More options:</p>
@@ -185,9 +271,14 @@ acquisition. The default value is 3 minutes.</li>
   <li><b>-lookup
 Time</b> is the lookup frequency in
 milliseconds for re-asking nodes. By default, it's value is 30 seconds.</li>
-  <li><b>-no_multi_proc_nodes</b> to share only a node. Otherwise, 1
+  <li><b>-no_multi_proc_nodes</b>
+to share only a node. Otherwise, 1
 node by CPU that means the p2p service which is running on a bi-pro
 will share 2 nodes. By default, 1 shared node for 1 CPU.</li>
+  <li><b>-xml_path</b> to share nodes from a XML deployment descriptor
+file. This option takes a file path. By default, no descriptors are
+specified that means the P2P Service shares only one local node or one
+local node by CPUs.</li>
 </ul>
 <p>All arguments are optional.</p>
 <p><b>Comment:
@@ -196,38 +287,35 @@ startP2PService script, the P2P service is persistent and runs like a
 UNIX <i>nice</i>
 process. If the JVMs that are running the P2P service stop (for a Java
 exception) the script re-starts a new one.</p>
-<h4>Usage Example</h4>
+<h4><a class="mozTocH4" name="mozTocId979491"></a>Usage
+Example</h4>
 <p>In this illustration, we will
-explain how to start a first peer and thenafter how new peers can
+explain how to start a first peer and then after how new peers can
 create a P2P network with the first one.</p>
 <p>Start the first peer with <i>rmi</i>
 protocol and listening on port <i>2410</i>:</p>
-<code>first.peer.host$
-startP2PService.sh rmi 2410</code>
+<pre class="snippet">first.peer.host$startP2PService.sh rmi 2410</pre>
 <p>Now, start new peers and
 connect them to the first peer to create a tiny P2P network:</p>
-<code>second.peer.host$
-startP2PService.sh rmi 2410 -s rmi://first.peer.host</code>
+<pre class="snippet">second.peer.host$startP2PService.sh rmi 2410 -s rmi://first.peer.host</pre>
 <p></p>
-<code> third.peer.host$
-startP2PService.sh rmi 2602 -s rmi://first.peer.host</code>
+<pre class="snippet">third.peer.host$startP2PService.sh rmi 2602 -s rmi://first.peer.host</pre>
 <p>You could specify different
 port number for each peer.</p>
 <p>Use a file to specify address
 of peers:</p>
 <p>The file <i>hosts.file</i>:</p>
-<pre> rmi://first.peer.host:2410<br> rmi://third.peer.host:2602<br></pre>
-<code> file.peer.host$
-startP2PService.sh rmi 8989 -f hosts.file</code>
+<pre class="snippet"> rmi://first.peer.host:2410<br> rmi://third.peer.host:2602<br></pre>
+<pre class="snippet"> file.peer.host$startP2PService.sh rmi 8989 -f hosts.file</pre>
 <p>Last, a new peer joins the P2P
 network by another peer of the first:</p>
-<code>last.peer.host$
-startP2PService.sh rmi 6666 -s rmi://third.peer.host:2410</code>
+<pre class="snippet">last.peer.host$startP2PService.sh rmi 6666 -s rmi://third.peer.host:2410</pre>
 <div align="center"> <img src="p2p_files/example.jpg" alt="Example">
 <p><b class="legend">Usage example P2P network (after
 firsts connections).</b></p>
 </div>
-<h3>The P2P Daemon</h3>
+<h3><a class="mozTocH3" name="mozTocId690540"></a>The
+P2P Daemon</h3>
 <p>The daemon aim to use computers
 in Peer-to-Peer computations, there will be a Java virtual machine
 sleeping on your computers and waking up at scheduled times to get some
@@ -236,40 +324,45 @@ work done.</p>
 scheduled to wake up during the weekend and during the night. Next, we
 will explain how to change the schedule. The JVM is running with the
 lowest priority.</p>
-<h4>Installation</h4>
-<h5>UNIX</h5>
-<p>Go to the directory: <code>ProActive/compile</code>
+<h4><a class="mozTocH4" name="mozTocId895651"></a>Installation</h4>
+<h5><a class="mozTocH5" name="mozTocId806893"></a>UNIX</h5>
+<p>Go to the directory: <b>ProActive/compile</b>
 and run this command:</p>
-<code>$ ./build daemon</code>
+<pre class="snippet">$ ./build daemon</pre>
 <p>Before compile you should
-change some parameter like the daemon user or the port in the file: <code>ProActive/p2p/src/common/proactivep2p.h</code>.</p>
+change some parameter like the daemon user or the port in the file:
+</p>
+<pre class="snippet">ProActive/p2p/src/common/proactivep2p.h</pre>
+<p></p>
 <p>Ask to your system
 administrator to add the daemon in a crontab or init.d. The process to
-run is located here: <code>ProActive/p2p/build/proactivep2p</code></p>
-<h5>Micorsoft Windows</h5>
+run is located here:
+</p>
+<pre class="snippet">ProActive/p2p/build/proactivep2p</pre>
+<p></p>
+<h5><a class="mozTocH5" name="mozTocId112499"></a>Microsoft
+Windows</h5>
 <p>To compile daemon source (in
-c++), we don't porvide any automatic script, you have to do it by
-yourself. All sources for Windows are in the directory: <code>ProActive/p2p/src/windows</code>.
+c++), we don't provide any automatic script, you have to do it by
+yourself. All sources for Windows are in the directory: <b>ProActive/p2p/src/windows</b>.
 If you use Visual Studio or else in the same directory you found
 Microsoft projects files.</p>
 <p>After that you are ready to
-install the daemon with Windows, you have jsut to run this script:</p>
-<code>C:&gt;
-ProActive\p2p\scripts\windows\Service\install.bat</code>
+install the daemon with Windows, you have just to run this script:</p>
+<pre class="snippet">C:&gt;ProActive\p2p\scripts\windows\Service\install.bat</pre>
 <p>To remove the daemon:</p>
-<code>C:&gt;
-ProActive\p2p\scripts\windows\Service\remove.bat</code>
+<pre class="snippet">C:&gt;ProActive\p2p\scripts\windows\Service\remove.bat</pre>
 <p><b>Comment</b>:
 By default the port number of the daemon is <b>9015</b>.</p>
-<h4>Configuration</h4>
+<h4><a class="mozTocH4" name="mozTocId799743"></a>Configuration</h4>
 <p>The daemon is configured with
-XML files in the <code>ProActive/p2p/config/</code>
+XML files in the <b>ProActive/p2p/config/</b>
 directory. To find the correct configuration file, the daemon will
-first try with a host dependant file: <code>config/proactivep2p.${HOST}.xml</code>
-for example: <code>config/proactivep2p.camel.inria.fr.xml</code>
-if the daemon is running on the host named <code>camel.inria.fr.</code></p>
+first try with a host dependent file: <b>config/proactivep2p.${HOST}.xml</b>
+for example: <b>config/proactivep2p.camel.inria.fr.xml</b>
+if the daemon is running on the host named <b>camel.inria.fr.</b></p>
 <p>If this host specific file is
-not found, the daemon will load <code>config/proactivep2p.xml</code>.
+not found, the daemon will load <b>config/proactivep2p.xml</b>.
 This mechanism can be useful to setup a default configuration and have
 a specific configuration for some hosts.</p>
 <p>The reference is the XML Schema
@@ -302,32 +395,90 @@ contained in a <b>&lt;configForHost&gt;</b>
 or <b>&lt;default&gt;</b>
 element. It consists of the scheduled times for work and the hosts
 where we register ourselves. Here is an example:</p>
-<pre>&lt;periods&gt;<br> &lt;period&gt;<br> &lt;start day="monday" hour="18" minute="0"/&gt;<br> &lt;end day="tuesday" hour="6" minute="0"/&gt;<br> &lt;/period&gt;<br> &lt;period&gt;<br> &lt;start day="saturday" hour="0" minute="0"/&gt;<br> &lt;end day="monday" hour="6" minute="0"/&gt;<br> &lt;/period&gt;<br>&lt;/periods&gt;<br>&lt;register&gt;<br> &lt;registry url="trinidad.inria.fr"/&gt;<br> &lt;registry url="amda.inria.fr"/&gt;<br> &lt;registry url="tranquility.inria.fr"/&gt;<br> &lt;registry url="psychoquack.inria.fr"/&gt;<br>&lt;/register&gt;<br></pre>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td>
+      <table class="xml" align="left">
+        <tbody>
+          <tr>
+            <td>
+            <p class="xml">&lt;periods&gt;<br>
+&nbsp;&lt;period&gt;<br>
+&nbsp; &lt;start day="monday" hour="18" minute="0"/&gt;<br>
+&nbsp; &lt;end day="tuesday" hour="6" minute="0"/&gt;<br>
+&nbsp; &lt;/period&gt;<br>
+&nbsp; &lt;period&gt;<br>
+&nbsp;&nbsp; &lt;start day="saturday" hour="0"
+minute="0"/&gt;<br>
+&nbsp;&nbsp; &lt;end day="monday" hour="6"
+minute="0"/&gt;<br>
+&nbsp; &lt;/period&gt;<br>
+&lt;/periods&gt;<br>
+&lt;register&gt;<br>
+&nbsp;&lt;registry url="trinidad.inria.fr"/&gt;<br>
+&nbsp;&lt;registry url="amda.inria.fr"/&gt;<br>
+&nbsp;&lt;registry url="tranquility.inria.fr"/&gt;<br>
+&nbsp;&lt;registry url="psychoquack.inria.fr"/&gt;<br>
+&lt;/register&gt;<br>
+            </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <p>In this example we clearly see
 that the JVM will wake up Monday evening and shut down Tuesday morning.
 It will also work during the weekend. In the <b>&lt;register&gt;</b>
 part we put the URL in which we will register ourselves, in the example
 we used the short form which is equivalent to <i>rmi://host:9301</i>.</p>
-<h4>Control</h4>
+<h4><a class="mozTocH4" name="mozTocId994982"></a>Control</h4>
+<p>Follow commands work only with
+UNIX friendly systems.</p>
 <ul>
   <li><b>Stop
 the JVM</b>: This command will stop
 the JVM and will restart it at the next scheduled time, which is the
 day after:<br>
-    <code>$
-ProActive/p2p/build/p2pctl stop</code> </li>
+    <pre class="snippet">$ProActive/p2p/build/p2pctl.sh stop [hostname]</pre>
+  </li>
   <li><b>Kill
 the daemon</b>:<br>
-    <code>$
-ProActive/p2p/build/p2pctl killdaemon</code></li>
+    <pre class="snippet">$ProActive/p2p/build/p2pctl.sh killdaemon [hostname]</pre>
+  </li>
+  <li><b>Restart
+the daemon</b>:
+    <pre class="snippet">$ProActive/p2p/build/p2pctl.sh restart [hostname]</pre>
+  </li>
+  <li><b>Test
+the daemon</b>:
+    <pre class="snippet">$ProActive/p2p/build/p2pctl.sh alive [hostname]</pre>
+  </li>
+  <li><b>Flush
+the daemon logs</b>:
+    <pre class="snippet">$ProActive/p2p/build/p2pctl.sh flush [hostname]</pre>
+  </li>
 </ul>
+<p><b>hostname</b>
+is the name of the remote host which the daemon
+command is
+sent. This parameter is optional, if host name is not specified the
+command is executed on the local host.</p>
 <p>Under Windows you could use
-some littles scripts in <code>ProActive/p2p/script/windows/JVM</code>
+some littles scripts in <b>ProActive/p2p/script/windows/JVM</b>
 to do that.</p>
+<p>All daemon logs are wrote in a
+file. All logs are available in:</p>
+<pre class="snippet">ProActive/p2p/build/logs/hostname</pre>
 <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-<h2><a name="appli"></a>Launch
+<h2><a class="mozTocH2" name="mozTocId315155"></a><a name="appli"></a>Launch
 your Application</h2>
-<h3>Simple: Use ProActive XML
+<h3><a class="mozTocH3" name="mozTocId332532"></a>Simple:
+Use ProActive
+XML
 Deployment Descriptors</h3>
 <p>You can customize some P2P
 settings such as:</p>
@@ -336,7 +487,8 @@ settings such as:</p>
 from the P2P infrastructure. Setting <b>MAX</b>
 as value is equivalent to an
 infinite number of node. (attribute <b>nodesAsked</b>)</li>
-  <li><b>host</b> that is the host name for starting a new P2P Service
+  <li><b>host</b>
+that is the host name for starting a new P2P Service
 or acquiring one if exists. By default, it's the local host.</li>
   <li><b>acq</b>
 is the communication
@@ -375,19 +527,12 @@ else a new one is started.
 tag will allow you to specify entry point of your P2P
 Infrastructure, where ProActive should ask for node. </p>
 <p> You can get nodes from the P2P
-Infrastructure using the ProActive Deployement Descriptor as described
+Infrastructure using the ProActive Deployment Descriptor as described
 above. <br>
 In fact you will ask for a certain number of nodes and ProActive will
 notify a "listener" (one of your class), every time a new node is
 available. </p>
-<pre><span class="java"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor("myP2PXmlDescriptor.xml");</span><br
- class="java"><br class="java"><span class="java"> // getting virtual node "p2pvn" defined in the ProActive Deployement Descriptor</span><br
- class="java"><span class="java"> VirtualNode vn = pad.getVirtualNode("p2pvn");</span><br
- class="java"><span class="java"> </span><br class="java"><span
- class="java"> // adding "this" or anyother class has a listener of the "NodeCreationEvent"</span><br
- class="java"><span class="java"> ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);</span><br
- class="java"><br class="java"><span class="java"> //activate that virtual node</span><br
- class="java"><span class="java"> vn.activate();</span><br></pre>
+<pre class="snippet"> ProActiveDescriptor pad = ProActive.getProactiveDescriptor("myP2PXmlDescriptor.xml");<br><br> // getting virtual node "p2pvn" defined in the ProActive Deployement Descriptor<br> VirtualNode vn = pad.getVirtualNode("p2pvn");<br> <br> // adding "this" or anyother class has a listener of the "NodeCreationEvent"<br> ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);<br><br> //activate that virtual node<br> vn.activate();<br></pre>
 <p>As you can see the class
 executing this code, must implements an interface in order to be
 notified when a new node is available from the P2P infrastructure.<br>
@@ -395,28 +540,163 @@ Basically you will have to implement the interface
 NodeCreationEventListener that can be found in package
 org.objectweb.proactive.core.event For example this method will be
 called every time a new host is acquired : </p>
-<pre> public void nodeCreated(NodeCreationEvent event) <br> {<br> // get the node<br> Node newNode = event.getNode();<br><br>	// now you can create an active object on your node.<br> }<br> </pre>
+<pre class="snippet"> public void nodeCreated(NodeCreationEvent event) <br> {<br> // get the node<br> Node newNode = event.getNode();<br><br>	// now you can create an active object on your node.<br> }<br> </pre>
 <p>You should carefully notice
 that you can be notified at any time, whatever the code you are
 executing, once you have activated the virtual node.</p>
 <p>A short preview of a XML
 descriptor:</p>
-<pre>	&lt;infrastructure&gt;<br>		&lt;/processes&gt;<br>			&lt;services&gt;<br>				&lt;serviceDefinition id="p2pservice"&gt;<br>					&lt;P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10"&gt;<br>						&lt;peerSet&gt;<br>							&lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;<br>						&lt;/peerSet&gt;<br>				&lt;/P2PService&gt;<br>			&lt;/serviceDefinition&gt;<br>		&lt;/services&gt;<br>	&lt;/infrastructure&gt;<br> </pre>
+<table width="100%">
+  <tbody>
+    <tr>
+      <td>
+      <table class="xml" align="left">
+        <tbody>
+          <tr>
+            <td>
+            <p class="xml">&lt;infrastructure&gt;<br>
+&nbsp;&lt;services&gt;<br>
+&nbsp; &lt;serviceDefinition id="p2pservice"&gt;<br>
+&nbsp;&nbsp; &lt;P2PService nodesAsked="2" acq="rmi"
+port="2410"
+NOA="10" TTU="60000" TTL="10"&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;peerSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;
+&lt;peer&gt;rmi://localhost:3000&lt;/peer&gt;<br>
+&nbsp;&nbsp;&nbsp; &lt;/peerSet&gt;<br>
+&nbsp;&nbsp; &lt;/P2PService&gt;<br>
+&nbsp; &lt;/serviceDefinition&gt;<br>
+&nbsp;&lt;/services&gt;<br>
+&lt;/infrastructure&gt;<br>
+            </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+    </tr>
+  </tbody>
+</table>
 <p>A complete example of file is
 available <a href="p2p_files/sample_p2p.xml">here</a>.</p>
 <p>For more information about
 ProActive XML Deployment Descriptor see this <a
  href="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Descriptor.html">page</a>.</p>
-<h3>Access from your Application
+<h3><a class="mozTocH3" name="mozTocId294040"></a>Access
+from your
+Application
 to the P2P Infrastructure</h3>
 <p>The next little sample of code
 explains how from an application you can start a P2P Service and deploy
 on it ProActive nodes:</p>
-<pre><code><br>import org.objectweb.proactive.ProActive;<br>import org.objectweb.proactive.core.ProActiveException;<br>import org.objectweb.proactive.core.mop.ClassNotReifiableException;<br>import org.objectweb.proactive.core.node.Node;<br>import org.objectweb.proactive.core.node.NodeException;<br>import org.objectweb.proactive.core.node.NodeFactory;<br>import org.objectweb.proactive.core.runtime.ProActiveRuntime;<br>import org.objectweb.proactive.core.runtime.RuntimeFactory;<br>import org.objectweb.proactive.p2p.core.service.P2PService;<br>import org.objectweb.proactive.p2p.core.service.StartP2PService;<br>...<br>// This constructor uses a file with address of peers<br>// See the Javadoc to choose different paramaters<br>StartP2PService startServiceP2P = new StartP2PService(p2pFile)<br><br>// Start the P2P Service on the local host<br>startServiceP2P.start();<br><br>// Get the reference on the P2P Service<br>P2PService serviceP2P = startServiceP2P.getP2PService();<br><br>// By the application's P2P Service ask to the P2P infrastructure<br>// for get nodes.<br>P2PNodesLookup p2pNodesLookup = p2pService.getNodes(nNodes,<br>                        virtualNodeName, JobID);<br>// Use method from p2pNodeLookup to get nodes<br>...<br></code></pre>
-<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-->
-<h2><a name="limitations"></a>Limitations</h2>
+<pre class="snippet"><br>import org.objectweb.proactive.ProActive;<br>import org.objectweb.proactive.core.ProActiveException;<br>import org.objectweb.proactive.core.mop.ClassNotReifiableException;<br>import org.objectweb.proactive.core.node.Node;<br>import org.objectweb.proactive.core.node.NodeException;<br>import org.objectweb.proactive.core.node.NodeFactory;<br>import org.objectweb.proactive.core.runtime.ProActiveRuntime;<br>import org.objectweb.proactive.core.runtime.RuntimeFactory;<br>import org.objectweb.proactive.p2p.core.service.P2PService;<br>import org.objectweb.proactive.p2p.core.service.StartP2PService;<br>...<br>// This constructor uses a file with address of peers<br>// See the Javadoc to choose different parameters<br>StartP2PService startServiceP2P = new StartP2PService(p2pFile)<br><br>// Start the P2P Service on the local host<br>startServiceP2P.start();<br><br>// Get the reference on the P2P Service<br>P2PService serviceP2P = startServiceP2P.getP2PService();<br><br>// By the application's P2P Service ask to the P2P infrastructure<br>// for get nodes.<br>P2PNodesLookup p2pNodesLookup = p2pService.getNodes(nNodes,<br> virtualNodeName, JobID);<br>// Use method from p2pNodeLookup to get nodes<br>...<br></pre>
+<h2><a class="mozTocH2" name="mozTocId1224"></a><a
+ name="infrastructure_model"></a>The
+P2P Infrastructure Model</h2>
+<p>The goals of this work are to
+use sparse CPU cycles from
+institutions' desktop workstations combined with grids and clusters.
+Consequently desktop workstation are not available all the time for
+sharing computations with different users than the workstation owner.
+Grids and clusters have the same problem that normal users don't want
+share their usage time. <br>
+</p>
+<p>Managing different sorts of
+resources (grids, clusters, desktop
+workstations) as a single network of resources with a hight instability
+of them needs a fully decentralized and dynamic approach.</p>
+<p>Therefore, P2P is a good
+solution for sharing a dynamic JVM network,
+where JVMs are the shared resources. Thereby, the P2P Infrastructure is
+P2P network which shares JVMs for computation. This infrastructure is
+completely self-organized and fully configurable.</p>
+<p>Before going on to consider the
+P2P infrastructure it's important to
+define what is Peer-to-Peer.<br>
+</p>
+<h3><a class="mozTocH3" name="mozTocId356736"></a>What
+is Peer-to-Peer?</h3>
+<p>There are a lot of P2P's
+definitions, many of them are similar to
+other distributed infrastructures, such as Grid, client / server, etc.
+There are 2 better definition which are really describe P2P:</p>
 <ul>
-  <li>Only Intranet P2P. </li>
+  <li>From&nbsp; <span style="font-style: italic;">Peer-to-Peer
+Harnessing&nbsp; the Power of Disruptive Technologies</span>
+(edited by
+Andy Oram):</li>
+</ul>
+<p>"[...] P2P is a class of
+applications that take advantage of <b>resources</b>
+- available at the edges of the Ineternet [...]"</p>
+<ul>
+  <li>And from <span style="font-style: italic;">A Definition of
+Peer-to-Peer Networking for the Classification of Peer-to-Peer
+Architectures and Applications </span>(R&uuml;diger
+Schollmeier -
+P2P'01):</li>
+</ul>
+<p>"[...] Peers are <b>accessible</b>
+by other peers directly [...]
+Any arbitrary chosen peer can be <b>removed</b>
+from the network <b>without
+fault</b> [...]"</p>
+<p><b>P2P's
+focus on sharing, decentralization, instability and fault
+tolerance.</b></p>
+<h3><a class="mozTocH3" name="mozTocId928306"></a>The
+P2P
+Infrastructure in short</h3>
+<h4><a class="mozTocH4" name="mozTocId101413"></a>Bootstrapping:
+First
+Contact</h4>
+<div align="center"> <img src="p2p_files/firstContact.jpg"
+ alt="Bootstrapping">
+<p><b class="legend">Example of first contact
+(Bootstrapping).</b></p>
+</div>
+<h4><a class="mozTocH4" name="mozTocId290311"></a>Creating
+a JVMs
+Overlay Network</h4>
+<h4><a class="mozTocH4" name="mozTocId470123"></a>Uncovering
+and
+Self-Organising in Continue</h4>
+<div align="center"> <img src="p2p_files/heartbeat.jpg"
+ alt="Heart Beat">
+<p><b class="legend">Heart beat sent every TTU.</b></p>
+</div>
+<h4><a class="mozTocH4" name="mozTocId299524"></a>Asking
+Computational
+Nodes and Deploying Applications</h4>
+<div align="center"> <img src="p2p_files/sendingNode.jpg"
+ alt="Asking nodes">
+<p><b class="legend">Asking nodes to acquaintances and
+getting a node.</b></p>
+</div>
+<h2><a class="mozTocH2" name="mozTocId197757"></a><a
+ name="implementation"></a>The
+P2P Infrastructure
+Implementation</h2>
+<div align="center"> <img src="p2p_files/implementation.jpg"
+ alt="P2P Implementation">
+<p><b class="legend">Nodes and Active Objects which are
+composing a P2P Service.</b></p>
+</div>
+<div align="center"> <img src="p2p_files/dynamicGroup.jpg"
+ alt="Dynamic Shared Group">
+<p><b class="legend">Dynamic Shared ProActive Typed Group.</b></p>
+</div>
+<div align="center"> <img src="p2p_files/screenshot.jpg"
+ alt="IC2D Screen Shot">
+<p><b class="legend">nBody application deployed on P2P
+Infractructure.</b></p>
+</div>
+<h2><a class="mozTocH2" name="mozTocId789872"></a><a name="limitations"></a>Limitations</h2>
+<ul>
+  <li>Problem to through firewall
+to combine clusters, grids and
+desktop workstations. Therefor a shared node in a desktop workstation
+could't communicate directly with another one inside a cluster,</li>
 </ul>
 <!--
 Footer : start ~~~ --> <br>

@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.util.Vector;
@@ -91,7 +91,7 @@ public class ServiceThread extends Thread {
             if (service.getServiceName().equals(P2PConstants.P2P_NODE_NAME)) {
                 // Start asking nodes
                 P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
-                P2PNodesLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
+                P2PNodeLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
                         this.vn.getName(), this.vn.getJobID());
                 ((VirtualNodeImpl) vn).addP2PNodesLookup(p2pNodesLookup);
                 this.nodeRequested = ((P2PDescriptorService) service).getNodeNumber();

@@ -140,44 +140,47 @@ Note that if not specified those properties are set programmatically
 with the default value. </li>
   <br>
   <br>
- 
-
- <li class="textNormal"><b>Fault-tolerance 
-properties</b><br>
+  <li class="textNormal"><b>Fault-tolerance properties</b><br>
     <br>
 Note that those properties should not be altered if the programmer uses
-deployment descriptor files. See <A HREF="faultTolerance.html">here</A> for
+deployment descriptor files. See <a href="faultTolerance.html">here</a>
+for
 more details.
     <ul class="listWithSpace">
-      <li class="textNormal"><b>proactive.ft</b>. Two values are possible: <b>enable,
-disable</b>. If enable, the fault-tolerance is enable and a set of servers
-	  must be defined with the following properties. Default value is <b>disable</b>.
-<br>
+      <li class="textNormal"><b>proactive.ft</b>. Two values are
+possible: <b>enable,
+disable</b>. If enable, the fault-tolerance is enable and a set of
+servers must be defined with the following properties. Default value is
+        <b>disable</b>.
+        <br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.checkpoint</b> is the URL
-	  of the <A HREF="faultTolerance.html#configuration">checkpoint server</A>.<br>
+      <li class="textNormal"><b>proactive.ft.server.checkpoint</b> is
+the URL of the <a href="faultTolerance.html#configuration">checkpoint
+server</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.location</b> is the URL of
-	  the <A HREF="faultTolerance.html#configuration">location server</A>.<br>
+      <li class="textNormal"><b>proactive.ft.server.location</b> is the
+URL of the <a href="faultTolerance.html#configuration">location server</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.recovery</b> is the URL
-	  of the <A HREF="faultTolerance.html#configuration">recovery process</A>.<br>
+      <li class="textNormal"><b>proactive.ft.server.recovery</b> is the
+URL of the <a href="faultTolerance.html#configuration">recovery process</a>.<br>
       </li>
-      <li class="textNormal"><b>proactive.ft.server.resource</b> is the URL of
-	  the <A HREF="faultTolerance.html#configuration">resource server</A>.<br>
+      <li class="textNormal"><b>proactive.ft.server.resource</b> is the
+URL of the <a href="faultTolerance.html#configuration">resource server</a>.<br>
       </li>
-	 <li class="textNormal"><b>proactive.ft.server.global</b> is the URL of
-	  the <A HREF="faultTolerance.html#configuration">global server</A>. If this property is set, all others
-	  <b>proactive.fr.server.*</b> are ignored.<br>
+      <li class="textNormal"><b>proactive.ft.server.global</b> is the
+URL of the <a href="faultTolerance.html#configuration">global server</a>.
+If this property is set, all others <b>proactive.fr.server.*</b> are
+ignored.<br>
       </li>
-	 <li class="textNormal"><b>proactive.ft.ttc</b> is the value of the <A
-	 HREF="faultTolerance.html#configuration">Time To Checkpoint</A>
-	 counter, in seconds. The default value is 30 sec.<BR> </li>
-
+      <li class="textNormal"><b>proactive.ft.ttc</b> is the value of
+the <a href="faultTolerance.html#configuration">Time To Checkpoint</a>
+counter, in seconds. The default value is 30 sec.<br>
+      </li>
     </ul>
-<br><br>
-
- <li class="textNormal"><b>Peer-to-Peer
+    <br>
+    <br>
+  </li>
+  <li class="textNormal"><b>Peer-to-Peer
 properties<a name="p2p_properties"></a></b><br>
     <br>
     <ul class="listWithSpace">
@@ -229,10 +232,14 @@ also uses with descriptor file. It is the lookup frequency in
 milliseconds for re-asking nodes. By default, it's value is 30 seconds.<br>
       </li>
       <li class="textNormal"><b>proactive.p2p.multi_proc_nodes</b> if
-    true deploying one shared nodes by CPU that means the p2p service
-    which is running on a bi-pro will share 2 nodes, else only one
-    node is shared independently of the number of CPU. By default,
-    it's value is true, i.e. 1 shared node for 1 CPU.</li><br>
+true deploying one shared nodes by CPU that means the p2p service which
+is running on a bi-pro will share 2 nodes, else only one node is shared
+independently of the number of CPU. By default, it's value is true,
+i.e. 1 shared node for 1 CPU.</li>
+      <li class="textNormal"><b>proactive.p2p.xml_path</b> is the XML
+deployment descriptor file path for sharing nodes more than a single
+node.</li>
+      <br>
     </ul>
   </li>
   <li class="textNormal"><b>Other

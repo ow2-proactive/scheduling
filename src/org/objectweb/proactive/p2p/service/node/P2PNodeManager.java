@@ -34,11 +34,14 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -60,7 +63,7 @@ import java.util.Vector;
  * Created on Jan 12, 2005
  */
 public class P2PNodeManager implements Serializable, InitActive, RunActive,
-    P2PConstants {
+    EndActive, P2PConstants {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Object localService = null;
@@ -70,6 +73,8 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
     private Vector bookedNodes = new Vector();
     private Vector usingNodes = new Vector();
     private int nodeCounter = 0;
+    private final String descriptorPath = System.getProperty(PROPERPY_XML_PATH);
+    private ProActiveDescriptor pad = null;
 
     //--------------------------------------------------------------------------
     // Class Constructors
@@ -133,11 +138,15 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
             nodeToFree.killAllActiveObjects();
 
             // Kill the node
-            this.proactiveRuntime.killNode(nodeToFree.getNodeInformation()
-                                                     .getURL());
-            logger.info("Node @" + nodeUrl + " left");
-            // Creating a new node
-            this.createNewNode();
+            if (this.descriptorPath == null) {
+                this.proactiveRuntime.killNode(nodeToFree.getNodeInformation()
+                                                         .getURL());
+                logger.info("Node @" + nodeUrl + " left");
+                // Creating a new node
+                this.createNewNode();
+            } else {
+                this.availbaleNodes.add(nodeToFree);
+            }
         } catch (Exception e) {
             logger.fatal("Coudln't delete or create a shared node", e);
         }
@@ -181,17 +190,24 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
         } catch (NodeException e) {
             logger.fatal("Couldn't get reference to the local p2pServiceNode", e);
         }
-        logger.debug("P2P node manager is running at " +
-            this.p2pServiceNode.getNodeInformation().getURL());
-        try {
-            logger.debug("ProActiveRuntime at " +
-                this.proactiveRuntime.getURL());
-        } catch (ProActiveException e1) {
-            logger.debug("Coudln't get the ProActiveRuntime URL", e1);
+        if (logger.isDebugEnabled()) {
+            logger.debug("P2P node manager is running at " +
+                this.p2pServiceNode.getNodeInformation().getURL());
+
+            try {
+                logger.debug("ProActiveRuntime at " +
+                    this.proactiveRuntime.getURL());
+            } catch (ProActiveException e1) {
+                logger.debug("Coudln't get the ProActiveRuntime URL", e1);
+            }
         }
 
-        // Creating default shared node
-        this.deployingDefaultSharedNodes();
+        // Creating shared nodes
+        if (this.descriptorPath == null) {
+            this.deployingDefaultSharedNodes();
+        } else {
+            this.deployingXmlSharedNodes();
+        }
 
         logger.debug("Exiting initActivity");
     }
@@ -244,6 +260,19 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
+     */
+    public void endActivity(Body body) {
+        if (this.pad != null) {
+            try {
+                this.pad.killall(false);
+            } catch (ProActiveException e) {
+                logger.warn("Couldn't kill deployed nodes", e);
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // Private class method
     // -------------------------------------------------------------------------
@@ -268,10 +297,14 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
      */
     private void deployingDefaultSharedNodes() {
         assert PROC > 0 : "Processor count = 0";
-        logger.info("Number of available processors for this JVM: " + PROC);
+        logger.debug("Number of available processors for this JVM: " + PROC);
+        int nodes = PROC;
+        if (!new Boolean(System.getProperty(PROPERTY_MULTI_PROC_NODES)).booleanValue()) {
+            nodes = 1;
+        }
 
         // Starting default shared nodes
-        for (int procNumber = 0; procNumber < PROC; procNumber++) {
+        for (int procNumber = 0; procNumber < nodes; procNumber++) {
             try {
                 Node node = this.createNewNode();
                 logger.debug("Default shared node succefuly created at: " +
@@ -280,6 +313,39 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                 logger.warn("Couldn't create default shared node", e);
             }
         }
+        logger.info(nodes + " shared nodes deployed");
+    }
+
+    /**
+     * Deploying shred nodes from a XML descriptor
+     */
+    private void deployingXmlSharedNodes() {
+        try {
+            this.pad = ProActive.getProactiveDescriptor(this.descriptorPath);
+        } catch (ProActiveException e) {
+            logger.fatal("Could't get ProActive Descripor at " +
+                this.descriptorPath, e);
+            return;
+        }
+        VirtualNode[] virtualNodes = this.pad.getVirtualNodes();
+        this.pad.activateMappings();
+        for (int i = 0; i < virtualNodes.length; i++) {
+            VirtualNode currentVn = virtualNodes[i];
+            Node[] nodes;
+            try {
+                nodes = currentVn.getNodes();
+                for (int j = 0; j < nodes.length; j++) {
+                    this.availbaleNodes.add(nodes[j]);
+                }
+            } catch (NodeException e) {
+                logger.warn("Problem with nodes for " + currentVn.getName(), e);
+            }
+        }
+        // Killing deployed nodes at the JVM shutdown
+        XmlNodeKiller killer = new XmlNodeKiller(pad);
+        Runtime.getRuntime().addShutdownHook(new Thread(killer));
+        
+        logger.info(this.availbaleNodes.size() + " shared nodes deployed");
     }
 
     // -------------------------------------------------------------------------

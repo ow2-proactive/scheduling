@@ -133,6 +133,16 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             if (checkNonEmpty(ttl)) {
                 p2pDescriptorService.setTtl(ttl);
             }
+
+            String multi_proc_nodes = attributes.getValue("multi_proc_nodes");
+            if (checkNonEmpty(multi_proc_nodes)) {
+                p2pDescriptorService.setMultiProcNodes(multi_proc_nodes);
+            }
+
+            String xml_path = attributes.getValue("xml_path");
+            if (checkNonEmpty(xml_path)) {
+                p2pDescriptorService.setXmlPath(xml_path);
+            }
         }
 
         protected void notifyEndActiveHandler(String name,

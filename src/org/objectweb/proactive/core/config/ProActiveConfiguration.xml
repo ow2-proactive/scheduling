@@ -61,6 +61,8 @@
 		<prop key="proactive.p2p.nodes_acq_to" value="180000" />
 		<!-- Lookup frequency for nodes -->
 		<prop key="proactive.p2p.lookup_freq" value="30000" />
+		<!-- If true deploying one shared nodes by CPU, else only one node is shared -->
+		<prop key="proactive.p2p.multi_proc_nodes" value="true" />
 		<!-- ***************************************************** -->
 	</properties>
 </ProActiveUserProperties>
