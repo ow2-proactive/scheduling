@@ -43,12 +43,25 @@ import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 
 
 
 /**
- * This class provides static methods to manage object representing a Group.
- *
+ * This class provides static methods to manage objects representing a Group (<b>typed group</b>).<br><br>
+ * 
+ * The ProActiveGroup class provides a set of static services through static method calls.
+ * It is the main entry point for users of ProActive Group Communication as they will call methods of this class
+ * to create group of object or to synchronize them.<br><br>
+ * 
+ * The main role of ProActiveGroup is to provide methods to create typed group. It is possible to create a typed
+ * group (empty or not) through instantiation using one of the version of newActive.
+ * It is also possible to create an active typed group from an existing using using the turnActive methods.<br>
+ * <b>Warning !!!</b> When a typed group is turned active, it looses the ability to switch to the
+ * <code>Group</code> representation. So an active typed group acquire the abilites of any active object
+ * (remote reference, migration, ...) but is no more able to evolve : no modification of the membership is possible.<br>
+ * (This feature will may appear in a later version of ProActive group communication). 
+ *   
  * @author Laurent Baduel
  *
  */
@@ -60,6 +73,8 @@ public class ProActiveGroup {
 	/** The name of the default proxy for group communication */
     public static final String DEFAULT_PROXYFORGROUP_CLASS_NAME = "org.objectweb.proactive.core.group.ProxyForGroup";
 
+
+	private ProActiveGroup () {}
 
 
     /**
@@ -139,17 +154,51 @@ public class ProActiveGroup {
 
 
 	/**
-	 * Creates an Active Object representing an empty group specifying the upper class of member.
-	 * @param the name of the (upper) class of the group's member. 
-	 * @return an empty active group of type <code>className</code>.
+	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a default
+	 * node in the local JVM.
+	 * @param <code>ogroup</code> the typed group to turn active. 
+	 * @return a reference on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
-     * @throws NodeException if the node was null and that the DefaultNode cannot be created
+     * @throws NodeException if the node was null and that the DefaultNode cannot be created.
 	 */
 	public static Object turnActiveGroup(Object ogroup)
 	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
 		return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup), (Node) null, null, null);
+	}
+
+
+	/**
+	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
+	 * @param <code>ogroup</code> the typed group to turn active.
+	 * @param <code>node</code> the node where to create the active object on. If <code>null</code>,
+	 * the active object is created localy on a default node
+	 * @return a reference (possibly remote) on the active object produced.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the specified node can not be reached.
+	 */
+	public static Object turnActiveGroup(Object ogroup, Node node)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup), node, null, null);
+	}
+
+
+	/**
+	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
+	 * @param <code>ogroup</code> the typed group to turn active.
+	 * @param <code>nodeName</code> the name of the node where to create the active object on.
+	 * @return a reference (possibly remote) on the active object produced.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the specified node can not be reached.
+	 */
+	public static Object turnActiveGroup(Object ogroup, String nodeName)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		return ProActive.turnActive(ogroup, ProActiveGroup.getType(ogroup), NodeFactory.getNode(nodeName), null, null);
 	}
 
 
