@@ -31,6 +31,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 import java.util.Hashtable;
@@ -64,10 +65,10 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-                     * Returns the {@link ContentController} interface of the given component.
+                     * Returns the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
                      *
                      * @param component a component.
-                     * @return the {@link ContentController} interface of the given component.
+                     * @return the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
                      * @throws NoSuchInterfaceException if there is no such interface.
                      */
     public static ComponentParametersController getComponentParametersController(
@@ -125,40 +126,29 @@ public class Fractive implements GenericFactory, Component, Factory {
                     throw new InstantiationException(
                         "Cannot create component on virtual node as no node is associated with this virtual node");
                 }
-                if (contentDesc.getVirtualNode().getNodes().length > 1) { // cyclic node
+                Node[] nodes = contentDesc.getVirtualNode().getNodes();
+                if (nodes.length > 1) { // cyclic node
                     Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
                     Group group_of_components = ProActiveGroup.getGroup(components);
                     Proxy proxy = null;
 
                     if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
+                        // task = instantiate a component with a different name 
+                        // on each of the node mapped to the given virtual node
                         String original_component_name = componentParameters.getName();
-                        Object active_objects = ProActive.newActive(contentDesc.getClassName(),
-                                contentDesc.getConstructorParameters(),
-                                contentDesc.getVirtualNode(),
-                                contentDesc.getActivity(),
-                                contentDesc.getFactory());
+                        contentDesc.getVirtualNode().activate();
 
-                        // iterate over the group : set names and proxies + add elements in the group
-                        Object[] ao_table = ProActiveGroup.getGroup(active_objects)
-                                                          .toArray();
-                        for (int i = 0; i < ao_table.length; i++) {
-                            ComponentParameters params = new ComponentParameters(componentParameters);
-
-                            // change the name of each component (add an suffix)
-                            params.setName(original_component_name +
-                                Constants.CYCLIC_NODE_SUFFIX + i);
-                            params.setStubOnReifiedObject(ao_table[i]);
-                            // Find each proxy
-                            proxy = ((StubObject) ao_table[i]).getProxy();
-                            if (proxy == null) {
-                                throw new ProActiveRuntimeException(
-                                    "Cannot find a Proxy on the stub object: " +
-                                    ao_table[i]);
-                            }
-                            group_of_components.add(ProActiveComponentRepresentativeFactory.instance()
-                                                                                           .createComponentRepresentative(params,
-                                    proxy));
+                        for (int i = 0; i < nodes.length; i++) {
+                            // change the name of each component (add a suffix)
+                            String new_name = original_component_name +
+                                Constants.CYCLIC_NODE_SUFFIX + i;
+                            componentParameters.setName(new_name);
+                            // change location of each component 
+                            contentDesc.setNode(nodes[i]);
+                            group_of_components.add(Fractive.newFcInstance(
+                                    contentDesc, componentParameters));
                         }
+
                         return components;
                     } else {
                         // component is a parallel or a composite : it will be created on the first node from this virtual node
@@ -221,7 +211,7 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-     * see {@link org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)
+     * see {@link org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type, java.lang.Object, java.lang.Object)}
      */
     public Component newFcInstance(Type arg0, Object arg1, Object arg2)
         throws InstantiationException {
