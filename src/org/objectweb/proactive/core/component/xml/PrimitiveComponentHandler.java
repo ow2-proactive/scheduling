@@ -134,7 +134,7 @@ public class PrimitiveComponentHandler extends ComponentHandler {
 
                 // keep the names of all components for binding them later
                 names = new String[components_table.length];
-                // ordering in iteration is guaranteed as underlying class containing the elements of the group is a vector
+                // ordering in iteration is guaranteed as underlying class containing the elements of the group is a List
                 for (int i = 0; i < components_table.length; i++) {
                     names[i] = controllerDescription.getName() +
                         Constants.CYCLIC_NODE_SUFFIX + i;
