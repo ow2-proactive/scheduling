@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.mop;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Vector;
 
 /**
  * This class contains static convenience and utility methods
@@ -451,6 +452,22 @@ public abstract class Utils extends Object {
     } else {
       return stubclassname;
     }
+  }
+  
+  /**
+   * looks for all super interfaces of the given interface, and adds them in the given Vector
+   * @param cl the base interface
+   * @param superItfs a vector that will list all Class instances corresponding to the super interfaces of cl
+   */
+  public static void addSuperInterfaces(Class cl, Vector superItfs) {
+	  if (!cl.isInterface()) {
+		  return;
+	  }
+	  Class[] super_interfaces = cl.getInterfaces();
+	  for (int i = 0; i < super_interfaces.length; i++) {
+		  superItfs.addElement(super_interfaces[i]);
+		  addSuperInterfaces(super_interfaces[i], superItfs);
+	  }
   }
 
   private static final Class silentForName(String classname) {
