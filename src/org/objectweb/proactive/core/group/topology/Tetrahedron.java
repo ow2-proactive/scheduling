@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
- /*
+/*
  * Created on Mar 19, 2004
  */
 package org.objectweb.proactive.core.group.topology;

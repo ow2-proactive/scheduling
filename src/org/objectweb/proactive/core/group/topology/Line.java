@@ -67,7 +67,7 @@ public class Line extends TopologyGroup { // implements Topology1D {
      */
     public Object right(Object o) {
         int position = this.indexOf(o);
-        if (position != this.getWidth()-1) {
+        if (position != (this.getWidth() - 1)) {
             return this.get(position + 1);
         } else {
             return null;

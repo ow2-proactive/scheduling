@@ -53,15 +53,14 @@ public class ThreadPool {
     /** the member to thread ratio, i.e. the number of members served by a single thread */
     private int memberToThreadRatio = 4;
 
-	/** the number of thread added to benefit nultithreading in low number of members */
-	private int additionalThreads = 3;
-
+    /** the number of thread added to benefit nultithreading in low number of members */
+    private int additionalThreads = 3;
 
     /** Builds a ThreadPool.
      * By default, the number of thread in the pool is 1.
      */
     public ThreadPool() {
-        this(1);//+3); //this.additionalThreads
+        this(1); //+3); //this.additionalThreads
     }
 
     /** Builds a ThreadPool, specifying the number of thread to create.
@@ -94,30 +93,35 @@ public class ThreadPool {
      * @param members - the number of members in the group
      */
     public void checkNumberOfThreads(int members) {
-    	// System.out.println("ThreadPool there are " + members + " members in the pool");
-		int i, f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) + this.additionalThreads;
-	    // System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
-		if (this.threads.length < f) {
-			Thread[] tmp = new Thread[f];
-			for (i = 0 ; i < this.threads.length ; i++) {
-				tmp[i] = this.threads[i];
-			}
-			for (; i < f ; i++) {
-				tmp[i] = new ThreadInThePool(this);
-				tmp[i].start();
-			}
-			this.threads = tmp;
-		} else if (this.threads.length > f) {
-			Thread[] tmp = new Thread[f];
-			for (i = 0; i < f; i++) {
-				tmp[i] = this.threads[i];
-			}
-			for (; i < this.threads.length; i++) {
-				this.threads[i].interrupt();
-				this.threads[i] = null;
-			}
-			this.threads = tmp;
-		}
+        // System.out.println("ThreadPool there are " + members + " members in the pool");
+        int i;
+
+        // System.out.println("ThreadPool there are " + members + " members in the pool");
+        int f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) +
+            this.additionalThreads;
+
+        // System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
+        if (this.threads.length < f) {
+            Thread[] tmp = new Thread[f];
+            for (i = 0; i < this.threads.length; i++) {
+                tmp[i] = this.threads[i];
+            }
+            for (; i < f; i++) {
+                tmp[i] = new ThreadInThePool(this);
+                tmp[i].start();
+            }
+            this.threads = tmp;
+        } else if (this.threads.length > f) {
+            Thread[] tmp = new Thread[f];
+            for (i = 0; i < f; i++) {
+                tmp[i] = this.threads[i];
+            }
+            for (; i < this.threads.length; i++) {
+                this.threads[i].interrupt();
+                this.threads[i] = null;
+            }
+            this.threads = tmp;
+        }
     }
 
     /**
@@ -128,13 +132,13 @@ public class ThreadPool {
         this.memberToThreadRatio = i;
     }
 
-	/**
-	 * Modifies the number of additional threads to serve members
-	 * @param i - the new number
-	 */
-	public void thread(int i) {
-		this.additionalThreads = i;
-	}
+    /**
+     * Modifies the number of additional threads to serve members
+     * @param i - the new number
+     */
+    public void thread(int i) {
+        this.additionalThreads = i;
+    }
 
     /** Adds a job to the pending queue of the thread pool. */
     public synchronized void addAJob(AbstractProcessForGroup r) {
@@ -148,12 +152,13 @@ public class ThreadPool {
      */
     public synchronized Runnable getJobForThePendingQueue() {
         try {
-//        	System.out.println("ThreadPool.getJobForThePendingQueue() currently " + this.pendingJobs.size() + " in the queue" );
+            //        	System.out.println("ThreadPool.getJobForThePendingQueue() currently " + this.pendingJobs.size() + " in the queue" );
             while (!this.pendingJobs.iterator().hasNext()) {
                 this.wait();
-//              	System.out.println("ThreadPool.getJobForThePendingQueue() woken currently " + this.pendingJobs.size() + " in the queue" );
+                //              	System.out.println("ThreadPool.getJobForThePendingQueue() woken currently " + this.pendingJobs.size() + " in the queue" );
             }
-//        	System.out.println("ThreadPool.getJobForThePendingQueue() picking a job from the queue");
+
+            //        	System.out.println("ThreadPool.getJobForThePendingQueue() picking a job from the queue");
             Runnable r = (Runnable) this.pendingJobs.iterator().next();
             this.pendingJobs.remove(r);
             return r;
@@ -169,22 +174,21 @@ public class ThreadPool {
         this.controler.waitDone();
     }
 
-//    /** Cleanly destroys a ThreadPool object */
-//    public void finalize() {
-//        this.controler.reset();
-//        for (int i = 0; i < threads.length; i++) {
-//            this.threads[i].interrupt();
-//            this.controler.jobStart();
-//            // this.threads[i].destroy();   // deprecated
-//        }
-//        this.controler.waitDone();
-//    }
+    //    /** Cleanly destroys a ThreadPool object */
+    //    public void finalize() {
+    //        this.controler.reset();
+    //        for (int i = 0; i < threads.length; i++) {
+    //            this.threads[i].interrupt();
+    //            this.controler.jobStart();
+    //            // this.threads[i].destroy();   // deprecated
+    //        }
+    //        this.controler.waitDone();
+    //    }
 
     /** Interrupts the thread in the pool */
-	public void clean() {
-	     for (int i = 0; i < threads.length; i++) {
+    public void clean() {
+        for (int i = 0; i < threads.length; i++) {
             this.threads[i].interrupt();
         }
-	}
-
+    }
 }

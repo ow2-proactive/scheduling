@@ -8,7 +8,8 @@ import org.objectweb.proactive.ProActive;
  *
  * @author Laurent Baduel
  */
-public class ProcessForGroupCreation extends AbstractProcessForGroup implements Runnable {
+public class ProcessForGroupCreation extends AbstractProcessForGroup
+    implements Runnable {
     private ProxyForGroup proxyGroup;
     private String className;
     private Object[] param;
@@ -24,19 +25,17 @@ public class ProcessForGroupCreation extends AbstractProcessForGroup implements 
         this.index = index;
     }
 
+    public void run() {
+        try {
+            this.proxyGroup.set(this.index,
+                ProActive.newActive(className, param, node));
+            //			this.proxyGroup.decrementWaitedAndNotifyAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-	public void run() {
-		try {
-			this.proxyGroup.set(this.index,ProActive.newActive(className, param, node));
-//			this.proxyGroup.decrementWaitedAndNotifyAll();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	
-	public int getMemberListSize() {
-		return 1;
-	}
-
+    public int getMemberListSize() {
+        return 1;
+    }
 }

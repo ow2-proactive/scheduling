@@ -85,9 +85,9 @@ public class Plan extends Line { // implements Topology2D {
     public Object left(Object o) {
         int pos = this.indexOf(o);
         if ((pos % this.getWidth()) == 0) {
-        	return null;
+            return null;
         } else {
-            return this.get(pos-1);
+            return this.get(pos - 1);
         }
     }
 
@@ -116,10 +116,10 @@ public class Plan extends Line { // implements Topology2D {
      */
     public Object right(Object o) {
         int pos = this.indexOf(o);
-        if ((pos % this.getWidth()) == this.getWidth()-1) {
-			return null;
+        if ((pos % this.getWidth()) == (this.getWidth() - 1)) {
+            return null;
         } else {
-            return this.get(pos+1);
+            return this.get(pos + 1);
         }
     }
 
@@ -129,11 +129,11 @@ public class Plan extends Line { // implements Topology2D {
      * @return the object at the up of <code>o<code>. If there is no object at the up of <code>o</code>, return <code>null</code>
      */
     public Object up(Object o) {
-		int pos = this.indexOf(o);
+        int pos = this.indexOf(o);
         if (pos < this.getWidth()) {
-        	return null;
+            return null;
         } else {
-			return this.get(pos - this.getWidth());
+            return this.get(pos - this.getWidth());
         }
     }
 
@@ -142,14 +142,14 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
-	public Object down(Object o) {
-		int pos = this.indexOf(o);
-		if (pos > ((this.getHeight()-1)*this.getWidth())-1) {
-			return null;
-		} else {
-			return this.get(pos + this.getWidth());
-		}
-	}
+    public Object down(Object o) {
+        int pos = this.indexOf(o);
+        if (pos > (((this.getHeight() - 1) * this.getWidth()) - 1)) {
+            return null;
+        } else {
+            return this.get(pos + this.getWidth());
+        }
+    }
 
     /**
      * Returns the line (one-dimensional topology group) with the specified number

@@ -18,7 +18,6 @@ import java.util.Vector;
  */
 public class ProcessForOneWayCall extends AbstractProcessForGroup
     implements Runnable {
-
     private int index;
     private MethodCall mc;
     private Body body;
@@ -34,11 +33,11 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
         this.exceptionList = exceptionList;
     }
 
-    public  void run() {
-    	
+    public void run() {
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
         Object object = this.memberList.get(this.index);
         boolean objectIsLocal = false;
+
         /* only do the communication (reify) if the object is not an error nor an exception */
         if (!(object instanceof Throwable)) {
             Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
@@ -49,28 +48,29 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                 if (lastProxy == null) {
                     // means we are dealing with a non-reified object (a standard Java Object)
                     this.mc.execute(object);
-				} else if (objectIsLocal) {
-					if (!(mc instanceof MethodCallControlForGroup)) {
-						((StubObject) object).getProxy().reify(new MethodCall(this.mc));
-					}
-					else {
-						if (object instanceof ProActiveComponentRepresentative) {
-							// component stubs can handle some method invocations  
-							this.mc.execute(object);
-						} else { 
-							((StubObject) object).getProxy().reify(this.mc);
-						}
-					}
-				} else {
-					if (object instanceof ProActiveComponentRepresentative) {
-							// component stubs can handle some method invocations	
-							this.mc.execute(object);
-					} else { 
-						((StubObject) object).getProxy().reify(this.mc);
-					}
-				}
+                } else if (objectIsLocal) {
+                    if (!(mc instanceof MethodCallControlForGroup)) {
+                        ((StubObject) object).getProxy().reify(new MethodCall(
+                                this.mc));
+                    } else {
+                        if (object instanceof ProActiveComponentRepresentative) {
+                            // component stubs can handle some method invocations  
+                            this.mc.execute(object);
+                        } else {
+                            ((StubObject) object).getProxy().reify(this.mc);
+                        }
+                    }
+                } else {
+                    if (object instanceof ProActiveComponentRepresentative) {
+                        // component stubs can handle some method invocations	
+                        this.mc.execute(object);
+                    } else {
+                        ((StubObject) object).getProxy().reify(this.mc);
+                    }
+                }
             } catch (Throwable e) {
-                this.exceptionList.add(new ExceptionInGroup(object, this.index, e));
+                this.exceptionList.add(new ExceptionInGroup(object, this.index,
+                        e));
             }
         }
     }

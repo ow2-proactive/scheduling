@@ -40,51 +40,49 @@ import org.objectweb.proactive.core.group.MethodCallControlForGroup;
  * @author Laurent Baduel
  */
 public class MethodCallBarrier extends MethodCallControlForGroup {
+    private String IDName;
+    private int awaitedCalls;
 
-	private String IDName;
-	private int awaitedCalls;
-
-	/**
-	 * Constructor
-	 * @param idname - the id name of the barrier 
-	 * @param nbCalls - the number of call need to finish the barrier 
-	 */
-	public MethodCallBarrier(String idname, int nbCalls) {
-		this.IDName = idname;
-		this.awaitedCalls = nbCalls;
-	}
-
-	/**
-	 * Constructor
-	 * @param idname - the id name of the barrier 
-	 */
-    public MethodCallBarrier(String idname) {
-    	this.IDName = idname;
-    	this.awaitedCalls = ((AbstractBody) ProActive.getBodyOnThis()).getSPMDGroupSize();
+    /**
+     * Constructor
+     * @param idname - the id name of the barrier
+     * @param nbCalls - the number of call need to finish the barrier
+     */
+    public MethodCallBarrier(String idname, int nbCalls) {
+        this.IDName = idname;
+        this.awaitedCalls = nbCalls;
     }
 
-	/**
-	 * Returns the name of the call
-	 * @return the String "MethodCallBarrier"
-	 */
-	public String getName() {
-		return "MethodCallBarrier";
-	}
+    /**
+     * Constructor
+     * @param idname - the id name of the barrier
+     */
+    public MethodCallBarrier(String idname) {
+        this.IDName = idname;
+        this.awaitedCalls = ((AbstractBody) ProActive.getBodyOnThis()).getSPMDGroupSize();
+    }
 
-	/**
-	 * Returns the number of awaited call for this barrier
-	 * @return the number of awaited call for this barrier
-	 */
-	public int getAwaitedCalls() {
-		return this.awaitedCalls;
-	}
-    
+    /**
+     * Returns the name of the call
+     * @return the String "MethodCallBarrier"
+     */
+    public String getName() {
+        return "MethodCallBarrier";
+    }
+
+    /**
+     * Returns the number of awaited call for this barrier
+     * @return the number of awaited call for this barrier
+     */
+    public int getAwaitedCalls() {
+        return this.awaitedCalls;
+    }
+
     /**
      * Returns the ID name of the barrier
      * @return the ID name of the barrier
      */
     public String getIDName() {
-    	return this.IDName;
+        return this.IDName;
     }
-
 }

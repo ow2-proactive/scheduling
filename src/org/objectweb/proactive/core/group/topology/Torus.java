@@ -125,7 +125,7 @@ public class Torus extends Ring { // implements Topology2D {
         return this.indexOf(o) / this.getWidth();
     }
 
-     /**
+    /**
      * Returns the Ring (one-dimensional topology group) with the specified number
      * @param Ring - the number of the Ring
      * @return the one-dimensional topology group formed by the Ring in the two-dimensional topology group, return <code>null</code> if the the specified Ring is incorrect
@@ -199,62 +199,59 @@ public class Torus extends Ring { // implements Topology2D {
         return this.column(this.getX(this.indexOf(o)));
     }
 
-	/**
-	  * Returns the object at the left of the specified object in the two-dimensional topology group
-	  * @param o - the specified object
-	  * @return the object at the left of <code>o<code>.
-	  */
-	 public Object left(Object o) {
-		 int pos = this.indexOf(o);
-		 if ((pos % this.getWidth()) == 0) {
-			 return this.get(pos+(this.width-1));
-		 } else {
-			 return this.get(pos-1);
-		 }
-	 }
+    /**
+     * Returns the object at the left of the specified object in the two-dimensional topology group
+     * @param o - the specified object
+     * @return the object at the left of <code>o<code>.
+     */
+    public Object left(Object o) {
+        int pos = this.indexOf(o);
+        if ((pos % this.getWidth()) == 0) {
+            return this.get(pos + (this.width - 1));
+        } else {
+            return this.get(pos - 1);
+        }
+    }
 
-	/**
-	 * Returns the object at the right of the specified object in the two-dimensional topology group
-	 * @param o - the specified object
-	 * @return the object at the right of <code>o<code>.
-	 */
-	public Object right(Object o) {
-		int pos = this.indexOf(o);
-		if ((pos % this.getWidth()) == this.getWidth()-1) {
-			return this.get(pos-(this.width-1));
-		} else {
-			return this.get(pos+1);
-		}
-	}
+    /**
+     * Returns the object at the right of the specified object in the two-dimensional topology group
+     * @param o - the specified object
+     * @return the object at the right of <code>o<code>.
+     */
+    public Object right(Object o) {
+        int pos = this.indexOf(o);
+        if ((pos % this.getWidth()) == (this.getWidth() - 1)) {
+            return this.get(pos - (this.width - 1));
+        } else {
+            return this.get(pos + 1);
+        }
+    }
 
-	/**
-	 * Returns the object at the up of the specified object in the two-dimensional topology group
-	 * @param o - the specified object
-	 * @return the object at the up of <code>o<code>.
-	 */
-	public Object up(Object o) {
-		int pos = this.indexOf(o);
-		if (pos < this.getWidth()) {
-			return this.get(pos + ((this.height-1)*this.width));
-		} else {
-			return this.get(pos - this.getWidth());
-		}
-	}
+    /**
+     * Returns the object at the up of the specified object in the two-dimensional topology group
+     * @param o - the specified object
+     * @return the object at the up of <code>o<code>.
+     */
+    public Object up(Object o) {
+        int pos = this.indexOf(o);
+        if (pos < this.getWidth()) {
+            return this.get(pos + ((this.height - 1) * this.width));
+        } else {
+            return this.get(pos - this.getWidth());
+        }
+    }
 
-	/**
-	 * Returns the object at the down of the specified object in the two-dimensional topology group
-	 * @param o - the specified object
-	 * @return the object at the down of <code>o<code>.
-	 */
-	public Object down(Object o) {
-		int pos = this.indexOf(o);
-		if (pos > ((this.getHeight()-1)*this.getWidth())-1) {
-			return this.get(pos - ((this.height-1)*this.width));
-		} else {
-			return this.get(pos + this.getWidth());
-		}
-	}
-
-
-
+    /**
+     * Returns the object at the down of the specified object in the two-dimensional topology group
+     * @param o - the specified object
+     * @return the object at the down of <code>o<code>.
+     */
+    public Object down(Object o) {
+        int pos = this.indexOf(o);
+        if (pos > (((this.getHeight() - 1) * this.getWidth()) - 1)) {
+            return this.get(pos - ((this.height - 1) * this.width));
+        } else {
+            return this.get(pos + this.getWidth());
+        }
+    }
 }

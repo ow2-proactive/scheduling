@@ -38,57 +38,58 @@ package org.objectweb.proactive.core.group.threadpool;
  */
 public class EndControler {
 
-	/** The number of active threads currently awake. */
-	private int numberOfAwakeThreads = 0;
+    /** The number of active threads currently awake. */
+    private int numberOfAwakeThreads = 0;
 
     /** This boolean keeps track of if the very first thread has started or not. This prevents
      * this object from falsely reporting that the ThreadPool is done, just because the first
      * thread has not yet started.
-	 */
-  //  private boolean started = false;
+     */
+
+    //  private boolean started = false;
 
     /** Suspends the current thread until all the pending jobs in the ThreadPool are done. */
-	synchronized public void waitDone() {
-		try {	
-			while (this.numberOfAwakeThreads > 0) {
-				this.wait();
-			} 
-		}
-		catch (InterruptedException e) { System.err.println("InterruptedException"); }
+    synchronized public void waitDone() {
+        try {
+            while (this.numberOfAwakeThreads > 0) {
+                this.wait();
+            }
+        } catch (InterruptedException e) {
+            System.err.println("InterruptedException");
+        }
     }
 
-//	/** Waits for the first thread to start. */
-//	synchronized public void waitBegin() {
-////		Thread.dumpStack();
-//		this.started=true;
-//	//	try {
-//		//	while (!this.started) {
-////				System.out.println("EndControler.waitBegin() started " + this.started);
-//			//	this.wait();
-//			//} }
-//	//	catch (InterruptedException e) { System.err.println("InterruptedException"); }
-//	}
+    //	/** Waits for the first thread to start. */
+    //	synchronized public void waitBegin() {
+    ////		Thread.dumpStack();
+    //		this.started=true;
+    //	//	try {
+    //		//	while (!this.started) {
+    ////				System.out.println("EndControler.waitBegin() started " + this.started);
+    //			//	this.wait();
+    //			//} }
+    //	//	catch (InterruptedException e) { System.err.println("InterruptedException"); }
+    //	}
 
-	/** A ThreadInThePool object calls this method to indicate it has started a job. */
-	synchronized public void jobStart() {
-//		Thread.dumpStack();
-	//	System.out.println("EndControler.jobStart()");
-		this.numberOfAwakeThreads++;
-	//	this.started = true;
-	//	this.notify();
-	}
+    /** A ThreadInThePool object calls this method to indicate it has started a job. */
+    synchronized public void jobStart() {
+        //		Thread.dumpStack();
+        //	System.out.println("EndControler.jobStart()");
+        this.numberOfAwakeThreads++;
+        //	this.started = true;
+        //	this.notify();
+    }
 
-	/** A ThreadInThePool object calls this method to indicate it has finished a job. */
+    /** A ThreadInThePool object calls this method to indicate it has finished a job. */
     synchronized public void jobFinish() {
-   // 	System.out.println("EndControler.jobFinish()");
-//    	Thread.dumpStack();
+        // 	System.out.println("EndControler.jobFinish()");
+        //    	Thread.dumpStack();
         this.numberOfAwakeThreads--;
         this.notify();
     }
 
-	/** Resets the controler to its initial state (no job awake). */
-	synchronized public void reset() {
-		this.numberOfAwakeThreads = 0;
-	}
-
+    /** Resets the controler to its initial state (no job awake). */
+    synchronized public void reset() {
+        this.numberOfAwakeThreads = 0;
+    }
 }
