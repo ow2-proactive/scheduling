@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
@@ -95,7 +96,7 @@ process_request:
                         bytes = msg.getMessage();
 
                         statusLine = "HTTP/1.1 200 OK";
-                        contentType = "text/xml";
+                        contentType = ProActiveXMLUtils.SERVICE_REQUEST_CONTENT_TYPE ;
                         responseHeaders = "ProActive-Action: " + actionType +
                             "\r\n";
                     } else {
