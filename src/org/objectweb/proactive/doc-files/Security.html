@@ -187,8 +187,8 @@ resulting from the deployment: a mapping of Virtual Nodes to processes
 and hosts.
 A first decisive feature
 allows to define application-level security on those application-level
-abstractions:
-<br>
+abstractions:</p>
+<p><br>
 <img src="security_images/img3.png.gif"
  alt="\begin{definition}{Virtual Node Security}\\
 Security policies can be defined at...
@@ -274,8 +274,8 @@ provide a conservative security strategy for un-forecasted deployments.
 active and mobile entities, there is
 a
 need
-to specify security at the level of such entities.
-<img src="security_images/img6.png.gif"
+to specify security at the level of such entities.</p>
+<p><img src="security_images/img6.png.gif"
  alt="\begin{definition}{Active Object Security} \\
 Security policies can be defined ...
 ... activity, the security policy attached to that object
@@ -642,10 +642,9 @@ default policy.<br>
 a path to a file is set inside the
 "name" parameters.</li>
 </ul>
-&lt;To&gt; tag contains all entities onto the interaction is
+<p>&lt;To&gt; tag contains all entities onto the interaction is
 made. As
-&lt;From&gt; tag, many entities can be specified.
-<p></p>
+&lt;From&gt; tag, many entities can be specified.</p>
 <pre> 15: &lt;To&gt;<br> 16: &lt;Entity type="VN" name="Locale"/&gt;<br> 17: &lt;/To&gt;</pre>
 <p>The
 &lt;Communication&gt; tag defines security policies to apply to
@@ -661,10 +660,9 @@ is authorized.</li>
   <li>"denied" means a request is
 denied.</li>
 </ul>
-Each &lt;Attribute&gt; (authentication,integrity,
+<p>Each &lt;Attribute&gt; (authentication,integrity,
 confidentiality) can
-be required, optional or denied.
-<p></p>
+be required, optional or denied.</p>
 <pre>&nbsp;&nbsp;19: &lt;Request value="authorized"&gt;<br>&nbsp;&nbsp;20: &nbsp; &lt;Attributes authentication="required" integrity="optional" confidentiality="optional"/&gt; <br>&nbsp;&nbsp;21: &lt;/Request&gt;</pre>
 <p>&lt;Reply&gt; tag has
 the same parameters that &lt;Request&gt;</p>
@@ -680,50 +678,50 @@ allows or not creation of active objects by
 Values can be "denied" or "authorized".</p>
 <pre> 27: &lt;OACreation&gt;denied&lt;/OACreation&gt;</pre>
 <pre> 1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br> 2:&lt;Policy&gt;<br> 3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;<br> 4: &lt;Certificate&gt;/net/home/acontes/certif/appli.cert&lt;/Certificate&gt;<br> 5: &lt;PrivateKey&gt;/net/home/acontes/certif/appli.key&lt;/PrivateKey&gt;<br> 6: &lt;CertificationAuthority&gt;<br> 7: &lt;Certificate&gt;&lt;/Certificate&gt;<br> 8: &lt;/CertificationAuthority&gt;<br> <br> 10: &lt;Rules&gt;<br> 11: &lt;Rule&gt;<br> 12: &lt;From&gt;<br> 13: &lt;Entity type="VN" name="vm2"/&gt;<br> 14: &lt;/From&gt;<br> 15: &lt;To&gt;<br> 16: &lt;Entity type="VN" name="Locale"/&gt;<br> 17: &lt;/To&gt;<br> 18: &lt;Communication&gt;<br> 19: &lt;Request value="authorized"&gt;<br> 20: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br> 21: &lt;/Request&gt;<br> 22: &lt;Reply value="authorized"&gt;<br> 23: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br> 24: &lt;/Reply&gt;<br> 25: &lt;/Communication&gt;<br> 26: &lt;Migration&gt;denied&lt;/Migration&gt;<br> 27: &lt;OACreation&gt;denied&lt;/OACreation&gt;<br> 28:<br> 29: &lt;/Rule&gt;<br> 30: &lt;Rule&gt;<br> 31: &lt;From&gt;<br> 32: &lt;Entity type="certificate" name="certificateRuntime1.cert"/&gt;<br> 33: &lt;/From&gt;<br> 34: &lt;To&gt;<br> 35: &lt;Entity type="VN" name="Locale"/&gt;<br> 36: &lt;/To&gt;<br> 37: &lt;Communication&gt;<br> 38: &lt;Request value="authorized"&gt;<br> 39: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br> 40: &lt;/Request&gt;<br> 41: &lt;Reply value="authorized"&gt;<br> 42: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br> 43: &lt;/Reply&gt;<br> 44: &lt;/Communication&gt;<br> 45: &lt;Migration&gt;denied&lt;/Migration&gt;<br> 46: &lt;OACreation&gt;denied&lt;/OACreation&gt;<br> 47:<br> 48: &lt;/Rule&gt;<br> ...<br> 90: &lt;Rule&gt;<br> 91: &lt;From&gt;<br> 92: &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br> 93: &lt;/From&gt;<br> 94: &lt;To&gt;<br> 95: &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br> 96: &lt;/To&gt;<br> 97: &lt;Communication&gt;<br> 98: &lt;Request value="denied"&gt;<br> 99: &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 100: &lt;/Request&gt;<br> 101: &lt;Reply value="denied"&gt;<br> 102: &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 103:<br>&nbsp;104: &lt;/Reply&gt;<br> 105: &lt;/Communication&gt;<br> 106: &lt;Migration&gt;denied&lt;/Migration&gt;<br> 107: &lt;OACreation&gt;authorized&lt;/OACreation&gt;<br> 108:<br> 109: &lt;/Rule&gt;<br> 110:<br> 111: &lt;/Rules&gt;<br> 112:&lt;/Policy&gt;<br></pre>
-Note that the JVM that reads the deployment descriptor should be
+<p>Note that the JVM that reads the deployment descriptor should be
 started with security policy. In order to start a secure JVM, you need
 to use the property proactive.runtime.security and give a path a
-security file descriptor.<br>
+security file descriptor.</p>
 <br>
-Here an example : java -Dproactive.runtime.security=jvmlocal.xml
-TestSecureDeployment secureDeployment.xml<br>
+<p>Here an example : java -Dproactive.runtime.security=jvmlocal.xml
+TestSecureDeployment secureDeployment.xml</p>
 <br>
 <h2><span style="text-decoration: underline;">How to
 quickly generate certificate ?</span><br>
 </h2>
-A GUI has been created to facilitate certificate generation. <br>
-<br>
+<p>
+A GUI has been created to facilitate certificate generation.<br>
 The first screenshot presents a root certificate. Notice that the
-certificate chain table is empty. <br>
-<div style="text-align: center;"><img
- style="width: 685px; height: 419px;" alt="root certificate"
- src="security_images/gui-oasis.jpg"><br>
+certificate chain table is empty. </p>
+<div style="text-align: center;">
+<p><img style="width: 685px; height: 419px;" alt="root certificate"
+ src="security_images/gui-oasis.jpg"></p>
 </div>
-<br>
-<br>
+<p><br>
+</p>
+<p>
 The second screenshot presents a certificate generated from the
 previous one using menu entry "Certificate -&gt; generate a
 sub-certificate".<br>
 Notice that the certification table contains one entry and
 Distinguished Name of the Entity ID 1 is the same as the subject DN of
-the certificate<br>
-<br>
-<br>
-<div style="text-align: center;"><img
- style="width: 685px; height: 419px;"
+the certificate</p>
+<p><br>
+</p>
+<div style="text-align: center;">
+<p><img style="width: 685px; height: 419px;"
  alt="ProActive Certificate Generator"
- src="security_images/gui-proactive.jpg"><br>
-<div style="text-align: left;"><br>
-</div>
-<div style="text-align: left;"><br>
+ src="security_images/gui-proactive.jpg"></p>
+<div style="text-align: left;">
+<p><br>
 Using
 this GUI, a user is able to generate a certificate and if needed a
 certificate chain.<br>
 Certificates are saved under a PKCS12 format (extension .p12). This
-format is natively supported by the ProActive Security mechanism.<br>
+format is natively supported by the ProActive Security mechanism.</p>
 </div>
 </div>
-<!--
+<p><!--
 <h2><a name="SECTION00060000000000000000">Bibliography</a>
 </h2>
 <dl compact="compact">
@@ -782,7 +780,7 @@ Remote methode invocation http://java.sun.com/products/jdk/rmi (2000) </dd>
 -->
 To learn more, see the <a href="../../../../index.html">JavaDoc</a><!--
 Footer : start ~~~ -->.
-<br>
+</p>
 <hr>
 <div class="textSmall" align="right">Copyright
 &copy; October 2004
