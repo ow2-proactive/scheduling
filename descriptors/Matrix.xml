@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
-	<virtualNodes>
-		<virtualNode name="matrixNode" property="multiple" />
-	</virtualNodes>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="matrixNode" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="matrixNode">
-				<jvmSet>
-					<vmName value="currentJVM"/>
+				<jvmSet>	
 					<vmName value="Jvm1"/>
 					<vmName value="Jvm2"/>
 					<vmName value="Jvm3"/>
@@ -16,12 +17,6 @@
 			</map>
 		</mapping>
 		<jvms>
-			<jvm name="currentJVM">
-				<acquisition method="rmi"/>
-				<creation>
-					<processReference refid="linuxJVM"/>
-				</creation>
-			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="User" property="unique"/>
+		</virtualNodesDefinition>
+		<virtualNodesAcquisition>
+			<virtualNode name="Dispatcher"/>
+		</virtualNodesAcquisition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="User">
+				<jvmSet>
+					<currentJVM protocol="rmi"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<lookup virtualNode="Dispatcher" host="*" protocol="rmi"/>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
-	<virtualNodes>
-		<virtualNode name="OutputListener" property="unique"/>
-		<virtualNode name="NumberSource" property="unique"/>
-		<virtualNode name="Containers" property="multiple"/>
-	</virtualNodes>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="OutputListener" property="unique"/>
+			<virtualNode name="NumberSource" property="unique"/>
+			<virtualNode name="Containers" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="OutputListener">
@@ -50,9 +52,6 @@
 		<processes>
 			<processDefinition id="linuxJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-<!--  				<policyFile>
-				   <path type="fromClasspath" value="proactive.java.policy"/>
-				</policyFile> -->
 			</processDefinition>
 		</processes>
 	</infrastructure>
