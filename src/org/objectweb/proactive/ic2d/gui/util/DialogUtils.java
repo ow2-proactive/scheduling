@@ -48,8 +48,9 @@ public class DialogUtils {
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())+":"+ System.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
+            logger.log(e.getMessage());
         }
 
         //	calling dlg for host or ip and depth control
@@ -71,7 +72,7 @@ public class DialogUtils {
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())+":"+ System.getProperty("proactive.http.port");;
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
         }
@@ -112,7 +113,7 @@ public class DialogUtils {
         IC2DMessageLogger logger) {
         String initialHostValue = "localhost";
         try {
-            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+            initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())+":"+ System.getProperty("proactive.rmi.port");
         } catch (java.net.UnknownHostException e) {
             logger.log(e.getMessage());
         }
