@@ -73,7 +73,7 @@ public class Test implements org.objectweb.proactive.RunActive, java.io.Serializ
     try {
       System.out.println("Test: creating object and turning it active localy");
       //Test t = new Test();
-      activeTest1 = (Test)ProActive.turnActive(test1);
+      activeTest1 = (Test)ProActive.turnActive(test1,args[0]);
       activeTest1.echo();
     } catch (Exception e) {
       e.printStackTrace();
