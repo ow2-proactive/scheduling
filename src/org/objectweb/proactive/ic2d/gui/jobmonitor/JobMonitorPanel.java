@@ -334,7 +334,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                             .getCanonicalHostName();
         String vmName = pr.getVMInformation().getName();
 
-        asso.addChild(HOST, hostname, vmName);
+        asso.addChild(JOB, jobId, vmName);
 
         String[] nodes = pr.getLocalNodeNames();
 
@@ -353,10 +353,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             }
 
             asso.addChild(JVM, vmName, nodeName);
+            asso.addChild(HOST, hostname, JVM, vmName);
             if (vnName != null) {
                 asso.addChild(VN, vnName, NODE, nodeName);
             }
-            asso.addChild(JOB, jobId, NODE, nodeName);
             handleActiveObjects(nodeName, activeObjects);
         }
     }

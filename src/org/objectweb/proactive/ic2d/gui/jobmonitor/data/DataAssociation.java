@@ -37,17 +37,13 @@ class AssoKey implements Comparable {
 }
 
 /*
- *                     VN
- *                      |
- *                      *
- *                      |
- *                      v
- * Host -*-> JVM -*-> Node -*-> AO
- *                      ^
- *                      |
- *                      *
- *                      |
- *                     Job
+ *         Host        VN
+ *           |         |
+ *           *         *
+ *           |         |
+ *           v         v
+ * Job -*-> JVM -*-> Node -*-> AO
+ *
  */
 
 public class DataAssociation implements JobMonitorConstants {
@@ -97,18 +93,18 @@ public class DataAssociation implements JobMonitorConstants {
 
 	/* Example : addChild(HOST, "camel.inria.fr", "PA_JVM_0123456798") */
 	public void addChild(int key, String lvalue, String rvalue) {
-		if (isSpecialKey(key))
+		if (getSpecialPath(key) != key)
 			throw new RuntimeException("This key does not have any child");
 		else
 			addChild(key, lvalue, key + 1, rvalue);
 	}
 
-	private boolean isSpecialKey(int key) {
-		for (int i = 0; i < SPECIAL_KEYS.length; i++)
-			if (key == SPECIAL_KEYS[i])
-				return true;
+	private int getSpecialPath(int key) {
+		for (int i = 0; i < SPECIAL_PATHS.length; i++)
+			if (key == SPECIAL_PATHS[i][0])
+				return SPECIAL_PATHS[i][1];
 
-		return false;
+		return key;
 	} 
 	
 	private Set getAsso(int from, String name, int to) {
@@ -122,15 +118,21 @@ public class DataAssociation implements JobMonitorConstants {
 		return (Set) res;
 	}
 	
-	private Set handleSpecialKey(int from, String name, int to) {
-//		dumpMap();
-		Set toNode;
-		toNode = getValues(from, name, NODE);
+	private Set handleSpecialPath(int from, String name, int to) {
+		int fromStep = getSpecialPath(from);
+		int toStep = getSpecialPath(to);
+		
+		if (to == fromStep || from == toStep)
+			return getAsso(from, name, to);
+		
+		int step = (fromStep != from) ? fromStep : toStep;
+
+		Set stepValues = getValues(from, name, step);
 		Set res = new TreeSet();
-		Iterator iter = toNode.iterator();
+		Iterator iter = stepValues.iterator();
 		while (iter.hasNext()) {
 			String stepName = (String) iter.next();
-			Set temp = getValues(NODE, stepName, to);
+			Set temp = getValues(step, stepName, to);
 			res.addAll(temp);
 		}
 		return res;
@@ -149,14 +151,8 @@ public class DataAssociation implements JobMonitorConstants {
 		if (from == NO_KEY)
 			return list(to);
 		
-		if (isSpecialKey(from) && to != NODE)
-			return handleSpecialKey(from, name, to);
-		
-		if ((from == NODE || to == NODE) && (isSpecialKey(from) || isSpecialKey(to)))
-			return getAsso(from, name, to);
-
-		if (isSpecialKey(from) || isSpecialKey(to))
-			return handleSpecialKey(from, name, to);
+		if (getSpecialPath(from) != from || getSpecialPath(to) != to)
+			return handleSpecialPath(from, name, to);
 		
 		if (to == from + 1 || to == from - 1)
 			return getAsso(from, name, to);
@@ -200,7 +196,7 @@ public class DataAssociation implements JobMonitorConstants {
 		if (getSetForKey(key) == null || !getSetForKey(key).remove(name))
 			return;
 		
-		if  (isSpecialKey(key))
+		if  (getSpecialPath(key) != key)
 			/* If we had a reference count : associatedNode.ref-- */
 			return;
 		

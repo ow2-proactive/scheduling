@@ -2,7 +2,6 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.switcher;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.swing.Icon;
 
