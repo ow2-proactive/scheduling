@@ -218,7 +218,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
         try {
             return (ProActiveRuntime[]) sendRequest(new RuntimeRequest(
-                    "getProActiveRuntime"));
+                    "getProActiveRuntimes"));
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
