@@ -93,13 +93,7 @@
 		<rmic classname="org.objectweb.proactive.core.body.jini.JiniBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
-		<rmic classname="org.objectweb.proactive.core.node.oldies.jini.JiniNodeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
-		</rmic>
 		<rmic classname="org.objectweb.proactive.core.body.rmi.RemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
-			<classpath refid="project.classpath"/>
-		</rmic>
-		<rmic classname="org.objectweb.proactive.core.node.oldies.rmi.RemoteNodeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
