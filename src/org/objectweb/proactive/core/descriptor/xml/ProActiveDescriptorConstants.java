@@ -50,6 +50,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String MAP_TAG = "map"; 
   public static final String JVMSET_TAG = "jvmSet";
   public static final String VMNAME_TAG = "vmName";
+  public static final String CURRENTJVM_TAG = "currentJVM";
   public static final String JVMS_TAG = "jvms"; 
   public static final String JVM_TAG = "jvm"; 
   public static final String ACQUISITION_TAG = "acquisition"; 

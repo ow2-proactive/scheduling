@@ -97,7 +97,7 @@ The following element ProActiveDescriptor defines the root of the schema
 					<xs:selector xpath="processes/processDefinition/globusProcess/processReference"/>
 					<xs:field xpath="@refid"/>
 					<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/globusProcess/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
-				</xs:keyref>	
+				</xs:keyref>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
@@ -148,16 +148,37 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:sequence>
 		<xs:attribute name="virtualNode" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!-- jvmSet element has only one child: vmName element that must appear once or more-->
+	<!-- jvmSet element has one child, it is a choice between an element  vmName that must occur once or more and a group: CurrentVMGroup that must occur once and only once-->
 	<xs:complexType name="JvmSetType">
-		<xs:sequence>
+		<xs:choice>
+			<xs:group ref="CurrentVMGroup"/>
 			<xs:element name="vmName" type="VmNameType" maxOccurs="unbounded"/>
+		</xs:choice>
+	</xs:complexType>
+	<!--CurrentVMGroup consists in two elements  currentJVM  that must occur once and only once and vmName that may not appear, or can appear many times-->
+	<xs:group name="CurrentVMGroup">
+		<xs:sequence>
+			<xs:element name="currentJVM" type="CurrentJVMType"/>
+			<xs:element name="vmName" type="VmNameType" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
+	</xs:group>
+	<!--currentVM element has one attribute: protocol wich is required and can take only two values rmi or jini. This element when set, indicates that a node will be created  on the jvm running the program and this node will be mapped on the virtualNode defined in deployment/mapping/map@virtualNode-->
+	<xs:complexType name="CurrentJVMType">
+		<xs:attribute name="protocol" use="required">
+		<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="rmi"/>
+					<xs:enumeration value="jini"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 	<!-- vmName element is a simpleType that can take any value of type String. This element represents the name of a virtualMachine. This name must have a corresponding value in jvms/jvm section(name attribute)-->
 	<xs:complexType name="VmNameType">
 		<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:complexType>
+	
+	
 	<!-- jvms element has only one child: jvm element that must appear once or more-->
 	<xs:complexType name="JvmsType">
 		<xs:sequence>
@@ -332,7 +353,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-<!--globusOption element has two childs gramPort element and gisPort element. They should not be modified -->
+	<!--globusOption element has two childs gramPort element and gisPort element. They should not be modified -->
 	<xs:complexType name="GlobusOptionType">
 		<xs:sequence>
 			<xs:element name="gramPort" type="xs:positiveInteger" minOccurs="0"/>
