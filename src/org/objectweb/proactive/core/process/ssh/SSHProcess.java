@@ -54,6 +54,8 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 
 public class SSHProcess extends AbstractExternalProcessDecorator {
   
+    
+    public final static String DEFAULT_SSHPATH="ssh";
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -64,6 +66,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
    */
   public SSHProcess() {
     super();
+    this.command_path = DEFAULT_SSHPATH;
   
   }
   
@@ -74,6 +77,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
    */
   public SSHProcess(ExternalProcess targetProcess) {
     super(targetProcess);
+    this.command_path = DEFAULT_SSHPATH;
   }
     
 
@@ -133,7 +137,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
   
   protected String buildWindowsSSHCommand() {
     StringBuffer command = new StringBuffer();
-    command.append("ssh");
+    command.append(command_path);
     command.append(" ");
     command.append(hostname);
     // append username
