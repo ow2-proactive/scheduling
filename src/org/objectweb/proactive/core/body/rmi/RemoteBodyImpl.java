@@ -152,7 +152,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
 	/**
 	 * Get information about the handlerizable object
-	 * @return
 	 */
 	public String getHandlerizableInfo() throws java.io.IOException {
 		return "REMOTE BODY (URL=" + body.getNodeURL() + ") of CLASS ["+ this.getClass()  +"]";

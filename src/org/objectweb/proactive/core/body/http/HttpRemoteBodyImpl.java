@@ -522,7 +522,6 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
 
     /**
      * Get information about the handlerizable object
-     * @return
      */
     public String getHandlerizableInfo() throws java.io.IOException {
         try {

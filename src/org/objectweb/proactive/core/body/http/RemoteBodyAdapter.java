@@ -115,7 +115,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     /**
      * Registers an active object into the table of body.
-     * @param obj the active object to register.
+     * @param paBody the body of the active object to register.
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
      */
@@ -131,7 +131,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     /**
      * Unregisters an active object previously registered into the bodys table
-     * @param url the urn under which the active object has been registered
+     * @param urn the urn under which the active object has been registered
      */
     public static void unregister(String urn) throws java.io.IOException {
         urnBodys.put(urn, null);
@@ -356,7 +356,6 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
     /**
      * Get information about the handlerizable object
-     * @return
      */
     public String getHandlerizableInfo() throws java.io.IOException {
         return remoteBodyStrategy.getHandlerizableInfo();
