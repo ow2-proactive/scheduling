@@ -188,6 +188,7 @@ public class ProxyForGroup extends AbstractProxy
     public  synchronized Object reify(MethodCall mc) throws InvocationTargetException {
 
 		//System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
+        ExceptionList exceptionList = null;
 
         /* if the method called is toString, apply it to the proxy, not to the members */
         if ("toString".equals(mc.getName())) {
@@ -210,12 +211,14 @@ public class ProxyForGroup extends AbstractProxy
         this.threadpool.checkNumberOfThreads(this.memberList.size());
 
         /* if OneWay : do not construct result */
-        if (AbstractProxy.isOneWayCall(mc)) {
-            this.oneWayCallOnGroup(mc);
+        if (mc.isOneWayCall()) {
+            exceptionList = new ExceptionList();
+        	this.oneWayCallOnGroup(mc,exceptionList);
         }
         /* Special case : the method returns void but is Synchronous because it throws Exception */
         else if (mc.getReifiedMethod().getReturnType() == Void.TYPE) {
-            this.oneWayCallOnGroup(mc);
+            exceptionList = new ExceptionList();
+        	this.oneWayCallOnGroup(mc,exceptionList);
         }
         /* if the call is asynchronous the group of result will be a group a future */
         else { // with group in general case : SYNC == ASYNC !!!!
@@ -223,9 +226,12 @@ public class ProxyForGroup extends AbstractProxy
         }
 
         /* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
-      
-      	this.threadpool.complete();
-      
+       	this.threadpool.complete();
+
+       	/* Throws the exceptionList if one or more exceptions occur in the oneWayCall */
+      	if ((exceptionList != null) && (exceptionList.size() != 0)) {
+        	throw exceptionList;
+        }
 
         return result;
     }
@@ -317,9 +323,8 @@ public class ProxyForGroup extends AbstractProxy
      * Launchs the threads for OneWay call of each member of the Group.
      * @param mc the MethodCall to be applied on each member of the Group.
      */
-    protected void oneWayCallOnGroup(MethodCall mc) {
+    protected void oneWayCallOnGroup(MethodCall mc, ExceptionList exceptionList) {
         Body body = ProActive.getBodyOnThis();
-        ExceptionList exceptionList = new ExceptionList();
         if (Profiling.GROUP) {
         	timer.setTimer("oneWayCallOnGroup."+mc.getName());
         	timer.start();
@@ -353,10 +358,6 @@ public class ProxyForGroup extends AbstractProxy
 
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
 
-        if (exceptionList.size() != 0) {
-            throw exceptionList;
-        }
-        
         if (Profiling.GROUP) {
             	timer.stop();
             }
