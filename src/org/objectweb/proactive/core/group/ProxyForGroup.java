@@ -448,12 +448,18 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Compares the specified object with this group for equality.
+     * Returns <code>true</code> if and only if the specified Object <code>o</code>
+     * is also a <code>Group</code>, both <code>Group</code>s have the same size,
+     * and all corresponding pairs of elements in the two <code>Group</code>s are equal.
+     * (Two elements e1 and e2 are equal if (<code>e1==null ? e2==null : e1.equals(e2)</code>).
+     * In other words, two <code>Group</code>s are defined to be equal if they contain the
+     * same elements in the same order.
      * @param o the Object for wich we test the equality.
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
     public boolean equals(Object o) {
         if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
-            return this.proxyForGroupID.equals(((org.objectweb.proactive.core.group.ProxyForGroup) o).proxyForGroupID);
+        	return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
         } else {
             return false;
         }
