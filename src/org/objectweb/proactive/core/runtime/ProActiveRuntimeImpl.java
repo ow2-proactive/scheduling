@@ -84,6 +84,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private ProActiveRuntimeImpl() {
         try {
             this.nodeMap = new java.util.Hashtable();
+
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable();
             this.virtualNodesMap = new java.util.Hashtable();

@@ -618,7 +618,7 @@ public class ProActive {
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null; 
-        if ("sun".equals(System.getProperty("proactive.rmi"))) {
+        if ("rmi".equals(System.getProperty("proactive.rmi"))) {
 			b = RemoteBodyAdapter.lookup(url);
         } else {
 			b = IbisRemoteBodyAdapter.lookup(url);

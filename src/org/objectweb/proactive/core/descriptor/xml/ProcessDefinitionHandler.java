@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
 import org.xml.sax.SAXException;
 
 
@@ -210,13 +211,13 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 
         // end inner class EnvironmentHandler
     }
-     //end of inner class ProcessHandler
 
+    //end of inner class ProcessHandler
     protected class PrunProcessHandler extends ProcessHandler {
         public PrunProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
-			this.addHandler(PRUN_OPTIONS_TAG, new PrunOptionHandler());
-		//	System.out.println("ProcessDefinitionHandler.PrunProcessHandler()");
+            this.addHandler(PRUN_OPTIONS_TAG, new PrunOptionHandler());
+            //	System.out.println("ProcessDefinitionHandler.PrunProcessHandler()");
         }
 
         protected class PrunOptionHandler extends PassiveCompositeUnmarshaller {
@@ -225,16 +226,18 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             //private LSFBSubProcess bSubProcess;
             public PrunOptionHandler() {
                 //this.bSubProcess = (LSFBSubProcess)targetProcess;
-          //      System.out.println("ProcessDefinitionHandler.PrunOptionHandler()");
+                //      System.out.println("ProcessDefinitionHandler.PrunOptionHandler()");
                 UnmarshallerHandler pathHandler = new PathHandler();
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
-				this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
+                this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
                 this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
-				this.addHandler(BOOKING_DURATION_TAG, new SingleValueUnmarshaller());
+                this.addHandler(BOOKING_DURATION_TAG,
+                    new SingleValueUnmarshaller());
+                this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
-            //    this.addHandler(SCRIPT_PATH_TAG, bch);
+                //    this.addHandler(SCRIPT_PATH_TAG, bch);
             }
 
             public void startContextElement(String name, Attributes attributes)
@@ -247,19 +250,22 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 // we know that it is a prun process since we are
                 // in prun option!!!
                 PrunSubProcess prunSubProcess = (PrunSubProcess) targetProcess;
-            //    System.out.println("+++++ notifyEndActiveHandler " + name);
+
+                //    System.out.println("+++++ notifyEndActiveHandler " + name);
                 if (name.equals(HOST_LIST_TAG)) {
                     prunSubProcess.setHostList((String) activeHandler.getResultObject());
                 } else if (name.equals(HOSTS_NUMBER_TAG)) {
                     prunSubProcess.setHostsNumber((String) activeHandler.getResultObject());
                 } else if (name.equals(PROCESSOR_PER_NODE_TAG)) {
-				     prunSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
-//                } else if (name.equals(SCRIPT_PATH_TAG)) {
-//                    prunSubProcess.setScriptLocation((String) activeHandler.getResultObject());
-//                }
-                } else  if (name.equals(BOOKING_DURATION_TAG)) {
-                	prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
-                } else  {
+                    prunSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
+                    //                } else if (name.equals(SCRIPT_PATH_TAG)) {
+                    //                    prunSubProcess.setScriptLocation((String) activeHandler.getResultObject());
+                    //                }
+                } else if (name.equals(BOOKING_DURATION_TAG)) {
+                    prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
+                } else if (name.equals(PRUN_OUTPUT_FILE)) {
+                    prunSubProcess.setOutputFile((String) activeHandler.getResultObject());
+                } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
             }
@@ -275,17 +281,22 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
                 cu.addHandler(ABS_PATH_TAG, pathHandler);
                 cu.addHandler(REL_PATH_TAG, pathHandler);
+                cu.addHandler(JVMPARAMETER_TAG, new JVMParameterHandler());
                 this.addHandler(CLASSPATH_TAG, cu);
+                this.addHandler(BOOT_CLASSPATH_TAG, cu);
+                this.addHandler(JVMPARAMETERS_TAG, cu);
             }
             BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
             bch.addHandler(ABS_PATH_TAG, pathHandler);
             bch.addHandler(REL_PATH_TAG, pathHandler);
+             bch.addHandler(JVMPARAMETER_TAG, new BasicUnmarshaller());
+            //  this.addHandler(JVMPARAMETERS_TAG, bch);
             this.addHandler(JAVA_PATH_TAG, bch);
             this.addHandler(POLICY_FILE_TAG, bch);
             this.addHandler(LOG4J_FILE_TAG, bch);
             this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
             this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
-            this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
+            // this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
         }
 
         //
@@ -312,6 +323,30 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     }
                     jvmProcess.setClasspath(sb.toString());
                 }
+            } else if (name.equals(BOOT_CLASSPATH_TAG)) {
+                String[] paths = (String[]) activeHandler.getResultObject();
+                if (paths.length > 0) {
+                    StringBuffer sb = new StringBuffer();
+                    String pathSeparator = System.getProperty("path.separator");
+                    sb.append(paths[0]);
+                    for (int i = 1; i < paths.length; i++) {
+                        sb.append(pathSeparator);
+                        sb.append(paths[i]);
+                    }
+                    jvmProcess.setBootClasspath(sb.toString());
+                }
+            } else if (name.equals(JVMPARAMETERS_TAG)) {
+                String[] paths = (String[]) activeHandler.getResultObject();
+
+                if (paths.length > 0) {
+                    StringBuffer sb = new StringBuffer();
+                    for (int i = 0; i < paths.length; i++) {
+                        //  sb.append(pathSeparator);
+                        sb.append(paths[i]);
+                        sb.append(" ");
+                    }
+                    jvmProcess.setJvmOptions(sb.toString());
+                }
             } else if (name.equals(JAVA_PATH_TAG)) {
                 String jp = (String) activeHandler.getResultObject();
                 jvmProcess.setJavaPath(jp);
@@ -323,9 +358,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 jvmProcess.setClassname((String) activeHandler.getResultObject());
             } else if (name.equals(PARAMETERS_TAG)) {
                 jvmProcess.setParameters((String) activeHandler.getResultObject());
-            } else if (name.equals(JVMPARAMETERS_TAG)) {
-                jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
-            } else {
+            }// else if (name.equals(JVMPARAMETERS_TAG)) {
+               // jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
+            //}
+             else {
                 super.notifyEndActiveHandler(name, activeHandler);
             }
         }
@@ -497,8 +533,20 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     //end of inner class GlobusProcessHandler
     private class SingleValueUnmarshaller extends BasicUnmarshaller {
         public void readValue(String value) throws org.xml.sax.SAXException {
+            //System.out.println("SingleValueUnmarshaller.readValue() " + value);
             setResultObject(value);
         }
+    }
+
+    private class JVMParameterHandler extends BasicUnmarshaller {
+		public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+	  // read from XML
+	  
+	  String value = attributes.getValue("value");
+	
+		setResultObject(value);
+	  
+    }
     }
 
     //end of inner class SingleValueUnmarshaller

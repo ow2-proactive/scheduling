@@ -1,40 +1,43 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.process;
+
+import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     implements ExternalProcess {
+    protected static Logger clogger = Logger.getLogger(AbstractExternalProcess.class.getName());
     protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
@@ -244,8 +247,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     /**
- * Implementation of a MessageLogger that output all messages to the standard output
- */
+     * Implementation of a MessageLogger that output all messages to the standard output
+     */
     public static class StandardOutputMessageLogger implements MessageLogger,
         java.io.Serializable {
         public StandardOutputMessageLogger() {
@@ -265,11 +268,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             t.printStackTrace();
         }
     }
-     // end inner class StandardOutputMessageLogger
+
+    // end inner class StandardOutputMessageLogger
 
     /**
- * Implementation of a MessageLogger that discard all output
- */
+     * Implementation of a MessageLogger that discard all output
+     */
     public static class NullMessageLogger implements MessageLogger,
         java.io.Serializable {
         public NullMessageLogger() {
@@ -284,11 +288,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         public void log(String message, Throwable t) {
         }
     }
-     // end inner class NullMessageLogger
+
+    // end inner class NullMessageLogger
 
     /**
- * Implementation of a MessageSink that can receive one message at a time
- */
+     * Implementation of a MessageSink that can receive one message at a time
+     */
     public static class SimpleMessageSink implements MessageSink,
         java.io.Serializable {
         private String message;
@@ -335,12 +340,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             return isActive;
         }
     }
-     // end inner class SimpleMessageSink
+
+    // end inner class SimpleMessageSink
 
     /**
- * This class reads all messages from an input and log them using a
- * MessageLogger
- */
+     * This class reads all messages from an input and log them using a
+     * MessageLogger
+     */
     protected class ProcessInputHandler implements Runnable {
         private java.io.BufferedReader in;
         private MessageLogger logger;
@@ -354,14 +360,27 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
 
         public void run() {
-            //logger.log("Process started Thread="+Thread.currentThread().getName());
+            if (AbstractExternalProcess.clogger.isDebugEnabled()) {
+				AbstractExternalProcess.clogger.debug("Process started Thread=" +
+                    Thread.currentThread().getName());
+            }
+
+            //
             try {
                 while (true) {
-                    threadMonitor.setActive(false);
-                    //System.out.println("ProcessInputHandler before readLine()");
-                    String s = in.readLine();
+                    //threadMonitor.setActive(false);
+                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
+						AbstractExternalProcess.clogger.debug(
+                            "ProcessInputHandler before readLine()");
+                    }
 
-                    //System.out.println("ProcessInputHandler after readLine() s="+s);
+                    String s = in.readLine();
+                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
+                        AbstractExternalProcess.clogger.debug(
+                            "ProcessInputHandler after readLine() s=" + s);
+                    }
+
+                    //
                     threadMonitor.setActive(true);
                     if (s == null) {
                         break;
@@ -384,12 +403,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             }
         }
     }
-     // end inner class ProcessInputHandler
+
+    // end inner class ProcessInputHandler
 
     /**
- * This class uses a MessageSink to write all messages produced
- * in a given output
- */
+     * This class uses a MessageSink to write all messages produced
+     * in a given output
+     */
     protected class ProcessOutputHandler implements Runnable {
         private java.io.BufferedWriter out;
         private MessageSink messageSink;
@@ -430,5 +450,6 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             }
         }
     }
-     // end inner class ProcessOutputHandler
+
+    // end inner class ProcessOutputHandler
 }

@@ -86,8 +86,10 @@ public interface ProActiveDescriptorConstants  {
   public static final String HOSTS_NUMBER_TAG = "hostsNumber";
   public static final String PROCESSOR_PER_NODE_TAG = "processorPerNode";
   public static final String BOOKING_DURATION_TAG = "bookingDuration";
+  public static final String PRUN_OUTPUT_FILE = "outputFile";
   public static final String VARIABLE_TAG = "variable"; 
   public static final String CLASSPATH_TAG = "classpath"; 
+  public static final String BOOT_CLASSPATH_TAG = "bootclasspath";
   public static final String JAVA_PATH_TAG = "javaPath"; 
   public static final String POLICY_FILE_TAG = "policyFile"; 
   public static final String LOG4J_FILE_TAG = "log4jpropertiesFile";
@@ -99,5 +101,5 @@ public interface ProActiveDescriptorConstants  {
   public static final String REL_PATH_TAG = "relativePath";  
   
   public static final String JVMPARAMETERS_TAG = "jvmParameters";
-  
+  public static final String JVMPARAMETER_TAG = "parameter";
 }

@@ -91,6 +91,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     protected String processorPerNode = DEFAULT_PROCESSOR_NUMBER;
     protected String bookingDuration = DEFAULT_BOOKING_DURATION;
     protected String interactive = "false";
+    protected String outputFile;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -155,6 +156,21 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * @return the filename given to prun using -o
+     */
+    public String getOutputFile() {
+        return outputFile;
+    }
+
+    /** Set the output file to be passed to prun
+     * using the -o option
+     * @param string
+     */
+    public void setOutputFile(String string) {
+        outputFile = string;
     }
 
     /**
@@ -313,9 +329,6 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         return buildEnvironmentCommand(); // + buildPSubCommand();
     }
 
-    //    protected String buildBJobsCommand() {
-    //        return DEFAULT_QJOBPATH + " " + jobID;
-    //    }
     protected void sendJobDetailsCommand() {
         //   outputMessageSink.setMessage(buildBJobsCommand());
     }
@@ -337,12 +350,18 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
         String[] commandAndOptions = separateCommandFromOptions(targetProcess.getCommand());
         prunCommand.append(" -no-panda -v -" + processorPerNode + " -t " +
-            bookingDuration + " ").append(commandAndOptions[0] + " " + hosts +
-            " " + commandAndOptions[1]); // " -q " + queueName + " ");
+            bookingDuration + " ");
 
         if (hostList != null) {
             prunCommand.append("-m " + hostList + " ");
         }
+
+        if (outputFile != null) {
+            prunCommand.append("-o " + outputFile + " ");
+        }
+
+        prunCommand.append(commandAndOptions[0] + " " + hosts + " " +
+            commandAndOptions[1]); // " -q " + queueName + " ");
 
         if (logger.isDebugEnabled()) {
             logger.debug("prun command is " + prunCommand.toString());
@@ -389,9 +408,10 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
             //System.out.println(" >>> log :" +message);
             int nbProcessor = (new Integer(hosts)).intValue();
             String h = parseHostname(message);
-//            if (h != null) {
-//                System.out.println(" ---- hostname " + h);
-//            }
+
+            //            if (h != null) {
+            //                System.out.println(" ---- hostname " + h);
+            //            }
         }
 
         public void log(Throwable t) {

@@ -142,7 +142,7 @@ public abstract class RuntimeFactory {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
 			defaultRuntime = getProtocolSpecificRuntime(System.getProperty("proactive.rmi") +":");
             if (logger.isDebugEnabled()) {
-                logger.debug("default runtime = " + defaultRuntime);
+                logger.debug("default runtime = " + defaultRuntime.getURL());
             }
         } catch (ProActiveException e) {
             //e.printStackTrace();
@@ -264,7 +264,7 @@ public abstract class RuntimeFactory {
 
     private static boolean isIbisEnabled() {
         try {
-            // test if Jini is available
+            // test if Ibis is available
             Class.forName("ibis.rmi.server.UnicastRemoteObject");
             if (logger.isInfoEnabled()) {
                 logger.info("Ibis enabled");
@@ -294,6 +294,9 @@ public abstract class RuntimeFactory {
     private static RuntimeFactory createRuntimeFactory(
         String factoryClassName, String protocol) throws ProActiveException {
         Class factoryClass = null;
+      if (logger.isDebugEnabled()) {
+      	logger.debug("factoryClassName " + factoryClassName);
+      }
         try {
             factoryClass = Class.forName(factoryClassName);
         } catch (ClassNotFoundException e) {
@@ -310,6 +313,7 @@ public abstract class RuntimeFactory {
         if (logger.isDebugEnabled()) {
             logger.debug("protocol = " + protocol);
         }
+  
         RuntimeFactory factory = (RuntimeFactory) instanceFactoryMapping.get(protocol);
         if (factory != null) {
             return factory;

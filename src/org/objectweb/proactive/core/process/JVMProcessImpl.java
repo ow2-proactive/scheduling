@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.process;
 
 import org.objectweb.proactive.core.util.MessageLogger;
@@ -77,12 +77,13 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public final static String DEFAULT_CLASSNAME = "org.objectweb.proactive.StartNode";
     public final static String DEFAULT_JVMPARAMETERS = "";
     protected String classpath = DEFAULT_CLASSPATH;
+    protected String bootClasspath;
     protected String javaPath = DEFAULT_JAVAPATH;
     protected String policyFile = DEFAULT_POLICY_FILE;
     protected String log4jFile = DEFAULT_LOG4J_FILE;
     protected String classname = DEFAULT_CLASSNAME;
-    protected String jvmParameters = DEFAULT_JVMPARAMETERS;
-    protected String parameters;
+    protected String parameters = DEFAULT_JVMPARAMETERS;
+    protected String jvmParameters;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -96,9 +97,9 @@ public class JVMProcessImpl extends AbstractExternalProcess
     }
 
     /**
-    * Creates a new JVMProcess
-    * @param messageLogger The logger that handles input and error stream of this process
-    */
+     * Creates a new JVMProcess
+     * @param messageLogger The logger that handles input and error stream of this process
+     */
     public JVMProcessImpl(MessageLogger messageLogger) {
         super(messageLogger);
     }
@@ -137,6 +138,15 @@ public class JVMProcessImpl extends AbstractExternalProcess
     public void setClasspath(String classpath) {
         checkStarted();
         this.classpath = classpath;
+    }
+
+    public void setBootClasspath(String bootClasspath) {
+        checkStarted();
+        this.bootClasspath = bootClasspath;
+    }
+
+    public String getBootClasspath() {
+        return bootClasspath;
     }
 
     public String getJavaPath() {
@@ -207,8 +217,14 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(javaPath);
         }
 
+        if (bootClasspath != null) {
+            javaCommand.append(" -Xbootclasspath:");
+            javaCommand.append(bootClasspath);
+            javaCommand.append(" ");
+        }
+
         // append jvmParameters
-        if ((jvmParameters != null) && (jvmParameters.length() > 0)) {
+        if (jvmParameters != null) {
             javaCommand.append(" " + jvmParameters);
         }
 
@@ -233,6 +249,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
         // append classname
         javaCommand.append(" ");
         javaCommand.append(classname);
+        System.out.println("Parameters " + parameters);
         if (parameters != null) {
             javaCommand.append(" ");
             javaCommand.append(parameters);
@@ -240,6 +257,11 @@ public class JVMProcessImpl extends AbstractExternalProcess
         if (logger.isDebugEnabled()) {
             logger.debug(javaCommand.toString());
         }
+        if (logger.isDebugEnabled()) {
+            logger.debug(javaCommand.toString() +"\n");
+		
+        }
+
         return javaCommand.toString();
     }
 

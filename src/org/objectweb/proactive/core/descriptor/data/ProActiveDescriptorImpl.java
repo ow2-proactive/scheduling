@@ -203,6 +203,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
         for (int i = 0; i < runtimeArray.length; i++) {
             try {
+            	System.out.println("ProActiveDescriptorImpl.killall() on " + i);
+            	System.out.println("ProActiveDescriptorImpl.killall() on " +  runtimeArray[i].getURL());
                 runtimeArray[i].killRT();
             } catch (Exception e) {
                 logger.info(" Virutal Machine " +
