@@ -55,8 +55,9 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
 
 
   public AppletBuffer(String name, int width, int height) {
-    super(name, width, height);
-    this.max = 7;
+    super(name);
+    max = 7;
+    init(width, height);
   }
 
 
@@ -155,6 +156,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
 
     // Cells panel
     javax.swing.JPanel cellsPanel = new javax.swing.JPanel();
+    System.out.println(" max="+max);
     cells = new CellPanel[max];
     for (int i = 0; i < max; i++) {
       cells[i] = new CellPanel();

@@ -50,12 +50,12 @@ If the programmer wants to implement a new metabehavior using our metaobject pro
 he or she has to write both a concrete (as opposed to abstract) class and an interface.
 The concrete class provides an implementation for the metabehavior he or she wants to
 achieve while the interface contains its declarative part.<br>
-The concrete class implements interface {\tt Proxy} and provides an implementation for
-the given behavior through the method {\tt reify}:
+The concrete class implements interface <b>Proxy</b> and provides an implementation for
+the given behavior through the method <b>reify</b>:
 </p>
 
 <blockquote><pre>
-  public Object reify (MethodCall c) throws InvocationTargetException, IllegalAccessException;
+  public Object reify (MethodCall c) throws Throwable;
 </pre></blockquote>
 
 <p class="textNormal">
@@ -89,7 +89,7 @@ profiling environments.
 class EchoProxy extends Object implements Proxy {
   // here are constructor and variables declaration
   // [...]
-  public Object reify (MethodCall c) throws InvocationTargetException, IllegalAccessException {
+  public Object reify (MethodCall c) throws Throwable {
       System.out.println (c.getMethodName());
       return c.execute (targetObject);
   }
@@ -182,7 +182,7 @@ cannot be subclassed.</li>
 <!--
  Footer : start 
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<br><hr><div align="right" class="textSmall">Copyright &#169; May 2002 INRIA All Rights Reserved.</p>
 <!-- Footer : end -->
 </body>
 </html>

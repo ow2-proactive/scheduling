@@ -74,7 +74,7 @@ These two main features have a lot of important consequences on the topology of 
 This has also consequences on the semantics of message-passing between subsystems.
 <ul class="listWithSpace">
 	<li class="textNormal">When an object in a subsystem calls a method on an active object, the parameters of the call may be references on passive objects of the subsystem, which would lead to shared passive objects. This is why passive objects passed as parameters of calls on active objects are always passed by <i>deep-copy</i>. Active objects, on the other hand, are always passed by reference. Symmetrically, this also applies to objects returned from methods called on active objects.</li>
-<li class="textNormal">When a method is called on an active object, it returns immediately (as the thread cannot execute methods in the other subsystem). A <i>future object</i>, which is a placeholder for the result of the methods invocation, is returned. From the point of view of the caller subsystem, no difference can be made between the future object and the object that would have been returned if the same call had been issued onto a passive object. Then, the calling thread can continue executing its code just like if the call had been effectively performed. The role of the future object is to block this thread if it invokes a method on the future object and the result has not yet been set (i.e. the thread of the subsystem on which the call was received has not yet performed the call and placed the result into the future object): this inter-object synchronization policy is known as {\it wait-by-necessity}.</li>
+<li class="textNormal">When a method is called on an active object, it returns immediately (as the thread cannot execute methods in the other subsystem). A <i>future object</i>, which is a placeholder for the result of the methods invocation, is returned. From the point of view of the caller subsystem, no difference can be made between the future object and the object that would have been returned if the same call had been issued onto a passive object. Then, the calling thread can continue executing its code just like if the call had been effectively performed. The role of the future object is to block this thread if it invokes a method on the future object and the result has not yet been set (i.e. the thread of the subsystem on which the call was received has not yet performed the call and placed the result into the future object): this inter-object synchronization policy is known as <i>wait-by-necessity</i>.</li>
 </ul>
 </p>
 
@@ -117,7 +117,7 @@ passive objects passed as parameters.
 <!--
  Footer : start 
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<br><hr><div align="right" class="textSmall">Copyright &#169; May 2002 INRIA All Rights Reserved.</p>
 <!-- Footer : end -->
 </body>
 </html>

@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.body.future;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * <p>
  * An object implementing this interface if a place holder object for an upcomming result yet
@@ -51,7 +49,7 @@ public interface Future extends LocalFuture {
 
   public void waitFor();
 
-  public InvocationTargetException getRaisedException();
+  public Throwable getRaisedException();
 
   public Object getResult();
 }

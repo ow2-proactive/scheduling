@@ -40,7 +40,7 @@ public interface Reply extends Message {
   /**
    * Sends this reply to the body destination
    * @param destinationBody the body destination of this reply
-   * @exeption java.io.IOException if the reply fails to be sent
+   * @exception java.io.IOException if the reply fails to be sent
    */
   public void send(UniversalBody destinationBody) throws java.io.IOException;
   

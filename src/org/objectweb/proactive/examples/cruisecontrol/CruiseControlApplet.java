@@ -57,7 +57,9 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
 
 
   public CruiseControlApplet(String name, int width, int height) {
-    super(name, width, height);
+    super(name);
+    createActiveObject();
+    init(width, height);
   }
 
 
@@ -74,11 +76,9 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
    *
    * then creates the object Interface
    */
-  public void start() {
-    Interface inter;
+  public void createActiveObject() {
     try {
-      inter = new Interface(this);
-      activeObject = (Interface)org.objectweb.proactive.ProActive.turnActive(inter);
+      activeObject = (Interface)org.objectweb.proactive.ProActive.turnActive(new Interface(this));
     } catch (Exception e) {
       e.printStackTrace();
       System.exit(0);
@@ -86,12 +86,12 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
     activeObject.initialize();
   }
 
+  protected void start(){}
 
   protected javax.swing.JPanel createRootPanel() {
     javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 1));
     carPane = new CarPanel(this, activeObject);
     controlPane = new CruiseControlPanel(this, activeObject);
-
     javax.swing.JSplitPane horizontalSplitPane = new javax.swing.JSplitPane(javax.swing.JSplitPane.HORIZONTAL_SPLIT);
     horizontalSplitPane.setDividerLocation(500);
     horizontalSplitPane.setLeftComponent(carPane);

@@ -33,26 +33,30 @@
 <h2>Active Object creation</h2>
 <p class="textNormal">
 Active objects are created on a per-object basis: an application can
-contain active as well as passive instances of a given class. We will
-see later an example of a binary tree where all nodes are instances of
-the same class, although some of them have been made active in order
-to transparently parallelize the search for a given element.
-</p><p class="textNormal">
+contain active as well as passive instances of a given class.
 In the remaining part of this section, we will consider that we want
-to create an active instance of class <code>example.A</code>. There
-unfortunately exist some restrictions which prevent some classes from
-giving birth to active objects. This will be discussed in details
-later.
-</p><p class="textNormal">
+to create an active instance of class <code>example.A</code>. Although 
+almost any object can be turned in an Active Object, there
+are some restrictions that we will detail below.
+</p>
+<p class="textNormal">
+Any method call <i>m</i> done on a given instance <i>a</i> of <code>A</code> would result 
+in the invocation of the method <i>m</i> on <i>a</i> by the caller thread. By contrast,
+the same call done on the active object <i>aa</i> created from <code>A</code> would 
+result into placing a request embedding the method call for <i>m</i> in the request 
+queue of the active object <i>aa</i>. Then, later on, the active thread of <i>aa</i> would 
+eventually pick-up and serve the request for the method <i>m</i>. That would result in the invocation 
+of <i>m</i> on the reified object <i>a</i> by the active thread.
+</p>
+<p class="textNormal">
 The code for creating a passive instance of <code>A</code>
 could be :
 </p>
 <blockquote><pre>
-    A a ;
-    a = new A(26, "astring");
+    A a = new A(26, "astring");
 </pre></blockquote>
 <p class="textNormal">
-ProActive PDC provides <b>three</b> methods for creating active objects:
+ProActive provides <b>three</b> methods for creating active objects:
 </p>
 <h3>Instantiation-Based Creation</h3>
 <blockquote><pre>
@@ -111,7 +115,7 @@ constructors if the second element of the array is <code>null</code>.</li>
 </pre></blockquote>
 <p class="textNormal">
 When the call to <code>newActive</code> returns, the active object has been
-created and its thread is started.
+created and its active thread is started.
 </p>
 
 <h4>Using a Node</h4>
@@ -129,31 +133,41 @@ or lookup nodes. The method <code>newActive</code> can take in parameter a nodeU
 object that points to an existing node. Here an example :
 </p>
 <blockquote><pre>
-      a = (A) ProActive.newActive("example.A", params, "//pluto.inria.fr/aNode");
+      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/aNode");
   or
-      Node node = NodeFactory.getNode("//pluto.inria.fr/aNode");
+      Node node = NodeFactory.getNode("rmi://pluto.inria.fr/aNode");
       a = (A) ProActive.newActive("example.A", params, node);
 </pre></blockquote>
 
 <h3>Class-based creation</h3>
 <p class="textNormal">
-Class-based creation is at the core of ProActive PDC because it allows
-the user to specify which proxy and which body to use for this active
-object.
-</p><p class="textNormal">
-The user has first to write a new class that inherits from <code>A</code> and 
-possibly implements <code><a href="../Active.html">Active</a></code> or any subinterfaces
-of <code>Active</code>. This interface does not declare any methods but
-declares the type of proxy and body to use. <code>Active</code> declares the
-default proxy and the default body.
-
-<blockquote><pre>
-public class AA extends A implements Active {}
-</pre></blockquote>
+Class-based creation is at the core of ProActive because it allows
+the user to specify the activity of this active object. By default, 
+an object turned into an active object serves its incomming requests 
+in a fifo manner. In order to specify another policy for serving the 
+requests one can add a <b>live</b> method to the class. That live 
+method is automatically invoked by ProActive at runtime.
+</p>
+<p class="textNormal">
+The user has first to write a new class that inherits from <code>A</code>.
+In this new class it can add a new method <code>live</code> that specifies the
+way the request coming to the active object are served.
+</p>
+<pre>
+public class AA extends A {
+  public void live(org.objectweb.proactive.Body body) {
+    // here an example doing passive fifo serving
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    while (body.isActive()) {
+      service.blockingServeOldest();
+    }
+  }
+}
+</pre>
 
 Instantiation code itself is as follows:
 
-<blockquote><pre>
+<pre>
     A a;
     Object[] params = new Object[] {new Integer (26), "astring"};
     try {
@@ -161,21 +175,20 @@ Instantiation code itself is as follows:
     } catch (Exception e) {
       e.printStackTrace() ;
     }
-</pre></blockquote>
+</pre>
 
 <p class="textNormal">
-The only difference with instantiation-based code is that we ask for an active instance of class <code>pA</code> instead of <code>A</code>, so
-that we can choose specific proxy and body classes. As <code>Active</code> actually declares the default proxy and body, the code
-above does exactly the same thing as instantiation-based code. Nevertheless, class-based creation will show its full
-strength when we describe how to fine-tune the synchronization of method invocations on an active object.
+There is no real difference between instantiation-based code and class-based creation. 
+The only one is that class-based creation is done from a class that is ProActive aware 
+and uses the full strenght of the library.
 </p>
 
 <h3>Object-Based Creation</h3>
 <p class="textNormal">
-Object-based creation is much of a convenience used for turning a
-passive object into an active one. Care must be taken in using this
+Object-based creation is used for turning an existing
+passive object instance into an active one. Care must be taken in using this
 technique since it may break the model. It has been introduced in
-ProActive PDC as an answer to the following problem. Consider, for
+ProActive as an answer to the following problem. Consider, for
 example, that an instance of class A is created inside a library and
 returned as the result of a method call. As a consequence, we do not
 have access to the source code where the object is created, which
@@ -191,23 +204,24 @@ Code for object-based creation looks like this :
 </pre></blockquote>
 
 <p class="textNormal">
-The second parameter if the location of the active object to be
-created. Null means that the active object is created on the current
+As for <code>newActive</code>, the second parameter of <code>turnActive</code>
+if given is the location of the active object to be created. 
+No parameter or <code>null</code> means that the active object is created localy in the current
 node.
 </p><p class="textNormal">
 When using this method, the programmer has to make
-sure that no other reference on the passive object a exist after the
+sure that no other reference on the passive object <i>a</i> exist after the
 call to turnActive. If such references were used for calling methods
 directly on the passive A (without going through its body), the model
 would no more be consistent and specialization of synchronization
 could no more be guaranteed.
-</p><p class="textNormal">
+</p>
 
 <h2>Restrictions on reifiable objects</h2>
 <p class="textNormal">
-Unfortunately, not all classes can give birth to active objects. There
-exist some restrictions, most of them caused by our choice to be 100%
-Java, which forbids modifying the Java Virtual Machine or compiler.
+Not all classes can give birth to active objects. There
+exist some restrictions, most of them caused by the 100%
+Java compliance, which forbids modifying the Java Virtual Machine or the compiler.
 </p><p class="textNormal">
 Some of these restrictions work at class-level :
 <ul class="listWithSpace">
@@ -228,16 +242,15 @@ exception. This restriction disappeared with JDK 1.2.</li>
 </p>
 <h2>Using the Factory Method Design Pattern</h2>
 <p class="textNormal">
-You may have noticed that creating an active object using ProActive is
-a little bit cumbersome and requires a lot more lines of code that
-for creating a passive object. There exist is nice solution to
-this problem through the use of the <b>factory method</b> pattern. This mainly applies to
+Creating an active object using ProActive might be a little bit cumbersome and require more lines of code that
+for creating a regular object. A nice solution to
+this problem is through the use of the <b>factory</b> pattern. This mainly applies to
 class-based creation. It consists in adding a static method to
 class <code>pA</code> that takes care of instantiating the active object
 and returns it. The code is :
 </p>
 <blockquote><pre>
-public class pA extends A implements Active {
+public class pA extends A {
     public static A createActiveA (int i, String s, NodeLocator nl) {
         A result;
         Object[] params = new Object[] {new Integer (i), s};
@@ -256,44 +269,72 @@ It is up to the programmer to decide whether this method has to
 throw exceptions or not. We recommend that this method only throws
 exceptions that appear in the signature of the reified constructor
 (none here as the constructor of A that we call doesn't throw any
-exception).
+exception). But the non functional exceptions induced by the creation 
+of the active object have to be dealt with somewhere in the code.
 </p>
 
 
-<h2>Advanced : Using custom Proxy or Body</h2>
+<h2>Advanced : Customizing the Body of an Active Object</h2>
 <h3>Motivations</h3>
-There are many cases where the user may want to use proxy and body
-classes different from the default ones. Using a different proxy
-would, for example, the user could extend the library so as to
-generate debug messages whenever a call is sent through the proxy.
+<p class="textNormal">There are many cases where you may want to customize the body used when creating an active object. For instance, one may want to add some debug messages or some timing behavior when sending or receiving requests. The body is a non changeable object that delegates most of its tasks to helper objects called MetaObjects. Standard MetaObjects are already used by default in ProActive but one can easily replace any of those MetaObjects by a custom one.
+</p>
+<p class="textNormal">We have defined the <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> interface able to create factories for each of those MetaObject. This interface is implemented by <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> which provides all the default factories used in ProActive.
+</p>
+<p class="textNormal">When creating an active object, as we saw above, it is possible to specify which <code>MetaObjectFactory</code> to use for that particular instance of active object being created. The class <a href="../ProActive.html">ProActive</a> provides extra <a href="../ProActive.html#newActive(java.lang.String, java.lang.Object[], org.objectweb.proactive.core.body.MetaObjectFactory, org.objectweb.proactive.core.node.Node)">newActive</a> and <a href="../ProActive.html#turnActive(java.lang.Object, org.objectweb.proactive.core.body.MetaObjectFactory, org.objectweb.proactive.core.node.Node)">turnActive</a> methods for that.
+</p>
+
 
 <h3>How to do it</h3>
-<p class="textNormal">Active objects created using class-based or object-based instantiation can have proxies and bodies different from the default ones.
-You may have noticed that, when using class-based creation that classes aimed to create active object can implements the interface 
-<code><a href="../Active.html">Active</a></code>. This interface defines two constants that are used to find out the body and the proxy 
-to use for the active object :
+<p class="textNormal">First you have to write a new MetaObject factory that inherits from <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> or directly implements <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> in order to redefine everything. Inheriting from <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> is a great time saver as you only redefine what you really need to. Here is an example :
 </p>
 <blockquote><pre>
-    public static String PROXY_CLASS_NAME;
-    public static String BODY_CLASS_NAME;
+public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
+
+  private static final MetaObjectFactory instance = new MyMetaObjectFactory();
+
+  protected MyMetaObjectFactory() {
+    super();
+  }
+
+  public static MetaObjectFactory newInstance() {
+    return instance;
+  }
+
+  //
+  // -- PROTECTED METHODS -----------------------------------------------
+  //
+
+  protected RequestFactory newRequestFactorySingleton() {
+    return new MyRequestFactory();
+  }
+
+  //
+  // -- INNER CLASSES -----------------------------------------------
+  //
+
+  protected class MyRequestFactory implements RequestFactory, java.io.Serializable {
+    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+      return new MyRequest(methodCall, sourceBody, isOneWay, sequenceID, server);
+    }
+  } // end inner class MyRequestFactory
+}
 </pre></blockquote>
-<p class="textNormal">
-If not specified, the default proxy is <code><a href="../core/body/proxy/UniversalProxyBody.html">UniversalProxyBody</a></code> and the 
-default body is <code><a href="../core/body/BodyImpl.html">UniversalProxyBody</a></code>.
-If the class defines those contants, either directly or by implementing an interface defining different values than the ones in <code>Active</code>, 
-then the proxy and the body of the resulting object will be the ones defined in the new constant.
-Using special classes for proxy and body using an interface can be done in two steps :
-<ul class="listWithSpace">
-<li class="textNormal">Write an interface that inherits directly or indirectly from
-<code>Active</code> and override only one or both constants in order to
-declare the name of the classes to use as proxy and body.</li>
-<li class="textNormal">Make the class from which we want to instantiate active objects
-implement this interface</li>
-</ul>
-</p>
-<p class="textNormal">
-In case of object-based instantiation, it is possible to specify the body and the proxy classes to use by using this specific <code><a href="../ProActive.html#turnActive(java.lang.Object, org.objectweb.proactive.core.node.Node, java.lang.String, java.lang.String)">turnActive</a></code> method from 
-<code><a href="../ProActive.html">ProActive</a></code>.
+<p class="textNormal">The factory above simply redefine the <code>RequestFactory</code> in order to make the body use a new type of request. The method <code>protected RequestFactory newRequestFactorySingleton()</code> is one convenience method that <a href="../core/body/ProActiveMetaObjectFactory.html">ProActiveMetaObjectFactory</a> to simplify the creation of factories as singleton. More explainations can be found in the javadoc of that class.
+The use of that new factory is fairly simple. All you have to do is to pass an instance of the factory when creating a new active object. If we take the same example as before we have :
+<pre>
+  Object[] params = new Object[] {new Integer (26), "astring"};
+  try {
+    A a = (A) ProActive.newActive("example.AA", params, MyMetaObjectFactory.newInstance(), null // for the node);
+  } catch (Exception e) {
+    e.printStackTrace() ;
+  }
+</pre>
+
+In the case of a <code>turnActive</code> we would have :
+<pre>
+  A a = new A(26, "astring");
+  a = (A) ProActive.turnActive(a, MyMetaObjectFactory.newInstance(), null // for the node);
+</pre>
 </p>
 
 <h2>Advanced : The role of the components of an active object</h2>
@@ -406,7 +447,7 @@ can be expressed using ProActive's high-level synchronization mechanism in a muc
 <!--
  Footer : start
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; October 2001 INRIA All Rights Reserved.</p>
+<br><hr><div align="right" class="textSmall">Copyright &#169; May 2002 INRIA All Rights Reserved.</p>
 <!-- Footer : end -->
 </body>
 </html>

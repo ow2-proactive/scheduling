@@ -82,7 +82,7 @@ public interface Request extends Message {
   /**
    * Sends this request to the body destination
    * @param destinationBody the body destination of this request
-   * @exeption java.io.IOException if the request fails to be sent
+   * @exception java.io.IOException if the request fails to be sent
    */
   public void send(UniversalBody destinationBody) throws java.io.IOException;
 
@@ -93,7 +93,7 @@ public interface Request extends Message {
    * a the reply is returned (based on that result).
    * @param targetBody the body destination of the call
    * @return the reply built using the result or null if the request is one way
-   * @exeption ServeException if the method call fails to be served
+   * @exception ServeException if the method call fails to be served
    */
   public Reply serve(Body targetBody) throws ServeException;
 
@@ -103,7 +103,7 @@ public interface Request extends Message {
    * When this request gets fowarded, this method must not be called as a
    * fowarder is not the genuine destination of the request.
    * @param bodyReceiver the body destination that received the request
-   * @exeption java.io.IOException if the request failed to perform a possible 
+   * @exception java.io.IOException if the request failed to perform a possible 
    * operation upon that notification
    */
   public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException;

@@ -120,14 +120,22 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
       return reifyAsSynchronous(methodCall);
     } catch (MethodCallExecutionFailedException e) {
       throw new ProActiveRuntimeException(e.getMessage(), e.getTargetException());
-    } catch (java.lang.reflect.InvocationTargetException e) {
-      Throwable t = e.getTargetException();
+    } catch (Throwable t) {
       if (t instanceof RuntimeException) {
         throw (RuntimeException) t;
       } else if (t instanceof Error) {
         throw (Error) t;
       } else {
-        throw t;
+        // check now which exception can be safely thrown
+        Class[] declaredExceptions = methodCall.getReifiedMethod().getExceptionTypes();
+        for (int i = 0; i<declaredExceptions.length; i++) {
+          Class exceptionClass = declaredExceptions[i];
+          if (exceptionClass.isAssignableFrom(t.getClass())) {
+            throw t;
+          }
+        }
+        // Here we should extend the behavior to accept exception Handler
+        throw new ProActiveRuntimeException(t);
       }
     }
   }
@@ -166,7 +174,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
   }
 
 
-  protected Object reifyAsSynchronous(MethodCall methodCall) throws java.lang.reflect.InvocationTargetException, MethodCallExecutionFailedException {
+  protected Object reifyAsSynchronous(MethodCall methodCall) throws Throwable, MethodCallExecutionFailedException {
     // Setting methodCall.res to null means that we do not use the future mechanism
     Future f = FutureProxy.getFutureProxy();
     // Set it as the 'thing' to send results to methodCall.res = f;

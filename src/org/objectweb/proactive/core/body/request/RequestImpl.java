@@ -115,21 +115,20 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   // -- PROTECTED METHODS -----------------------------------------------
   //
   protected Object serveInternal(Body targetBody) throws ServeException {
-    Object result = null;
     try {
-      result = methodCall.execute(targetBody.getReifiedObject());
+      return methodCall.execute(targetBody.getReifiedObject());
     } catch (MethodCallExecutionFailedException e) {
       e.printStackTrace();
       throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed", e);
     } catch (java.lang.reflect.InvocationTargetException e) {
-      e.printStackTrace();
+      Throwable t = e.getTargetException();
+      // t.printStackTrace();
       if (isOneWay) {
-        throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed", e.getTargetException());
+        throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed", t);
       } else {
-        result = e;
+        return t;
       }
     }
-    return result;  
   }
   
   protected Reply createReply(Body targetBody, Object result) {
@@ -137,9 +136,7 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   }
 
   protected void sendRequest(UniversalBody destinationBody) throws java.io.IOException {
-//      try {
     destinationBody.receiveRequest(this);
-//      } catch (Exception e) {e.printStackTrace();}
   }
   
   //

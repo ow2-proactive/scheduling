@@ -189,9 +189,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     }
     target = obj;
     if (target != null) {
-      if (target.getClass().equals(java.lang.reflect.InvocationTargetException.class)) {
-        isException = true;
-      }
+      isException = (target instanceof Throwable);
     }
     isAvailable = true;
     this.notifyAll();
@@ -203,9 +201,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
    * or null if the result is not an exception. The method blocks until the result is available.
    * @return the exception raised once available or null if no exception.
    */
-  public synchronized InvocationTargetException getRaisedException() {
+  public synchronized Throwable getRaisedException() {
     waitFor();
-    if (isException) return (InvocationTargetException)target;
+    if (isException) return (Throwable)target;
     return null;
   }
 

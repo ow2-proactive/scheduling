@@ -98,9 +98,9 @@ public class RemoteNodeImpl extends java.rmi.server.UnicastRemoteObject implemen
   //
 
   public UniversalBody createBody(ConstructorCall c) throws ConstructorCallExecutionFailedException, java.lang.reflect.InvocationTargetException  {
-    System.out.println ("RemoteNodeImpl.createBody "+nodeInformation.getURL()+" -> new "+c.getTargetClassName());
+    //System.out.println ("RemoteNodeImpl.createBody "+nodeInformation.getURL()+" -> new "+c.getTargetClassName());
     Body localBody = (Body)c.execute();
-    System.out.println ("RemoteNodeImpl.localBody created localBody="+localBody);
+    //System.out.println ("RemoteNodeImpl.localBody created localBody="+localBody);
     return localBody.getRemoteAdapter();
   }
 

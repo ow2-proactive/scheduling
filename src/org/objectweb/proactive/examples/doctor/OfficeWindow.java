@@ -27,32 +27,24 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.examples.doctor;
 
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-
-public class OfficeWindow extends javax.swing.JFrame implements ActionListener {
+public class OfficeWindow extends javax.swing.JFrame implements java.awt.event.ActionListener {
 
   DisplayPanel pan;
-  javax.swing.JButton bLegend,bExit;
+  javax.swing.JButton bLegend, bExit;
   Legend legendDlg;
-
 
   public OfficeWindow() {
     java.awt.Container c = getContentPane();
     legendDlg = null;
-    GridBagLayout lay = new GridBagLayout();
-    GridBagConstraints constr = new GridBagConstraints();
+    java.awt.GridBagLayout lay = new java.awt.GridBagLayout();
+    java.awt.GridBagConstraints constr = new java.awt.GridBagConstraints();
     c.setLayout(lay);
 
-    constr.gridwidth = GridBagConstraints.REMAINDER;
-    constr.fill = GridBagConstraints.BOTH;
+    constr.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+    constr.fill = java.awt.GridBagConstraints.BOTH;
     constr.weightx = 0.0;
     pan = new DisplayPanel();
     lay.setConstraints(pan, constr);
@@ -65,27 +57,23 @@ public class OfficeWindow extends javax.swing.JFrame implements ActionListener {
     c.add(bLegend);
     bLegend.addActionListener(this);
 
-    constr.gridwidth = GridBagConstraints.REMAINDER;
+    constr.gridwidth = java.awt.GridBagConstraints.REMAINDER;
     bExit = new javax.swing.JButton("Exit");
     lay.setConstraints(bExit, constr);
     c.add(bExit);
     bExit.addActionListener(this);
 
-    this.addWindowListener(new WindowAdapter() {
-
-      public void windowClosing(WindowEvent e) {
+    this.addWindowListener(new java.awt.event.WindowAdapter() {
+      public void windowClosing(java.awt.event.WindowEvent e) {
         System.exit(0);
       }
     });
   }
 
-
-  public void actionPerformed(ActionEvent e) {
-    System.out.println("Action performed:\n" + e.toString());
+  public void actionPerformed(java.awt.event.ActionEvent e) {
     if (e.getSource() == bExit) {
       System.exit(0);
     }
-
     if (e.getSource() == bLegend) {
       if (legendDlg == null)
         legendDlg = new Legend(this, pan);
@@ -94,9 +82,7 @@ public class OfficeWindow extends javax.swing.JFrame implements ActionListener {
       else
         legendDlg.show();
     }
-
   }
-
 
   public DisplayPanel getDisplay() {
     return pan;

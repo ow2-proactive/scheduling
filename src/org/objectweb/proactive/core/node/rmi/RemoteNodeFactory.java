@@ -44,10 +44,6 @@ public class RemoteNodeFactory extends NodeFactory {
   protected static RegistryHelper registryHelper = new RegistryHelper();
   protected static ClassServerHelper classServerHelper = new ClassServerHelper();
 
-  static {
-    System.out.println ("RemoteNodeFactory created with "+RemoteNodeFactory.class.getClassLoader().getClass().getName());
-  }
-
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //

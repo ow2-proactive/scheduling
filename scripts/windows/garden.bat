@@ -17,6 +17,7 @@ start %JAVA_CMD% org.objectweb.proactive.StartNode ///vm2
 pause
 %JAVA_CMD% org.objectweb.proactive.examples.garden.Flower
 ENDLOCAL
+pause
 
 :end
 echo. 

@@ -105,8 +105,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     // find out the live method to run
     // try to find live(Body body)
     java.lang.reflect.Method liveMethod = locateLiveRoutine(Constants.DEFAULT_BODY_INTERFACE);
-    // then try to find a method live(<specific type of body)
-    if (liveMethod == null) liveMethod = locateLiveRoutine(this.getClass());
     try {
       if (liveMethod == null) {
         // no live method found : default to fifoPolicy

@@ -116,7 +116,7 @@ public class PenguinApplet extends StandardFrame implements PenguinMessageReceiv
   private int getIndex() {
     int n = agentList.getSelectedIndex();
     if (n == -1) {
-      receiveMessage("You must select an agent in the list first and add one if none is already present");
+      receiveMessage("You must select an agent in the list first or add one if none is already present");
     }
     return agentList.getSelectedIndex();
   }
