@@ -301,6 +301,12 @@
 			<zipfileset dir="${PAdist.dir}" prefix="ProActive"/>
 		</zip>
 		<!-- 
+			create zip version of ProActive doc 
+		-->
+		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
+			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
+		</zip>
+		<!-- 
 			copy PDF Manual 
 		-->
 		<copy file="${base}/docs/ProActiveManual.pdf" todir="${dist.dir}"/>
@@ -308,12 +314,6 @@
 			create zip version of ProActive Manual 
 		-->
 		<zip zipfile="${dist.dir}/ProActiveManual.zip" basedir="${dist.dir}" includes="ProActiveManual.pdf"/>
-		<!-- 
-			create zip version of ProActive doc 
-		-->
-		<zip zipfile="${dist.dir}/ProActiveDoc.zip">
-			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
-		</zip>
 	</target>
 	<!--
 	   ================================================================
@@ -328,7 +328,7 @@
 		<mkdir dir="${docs.dir}"/>
 		<mkdir dir="${docs.dir}/api"/>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.rmi,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 0.91&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.rmi,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 0.9.1&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
 			<classpath refid="project.classpath"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive:org.objectweb.proactive.rmi"/>
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
