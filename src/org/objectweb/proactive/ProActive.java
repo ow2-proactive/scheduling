@@ -30,17 +30,14 @@
  */
 package org.objectweb.proactive;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -79,13 +76,20 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException; 
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
- 
+
+import java.io.IOException;
+
+import java.net.UnknownHostException;
+
+import java.util.HashMap;
+import java.util.Set;
+
 
 public class ProActive {
     protected static Logger logger = Logger.getLogger(ProActive.class.getName());
@@ -108,7 +112,7 @@ public class ProActive {
     static public HashMap VMLevel = null;
 
     /**
-     * Code level is used for temporary handlers 
+     * Code level is used for temporary handlers
      */
     static public HashMap codeLevel = null;
 
@@ -627,53 +631,54 @@ public class ProActive {
     }
 
     /**
-     * Registers an active object into a RMI registry. In fact it is the
-     * remote version of the body of the active object that is registered into the
-     * RMI Registry under the given URL.
+     * Registers an active object into a registry(RMI or IBIS or HTTP, default is RMI).
+     * In fact it is the remote version of the body of the active object that is registered
+     * into the registry under the given URL. According to the type of the associated body(default is Rmi),
+     * the registry in which to register is automatically found.
      * @param obj the active object to register.
-     * @param url the url under which the remote body is registered.
+     * @param url the url under which the remote body is registered. The url must point to the localhost
+     * since registering is always a local action. The url can take the form:protocol://localhost:port/nam
+     * or //localhost:port/name if protocol is RMI or //localhost/name if port is 1099 or only the name.
+     * The registered object will be reachable with the following url: protocol://machine_name:port/name
+     * using lookupActive method. Protocol and port can be removed if default
      * @exception java.io.IOException if the remote body cannot be registered
      */
     public static void register(Object obj, String url)
-    throws java.io.IOException {
-    // Check if obj is really a reified object
-    if (!(MOP.isReifiedObject(obj))) {
-        throw new java.io.IOException("The given object " + obj +
-            " is not a reified object");
+        throws java.io.IOException {
+        // Check if obj is really a reified object
+        if (!(MOP.isReifiedObject(obj))) {
+            throw new java.io.IOException("The given object " + obj +
+                " is not a reified object");
+        }
+
+        // Find the appropriate remoteBody
+        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+
+        if (myProxy == null) {
+            throw new java.io.IOException(
+                "Cannot find a Proxy on the stub object: " + obj);
+        }
+
+        BodyProxy myBodyProxy = (BodyProxy) myProxy;
+        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+
+        if (body instanceof RemoteBodyAdapter) {
+            RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
+        } else if (body instanceof IbisRemoteBodyAdapter) {
+            IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
+        } else if (body instanceof org.objectweb.proactive.core.body.http.RemoteBodyAdapter) {
+            org.objectweb.proactive.core.body.http.RemoteBodyAdapter.register((org.objectweb.proactive.core.body.http.RemoteBodyAdapter) body,
+                url);
+        } else {
+            throw new java.io.IOException(
+                "Cannot reconize the type of this UniversalBody: " +
+                body.getClass().getName());
+        }
+
+        if (logger.isInfoEnabled()) {
+            logger.info("Success at binding url " + url);
+        }
     }
-
-    // Find the appropriate remoteBody
-    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-
-    if (myProxy == null) {
-        throw new java.io.IOException(
-            "Cannot find a Proxy on the stub object: " + obj);
-    }
-
-    BodyProxy myBodyProxy = (BodyProxy) myProxy;
-    UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
-
-    if (body instanceof RemoteBodyAdapter) {
-        RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
-    } 
-    else if (body instanceof IbisRemoteBodyAdapter) {
-    	IbisRemoteBodyAdapter.register((IbisRemoteBodyAdapter) body, url);
-    }	
-    else if (body instanceof org.objectweb.proactive.core.body.http.RemoteBodyAdapter) {
-    	org.objectweb.proactive.core.body.http.RemoteBodyAdapter.register(
-    			(org.objectweb.proactive.core.body.http.RemoteBodyAdapter) body, url);
-    } 
-    else {
-    	throw new java.io.IOException(
-    			"Cannot reconize the type of this UniversalBody: " +
-				body.getClass().getName());
-    }
-
-    if (logger.isInfoEnabled()) {
-        logger.info("Success at binding url " + url);
-    }
-
-}
 
     /**
      * Unregisters an active object previously registered into a RMI registry.
@@ -688,12 +693,15 @@ public class ProActive {
     }
 
     /**
-     * Looks-up an active object previously registered in a RMI registry. In fact it is the
-     * remote version of the body of an active object that can be registered into the
-     * RMI Registry under a given URL. If the lookup is successful, the method reconstructs
-     * a Stub-Proxy couple and point it to the RemoteBody found.
+     * Looks-up an active object previously registered in a registry(RMI, IBIS, HTTP). In fact it is the
+     * remote version of the body of an active object that can be registered into the Registry
+     * under a given URL. If the lookup is successful, the method reconstructs a Stub-Proxy couple and
+     * point it to the RemoteBody found.
+     * The registry where to look for is fully determined with the protocol included in the url
      * @param classname the fully qualified name of the class the stub should inherit from.
-     * @param url the url under which the remote body is registered.
+     * @param url the url under which the remote body is registered. The url takes the following form:
+     * protocol://machine_name:port/name. Protocol and port can be ommited if respectively RMI and 1099:
+     * //machine_name/name
      * @return a remote reference on a Stub of type <code>classname</code> pointing to the
      *     remote body found
      * @exception java.io.IOException if the remote body cannot be found under the given url
@@ -703,13 +711,13 @@ public class ProActive {
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
-        if ("ibis".equals(System.getProperty("proactive.communication.protocol"))) {
-            b = IbisRemoteBodyAdapter.lookup(url); 
-        }
-        else if ("http".equals(System.getProperty("proactive.communication.protocol"))) {
-        	b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
-        } 	
-        else {
+
+        // First step towards Body factory, will be introduced after the release
+        if (UrlBuilder.getProtocol(url).equals("ibis:")) {
+            b = IbisRemoteBodyAdapter.lookup(url);
+        } else if (UrlBuilder.getProtocol(url).equals("http:")) {
+            b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
+        } else {
             b = RemoteBodyAdapter.lookup(url);
         }
 
@@ -822,10 +830,12 @@ public class ProActive {
     }
 
     /**
-     * Registers locally the given VirtualNode in a registry such RMIRegistry or JINI Lookup Service.
+     * Registers locally the given VirtualNode in a registry such RMIRegistry or JINI Lookup Service or HTTP registry.
      * The VirtualNode to register must exist on the local runtime. This is done when using XML Deployment Descriptors
      * @param virtualNode the VirtualNode to register.
-     * @param registrationProtocol The protocol used for registration. At this time RMI and JINI are supported
+     * @param registrationProtocol The protocol used for registration or null in order to use the protocol used to start the jvm.
+     * At this time RMI, JINI, HTTP, IBIS are supported. If set to null, the registration protocol will be set to the system property:
+     * proactive.communication.protocol
      * @param replacePreviousBinding
      * @throws ProActiveException If the VirtualNode with the given name does not exist on the local runtime
      */
@@ -835,6 +845,10 @@ public class ProActive {
         if (!(virtualNode instanceof VirtualNodeImpl)) {
             throw new ProActiveException(
                 "Cannot register such virtualNode since it results from a lookup!");
+        }
+        if (registrationProtocol == null) {
+            registrationProtocol = System.getProperty(
+                    "proactive.communication.protocol");
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
@@ -848,18 +862,20 @@ public class ProActive {
     }
 
     /**
-     * Looks-up a VirtualNode previously registered in a registry(RMI or JINI)
-     * @param url The url where to perform the lookup
-     * @param protocol The protocol used to perform the lookup(RMI and JINI are supported)
+     * Looks-up a VirtualNode previously registered in a registry(RMI or JINI or HTTP or IBIS)
+     * The registry where to look for is fully determined with the protocol included in the url
+     * @param url The url where to perform the lookup. The url takes the following form:
+     * protocol://machine_name:port/name. Protocol and port can be ommited if respectively RMI and 1099:
+     * //machine_name/name
      * @return VirtualNode The virtualNode returned by the lookup
      * @throws ProActiveException If no objects are bound with the given url
      */
-    public static VirtualNode lookupVirtualNode(String url, String protocol)
+    public static VirtualNode lookupVirtualNode(String url)
         throws ProActiveException {
         ProActiveRuntime remoteProActiveRuntime = null;
         try {
             remoteProActiveRuntime = RuntimeFactory.getRuntime(UrlBuilder.buildVirtualNodeUrl(
-                        url), protocol);
+                        url), UrlBuilder.getProtocol(url));
         } catch (UnknownHostException ex) {
             throw new ProActiveException(ex);
         }
