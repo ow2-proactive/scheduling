@@ -45,6 +45,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
   private javax.swing.text.Style errorStyle;
   private javax.swing.text.Style threadNameStyle;
   private javax.swing.text.Style timeStampStyle;
+  private static int MAX_LENGTH = 10000;
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -149,7 +150,12 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
   private void append(String str, javax.swing.text.AttributeSet style) {
     try {
       document.insertString(document.getLength(), str, style);
-    } catch (javax.swing.text.BadLocationException e) {}
+      int tooMuch = document.getLength() - MAX_LENGTH;
+      if (tooMuch > 0)
+      	document.remove(0, tooMuch);
+    } catch (javax.swing.text.BadLocationException e) {
+      e.printStackTrace();
+    }
   }
   
 }
