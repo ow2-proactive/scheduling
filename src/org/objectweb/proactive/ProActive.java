@@ -30,6 +30,9 @@
 */
 package org.objectweb.proactive;
 
+import java.net.UnknownHostException;
+import java.util.HashMap;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -46,6 +49,7 @@ import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
 import org.objectweb.proactive.core.exceptions.creation.ProActiveCreationException;
@@ -68,9 +72,10 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
-import java.util.HashMap;
 
 
 /**
@@ -653,7 +658,63 @@ public class ProActive {
             throw new ProActiveException(e);
         }
     }
-
+    
+    
+    
+		/**
+		 * Registers locally the given VirtualNode in a registry such RMIRegistry or JINI Lookup Service.
+		 * The VirtualNode to register must exist on the local runtime. This is done when using XML Deployment Descriptors
+		 * @param virtualNode the VirtualNode to register. 
+		 * @param registrationProtocol The protocol used for registration. At this time RMI and JINI are supported
+		 * @param replacePreviousBinding 
+		 * @throws ProActiveException If the VirtualNode with the given name does not exist on the local runtime
+		 */
+    public static void registerVirtualNode(VirtualNode virtualNode, String registrationProtocol, boolean replacePreviousBinding ) throws ProActiveException{
+    	if(!(virtualNode instanceof VirtualNodeImpl)) throw new ProActiveException("Cannot register such virtualNode since it results from a lookup!");
+    	String virtualnodeName = virtualNode.getName();
+    	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
+    	VirtualNode vn = part.getVirtualNode(virtualnodeName);
+    	if(vn == null) throw new ProActiveException("VirtualNode "+virtualnodeName+" does not exist !");
+  		part.registerVirtualNode(UrlBuilder.appendVnSuffix(virtualnodeName),replacePreviousBinding);
+    }
+    
+    
+    
+		/**
+		 * Looks-up a VirtualNode previously registered in a registry(RMI or JINI)
+		 * @param url The url where to perform the lookup
+		 * @param protocol The protocol used to perform the lookup(RMI and JINI are supported)
+		 * @return VirtualNode The virtualNode returned by the lookup 
+		 * @throws ProActiveException If no objects are bound with the given url
+		 */
+    public static VirtualNode lookupVirtualNode(String url, String protocol) throws ProActiveException{
+    	ProActiveRuntime remoteProActiveRuntime = null;
+    	try{
+    	//System.out.println("vn url "+UrlBuilder.buildVirtualNodeUrl(url));	
+    	remoteProActiveRuntime = RuntimeFactory.getRuntime(UrlBuilder.buildVirtualNodeUrl(url),protocol);
+    	}catch(UnknownHostException ex){
+    		throw new ProActiveException(ex);
+    	}
+		  return remoteProActiveRuntime.getVirtualNode(UrlBuilder.getNameFromUrl(url));
+    }
+			
+			
+		/**
+		 * Unregisters the virtualNode previoulsy registered in a registry such as JINI or RMI.
+		 * Calling this method removes the VirtualNode from the local runtime.
+		 * @param virtualNode The VirtualNode to unregister
+		 * @throws ProActiveException if a problem occurs whle unregistering the VirtualNode
+		 */
+		public static void unregisterVirtualNode(VirtualNode virtualNode)throws ProActiveException{
+			//VirtualNode vn = ((VirtualNodeStrategy)virtualNode).getVirtualNode();
+			if(!( virtualNode instanceof VirtualNodeImpl)) throw new ProActiveException("Cannot register such virtualNode since it results from a lookup!");
+			String virtualNodeName = virtualNode.getName();
+			ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(((VirtualNodeImpl)virtualNode).getRegistrationProtocol());
+			part.unregisterVirtualNode(UrlBuilder.appendVnSuffix(virtualNode.getName()));
+    	System.out.println("Success at unbinding " + virtualNodeName);
+		}
+		
+		
     /**
      * When an active object is created, it is associated with a Body that takes care
      * of all non fonctionnal properties. Assuming that the active object is only
