@@ -121,7 +121,8 @@ public class NodeExploration implements JobMonitorConstants {
             if (vnName != null) {
                 asso.addChild(VN, vnName, NODE, nodeName);
             }
-            handleActiveObjects(nodeName, activeObjects);
+            if (activeObjects != null)
+            	handleActiveObjects(nodeName, activeObjects);
         }
 
         if (depth < maxDepth) {
