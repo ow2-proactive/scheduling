@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.process.globus.GlobusProcess;
 public class GlobusProcessControlFrame extends javax.swing.JFrame {
 
   private static final int DEFAULT_WIDTH = 600;
-  private static final int DEFAULT_HEIGHT = 400;
+  private static final int DEFAULT_HEIGHT = 500;
   
   //
   // -- CONTRUCTORS -----------------------------------------------
