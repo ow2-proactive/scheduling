@@ -403,6 +403,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="pbsProcess" type="PbsProcessType"/>
+			<xs:element name="oarProcess" type="oarProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
 			<xs:element name="prunProcess" type="prunProcessType"/>
 		</xs:choice>
@@ -600,6 +601,31 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="bookingDuration" type="xs:string" minOccurs="0"/>
 			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
+	</xs:complexType>
+	<!--oarProcess-->
+	<xs:complexType name="oarProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element name="oarOption" type="OarOptionType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.oar.OARSubProcess"/>
+		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<!--oarOption-->
+	<xs:complexType name="OarOptionType">
+		<xs:complexContent>
+			<xs:extension base="prunOptionType">
+				<xs:sequence>
+					<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+				</xs:sequence>
+			</xs:extension>
+			<!--<xs:extension base="prunOptionType">
+			<xs:sequence>
+			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+			</xs:sequence>
+			</xs:extension>  -->
+		</xs:complexContent>
 	</xs:complexType>
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
 	<xs:simpleType name="ListType">
