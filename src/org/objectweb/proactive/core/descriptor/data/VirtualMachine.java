@@ -44,20 +44,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  */
 public interface VirtualMachine {
 
-  /**
-	 * Method setCyclic.
-	 * @param b the value of cyclic attribute, the default value is false
-	 */
-  public void setCyclic(boolean b);
-  
-  
-  /**
-	 * Returns the value of cyclic attribute.
-	 * @return boolean
-	 */
-  public boolean getCyclic();
-  
-  
+    
 	/**
 	 * Sets the number of nodes that will be created on this VirtualMachine.
 	 * @param nodeNumber

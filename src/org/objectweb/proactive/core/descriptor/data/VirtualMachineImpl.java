@@ -52,8 +52,6 @@ public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
   /** the name of this VirtualMachine */
   private String name;
 
-  /** true if this VirtualMachine is cyclic */
-  private boolean cyclic;
   
   /** number of nodes that will be deployed on this VM. One node is the default */
   private String nodeNumber = "1";
@@ -82,16 +80,9 @@ public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
   //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
   //
   
-  public void setCyclic(boolean b) {
-    cyclic = b;
-  }
-  
-  public boolean getCyclic() {
-    return cyclic;
-  }
   
   public void setNodeNumber(String nodeNumber) throws java.io.IOException{
-  	if (!cyclic) throw new java.io.IOException("non cyclic jvm cannot deploy more than one node");
+  	if (new Integer(nodeNumber).intValue() < 1) throw new java.io.IOException("Cannot define nodeNumber with a value < 1");
   	this.nodeNumber = nodeNumber;
   }
   

@@ -67,11 +67,8 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   /** the name of this VirtualNode */
   private String name;
 
-  /** true if this VirtualNode is cyclic */
-  private boolean cyclic;
-
-  /** true if this VirtualNode should be created localy in case the creation of the target jvm fails */
-  private boolean localBackup;
+  /** the property of this virtualNode, property field can take five value: null,unique, unique_singleAO, multiple, multiple_cyclic */
+  private String property;
 
   /** the list of virtual machines associated with this VirtualNode */
   private java.util.ArrayList virtualMachines;
@@ -121,21 +118,12 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
   //
   
-  public void setCyclic(boolean b) {
-    cyclic = b;
+  public void setProperty(String value) {
+    this.property = value;
   }
   
-  public boolean getCyclic() {
-    return cyclic;
-  }
-
-
-  public void setLocalBackup(boolean b) {
-    localBackup = b;
-  }
-  
-  public boolean getLocalBackup() {
-    return localBackup;
+  public String getProperty() {
+    return property;
   }
 
 
@@ -524,7 +512,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   } 
   
   private void increaseIndex(){
-  	if (cyclic) {
+  	if (virtualMachines.size() > 1) {
       		lastVirtualMachineIndex = (lastVirtualMachineIndex + 1) % virtualMachines.size();
     		}
   }
