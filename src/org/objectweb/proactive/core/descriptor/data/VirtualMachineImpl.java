@@ -32,14 +32,17 @@ package org.objectweb.proactive.core.descriptor.data;
 
 
 import org.objectweb.proactive.core.process.ExternalProcess;
+
 /**
- * @author rquilici
+ * A <code>VirtualMachine</code> is a conceptual entity that represents
+ * a JVM running a ProActiveRuntime
  *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ *
  */
+
 public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
 {
  //
@@ -60,6 +63,9 @@ public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
 
   /** the process to start in order to create the JVM */
   private ExternalProcess process;
+  
+  /** The name of the VirtualNode that created this VirtualMachine */
+  private String creatorId = null;
 
   //
   //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -134,5 +140,15 @@ public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
   	}
   	return hostName;
   }
+  
+  
+  public void setCreatorId(String creatorId){
+  	this.creatorId = creatorId;
+  }
+  
+  
+  public String getCreatorId(){
+  	return this.creatorId ;
+  } 
 }
 
