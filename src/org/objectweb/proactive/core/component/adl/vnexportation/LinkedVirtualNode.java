@@ -58,6 +58,7 @@ public class LinkedVirtualNode {
     private String componentName;
     private String virtualNodeName;
     private boolean isMultiple = false;
+    boolean isLeaf = false;
 //    /private boolean selfExported = false;
     public final static String EMPTY_COMPONENT_NAME="component_name";
     public final static String EMPTY_VIRTUAL_NODE_NAME = "virtual_node_name";
@@ -83,6 +84,7 @@ public class LinkedVirtualNode {
      * @return true if the virtual node was added, false if it was already present as a composing virtual node
      */
     public boolean addComposingVirtualNode(LinkedVirtualNode vn) {
+        System.out.println("ADDING " + vn.toString() + " \nTO : " + toString());
         setMultiple(vn.isMultiple());
         if (!composingVirtualNodes.contains(vn)) {
             composingVirtualNodes.add(vn);
@@ -109,10 +111,10 @@ public class LinkedVirtualNode {
         StringBuffer buff = new StringBuffer();
         while (iter.hasNext()) {
             LinkedVirtualNode element = (LinkedVirtualNode)iter.next();
-            if (element.getDefiningComponentName().equals(EMPTY_COMPONENT_NAME) || element.getVirtualNodeNameBeforeComposition().equals(EMPTY_VIRTUAL_NODE_NAME)) {
+            if (element.getDefiningComponentName().equals(EMPTY_COMPONENT_NAME) || element.getVirtualNodeName().equals(EMPTY_VIRTUAL_NODE_NAME)) {
                 continue;
             }
-            buff.append(element.getDefiningComponentName() + "." + element.getVirtualNodeNameBeforeComposition());
+            buff.append(element.getDefiningComponentName() + "." + element.getVirtualNodeName());
             buff.append(";");
         }
         return buff.toString();
@@ -122,7 +124,7 @@ public class LinkedVirtualNode {
      * 
      * @return the name of the virtual node given at construction time
      */
-    public String getVirtualNodeNameBeforeComposition() {
+    public String getVirtualNodeName() {
         return virtualNodeName;
     }
     
@@ -146,8 +148,8 @@ public class LinkedVirtualNode {
      * 
      * @return the name 
      */
-    public String getExportedNameBeforeComposition() {
-        return ((composer == null) ? virtualNodeName : composer.getVirtualNodeNameBeforeComposition());
+    public String getExportedVirtualNodeNameBeforeComposition() {
+        return ((composer == null) ? virtualNodeName : composer.getVirtualNodeName());
     }
     
     /**
@@ -213,7 +215,7 @@ public class LinkedVirtualNode {
         while (it.hasNext()) {
             LinkedVirtualNode lvn = (LinkedVirtualNode)it.next();
             if (lvn.getDefiningComponentName().equals(componentName)) {
-                if (lvn.getVirtualNodeNameBeforeComposition().equals(virtualNodeName)) {
+                if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return true;
                 }
             }
@@ -229,15 +231,30 @@ public class LinkedVirtualNode {
         return composer;
     }
     
+    public void setIsLeaf() {
+        isLeaf = true;
+    }
+    
+    public boolean isLeaf() {
+        return isLeaf;
+    }
+
+
+    
     
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        if (composer != null) {
-            buffer.append(composer.getDefiningComponentName() +"." +composer.getVirtualNodeNameBeforeComposition() + "<--" +componentName + "." + virtualNodeName +"-->{" );
+        if (composer == this) {
+            buffer.append(getDefiningComponentName() +"." +getVirtualNodeName() + "<--" +componentName + "." + virtualNodeName +"-->{" );
+        } else if (composer != null) {
+            buffer.append(composer.getDefiningComponentName() +"." +composer.getVirtualNodeName() + "<--" +componentName + "." + virtualNodeName +"-->{" );
         }
         Iterator it = composingVirtualNodes.iterator();
         while (it.hasNext()) {
             LinkedVirtualNode lvn = (LinkedVirtualNode)it.next();
+            if (lvn == this) {
+                continue;
+            }
             buffer.append(lvn.toString());
         }
         return buffer.append("}").toString();
