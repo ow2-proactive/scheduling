@@ -68,7 +68,7 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
 
   public RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
     this.proxiedRemoteBody = remoteBody;
-    System.out.println(proxiedRemoteBody.getClass());
+    //System.out.println(proxiedRemoteBody.getClass());
     try {
       this.bodyID = remoteBody.getID();
     } catch (java.rmi.RemoteException e) {
