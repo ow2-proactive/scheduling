@@ -123,7 +123,7 @@ public class GroupHandler {
                         this.manager);
             } catch (BrowsePackageException e) {
                 logger.warn("Can't create a package group");
-                new SAXException("Can't create a package group", e);
+                throw new SAXException("Can't create a package group", e);
             }
             String groupName = attributes.getValue("name");
             if (checkNonEmpty(groupName)) {
