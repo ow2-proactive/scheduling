@@ -718,7 +718,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
+     * @see org.objectweb.proactive.core.descriptor.services.ServiceUser#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
      */
     public void setService(UniversalService service) throws ProActiveException {
         if (FaultToleranceService.FT_SERVICE_NAME.equals(
