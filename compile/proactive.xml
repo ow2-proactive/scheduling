@@ -18,6 +18,12 @@
 		</fileset>
 		<pathelement location="${base}/classes"/>
 	</path>
+	<path id="test.classpath">
+		<path refid="project.classpath"/>
+		<pathelement location="${base}/dev/lib/xmlParserAPIs.jar"/>
+		<pathelement location="${base}/dev/lib/jcommon-0.8.7.jar"/>
+		<pathelement location="${base}/dev/lib/jfreechart-0.9.12.jar"/>
+	</path>
 	<!-- default target that displays usage -->
 	<target name="usage">
 		<echo message=""/>
@@ -43,13 +49,17 @@
 		<echo message="  ------------------------------"/>
 		<echo message="    Special source file builds"/>
 		<echo message="  ------------------------------"/>
-		<echo message="  test"/>
+		<echo message="  testsuite	:TestSuite API"/>
+		<echo message="  benchmark	:BenchMark API"/>
+		<echo message="  nonregressiontest	: Non regression tests compilation"/>
 		<echo message="  essai"/>
 		<echo message="  migration"/>
 		<echo message="  modelisation"/>
 		<echo message="  util"/>
 		<echo message="  alljunk  : means all of the above"/>
 		<echo message="  ibis     : everything related to proactive ibis"/>
+		<echo message="  runTests	: Run all non regression tests"/>
+		<echo message="  runBench	: Run benchmarks"/>
 		<echo message=""/>
 		<echo message="=========================================="/>
 	</target>
@@ -141,7 +151,7 @@
 	-->
 	<target name="examples" depends="ext">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" debug="${debug}">
-		<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/examples">
@@ -152,36 +162,24 @@
 	<!--
 	   ================================================================
 	   ==
-      ==  Compile test
-      ==
-      ================================================================
-	-->
-	<target name="test" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="test/**" deprecation="on" debug="${debug}">
-			<classpath refid="project.classpath"/>
-		</javac>
-	</target>
-	<!--
-	   ================================================================
-	   ==
       ==  Compile Test Suite
       ==
       ================================================================
 	-->
 	<target name="copyDivers">
-    	<copy toDir="${classes.dir}">
-        	<fileset dir="${src.dir}">
-            	<include name="**/*.prop"/>
-            	<include name="**/*.css"/>
-            	<include name="**/*.xml"/>
-            	<include name="**/*.xsl"/>
-            	<include name="**/*.xsd"/>
-    		</fileset>
-   		</copy>
+		<copy toDir="${classes.dir}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.prop"/>
+				<include name="**/*.css"/>
+				<include name="**/*.xml"/>
+				<include name="**/*.xsl"/>
+				<include name="**/*.xsd"/>
+			</fileset>
+		</copy>
 	</target>
 	<target name="testsuite" depends="ext, copyDivers">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" debug="${debug}">
-			<classpath refid="project.classpath"/>
+			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
 	<!--
@@ -220,7 +218,10 @@
 	-->
 	<target name="modelisation" depends="ext, util">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="modelisation/**" deprecation="on" debug="${debug}">
-			<classpath refid="project.classpath"/>
+			<classpath>
+				<path refid="project.classpath"/>
+				<pathelement location="${base}/dev/lib/Jama-1.0.1.jar"/>
+			</classpath>
 		</javac>
 	</target>
 	<!--
@@ -240,7 +241,7 @@
       ==
       ================================================================
 	-->
-	<target name="alljunk" depends="all, migration, modelisation, essai, test"/>
+	<target name="alljunk" depends="all, migration, modelisation, essai, nonregressiontest, benchmark"/>
 	<!--
 	   ================================================================
 	   ==
@@ -402,8 +403,8 @@
       ================================================================
 	-->
 	<target name="nonregressiontest" depends="testsuite">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" debug="${debug}" >
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" debug="${debug}">
+			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
 	<!--
@@ -415,8 +416,8 @@
 	-->
 	<target name="runTests" depends="testsuite, nonregressiontest">
 		<java classname="nonregressiontest.MainManager" fork="true">
-			<classpath refid="project.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<classpath refid="test.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
 		</java>
 	</target>
 	<!--
@@ -427,8 +428,8 @@
       ================================================================
 	-->
 	<target name="benchmark" depends="testsuite">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}" >
-			<classpath refid="project.classpath"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}">
+			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
 	<!--
@@ -440,8 +441,8 @@
 	-->
 	<target name="runBench" depends="testsuite, benchmark">
 		<java classname="benchmark.BenchCenter" fork="true">
-			<classpath refid="project.classpath"/>
-			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+			<classpath refid="test.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
 		</java>
 	</target>
 </project>
