@@ -62,9 +62,8 @@ The third section is a word on the current Architecture Description Language. Th
   the other hand, ProActive is based on a meta-object protocol and provides a reference to an active object through
   a typed stub. If we wanted to use active objects with Julia, the Julia runtime would try to manipulate the stub, and
   not the active object itself. And if trying to force Julia to work on the same base object than ProActive, the control flow
-  could not traverse both ProActive and Julia.<br> Eventually, re-implementing ProActive using Julia could be a solution, but it would imply a full refactoring of the library, and therefore quite a few resources...<br>
-  More generally speaking, Julia is designed to work with standard objects, but not with the active objects of ProActive. Some features would not be
-   reusable using Julia with active objects, as explained in the following section. <br>
+  could not traverse both ProActive and Julia.<br> Eventually, re-implementing ProActive using Julia could be a solution (a starting point could be the "protoactive" example of Julia), but this would imply a full refactoring of the library, and therefore quite a few resources...<br>
+  More generally speaking, Julia is designed to work with standard objects, but not with the active objects of ProActive. Some features (see next section) would not be reusable using Julia with ProActive active objects.<br>
    Therefore, we had to go for our own implementation. </p>
 <p class="textNormal">This implementation is different from Julia both in its
   objectives and in the programming technniques. As previously stated, we target
@@ -290,7 +289,7 @@ public interface Service {
 public class TotoImpl implements Toto, BindingController {
         Service service; // attribute corresponding to a client interface
 
-        public Toto() {}
+        public TotoImpl() {}
 
         // implementation of the Toto interface
         public String foo() {
