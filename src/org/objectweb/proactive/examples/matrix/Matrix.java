@@ -2,11 +2,8 @@ package org.objectweb.proactive.examples.matrix;
 
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;

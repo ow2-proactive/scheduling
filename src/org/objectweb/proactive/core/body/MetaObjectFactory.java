@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
+
 /**
  * <p>
  * A class implementing this interface if able to provide instances of factories
@@ -49,59 +50,52 @@ import org.objectweb.proactive.core.util.ThreadStoreFactory;
  */
 public interface MetaObjectFactory {
 
-  /**
-   * Creates or reuses a RequestFactory
-   * @return a new or existing RequestFactory
-   * @see RequestFactory
-   */
-  public RequestFactory newRequestFactory();
-  
+    /**
+     * Creates or reuses a RequestFactory
+     * @return a new or existing RequestFactory
+     * @see RequestFactory
+     */
+    public RequestFactory newRequestFactory();
 
-  /**
-   * Creates or reuses a ReplyReceiverFactory
-   * @return a new or existing ReplyReceiverFactory
-   * @see ReplyReceiverFactory
-   */
-  public ReplyReceiverFactory newReplyReceiverFactory();
-  
+    /**
+     * Creates or reuses a ReplyReceiverFactory
+     * @return a new or existing ReplyReceiverFactory
+     * @see ReplyReceiverFactory
+     */
+    public ReplyReceiverFactory newReplyReceiverFactory();
 
-  /**
-   * Creates or reuses a RequestReceiverFactory
-   * @return a new or existing RequestReceiverFactory
-   * @see RequestReceiverFactory
-   */
-  public RequestReceiverFactory newRequestReceiverFactory();
-  
+    /**
+     * Creates or reuses a RequestReceiverFactory
+     * @return a new or existing RequestReceiverFactory
+     * @see RequestReceiverFactory
+     */
+    public RequestReceiverFactory newRequestReceiverFactory();
 
-  /**
-   * Creates or reuses a RequestQueueFactory
-   * @return a new or existing RequestQueueFactory
-   * @see RequestQueueFactory
-   */
-  public RequestQueueFactory newRequestQueueFactory();
-  
+    /**
+     * Creates or reuses a RequestQueueFactory
+     * @return a new or existing RequestQueueFactory
+     * @see RequestQueueFactory
+     */
+    public RequestQueueFactory newRequestQueueFactory();
 
-  /**
-   * Creates or reuses a MigrationManagerFactory
-   * @return a new or existing MigrationManagerFactory
-   * @see MigrationManagerFactory
-   */
-  public MigrationManagerFactory newMigrationManagerFactory();
-  
+    /**
+     * Creates or reuses a MigrationManagerFactory
+     * @return a new or existing MigrationManagerFactory
+     * @see MigrationManagerFactory
+     */
+    public MigrationManagerFactory newMigrationManagerFactory();
 
-  /**
-   * Creates or reuses a RemoteBodyFactory
-   * @return a new or existing RemoteBodyFactory
-   * @see RemoteBodyFactory
-   */
-  public RemoteBodyFactory newRemoteBodyFactory();
-  
+    /**
+     * Creates or reuses a RemoteBodyFactory
+     * @return a new or existing RemoteBodyFactory
+     * @see RemoteBodyFactory
+     */
+    public RemoteBodyFactory newRemoteBodyFactory();
 
-  /**
-   * Creates or reuses a ThreadStoreFactory
-   * @return a new or existing ThreadStoreFactory
-   * @see ThreadStoreFactory
-   */
-  public ThreadStoreFactory newThreadStoreFactory();
-
+    /**
+     * Creates or reuses a ThreadStoreFactory
+     * @return a new or existing ThreadStoreFactory
+     * @see ThreadStoreFactory
+     */
+    public ThreadStoreFactory newThreadStoreFactory();
 }

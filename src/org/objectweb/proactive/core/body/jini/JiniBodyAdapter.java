@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.core.body.jini;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;

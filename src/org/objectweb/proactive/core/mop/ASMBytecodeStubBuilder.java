@@ -77,6 +77,25 @@ public class ASMBytecodeStubBuilder implements Constants {
 		// Fills in all the infos about this class
 		this.setInfos();
 	}
+////Modif FAb
+//	public ASMBytecodeStubBuilder(String classname, ClassLoader classLoader) throws ClassNotFoundException {
+//		// Obtains the object that represents the type we want to create
+//		// a wrapper class for. This call may fail with a ClassNotFoundException
+//		// if the class corresponding to this type cannot be found.
+//		if (classLoader != null) {
+//			
+//		
+//		  this.cl = classLoader.loadClass(classname);
+//		} else {
+//			this.cl = Class.forName(classname);
+//			
+//		}
+//		// Keep this info at hand for performance purpose
+//		this.className = classname;
+//
+//		// Fills in all the infos about this class
+//		this.setInfos();
+//	}
 
 	protected ClassWriter createClassGenerator() {
 		String superclassName;

@@ -38,20 +38,14 @@ import java.io.OutputStream;
 public class PAObjectOutputStream extends ObjectOutputStream {
 
 	public PAObjectOutputStream(OutputStream out) throws IOException {
-		super(out);
-		// TODO Auto-generated constructor stub
+		super(out);	
 	}
 
 	public PAObjectOutputStream() throws IOException, SecurityException {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 	
-	
-
 	protected void annotateClass(Class cl) throws IOException {
-//		System.out.println("PAObjectOutputStream.annotateClass " + cl);
-//		System.out.println("PAObjectOutputStream.annotateClass classLoader is "+ cl.getClassLoader() );
 		MOP.addClassToCache(cl.getName(), cl);
 		super.annotateClass(cl);
 	}

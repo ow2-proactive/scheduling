@@ -185,7 +185,8 @@ public class ClassFileServer extends ClassServer {
       }
       if (b != null) return b;
       // try to get the class as a generated stub
-      b = org.objectweb.proactive.core.mop.MOPClassLoader.getClassData(path);
+      // generate it if necessary
+      b = org.objectweb.proactive.core.mop.MOPClassLoader.getMOPClassLoader().getClassData(path);
       if (b != null) return b;
       throw new ClassNotFoundException("Cannot find class "+path);
     }

@@ -156,7 +156,9 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     StubObject futureobject;
     // Creates a stub + FutureProxy for representing the result
     try {
-      futureobject = (StubObject)MOP.newInstance(methodCall.getReifiedMethod().getReturnType().getName(), null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+      //futureobject = (StubObject)MOP.newInstance(methodCall.getReifiedMethod().getReturnType().getName(), null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+	  futureobject = (StubObject)MOP.newInstance(methodCall.getReifiedMethod().getReturnType(), null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+     
     } catch (MOPException e) {
       throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for m="+methodCall.getName(), e);
     } catch (ClassNotFoundException e) {
