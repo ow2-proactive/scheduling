@@ -3,7 +3,7 @@
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Workers" property="multiple" ftServiceId="appli"/>
-                        <virtualNode name="Failed" property="multiple" ftServiceId="ressource"/>
+                        <virtualNode name="Failed" property="multiple" ftServiceId="resource"/>
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -58,10 +58,10 @@
                                 </faultTolerance>
                         </serviceDefinition>
 
-                        <serviceDefinition id="ressource">
+                        <serviceDefinition id="resource">
                                 <faultTolerance>
                                         <globalServer url="rmi://localhost:1100/FTServer"></globalServer>
-					<ressourceServer url="rmi://localhost:1100/FTServer"></ressourceServer>
+					<resourceServer url="rmi://localhost:1100/FTServer"></resourceServer>
                                         <ttc value="5"></ttc>
                                 </faultTolerance>
                         </serviceDefinition>

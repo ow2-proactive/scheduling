@@ -188,8 +188,8 @@ public class ProActiveConfiguration {
     public static String getTTCValue() {
         return System.getProperty("proactive.ft.ttc");
     }
-    public static String getAttachedRessourceServer(){
-        return System.getProperty("proactive.ft.server.ressource");
+    public static String getAttachedResourceServer(){
+        return System.getProperty("proactive.ft.server.resource");
     }
     
     //To be used for the launcher 
@@ -224,7 +224,6 @@ public class ProActiveConfiguration {
         }
         
         setProperty("proactive.rmi.port", "1099");
-        setProperty("proactive.http.port", "2010");
         
         setProperty("proactive.ft", "disable");
         setProperty("proactive.ft.ttc", "30");

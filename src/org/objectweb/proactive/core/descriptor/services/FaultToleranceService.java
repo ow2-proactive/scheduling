@@ -37,7 +37,7 @@ import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.ft.util.ressource.RessourceServer;
+import org.objectweb.proactive.core.body.ft.util.resource.ResourceServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
@@ -66,7 +66,7 @@ public class FaultToleranceService implements UniversalService {
     private String ttcValue;
     
     // attached ressource server
-    private String attachedRessourceServer; // null if not registred has a ressource node
+    private String attachedResourceServer; // null if not registred has a ressource node
     
     
     public FaultToleranceService() {
@@ -109,8 +109,8 @@ public class FaultToleranceService implements UniversalService {
             line.append(" -Dproactive.ft.ttc=" + this.getTtcValue());
         } 
         
-        if (this.getAttachedRessourceServer()!=null){
-            line.append(" -Dproactive.ft.server.ressource=" + this.getAttachedRessourceServer());
+        if (this.getAttachedResourceServer()!=null){
+            line.append(" -Dproactive.ft.server.ressource=" + this.getAttachedResourceServer());
         }
         
         if (logger.isDebugEnabled()){
@@ -127,9 +127,9 @@ public class FaultToleranceService implements UniversalService {
      * @return true if nodes has been registered, false otherwise.
      */
     public boolean registerRessources(Node[] nodes){
-        if (this.getAttachedRessourceServer()!=null){
+        if (this.getAttachedResourceServer()!=null){
             try {
-                RessourceServer rs = (RessourceServer)(Naming.lookup(this.getAttachedRessourceServer()));
+                ResourceServer rs = (ResourceServer)(Naming.lookup(this.getAttachedResourceServer()));
                 for (int i=0;i<nodes.length;i++){
                     rs.addFreeNode(nodes[i]);
                 }
@@ -151,11 +151,11 @@ public class FaultToleranceService implements UniversalService {
     
     // Getters and setters
     
-    public String getAttachedRessourceServer() {
-        return attachedRessourceServer;
+    public String getAttachedResourceServer() {
+        return attachedResourceServer;
     }
-    public void setAttachedRessourceServer(String attachedRessourceServer) {
-        this.attachedRessourceServer = attachedRessourceServer;
+    public void setAttachedResourceServer(String attachedRessourceServer) {
+        this.attachedResourceServer = attachedRessourceServer;
     }
     public String getCheckpointServerURL() {
         return checkpointServerURL;

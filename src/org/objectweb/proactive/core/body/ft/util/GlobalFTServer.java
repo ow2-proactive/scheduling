@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.util.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.util.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
-import org.objectweb.proactive.core.body.ft.util.ressource.RessourceServer;
+import org.objectweb.proactive.core.body.ft.util.resource.ResourceServer;
 import org.objectweb.proactive.core.body.ft.util.storage.CheckpointServer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -69,7 +69,7 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
  */
 
 public class GlobalFTServer extends UnicastRemoteObject implements 
-	CheckpointServer, RecoveryProcess, LocationServer, FaultDetector, RessourceServer {
+	CheckpointServer, RecoveryProcess, LocationServer, FaultDetector, ResourceServer {
     
     /** Default server port */
     public static final int DEFAULT_PORT = 1100;

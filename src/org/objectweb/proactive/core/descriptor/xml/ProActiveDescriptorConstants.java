@@ -117,7 +117,7 @@ public interface ProActiveDescriptorConstants {
     public static final String FT_CKPTSERVER_TAG = "checkpointServer";
     public static final String FT_RECPROCESS_TAG = "recoveryProcess";
     public static final String FT_LOCSERVER_TAG = "locationServer";
-    public static final String FT_RESSERVER_TAG = "ressourceServer";
+    public static final String FT_RESSERVER_TAG = "resourceServer";
     public static final String FT_GLOBALSERVER_TAG = "globalServer";
     public static final String FT_TTCVALUE_TAG = "ttc";
 }

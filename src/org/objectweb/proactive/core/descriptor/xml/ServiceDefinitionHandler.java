@@ -186,7 +186,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 } else if (FT_CKPTSERVER_TAG.equals(name)){
                     FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue("url"));
                 }  else if (FT_RESSERVER_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setAttachedRessourceServer(attributes.getValue("url"));
+                    FaultToleranceHandler.this.ftService.setAttachedResourceServer(attributes.getValue("url"));
                 }  else if (FT_TTCVALUE_TAG.equals(name)){
                     FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue("value"));
                 }  else if (FT_GLOBALSERVER_TAG.equals(name)){

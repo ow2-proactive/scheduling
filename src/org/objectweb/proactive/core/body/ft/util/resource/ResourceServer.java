@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ft.util.ressource;
+package org.objectweb.proactive.core.body.ft.util.resource;
 
 import org.objectweb.proactive.core.node.Node;
 
@@ -43,7 +43,7 @@ import java.rmi.RemoteException;
  * @author cdelbe
  * @since ProActive 2.2
  */
-public interface RessourceServer extends Remote {
+public interface ResourceServer extends Remote {
 
     /**
      * Add a new node usable for recovery.
