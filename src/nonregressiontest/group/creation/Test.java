@@ -27,7 +27,7 @@ public class Test extends ProActiveFunctionalTest {
 		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
 		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
 
-		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, hosts);
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
 		return this.typedGroup;
 	}
 

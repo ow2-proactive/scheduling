@@ -94,6 +94,7 @@ public class HostObject extends AbstractDataObject {
     RunnableProcessor.getInstance().processRunnable("Create one node for "+hostname, new CreateNodeTask(nodeName), controller);
   }  
   
+
     
   //
   // accessor methods
@@ -235,17 +236,17 @@ public class HostObject extends AbstractDataObject {
     public void run() {
       Node[] nodes;
       try {
-        hosts = nodeFinder.findNodes(hostname);
+        nodes = nodeFinder.findNodes(hostname);
       //  System.out.println("XXXXXXX");
       } catch (java.io.IOException e) {
         controller.log("There is no RMI Registry on host "+hostname, e);
         return;
       }
-      if (hosts.length == 0) {
+      if (nodes.length == 0) {
         controller.warn("A RMIRegistry has been found on host "+hostname+" but no Node object are bound !");
       }
-      for (int i = 0; i < hosts.length; i++) {
-        Node node = hosts[i];
+      for (int i = 0; i < nodes.length; i++) {
+        Node node = nodes[i];
         //System.out.println("nodeURL "+node.getNodeInformation().getURL());
         String nodeName = node.getNodeInformation().getName();
         if ((targetNodeName == null) || targetNodeName.equals(nodeName)) {

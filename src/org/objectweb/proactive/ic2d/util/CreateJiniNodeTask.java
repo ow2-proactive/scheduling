@@ -56,11 +56,11 @@ public class CreateJiniNodeTask implements Runnable {
 
         Node[] nodes;
         JiniNodeFinder finder = new JiniNodeFinder();
-        hosts = finder.findNodes(host);
+        nodes = finder.findNodes(host);
 
         //System.out.println("fin de la recherche NB de noeud: "+nodes.length);
-        for (int i = 0; i < hosts.length; i++) {
-            Node node = hosts[i];
+        for (int i = 0; i < nodes.length; i++) {
+            Node node = nodes[i];
             String nodeName = node.getNodeInformation().getName();
             String hostname = node.getNodeInformation().getInetAddress()
                                   .getHostName();

@@ -15,7 +15,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 
 import java.util.Date;
 
-
 public class Bench extends ModelisationBench
     implements org.objectweb.proactive.RunActive {
     protected static NodeControler auto;
@@ -26,7 +25,7 @@ public class Bench extends ModelisationBench
         Agent agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = hosts;
+        args[1] = nodes;
         args[2] = new Long(lifeTime);
         try {
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
@@ -53,9 +52,9 @@ public class Bench extends ModelisationBench
         Agent agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = hosts;
+        args[1] = nodes;
         args[2] = new Long(lifeTime);
-        System.out.println("NODES SIZE = " + hosts.length);
+        System.out.println("NODES SIZE = " + nodes.length);
         try {
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
                 System.out.println(" USING IBIS");
@@ -135,7 +134,7 @@ public class Bench extends ModelisationBench
         //    Node[] nodes = Bench.readDestinationFile(args[2], "" + args[0] + "_" + args[1]);
         Node[] nodes = Bench.readMapingFile(args[2]);
 
-        Agent agent = Bench.startAgent(Double.parseDouble(args[1]), hosts,
+        Agent agent = Bench.startAgent(Double.parseDouble(args[1]), nodes,
                 Long.parseLong(args[4]));
         try {
             Thread.sleep(2000);

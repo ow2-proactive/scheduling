@@ -26,9 +26,9 @@ public class Bench implements org.objectweb.proactive.RunActive {
         AgentWithExponentialMigrationAndServer agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = hosts;
+        args[1] = nodes;
         args[2] = new Long(lifeTime);
-        System.out.println("NODES SIZE = " + hosts.length);
+        System.out.println("NODES SIZE = " + nodes);
         try {
             agent = (AgentWithExponentialMigrationAndServer)ProActive.newActive(AgentWithExponentialMigrationAndServer.class.getName(), 
                                                                                 args, 
@@ -168,14 +168,14 @@ public class Bench implements org.objectweb.proactive.RunActive {
         //   System.out.println("Test: calling initialize on ObjectWithoutForwarder with parameter class " + s.getClass().getName());
         //Reading the destination file
         Node[] nodes = Bench.readDestinationFile(args[2]);
-        System.out.println("NODES IN MAIN = " + hosts.length);
+        System.out.println("NODES IN MAIN = " + nodes.length);
 
         //   System.exit(-1);
         //   obj1.initialize(nodes);
         //Bench.mesureRequestCost(obj1, 1000);
         AgentWithExponentialMigrationAndServer agent = Bench.startExponentialAgent(Double.parseDouble(
                                                                                            args[1]), 
-                                                                                   hosts, 
+                                                                                   nodes, 
                                                                                    args[3], 
                                                                                    Long.parseLong(
                                                                                            args[4]));

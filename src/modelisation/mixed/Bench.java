@@ -25,9 +25,9 @@ public class Bench extends ModelisationBench
         AgentWithExponentialMigrationMixed agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = hosts;
+        args[1] = nodes;
         args[2] = new Long(lifeTime);
-        System.out.println("NODES SIZE = " + hosts.length);
+        System.out.println("NODES SIZE = " + nodes.length);
         try {
             agent = (AgentWithExponentialMigrationMixed) ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(),
                     args, NodeFactory.getNode(nodeName), null,
@@ -43,9 +43,9 @@ public class Bench extends ModelisationBench
         AgentWithExponentialMigrationMixed agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = hosts;
+        args[1] = nodes;
         args[2] = new Long(lifeTime);
-        System.out.println("NODES SIZE = " + hosts.length);
+        System.out.println("NODES SIZE = " + nodes.length);
         try {
             agent = (AgentWithExponentialMigrationMixed) ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(),
                     args, Bench.StartNode, null,
@@ -125,10 +125,10 @@ public class Bench extends ModelisationBench
         //        Node[] nodes = Bench.readDestinationFile(args[4],"" + args[0] + "_" + args[1]);
         Node[] nodes = Bench.readMapingFile(args[4]);
 
-        System.out.println("NODES IN MAIN = " + hosts.length);
+        System.out.println("NODES IN MAIN = " + nodes.length);
 
         AgentWithExponentialMigrationMixed agent = Bench.startExponentialAgent(Double.parseDouble(
-                    args[1]), hosts, Long.parseLong(args[6]));
+                    args[1]), nodes, Long.parseLong(args[6]));
 
         try {
             Thread.sleep(2000);

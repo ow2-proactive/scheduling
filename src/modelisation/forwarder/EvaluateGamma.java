@@ -20,9 +20,9 @@ public class EvaluateGamma implements org.objectweb.proactive.RunActive, Seriali
 
 
     public EvaluateGamma(String[] nodes) {
-        System.out.println("EvaluateGamma constructor with " + hosts.length + " destinations");
+        System.out.println("EvaluateGamma constructor with " + nodes + " destinations");
         index = 0;
-        destinations = hosts;
+        destinations = nodes;
     }
 
 
