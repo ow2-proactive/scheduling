@@ -137,10 +137,13 @@ public class DataAssociation implements JobMonitorConstants {
         from = addToSet(from);
         to = addToSet(to);
 
+        if (from.isDeleted())
+        	delAsso(from, to);
+        
         from.setDeleted(false);
         to.setDeleted(false);
 
-        addAsso(from, to);
+        addAsso(from, to);        
         delAsso(to, from);
         addAsso(to, from);
     }
@@ -164,6 +167,9 @@ public class DataAssociation implements JobMonitorConstants {
         Iterator iter = constraints.iterator();
         while (iter.hasNext()) {
             BasicMonitoredObject testValue = (BasicMonitoredObject) iter.next();
+            if (testValue.getKey() == JOB && value.getKey() == AO)
+            	continue;
+
             MonitoredObjectSet test = getValues(value, testValue.getKey(), null);
             if (!test.contains(testValue)) {
             	return false;
