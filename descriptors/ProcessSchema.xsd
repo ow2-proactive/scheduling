@@ -91,12 +91,13 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--jvmProcess element has five childs: classpath, javaPath, policyFile, classname, parameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess. classname represents the class to start with the enclosing jvmProcess. parameters represent parameters of the class to start.This element has also one attribute: class which is required. This attribute can take two values: org.objectweb.proactive.core.process.JVMProcessImpl, org.objectweb.proactive.core.process.JVMNodeProcess(in that case the class to start is alrady set(see api). This element is used to create a local jvm-->
+	<!--jvmProcess element has five childs: classpath, javaPath, policyFile, classname, parameters. They may not appear. classpath element represents the classpath value for the enclosing jvmProcess. javaPath represents the location of the java command to run for the jvmProcess. policyFile element represents the location of the policy file to use in the jvmProcess. jvmParameters element represents all options(except of course classpath and policy file) that can be given to the the jvm. classname represents the class to start with the enclosing jvmProcess. parameters represent parameters of the class to start.This element has also one attribute: class which is required. This attribute can take two values: org.objectweb.proactive.core.process.JVMProcessImpl, org.objectweb.proactive.core.process.JVMNodeProcess(in that case the class to start is alrady set(see api). This element is used to create a local jvm-->
 	<xs:complexType name="JvmProcessType">
 		<xs:sequence>
 			<xs:element name="classpath" type="ClasspathType" minOccurs="0"/>
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 			<xs:element name="classname" type="xs:string" minOccurs="0"/>
 			<xs:element name="parameters" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
@@ -142,6 +143,11 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="type" type="xs:string" use="required" fixed="absolute"/>
 		<xs:attribute name="value" type="xs:string" use="required"/>
 	</xs:complexType>
+	<!--jvmParameters represents options to be passed to the jvm. It is represented by a list of srings -->
+	<xs:simpleType name="JvmParameterType">
+		<xs:list itemType="xs:string"/>
+	</xs:simpleType>
+
 	<!--rshProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote host with rsh protocol a jvm will be created on the remote host.This element has also an environment element that may not appear and three attributes: class which is required and can take only three values: org.objectweb.proactive.core.process.rsh.RSHNodeProcess, org.objectweb.proactive.core.process.rsh.RSHJVMProcess or org.objectweb.proactive.core.process.rsh.RSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with rsh-->
 	<xs:complexType name="RshProcessType">
 		<xs:sequence>
@@ -225,7 +231,6 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="globusHostList" type="GlobusHostListType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-	
 	<xs:complexType name="GlobusHostListType">
 		<xs:sequence>
 			<xs:element name="globusHost" type="xs:string" maxOccurs="unbounded"/>
