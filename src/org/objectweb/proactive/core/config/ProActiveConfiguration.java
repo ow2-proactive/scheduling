@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.config;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.config.xml.MasterFileHandler;
 
 import java.util.HashMap;
@@ -7,6 +9,7 @@ import java.util.Iterator;
 
 
 public class ProActiveConfiguration {
+    protected static Logger logger = Logger.getLogger(ProActiveConfiguration.class);
     protected HashMap loadedProperties;
     protected HashMap addedProperties;
     protected static ProActiveConfiguration singleton;
@@ -35,11 +38,15 @@ public class ProActiveConfiguration {
         if (System.getProperty("proactive.configuration") != null) {
             filename = System.getProperty("proactive.configuration");
         } else {
-            System.out.println("******** No proactive.configuration");
+            if (logger.isDebugEnabled()) {
+                logger.debug("******** No proactive.configuration");
+            }
             filename = ProActiveConfiguration.class.getResource(
                     "ProActiveConfiguration.xml").toString();
         }
-        System.out.println("****** Reading configuration from " + filename);
+        if (logger.isDebugEnabled()) {
+            System.out.println("****** Reading configuration from " + filename);
+        }
         ProActiveConfiguration.load(filename);
     }
 
@@ -66,7 +73,6 @@ public class ProActiveConfiguration {
      * @param value value of the property
      */
     public void propertyFound(String name, String value) {
-        //	System.out.println("name=" + name + ",value =" + value);
         this.loadedProperties.put(name, value);
     }
 
@@ -81,9 +87,6 @@ public class ProActiveConfiguration {
         while (it.hasNext()) {
             name = (String) it.next();
             value = (String) this.loadedProperties.get(name);
-
-            //System.out.println(">>> " + name + " " + value + "<<<");
-            //System.out.println("value " + value);
             if (System.getProperty(name) == null) {
                 System.setProperty(name, value);
                 this.addedProperties.put(name, value);
