@@ -1,6 +1,7 @@
 package modelisation.multiqueueserver;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestQueue;
@@ -29,7 +30,7 @@ public class CompositeRequestQueue extends BlockingRequestQueueImpl implements j
    * The queue will remove previous requests with the same method name in the
    * queue
    */
-  public synchronized void add(Request r) {
+  public synchronized int add(Request r) {
     RequestQueue tmp = null;
     if ((tmp = this.getRequestQueue((UniqueID) r.getParameter(0))) == null) {
       System.out.println("CompositeRequestQueue: creating a new request queue " + "for id " + r.getParameter(0));
@@ -44,6 +45,7 @@ public class CompositeRequestQueue extends BlockingRequestQueueImpl implements j
     if (requestCount == 1) {
       this.notifyAll();
     }
+    return FTManager.NON_FT; // dummy value for fault-tolerance
   }
 
   protected synchronized void removeAllRequests(RequestQueue rq, String name) {

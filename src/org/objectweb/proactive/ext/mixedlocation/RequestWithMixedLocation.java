@@ -36,6 +36,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -63,17 +64,19 @@ public class RequestWithMixedLocation extends RequestImpl
         this.server = server;
     }
 
-    protected void sendRequest(UniversalBody destinationBody)
+    protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
+        int ftres = FTManager.NON_FT;
         if (logger.isDebugEnabled()) {
             logger.debug("RequestWithMixedLocation: sending to universal " +
                 counter);
         }
         try {
-            destinationBody.receiveRequest(this);
+            ftres = destinationBody.receiveRequest(this);
         } catch (Exception e) {
             this.backupSolution(destinationBody);
         }
+        return ftres;
     }
 
     /**

@@ -16,15 +16,16 @@ public class TimedRequest extends RequestImpl implements java.io.Serializable {
         this.shouldMesureTime = true;
     }
 
-    protected void sendRequest(UniversalBody destinationBody)
+    protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
+        int ftres = 0;
         long startTime = 0;
 
         //        if (shouldMesureTime) {
         startTime = System.currentTimeMillis();
         //        }
         try {
-            destinationBody.receiveRequest(this);
+            ftres = destinationBody.receiveRequest(this);
             if (shouldMesureTime) {
                 System.out.println("TimedRequest: done after " +
                     (System.currentTimeMillis() - startTime));
@@ -35,6 +36,7 @@ public class TimedRequest extends RequestImpl implements java.io.Serializable {
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }
+        return ftres;
     }
 
     public void notifyReception(UniversalBody bodyReceiver)

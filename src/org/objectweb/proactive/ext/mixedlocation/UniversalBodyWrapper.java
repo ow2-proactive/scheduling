@@ -16,6 +16,7 @@ import java.util.HashMap;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -56,7 +57,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //   t.start();
     }
 
-    public void receiveRequest(Request request)
+    public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
         //       System.out.println("UniversalBodyWrapper.receiveRequest");
         if (this.wrappedBody == null) {
@@ -72,7 +73,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
             throw new IOException();
         } else {
             try {
-                this.wrappedBody.receiveRequest(request);
+                return this.wrappedBody.receiveRequest(request);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw e;
@@ -82,8 +83,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //      this.stop();
     }
 
-    public void receiveReply(Reply r) throws IOException {
-        this.wrappedBody.receiveReply(r);
+    public int receiveReply(Reply r) throws IOException {
+        return this.wrappedBody.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -301,5 +302,12 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     public Communication getPolicyTo(String vn, String from, String to)
         throws java.io.IOException, SecurityNotAvailableException {
         return this.wrappedBody.getPolicyTo(vn, from, to);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return this.wrappedBody.receiveFTMessage(ev);
     }
 }

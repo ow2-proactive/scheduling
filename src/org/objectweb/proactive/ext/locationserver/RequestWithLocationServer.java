@@ -37,6 +37,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
@@ -68,16 +69,18 @@ public class RequestWithLocationServer extends RequestImpl
         return r;
     }
 
-    protected void sendRequest(UniversalBody destinationBody)
+    protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
+        int ftres = FTManager.NON_FT;
         try {
             //   startTime = System.currentTimeMillis();
-            destinationBody.receiveRequest(this);
+            ftres = destinationBody.receiveRequest(this);
 
             //    long endTime = System.currentTimeMillis();
         } catch (Exception e) {
             this.backupSolution(destinationBody);
         }
+        return ftres;
     }
 
     /**

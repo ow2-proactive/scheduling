@@ -4,6 +4,7 @@ package org.objectweb.proactive.ext.mixedlocation;
 import org.objectweb.proactive.ext.locationserver.TimedRequestWithLocationServer;
 
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -26,16 +27,18 @@ public class TimedRequestWithMixedLocation
         super(methodCall, sender, isOneWay, nextSequenceID, server);
     }
 
-    protected void sendRequest(UniversalBody destinationBody)
+    protected int sendRequest(UniversalBody destinationBody)
                         throws java.io.IOException {
         System.out.println(
                 "RequestWithMixedLocation: sending to universal " + counter);
+        int ftres = FTManager.NON_FT;
         try {
-            destinationBody.receiveRequest(this);
+            ftres = destinationBody.receiveRequest(this);
         } catch (Exception e) {
             //  e.printStackTrace();
             this.backupSolution(destinationBody);
         }
+        return ftres;
     }
 
     /**

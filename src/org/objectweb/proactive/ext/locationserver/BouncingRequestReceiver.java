@@ -39,7 +39,7 @@ public class BouncingRequestReceiver implements RequestReceiver {
 
     protected static java.io.IOException REUSABLE_EXCEPTION  = new java.io.IOException("Object has migrated");
 
-  public void receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException {
+  public int receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException {
       //System.out.println("BouncingRequestReceiver: receiveRequest()");
       throw REUSABLE_EXCEPTION;
   }
