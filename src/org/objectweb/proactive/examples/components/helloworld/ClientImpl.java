@@ -1,7 +1,6 @@
-package org.objectweb.proactive.examples.components.helloworld;
 /***
- * Julia: France Telecom's implementation of the Fractal API
- * Copyright (C) 2001-2002 France Telecom R&D
+ * Fractal ADL Parser
+ * Copyright (C) 2002-2004 France Telecom R&D
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,15 +21,20 @@ package org.objectweb.proactive.examples.components.helloworld;
  * Author: Eric Bruneton
  */
 
+package org.objectweb.proactive.examples.components.helloworld;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.proactive.ProActive;
 
-public class ClientImpl implements Main, BindingController {
+public class ClientImpl implements Runnable, BindingController {
 
   private Service service;
 
-  public void main (final String[] args) {
-	System.out.println("main method on client implementation object on node : " + ProActive.getBodyOnThis().getNodeURL());
+  public ClientImpl () {
+      // the following instruction was removed, because ProActive requires empty no-args constructors
+      // otherwise this instruction is executed also at the construction of the stubs
+    System.err.println("CLIENT created");
+  }
+  
+  public void run() {
     service.print("hello world");
   }
 

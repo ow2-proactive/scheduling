@@ -1,7 +1,6 @@
-package org.objectweb.proactive.examples.components.helloworld;
 /***
- * Julia: France Telecom's implementation of the Fractal API
- * Copyright (C) 2001-2002 France Telecom R&D
+ * Fractal ADL Parser
+ * Copyright (C) 2002-2004 France Telecom R&D
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +20,8 @@ package org.objectweb.proactive.examples.components.helloworld;
  *
  * Author: Eric Bruneton
  */
+
+package org.objectweb.proactive.examples.components.helloworld;
 
 public interface Service {
   void print (String msg);

@@ -1,4 +1,3 @@
-package org.objectweb.proactive.examples.components.helloworld;
 /***
  * Julia: France Telecom's implementation of the Fractal API
  * Copyright (C) 2001-2002 France Telecom R&D
@@ -21,7 +20,7 @@ package org.objectweb.proactive.examples.components.helloworld;
  *
  * Author: Eric Bruneton
  */
-
+package org.objectweb.proactive.examples.components.helloworld;
 public interface Main {
   void main (String[] args);
 }
