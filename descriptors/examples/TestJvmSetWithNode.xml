@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<virtualNodes>
-		<virtualNode name="dispatcher" cyclic="true"/>
+		<virtualNode name="Node" property="multiple"/>
 	</virtualNodes>
 	<deployment>
 		<mapping>
-			<map virtualNode="dispatcher">
+			<map virtualNode="Node">
 				<jvmSet>
-					<vmName>currentJVM</vmName>
-					<vmName>Jvm1</vmName>
-					<vmName>Jvm2</vmName>
+					<vmName value="currentJVM"/>
+					<vmName value="Jvm1"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -17,26 +16,22 @@
 			<jvm name="currentJVM">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
-			<jvm name="Jvm1" cyclic="true" nodeNumber="3">
+			<jvm name="Jvm1" nodeNumber="3">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
-				</creation>
-			</jvm>
-			<jvm name="Jvm2">
-				<acquisition method="rmi"/>
-				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

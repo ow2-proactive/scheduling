@@ -1,41 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<virtualNodes>
 		<virtualNode name="Node1"/>
 		<virtualNode name="Node2"/>
 	</virtualNodes>
 	<deployment>
 		<mapping>
-			<map virtualNode="Node1" jvm="currentJvm"/>
-			<map virtualNode="Node2" jvm="Jvm2"/>
+			<map virtualNode="Node1">
+				<jvmSet>
+					<vmName value="currentJvm"/>
+				</jvmSet>
+			</map>
+			<map virtualNode="Node2">
+				<jvmSet>
+					<vmName value="Jvm2"/>
+				</jvmSet>
+			</map>
 		</mapping>
 		<jvms>
 			<jvm name="currentJvm">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="rshProcess"/>
+					<processReference refid="rshProcess"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMProcessImpl">
-				<policyFile>
-					<path type="absolute" value="/ProActive/classes/proactive.java.policy"/>
-				</policyFile>
-				<classname>org.objectweb.proactive.rmi.StartNode</classname>
-				<parameters>///bob</parameters>
-			</jvmProcess>
-			<process id="rshProcess" class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="sea.inria.fr">
-				<jvmProcess refid="linuxJVM"/>
-			</process>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="rshProcess">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="ornata.inria.fr">
+					<processReference refid="linuxJVM"/>
+				</rshProcess>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

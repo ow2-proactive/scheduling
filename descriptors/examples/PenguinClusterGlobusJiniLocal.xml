@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<virtualNodes>
-		<virtualNode name="penguinNode" cyclic="true"/>
+		<virtualNode name="penguinNode" property="multiple"/>
 	</virtualNodes>
 	<deployment>
 		<mapping>
 			<map virtualNode="penguinNode">
 				<jvmSet>
-					<vmName>currentJVM</vmName>
-					<vmName>Jvm1</vmName>
-					<vmName>Jvm2</vmName>
-					<vmName>Jvm3</vmName>
-					<vmName>Jvm4</vmName>
-					<vmName>Jvm5</vmName>s
+					<vmName value="currentJVM"/>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
+					<vmName value="Jvm4"/>
+					<vmName value="Jvm5"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -20,89 +20,89 @@
 			<jvm name="currentJVM">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<acquisition method="jini"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="sshInriaCluster"/>
+					<processReference refid="sshInriaCluster"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm5">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="globusProcess"/>
+					<processReference refid="globusProcess"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			<jvmProcess id="linuxJVM1" class="org.objectweb.proactive.core.process.JVMNodeProcess">
-				<classpath>
-					<path type="absolute" value="/net/home/rquilici/ProActive/classes"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/asm.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
-				</classpath>
-				<javaPath>
-					<path type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
-				</javaPath>
-				<policyFile>
-					<path type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
-				</policyFile>
-			</jvmProcess>
-			<process id="bsubInriaCluster" class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
-				<jvmProcess refid="linuxJVM1"/>
-				<bsubOption>
-					<hostlist>pf10.inria.fr</hostlist>
-					<processor>2</processor>
-					<scriptPath>
-						<path type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
-					</scriptPath>
-				</bsubOption>
-			</process>
-			<process id="sshInriaCluster" class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="galere1.inria.fr">
-				<process refid="bsubInriaCluster"/>
-			</process>
-			<process id="globusProcess" class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
-				<jvmProcess refid="linuxJVM1"/>
-				<environment>
-					<variable name="DISPLAY" value="vis151.inria.fr:0.0"/>
-				</environment>
-				<globusOption>
-					<gramPort>2119</gramPort>
-					<gisPort>2135</gisPort>
-					<globusHostList>
-						<globusHost>globus1.inria.fr</globusHost>
-						<globusHost>globus2.inria.fr</globusHost>
-						<globusHost>globus3.inria.fr</globusHost>
-						<globusHost>globus4.inria.fr</globusHost>
-					</globusHostList>
-				</globusOption>
-			</process>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="linuxJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/classes"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/asm.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
+					</policyFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="bsubInriaCluster">
+				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
+					<processReference refid="linuxJVM1"/>
+					<bsubOption>
+						<hostlist>pf10.inria.fr</hostlist>
+						<processor>2</processor>
+						<scriptPath>
+							<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
+						</scriptPath>
+					</bsubOption>
+				</bsubProcess>
+			</processDefinition>
+			<processDefinition id="sshInriaCluster">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="galere1.inria.fr">
+					<processReference refid="bsubInriaCluster"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="globusProcess">
+				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
+					<environment>
+						<variable name="DISPLAY" value="vis151.inria.fr:0.0"/>
+					</environment>
+					<processReference refid="linuxJVM1"/>
+				</globusProcess>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

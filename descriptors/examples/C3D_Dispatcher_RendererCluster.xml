@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<virtualNodes>
-		<virtualNode name="Dispatcher"/>
-		<virtualNode name="Renderer" cyclic="true"/>
+		<virtualNode name="Dispatcher" property="unique"/>
+		<virtualNode name="Renderer" property="multiple"/>
 	</virtualNodes>
 	<deployment>
 		<mapping>
-			<map virtualNode="Dispatcher" jvm="currentJvm"/>
+			<map virtualNode="Dispatcher">
+				<jvmSet>
+					<vmName value="currentJvm"/>
+				</jvmSet>
+			</map>
 			<map virtualNode="Renderer">
 				<jvmSet>
-					<vmName>Jvm1</vmName>
-					<vmName>Jvm2</vmName>
-					<vmName>Jvm3</vmName>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -19,61 +23,69 @@
 			<jvm name="currentJvm">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
-				<acquisition method="jini"/>
+				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="sshInriaCluster"/>
+					<processReference refid="sshInriaCluster"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
-			<jvmProcess id="linuxJVM1" class="org.objectweb.proactive.core.process.JVMNodeProcess">
-				<classpath>
-					<path type="absolute" value="/net/home/rquilici/ProActive/classes"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/asm.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
-					<path type="absolute" value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
-				</classpath>
-				<javaPath>
-					<path type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
-				</javaPath>
-				<policyFile>
-					<path type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
-				</policyFile>
-			</jvmProcess>
-			<process id="bsubInriaCluster" class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
-				<jvmProcess refid="linuxJVM1"/>
-				<bsubOption>
-					<hostlist>pf10.inria.fr pf11.inria.fr</hostlist>
-					<processor>4</processor>
-					<scriptPath>
-						<path type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
-					</scriptPath>	
-				</bsubOption>
-			</process>
-			<process id="sshInriaCluster" class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="galere1.inria.fr">
-				<process refid="bsubInriaCluster"/>
-			</process>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="linuxJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/classes"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/bcel.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/asm.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/jini-core.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/jini-ext.jar"/>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/lib/reggie.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
+					</policyFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="bsubInriaCluster">
+				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
+					<processReference refid="linuxJVM1"/>
+					<bsubOption>
+						<hostlist>galere10.inria.fr galere11.inria.fr</hostlist>
+						<processor>4</processor>
+						<scriptPath>
+							<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
+						</scriptPath>
+					</bsubOption>
+				</bsubProcess>
+			</processDefinition>
+			<processDefinition id="sshInriaCluster">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="galere1.inria.fr">
+					<processReference refid="bsubInriaCluster"/>
+				</sshProcess>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>
