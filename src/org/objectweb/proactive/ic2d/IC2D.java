@@ -29,6 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.ic2d;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.IC2DFrame;
@@ -53,6 +55,7 @@ public class IC2D {
   public final static int GLOBUS = 1;
   public final static int RSH = 2;
   
+  
   /**
    * Main startup. 
    */
@@ -72,8 +75,13 @@ public class IC2D {
     }
     */
     try {
+    	//Not sure following line is useful !
       Class.forName("org.objectweb.proactive.core.runtime.RuntimeFactory");
-    } catch (ClassNotFoundException e) {
+		RuntimeFactory.getDefaultRuntime();
+	} catch (ProActiveException e1) {
+		e1.printStackTrace();
+	}
+   catch (ClassNotFoundException e) {
       e.printStackTrace();
       System.exit(1);
     }
@@ -84,7 +92,7 @@ public class IC2D {
       for (int i = 0; i<hosts.length; i++) {
         try {
         	// to do : should decide wether we want rmi as default protocol
-          worldObject.addHostObject(hosts[i], "rmi");
+          worldObject.addHostObject(hosts[i], System.getProperty("proactive.rmi"));
         } catch (java.rmi.RemoteException e) {
           System.out.println("Can't create the host "+hosts[i]+", e="+e);
         }

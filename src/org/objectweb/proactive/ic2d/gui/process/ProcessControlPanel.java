@@ -30,8 +30,14 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.process;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.rsh.RSHProcess;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.MessageLogger;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 
@@ -246,19 +252,30 @@ public class ProcessControlPanel extends javax.swing.JPanel {
   *
   */
   private class ProcessDefinitionPanel extends javax.swing.JPanel implements MonitoredRSHProcessObserver {
-  
+	//ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+	
+	String localRuntimeUrl;
     private javax.swing.JTextField hostnameField = new javax.swing.JTextField(RSHProcess.DEFAULT_HOSTNAME);
     private javax.swing.JTextField usernameField = new javax.swing.JTextField(RSHProcess.DEFAULT_USERNAME);
     private javax.swing.JTextField javaPathField = new javax.swing.JTextField(JVMProcessImpl.DEFAULT_JAVAPATH);
     private javax.swing.JTextField policyFileField = new javax.swing.JTextField(JVMProcessImpl.DEFAULT_POLICY_FILE);
-    private javax.swing.JTextField classnameField = new javax.swing.JTextField(JVMProcessImpl.DEFAULT_CLASSNAME);
-    private javax.swing.JTextField parametersField = new javax.swing.JTextField(20);
+    private javax.swing.JTextField classnameField = new javax.swing.JTextField("org.objectweb.proactive.core.runtime.StartRuntime");
+    private javax.swing.JTextField parametersField;
     private javax.swing.JTextArea classpathField = new javax.swing.JTextArea(JVMProcessImpl.DEFAULT_CLASSPATH, 4, 0);
     private javax.swing.JTextArea environmentField = new javax.swing.JTextArea(stringArrayToString(DEFAULT_ENVIRONMENT), 4, 0);
     
     public ProcessDefinitionPanel() {
       setBorder(javax.swing.BorderFactory.createTitledBorder("Create new process"));
       setLayout(new java.awt.BorderLayout());
+	  ProActiveRuntime part;
+	try {
+		part = RuntimeFactory.getDefaultRuntime();
+		localRuntimeUrl = part.getURL();
+	} catch (ProActiveException e1) {
+		e1.printStackTrace();
+	}
+	parametersField = new javax.swing.JTextField("ic2d "+localRuntimeUrl+" rmi: 1 jvm");
+	  
       
       // defines fields in the north panel 
       {
@@ -341,12 +358,20 @@ public class ProcessControlPanel extends javax.swing.JPanel {
       process.setClasspath(classpath);
       process.setClassname(classname);
       process.setParameters(parameters);
-      if (hostname != null) {
-        RSHProcess rshProcess = new RSHProcess(process);
-        rshProcess.setHostname(hostname);
-        rshProcess.setUsername(username);
-        return new JVMProcessWrapper(rshProcess, messagePanel, javaPath, policyFile, classpath, classname, parameters, hostname, username);
-      }
+      try {
+		if (!hostname.equals(InetAddress.getLocalHost().getHostName())) {
+		    RSHProcess rshProcess = new RSHProcess(process);
+		    rshProcess.setHostname(hostname);
+		    rshProcess.setUsername(username);
+		    process.setParameters("ic2d "+localRuntimeUrl+" rmi: 1 rsh-jvm");
+		    return new JVMProcessWrapper(rshProcess, messagePanel, javaPath, policyFile, classpath, classname, parameters, hostname, username);
+		  }
+	} catch (UnknownHostException e) {
+		// TODO Auto-generated catch block
+		//e.printStackTrace();
+		messagePanel.getMessageLogger().log("Unknown Host",e);
+		
+	}
       return new JVMProcessWrapper(process, messagePanel, javaPath, policyFile, classpath, classname, parameters);
     }
     

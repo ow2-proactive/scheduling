@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.ic2d.data;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.util.CreateJiniNodeTask;
 import org.objectweb.proactive.ic2d.util.RunnableProcessor;
@@ -77,10 +78,11 @@ public class WorldObject extends AbstractDataObject {
   
 
   public HostObject addHostObject(String hostname, String nodeName, String protocol) throws java.rmi.RemoteException {
+	String shortHostname = null;
     try {
-      hostname = java.net.InetAddress.getByName(hostname).getHostName();
+		shortHostname = java.net.InetAddress.getByName(UrlBuilder.removePortFromHost(hostname)).getHostName();
     } catch (java.net.UnknownHostException e) {
-      controller.warn("Hostname "+hostname+ " failed reverse lookup.");
+      controller.warn("Hostname "+shortHostname+ " failed reverse lookup.");
       return null;
     }
     HostObject host = getHostObject(hostname);

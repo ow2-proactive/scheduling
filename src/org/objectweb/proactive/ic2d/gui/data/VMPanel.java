@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.awt.Color;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.NodeObject;
 import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
@@ -49,6 +51,9 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     activeObjectFilter.addClass(SpyListenerImpl.class.getName());
     this.vmObject = targetVMObject;
     this.setLayout(new java.awt.GridLayout(1, 0, 4, 4));
+    if (targetVMObject.getProtocolId().indexOf("globus")>=0){
+    	this.setBackground(new Color(0xff, 0xd0, 0xd0));
+    }
     createBorder(name);
 	
     // The popup
@@ -113,7 +118,8 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
   protected Object[][] getDataObjectInfo() {
     return new Object[][] {
         {"ID",vmObject.getID()},
-        {"Active objects",new Integer(vmObject.getActiveObjectsCount())}
+        {"Active objects",new Integer(vmObject.getActiveObjectsCount())},
+        {"Protocol identifier",vmObject.getProtocolId()}
       };
   }
 

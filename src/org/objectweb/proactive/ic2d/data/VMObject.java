@@ -74,6 +74,7 @@ public class VMObject extends AbstractDataObject {
   
   protected Spy spy;
   protected VMID vmid;
+  protected String protocolId;
   protected java.util.HashMap objectNodeMap;
 
   protected SpyListenerImpl activeSpyListener;
@@ -84,13 +85,14 @@ public class VMObject extends AbstractDataObject {
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  public VMObject(HostObject host, VMID vmid, Node node) throws ActiveObjectCreationException, NodeException {
+  public VMObject(HostObject host, VMID vmid, Node node, String protocolId) throws ActiveObjectCreationException, NodeException {
     super(host);
     //System.out.println("nodeURL : "+node.getNodeInformation().getURL());
     if (log4jlogger.isDebugEnabled()){
     log4jlogger.debug ("VMObject.<init>");
     }
     this.vmid = vmid;
+    this.protocolId = protocolId;
     this.objectNodeMap = new java.util.HashMap();
     SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
 		if (log4jlogger.isDebugEnabled()){
@@ -149,6 +151,10 @@ public class VMObject extends AbstractDataObject {
   public VMID getID() {
     return vmid;
   }
+  
+  public String getProtocolId(){
+  	return this.protocolId;
+  } 
   
   public int getActiveObjectsCount() {
     return objectNodeMap.size();

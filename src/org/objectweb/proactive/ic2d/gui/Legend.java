@@ -213,10 +213,10 @@ public class Legend extends JFrame {
         	}, JLabel.LEFT));
       }
 
-      JPanel jvmPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
-      getContentPane().add(jvmPanel);
-      jvmPanel.setBorder(new TitledBorder("Nodes"));
-       gridBagLayout.setConstraints(jvmPanel,
+      JPanel nodePanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+      getContentPane().add(nodePanel);
+      nodePanel.setBorder(new TitledBorder("Nodes"));
+       gridBagLayout.setConstraints(nodePanel,
        		new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
        		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
@@ -231,8 +231,8 @@ public class Legend extends JFrame {
             g.fillRect(w/4, 0, w/2, h);
           }
         };
-        jvmPanel.add(comp);
-        jvmPanel.add(new JLabel("RMI Node"));
+        nodePanel.add(comp);
+        nodePanel.add(new JLabel("RMI Node"));
       }
       
       {
@@ -247,15 +247,58 @@ public class Legend extends JFrame {
             g.fillRect(w/4, 0, w/2, h);
           }
         };
+        nodePanel.add(comp);
+        nodePanel.add(new JLabel("Jini Node"));
+      }
+      
+      JPanel jvmPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+      getContentPane().add(jvmPanel);
+      jvmPanel.setBorder(new TitledBorder("JVMs"));
+       gridBagLayout.setConstraints(jvmPanel,
+       		new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+      {
+        JComponent comp = new JPanel() {
+
+          private int w = 100;
+          private int h = 50;
+
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+            g.setColor(new Color(0xd0, 0xd0, 0xd0));
+            g.fillRect(w/4, 0, w/2, h);
+          }
+        };
         jvmPanel.add(comp);
-        jvmPanel.add(new JLabel("Jini Node"));
+        jvmPanel.add(new JLabel("Standard Jvm"));
+      }
+
+      {
+        JComponent comp = new JPanel() {
+
+          private int w = 100;
+          private int h = 50;
+
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+            g.setColor(new Color(0xff, 0xd0, 0xd0));
+            g.fillRect(w/4, 0, w/2, h);
+          }
+        };
+        jvmPanel.add(comp);
+        jvmPanel.add(new JLabel("Globus Jvm"));
       }
 
       JPanel hostPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
       getContentPane().add(hostPanel);
       hostPanel.setBorder(new TitledBorder("Hosts"));
        gridBagLayout.setConstraints(hostPanel,
-       		new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		new GridBagConstraints(0, 4, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
        		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
       {
@@ -276,23 +319,7 @@ public class Legend extends JFrame {
         hostPanel.add(new JLabel("Standard Host"));
       }
 
-      {
-        JComponent comp = new JPanel() {
-
-          private int w = 100;
-          private int h = 50;
-
-          public void paintComponent(Graphics g) {
-            Dimension dim = getSize();
-            int w = dim.width;
-            int h = dim.height;
-            g.setColor(new Color(0xff, 0xd0, 0xd0));
-            g.fillRect(w/4, 0, w/2, h);
-          }
-        };
-        hostPanel.add(comp);
-        hostPanel.add(new JLabel("Globus Host"));
-      }
+      
 
       getContentPane().validate();
     }

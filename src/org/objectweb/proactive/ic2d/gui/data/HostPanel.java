@@ -49,9 +49,10 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
     super(parentDataObjectPanel, targetHostObject.getHostName(), "HostObject");
     this.hostObject = targetHostObject;
     // Component init
-    if (hostObject.isGlobusEnabled())
-      setBackground(new java.awt.Color(0xff, 0xd0, 0xd0));
-    else setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
+//    if (hostObject.isGlobusEnabled())
+//      setBackground(new java.awt.Color(0xff, 0xd0, 0xd0));
+    //else 
+    setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
     createBorder(hostObject.getOperatingSystem());
     setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
 
