@@ -15,23 +15,39 @@
                 <interface name="i2" signature="nonregressiontest.component.I2"/>
             </requires>
         </component-type>
+        <component-type name="C-Type" >
+            <!-- extends attribute to allow! -->
+            <provides>
+                <interface name="i1-server" signature="nonregressiontest.component.I1"/>
+            </provides>
+            <requires>
+                <interface name="i1-client" signature="nonregressiontest.component.I1"/>
+            </requires>
+        </component-type>
     </types>
     <components>
         <primitive-component implementation="nonregressiontest.component.PrimitiveComponentB"
-            name="p2" type="B-Type" virtualNode="Dispatcher1-AC"/>
-        <composite-component name="c" type="A-Type" virtualNode="Dispatcher1-AC">
+            name="p2" type="B-Type" virtualNode="null"/>
+        <composite-component name="c" type="A-Type" virtualNode="null">
             <components>
                 <primitive-component
                     implementation="nonregressiontest.component.PrimitiveComponentA" name="p1"
-                    type="A-Type" virtualNode="Dispatcher1-AC"/>
+                    type="A-Type" virtualNode="null"/>
             </components>
             <bindings>
                 <binding client="c.i1" server="p1.i1"/>
                 <binding client="p1.i2" server="c.i2"/>
             </bindings>
         </composite-component>
+        <parallel-composite-component name="parallel" type="C-Type" virtualNode="null">
+            <components>
+                <primitive-component  implementation="nonregressiontest.component.PrimitiveComponentC" name="parallelized"
+                    type="C-Type" virtualNode="VN3"/>
+            </components>
+        </parallel-composite-component>
     </components>
     <bindings>
+        <binding client="parallel.i1-client" server="c.i1"/> 
         <binding client="c.i2" server="p2.i2"/>
     </bindings>
 </componentsDescriptor>
