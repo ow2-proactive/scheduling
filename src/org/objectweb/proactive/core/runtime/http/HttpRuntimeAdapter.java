@@ -316,17 +316,17 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(java.lang.String)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addAcquaintance(java.lang.String)
      */
-    public void addParent(String proActiveRuntimeName) {
-        this.runtimestrategyadapter.addParent(proActiveRuntimeName);
+    public void addAcquaintance(String proActiveRuntimeName) {
+        this.runtimestrategyadapter.addAcquaintance(proActiveRuntimeName);
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getAcquaintances()
      */
-    public String[] getParents() {
-        return this.runtimestrategyadapter.getParents();
+    public String[] getAcquaintances() {
+        return this.runtimestrategyadapter.getAcquaintances();
     }
 
     public SecurityContext getPolicy(SecurityContext sc)
@@ -334,11 +334,29 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return this.runtimestrategyadapter.getPolicy(sc);
     }
 
-    /*
-       private void writeObject(java.io.ObjectOutputStream out)
-           throws IOException {
-           out.defaultWriteObject();
-       }*/
+    /**
+     * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
+     */
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws ProActiveException {
+        return this.runtimestrategyadapter.getClassDataFromParentRuntime(className);
+    }
+    
+    
+    /**
+     * @see ProActiveRuntime#getClassDataFromThisRuntime(String)
+     */
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+        return this.runtimestrategyadapter.getClassDataFromThisRuntime(className);
+    }
+    
+    /**
+     * @see ProActiveRuntime#setParent(String)
+     */
+    public void setParent(String parentRuntimeName) throws ProActiveException {
+        this.runtimestrategyadapter.setParent(parentRuntimeName);
+    }
+        
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();

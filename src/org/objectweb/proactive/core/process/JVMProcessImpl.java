@@ -266,7 +266,18 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(LOG4J_OPTION);
             javaCommand.append(checkWhiteSpaces(log4jFile));
         }
-
+        
+        // dynamic classloading through runtimes
+        if ("enable".equals(System.getProperty("proactive.classloader"))) {
+            javaCommand.append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
+            // to avoid clashes due to multiple classloader, we initiate the
+            // configuration of log4j ourselves 
+            // (see StartRuntime.main)
+            javaCommand.append(" -Dlog4j.defaultInitOverride=true");
+            if ("rmi".equals(System.getProperty("proactive.communication.protocol"))) {
+                javaCommand.append(" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
+            }
+        }
         // append proactive policy File
         // if (securityFile != null) {
         //      javaCommand.append(PROACTIVE_POLICYFILE_OPTION);

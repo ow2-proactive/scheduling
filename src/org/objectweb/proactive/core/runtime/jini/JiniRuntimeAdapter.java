@@ -234,18 +234,18 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
         }
     }
     
-    public void addParent(String proActiveRuntimeName) {
+    public void addAcquaintance(String proActiveRuntimeName) {
     	try {
-    		jiniRuntime.addParent(proActiveRuntimeName);
+    		jiniRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (RemoteException re) {
         	// hum ...
         	re.printStackTrace();
         }
     }
 
-    public String[] getParents() {
+    public String[] getAcquaintances() {
     	try {
-    		return jiniRuntime.getParents();
+    		return jiniRuntime.getAcquaintances();
     	} catch (RemoteException re) {
         	// hum ...
         	re.printStackTrace();
@@ -507,6 +507,31 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
     public String getJobID(String nodeUrl) throws ProActiveException {
         try {
             return jiniRuntime.getJobID(nodeUrl);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+    
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws ProActiveException {
+        try {
+            return jiniRuntime.getClassDataFromParentRuntime(className);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }    }
+    
+    
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+        try {
+            return jiniRuntime.getClassDataFromThisRuntime(className);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+
+    public void setParent(String fatherRuntimeName)  throws ProActiveException {
+        try {
+             jiniRuntime.setParent(fatherRuntimeName);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }

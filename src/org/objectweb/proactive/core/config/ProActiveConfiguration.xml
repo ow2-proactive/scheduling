@@ -28,6 +28,7 @@
 		<prop key="proactive.tunneling.try_normal_first" value="yes"/>
 		<prop key="proactive.tunneling.use_gc" value="yes"/>
 		<prop key="proactive.tunneling.gc_period" value="10000"/>
+		<prop key="proactive.classloader" value="disable"/>
 		<!-- <prop key="proactive.ssh.known_hosts" value="/user/mlacage/home/.ssh/known_hosts"/> -->
 		<!-- <prop key="proactive.ssh.key_directory" value="/user/mlacage/home/.ssh/"/> -->
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->

@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.runtime.rmi;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -61,7 +62,12 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         //System.out.println("toto");
         this.hasCreatedRegistry = RegistryHelper.getRegistryCreator();
-        this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        try {
+            this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        }catch (ExceptionInInitializerError e) {
+            e.printStackTrace();
+            throw e;
+        }
         this.nodesArray = new java.util.ArrayList();
         this.vnNodesArray = new java.util.ArrayList();
         //this.urlBuilder = new UrlBuilder();
@@ -180,12 +186,12 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void addParent(String proActiveRuntimeName) {
-        proActiveRuntime.addParent(proActiveRuntimeName);
+    public void addAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.addAcquaintance(proActiveRuntimeName);
     }
 
-    public String[] getParents() {
-        return proActiveRuntime.getParents();
+    public String[] getAcquaintances() {
+        return proActiveRuntime.getAcquaintances();
     }
 
     public void killRT(boolean softly) throws java.rmi.RemoteException {
@@ -371,7 +377,29 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public String getJobID(String nodeUrl) throws RemoteException {
         return proActiveRuntime.getJobID(nodeUrl);
     }
+    
+  
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromParentRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class data not found", e);
+        }
+    }
 
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromThisRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class data not found", e);
+        }
+    }
+    
+    public void setParent(String fatherRuntimeName) throws RemoteException {
+            proActiveRuntime.setParent(fatherRuntimeName);
+    }
+    
     //
     // ---PRIVATE METHODS--------------------------------------
     //

@@ -31,10 +31,16 @@
 package org.objectweb.proactive.core.runtime;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.net.URL;
 
 
 /**
@@ -86,15 +92,22 @@ public class StartRuntime {
     }
 
     public static void main(String[] args) {
-        //        if (args.length < 3) {
-        //           logger.error(
-        //             "Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod> <portNumber>");
-        //        System.exit(1);
-        //  }
+        
+        if ("true".equals(System.getProperty("log4j.defaultInitOverride")) && System.getProperty("log4j.configuration") != null) {
+            // configure log4j here to avoid classloading problems with log4j classes
+            try {
+                String log4jConfiguration = System.getProperty("log4j.configuration");
+                File f = new File(log4jConfiguration);
+                PropertyConfigurator.configure(new URL(f.getPath()));
+            } catch (IOException e) {
+                System.out.println(
+                    "Error : incorrect path for log4j configuration : " +
+                    System.getProperty("log4j.configuration"));
+            }
+        }
+
         ProActiveConfiguration.load();
 
-        //        System.out.println("StartRunTime.main() " + args[0] + " " + args[1] +
-        //            " " + args[2] + " " + args[3]);
         try {
             logger.info("**** Starting jvm on " +
                 UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
@@ -117,16 +130,19 @@ public class StartRuntime {
      */
     private void run() {
         try {
-            //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
-                        "proactive.communication.protocol") + ":");
-            
-            String comProtocol = System.getProperty("proactive.communication.protocol");
-            if(comProtocol == "http");
-            	comProtocol="";
-            
-//            logger.info("Runtime started at " + comProtocol+ ":" +
-//                proActiveRuntime.getURL());
+                        //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
+                "proactive.communication.protocol") + ":");
+
+            String comProtocol = System.getProperty(
+                    "proactive.communication.protocol");
+            if (comProtocol == "http") {
+                ;
+            }
+            comProtocol = "";
+
+            //            logger.info("Runtime started at " + comProtocol+ ":" +
+            //                proActiveRuntime.getURL());
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             /*
@@ -146,10 +162,6 @@ public class StartRuntime {
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
-
-        //		catch(Exception e){
-        //			e.printStackTrace();
-        //		}
     }
 
     /**
@@ -165,7 +177,7 @@ public class StartRuntime {
                 creatorID,
                 System.getProperty("proactive.communication.protocol") + ":",
                 vmName);
-            proActiveRuntime.addParent(DefaultRuntimeURL);
+            proActiveRuntime.setParent(DefaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

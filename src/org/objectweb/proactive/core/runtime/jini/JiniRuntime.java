@@ -91,9 +91,9 @@ public interface JiniRuntime extends java.rmi.Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
-    public void addParent(String proActiveRuntimeName) throws java.rmi.RemoteException;
+    public void addAcquaintance(String proActiveRuntimeName) throws java.rmi.RemoteException;
 
-    public String[] getParents() throws java.rmi.RemoteException;
+    public String[] getAcquaintances() throws java.rmi.RemoteException;
     
     public void killRT(boolean softly) throws java.rmi.RemoteException;
 
@@ -186,4 +186,20 @@ public interface JiniRuntime extends java.rmi.Remote {
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws RemoteException;
+    
+    /**
+     * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
+     */
+    public byte[] getClassDataFromParentRuntime(String className) throws RemoteException;    
+
+    /**
+     * @see ProActiveRuntime#getClassDataFromThisRuntime(String)
+     */
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException;
+    
+    /**
+     * @see ProActiveRuntime#setParent(String)
+     */
+    public void setParent(String parentRuntimeName) throws RemoteException;
+    
 }

@@ -248,18 +248,18 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void addParent(String proActiveRuntimeName) {
+    public void addAcquaintance(String proActiveRuntimeName) {
     	try {
-    		remoteProActiveRuntime.addParent(proActiveRuntimeName);
+    		remoteProActiveRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (RemoteException re) {
         	// hum ...
         	re.printStackTrace();
         }
     }
 
-    public String[] getParents() {
+    public String[] getAcquaintances() {
     	try {
-    		return remoteProActiveRuntime.getParents();
+    		return remoteProActiveRuntime.getAcquaintances();
     	} catch (RemoteException re) {
         	// hum ...
         	re.printStackTrace();
@@ -526,7 +526,33 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
 					throw new ProActiveException(re);
 				}
 		}
-    //
+		
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getClassDataFromParentRuntime(className);
+		} catch (RemoteException re) {
+			throw new ProActiveException(re);
+		}
+    }
+    
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException{
+        try {
+            return remoteProActiveRuntime.getClassDataFromThisRuntime(className);
+		} catch (RemoteException re) {
+			throw new ProActiveException(re);
+		}
+    }
+
+   public void setParent(String parentRuntimeName) throws ProActiveException  {
+       try {
+           remoteProActiveRuntime.setParent(parentRuntimeName);
+		} catch (RemoteException re) {
+			throw new ProActiveException(re);
+		}
+    }
+
+   //
     // -- PROTECTED METHODS -----------------------------------------------
     //
     protected RemoteProActiveRuntime createRemoteProActiveRuntime()

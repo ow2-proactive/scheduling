@@ -44,6 +44,7 @@ import net.jini.lease.LeaseRenewalEvent;
 import net.jini.lookup.entry.Name;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -213,12 +214,12 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void addParent(String proActiveRuntimeName) {
-        proActiveRuntime.addParent(proActiveRuntimeName);
+    public void addAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.addAcquaintance(proActiveRuntimeName);
     }
 
-    public String[] getParents() {
-        return proActiveRuntime.getParents();
+    public String[] getAcquaintances() {
+        return proActiveRuntime.getAcquaintances();
     }
 
     public void killRT(boolean softly) throws java.rmi.RemoteException {
@@ -484,6 +485,29 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
      */
     public String getJobID(String nodeUrl) throws RemoteException {
         return proActiveRuntime.getJobID(nodeUrl);
+    }
+
+    public byte[] getClassDataFromParentRuntime(String className)
+        throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromParentRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class data not found for class " +
+                className, e);
+        }
+    }
+
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromThisRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class data not found for class " +
+                className, e);
+        }
+    }
+
+    public void setParent(String parentRuntimeName)  throws RemoteException {
+            proActiveRuntime.setParent(parentRuntimeName);
     }
 
     //

@@ -236,18 +236,18 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void addParent(String proActiveRuntimeName) {
+    public void addAcquaintance(String proActiveRuntimeName) {
     	try {
-    		remoteProActiveRuntime.addParent(proActiveRuntimeName);
+    		remoteProActiveRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (java.rmi.RemoteException re) {
         	// hum ...
         	re.printStackTrace();
         }
     }
 
-    public String[] getParents() {
+    public String[] getAcquaintances() {
     	try {
-    		return remoteProActiveRuntime.getParents();
+    		return remoteProActiveRuntime.getAcquaintances();
     	} catch (java.rmi.RemoteException re) {
         	// hum ...
         	re.printStackTrace();
@@ -343,6 +343,9 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
                 bodyConstructorCall, isNodeLocal);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
+        } catch (LinkageError e) {
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -500,6 +503,31 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     public String getJobID(String nodeUrl) throws ProActiveException {
         try {
             return remoteProActiveRuntime.getJobID(nodeUrl);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getClassDataFromParentRuntime(className);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+    
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+        try {
+            return remoteProActiveRuntime.getClassDataFromThisRuntime(className);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+    
+    public void setParent(String parentRuntimeName) throws ProActiveException {
+        try {
+            remoteProActiveRuntime.setParent(parentRuntimeName);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }

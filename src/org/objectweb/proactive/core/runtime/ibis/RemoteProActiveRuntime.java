@@ -91,9 +91,9 @@ public interface RemoteProActiveRuntime extends Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws RemoteException;
 
-    public void addParent(String proActiveRuntimeName) throws RemoteException;
+    public void addAcquaintance(String proActiveRuntimeName) throws RemoteException;
 
-    public String[] getParents() throws RemoteException;
+    public String[] getAcquaintances() throws RemoteException;
     
     public void killRT(boolean softly) throws RemoteException;
 
@@ -184,4 +184,10 @@ public interface RemoteProActiveRuntime extends Remote {
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws RemoteException;
+    
+    public byte[] getClassDataFromParentRuntime(String className) throws RemoteException;
+    
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException;
+    
+    public void setParent(String parentRuntimeName) throws RemoteException;
 }

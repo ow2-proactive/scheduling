@@ -556,20 +556,20 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     }
 
     ///////////////
-    public void addParent(String proActiveRuntimeName) {
+    public void addAcquaintance(String proActiveRuntimeName) {
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
         try {
-            sendRequest(new RuntimeRequest("addParent", params));
+            sendRequest(new RuntimeRequest("addAcquaintance", params));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public String[] getParents() {
+    public String[] getAcquaintances() {
         try {
-            return (String[]) sendRequest(new RuntimeRequest("getParents"));
+            return (String[]) sendRequest(new RuntimeRequest("getAcquaintances"));
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -591,13 +591,48 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             throw new ProActiveException(e);
         }
     }
+    
+    
+    public byte[] getClassDataFromParentRuntime(String className)
+            throws ProActiveException {
+        ArrayList params = new ArrayList();
+        params.add(className);
+
+        try {
+            return (byte[]) sendRequest(new RuntimeRequest("getClassDataFromParentRuntime", params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }    }
+ 
+    public byte[] getClassDataFromThisRuntime(String className) {
+        ArrayList params = new ArrayList();
+        params.add(className);
+
+        try {
+            return (byte[]) sendRequest(new RuntimeRequest("getClassDataFromThisRuntime", params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public void setParent(String parentRuntimeName) {
+        ArrayList params = new ArrayList();
+        params.add(parentRuntimeName);
+        try {
+            sendRequest(new RuntimeRequest("setParent", params));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public void listVirtualNodes() throws ProActiveException {
         try {
             //  remoteProActiveRuntime.updateLocalNodeVirtualName();
             sendRequest(new RuntimeRequest("listVirtualNodes"));
         } catch (Exception e) {
-            throw new ProActiveException(e);
+            e.printStackTrace();
         }
     }
 }

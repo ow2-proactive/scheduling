@@ -156,13 +156,13 @@ public interface ProActiveRuntime extends Job {
      * Tells this runtime that it's registered in another one 
      * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
      */
-    public void addParent(String proActiveRuntimeName);
+    void addAcquaintance(String proActiveRuntimeName);
     
     /**
      * Returns all the ProActiveRuntime URL in which this runtime is registered
      * @return all the ProActiveRuntime URL in which this runtime is registered
      */
-    public String[] getParents();
+    public String[] getAcquaintances();
     
     /**
      * Kills this ProActiveRuntime and this VM
@@ -332,10 +332,29 @@ public interface ProActiveRuntime extends Job {
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException;
-
+    
     /**
-     * @param PART
+     * Looks for class bytecode in the current runtime.
+     * If current runtime has no father, stub generation can be intented to 
+     * get the class bytecode
+     * @param className name of the class
+     * @return the bytecode corresponding to the given class, or null if not found
      */
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException;
+    
+    /**
+     * Looks for class bytecode in the ancestors of the current runtime : first it tries in the father runtime,
+     * then in the grand-father etc...
+     * @param className name of the class
+     * @return the bytecode corresponding to the given class, or null if not found
+     */
+    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException;
+    
+    /**
+     * This method adds a reference to the runtime that created this runtime.
+     * It is called when a new runtime is created from another one.
+     * @param parentRuntimeName the name of the creator of this runtime
+     */
+    public void setParent(String parentRuntimeName) throws ProActiveException;
 
-    //public void setUpSecurityForRemoteLauch(ProActiveRuntime PART)throws ProActiveException;
 }

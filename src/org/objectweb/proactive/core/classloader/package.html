@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+</head>
+<body bgcolor="white">
+<p>
+This package holds most of the mechanism for dynamic classloading through ProActiveRuntimes. Other classes
+involved are {@link org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl} and 
+{@link org.objectweb.proactive.core.util.ClassDataCache}.
+</p><p>
+This mechanism can be used for hierarchical deployment using deployment descriptors. It overcomes the following 
+problem :</p>
+
+<p>If an active object (of type "A" for instance) is deployed on a runtime where the application classes are not 
+available, it is not possible to create new active objects of classes which are application classes (class "B" 
+for instance).<br>
+example : <code>ProActive.newActive("B");</code>
+</p>
+
+<p>This problem also occurs when trying to load a class from the standard classloader (Class.forName operation) and 
+from a class that was not loaded by the RMIClassLoader. (This is the case for the MOP class)</p>
+
+<p>The RMI dynamic classloading mechanism allows the creation of passive objects, but this mechanism is not
+available in the MOP, which looks for classes using the classloader that loaded the MOP class. Because it does
+not hold a reference to the classloader that created "A", the MOP cannot use the classloader that loaded "A", 
+which is able to download classes from the annotated codebase retreived when "A" was deserialized).
+
+</p><p>
+The ProActive class downloading mechanism is set up as follows : <br>
+	- The property "proactive.classloader" should be set to "enable" in the runtime that initiates the deployment
+    - When a new runtime is created from a deployment descriptor, it holds a reference on the runtime 
+    that created it. <br>
+    (- It is also possible to add other runtimes parents dynamically (ProActiveRuntime.addParent method))<br>
+    - This new runtime is created using {@link ProActiveClassLoader} as the system classloader.<br>
+    - If RMI is the communication protocol, a ProActiveRMIClassLoaderSpi is also created.
+</p><p>
+The ProActive class downloading mechanism works as follows : <br>
+	- new runtimes/jvms are created with the parameter 
+	"java.system.class.loader=org.objectweb.proactive.core.netclassloader.ProActiveClassLoader"<br>
+	- The java.system.class.loader property sets ProActiveClassLoader as the system classloader, 
+	thus ProActiveClassLoader loads all non-system classes. It first tries to load a class from the 
+	classpath, and if this fails, it asks its father runtime to send the class bytecode 
+	and defines it locally. This process is recursive : the father runtime, if it cannot find the class bytecode,
+	will ask its parent runtime if it has one. Otherwise it returns null.<br>
+    - When incoming streams - corresponding to remote invocations - are deserialized, the same mechanism takes 
+    place. If RMI is the communication protocol, the ProActiveRMIClassLoaderSpi ensures that ProActiveClassLoader
+    will be used to load the classes. (only works for 1.4+ jvms)
+</p>
+</p><p>
+Currently, although incoming streams contain annotated classes, and therefore a reference to a http class server,
+the standard RMI dynamic classloading mechanism is not used at all, and dynamic downloading only occurs through 
+inter-runtimes communications.
+</p>
+
+
+<!-- Put @see and @since tags down here. -->
+  @author  Matthieu Morel
+
+</body>
+</html>
+

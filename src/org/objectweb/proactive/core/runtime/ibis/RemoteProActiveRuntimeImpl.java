@@ -8,6 +8,7 @@ import ibis.rmi.RemoteException;
 import ibis.rmi.server.UnicastRemoteObject;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -161,12 +162,12 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void addParent(String proActiveRuntimeName) {
-        proActiveRuntime.addParent(proActiveRuntimeName);
+    public void addAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.addAcquaintance(proActiveRuntimeName);
     }
 
-    public String[] getParents() {
-        return proActiveRuntime.getParents();
+    public String[] getAcquaintances() {
+        return proActiveRuntime.getAcquaintances();
     }
 
     public void killRT(boolean softly) throws RemoteException {
@@ -340,6 +341,31 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public SecurityContext getPolicy(SecurityContext sc)
         throws RemoteException, SecurityNotAvailableException {
         return proActiveRuntime.getPolicy(sc);
+    }
+
+    public byte[] getClassDataFromParentRuntime(String className)
+        throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromParentRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class not found : " + className, e);
+        }
+    }
+
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+        try {
+            return proActiveRuntime.getClassDataFromThisRuntime(className);
+        } catch (ProActiveException e) {
+            throw new RemoteException("class not found : " + className, e);
+        }
+    }
+    
+    public void setParent(String fatherRuntimeName) throws RemoteException {
+//        try {
+            proActiveRuntime.setParent(fatherRuntimeName);
+//        } catch (ProActiveException e) {
+//            throw new RemoteException("cannot set runtime father : " + fatherRuntimeName, e);
+//        }
     }
 
     //

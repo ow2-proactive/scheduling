@@ -132,9 +132,9 @@ public class FileProcess  {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private byte[] getBytesFromResource(String path) throws java.io.IOException {
+    public static byte[] getBytesFromResource(String path) throws java.io.IOException {
         String filename = path.replace('.', '/') + ".class";
-        java.io.InputStream in = this.getClass().getClassLoader()
+        java.io.InputStream in = FileProcess.class.getClassLoader()
                                      .getResourceAsStream(filename);
         if (in == null) {
             return null;
@@ -221,7 +221,7 @@ public class FileProcess  {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private byte[] getBytesFromInputStream(java.io.InputStream in, int length)
+    private static byte[] getBytesFromInputStream(java.io.InputStream in, int length)
         throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[length];

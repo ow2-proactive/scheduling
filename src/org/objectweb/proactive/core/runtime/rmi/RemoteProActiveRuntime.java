@@ -88,9 +88,9 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
-    public void addParent(String proActiveRuntimeName) throws java.rmi.RemoteException;
+    public void addAcquaintance(String proActiveRuntimeName) throws java.rmi.RemoteException;
 
-    public String[] getParents() throws java.rmi.RemoteException;
+    public String[] getAcquaintances() throws java.rmi.RemoteException;
     
     public void killRT(boolean softly) throws java.rmi.RemoteException;
 
@@ -176,6 +176,22 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 	 * @param sc
 	 */
 	public SecurityContext getPolicy(SecurityContext sc) throws RemoteException,SecurityNotAvailableException;
+	
+    /**
+     * @see ProActiveRuntime#getClassDataFromParentRuntime(String) 
+     */
+	public byte[] getClassDataFromParentRuntime(String className) throws RemoteException;
+
+    /**
+     * @see ProActiveRuntime#getClassDataFromThisRuntime(String) 
+     */
+    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException;
+    
+    /**
+     * @see ProActiveRuntime#setParent(String) 
+     */
+    public void setParent(String parentRuntimeName) throws RemoteException;
+
  
 
 }

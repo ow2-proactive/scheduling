@@ -31,18 +31,27 @@
 package org.objectweb.proactive.core.runtime;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
+import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
+import org.objectweb.proactive.core.mop.BytecodeStubBuilder;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.MOPClassLoader;
+import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.rmi.FileProcess;
+import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Entity;
 import org.objectweb.proactive.ext.security.EntityCertificate;
@@ -128,7 +137,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private java.util.Hashtable proActiveRuntimeMap;
 
     // synchronized set of URL to runtimes in which we are registered
-    private java.util.Set parentsURL;
+    private java.util.Set runtimeAcquaintancesURL;
+    private String parentRuntimeURL;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------------------
@@ -140,7 +150,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable();
-            this.parentsURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
+            this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet());
             this.virtualNodesMap = new java.util.Hashtable();
             this.virtualNodesMapNodes = new java.util.Hashtable();
             this.descriptorMap = new java.util.Hashtable();
@@ -159,16 +169,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                 // policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
                 psm = new ProActiveSecurityManager(file);
-            } 
-//            else {
-                // creating a generic certificate
-//                logger.info(
-//                    "ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
-                //Object[] tmp = ProActiveSecurity.generateGenericCertificate();
-                //certificate = (X509Certificate) tmp[0];
-                //privateKey = (PrivateKey) tmp[1];
-            //}
+            }
 
+            //            else {
+            // creating a generic certificate
+            //                logger.info(
+            //                    "ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
+            //Object[] tmp = ProActiveSecurity.generateGenericCertificate();
+            //certificate = (X509Certificate) tmp[0];
+            //privateKey = (PrivateKey) tmp[1];
+            //}
             //System.out.println(vmInformation.getVMID().toString());
         } catch (java.net.UnknownHostException e) {
             //System.out.println();
@@ -353,26 +363,37 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#addParent(String)
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#addAcquaintance(String)
      */
-    public void addParent(String proActiveRuntimeName) {
-        parentsURL.add(proActiveRuntimeName);
+    public void addAcquaintance(String proActiveRuntimeName) {
+        runtimeAcquaintancesURL.add(proActiveRuntimeName);
     }
 
     /**
-     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getParents()
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getAcquaintances()
      */
-    public String[] getParents() {
+    public String[] getAcquaintances() {
         String[] urls;
 
-        synchronized (parentsURL) {
-            urls = new String[parentsURL.size()];
-            java.util.Iterator iter = parentsURL.iterator();
+        synchronized (runtimeAcquaintancesURL) {
+            urls = new String[runtimeAcquaintancesURL.size()];
+            java.util.Iterator iter = runtimeAcquaintancesURL.iterator();
             for (int i = 0; i < urls.length; i++)
                 urls[i] = (String) iter.next();
         }
 
         return urls;
+    }
+
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#setParent(String)
+     */
+    public void setParent(String parentRuntimeName) {
+        if (parentRuntimeURL == null) {
+            parentRuntimeURL = parentRuntimeName;
+        } else {
+            logger.error("Parent runtime already set!");
+        }
     }
 
     /**
@@ -828,5 +849,113 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      */
     public String getJobID() {
         return vmInformation.getJobID();
+    }
+
+    public byte[] getClassDataFromParentRuntime(String className)
+        throws ProActiveException {
+        byte[] classData = null;
+
+        if (parentRuntimeURL != null) {
+            // get remote runtime
+            ProActiveRuntime runtime = RuntimeFactory.getRuntime(parentRuntimeURL,
+                    UrlBuilder.getProtocol(parentRuntimeURL));
+            classData = runtime.getClassDataFromThisRuntime(className);
+
+            if (classData == null) {
+                // continue searching
+                classData = runtime.getClassDataFromParentRuntime(className);
+            }
+            if (classData != null) {
+                // caching class
+                ClassDataCache.instance().addClassData(className, classData);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Returning class " + className + " found in " +
+                        parentRuntimeURL);
+                }
+                return classData;
+            }
+        }
+
+        return null;
+    }
+
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws ProActiveException {
+        byte[] classData = null;
+
+        // 1. look in class cache
+        // this can be redundant if not looking in a parent
+        classData = ClassDataCache.instance().getClassData(className);
+        // found something in classloader or cache...
+        if (classData != null) {
+            return classData;
+        }
+        try {
+            // 2. look in classpath
+            classData = FileProcess.getBytesFromResource(className);
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
+        if (classData != null) {
+            ClassDataCache.instance().addClassData(className, classData);
+            return classData;
+        }
+
+        if (parentRuntimeURL == null) {
+            // top of hierarchy of runtimes
+            classData = generateStub(className);
+            if (classData != null) {
+                return classData;
+            }
+        }
+        return null;
+    }
+
+    // tries to generate a stub without using MOP methods
+    private byte[] generateStub(String className) {
+        byte[] classData = null;
+        if (Utils.isStubClassName(className)) {
+            try {
+                // do not use directly MOP methods (avoid classloader cycles)
+                //                /Logger.getLogger(Loggers.CLASSLOADER).debug("Generating class : " + className);
+                //    e.printStackTrace();
+                String classname = Utils.convertStubClassNameToClassName(className);
+
+                //ASM is now the default bytecode manipulator
+                if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
+                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+                    classData = bsb.create();
+                } else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("BCEL")) {
+                    BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
+                    classData = bsb.create();
+                } else {
+                    // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
+                    System.err.println(
+                        "byteCodeManipulator argument is optional. If specified, it can only be set to BCEL.");
+                    System.err.println(
+                        "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
+                }
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        if (classData != null) {
+            ClassDataCache.instance().addClassData(className, classData);
+            return classData;
+        }
+
+        // try to get the class as a generated component interface reference
+        classData = RepresentativeInterfaceClassGenerator.getClassData(className);
+        if (classData != null) {
+            ClassDataCache.instance().addClassData(className, classData);
+            return classData;
+        }
+
+        // try to get the class as a generated component interface reference
+        classData = MetaObjectInterfaceClassGenerator.getClassData(className);
+        if (classData != null) {
+            ClassDataCache.instance().addClassData(className, classData);
+            return classData;
+        }
+        return null;
     }
 }
