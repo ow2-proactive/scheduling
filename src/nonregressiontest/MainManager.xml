@@ -7,7 +7,7 @@
 	<!-- all classes in package nonregressiontest are added, only the specified
 		tests are sorted. -->
 	<packageGroup name="Unit test group" description="group of unit tests" 
-		dir="/net/home/adicosta/workspace/ProActive/classes" 
+		dir="../classes" 
 		packageName="nonregressiontest" >
 			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
 			<unitTest class="nonregressiontest.node.nodefactory.Test" />
