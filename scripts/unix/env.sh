@@ -84,9 +84,13 @@ if [ -f $PROACTIVE/lib/log4j-core.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
 fi
-if [ -f $PROACTIVE/lib/xerces.jar ]
+if [ -f $PROACTIVE/lib/jaxp.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xerces.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jaxp.jar
+fi
+if [ -f $PROACTIVE/lib/crimson.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/crimson.jar
 fi
 CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 
