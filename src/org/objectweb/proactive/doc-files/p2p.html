@@ -45,7 +45,7 @@
   <p><b class="legend">Example of a ProActive P2P infrastructure.</b></p> 
 </div> 
 <p>When the P2P infrastructure is running, it is very easy to obtain some nodes (JVMs). The next section describes how to use it.</p> 
-<p>Further research informations are available <a
+<p>Further research information are available <a
  href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</a>.</p> 
 <p>The outline of this short handbook:</p> 
 <!--<li><a href="#network">Create your P2P Network</a></li>
@@ -119,7 +119,7 @@ Implementation</a></li>
   <li><b>Number Of Acquaintances (NOA)</b>: is the minimal number of peers one peer needs to know to keep up the infrastructure. By default, its value is 10 peers.</li> 
   <li><b>Time To Live (TTL)</b>: in hops for JVMs (node) depth search (acquisition). By default, its value is 5 hops.</li> 
 </ul> 
-<p>All parameters description and how to change theirs default values are explained <a href="Configuration.html#p2p_properties">here</a>. Next section shows how to configure the infrastructure when starting the P2P Service with the command line.</p> 
+<p>All parameters description and the way to change their default values are explained <a href="Configuration.html#p2p_properties">here</a>. Next section shows how to configure the infrastructure when starting the P2P Service with the command line.</p> 
 <p>The bootstrapping or first contact problem is how a new peer can join the p2p infrastructure. We solved this problem by just specifying one or several addresses of supposed peers which are running in the p2p infrastructure. Next, we will explain how and where you can specify this list of peers.</p> 
 <p>Now, you have just to start peers. There are two ways to do it:</p> 
 <h3><a class="mozTocH3" name="mozTocId117139"></a>Quick Start Peer</h3> 
@@ -321,14 +321,14 @@ Implementation</a></li>
 </pre> 
 <h2><a class="mozTocH2" name="mozTocId1224"></a><a
  name="infrastructure_model"></a>The P2P Infrastructure Model</h2> 
-<p>The goals of this work are to use sparse CPU cycles from institutions' desktop workstations combined with grids and clusters. Consequently desktop workstation are not available all the time for sharing computations with different users than the workstation owner. Grids and clusters have the same problem that normal users don't want share their usage time. <br> 
+<p>The goals of this work are to use sparse CPU cycles from institutions' desktop workstations combined with grids and clusters. Consequently desktop workstations are not available all the time for sharing computation times with different users than the workstation owner. Grids and clusters have the same problem that normal users don't want share their usage time. <br> 
 </p> 
-<p>Managing different sorts of resources (grids, clusters, desktop workstations) as a single network of resources with a hight instability of them needs a fully decentralized and dynamic approach.</p> 
-<p>Therefore, P2P is a good solution for sharing a dynamic JVM network, where JVMs are the shared resources. Thereby, the P2P Infrastructure is P2P network which shares JVMs for computation. This infrastructure is completely self-organized and fully configurable.</p> 
+<p>Managing different sort of resources (grids, clusters, desktop workstations) as a single network of resources with a hight instability of them needs a fully decentralized and dynamic approach.</p> 
+<p>Therefore, P2P is a good solution for sharing a dynamic JVM network, where JVMs are the shared resources. Thereby, the P2P Infrastructure is a P2P network which shares JVMs for computation. This infrastructure is completely self-organized and fully configurable.</p> 
 <p>Before going on to consider the P2P infrastructure it's important to define what is Peer-to-Peer.<br> 
 </p> 
 <h3><a class="mozTocH3" name="mozTocId356736"></a>What is Peer-to-Peer?</h3> 
-<p>There are a lot of P2P's definitions, many of them are similar to other distributed infrastructures, such as Grid, client / server, etc. There are 2 better definition which are really describe P2P:</p> 
+<p>There are a lot of P2P's definitions, many of them are similar to other distributed infrastructures, such as Grid, client / server, etc. There are 2 better definitions which are really describe P2P:</p> 
 <ul> 
   <li>From&nbsp; <span style="font-style: italic;">Peer-to-Peer Harnessing&nbsp; the Power of Disruptive Technologies</span> (edited by Andy Oram):</li> 
 </ul> 
@@ -349,7 +349,7 @@ Implementation</a></li>
   <li>A fresh peer has a list of "server" addresses. These are peers&nbsp; which have a high potential to be available and to be in the P2P network, they are in a certain way the P2P network core.</li> 
   <li>With this list the fresh peer tries to contact each servers. When a server is reachable the fresh peer add it in its list of known peers (acquaintances).<br> 
   </li> 
-  <li>Then the fresh peers knows some servers, it is in the P2P Network and it is no more fresh peer, it is a peer of the P2P network.</li> 
+  <li>Then the fresh peer knows some servers, it is in the P2P Network and it is no more fresh peer, it is a peer of the P2P network.</li> 
 </ul> 
 <p>Furthermore, int the case of the fresh peer can't contact any servers from the list, the fresh peer will try every TTU (see below, about Time To Update parameter) to re-contact all of them until one or several of them are finally available. At any moments of the peer knows nobody because all of its acquaintances are no more available, the peer will try to contact all servers like earlier.</p> 
 <p>An example of a fresh peer which is trying to join a P2P network is shown by the next Figure. The new peer has 2 servers to contact for joining the existed P2P infrastructure.<br> 
@@ -359,40 +359,40 @@ Implementation</a></li>
   <p><b class="legend">Example of first contact (Bootstrapping).</b></p> 
 </div> 
 <h4><a class="mozTocH4" name="mozTocId470123"></a>Discovering and Self-Organizing in Continue</h4> 
-<p>The main particularity of a P2P network is the peers high volatility.&nbsp; This results from various attributes which composes P2P: <br> 
+<p>The main particularity of a P2P network is the peers high volatility.&nbsp; This results from various attributes which compose P2P: <br> 
 </p> 
 <ul> 
-  <li>Peers run on different kind of computer: desktop workstations, laptops, server, cluster nodes, etc.</li> 
-  <li>Each peer has a particular configuration: operating systems, etc.</li> 
-  <li>Communicating network between peers composes with different speed connections: modem, 100Mb Ethernet, fiber channel, etc.</li> 
-  <li>Peers are not available all time and not all at the same moment.</li> 
+  <li>Peers run on different kind of computers: desktop workstations, laptops, servers, cluster nodes, etc.</li> 
+  <li>Each peer has a particular configuration: operating system, etc.</li> 
+  <li>Communicating network between peers is composed by different speed connections: modem, 100Mb Ethernet, fiber channel, etc.</li> 
+  <li>Peers are not available all the time and not all at the same moment.</li> 
   <li>Peer latency is not&nbsp; equal for all.</li> 
   <li>etc.</li> 
 </ul> 
-<p>As a result of these points is the instability of the P2P network Hence the ProActive P2P manages by automatically and transparency ways this problem.</p> 
-<p>ProActive P2P aims to maintain a created P2P network alive until there are peers available in the network, this is called self-organizing of the P2P network. On condition that P2P doesn't have exterior entities, as such centralized servers which maintain peer data bases, the P2P network has to be self-organized. That means all peers should be enabled to stay in the P2P network by their own means.</p> 
+<p>As a result of these points is the instability of the P2P network. Hence the ProActive P2P infrastructure manages automatically and transparency ways this problem.</p> 
+<p>ProActive P2P infrastructure aims to maintain a created P2P network alive while there are available peers in the network, this is called self-organizing of the P2P network. On condition that P2P doesn't have exterior entities, as such centralized servers which maintain peer data bases, the P2P network has to be self-organized. That means all peers should be enabled to stay in the P2P network by their own means.</p> 
 <p>There is solution which is widely used in data P2P networks; this consists of for each peers to maintain a list of their neighbors, a peer's neighbors is typically a peers close to it (IP address or geographically).</p> 
-<p>In the same way, this idea was selected to keep the ProActive P2P infrastructure up. All peers have to maintain a list of <b>acquaintances</b>. At the beginning, when a fresh peer has just joined the P2P infrastructure, it knows only peers from its <a href="#mozTocId101413">bootstrapping</a> step. However, as long as is the list of servers, many of them could be not reachable, unavailable, etc. and the fresh peer lands up to know a small number of acquaintances. Knowing a small number of acquaintances is a real problem in a dynamic P2P network, when all servers will be unavailable the fresh peer will unconnected from the P2P infrastructure.</p> 
+<p>In the same way, this idea was selected to keep the ProActive P2P infrastructure up. All peers have to maintain a list of <b>acquaintances</b>. At the beginning, when a fresh peer has just joined the P2P infrastructure, it knows only peers from its <a href="#mozTocId101413">bootstrapping</a> step. However, as long as is the list of servers, many of them could be not reachable, unavailable, etc. and the fresh peer lands up to know a small number of acquaintances. Knowing a small number of acquaintances is a real problem in a dynamic P2P network, when all servers will be unavailable the fresh peer will be unconnected from the P2P infrastructure.</p> 
 <p>Therefore, the ProActive P2P infrastructure uses a specific parameter called: <b>Number Of Acquaintances (NOA)</b>. This is a minimum size of the list of acquaintances of all peers. More peers are highly dynamic more NOA should be high. Thereby, a peer must to discover new acquaintances through the P2P infrastructure.<br> 
 </p> 
-<p>In the next <a href="#mozTocId299524">section</a>, we will see in detail how the message protocol works, for the moment we will just explain briefly the discovering of acquaintances without go into detail in the message protocol.</p> 
-<p>The peer called "Alice" has a 2 acquaintances resulted from its first contact with the P2P infrastructure and by default NOA is 10 peers. Alice must find at least 8 peers to could stay with a certain guarantee inside the infrastructure.</p> 
+<p>In the next <a href="#mozTocId299524">section</a>, we will see in detail how the message protocol works, for the moment we will just explain briefly the discovering acquaintances process without go into detail in the message protocol.</p> 
+<p>The peer called "Alice" has 2 acquaintances resulted from its first contact with the P2P infrastructure and by default NOA is 10 peers. Alice must find at least 8 peers to could stay with a certain guarantee inside the infrastructure.</p> 
 <p>The acquaintance discovering works as follow:</p> 
 <ul> 
-  <li>Send an exploring message to all its acquaintance, and waiting for responses from new acquaintances (no firstly contacted peers or already known peers).</li> 
+  <li>Send an exploring message to all of its acquaintances, and waiting for responses from new acquaintances (not firstly contacted peers or not already known peers).</li> 
   <li>When receiving an exploring message:
     <ul> 
       <li>Forward the message to my acquaintances until the message Time To Live (TTL) reaches 0. <br> 
       </li> 
-      <li>Choose to be or not be an acquaintance of the asking peer.</li> 
+      <li>Choose to be or not to be an acquaintance of the asking peer.</li> 
     </ul> 
   </li> 
 </ul> 
-<p>In order to do not have isolated peers in the infrastructure, all peers registration are symmetric that means if Alice knows the peer "Bob", Bod knows also Alice. Hence, when a peer chooses to be or not an acquaintance, the peer has to check previously in its own acquaintance list if it doesn't already know the asking peer. Next, if it's an unknown peer, the peer decides with a random function to be an acquaintance or not. With the parameter of <b>agree responses</b>, it is possible to configure the percentage of positive response to an exploring message. A random function is a temporally solution to solve a flooding problem dues to the message protocol (see next <a
+<p>In order to do not have isolated peers in the infrastructure, all peers registration are symmetric that means if Alice knows the peer "Bob", Bod knows also Alice. Hence, when a peer chooses to be or not an acquaintance, the peer has to check previously in its own acquaintance list if it doesn't already know the asking peer. Next, if it's an unknown peer, the peer decides with a random function to be an acquaintance or not. With the parameter of <b>agree responses</b>, it is possible to configure the percentage of positive response to an exploring message. The random function is a temporally solution to solve the flooding problem dues to the message protocol (see next <a
  href="#mozTocId299524">section</a>), we are thinking to use a new parameter Maximum Number of Acquaintances and improving the message protocol. For the moment, we don't consider peers IP addresses or geographical place of the peers as an acquaintances criteria.<br> 
 </p> 
 <p>As the P2P infrastructure is a dynamic environment, the list of acquaintances must be also dynamic. Many acquaintances could be unavailable, should be removed and in case of the size of the list is less than the NOA discovering new peers. Therefore, all peers keeps frequently their lists up-to-date that's what a new parameter must be introduce: <b>Time To Update (TTU)</b>. This is the frequency which the peer must check its own acquaintances' list to removed unavailable peer and in case of need discovering new peers. To verify the acquaintances availability, the peer send an <b>Heart Beat</b> to all of its acquaintances. The heart beat is sent every TTU.</p> 
-<p>The next figure shows a peer which is sending an hart beat to all of its acquaintances. </p> 
+<p>The next figure shows a peer which is sending an heart beat to all of its acquaintances. </p> 
 <div align="center"> <img src="p2p_files/heartbeat.jpg"
  alt="Heart Beat"> 
   <p><b class="legend">Heart beat sent every TTU.</b></p> 
@@ -408,9 +408,9 @@ Implementation</a></li>
 </p> 
 <p>All BFS messages must contain these information:</p> 
 <ul> 
-  <li>An Unique Universal Message Identifier (UUID);</li> 
-  <li>the <b>Time To Live (TTL) infrastructure parameter</b>, in number of hops;</li> 
-  <li>A reference to the peer which sent firstly the request and which is waiting responses for nodes or acquaintances.</li> 
+  <li>An Unique Universal Message Identifier (UUID): this message identifier is not pure universal unique, it is just unique for the infrastructure;</li> 
+  <li>The <b>Time To Live (TTL) infrastructure parameter</b>, in number of hops;</li> 
+  <li>A reference to the peer which is sent firstly the request and which is waiting responses for nodes or acquaintances.</li> 
 </ul> 
 <p>Our BFS inspired version work as follow:</p> 
 <ul> 
@@ -454,10 +454,10 @@ Implementation</a></li>
 <h3><a class="mozTocH3" name="mozTocId467214"></a>Peers Implementation</h3> 
 <p>The P2P infrastructure is implemented with ProActive thus the shared resource is not a JVMs but a ProActive node, nodes are like container which receive work to do that is active objects.</p> 
 <p>The P2P infrastructure is not directly implemented in the ProActive core at the ProActive runtime level because we choose to be above communication protocols, such as RMI, HTTP, Ibis, etc. Therefore, the P2P infrastructure can use RMI or HTTP as communication layer. Hence, the P2P infrastructure is implemented with classic ProActive active objects and especially with ProActive typed group for broadcasting communications between peers due to your inspired BFS.</p> 
-<p>Using active object for the implementation is a good mapping with the idea of a peer which is an independent entities that works as a server with a FIFO request queue. The peer is also a client which sends requests to other peers.</p> 
+<p>Using active objects for the implementation is a good mapping with the idea of a peer which is an independent entities that works as a server with a FIFO request queue. The peer is also a client which sends requests to other peers.</p> 
 <p>The list of P2P active objects:</p> 
 <ul> 
-  <li><b>P2PService</b>: is the main active object. It serves all register requests or resource query, such as nodes or acquaintances.</li> 
+  <li><b>P2PService</b>: is the main active object. It serves all register requests or resource queries, such as nodes or acquaintances.</li> 
   <li><b>P2PNodeManager</b>: works together with the P2PService, this active object manages one or several shared nodes. It handles the booking node system, see <a href="#mozTocId690451">here</a> for more details.</li> 
   <li><b>P2PAcquaintanceManager</b>: manages the list of acquaintances and provides group communication, see next <a href="#mozTocId587594">section</a>.</li> 
   <li><b>P2PNodeLookup</b>: works as a broker when the P2PService asks nodes. All the asking node protocol is inside it. This broker can be migrate to a different node to be more close to the deployed application.</li> 
@@ -469,14 +469,14 @@ Implementation</a></li>
 <div style="text-align: center;"><img src="p2p_files/implementation.jpg"
  alt="P2P Implementation"> </div> 
 <p style="text-align: center;"><b class="legend">Nodes and Active Objects which are composing a P2P Service.</b></p> 
-<p>All communications between peers use Group communication but for sending response of a request message, it's a point-to-point communication. Though ProActive communications are asynchronous, it's not really messages which are sent between peers. Nevertheless, it's not a real problem; ProActive is implemented above Java RMI which is RPC and RPC is synchronous, however ProActive uses future mechanism and Rendez-vous method to turn RPC method in asynchronous, that means ProActive is asynchronous RPC. Rendez-vous is interesting in your case because it&nbsp; guarantees the method is successfully received by the receiver. With the Heart beat message is sent an exception can be caught if an acquaintance is down. <br> 
+<p>All communications between peers use Group communication but for sending response of a request message, it's a point-to-point communication. Though ProActive communications are asynchronous, it's not really messages which are sent between peers. Nevertheless, it's not a real problem; ProActive is implemented above Java RMI which is RPC and RPC is synchronous, however ProActive uses future mechanism and Rendez-vous method to turn RPC methods in asynchronous, that means ProActive is asynchronous RPC. Rendez-vous is interesting in your case because it&nbsp; guarantees the method is successfully received by the receiver. With the Heart beat message is sent a Java exception can be caught if an acquaintance is down. <br> 
 </p> 
 <p>The P2PAcquaintanceManager manages the list of acquaintances, this list is represented by a ProActive typed group of P2PService. This is the point of the next section.</p> 
 <h3><a class="mozTocH3" name="mozTocId587594"></a>Dynamic Shared ProActive Group</h3> 
 <p>ProActive typed group does't allow to access group elements and to make calls from different active objects to the same group, i.e. a group can not be shared. However, the point of the P2P infrastructure is to broadcast message to all member of the acquaintance list, ProActive typed group are perfect to do that. A typed group of P2PService is a well implementation of the acquaintance list design.</p> 
 <p>But a typed group is not applied from many active objects, especially making group method calls from different objects, adding / removing / etc. members in the group. Therefore, for the P2P infrastructure the P2PAcquaintanceManager (PAM) was made.</p> 
-<p>The PAM is a standard active object, at its initialization it construct an empty P2PService group. The PAM provides few access group methods, such as removing, adding and group size methods. All other active objects, such as P2PService or P2PNodeLookup, have to use PAM methods to access to the group. The PAM works a server with a FIFO queue behind the group.</p> 
-<p>That solve the problem of group member accessing but not how other active object can call methods on the group. The ProActive group API provides a method to turn active a group that is made possible to get ProActive reference on the group. The PAM turns active the group after its creation. P2PService, P2PNodeLookup and all get the group reference by a PAM getter.</p> 
+<p>The PAM is a standard active object, at its initialization it construct an empty P2PService group. The PAM provides few access group methods, such as removing, adding and group size methods. All other active objects, such as P2PService or P2PNodeLookup, have to use PAM methods to access to the group. The PAM works as a server with a FIFO queue behind the group.</p> 
+<p>That solve the problem of group member accessing but not how other active object can call methods on the group. The ProActive group API provides a method to turn active a group that is made possible to get ProActive reference on the group. The PAM turns active the group after its creation. P2PService, P2PNodeLookup and all get the group reference by a PAM's getter.</p> 
 <p>The PAM during is activity send frequently heart beats to remove unavailable peers, the P2PService adds by the PAM new discovered acquaintance (P2PService) and the P2PNodeLookup calls group method to ask nodes by the group reference. The P2PService does also group method calls.</p> 
 <p>In short all is in the next Figure:</p> 
 <div align="center"> <img src="p2p_files/dynamicGroup.jpg"
@@ -487,16 +487,17 @@ Implementation</a></li>
 </p> 
 <h3><a class="mozTocH3" name="mozTocId690451"></a>Sharing Node Mechanism</h3> 
 <p>The sharing node mechanism provides an independent activity from the P2P service for all about shared nodes. Nodes are the sharing resource of this P2P network. This activity is handled by the P2PNodeManager active object.</p> 
-<p>At the initialization of the P2PNodeManager (PNM), it has to instantiate the shared resource. By default, it's 1 ProActive nodes by own machine CPU, for example on a single processor machine the PNM starts 1 node and on a bi-processors machine it starts 2 nodes. It's possible to choose to share only a single node independently the number of processor. An other way is to share nodes from an XML deployment descriptor file by specifing the descriptor to the PNM which actives deployment and gets nodes ready to share.</p> 
-<p>When the P2P service receives a node request, the request is forwarded (after the BFS broadcast) to the PNM which is checking for free node. In the case of at least 1 node is free, the PNM must book the node and send back a reference on the the node to the original request sender. However, the booking remains valid for a predetermined time, this time expires after a configurable timeout. The PNM knows if the node is used or not by testing the active object presence inside the node. Consequently, at the end of the booking time, the PNM kill the node, the node is no more usable. Though, some applications could need empty node for a long time before use them, thereby there is a pseudo expand booking time system: creating "Dummy" active objects in booked nodes for a later use. This system is allowed by the P2PNodeLookup.</p> 
-<p>The deployed applications have to leave nodes after using. Therefor, the PNM offers a leaving node mechanism that application send a leaving message fro a specified node to the PNM which kills all nodes active objects by terminate their bodies and kills the node. After that, the PNM creates a new node which is ready for sharing. However, if nodes are deployed by an XML descriptor the PNM does't kill the node, it just terminates all its active object and re-share the same node.</p> 
+<p>At the initialization of the P2PNodeManager (PNM), it has to instantiate the shared resource. By default, it's 1 ProActive nodes by own machine CPU, for example on a single processor machine the PNM starts 1 node and on a bi-processors machine it starts 2 nodes. It's possible to choose to share only a single node independently of the number of processors. An other way is to share nodes from an XML deployment descriptor file by specifing the descriptor to the PNM which actives deployment and gets nodes ready to share.</p> 
+<p>When the P2P service receives a node request, the request is forwarded (after the BFS broadcast) to the PNM which is checking for a free node. In the case of at least 1 node is free, the PNM must book the node and send back a reference on the the node to the original request sender. However, the booking remains valid for a predetermined time, this time expires after a configurable timeout. The PNM knows if the node is used or not by testing the active object presence inside the node. Consequently, at the end of the booking time, the PNM kill the node, the node is no more usable. Though, some applications could need empty node for a long time before use them, thereby there is a pseudo expand booking time system: creating "Dummy" active objects in booked nodes for a later use. This system is allowed by the P2PNodeLookup.</p>
+<p>The P2PNodeLookup could receive more nodes than it needs, for all additional nodes, the P2PNodeLookup send a message to all node PNM to cancel its book on the node. </p>
+<p>The deployed applications have to leave nodes after using. Therefor, the PNM offers a leaving node mechanism that application send a leaving message for a specified node to the PNM which kills all node's active objects by terminate their bodies and kills the node. After that, the PNM creates a new node which is ready for sharing. However, if nodes are deployed by an XML descriptor the PNM does't kill the node, it just terminates all its active objects and re-share the same node.</p> 
 <p>The asking node mechanism is allowed by the P2PNodeLookup, this object is active by the P2PService when it receives a asking node request from an application. The P2PNodeLookup (PNL) works as a broker, it could be migrate to an another place (node, machine, etc.) to be more closer to the application.</p> 
 <p>The PNL aims to find trough the P2P infrastructure the application requested number of nodes. It uses the BFS to flood frequently the network until it gets all needed nodes or until the timeout reached. However, the application can ask the maximum number of nodes, in that case the PNL asks nodes until the end of the application with a greater frequency. The PNL provides a listener / producer event mechanism that is great for application which wants to know when a node is found.<br> 
 </p> 
 <p>Finally, the application kills nodes by the PNL which is in charge to contact all PNMs of each nodes and asks to them to leave nodes. The PNMs leave nodes with the mechanism of the booking timeout.</p> 
 <p>Lastly, the asking nodes mechanism with the PNL is fully integrated to the ProActive XML deployment descriptor.</p> 
 <h3><a class="mozTocH3" name="mozTocId586812"></a>IC2D Screen shot</h3> 
-<p>A screen shot made with IC2D. You can see principaly 3 P2P services which are sharing 2 nodes (bi-processors machines). Inside nodes some Domain object from the nBody application which is deployed on this small P2P infrastructure.</p> 
+<p>A screen shot made with IC2D. You can see principaly 3 P2P services which are sharing 2 nodes (bi-processors machines). Inside nodes some Domain objects from the nBody application which is deployed on this small P2P infrastructure.</p> 
 <div align="center"> <img src="p2p_files/screenshot.jpg"
  alt="IC2D Screen Shot"> 
   <p></p> 
