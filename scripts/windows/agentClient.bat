@@ -1,16 +1,16 @@
 @echo off
 echo. 
-echo --- UpperClient----------------------------------------
+echo --- AgentClient----------------------------------------
 if "%1" == "" goto usage
 
 goto doit
 
 :usage
 echo. 
-echo Start the upper Client
+echo Start the Agent Client
 echo    - 1 : the url of the node the active object Upper is going to be migrated
 echo. 
-echo ex : upperClient //localhost/Node1
+echo ex : agentClient //localhost/Node1
 echo This node has to be previously launched with the command startNode.bat //localhost/Node1
 echo. 
 goto end
