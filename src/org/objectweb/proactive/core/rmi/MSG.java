@@ -1,8 +1,6 @@
 /*
  * Created on Jul 23, 2004
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package org.objectweb.proactive.core.rmi;
 
@@ -10,8 +8,6 @@ package org.objectweb.proactive.core.rmi;
 /**
  * @author sbeucler
  *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 public class MSG {
     private byte[] message;

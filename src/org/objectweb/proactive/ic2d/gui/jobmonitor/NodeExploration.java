@@ -218,7 +218,6 @@ public class NodeExploration implements JobMonitorConstants {
         //        try {
         //            System.out.println("OK for "+ pr.getURL()+ " " +vmName );
         //        } catch (ProActiveException e1) {
-        //            // TODO Auto-generated catch block
         //            e1.printStackTrace();
         //        }
         visitedVM.add(vmName);
@@ -257,7 +256,6 @@ public class NodeExploration implements JobMonitorConstants {
             try {
                 host = UrlBuilder.getHostNameFromUrl(runtimeUrl);
             } catch (UnknownHostException e1) {
-                // TODO Auto-generated catch block
                 log(e1);
                 e1.printStackTrace();
             }

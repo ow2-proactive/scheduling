@@ -88,7 +88,6 @@ public class MonitorThread extends Thread {
             try {
                 worldObject.addHostObject(monitoredhost, asso);
             } catch (RemoteException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
