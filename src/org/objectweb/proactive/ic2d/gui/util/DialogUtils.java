@@ -180,10 +180,31 @@ public class DialogUtils {
 	 * @param logger
 	 */
 	public static void openNewGlobusHostDialog(
-		Component component,
+		Component parentComponent,
 		WorldObject worldObject,
 		IC2DMessageLogger logger)
 	{
-	}
+		String initialHostValue = "localhost";
+    try {
+      initialHostValue = java.net.InetAddress.getLocalHost().getHostName();
+    } catch (java.net.UnknownHostException e) {
+    }
+    Object result = javax.swing.JOptionPane.showInputDialog(parentComponent, // Component parentComponent,
+        "Please enter the name or the IP of the Globus host to monitor :", // Object message,
+        "Adding a host to monitor", // String title,
+        javax.swing.JOptionPane.PLAIN_MESSAGE, // int messageType,
+        null, // Icon icon,
+        null, // Object[] selectionValues,
+        initialHostValue // Object initialSelectionValue)
+      );
+    if (result == null || (!(result instanceof String)))
+      return;
+    String host = (String) result;
+    try {
+      worldObject.addHostObject(host);
+      worldObject.addHosts(host);
+    } catch (java.rmi.RemoteException e) {
+      logger.log("Cannot create the Globus Host " + host, e);
+    }
 
 }
