@@ -82,20 +82,16 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
 
-		Body body = ProActive.getBodyOnThis();		
-
 		/* if OneWay : do not construct result */
 		if (AbstractProxy.isOneWayCall(mc))
-			oneWayCallOnGroup(mc,body);
+			oneWayCallOnGroup(mc);
 
 		/* if the call is asynchronous the group of result will be a group a future */
 		else // with group : SYNC == ASYNC !!!!
-			result = asynchronousCallOnGroup(mc,body);
+			result = asynchronousCallOnGroup(mc);
 
 		/* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
 		this.waitForAllCallsDone();
-
-		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 
 		return result;
 	}
@@ -123,8 +119,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Create and initialize (and return) the group of result, then launch threads for asynchronous call of each member
 	 */
-	protected synchronized Object asynchronousCallOnGroup(MethodCall mc, Body body) {
+	protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
 		Object result;
+		Body body = ProActive.getBodyOnThis();		
+
 		int size = memberList.size();
 		// Creates a stub + ProxyForGroup for representing the result
 		try {
@@ -158,6 +156,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			}
 		}
 
+		LocalBodyStore.getInstance().setCurrentThreadBody(body);
+
 		return result;
 	}
 
@@ -176,7 +176,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Launch threads for OneWay call of each member
 	 */
-	protected void oneWayCallOnGroup(MethodCall mc, Body body) {
+	protected void oneWayCallOnGroup(MethodCall mc) {
+		Body body = ProActive.getBodyOnThis();		
 		// Creating Threads
 
 		if (dispatching == false)
@@ -194,6 +195,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body);
 			}
 		}
+
+		LocalBodyStore.getInstance().setCurrentThreadBody(body);
 	}
 
 	private synchronized void createThreadForOneWay(Vector memberListStubOfThis, int index, MethodCall mc, Body body) {
