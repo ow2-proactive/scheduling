@@ -50,10 +50,10 @@ public class CertificateChainValidation {
 			//acPrivateKey = (PrivateKey) o[1];
 			kp = KeyTools.genKeys(2048);
 		} catch (NoSuchAlgorithmException e4) {
-			// TODO Auto-generated catch block
+			
 			e4.printStackTrace();
 		} catch (NoSuchProviderException e4) {
-			// TODO Auto-generated catch block
+			
 			e4.printStackTrace();
 		}
 		return kp;
@@ -69,10 +69,10 @@ public class CertificateChainValidation {
 		try {
 			cf = CertificateFactory.getInstance("X.509", "BC");
 		} catch (CertificateException e1) {
-			// TODO Auto-generated catch block
+			
 			e1.printStackTrace();
 		} catch (NoSuchProviderException e1) {
-			// TODO Auto-generated catch block
+		
 			e1.printStackTrace();
 		}
 		X509Certificate acCert = null;
@@ -82,9 +82,8 @@ public class CertificateChainValidation {
 		/*
 		 * try { acCert = (X509Certificate)cf.generateCertificate(new
 		 * FileInputStream("/net/home/acontes/certif/appli.cert")); } catch
-		 * (CertificateException e2) { // TODO Auto-generated catch block
-		 * e2.printStackTrace(); } catch (FileNotFoundException e2) { // TODO
-		 * Auto-generated catch block e2.printStackTrace(); }
+		 * (CertificateException e2) { 
+		 * e2.printStackTrace(); } catch (FileNotFoundException e2) {  e2.printStackTrace(); }
 		 * 
 		 * 
 		 * 
@@ -116,13 +115,13 @@ public class CertificateChainValidation {
 			acCert = CertTools.genSelfCert("CN=autorithy", 50, null, kp
 					.getPrivate(), kp.getPublic(), true);
 		} catch (InvalidKeyException e2) {
-			// TODO Auto-generated catch block
+			
 			e2.printStackTrace();
 		} catch (NoSuchAlgorithmException e2) {
-			// TODO Auto-generated catch block
+			
 			e2.printStackTrace();
 		} catch (SignatureException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		}
 		//acCert = (X509Certificate ) o[0];
@@ -135,19 +134,19 @@ public class CertificateChainValidation {
 			acCert.verify(acCert.getPublicKey());
 			CertTools.isSelfSigned(acCert);
 		} catch (InvalidKeyException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (CertificateException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (NoSuchAlgorithmException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (NoSuchProviderException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (SignatureException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		}
 		
@@ -172,13 +171,13 @@ public class CertificateChainValidation {
 			certLevel1 = CertTools.genCert("CN=level1", 50, null, kp1
 					.getPrivate(), kp1.getPublic(), true, acCert.getSubjectDN().toString(), acPrivateKey, acCert.getPublicKey());
 		} catch (InvalidKeyException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		} catch (NoSuchAlgorithmException e2) {
-			// TODO Auto-generated catch block
+	
 			e2.printStackTrace();
 		} catch (SignatureException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		}
 		
@@ -190,19 +189,19 @@ public class CertificateChainValidation {
 		try {
 			certLevel1.verify(acCert.getPublicKey());
 		} catch (InvalidKeyException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (CertificateException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (NoSuchAlgorithmException e3) {
-			// TODO Auto-generated catch block
+		
 			e3.printStackTrace();
 		} catch (NoSuchProviderException e3) {
-			// TODO Auto-generated catch block
+		
 			e3.printStackTrace();
 		} catch (SignatureException e3) {
-			// TODO Auto-generated catch block
+		
 			e3.printStackTrace();
 		}
 		
@@ -219,13 +218,13 @@ public class CertificateChainValidation {
 			certLevel2 = CertTools.genCert("CN=level2", 50, null, kp2
 					.getPrivate(), kp2.getPublic(), true, certLevel1.getSubjectDN().toString(), privateKeyLevel1,certLevel1.getPublicKey());
 		} catch (InvalidKeyException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		} catch (NoSuchAlgorithmException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		} catch (SignatureException e2) {
-			// TODO Auto-generated catch block
+		
 			e2.printStackTrace();
 		}
 		
@@ -237,19 +236,19 @@ public class CertificateChainValidation {
 		try {
 			certLevel2.verify(certLevel1.getPublicKey());
 		} catch (InvalidKeyException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (CertificateException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (NoSuchAlgorithmException e3) {
-			// TODO Auto-generated catch block
+			
 			e3.printStackTrace();
 		} catch (NoSuchProviderException e3) {
-			// TODO Auto-generated catch block
+
 			e3.printStackTrace();
 		} catch (SignatureException e3) {
-			// TODO Auto-generated catch block
+		
 			e3.printStackTrace();
 		}
 		
@@ -269,13 +268,12 @@ public class CertificateChainValidation {
 		 * certLevel3.getIssuerDN() );
 		 * 
 		 * try { certLevel3.verify(certLevel3.getPublicKey()); } catch
-		 * (InvalidKeyException e3) { // TODO Auto-generated catch block
-		 * e3.printStackTrace(); } catch (CertificateException e3) { // TODO
-		 * Auto-generated catch block e3.printStackTrace(); } catch
-		 * (NoSuchAlgorithmException e3) { // TODO Auto-generated catch block
-		 * e3.printStackTrace(); } catch (NoSuchProviderException e3) { // TODO
-		 * Auto-generated catch block e3.printStackTrace(); } catch
-		 * (SignatureException e3) { // TODO Auto-generated catch block
+		 * (InvalidKeyException e3) { 
+		 * e3.printStackTrace(); } catch (CertificateException e3) { 
+		 * e3.printStackTrace(); } catch
+		 * (NoSuchAlgorithmException e3) { 
+		 * e3.printStackTrace(); } catch (NoSuchProviderException e3) {  e3.printStackTrace(); } catch
+		 * (SignatureException e3) { 
 		 * e3.printStackTrace(); }
 		 * 
 		 * 
@@ -292,13 +290,13 @@ public class CertificateChainValidation {
 		 * certLevel4.getIssuerDN() ); CertTools.isSelfSigned(certLevel4);
 		 * 
 		 * try { certLevel4.verify(certLevel4.getPublicKey()); } catch
-		 * (InvalidKeyException e3) { // TODO Auto-generated catch block
-		 * e3.printStackTrace(); } catch (CertificateException e3) { // TODO
+		 * (InvalidKeyException e3) {
+		 * e3.printStackTrace(); } catch (CertificateException e3) {
+		 *  e3.printStackTrace(); } catch
+		 * (NoSuchAlgorithmException e3) {
+		 * e3.printStackTrace(); } catch (NoSuchProviderException e3) { 
 		 * Auto-generated catch block e3.printStackTrace(); } catch
-		 * (NoSuchAlgorithmException e3) { // TODO Auto-generated catch block
-		 * e3.printStackTrace(); } catch (NoSuchProviderException e3) { // TODO
-		 * Auto-generated catch block e3.printStackTrace(); } catch
-		 * (SignatureException e3) { // TODO Auto-generated catch block
+		 * (SignatureException e3) { 
 		 * e3.printStackTrace(); }
 		 * 
 		 * 
@@ -323,7 +321,7 @@ public class CertificateChainValidation {
 			try {
 				cpv = CertPathValidator.getInstance("PKIX", "BC");
 			} catch (NoSuchProviderException e5) {
-				// TODO Auto-generated catch block
+				
 				e5.printStackTrace();
 			}
 			PKIXCertPathValidatorResult result = (PKIXCertPathValidatorResult) cpv
@@ -337,13 +335,13 @@ public class CertificateChainValidation {
 			System.out.println("Validation failure, cert[" + cpve.getIndex()
 					+ "] :" + cpve.getMessage());
 		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
+		
 			e.printStackTrace();
 		}
 	
@@ -391,19 +389,19 @@ public class CertificateChainValidation {
     System.out.println("certificate equal ? " + certLevel1.equals(cc));
 	
 	} catch (KeyStoreException e5) {
-		// TODO Auto-generated catch block
+	
 		e5.printStackTrace();
 	} catch (NoSuchProviderException e5) {
-		// TODO Auto-generated catch block
+		
 		e5.printStackTrace();
 	} catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
+		
 		e.printStackTrace();
 	} catch (CertificateException e) {
-		// TODO Auto-generated catch block
+	
 		e.printStackTrace();
 	} catch (IOException e) {
-		// TODO Auto-generated catch block
+		
 		e.printStackTrace();
 	}
 	
@@ -459,19 +457,19 @@ public class CertificateChainValidation {
     try {
 		certLevel1.verify(acCert.getPublicKey());
 	} catch (InvalidKeyException e4) {
-		// TODO Auto-generated catch block
+	
 		e4.printStackTrace();
 	} catch (CertificateException e4) {
-		// TODO Auto-generated catch block
+		
 		e4.printStackTrace();
 	} catch (NoSuchAlgorithmException e4) {
-		// TODO Auto-generated catch block
+	
 		e4.printStackTrace();
 	} catch (NoSuchProviderException e4) {
-		// TODO Auto-generated catch block
+	
 		e4.printStackTrace();
 	} catch (SignatureException e4) {
-		// TODO Auto-generated catch block
+	
 		e4.printStackTrace();
 	}
     

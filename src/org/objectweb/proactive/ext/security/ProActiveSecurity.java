@@ -211,13 +211,13 @@ public class ProActiveSecurity {
         try {
 			o = genCert(dnName,365,null,privateKey,publicKey,true,issuerName,caPrivKey,caPubKey);
 		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (SignatureException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITY Auto-generated catch block
 			e.printStackTrace();
 		}
         
@@ -569,13 +569,13 @@ public class ProActiveSecurity {
     		System.out.println("Validation failure, cert[" + cpve.getIndex()
     				+ "] :" + cpve.getMessage());
     	} catch (InvalidAlgorithmParameterException e) {
-    		// TODO Auto-generated catch block
+    		// TODOSECURITY Auto-generated catch block
     		e.printStackTrace();
     	} catch (NoSuchAlgorithmException e) {
-    		// TODO Auto-generated catch block
+    		// TODOSECURITY Auto-generated catch block
     		e.printStackTrace();
     	} catch (CertificateException e) {
-    		// TODO Auto-generated catch block
+    		// TODOSECURITY Auto-generated catch block
     		e.printStackTrace();
     	}
     }

@@ -499,10 +499,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // should never happen
             e.printStackTrace();
         } catch (SecurityNotAvailableException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 

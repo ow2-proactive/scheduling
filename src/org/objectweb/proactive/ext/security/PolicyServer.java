@@ -350,7 +350,7 @@ public class PolicyServer implements Serializable, Cloneable {
 
         System.out.println("Policy is : " + matchingPolicy);
 
-        //  TODO split receive of a request or a reply 
+        //  TODOSECURITY split receive of a request or a reply 
         if ((securityContext.getType() == SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM) ||
                 (securityContext.getType() == SecurityContext.COMMUNICATION_RECEIVE_REPLY_FROM)) {
             communication = matchingPolicy.getCommunicationReply();
@@ -481,16 +481,16 @@ public class PolicyServer implements Serializable, Cloneable {
               
        
         } catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -510,19 +510,19 @@ public class PolicyServer implements Serializable, Cloneable {
 		        
 			
 		} catch (KeyStoreException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -618,7 +618,7 @@ public class PolicyServer implements Serializable, Cloneable {
      * @param uri
      */
     public void setFile(String uri) {
-        // TODO remove it !!!!! only for test
+        // TODOSECURITYSECURITY remove it !!!!! only for test
         f = uri;
     }
 
@@ -779,10 +779,10 @@ public class PolicyServer implements Serializable, Cloneable {
     	clone = (PolicyServer) ois.readObject();
     	
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
+			// TODOSECURITYSECURITY Auto-generated catch block
 			e.printStackTrace();
 		}
     	/*
