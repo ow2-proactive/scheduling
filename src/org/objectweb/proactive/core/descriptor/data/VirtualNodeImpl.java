@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
@@ -64,14 +69,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
 
 
 /**
@@ -464,7 +461,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 //we have to be carefull. Indeed if the node is local, we do not
                 // want to kill the runtime, otherwise the application is over
                 // so if the node is local, we just unregister this node from any registry
-                if (!NodeFactory.isNodeLocal(node) && !this.isP2pNode(node)) {
+                if (!NodeFactory.isNodeLocal(node) ) {
                     try {
                         part.killRT(softly);
                     } catch (ProActiveException e1) {
@@ -476,17 +473,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                                 part.getVMInformation().getInetAddress()) +
                             " terminated!!!");
                     }
-                } else if (!this.isP2pNode(node)) {
+                } else  {
                     try {
                         //					the node is local, unregister it.
                         part.killNode(node.getNodeInformation().getURL());
                     } catch (ProActiveException e) {
                         e.printStackTrace();
                     }
-                } else {
-                    // it's a p2p node
-                    this.killP2PNode(node);
-                }
+                } 
             }
             isActivated = false;
             try {
@@ -1228,9 +1222,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeUrl, e);
         }
         if (remoteAO.size() == 1) {
-        	// FIXME CLASS CAST EXCEPTION
-           // P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
-           // remoteNodeManager.leaveNode(node);
+            // FIXME CLASS CAST EXCEPTION
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
+            remoteNodeManager.leaveNode(node);
             if (P2P_LOGGER.isInfoEnabled()) {
                 P2P_LOGGER.info("Node at " + nodeUrl + " succefuly killed");
             }
