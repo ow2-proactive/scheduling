@@ -34,8 +34,10 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.io.Serializable;
 import java.util.Hashtable;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
+import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeImpl;
@@ -57,13 +59,15 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since   ProActive 0.9.4
  */
 
-public class VirtualNodeImpl implements VirtualNode,Serializable
+public class VirtualNodeImpl extends RuntimeDeploymentProperties implements VirtualNode,Serializable,RuntimeRegistrationEventListener
 {
 //
+
+	
   //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
   //
   /** Reference on the local runtime*/
-  private ProActiveRuntimeImpl proActiveRuntimeImpl;
+  protected transient ProActiveRuntimeImpl proActiveRuntimeImpl;
   
   /** the name of this VirtualNode */
   private String name;
@@ -96,22 +100,38 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
    * already assigned in the XML descriptor */
   private Hashtable awaitedVirtualNodes;
   
+  private String registrationProtocol;
+  
+  private boolean registration = false;
+  
+  //private boolean deepCopyTag;
+  
 	protected static final int MAX_RETRY = 70;
+	
+	private Object uniqueActiveObject = null;
 	
   //
   //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
   //
+ /**
+  * Contructs a new intance of VirtualNode
+  */
+  VirtualNodeImpl(){
+  }
 
  /**
   * Contructs a new intance of VirtualNode
   */
-  VirtualNodeImpl() {
+  VirtualNodeImpl(String name) {
+  	this.name = name;
     virtualMachines = new java.util.ArrayList(5);
     createdNodes = new java.util.ArrayList();
     awaitedVirtualNodes = new Hashtable();
     proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
    // System.out.println("vn "+this.name+" registered on "+proActiveRuntimeImpl.getVMInformation().getVMID().toString());
     proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
+    proActiveRuntimeImpl.registerLocalVirtualNode(this,this.name);
+    
   }
 
 
@@ -139,6 +159,12 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   
   public void addVirtualMachine(VirtualMachine virtualMachine) {
     virtualMachines.add(virtualMachine);
+    if(!((virtualMachine.getCreatorId()).equals(this.name))){
+    	// add in the hashtable the vm's creator id, and the number of nodes that should be created
+				awaitedVirtualNodes.put(virtualMachine.getCreatorId(),virtualMachine);
+				//we need to do it here otherwise event could occurs, whereas vm 's creator id is not in the hash map
+				//just synchro pb, this workaround solves the pb
+    }
     //System.out.println("mapped VirtualNode="+name+" with VirtualMachine="+virtualMachine.getName());
   }
 
@@ -159,24 +185,29 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
 			VirtualMachine vm = getVirtualMachine();
 			boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
 			ExternalProcess process = getProcess(vm,vmAlreadyAssigned);
-			setParameters(process,vm,vmAlreadyAssigned);
+			
 			// Test if that is this virtual Node that originates the creation of the vm
 			// else the vm was already created by another virtualNode, in that case, nothing is
 			// done at this point, nodes creation will occur when the runtime associated with the jvm
 			// will register.
 				if(!vmAlreadyAssigned){
+					setParameters(process,vm);
 					// It is this virtual Node that originates the creation of the vm
-				try{
-    			proActiveRuntimeImpl.createVM(process);	
-    		}catch(java.io.IOException e){
-    			e.printStackTrace();
-    			System.out.println("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
-    		}
-			}else{
-				// add in the hashtable the vm's creator id, and the number of nodes that should be created
-				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
-			}
+					try{
+    				proActiveRuntimeImpl.createVM(process);	
+    			}catch(java.io.IOException e){
+    				e.printStackTrace();
+    				System.out.println("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
+    			}
+				}
+//			}else{
+//				// add in the hashtable the vm's creator id, and the number of nodes that should be created
+//				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
+//			}
 			increaseIndex();	
+		}
+		if (registration){
+			register();
 		}
     
   }
@@ -225,13 +256,11 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	}		
   }
   
-  /**
-   * Returns the Node mapped to this VirtualNode with the specified index(in the XML Descriptor
-   * @param index
-   * @return Node
-   */
-  public Node getNode(int index){
-    return (Node)createdNodes.get(index);
+  
+  public Node getNode(int index) throws NodeException{
+  	Node node = (Node)createdNodes.get(index);
+  	if (node == null) throw new NodeException("Cannot return the first node, no nodes hava been created");
+    return node;
   }
   
   
@@ -317,14 +346,35 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	//create the node
   	defaultRuntime.createLocalNode(url,false);
   	//add this node to this virtualNode
-  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
-  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
-		nodeCreated = true;
-  	nodeCountCreated ++ ;
+//  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
+//  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+//		nodeCreated = true;
+//  	nodeCountCreated ++ ;
+			performOperations(defaultRuntime,url,protocol);
   	}catch(Exception e)
   	{
 			e.printStackTrace();
 		}
+  }
+  
+  public Object getUniqueAO() throws ProActiveException{
+  	
+  	if(!property.equals("unique_singleAO")) System.out.println("!!!!!!!!!!WARNING. This VirtualNode is not defined with unique_single_AO property in the XML descriptor. Calling getUniqueAO() on this VirtualNode can lead to unexpected behaviour");
+  	if(uniqueActiveObject == null){
+  		try{
+  		Node node = getNode();
+  		if(node.getActiveObjects().length > 1) System.out.println("!!!!!!!!!!WARNING. More than one active object is created on this VirtualNode.");
+  		uniqueActiveObject = node.getActiveObjects()[0];
+ 		 
+  		}catch(Exception e){
+  			e.printStackTrace();
+  		}
+  		
+  	}
+  	if(uniqueActiveObject == null) throw new ProActiveException("No active object are registered on this VirtualNode");
+  	
+  	return uniqueActiveObject;
+  	
   }
   //
   //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
@@ -356,11 +406,12 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   			//System.out.println(buildURL(nodeHost,nodeNames[i]));
 				nodeName = nodeNames[i];
 			  url = buildURL(nodeHost,nodeName,protocol);
-				createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
-				System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");
-				//System.out.println("nodecount "+nodeCountCreated);
-			  nodeCreated = true;
-				nodeCountCreated++;
+//				createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
+//				System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");
+//				//System.out.println("nodecount "+nodeCountCreated);
+//			  nodeCreated = true;
+//				nodeCountCreated++;
+				performOperations(proActiveRuntimeRegistered,url,protocol);
 			}
 			
   	}
@@ -371,8 +422,9 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   		// get the host for the node to be created
   		nodeHost = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
   		protocol = event.getProtocol();
-  		int nodeNumber = (new Integer((String)awaitedVirtualNodes.get(event.getCreatorID()))).intValue();
-  		//System.out.println("NodeNumber "+nodeNumber);
+  		// it is the only way to get accurate value of nodeNumber
+  		VirtualMachine vm = (VirtualMachine)awaitedVirtualNodes.get(event.getCreatorID());
+  		int nodeNumber = (new Integer((String)vm.getNodeNumber())).intValue();
   		for (int i = 1; i <= nodeNumber; i++)
 				{
 					try{
@@ -381,10 +433,11 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
 						// nodes are created from the registered runtime, since this virtualNode is
 						// waiting for runtime registration to perform co-allocation in the jvm.
 					  proActiveRuntimeRegistered.createLocalNode(url,false);
-						createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
-						System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
-						nodeCreated = true;
-						nodeCountCreated++;
+//						createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
+//						System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+//						nodeCreated = true;
+//						nodeCountCreated++;
+							performOperations(proActiveRuntimeRegistered,url,protocol);
 					}catch(ProActiveException e){
 						e.printStackTrace();
 					}
@@ -392,7 +445,29 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	} 
   }
   
+  /**
+	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
+	 * At the moment no property can be set at runtime on a VirtualNodeImpl.
+	 */
+	public void setRuntimeInformations(String information, String value) throws ProActiveException{
+		try{
+			checkProperty(information);
+		}catch(ProActiveException e){
+			throw new ProActiveException("No property can be set at runtime on this VirtualNode",e);
+		}
+		
+	}
+	
+  public void setRegistrationProtocol(String protocol){
+  	setRegistrationValue(true);
+  	this.registrationProtocol = protocol;
+  }
   
+  
+  
+  public String getRegistrationProtocol(){
+  	return this.registrationProtocol;
+  }
   //
   //-------------------PRIVATE METHODS--------------------------------------
   //
@@ -424,6 +499,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
    */
   private void waitForAllNodesCreation() throws NodeException{
   	int count = 0;
+  	
   	while(nodeCountCreated != nodeCount){
   		if(count<MAX_RETRY){
   			//System.out.println("Error when getting the node, retrying ("+count+")");
@@ -435,6 +511,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   			throw new NodeException("After many retries, only "+nodeCountCreated+" nodes are created on "+nodeCount+" expected");
   		}
   	}
+  	
   	return;
   }
   
@@ -456,6 +533,8 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
 		vm.setProcess(copyProcess);
 		return copyProcess;
 	}else{
+		//increment the node count by nodeNumber
+		increaseNodeCount(new Integer(vm.getNodeNumber()).intValue());
 		return process;
 	}
  }
@@ -465,7 +544,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
 	 * Sets parameters to the JVMProcess linked to the ExternalProcess
 	 * @param process
 	 */
-  private void setParameters(ExternalProcess process, VirtualMachine vm, boolean vmAlreadyAssigned){
+  private void setParameters(ExternalProcess process, VirtualMachine vm){
   	ExternalProcess processImpl = process;
   	ExternalProcessDecorator processImplDecorator;
   	JVMProcess jvmProcess;
@@ -494,7 +573,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   			//if bsub is null we can increase the nodeCount
   			increaseNodeCount(nodeNumber);
   		}
-  		if(!vmAlreadyAssigned){
+  		//if(!vmAlreadyAssigned){
   			String vnName = this.name;
   			String acquisitionMethod = vm.getAcquisitionMethod();
   			//System.out.println("Aquisition method :"+acquisitionMethod);
@@ -502,7 +581,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   			String localruntimeURL = proActiveRuntimeImpl.getURL();
   			//System.out.println(localruntimeURL);
   			jvmProcess.setParameters(vnName+" "+localruntimeURL+" "+acquisitionMethod+":"+" "+nodeNumber);
-  		}
+  		//}
   	}
   }
   
@@ -512,6 +591,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
 	 * @return ExternalProcess, the copy version of the process
 	 */
   private ExternalProcess makeDeepCopy(ExternalProcess process){
+  	//deepCopyTag = true;
   	ExternalProcess result = null;
   	try{
   	java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
@@ -526,6 +606,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	}catch(Exception e){
   		e.printStackTrace();
   	}
+  	//deepCopyTag = false;
     return result; 
   }
   
@@ -536,7 +617,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	return UrlBuilder.buildUrl(host,name);
   } 
   
-  private void increaseIndex(){
+  private void increaseIndex(){ 
   	if (virtualMachines.size() > 1) {
       		lastVirtualMachineIndex = (lastVirtualMachineIndex + 1) % virtualMachines.size();
     		}
@@ -557,6 +638,52 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	
   	if(protocol.indexOf(":") == -1) return protocol.concat(":");
   	return protocol;
+  }
+  
+  
+  private void performOperations(ProActiveRuntime part, String url, String protocol){
+  	createdNodes.add(new NodeImpl(part,url,checkProtocol(protocol)));
+  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+		nodeCreated = true;
+		nodeCountCreated++;
+  }
+  
+  private void register() {
+  	
+  	try{
+  	waitForAllNodesCreation();
+//  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
+//  	part.registerVirtualnode(this.name,false);
+		ProActive.registerVirtualNode(this,registrationProtocol,false);
+  	}catch(NodeException e){
+  		System.out.println(e.getMessage());
+  	}
+  	catch(ProActiveException e){
+  		e.printStackTrace();
+  	}
+  	
+  }
+  
+  private void setRegistrationValue(boolean value){
+  	this.registration = value;
+  }
+  
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+  	
+  	try{
+  	waitForAllNodesCreation();
+  	}catch(NodeException e){
+  		e.printStackTrace();
+  	}
+		
+  	out.defaultWriteObject();
+  
+  }
+
+	
+	
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
   }
  
   

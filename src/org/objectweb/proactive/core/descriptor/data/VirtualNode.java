@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.core.descriptor.data;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -44,7 +45,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * @see ProActiveDescriptor
  * @see VirtualMachine
  */
-public interface VirtualNode extends RuntimeRegistrationEventListener
+public interface VirtualNode extends java.io.Serializable
 {
 
  
@@ -123,7 +124,7 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
    * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor 
    * Another call to this method will return the following created node if any. Note that the order
    * in which Nodes are created has nothing to do with the order defined in the XML descriptor.
-   * @return Node
+   * @return Node 
    */
   public Node getNode() throws NodeException;
 
@@ -135,7 +136,7 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
    * @param index
    * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
    */
-  public Node getNode(int index);
+  public Node getNode(int index) throws NodeException;;
   
   
 	/**
@@ -169,6 +170,37 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
 	 * @param protocol the protocol to create the node. It has to be rmi or jini.
 	 */
   public void createNodeOnCurrentJvm(String protocol);
+  
+	/**
+	 * Returns the unique active object created on the unique node mapped to this VirtualNode.
+	 * This method should be called on a virtualNode, with unique_singleAO property defined in theXML descriptor. If more than one active object are found, a 
+	 * warning is generated, and the first active object found is returned
+	 * @return Object the unique active object created on the unique node mapped to this VirtualNode. If many active objects are found, the first one is returned
+	 * @throws ProActiveException if no active objects are created on this VirtualNode.
+	 */
+  public Object getUniqueAO()throws ProActiveException;
+  
+  
+	/**
+	 * Allows to set runtime informations for this VirtualNode activation.
+	 * This method allows to give to this VirtualNode some informations retrieved at runtime and 
+	 * not defined in the XML descriptor.
+	 * In the current release, this method can be called on a VirtualNode resulting from a lookup. The only
+	 * one information that can be set is LOOKUP_HOST. This information has a sense if in the XML descriptor
+	 * this VirtualNode is defined with the line:
+	 * <pre>
+ 	 * lookup virtualNode="vnName" host="*" protocol="rmi or jini", ie the name of the host where to perform the lookup 
+ 	 * will be known at runtime.
+ 	 * </pre>
+ 	 * We expect to implement several runtime informations.
+ 	 * If this method fails, for instance, if the property does not exist or has already been set, or is performed on a VirtualNode not resulting 
+ 	 * from a lookup, an exception will be thrown but the application will carry on.
+	 * @param information the information to be set at runtime
+	 * @param value the value of the information
+	 * @throws ProActiveException if the given information does not exist or has alredy been set
+	 */
+  public void setRuntimeInformations(String information, String value) throws ProActiveException;
+  
   	
  
 }
