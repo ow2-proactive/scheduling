@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 import java.util.Hashtable;
 import java.util.Map;

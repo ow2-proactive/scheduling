@@ -30,19 +30,17 @@
  */
 package org.objectweb.proactive.core.component.adl.vnexportation;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.fractal.adl.ADLException;
-
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
-import org.objectweb.proactive.core.util.ProActiveLogger;
-
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.objectweb.fractal.adl.ADLException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**

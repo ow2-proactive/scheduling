@@ -33,10 +33,8 @@ package org.objectweb.proactive.core.runtime.ibis;
 import ibis.rmi.Remote;
 import ibis.rmi.RemoteException;
 
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -51,6 +49,10 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -85,15 +87,22 @@ public interface RemoteProActiveRuntime extends Remote {
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) throws RemoteException;
 
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws RemoteException;
+
     public ProActiveRuntime[] getProActiveRuntimes() throws RemoteException;
 
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws RemoteException;
 
-    public void addAcquaintance(String proActiveRuntimeName) throws RemoteException;
+    public void addAcquaintance(String proActiveRuntimeName)
+        throws RemoteException;
 
     public String[] getAcquaintances() throws RemoteException;
-    
+
+    public void rmAcquaintance(String proActiveRuntimeName);
+
     public void killRT(boolean softly) throws RemoteException;
 
     public String getURL() throws RemoteException;
@@ -125,10 +134,9 @@ public interface RemoteProActiveRuntime extends Remote {
     public UniversalBody receiveBody(String nodeName, Body body)
         throws RemoteException;
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
-    	throws RemoteException;
-        
-    
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws RemoteException;
+
     /**
      * @return creator certificate
      */
@@ -187,10 +195,12 @@ public interface RemoteProActiveRuntime extends Remote {
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws RemoteException;
-    
-    public byte[] getClassDataFromParentRuntime(String className) throws RemoteException;
-    
-    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException;
-    
+
+    public byte[] getClassDataFromParentRuntime(String className)
+        throws RemoteException;
+
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws RemoteException;
+
     public void setParent(String parentRuntimeName) throws RemoteException;
 }

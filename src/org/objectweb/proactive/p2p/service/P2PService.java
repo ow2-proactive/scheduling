@@ -36,10 +36,12 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
@@ -47,6 +49,7 @@ import org.objectweb.proactive.p2p.service.node.P2PNodesLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import java.util.Random;
@@ -63,7 +66,7 @@ import java.util.Vector;
 public class P2PService implements InitActive, P2PConstants, Serializable {
 
     /** Logger. */
-    private static final Logger logger = Logger.getLogger(Loggers.P2P_SERVICE);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);
 
     /** ProActive Group of acquaintances. **/
     private P2PService acquaintances;
@@ -98,7 +101,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     /**
      * A collection of not full <code>P2PNodesLookup</code>.
      */
-    private Vector watingNodesLookup = new Vector();
+    private Vector waitingNodesLookup = new Vector();
 
     //--------------------------------------------------------------------------
     // Class Constructors
@@ -143,10 +146,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      */
     public void register(P2PService service) {
         this.acquaintanceManager.add(service);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Remote peer localy registered: " +
-                ProActive.getActiveObjectNodeUrl(service));
-        }
+        logger.debug("Remote peer localy registered: " +
+            ProActive.getActiveObjectNodeUrl(service));
 
         // Wake up all node accessor, because new peers are know
         this.wakeUpEveryBody();
@@ -156,9 +157,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * Just to test if the peer is alive.
      */
     public void heartBeat() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Heart-beat message received");
-        }
+        logger.debug("Heart-beat message received");
     }
 
     /**
@@ -172,9 +171,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     public void exploring(int ttl, UniversalUniqueID uuid,
         P2PService remoteService) {
         if (uuid != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Exploring message received with #" + uuid);
-            }
+            logger.debug("Exploring message received with #" + uuid);
             ttl--;
         }
 
@@ -187,15 +184,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         if (broadcast) {
             // Forwarding the message
             if (uuid == null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Generating uuid for exploring message");
-                }
+                logger.debug("Generating uuid for exploring message");
                 uuid = generateUuid();
             }
             this.acquaintances.exploring(ttl, uuid, remoteService);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Broadcast exploring message with #" + uuid);
-            }
+            logger.debug("Broadcast exploring message with #" + uuid);
         }
 
         // Method code ---------------------------------------------------------
@@ -212,16 +205,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param ttl Time to live of the message, in number of hops.
      * @param uuid UUID of the message.
      * @param remoteService The original sender.
+     * @param lookup The P2P nodes lookup.
      * @param vnName Virtual node name.
      * @param Job ID.
      */
     public void askingNode(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, String vnName, String jobId) {
+        P2PService remoteService, P2PNodesLookup lookup, String vnName,
+        String jobId) {
         boolean broadcast;
         if (uuid != null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("AskingNode message received with #" + uuid);
-            }
+            logger.debug("AskingNode message received with #" + uuid);
             ttl--;
             try {
                 broadcast = broadcaster(ttl, uuid, remoteService);
@@ -239,16 +232,12 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         if (broadcast) {
             // Forwarding the message
             if (uuid == null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Generating uuid for askingNode message");
-                }
+                logger.debug("Generating uuid for askingNode message");
                 uuid = generateUuid();
             }
-            this.acquaintances.askingNode(ttl, uuid, remoteService, vnName,
-                jobId);
-            if (logger.isDebugEnabled()) {
-                logger.debug("Broadcast askingNode message with #" + uuid);
-            }
+            this.acquaintances.askingNode(ttl, uuid, remoteService, lookup,
+                vnName, jobId);
+            logger.debug("Broadcast askingNode message with #" + uuid);
         }
 
         // Asking node available?
@@ -257,49 +246,18 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             // Setting vnInformation and JobId
             if (vnName != null) {
                 nodeAvailable.setVnName(vnName);
+                try {
+                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName,
+                        true);
+                } catch (ProActiveException e) {
+                    logger.warn("Couldn't register " + vnName + " in the PAR", e);
+                }
             }
             if (jobId != null) {
                 nodeAvailable.getNodeInformation().setJobID(jobId);
             }
-            if (logger.isInfoEnabled()) {
-                logger.info("Giving 1 node to vn: " + vnName);
-            }
-            remoteService.giveNode(nodeAvailable, this.nodeManager);
-        }
-    }
-
-    private int indexOfP2PNodeAccessor = -1;
-
-    /**
-     * Receipt a reference to a shared node.
-     *
-     * @param givenNode the shared node.
-     * @param remoteNodeManager the remote node manager for the given node.
-     */
-    public void giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Given node received from " +
-                givenNode.getNodeInformation().getURL());
-        }
-        if (this.watingNodesLookup.size() == 0) {
-            this.indexOfP2PNodeAccessor = 0;
-            if (logger.isDebugEnabled()) {
-                logger.debug("No node accessor available");
-            }
-            remoteNodeManager.leaveNode(givenNode);
-            return;
-        }
-
-        // Get currrent nodes accessor
-        this.indexOfP2PNodeAccessor++;
-        P2PNodesLookup current = (P2PNodesLookup) this.watingNodesLookup.get(this.indexOfP2PNodeAccessor % this.watingNodesLookup.size());
-        while (current.allArrived()) {
-            this.indexOfP2PNodeAccessor++;
-            current = (P2PNodesLookup) this.watingNodesLookup.get(this.indexOfP2PNodeAccessor % this.watingNodesLookup.size());
-        }
-        current.addNode(givenNode);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Node given to the current P2P nodes lookup");
+            logger.info("Giving 1 node to vn: " + vnName);
+            lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
         }
     }
 
@@ -322,14 +280,20 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         try {
             lookup = (P2PNodesLookup) ProActive.newActive(P2PNodesLookup.class.getName(),
                     params, this.p2pServiceNode);
-            this.watingNodesLookup.add(lookup);
+            ProActive.enableAC(lookup);
+            this.waitingNodesLookup.add(lookup);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't create an active lookup", e);
             return null;
         } catch (NodeException e) {
             logger.fatal("Couldn't connect node to creat", e);
             return null;
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Couldn't enable AC for a nodes lookup", e);
+            }
         }
+
         if (logger.isInfoEnabled()) {
             if (numberOfNodes != MAX_NODE) {
                 logger.info("Asking for" + numberOfNodes + " nodes");
@@ -357,10 +321,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param accessorToRemove the accessor to remove.
      */
     public void removeWaitingAccessor(P2PNodesLookup accessorToRemove) {
-        this.watingNodesLookup.remove(accessorToRemove);
-        if (logger.isDebugEnabled()) {
-            logger.debug("Accessor succefuly removed");
-        }
+        this.waitingNodesLookup.remove(accessorToRemove);
+        logger.debug("Accessor succefuly removed");
     }
 
     /**
@@ -375,26 +337,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     // -------------------------------------------------------------------------
 
     /**
-     * Call this method when new acquaintances are availbale for looking new
-     * shared nodes.
-     */
-    private void wakeUpEveryBody() {
-        for (int index = 0; index < this.watingNodesLookup.size(); index++) {
-            P2PNodesLookup currentNodesAccessor = (P2PNodesLookup) this.watingNodesLookup.get(index);
-            currentNodesAccessor.wakeUp();
-        }
-    }
-
-    /**
      * <b>* ONLY FOR INTERNAL USE *</b>
      * @return a random UUID for sending message.
      */
     private UniversalUniqueID generateUuid() {
         UniversalUniqueID uuid = UniversalUniqueID.randomUUID();
         oldMessageList.add(uuid);
-        if (logger.isDebugEnabled()) {
-            logger.debug(" UUID generated with #" + uuid);
-        }
+        logger.debug(" UUID generated with #" + uuid);
         return uuid;
     }
 
@@ -415,14 +364,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         boolean isAnOldMessage = this.isAnOldMessage(uuid);
         if (!isAnOldMessage && !remoteNodeUrl.equals(thisNodeUrl)) {
             if (ttl > 0) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Forwarding message request");
-                }
+                logger.debug("Forwarding message request");
                 return true;
             }
             return false;
         } else {
             // it is an old message: nothing to do
+            // NO REMOVE the isDebugEnabled message
             if (logger.isDebugEnabled()) {
                 if (isAnOldMessage) {
                     logger.debug("Old message request with #" + uuid);
@@ -444,27 +392,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      */
     private boolean shouldBeAcquaintance(P2PService remoteService) {
         if (this.acquaintanceManager.contains(remoteService)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("The remote peer is already known");
-            }
+            logger.debug("The remote peer is already known");
             return false;
         }
         if (this.acquaintanceManager.size() < NOA) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("NOA not reached: I should be an acquaintance");
-            }
+            logger.debug("NOA not reached: I should be an acquaintance");
             return true;
         } else {
             int random = randomizer.nextInt(100);
             if (random < EXPL_MSG) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Random said: I should be an acquaintance");
-                }
+                logger.debug("Random said: I should be an acquaintance");
                 return true;
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Random said: I should not be an acquaintance");
-                }
+                logger.debug("Random said: I should not be an acquaintance");
                 return false;
             }
         }
@@ -490,6 +430,15 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         }
     }
 
+    /**
+     * Wake up all node lookups.
+     */
+    private void wakeUpEveryBody() {
+        for (int i = 0; i < this.waitingNodesLookup.size(); i++) {
+            ((P2PNodesLookup) this.waitingNodesLookup.get(i)).wakeUp();
+        }
+    }
+
     //--------------------------------------------------------------------------
     // Active Object methods
     //--------------------------------------------------------------------------
@@ -498,9 +447,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Entering initActivity");
-        }
+        logger.debug("Entering initActivity");
 
         try {
             // Reference to my current p2pServiceNode
@@ -509,10 +456,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             logger.fatal("Couldn't get reference to the local p2pServiceNode", e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("P2P Service running in p2pServiceNode: " +
-                this.p2pServiceNode.getNodeInformation().getURL());
-        }
+        logger.debug("P2P Service running in p2pServiceNode: " +
+            this.p2pServiceNode.getNodeInformation().getURL());
 
         Object[] params = new Object[1];
         params[0] = ProActive.getStubOnThis();
@@ -520,30 +465,22 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             // Active acquaintances
             this.acquaintanceManager = (P2PAcquaintanceManager) ProActive.newActive(P2PAcquaintanceManager.class.getName(),
                     params, this.p2pServiceNode);
-            if (logger.isDebugEnabled()) {
-                logger.debug("P2P acquaintance manager activated");
-            }
+            logger.debug("P2P acquaintance manager activated");
 
             // Get active group
             this.acquaintances = this.acquaintanceManager.getActiveGroup();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Got active group reference");
-            }
+            logger.debug("Got active group reference");
 
             // Active Node Manager
             this.nodeManager = (P2PNodeManager) ProActive.newActive(P2PNodeManager.class.getName(),
                     params, this.p2pServiceNode);
-            if (logger.isDebugEnabled()) {
-                logger.debug("P2P node manager activated");
-            }
+            logger.debug("P2P node manager activated");
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't create one of managers", e);
         } catch (NodeException e) {
             logger.fatal("Couldn't create one the managers", e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Exiting initActivity");
-        }
+        logger.debug("Exiting initActivity");
     }
 }

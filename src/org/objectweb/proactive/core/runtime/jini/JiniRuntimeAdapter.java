@@ -30,12 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.rmi.RemoteException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -51,6 +45,16 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.rmi.RemoteException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -216,6 +220,21 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
+        String vmName) {
+        try {
+            this.jiniRuntime.unregister(proActiveRuntimeDist,
+                proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
+        } catch (java.rmi.RemoteException re) {
+            re.printStackTrace();
+            // behavior to be defined
+        }
+    }
+
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
         try {
             return jiniRuntime.getProActiveRuntimes();
@@ -234,26 +253,35 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
             // behavior to be defined
         }
     }
-    
+
     public void addAcquaintance(String proActiveRuntimeName) {
-    	try {
-    		jiniRuntime.addAcquaintance(proActiveRuntimeName);
+        try {
+            jiniRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (RemoteException re) {
-        	// hum ...
-        	re.printStackTrace();
+            // hum ...
+            re.printStackTrace();
         }
     }
 
     public String[] getAcquaintances() {
-    	try {
-    		return jiniRuntime.getAcquaintances();
-    	} catch (RemoteException re) {
-        	// hum ...
-        	re.printStackTrace();
-        	return new String[0];
-        }	
+        try {
+            return jiniRuntime.getAcquaintances();
+        } catch (RemoteException re) {
+            // hum ...
+            re.printStackTrace();
+            return new String[0];
+        }
     }
-    
+
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        try {
+			jiniRuntime.rmAcquaintance(proActiveRuntimeName);
+		} catch (RemoteException e) {
+			// hum ...
+			e.printStackTrace();
+		}
+    }
+
     public void killRT(boolean softly) throws Exception {
         try {
             jiniRuntime.killRT(softly);
@@ -349,16 +377,15 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
-    	throws ProActiveException {
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws ProActiveException {
         try {
-            return jiniRuntime.receiveCheckpoint(nodeName,ckpt,inc);
-    	} catch (java.rmi.RemoteException re) {
+            return jiniRuntime.receiveCheckpoint(nodeName, ckpt, inc);
+        } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }
     }
-        
-    
+
     // SECURITY
 
     /* (non-Javadoc)
@@ -522,17 +549,18 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
             throw new ProActiveException(re);
         }
     }
-    
+
     public byte[] getClassDataFromParentRuntime(String className)
-            throws ProActiveException {
+        throws ProActiveException {
         try {
             return jiniRuntime.getClassDataFromParentRuntime(className);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
-        }    }
-    
-    
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+        }
+    }
+
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws ProActiveException {
         try {
             return jiniRuntime.getClassDataFromThisRuntime(className);
         } catch (java.rmi.RemoteException re) {
@@ -540,9 +568,9 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void setParent(String fatherRuntimeName)  throws ProActiveException {
+    public void setParent(String fatherRuntimeName) throws ProActiveException {
         try {
-             jiniRuntime.setParent(fatherRuntimeName);
+            jiniRuntime.setParent(fatherRuntimeName);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }

@@ -30,19 +30,17 @@
  */
 package org.objectweb.proactive.core.component.adl;
 
-import org.apache.log4j.Logger;
+import java.util.Hashtable;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.util.ProActiveLogger;
-
-import java.util.Hashtable;
-import java.util.Iterator;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**

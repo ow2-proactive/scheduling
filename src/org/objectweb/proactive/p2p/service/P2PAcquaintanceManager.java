@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Iterator;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -44,12 +46,9 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.util.Iterator;
 
 
 /**
@@ -60,7 +59,7 @@ import java.util.Iterator;
  */
 public class P2PAcquaintanceManager implements InitActive, RunActive,
     Serializable, P2PConstants {
-    private final static Logger logger = Logger.getLogger(Loggers.P2P_ACQUAINTANCES);
+    private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService localService = null;
     private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
@@ -109,9 +108,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             logger.fatal("Couldn't create the group of exportAcquaintances", e);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Group of exportAcquaintances succefuly created");
-        }
+        logger.debug("Group of exportAcquaintances succefuly created");
     }
 
     /**
@@ -124,59 +121,43 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             try {
                 if (this.groupOfAcquaintances.size() > 0) {
                     // Register the local P2P service in all exportAcquaintances
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Sending heart-beat");
-                    }
+                    logger.debug("Sending heart-beat");
                     this.acquaintances.heartBeat();
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Heart-beat sent");
-                    }
+                    logger.debug("Heart-beat sent");
 
                     // How many peers ?
                     if (this.groupOfAcquaintances.size() < NOA) {
                         // Looking for new peers
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("NOA is " + NOA +
-                                " - Size of P2PAcquaintanceManager is " +
-                                this.groupOfAcquaintances.size());
-                        }
+                        logger.debug("NOA is " + NOA +
+                            " - Size of P2PAcquaintanceManager is " +
+                            this.groupOfAcquaintances.size());
 
                         // Sending exploring message
                         this.acquaintances.exploring(TTL, null,
                             this.localService);
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Explorating message sent");
-                        }
+                        logger.debug("Explorating message sent");
                     }
                 }
 
                 // Waiting TTU & serving requests
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Waiting for " + TTU + "ms");
-                }
+                logger.debug("Waiting for " + TTU + "ms");
                 long endTime = System.currentTimeMillis() + TTU;
                 service.blockingServeOldest(TTU);
                 while (System.currentTimeMillis() < endTime) {
                     service.blockingServeOldest(endTime -
                         System.currentTimeMillis());
                 }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("End waiting");
-                }
+                logger.debug("End waiting");
             } catch (ExceptionList e) {
                 // Removing bad peers
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Some peers to remove from group");
-                }
+                logger.debug("Some peers to remove from group");
                 Iterator it = e.iterator();
                 while (it.hasNext()) {
                     // Remove bad peers
                     ExceptionInGroup ex = (ExceptionInGroup) it.next();
                     Object peer = ex.getObject();
                     this.groupOfAcquaintances.remove(peer);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("Peer removed");
-                    }
+                    logger.info("Peer removed");
                 }
             }
         }
@@ -196,11 +177,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void add(P2PService peer) {
         if (!this.groupOfAcquaintances.contains(peer)) {
             boolean result = this.groupOfAcquaintances.add(peer);
-            if (logger.isInfoEnabled()) {
-                String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
-                logger.info("Acquaintance " + peerUrl + " " + result +
-                    " added");
-            }
+            String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+            logger.info("Acquaintance " + peerUrl + " " + result + " added");
         }
     }
 

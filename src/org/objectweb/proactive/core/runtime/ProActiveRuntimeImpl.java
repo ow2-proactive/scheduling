@@ -342,6 +342,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
+        String vmName) {
+        this.proActiveRuntimeMap.remove(proActiveRuntimeUrl);
+        notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_UNREGISTERED,
+            proActiveRuntimeDist, creatorID, creationProtocol, vmName);
+    }
+
+    /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntimes()
      */
     public ProActiveRuntime[] getProActiveRuntimes() {
@@ -388,6 +399,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return urls;
     }
 
+	/**
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
+	 */
+	public void rmAcquaintance(String proActiveRuntimeName) {
+		runtimeAcquaintancesURL.remove(proActiveRuntimeName);
+	}
+	
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#setParent(String)
      */
@@ -395,8 +413,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if (parentRuntimeURL == null) {
             parentRuntimeURL = parentRuntimeName;
             runtimeAcquaintancesURL.add(parentRuntimeURL);
-
-		
         } else {
             logger.error("Parent runtime already set!");
         }
@@ -465,7 +481,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public void unregisterVirtualNode(String virtualNodeName) {
         removeRuntimeRegistrationEventListener((VirtualNodeImpl) virtualNodesMap.get(
                 virtualNodeName));
-        virtualNodesMap.remove(virtualNodeName);
+			virtualNodesMap.remove(virtualNodeName);
     }
 
     public void unregisterAllVirtualNodes() {
@@ -591,42 +607,40 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return boa;
     }
 
-    
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(String, Checkpoint, int)
      */
-	public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
-	    logger.debug("Receive a checkpoint for recovery");
-	    
-	    // the recovered body
-	    Body ret = ckpt.recover();
-	    
-	    //update the nodeURL in the registred body 
-	    String newURL = UrlBuilder.buildUrlFromProperties
-	    	(vmInformation.getInetAddress().getHostName(),nodeName);
-		ret.updateNodeURL(newURL);
-		
-	    // set ftm.owner and call beforeRecoery()
-	    ((AbstractBody)ret).getFTManager().owner = ((AbstractBody)ret);
-	    ((AbstractBody)ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(),inc);
-			
-	    // register the body
-	    this.registerBody(nodeName, ret);
-	    
-	    // restart actvity
-	    if (logger.isDebugEnabled()){
-	        logger.debug(ret.getID() + " is restarting activity...");
-	    }
-	    ((ActiveBody)ret).startBody();
-	    
-	    // no more need to return the recovered body
-		return null;
-	}
-    
-    
-    
-    
-    
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) {
+        logger.debug("Receive a checkpoint for recovery");
+
+        // the recovered body
+        Body ret = ckpt.recover();
+
+        //update the nodeURL in the registred body 
+        String newURL = UrlBuilder.buildUrlFromProperties(vmInformation.getInetAddress()
+                                                                       .getHostName(),
+                nodeName);
+        ret.updateNodeURL(newURL);
+
+        // set ftm.owner and call beforeRecoery()
+        ((AbstractBody) ret).getFTManager().owner = ((AbstractBody) ret);
+        ((AbstractBody) ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(),
+            inc);
+
+        // register the body
+        this.registerBody(nodeName, ret);
+
+        // restart actvity
+        if (logger.isDebugEnabled()) {
+            logger.debug(ret.getID() + " is restarting activity...");
+        }
+        ((ActiveBody) ret).startBody();
+
+        // no more need to return the recovered body
+        return null;
+    }
+
     /**
      * Registers the specified body at the nodeName key in the <code>nodeMap</code>.
      * In fact it is the <code>UniqueID</code> of the body that is attached to the nodeName
@@ -911,8 +925,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // caching class
                 ClassDataCache.instance().addClassData(className, classData);
                 if (logger.isDebugEnabled()) {
-                    logger.debug(getURL() + " -- > Returning class " + className + " found in " +
-                        parentRuntimeURL);
+                    logger.debug(getURL() + " -- > Returning class " +
+                        className + " found in " + parentRuntimeURL);
                 }
                 return classData;
             }

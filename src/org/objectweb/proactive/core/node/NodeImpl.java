@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 
@@ -129,6 +130,20 @@ public class NodeImpl implements Node, Serializable {
         }
     }
 
+	/**
+	 * @see org.objectweb.proactive.core.node.Node#getNumberOfActiveObjects()
+	 */
+	public int getNumberOfActiveObjects() throws NodeException {
+		ArrayList bodyArray;  try {
+            bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
+        } catch (ProActiveException e) {
+            throw new NodeException(
+                "Cannot get Active Objects registered on this node: " +
+                this.nodeInformation.getURL(), e);
+        }
+        return bodyArray.size();
+	}
+	
     /**
      * @see org.objectweb.proactive.core.node.Node#getActiveObjects(String)
      */
@@ -311,5 +326,25 @@ public class NodeImpl implements Node, Serializable {
      */
     public void setVnName(String string) {
         vnName = string;
+    }
+
+    /**
+     *
+     * @throws IOException
+     * @see org.objectweb.proactive.core.node.Node#killAllActiveObjects()
+     */
+    public void killAllActiveObjects() throws NodeException, IOException {
+        ArrayList bodyArray;
+        try {
+            bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
+        } catch (ProActiveException e) {
+            throw new NodeException(
+                "Cannot get Active Objects registered on this node: " +
+                this.nodeInformation.getURL(), e);
+        }
+        for (int i = 0; i < bodyArray.size(); i++) {
+            UniversalBody body = (UniversalBody) ((ArrayList) bodyArray.get(i)).get(0);
+            body.terminate();
+        }
     }
 }

@@ -30,13 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime.rmi;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
-import java.rmi.UnmarshalException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -52,6 +45,18 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.rmi.RemoteException;
+import java.rmi.UnmarshalException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -75,7 +80,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     // -- Constructors -----------------------------------------------
     //
     public RemoteProActiveRuntimeAdapter() throws ProActiveException {
-   
     }
 
     public RemoteProActiveRuntimeAdapter(
@@ -110,8 +114,8 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vname, String jobId)
-        throws NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vname,
+        String jobId) throws NodeException {
         try {
             return remoteProActiveRuntime.createLocalNode(nodeName,
                 replacePreviousBinding, ps, vname, jobId);
@@ -218,6 +222,21 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
+        String vmName) {
+        try {
+            this.remoteProActiveRuntime.unregister(proActiveRuntimeDist,
+                proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
+        } catch (java.rmi.RemoteException re) {
+            re.printStackTrace();
+            // behavior to be defined
+        }
+    }
+
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
         try {
             return remoteProActiveRuntime.getProActiveRuntimes();
@@ -238,24 +257,36 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     public void addAcquaintance(String proActiveRuntimeName) {
-    	try {
-    		remoteProActiveRuntime.addAcquaintance(proActiveRuntimeName);
+        try {
+            remoteProActiveRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (java.rmi.RemoteException re) {
-        	// hum ...
-        	re.printStackTrace();
+            // hum ...
+            re.printStackTrace();
         }
     }
 
     public String[] getAcquaintances() {
-    	try {
-    		return remoteProActiveRuntime.getAcquaintances();
-    	} catch (java.rmi.RemoteException re) {
-        	// hum ...
-        	re.printStackTrace();
-        	return new String[0];
-        }	
+        try {
+            return remoteProActiveRuntime.getAcquaintances();
+        } catch (java.rmi.RemoteException re) {
+            // hum ...
+            re.printStackTrace();
+            return new String[0];
+        }
     }
-    
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
+     */
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        try {
+            this.remoteProActiveRuntime.rmAcquaintance(proActiveRuntimeName);
+        } catch (RemoteException e) {
+            // hum ...
+            e.printStackTrace();
+        }
+    }
+
     public void killRT(boolean softly) throws Exception {
         try {
             if (!alreadykilled) {
@@ -358,10 +389,9 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
             throw new ProActiveException(re);
         }
     }
-    
-    
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
-    	throws ProActiveException {
+
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws ProActiveException {
         try {
             return remoteProActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
         } catch (java.rmi.RemoteException re) {
@@ -370,8 +400,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     // SECURITY 
-
-    
     public PolicyServer getPolicyServer() throws ProActiveException {
         try {
             return remoteProActiveRuntime.getPolicyServer();
@@ -490,16 +518,17 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-	 */
-	public SecurityContext getPolicy(SecurityContext sc) throws ProActiveException,SecurityNotAvailableException {
-		 try {
-			 return remoteProActiveRuntime.getPolicy(sc);
-		 } catch (java.rmi.RemoteException re) {
-			 throw new ProActiveException(re);
-		 }
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException {
+        try {
+            return remoteProActiveRuntime.getPolicy(sc);
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
 
     /**
      * @see org.objectweb.proactive.Job#getJobID()
@@ -520,22 +549,23 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     public byte[] getClassDataFromParentRuntime(String className)
-            throws ProActiveException {
+        throws ProActiveException {
         try {
             return remoteProActiveRuntime.getClassDataFromParentRuntime(className);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }
     }
-    
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws ProActiveException {
         try {
             return remoteProActiveRuntime.getClassDataFromThisRuntime(className);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }
     }
-    
+
     public void setParent(String parentRuntimeName) throws ProActiveException {
         try {
             remoteProActiveRuntime.setParent(parentRuntimeName);

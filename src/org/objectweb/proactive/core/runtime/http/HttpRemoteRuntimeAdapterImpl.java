@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime.http;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -55,18 +51,26 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
+
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls usinfg HTTP. This helps isolate HTTP-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
  *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-
 public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
     private String url;
     private int port;
-    
+
     //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
     // which is already dead
     protected boolean alreadykilled = false;
@@ -79,10 +83,8 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         logger.debug("Adapter URL = " + newurl);
         this.url = newurl;
         this.port = UrlBuilder.getPortFromUrl(newurl);
-        logger.debug("New Remote XML Adapter : " + url +
-            " port = " + port);
+        logger.debug("New Remote XML Adapter : " + url + " port = " + port);
     }
-
 
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
@@ -118,8 +120,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
      * @throws ProActiveException
      */
     private Object sendRequest(RuntimeRequest req) throws Exception {
-        logger.debug("Send request to : " + url + ":" +
-            port);
+        logger.debug("Send request to : " + url + ":" + port);
 
         if (req.getMethodName() == null) {
             throw new ProActiveException("Null request");
@@ -211,6 +212,35 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             Object o = sendRequest(req);
 
             //runtimeadapter.register(proActiveRuntimeDist, proActiveRuntimeName, creatorID, creationProtocol, vmName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
+        String vmName) {
+        try {
+            ArrayList params = new ArrayList();
+            ArrayList paramsTypes = new ArrayList();
+
+            params.add(proActiveRuntimeDist);
+            paramsTypes.add(ProActiveRuntime.class);
+            params.add(proActiveRuntimeUrl);
+            paramsTypes.add(String.class);
+            params.add(creatorID);
+            paramsTypes.add(String.class);
+            params.add(creationProtocol);
+            paramsTypes.add(String.class);
+            params.add(vmName);
+            paramsTypes.add(String.class);
+            RuntimeRequest req = new RuntimeRequest("unregister", params,
+                    paramsTypes);
+
+            Object o = sendRequest(req);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -343,7 +373,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         params.add(bodyConstructorCall);
         params.add(new Boolean(isNodeLocal));
 
-  
         try {
             return (UniversalBody) sendRequest(new RuntimeRequest(
                     "createBody", params));
@@ -578,6 +607,20 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         }
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
+     */
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        ArrayList params = new ArrayList();
+        params.add(proActiveRuntimeName);
+
+        try {
+            sendRequest(new RuntimeRequest("rmAcquaintance", params));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException {
         ArrayList params = new ArrayList();
@@ -592,26 +635,28 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             throw new ProActiveException(e);
         }
     }
-    
-    
+
     public byte[] getClassDataFromParentRuntime(String className)
-            throws ProActiveException {
+        throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(className);
 
         try {
-            return (byte[]) sendRequest(new RuntimeRequest("getClassDataFromParentRuntime", params));
+            return (byte[]) sendRequest(new RuntimeRequest(
+                    "getClassDataFromParentRuntime", params));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }    }
- 
+        }
+    }
+
     public byte[] getClassDataFromThisRuntime(String className) {
         ArrayList params = new ArrayList();
         params.add(className);
 
         try {
-            return (byte[]) sendRequest(new RuntimeRequest("getClassDataFromThisRuntime", params));
+            return (byte[]) sendRequest(new RuntimeRequest(
+                    "getClassDataFromThisRuntime", params));
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -637,11 +682,11 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         }
     }
 
-
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(java.lang.String, org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) throws ProActiveException {
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws ProActiveException {
         // TODO Auto-generated method stub
         return null;
     }

@@ -52,7 +52,6 @@ public class Test extends FunctionalTest {
     JVMProcessImpl process;
     Node[] nodeTab;
     ProActiveDescriptor pad;
-    private String defaultPort;
 
     public Test() {
         super("P2P JVM acquisition in deployment descriptor",
@@ -87,7 +86,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        this.defaultPort = System.getProperty("proactive.rmi.port");
     }
 
     /* (non-Javadoc)
@@ -97,8 +95,10 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        pad.killall(false);
-        System.setProperty("proactive.rmi.port", this.defaultPort);
+        this.process.stopProcess();
+        this.process1.stopProcess();
+        this.pad.killall(false);
+        // TODO kill realy everything...
         return nodeTab.length == 3;
     }
 

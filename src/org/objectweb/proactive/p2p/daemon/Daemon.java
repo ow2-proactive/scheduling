@@ -1,22 +1,5 @@
 package org.objectweb.proactive.p2p.daemon;
 
-import org.apache.log4j.Layout;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.ProActiveLogger;
-import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
-import org.objectweb.proactive.core.xml.io.Attributes;
-import org.objectweb.proactive.core.xml.io.StreamReader;
-import org.objectweb.proactive.p2p.service.StartP2PService;
-
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -25,12 +8,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -42,6 +23,21 @@ import java.util.ListIterator;
 import java.util.Random;
 import java.util.Stack;
 import java.util.Vector;
+
+import org.apache.log4j.Layout;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.RollingFileAppender;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.io.Attributes;
+import org.objectweb.proactive.core.xml.io.StreamReader;
+import org.objectweb.proactive.p2p.service.StartP2PService;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 /*

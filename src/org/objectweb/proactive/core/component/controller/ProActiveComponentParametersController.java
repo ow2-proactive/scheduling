@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
 
 import java.io.Serializable;
 

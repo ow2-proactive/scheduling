@@ -28,32 +28,23 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.util;
+package org.objectweb.proactive.core.util.log;
 
 import org.apache.log4j.Logger;
-
-import java.util.HashMap;
+import org.apache.log4j.spi.LoggerFactory;
 
 
 /**
- * @author Arnaud Contes
+ * @author Alexandre di Costanzo
  *
- *  This class stores all logger used in proactive. It provides an easy way
- *  to create and to retrieve a logger.
+ * Created on Feb 21, 2005
  */
-public class ProActiveLogger {
-    protected static HashMap loggers = new HashMap();
+public class ProActiveLoggerFactory implements LoggerFactory {
 
     /**
-     * @param loggerName the name of the desired logger, if the logger does not exist, it will be created
-     * @return  the logger corresponding to the name passed as parameter
+     * @see org.apache.log4j.spi.LoggerFactory#makeNewLoggerInstance(java.lang.String)
      */
-    public static Logger getLogger(String loggerName) {
-        Logger logger = (Logger) loggers.get(loggerName);
-        if (logger == null) {
-            logger = Logger.getLogger(loggerName);
-            loggers.put(loggerName, logger);
-        }
-        return logger;
+    public Logger makeNewLoggerInstance(String name) {
+        return new ProActiveLogger(name);
     }
 }

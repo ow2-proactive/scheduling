@@ -30,13 +30,11 @@
  */
 package org.objectweb.proactive.core.component;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.fractal.api.Interface;
-
-import org.objectweb.proactive.core.util.ProActiveLogger;
-
 import java.io.Serializable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Interface;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**

@@ -155,6 +155,16 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             creatorID, creationProtocol, vmName);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws RemoteException {
+        this.proActiveRuntime.unregister(proActiveRuntimeDist,
+            proActiveRuntimeURL, creatorID, creationProtocol, vmName);
+    }
+
     public ProActiveRuntime[] getProActiveRuntimes() {
         return proActiveRuntime.getProActiveRuntimes();
     }
@@ -169,6 +179,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
     public String[] getAcquaintances() {
         return proActiveRuntime.getAcquaintances();
+    }
+
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
     }
 
     public void killRT(boolean softly) throws RemoteException {
@@ -243,11 +257,11 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
-        return proActiveRuntime.receiveCheckpoint(nodeName,ckpt,inc);
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) {
+        return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
-        
-    
+
     // SECURITY
 
     /* (non-Javadoc)
@@ -358,20 +372,21 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         }
     }
 
-    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws RemoteException {
         try {
             return proActiveRuntime.getClassDataFromThisRuntime(className);
         } catch (ProActiveException e) {
             throw new RemoteException("class not found : " + className, e);
         }
     }
-    
+
     public void setParent(String fatherRuntimeName) throws RemoteException {
-//        try {
-            proActiveRuntime.setParent(fatherRuntimeName);
-//        } catch (ProActiveException e) {
-//            throw new RemoteException("cannot set runtime father : " + fatherRuntimeName, e);
-//        }
+        //        try {
+        proActiveRuntime.setParent(fatherRuntimeName);
+        //        } catch (ProActiveException e) {
+        //            throw new RemoteException("cannot set runtime father : " + fatherRuntimeName, e);
+        //        }
     }
 
     //
@@ -389,7 +404,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 logger.info(url + " successfully bound in registry at " + url);
             }
         } catch (AlreadyBoundException e) {
-            logger.warn("WARNING "+url + " already bound in registry", e);
+            logger.warn("WARNING " + url + " already bound in registry", e);
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("cannot bind in registry at " + url, e);
         }

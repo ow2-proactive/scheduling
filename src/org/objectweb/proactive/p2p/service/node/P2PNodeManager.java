@@ -30,27 +30,28 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.proxy.BodyProxy;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.util.Iterator;
+import java.util.Vector;
 
 
 /**
@@ -59,8 +60,8 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * Created on Jan 12, 2005
  */
 public class P2PNodeManager implements Serializable, InitActive, RunActive,
-    EndActive, P2PConstants {
-    private static final Logger logger = Logger.getLogger(Loggers.P2P_NODES);
+    P2PConstants {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Object localService = null;
     private Node p2pServiceNode = null;
@@ -99,9 +100,7 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
      * if no shared nodes are available.
      */
     public P2PNode askingNode() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Asking a node to the nodes manager");
-        }
+        logger.debug("Asking a node to the nodes manager");
         if ((this.availbaleNodes.size() == 0) &&
                 (this.bookedNodes.size() == 0) &&
                 (this.usingNodes.size() == 0)) {
@@ -110,16 +109,12 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
         if (this.availbaleNodes.size() > 0) {
             Node node = (Node) this.availbaleNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
-            if (logger.isDebugEnabled()) {
-                logger.debug("Yes the manager has a node");
-            }
-            return new P2PNode(node);
+            logger.debug("Yes the manager has a node");
+            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
         } else {
             // All nodes is already assigned
-            if (logger.isDebugEnabled()) {
-                logger.debug("Sorry no availbale node for the moment");
-            }
-            return new P2PNode(null);
+            logger.debug("Sorry no availbale node for the moment");
+            return new P2PNode(null, null);
         }
     }
 
@@ -127,28 +122,44 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
      * Leave the specified node. The node is killed and new one is created and
      * ready for sharing.
      * @param nodeToFree the node to kill.
+     * @param vnName Virtual node name to unregister or null.
      */
-    public void leaveNode(Node nodeToFree) {
+    public void leaveNode(Node nodeToFree, String vnName) {
+        String nodeUrl = nodeToFree.getNodeInformation().getURL();
+        logger.debug("LeaveNode message received for node @" + nodeUrl);
         this.usingNodes.remove(nodeToFree);
         try {
             // Terminating all body
-            Object[] activeObjects = nodeToFree.getActiveObjects();
-            for (int index = 0; index < activeObjects.length; index++) {
-                BodyProxy proxy = (BodyProxy) ((StubObject) activeObjects[index]).getProxy();
-                try {
-                    ((Body) proxy.getBody()).terminate();
-                } catch (IOException e1) {
-                    logger.error(e1);
-                }
-            }
+            nodeToFree.killAllActiveObjects();
 
             // Kill the node
             this.proactiveRuntime.killNode(nodeToFree.getNodeInformation()
                                                      .getURL());
+            logger.info("Node @" + nodeUrl + " left");
             // Creating a new node
             this.createNewNode();
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             logger.fatal("Coudln't delete or create a shared node", e);
+        }
+    }
+
+    /**
+     * Free a booked node.
+     * @param givenNode node given and not used.
+     */
+    public void noMoreNodeNeeded(Node givenNode) {
+        Iterator it = this.bookedNodes.iterator();
+        while (it.hasNext()) {
+            Booking current = (Booking) it.next();
+            if (current.getNode().equals(givenNode)) {
+                this.bookedNodes.remove(current);
+                break;
+            }
+        }
+        this.availbaleNodes.add(givenNode);
+        if (logger.isInfoEnabled()) {
+            logger.info("Booked node " +
+                givenNode.getNodeInformation().getURL() + " is now shared");
         }
     }
 
@@ -160,9 +171,7 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
      * @see org.objectweb.proactive.InitActive#initActivity(org.objectweb.proactive.Body)
      */
     public void initActivity(Body body) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Entering initActivity");
-        }
+        logger.debug("Entering initActivity");
 
         try {
             // Getting reference to the P2P node
@@ -172,23 +181,19 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
         } catch (NodeException e) {
             logger.fatal("Couldn't get reference to the local p2pServiceNode", e);
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug("P2P node manager is running at " +
-                this.p2pServiceNode.getNodeInformation().getURL());
-            try {
-                logger.debug("ProActiveRuntime at " +
-                    this.proactiveRuntime.getURL());
-            } catch (ProActiveException e1) {
-                logger.debug("Coudln't get the ProActiveRuntime URL", e1);
-            }
+        logger.debug("P2P node manager is running at " +
+            this.p2pServiceNode.getNodeInformation().getURL());
+        try {
+            logger.debug("ProActiveRuntime at " +
+                this.proactiveRuntime.getURL());
+        } catch (ProActiveException e1) {
+            logger.debug("Coudln't get the ProActiveRuntime URL", e1);
         }
 
         // Creating default shared node
         this.deployingDefaultSharedNodes();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Exiting initActivity");
-        }
+        logger.debug("Exiting initActivity");
     }
 
     /**
@@ -203,7 +208,7 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                 Booking bookedNode = (Booking) this.bookedNodes.get(index);
                 try {
                     // Searching expired booking
-                    if ((bookedNode.getNode().getActiveObjects().length == 0) &&
+                    if ((bookedNode.getNode().getNumberOfActiveObjects() == 0) &&
                             (currentTime > bookedNode.getExpirationTime())) {
                         // Cancel booking
                         this.bookedNodes.remove(bookedNode);
@@ -211,22 +216,23 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                                                    .getNodeInformation().getURL();
                         this.proactiveRuntime.killNode(nodeUrl);
                         this.createNewNode();
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Node at " + nodeUrl + " killed");
-                        }
-                    } else if (bookedNode.getNode().getActiveObjects().length != 0) {
+                        logger.info("Node at " + nodeUrl + " killed");
+                    } else if (bookedNode.getNode().getNumberOfActiveObjects() != 0) {
                         // Move booked nodes to used nodes
                         this.bookedNodes.remove(bookedNode);
-                        this.usingNodes.add(bookedNode);
+                        this.usingNodes.add(bookedNode.getNode());
                     } else {
                         index++;
                     }
                 } catch (NodeException e) {
-                    logger.warn("Problem with a shared node", e);
+                    logger.debug("Problem with a shared node: " +
+                        e.getMessage());
                 } catch (ActiveObjectCreationException e) {
-                    logger.warn("Problem with a shared node", e);
+                    logger.debug("Problem with a shared node: " +
+                        e.getMessage());
                 } catch (ProActiveException e) {
-                    logger.warn("Problem with a shared node", e);
+                    logger.debug("Problem with a shared node: " +
+                        e.getMessage());
                 }
             }
 
@@ -236,13 +242,6 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                 service.serveOldest();
             }
         }
-    }
-
-    /**
-     * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
-     */
-    public void endActivity(Body body) {
-        this.killAllSharedNodes();
     }
 
     // -------------------------------------------------------------------------
@@ -259,6 +258,8 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                 "_" + this.nodeCounter++, true,
                 this.proactiveRuntime.getPolicyServer(), P2PConstants.VN_NAME);
         this.availbaleNodes.add(newNode);
+        logger.info("New shared node created @" +
+            newNode.getNodeInformation().getURL());
         return newNode;
     }
 
@@ -267,41 +268,16 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
      */
     private void deployingDefaultSharedNodes() {
         assert PROC > 0 : "Processor count = 0";
-        if (logger.isInfoEnabled()) {
-            logger.info("Number of available processors for this JVM: " + PROC);
-        }
+        logger.info("Number of available processors for this JVM: " + PROC);
 
         // Starting default shared nodes
         for (int procNumber = 0; procNumber < PROC; procNumber++) {
             try {
-                Node node = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
-                        "_" + procNumber);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Default shared node succefuly created at: " +
-                        node.getNodeInformation().getURL());
-                }
-                this.availbaleNodes.add(node);
-                this.nodeCounter++;
-            } catch (NodeException e) {
+                Node node = this.createNewNode();
+                logger.debug("Default shared node succefuly created at: " +
+                    node.getNodeInformation().getURL());
+            } catch (Exception e) {
                 logger.warn("Couldn't create default shared node", e);
-            }
-        }
-        this.nodeCounter++;
-    }
-
-    /**
-     * Kill all shared nodes.
-     */
-    private void killAllSharedNodes() {
-        this.availbaleNodes = new Vector();
-        this.bookedNodes = new Vector();
-        this.usingNodes = new Vector();
-        for (int procNumber = 0; procNumber < PROC; procNumber++) {
-            try {
-                this.proactiveRuntime.killNode(P2PConstants.SHARED_NODE_NAME +
-                    "_" + procNumber);
-            } catch (ProActiveException e) {
-                logger.warn("Couldn't delete the previous shared node", e);
             }
         }
     }

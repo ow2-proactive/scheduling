@@ -207,6 +207,16 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             creatorID, creationProtocol, vmName);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws RemoteException {
+        this.proActiveRuntime.unregister(proActiveRuntimeDist,
+            proActiveRuntimeURL, creatorID, creationProtocol, vmName);
+    }
+
     public ProActiveRuntime[] getProActiveRuntimes() {
         return proActiveRuntime.getProActiveRuntimes();
     }
@@ -221,6 +231,10 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
 
     public String[] getAcquaintances() {
         return proActiveRuntime.getAcquaintances();
+    }
+
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
     }
 
     public void killRT(boolean softly) throws java.rmi.RemoteException {
@@ -309,10 +323,11 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
-        return proActiveRuntime.receiveCheckpoint(nodeName,ckpt,inc);
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) {
+        return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
-    
+
     //
     // -- Implements  DiscoveryListener,LeaseListener-----------------------------------------------
     //
@@ -502,7 +517,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         }
     }
 
-    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws RemoteException {
         try {
             return proActiveRuntime.getClassDataFromThisRuntime(className);
         } catch (ProActiveException e) {
@@ -511,8 +527,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         }
     }
 
-    public void setParent(String parentRuntimeName)  throws RemoteException {
-            proActiveRuntime.setParent(parentRuntimeName);
+    public void setParent(String parentRuntimeName) throws RemoteException {
+        proActiveRuntime.setParent(parentRuntimeName);
     }
 
     //

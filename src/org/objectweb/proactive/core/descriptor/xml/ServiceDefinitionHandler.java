@@ -104,7 +104,8 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 if (askedNodes.equals("MAX")) {
                     p2pDescriptorService.setNodeNumberToMAX();
                 } else {
-                    p2pDescriptorService.setNodeNumber(Integer.parseInt(askedNodes));
+                    p2pDescriptorService.setNodeNumber(Integer.parseInt(
+                            askedNodes));
                 }
             }
 
@@ -151,12 +152,11 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             }
         }
     } // end of inner class P2PLookupHandler
-    
+
     protected class FaultToleranceHandler extends PassiveCompositeUnmarshaller {
-        
         protected FaultToleranceService ftService;
-        
-        public FaultToleranceHandler(){
+
+        public FaultToleranceHandler() {
             FTConfigHandler ftch = new FTConfigHandler();
             this.addHandler(FT_CKPTSERVER_TAG, ftch);
             this.addHandler(FT_RECPROCESS_TAG, ftch);
@@ -165,38 +165,39 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             this.addHandler(FT_GLOBALSERVER_TAG, ftch);
             this.addHandler(FT_TTCVALUE_TAG, ftch);
         }
-        
+
         public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+            throws org.xml.sax.SAXException {
             this.ftService = new FaultToleranceService();
         }
-        
+
         public Object getResultObject() throws org.xml.sax.SAXException {
             return this.ftService;
-        } 
-        
+        }
+
         protected class FTConfigHandler extends BasicUnmarshaller {
-            
             public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
-                if (FT_RECPROCESS_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setRecoveryProcessURL(attributes.getValue("url"));
-                } else if (FT_LOCSERVER_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setLocationServerURL(attributes.getValue("url"));
-                } else if (FT_CKPTSERVER_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue("url"));
-                }  else if (FT_RESSERVER_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setAttachedResourceServer(attributes.getValue("url"));
-                }  else if (FT_TTCVALUE_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue("value"));
-                }  else if (FT_GLOBALSERVER_TAG.equals(name)){
-                    FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue("url"));
-                } 
+                throws org.xml.sax.SAXException {
+                if (FT_RECPROCESS_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setRecoveryProcessURL(attributes.getValue(
+                            "url"));
+                } else if (FT_LOCSERVER_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setLocationServerURL(attributes.getValue(
+                            "url"));
+                } else if (FT_CKPTSERVER_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue(
+                            "url"));
+                } else if (FT_RESSERVER_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setAttachedResourceServer(attributes.getValue(
+                            "url"));
+                } else if (FT_TTCVALUE_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue(
+                            "value"));
+                } else if (FT_GLOBALSERVER_TAG.equals(name)) {
+                    FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue(
+                            "url"));
+                }
             }
         }
-    
     }
-    
-
-
 }

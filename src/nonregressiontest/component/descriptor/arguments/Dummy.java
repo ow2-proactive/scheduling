@@ -1,6 +1,5 @@
 package nonregressiontest.component.descriptor.arguments;
 
-import nonregressiontest.component.Message;
 
 /**
  * @author Matthieu Morel

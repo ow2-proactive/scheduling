@@ -30,18 +30,17 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.util.Vector;
 
 
 /**
@@ -53,7 +52,7 @@ import java.util.Vector;
  * Created on Jan 4, 2005
  */
 public class P2PFirstContact implements Serializable, RunActive, P2PConstants {
-    private static final Logger logger = Logger.getLogger(Loggers.P2P_FIRST_CONTACT);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_FIRST_CONTACT);
     private Vector peers;
     private P2PAcquaintanceManager acqGroup;
     private P2PService localP2pService;
@@ -115,10 +114,8 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants {
                 // Add the peer in my group of acquaintances
                 this.acqGroup.add(peer);
             } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("The peer at " + peerUrl +
-                        " couldn't be contacted", e);
-                }
+                logger.debug("The peer at " + peerUrl +
+                    " couldn't be contacted", e);
             }
         }
     }

@@ -30,23 +30,19 @@
  */
 package org.objectweb.proactive.core.component.asmgen;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Type;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
-
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.core.util.ProActiveLogger;
-
-import java.io.Serializable;
-
-import java.lang.reflect.Method;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**

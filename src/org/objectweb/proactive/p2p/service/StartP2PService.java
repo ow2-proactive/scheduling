@@ -37,8 +37,9 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.Loggers;
 import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.io.BufferedReader;
@@ -57,10 +58,9 @@ import java.util.Vector;
  * Created on Jan 4, 2005
  */
 public class StartP2PService implements P2PConstants {
-    private static final Logger logger = Logger.getLogger(Loggers.P2P_STARTSERVICE);
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_STARTSERVICE);
 
     static {
-        // Loading ProActive configuration during loading class StartP2PService
         ProActiveConfiguration.load();
     }
 
@@ -259,15 +259,14 @@ public class StartP2PService implements P2PConstants {
         initP2PProperties(parsed);
 
         // For Debbugging
-        if (logger.isInfoEnabled()) {
-            try {
-                logger.info("**** Starting jvm on " +
-                    UrlBuilder.getHostNameorIP(
-                        java.net.InetAddress.getLocalHost()));
-            } catch (UnknownHostException e) {
-                logger.warn("Couldn't get local host name", e);
-            }
+        try {
+            logger.info("**** Starting jvm on " +
+                UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost()));
+        } catch (UnknownHostException e) {
+            logger.warn("Couldn't get local host name", e);
         }
+
+        // NO REMOVE the isDebugEnabled test
         if (logger.isDebugEnabled()) {
             logger.debug("**** Starting jvm with classpath " +
                 System.getProperty("java.class.path"));
@@ -424,11 +423,31 @@ public class StartP2PService implements P2PConstants {
         String acquisitionMethod = System.getProperty(P2PConstants.PROPERTY_ACQUISITION);
         String portNumber = System.getProperty(P2PConstants.PROPERTY_PORT);
 
+        // Keep previous port value
+        String bckPortValue = null;
+        if (!acquisitionMethod.equals("ibis")) {
+            bckPortValue = System.getProperty("proactive." + acquisitionMethod +
+                    ".port");
+            System.setProperty("proactive." + acquisitionMethod + ".port",
+                portNumber);
+        } else {
+            bckPortValue = System.getProperty("proactive.rmi.port");
+            System.setProperty("proactive.rmi.port", portNumber);
+        }
+
         // ProActiveRuntime creation
-        System.setProperty("proactive." + acquisitionMethod + ".port",
-            portNumber);
         ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod +
                 ":");
+
+        // Set property port with previous value
+        if (bckPortValue != null) {
+            if (!acquisitionMethod.equals("ibis")) {
+                System.setProperty("proactive." + acquisitionMethod + ".port",
+                    bckPortValue);
+            } else {
+                System.setProperty("proactive.rmi.port", bckPortValue);
+            }
+        }
 
         // Node Creation
         String url = paRuntime.createLocalNode(P2PConstants.P2P_NODE_NAME,
@@ -438,11 +457,16 @@ public class StartP2PService implements P2PConstants {
         // P2PService Active Object Creation
         this.p2pService = (P2PService) ProActive.newActive(P2PService.class.getName(),
                 null, url);
-
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                "/////////////////  STARTING P2P SERVICE //////////////////");
+        try {
+            ProActive.enableAC(this.p2pService);
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Couldn't enable AC for the P2P service", e);
+            }
         }
+
+        logger.info(
+            "/////////////////  STARTING P2P SERVICE //////////////////");
 
         // Record the ProActiveRuntime in other from Servers List File
         if (!this.peers.isEmpty()) {

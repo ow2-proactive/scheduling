@@ -65,7 +65,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         this.hasCreatedRegistry = RegistryHelper.getRegistryCreator();
         try {
             this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-        }catch (ExceptionInInitializerError e) {
+        } catch (ExceptionInInitializerError e) {
             e.printStackTrace();
             throw e;
         }
@@ -179,6 +179,16 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             creatorID, creationProtocol, vmName);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws RemoteException {
+        this.proActiveRuntime.unregister(proActiveRuntimeDist,
+            proActiveRuntimeURL, creatorID, creationProtocol, vmName);
+    }
+
     public ProActiveRuntime[] getProActiveRuntimes() {
         return proActiveRuntime.getProActiveRuntimes();
     }
@@ -193,6 +203,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
     public String[] getAcquaintances() {
         return proActiveRuntime.getAcquaintances();
+    }
+
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
     }
 
     public void killRT(boolean softly) throws java.rmi.RemoteException {
@@ -284,10 +298,11 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) {
-        return proActiveRuntime.receiveCheckpoint(nodeName,ckpt,inc);
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) {
+        return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
-    
+
     // SECURITY
 
     /* (non-Javadoc)
@@ -382,10 +397,9 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public String getJobID(String nodeUrl) throws RemoteException {
         return proActiveRuntime.getJobID(nodeUrl);
     }
-    
-  
+
     public byte[] getClassDataFromParentRuntime(String className)
-            throws RemoteException {
+        throws RemoteException {
         try {
             return proActiveRuntime.getClassDataFromParentRuntime(className);
         } catch (ProActiveException e) {
@@ -393,18 +407,19 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         }
     }
 
-    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException {
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws RemoteException {
         try {
             return proActiveRuntime.getClassDataFromThisRuntime(className);
         } catch (ProActiveException e) {
             throw new RemoteException("class data not found", e);
         }
     }
-    
+
     public void setParent(String fatherRuntimeName) throws RemoteException {
-            proActiveRuntime.setParent(fatherRuntimeName);
+        proActiveRuntime.setParent(fatherRuntimeName);
     }
-    
+
     //
     // ---PRIVATE METHODS--------------------------------------
     //
@@ -422,8 +437,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 logger.info(url + " successfully bound in registry at " + url);
             }
         } catch (java.rmi.AlreadyBoundException e) {
-            logger.warn("WARNING "+url +
-                " already bound in registry", e);
+            logger.warn("WARNING " + url + " already bound in registry", e);
         } catch (java.net.MalformedURLException e) {
             throw new java.rmi.RemoteException("cannot bind in registry at " +
                 url, e);

@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
-import java.rmi.RemoteException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
@@ -49,6 +46,12 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.rmi.RemoteException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -83,16 +86,24 @@ public interface JiniRuntime extends java.rmi.Remote {
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) throws java.rmi.RemoteException;
 
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeName, String creatorID, String creationProtocol,
+        String vmName) throws java.rmi.RemoteException;
+
     public ProActiveRuntime[] getProActiveRuntimes()
         throws java.rmi.RemoteException;
 
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
-    public void addAcquaintance(String proActiveRuntimeName) throws java.rmi.RemoteException;
+    public void addAcquaintance(String proActiveRuntimeName)
+        throws java.rmi.RemoteException;
 
     public String[] getAcquaintances() throws java.rmi.RemoteException;
-    
+
+    public void rmAcquaintance(String proActiveRuntimeName)
+        throws java.rmi.RemoteException;
+
     public void killRT(boolean softly) throws java.rmi.RemoteException;
 
     public String getURL() throws java.rmi.RemoteException;
@@ -124,10 +135,10 @@ public interface JiniRuntime extends java.rmi.Remote {
 
     public UniversalBody receiveBody(String nodeName, Body body)
         throws java.rmi.RemoteException;
-    
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) 
-    	throws java.rmi.RemoteException;
-        
+
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws java.rmi.RemoteException;
+
     /**
      * @return creator certificate
      */
@@ -187,20 +198,21 @@ public interface JiniRuntime extends java.rmi.Remote {
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws RemoteException;
-    
+
     /**
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
      */
-    public byte[] getClassDataFromParentRuntime(String className) throws RemoteException;    
+    public byte[] getClassDataFromParentRuntime(String className)
+        throws RemoteException;
 
     /**
      * @see ProActiveRuntime#getClassDataFromThisRuntime(String)
      */
-    public byte[] getClassDataFromThisRuntime(String className) throws RemoteException;
-    
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws RemoteException;
+
     /**
      * @see ProActiveRuntime#setParent(String)
      */
     public void setParent(String parentRuntimeName) throws RemoteException;
-    
 }

@@ -41,16 +41,18 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.Loggers;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PAcquaintanceManager;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.io.Serializable;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Vector;
 
 
@@ -61,8 +63,9 @@ import java.util.Vector;
  */
 public class P2PNodesLookup implements InitActive, RunActive, EndActive,
     P2PConstants, Serializable {
-    private static final Logger logger = Logger.getLogger(Loggers.P2P_NODES);
-    private Vector nodesList;
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
+    private Vector waitingNodesList;
+    private Vector nodesToKillList;
     private long expirationTime;
     private static final long TIMEOUT = Long.parseLong(System.getProperty(
                 PROPERTY_NODES_ACQUISITION_T0));
@@ -80,6 +83,8 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
     private P2PNodesLookup stub;
     private ProActiveRuntime paRuntime;
     private String parUrl;
+    private HashMap nodeManagerMap = new HashMap();
+    private boolean killAllFlag = false;
 
     public P2PNodesLookup() {
         // the empty constructor
@@ -88,7 +93,8 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
     public P2PNodesLookup(Integer numberOfAskedNodes,
         P2PService localP2pService, P2PAcquaintanceManager acquaintances,
         String vnName, String jobId) {
-        this.nodesList = new Vector();
+        this.waitingNodesList = new Vector();
+        this.nodesToKillList = new Vector();
         this.expirationTime = System.currentTimeMillis() + TIMEOUT;
         this.numberOfAskedNodes = numberOfAskedNodes.intValue();
         assert (this.numberOfAskedNodes > 0) ||
@@ -128,34 +134,28 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
 
     /**
      * Kill the given node.
-     * @param node the node to kill.
+     * @param node the node url to kill.
      */
-    public void killNode(Node node) {
-        String nodeUrl = node.getNodeInformation().getURL();
-
-        // Get remote reference to the node manager
-        ProActiveRuntime remoteRuntime = node.getProActiveRuntime();
-        ArrayList remoteAO = null;
+    public void killNode(String node) {
         try {
-            remoteAO = remoteRuntime.getActiveObjects(P2P_NODE_NAME,
-                    P2PNodeManager.class.getName());
-        } catch (ProActiveException e) {
-            logger.warn("Couldn't get reference to remote node manager at " +
-                nodeUrl, e);
-        }
-        if (remoteAO.size() == 1) {
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
-            remoteNodeManager.leaveNode(node);
-            if (logger.isInfoEnabled()) {
-                logger.info("Node at " + nodeUrl + " succefuly killed");
-            }
-        } else {
-            logger.warn(
-                "Couldn't kill remote node: no remote node manager found at " +
-                nodeUrl);
-        }
+            Node remoteNode = NodeFactory.getNode(node);
+            ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) this.nodeManagerMap.get(node);
 
-        // TODO Adding unregister method in PA Runtime
+            remoteRuntime.unregisterVirtualNode(vnName);
+            remoteRuntime.rmAcquaintance(this.parUrl);
+            remoteNodeManager.leaveNode(remoteNode, this.vnName);
+            this.nodesToKillList.remove(node);
+
+            logger.info("Node at " + node + " succefuly removed");
+
+            // Unregister the remote runtime
+            this.paRuntime.unregister(remoteRuntime, this.parUrl, "p2p",
+                System.getProperty(PROPERTY_ACQUISITION) + ":",
+                this.paRuntime.getVMInformation().getName());
+        } catch (Exception e) {
+            logger.warn("Couldn't leave node @" + node, e);
+        }
     }
 
     /**
@@ -164,41 +164,10 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
      * not kill.</p>
      */
     public void killAllNodes() {
-        for (int index = 0; index < this.nodesList.size(); index++) {
-            Node currentNode = (Node) this.nodesList.get(index);
+        this.killAllFlag = true;
+        while (this.nodesToKillList.size() > 0) {
+            String currentNode = (String) this.nodesToKillList.get(0);
             this.killNode(currentNode);
-        }
-    }
-
-    /**
-     * Asynchronous adding node.
-     * @param node the node to add.
-     */
-    public void addNode(Node node) {
-        boolean r = this.nodesList.add(node);
-        if (r) {
-            this.acquiredNodes++;
-            if (logger.isInfoEnabled()) {
-                logger.info("Lookup got " + this.acquiredNodes + " nodes");
-            }
-            ProActiveRuntime remoteRt = node.getProActiveRuntime();
-            remoteRt.addAcquaintance(this.parUrl);
-            try {
-                this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p",
-                    System.getProperty(PROPERTY_ACQUISITION) + ":",
-                    this.paRuntime.getVMInformation().getName());
-            } catch (ProActiveException e) {
-                logger.warn("Couldn't recgister the remote runtime", e);
-            }
-        }
-        if (logger.isDebugEnabled()) {
-            if (r) {
-                logger.debug("Node at " + node.getNodeInformation().getURL() +
-                    " succefuly added");
-            } else {
-                logger.debug("Node at " + node.getNodeInformation().getURL() +
-                    " NOT added");
-            }
         }
     }
 
@@ -207,6 +176,38 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
      */
     public void wakeUp() {
         // nothing to do, just wake up the run activity
+    }
+
+    /**
+     * Receipt a reference to a shared node.
+     *
+     * @param givenNode the shared node.
+     * @param remoteNodeManager the remote node manager for the given node.
+     */
+    public void giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Given node received from " +
+                givenNode.getNodeInformation().getURL());
+        }
+
+        // Get currrent nodes accessor
+        if (!this.allArrived()) {
+            this.waitingNodesList.add(givenNode);
+            String nodeUrl = givenNode.getNodeInformation().getURL();
+            this.nodeManagerMap.put(nodeUrl, remoteNodeManager);
+            this.acquiredNodes++;
+            logger.info("Lookup got " + this.acquiredNodes + " nodes");
+            ProActiveRuntime remoteRt = givenNode.getProActiveRuntime();
+            try {
+                remoteRt.addAcquaintance(this.parUrl);
+                this.paRuntime.register(remoteRt, remoteRt.getURL(), "p2p",
+                    System.getProperty(PROPERTY_ACQUISITION) + ":",
+                    this.paRuntime.getVMInformation().getName());
+            } catch (ProActiveException e) {
+                logger.warn("Couldn't recgister the remote runtime", e);
+            }
+            logger.debug("Node at " + nodeUrl + " succefuly added");
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -226,40 +227,20 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
         }
     }
 
-    private int currentTtl = 0;
-
     /**
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
-        if (logger.isInfoEnabled()) {
-            logger.info("Looking for " + this.numberOfAskedNodes + " nodes");
-        }
+        logger.info("Looking for " + this.numberOfAskedNodes + " nodes");
         Service service = new Service(body);
         while (!this.allArrived() &&
-                (System.currentTimeMillis() < this.expirationTime)) {
-            if (this.numberOfAskedNodes == MAX_NODE) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Aksing MAX number of nodes");
-                }
+                (System.currentTimeMillis() < this.expirationTime) &&
+                !this.killAllFlag) {
+            logger.debug("Aksing nodes");
 
-                // Send a message to everybody
-                this.localP2pService.askingNode(TTL, null,
-                    this.localP2pService, this.vnName, this.jobId);
-            } else {
-                // incremental TTL
-                if ((currentTtl < TTL) &&
-                        (this.numberOfAskedNodes <= this.acquaintances.size())) {
-                    currentTtl++;
-                } else {
-                    currentTtl = TTL;
-                }
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Asking nodes with TTL = " + currentTtl);
-                }
-                this.localP2pService.askingNode(currentTtl, null,
-                    this.localP2pService, this.vnName, this.jobId);
-            }
+            // Send a message to everybody
+            this.localP2pService.askingNode(TTL, null, this.localP2pService,
+                stub, this.vnName, this.jobId);
 
             // Serving request
             service.blockingServeOldest(LOOKUP_FREQ);
@@ -276,20 +257,17 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
      */
     public void endActivity(Body body) {
         Service service = new Service(body);
-        if (logger.isInfoEnabled()) {
-            logger.info("All nodes (" + this.acquiredNodes +
-                ") arrived ending activity");
-        }
+        logger.info("All nodes (" + this.acquiredNodes +
+            ") arrived ending activity");
         this.localP2pService.removeWaitingAccessor(this.stub);
-        while (this.nodesList.size() > 0) {
+        while ((this.waitingNodesList.size() > 0) ||
+                (this.nodesToKillList.size() > 0)) {
             service.blockingServeOldest(LOOKUP_FREQ);
             while (service.hasRequestToServe()) {
                 service.serveOldest();
             }
         }
-        if (logger.isInfoEnabled()) {
-            logger.info("This P2P nodes lookup is no more active, bye..");
-        }
+        logger.info("This P2P nodes lookup is no more active, bye..");
     }
 
     /**
@@ -309,10 +287,11 @@ public class P2PNodesLookup implements InitActive, RunActive, EndActive,
      */
     public Vector getAndRemoveNodes() {
         Vector v = new Vector();
-        while (this.nodesList.size() != 0) {
-            Object elem = this.nodesList.get(0);
+        while (this.waitingNodesList.size() != 0) {
+            Object elem = this.waitingNodesList.get(0);
             v.add(elem);
-            this.nodesList.remove(elem);
+            this.waitingNodesList.remove(elem);
+            this.nodesToKillList.add(((Node) elem).getNodeInformation().getURL());
         }
         return v;
     }

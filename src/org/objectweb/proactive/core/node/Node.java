@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.node;      
 
+import java.io.IOException;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
@@ -85,6 +87,12 @@ public interface Node
 	
 
 	/**
+	 * @return The number of active objects deployed in this Node.
+	 * @throws NodeException Cannot get Active Objects registered on this node.
+	 */
+	public int getNumberOfActiveObjects() throws NodeException;
+	
+	/**
 	 * Returns the name of the VirtualNode this Node belongs to
 	 * @return the name of the VirtualNode this Node belongs to
 	 */
@@ -95,5 +103,12 @@ public interface Node
 	 * @param virtualNodeName
 	 */
 	public void setVnName(String virtualNodeName);
+	
+	/**
+	 * Terminate body of all node's active objects.
+	 * @throws NodeException
+	 * @throws IOException
+ 	 */
+	public void killAllActiveObjects() throws NodeException, IOException;
 
 }

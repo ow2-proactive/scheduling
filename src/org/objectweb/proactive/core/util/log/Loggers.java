@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.util;
+package org.objectweb.proactive.core.util.log;
 
 
 /**

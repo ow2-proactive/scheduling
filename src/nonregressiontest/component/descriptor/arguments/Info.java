@@ -1,7 +1,5 @@
 package nonregressiontest.component.descriptor.arguments;
 
-import nonregressiontest.component.Message;
-
 import org.objectweb.fractal.api.control.AttributeController;
 
 /**

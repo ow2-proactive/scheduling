@@ -28,47 +28,42 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.p2p.service.node;
+package org.objectweb.proactive.core.util.log;
 
-import org.objectweb.proactive.core.node.Node;
-
-import java.io.Serializable;
+import org.apache.log4j.Category;
+import org.apache.log4j.Logger;
 
 
 /**
- * Used to return an available node or not from the node manager.
+ * @author Arnaud Contes
  *
- * @author Alexandre di Costanzo
- *
- * Created on Jan 13, 2005
+ *  This class stores all logger used in proactive. It provides an easy way
+ *  to create and to retrieve a logger.
  */
-public class P2PNode implements Serializable {
-    private Node node = null;
-    private P2PNodeManager nodeManager = null;
+public class ProActiveLogger extends Logger {
+    // It's enough to instantiate a factory once and for all.
+    private static ProActiveLoggerFactory myFactory = new ProActiveLoggerFactory();
 
     /**
-     * Construct a new <code>P2PNode</code> with specified <code>node</code> or
-     * <code>null</code>.
-     *
-     * @param node a ProActive node or <code>null</code>.
-     * @see org.objectweb.proactive.core.node.Node
+       Just calls the parent constuctor.
      */
-    public P2PNode(Node node, P2PNodeManager nodeManager) {
-        this.node = node;
-        this.nodeManager = nodeManager;
+    protected ProActiveLogger(String name) {
+        super(name);
     }
 
     /**
-     * @return a free node or <code>null</code> if no nodes are available.
+       This method overrides {@link Logger#getInstance} by supplying
+       its own factory type as a parameter.
      */
-    public Node getNode() {
-        return this.node;
+    public static Category getInstance(String name) {
+        return Logger.getLogger(name, myFactory);
     }
 
-	/**
-	 * @return the associed node manager.
-	 */
-	public P2PNodeManager getNodeManager() {
-		return this.nodeManager;
-	}
+    /**
+       This method overrides {@link Logger#getLogger} by supplying
+       its own factory type as a parameter.
+     */
+    public static Logger getLogger(String name) {
+        return Logger.getLogger(name, myFactory);
+    }
 }

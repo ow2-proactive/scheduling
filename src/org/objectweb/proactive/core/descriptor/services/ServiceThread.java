@@ -66,9 +66,11 @@ public class ServiceThread extends Thread {
     private ProActiveRuntime localRuntime;
     int nodeCount = 0;
     long timeout = 0;
-    long P2Ptimeout;
     int nodeRequested;
     public static Logger loggerDeployment = Logger.getLogger("DEPLOYMENT");
+    private static final long TIMEOUT = Long.parseLong(System.getProperty(
+                P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+    private long expirationTime;
 
     public ServiceThread(VirtualNode vn, VirtualMachine vm) {
         this.vn = vn;
@@ -91,16 +93,21 @@ public class ServiceThread extends Thread {
                 P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
                 P2PNodesLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
                         this.vn.getName(), this.vn.getJobID());
-                this.P2Ptimeout = Long.parseLong(System.getProperty(
-                            P2PConstants.PROPERTY_NODES_ACQUISITION_T0));
+                ((VirtualNodeImpl) vn).addP2PNodesLookup(p2pNodesLookup);
                 this.nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
-                // if the timeout of the service is longer than the vn's one
-                // then adjust the vn's timeout.
+                // Timeout
                 long vnTimeout = vn.getTimeout();
-                if (vnTimeout < P2Ptimeout) {
-                    ((VirtualNodeImpl) vn).setTimeout(P2Ptimeout, false);
+                this.expirationTime = System.currentTimeMillis() + TIMEOUT;
+                if (this.nodeRequested == MAX_NODE) {
+                    this.expirationTime = Long.MAX_VALUE;
+                    ((VirtualNodeImpl) vn).setTimeout(this.expirationTime, false);
+                } else if (vnTimeout < TIMEOUT) {
+                    ((VirtualNodeImpl) vn).setTimeout(TIMEOUT, false);
                 }
-                while (!timeoutExpired() && askForNodes()) {
+
+                long step = 500;
+                while (askForNodes() &&
+                        (System.currentTimeMillis() < this.expirationTime)) {
                     Vector future = p2pNodesLookup.getAndRemoveNodes();
                     Vector nodes = (Vector) ProActive.getFutureValue(future);
                     for (int i = 0; i < nodes.size(); i++) {
@@ -110,10 +117,26 @@ public class ServiceThread extends Thread {
                                 vn, NodeCreationEvent.NODE_CREATED, node,
                                 nodeCount));
                     }
-                    if (askForNodes() && (nodeCount != 0)) {
+
+                    // Sleeping with FastStart algo
+                    if (askForNodes() &&
+                            (nodeRequested == P2PConstants.MAX_NODE)) {
+                        // Askig max nodes
                         Thread.sleep(LOOK_UP_FREQ);
+                    } else if (askForNodes() && (this.nodeCount == 0)) {
+                        // still no node
+                        Thread.sleep(step);
                     } else if (askForNodes()) {
-                        Thread.sleep(100);
+                        // normal waiting
+                        if (step == LOOK_UP_FREQ) {
+                            Thread.sleep(LOOK_UP_FREQ);
+                        } else if (step > LOOK_UP_FREQ) {
+                            step = LOOK_UP_FREQ;
+                            Thread.sleep(LOOK_UP_FREQ);
+                        } else {
+                            step += 500;
+                            Thread.sleep(step);
+                        }
                     }
                 }
             }
@@ -136,24 +159,6 @@ public class ServiceThread extends Thread {
                     RuntimeRegistrationEvent.RUNTIME_ACQUIRED, part[i],
                     vn.getName(), protocol, vm.getName());
             ((RuntimeRegistrationEventListener) vn).runtimeRegistered(event);
-        }
-    }
-
-    /**
-     * Method used for the timout of the P2PService
-     * Returns true if the timeout has expired
-     * @return true if the timeout has expired
-     */
-    private boolean timeoutExpired() {
-        if (P2Ptimeout == -1) {
-            // timeout = -1 means infinite timeout
-            return false;
-        } else {
-            if (timeout == 0) {
-                this.timeout = System.currentTimeMillis() + this.P2Ptimeout;
-            }
-            long currentDate = System.currentTimeMillis();
-            return currentDate > timeout;
         }
     }
 

@@ -89,24 +89,23 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         this.vmInformation = runtimestrategyadapter.getVMInformation();
     }
 
-//    public void createURL() {
-//
-//        /* !!! */
-//        if (!url.startsWith("http:")) {
-//            url = "http:" + url;
-//        }
-//
-//        if (port == 0) {
-//            port = UrlBuilder.getPortFromUrl(url);
-//        }
-//
-//        try {
-//            url = "http://" + UrlBuilder.getHostNameAndPortFromUrl(url);
-//        } catch (UnknownHostException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
+    //    public void createURL() {
+    //
+    //        /* !!! */
+    //        if (!url.startsWith("http:")) {
+    //            url = "http:" + url;
+    //        }
+    //
+    //        if (port == 0) {
+    //            port = UrlBuilder.getPortFromUrl(url);
+    //        }
+    //
+    //        try {
+    //            url = "http://" + UrlBuilder.getHostNameAndPortFromUrl(url);
+    //        } catch (UnknownHostException e) {
+    //            e.printStackTrace();
+    //        }
+    //    }
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
@@ -161,6 +160,16 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         String vmName) {
         runtimestrategyadapter.register(proActiveRuntimeDist,
             proActiveRuntimeName, creatorID, creationProtocol, vmName);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unregister(ProActiveRuntime proActiveRuntimeDist,
+        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
+        String vmName) {
+        this.runtimestrategyadapter.unregister(proActiveRuntimeDist,
+            proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
@@ -333,6 +342,13 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return this.runtimestrategyadapter.getAcquaintances();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
+     */
+    public void rmAcquaintance(String proActiveRuntimeName) {
+        this.runtimestrategyadapter.rmAcquaintance(proActiveRuntimeName);
+    }
+
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException {
         return this.runtimestrategyadapter.getPolicy(sc);
@@ -342,25 +358,25 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @see ProActiveRuntime#getClassDataFromParentRuntime(String)
      */
     public byte[] getClassDataFromParentRuntime(String className)
-            throws ProActiveException {
+        throws ProActiveException {
         return this.runtimestrategyadapter.getClassDataFromParentRuntime(className);
     }
-    
-    
+
     /**
      * @see ProActiveRuntime#getClassDataFromThisRuntime(String)
      */
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws ProActiveException {
         return this.runtimestrategyadapter.getClassDataFromThisRuntime(className);
     }
-    
+
     /**
      * @see ProActiveRuntime#setParent(String)
      */
     public void setParent(String parentRuntimeName) throws ProActiveException {
         this.runtimestrategyadapter.setParent(parentRuntimeName);
     }
-        
+
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -419,11 +435,11 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         return runtimestrategyadapter.hashCode();
     }
 
-  
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(java.lang.String, org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc) throws ProActiveException {
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
+        int inc) throws ProActiveException {
         // TODO Auto-generated method stub
         return null;
     }
