@@ -8,11 +8,11 @@
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
-		<register virtualNode="Dispatcher" protocol="rmi"/> 
+		<register virtualNode="Dispatcher"/> 
 		<mapping>
 			<map virtualNode="Dispatcher">
 				<jvmSet>
-					<currentJVM protocol="rmi"/>
+					<currentJVM/>
 				</jvmSet>
 			</map>
 			<map virtualNode="Renderer">
