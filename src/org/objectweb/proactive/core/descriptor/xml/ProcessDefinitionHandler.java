@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshallerDecorator;
@@ -51,20 +52,26 @@ import org.xml.sax.SAXException;
  * Receives SAX event and pass them on
  *
  */
+import org.apache.log4j.Logger;
+
 public class ProcessDefinitionHandler
+
+
 	extends AbstractUnmarshallerDecorator
 	implements ProActiveDescriptorConstants
 {
+	
 	protected String id;
 	protected ProActiveDescriptor proActiveDescriptor;
 	protected ExternalProcess targetProcess;
 
 	public ProcessDefinitionHandler(ProActiveDescriptor proActiveDescriptor)
 	{
-		super();
+		super(false);
 		this.proActiveDescriptor = proActiveDescriptor;
 		this.addHandler(JVM_PROCESS_TAG,new JVMProcessHandler(proActiveDescriptor));
 		this.addHandler(RSH_PROCESS_TAG, new RSHProcessHandler(proActiveDescriptor));
+		this.addHandler(MAPRSH_PROCESS_TAG, new MapRshProcessHandler(proActiveDescriptor));
 		this.addHandler(SSH_PROCESS_TAG, new SSHProcessHandler(proActiveDescriptor));
 		this.addHandler(RLOGIN_PROCESS_TAG, new RLoginProcessHandler(proActiveDescriptor));
 		this.addHandler(BSUB_PROCESS_TAG, new BSubProcessHandler(proActiveDescriptor));
@@ -104,7 +111,9 @@ public class ProcessDefinitionHandler
 		id = attributes.getValue("id");
 	}
 
+
 	public class ProcessHandler
+
 		extends AbstractUnmarshallerDecorator
 		implements ProActiveDescriptorConstants
 	{
@@ -232,8 +241,7 @@ public class ProcessDefinitionHandler
 					String vValue = attributes.getValue("value");
 					if (checkNonEmpty(vName) && vValue != null)
 					{
-						System.out.println(
-							"Found environment variable name=" + vName + " value=" + vValue);
+						logger.info("Found environment variable name=" + vName + " value=" + vValue);
 						variables.add(vName + "=" + vValue);
 					}
 				}
@@ -259,6 +267,7 @@ public class ProcessDefinitionHandler
 			bch.addHandler(REL_PATH_TAG, pathHandler);
 			this.addHandler(JAVA_PATH_TAG, bch);
 			this.addHandler(POLICY_FILE_TAG, bch);
+			this.addHandler(LOG4J_FILE_TAG, bch);
 			this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
 			this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
 			this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
@@ -308,6 +317,10 @@ public class ProcessDefinitionHandler
 			{
 				jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
 			}
+			else if (name.equals(LOG4J_FILE_TAG))
+			{
+				jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
+			}
 			else if (name.equals(CLASSNAME_TAG))
 			{
 				jvmProcess.setClassname((String) activeHandler.getResultObject());
@@ -338,6 +351,51 @@ public class ProcessDefinitionHandler
 		}
 
 	} //end of inner class RSHProcessHandler
+	
+	protected class MapRshProcessHandler extends ProcessHandler
+	{
+		
+
+		public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor)
+		{
+			super(proActiveDescriptor);
+			UnmarshallerHandler pathHandler = new PathHandler();
+			BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+			bch.addHandler(ABS_PATH_TAG, pathHandler);
+			bch.addHandler(REL_PATH_TAG, pathHandler);
+			this.addHandler(SCRIPT_PATH_TAG, bch);
+		}
+		
+		public void startContextElement(String name, Attributes attributes)
+				throws org.xml.sax.SAXException
+			{
+				// we know that it is a maprsh process since we are
+  		// in map rsh handler!!!
+  			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+				super.startContextElement(name,attributes);
+				String parallelize = attributes.getValue("parallelize"); 
+				if (checkNonEmpty(parallelize))
+				((MapRshProcess)targetProcess).setParallelization("parallelize");
+			}
+			
+		protected void notifyEndActiveHandler(String name,UnmarshallerHandler activeHandler)
+			throws org.xml.sax.SAXException
+		{
+			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+			if (name.equals(SCRIPT_PATH_TAG))
+				{
+
+					((MapRshProcess)targetProcess).setScriptLocation(
+						(String) activeHandler.getResultObject());
+						
+				}
+				else
+				{
+				super.notifyEndActiveHandler(name, activeHandler);
+				}
+		}
+
+	} //end of inner class MapRshProcessHandler
 
 	protected class SSHProcessHandler extends ProcessHandler
 	{
@@ -368,7 +426,23 @@ public class ProcessDefinitionHandler
 			this.addHandler(BSUB_OPTIONS_TAG, new BsubOptionHandler());
 		}
 		
-
+		public void startContextElement(String name, Attributes attributes)
+				throws org.xml.sax.SAXException
+			{
+				// we know that it is a maprsh process since we are
+  		// in map rsh handler!!!
+  			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+				super.startContextElement(name,attributes);
+				String interactive = (attributes.getValue("interactive"));
+				if (checkNonEmpty(interactive))
+				((LSFBSubProcess) targetProcess).setInteractive(interactive);
+				String queueName = (attributes.getValue("queue"));
+				if (checkNonEmpty(interactive)){
+					((LSFBSubProcess) targetProcess).setQueueName(queueName);
+				}
+			}
+			
+			
 		protected class BsubOptionHandler extends PassiveCompositeUnmarshaller
 		{
 
