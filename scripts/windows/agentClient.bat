@@ -10,7 +10,8 @@ echo.
 echo Start the Agent Client
 echo    - 1 : the url of the node the active object Agent is going to be migrated
 echo. 
-echo ex : agentClient //localhost/Node1
+echo ex : agentClient.bat //localhost/Node1
+
 echo This node has to be previously launched with the command startNode.bat //localhost/Node1
 echo. 
 goto end
