@@ -337,7 +337,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="javaPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="policyFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="log4jpropertiesFile" type="FilePathType" minOccurs="0"/>
-			<xs:element name="proActivePropertiesFile" type="FilePathType" minOccurs="0"/>
+			<xs:element name="ProActiveUserPropertiesFile" type="FilePathType" minOccurs="0"/>
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
@@ -414,7 +414,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="parallelize" type="xs:positiveInteger" use="optional"/>
-		<xs:attribute name="hostname" type="HostListType" use="required"/>
+		<xs:attribute name="hostname" type="ListType" use="required"/>
 	</xs:complexType>
 	<!--sshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id).and environment element that may not appear and three attributes: class which is required and can take only two values: org.objectweb.proactive.core.process.ssh.SSHJVMProcess or org.objectweb.proactive.core.process.ssh.SSHProcess, username attribute which is optional, and hostname which is required and represents the remote host to log on with ssh-->
 	<xs:complexType name="SshProcessType">
@@ -466,8 +466,13 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--bsubOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="BsubOptionType">
 		<xs:sequence>
-			<xs:element name="hostlist" type="HostListType" minOccurs="0"/>
+			<xs:element name="hostlist" type="ListType" minOccurs="0"/>
 			<xs:element name="processor" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="resourceRequirement" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="value" type="xs:string"/>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
@@ -495,7 +500,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="prunOptionType">
 		<xs:sequence>
-			<xs:element name="hostlist" type="HostListType" minOccurs="0"/>
+			<xs:element name="hostlist" type="ListType" minOccurs="0"/>
 			<xs:element name="hostsNumber" type="xs:positiveInteger" minOccurs="0"/>
 			<xs:element name="processorPerNode" type="xs:positiveInteger" minOccurs="0"/>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
@@ -504,7 +509,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:sequence>
 	</xs:complexType>
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
-	<xs:simpleType name="HostListType">
+	<xs:simpleType name="ListType">
 		<xs:list itemType="xs:string"/>
 	</xs:simpleType>
 	<!--globusProcess element has three childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) , environment, and globusOption element  which represents different options of globus command.They may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.globus.GlobusProcess, and hostname which is required and represents the globus host where the RSL request is destinated -->

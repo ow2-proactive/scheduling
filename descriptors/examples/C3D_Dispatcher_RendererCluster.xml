@@ -73,9 +73,9 @@
 					<log4jpropertiesFile>
 						<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/proactive-log4j"/>
 					</log4jpropertiesFile>
-					<proActivePropertiesFile>
+					<ProActiveUserPropertiesFile>
 						<absolutePath value="/net/home/rquilici/config.xml"/>
-					</proActivePropertiesFile>
+					</ProActiveUserPropertiesFile>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="bsubInriaCluster">
@@ -84,6 +84,7 @@
 					<bsubOption>
 						<hostlist>pf10.inria.fr</hostlist>
 						<processor>2</processor>
+						<resourceRequirement value="span[ptile=2"/>
 						<scriptPath>
 							<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
 						</scriptPath>
