@@ -95,13 +95,11 @@
 	-->
 	<target name="configurationCopy">
 		<copy toDir="${classes.dir}">
-			<fileset dir="${src.dir}">			
-				<include name="**/*.xml"/>		
+			<fileset dir="${src.dir}">
+				<include name="**/*.xml"/>
 			</fileset>
 		</copy>
 	</target>
-	
-	
 	<target name="core" depends="init, configurationCopy">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
 			<classpath refid="project.classpath"/>
@@ -425,22 +423,21 @@
       ================================================================
 	-->
 	<target name="runTests" depends="testsuite, nonregressiontest">
+		<delete file="${base}/compile/tests.log"/>
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
 		</java>
 	</target>
-	
-	
-	
-		<target name="runTestsLocal" depends="testsuite, nonregressiontest">
+	<target name="runTestsLocal" depends="testsuite, nonregressiontest">
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+			<jvmarg value="-Dlog4j.configuration=file:${base}/compile/proactive-log4j"/>
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
 		</java>
 	</target>
-	
 	<!--
 	   ================================================================
 	   ==
@@ -462,7 +459,6 @@
 			</fileset>
 		</copy>
 	</target>
-	
 	<target name="benchmark" depends="testsuite, microTimer">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}">
 			<classpath refid="test.classpath"/>
