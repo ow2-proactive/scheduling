@@ -863,6 +863,15 @@ public class ProxyForGroup extends AbstractProxy
         return this.memberList.get(ProActive.waitForAny(this.memberList));
     }
 
+	/**
+	 * Waits one future is arrived and returns it (removes it from the group).
+	 * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
+	 */
+	public Object waitAndGetOneThenRemoveIt() {
+		return this.memberList.remove(ProActive.waitForAny(this.memberList));
+	}
+
+
     /**
      * Waits that the member at the specified rank is arrived and returns it.
      * @param <code>n</code> the rank of the wanted member.
@@ -1074,5 +1083,6 @@ public class ProxyForGroup extends AbstractProxy
 	public Set keySet() {
 		return this.hashList.keySet();
 	}
+
 
 }

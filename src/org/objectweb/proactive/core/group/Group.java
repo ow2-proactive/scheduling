@@ -112,6 +112,12 @@ public interface Group extends Collection {
      * @return a non-awaited member of the Group.
      */
     public Object waitAndGetOne();
+    
+	/**
+	 * Waits one future is arrived and returns it (removes it from the group).
+	 * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
+	 */
+	public Object waitAndGetOneThenRemoveIt();
 
     /**
      * Waits that the member at the specified rank is arrived and returns it.

@@ -538,13 +538,36 @@ public class ProActiveGroup {
 	    	if (theProxy != null)
 				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOne();
 	    	// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
-	    	else
+	    	else {
 				return o;
-		}
+			}
+	    }
 		// if o is not a reified object just return it
 		else
 	    	return o;
     }
+
+	/**
+	 * Waits one future is arrived and returns it (removes it from the typed group).
+	 * @param <code>o</code> a typed group.
+	 * @return a member of <code>o</code>. (<code>o</code> is removed from the typed group)
+	 */
+	public static Object waitAndGetOneThenRemoveIt (Object o) {
+		if (MOP.isReifiedObject (o)) {
+			org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
+			// If the object represents a group, we use the proxyForGroup's method
+			if (theProxy != null)
+				return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).waitAndGetOneThenRemoveIt();
+			// Else the "standard waitFor" method has been used in the findProxyForGroup method so the future is arrived, just return it
+			else {
+				return o;
+			}
+		}
+		// if o is not a reified object just return it
+		else
+			return o;
+	}
+
 
 
     /**
