@@ -251,7 +251,6 @@ public class LocalBodyStore {
     public void registerForwarder(AbstractBody body) {
     	if (localForwarderMap.getBody(body.bodyID) != null) {
             logger.debug("DEBUUUUUUUUUUUUG1 Forwarder already registered in the body map");
-            System.err.println("DEBUUUUUUUUUUUUG2 Forwarder already registered in the body map");
             localForwarderMap.removeBody(body.bodyID);
         }
         localForwarderMap.putBody(body.bodyID, body);
