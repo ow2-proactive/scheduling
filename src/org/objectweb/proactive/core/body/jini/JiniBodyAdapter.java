@@ -40,12 +40,12 @@ import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.IOException;
 

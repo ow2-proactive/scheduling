@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -482,6 +484,17 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+	 */
+	public SecurityContext getPolicy(SecurityContext sc) throws ProActiveException,SecurityNotAvailableException {
+		 try {
+			 return remoteProActiveRuntime.getPolicy(sc);
+		 } catch (java.rmi.RemoteException re) {
+			 throw new ProActiveException(re);
+		 }
+	}
+
     /**
      * @see org.objectweb.proactive.Job#getJobID()
      */
@@ -500,11 +513,13 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    //
+	//
     // -- PROTECTED METHODS -----------------------------------------------
     //
     protected RemoteProActiveRuntime createRemoteProActiveRuntime()
         throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
         return new RemoteProActiveRuntimeImpl();
     }
+
+
 }

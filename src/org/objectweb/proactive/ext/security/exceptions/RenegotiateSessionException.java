@@ -28,7 +28,7 @@
 *
 * ################################################################
 */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.exceptions;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 
@@ -41,8 +41,7 @@ import java.io.Serializable;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public class RenegotiateSessionException extends Exception
-    implements Serializable {
+public class RenegotiateSessionException extends Exception    implements Serializable {
     protected UniversalBody body;
 
     /**

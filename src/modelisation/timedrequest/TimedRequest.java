@@ -3,7 +3,7 @@ package modelisation.timedrequest;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public class TimedRequest extends RequestImpl implements java.io.Serializable {

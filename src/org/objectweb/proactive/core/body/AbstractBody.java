@@ -1,42 +1,34 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body;
-
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -49,9 +41,9 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.group.ProActiveGroupManager;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.group.ProActiveGroupManager;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
@@ -60,14 +52,29 @@ import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.DefaultProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.Policy;
+import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.Secure;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.HashMap;
 
 
 /**
@@ -116,6 +123,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected transient InternalBodySecurity internalBodySecurity;
     protected Hashtable openedSessions;
     protected static Logger logger = Logger.getLogger(AbstractBody.class.getName());
+    protected boolean isInterfaceSecureImplemented = false;
 
     // GROUP
     protected ProActiveGroupManager pgm;
@@ -128,11 +136,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     private transient boolean isActive;
 
     /** whether the body has been killed. A killed body has no more activity although
-     stopping the activity thread is not immediate */
+       stopping the activity thread is not immediate */
     private transient boolean isDead;
 
-    /** table of handlers associated to the body */
-    private HashMap bodyLevel;
+	/** table of handlers associated to the body */
+	private HashMap bodyLevel;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -161,15 +169,26 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.pgm = factory.newProActiveGroupManagerFactory()
                           .newProActiveGroupManager();
 
+        Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+        Security.addProvider(myProvider);
+
         // SECURITY
-        this.psm = factory.getProActiveSecurityManager();
-        if (psm != null) {
-            //  startDefaultProActiveSecurityManager();
-            isSecurityOn = (psm != null);
-            logger.debug("Security is on " + isSecurityOn);
-            psm.setBody(this);
-            internalBodySecurity = new InternalBodySecurity(null);
+        if (reifiedObject instanceof Secure) {
+            isInterfaceSecureImplemented = true;
         }
+		psm = new ProActiveSecurityManager();
+        internalBodySecurity = new InternalBodySecurity(null); // SECURITY
+
+        /*
+           this.psm = factory.getProActiveSecurityManager();
+             if (psm != null) {
+                     //  startDefaultProActiveSecurityManager();
+                     isSecurityOn = (psm != null);
+                     logger.debug("Security is " + isSecurityOn);
+                     psm.setBody(this);
+                     internalBodySecurity = new InternalBodySecurity(null);
+             }
+         */
     }
 
     //
@@ -197,6 +216,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
             if (this.isSecurityOn) {
+
+                /*
+                   if (isInterfaceSecureImplemented) {
+                   Session session = psm.getSession(request.getSessionId());
+                   ((Secure) getReifiedObject()).receiveRequest(session.getSecurityContext());
+                   }
+                 */
                 try {
                     this.renegociateSessionIfNeeded(request.getSessionId());
                     if ((this.internalBodySecurity.isLocalBody()) &&
@@ -392,11 +418,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     return psm;
                 } else {
                     ProActiveSecurityManager plop = internalBodySecurity.getProActiveSecurityManager();
-
                     return plop;
                 }
+            } else {
+                throw new SecurityNotAvailableException();
             }
-            throw new SecurityNotAvailableException();
         } finally {
             exitFromThreadStore();
         }
@@ -577,8 +603,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             byte[][] ske;
 
-            renegociateSessionIfNeeded(sessionID);
-
+             renegociateSessionIfNeeded(sessionID);
             if (internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
                 ske = psm.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
@@ -636,21 +661,25 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         throws IOException, SecurityNotAvailableException {
         try {
             enterInThreadStore();
-            if (psm == null) {
-                startDefaultProActiveSecurityManager();
-            }
-            if (!isSecurityOn) {
+
+            //if (psm == null) {
+            //	  startDefaultProActiveSecurityManager();
+            // }
+            if (!isSecurityOn || (psm == null)) {
                 throw new SecurityNotAvailableException();
             }
 
             if (internalBodySecurity.isLocalBody()) {
-                return psm.getCertificateEncoded();
+                return psm.getCertificate().getEncoded();
             } else {
                 return internalBodySecurity.getCertificatEncoded();
             }
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
         } finally {
             exitFromThreadStore();
         }
+        return null;
     }
 
     protected void startDefaultProActiveSecurityManager() {
@@ -735,6 +764,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
+    public void setPolicyServer(PolicyServer server) {
+        if (server != null) {
+            if ((psm != null) && (psm.getPolicyServer() == null)) {
+                psm = new ProActiveSecurityManager(server);
+                isSecurityOn = true;
+                System.out.println("Security is on " + isSecurityOn);
+                psm.setBody(this);
+            }
+        }
+    }
+
     //
     // -- implements LocalBody -----------------------------------------------
     //
@@ -775,10 +815,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     throw new SecurityNotAvailableException();
                 }
                 if (internalBodySecurity.isLocalBody()) {
-                    System.out.println("send Request AbstractBody");
                     byte[] certE = destinationBody.getRemoteAdapter()
                                                   .getCertificateEncoded();
                     X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                    System.out.println("send Request AbstractBody, method " +
+                        methodCall.getName() + " cert " +
+                        cert.getSubjectDN().getName());
                     if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
                         psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
                             destinationBody.getRemoteAdapter());
@@ -805,52 +847,52 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    /** Give a reference to a local map of handlers
-          * @return A reference to a map of handlers
-          */
-    public HashMap getHandlersLevel() throws ProActiveException {
-        return bodyLevel;
-    }
+	/** Give a reference to a local map of handlers
+		   * @return A reference to a map of handlers
+		   */
+	 public HashMap getHandlersLevel() throws ProActiveException {
+		 return bodyLevel;
+	 }
 
-    /** Set a new handler within the table of the Handlerizable Object
-         * @param handler A class of handler associated with a class of non functional exception.
-         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-         */
-    public void setExceptionHandler(Class handler, Class exception)
-        throws ProActiveException {
-        // add handler to the body level
-        //System.out.println("[SET_EXCEPTION_HANDLER] " + "[P1=" + handler.getName() + "] [P2=" + exception.getName() + "]");
-        if (bodyLevel == null) {
-            bodyLevel = new HashMap();
-        }
-        bodyLevel.put(exception, handler);
-        //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
-    }
+	 /** Set a new handler within the table of the Handlerizable Object
+		  * @param handler A class of handler associated with a class of non functional exception.
+		  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+		  */
+	 public void setExceptionHandler(Class handler, Class exception)
+		 throws ProActiveException {
+		 // add handler to the body level
+		 //System.out.println("[SET_EXCEPTION_HANDLER] " + "[P1=" + handler.getName() + "] [P2=" + exception.getName() + "]");
+		 if (bodyLevel == null) {
+			 bodyLevel = new HashMap();
+		 }
+		 bodyLevel.put(exception, handler);
+		 //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
+	 }
 
-    /** Remove a handler from the table of the Handlerizable Object
-         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-         * @return The removed handler or null
-         */
-    public Handler unsetExceptionHandler(Class exception)
-        throws ProActiveException {
-        // add handler to the body level
-        if (bodyLevel != null) {
-            // System.out.println("[UNSET_EXCEPTION_HANDLER] " + "[P1=" + exception.getName() + "]");
-            Class handlerClass = (Class) bodyLevel.remove(exception);
+	 /** Remove a handler from the table of the Handlerizable Object
+		  * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+		  * @return The removed handler or null
+		  */
+	 public Handler unsetExceptionHandler(Class exception)
+		 throws ProActiveException {
+		 // add handler to the body level
+		 if (bodyLevel != null) {
+			 // System.out.println("[UNSET_EXCEPTION_HANDLER] " + "[P1=" + exception.getName() + "]");
+			 Class handlerClass = (Class) bodyLevel.remove(exception);
 
-            //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
-            try {
-                Handler handler = (Handler) handlerClass.newInstance();
-                return handler;
-            } catch (IllegalAccessException e) {
-                System.out.println("*** ERROR : " + e);
-            } catch (InstantiationException e) {
-                System.out.println("*** INSTANTIATION ERROR : " + e);
-            }
-            return null;
-        }
-        return null;
-    }
+			 //System.out.println("SIZE OF BODY LEVEL = " + bodyLevel.size() + "\n");
+			 try {
+				 Handler handler = (Handler) handlerClass.newInstance();
+				 return handler;
+			 } catch (IllegalAccessException e) {
+				 System.out.println("*** ERROR : " + e);
+			 } catch (InstantiationException e) {
+				 System.out.println("*** INSTANTIATION ERROR : " + e);
+			 }
+			 return null;
+		 }
+		 return null;
+	 }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -957,5 +999,4 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         in.defaultReadObject();
         logger = Logger.getLogger("AbstractBody");
     }
-
 }

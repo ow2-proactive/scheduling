@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.Utils;
 
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class FuturePool extends Object implements java.io.Serializable {

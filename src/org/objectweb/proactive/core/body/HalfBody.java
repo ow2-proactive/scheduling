@@ -47,10 +47,10 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.InternalBodySecurity;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.security.cert.X509Certificate;
 
@@ -84,7 +84,20 @@ public class HalfBody extends AbstractBody {
         //psm = new ProActiveSecurityManager();
         //isSecurityOn = true;
         //psm.setBody(this);
-        internalBodySecurity = new InternalBodySecurity(null);
+        
+       
+   	 this.psm = factory.getProActiveSecurityManager();
+   	   if (psm != null) {
+   		   //  startDefaultProActiveSecurityManager();
+   		   isSecurityOn = (psm != null);
+   		   logger.debug("HalfBody Security is " + isSecurityOn);
+   		   psm.setBody(this);
+   		   internalBodySecurity = new InternalBodySecurity(null);  
+
+   	   }
+   	   
+        
+       // internalBodySecurity = new InternalBodySecurity(null);
 
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));

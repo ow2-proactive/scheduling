@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.core.descriptor.xml;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
@@ -233,7 +236,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
-                    vn.createNodeOnCurrentJvm(protocol);
+                    vn.createNodeOnCurrentJvm(protocol);               
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
@@ -279,7 +282,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         private VirtualMachine currentVM;
 
         private JVMHandler() {
-            //this.addHandler(ACQUISITION_TAG, new AcquisitionHandler());
+            this.addHandler(ACQUISITION_TAG, new AcquisitionHandler());
             this.addHandler(CREATION_PROCESS_TAG, new CreationHandler());
         }
 
@@ -305,22 +308,34 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         /**
          * This class receives acquisition events
          */
-//        private class AcquisitionHandler extends BasicUnmarshaller {
-//            private AcquisitionHandler() {
-//            }
-//
-//            public void startContextElement(String name, Attributes attributes)
-//                throws org.xml.sax.SAXException {
-//                String acquisitionMethod = attributes.getValue("method");
-//                //String portNumber = attributes.getValue("port");
-//                if (acquisitionMethod != null) {
-//                    currentVM.setAcquisitionMethod(acquisitionMethod);
-//                }
-////                if (portNumber != null) {
-////                    currentVM.setPortNumber(portNumber);
+        private class AcquisitionHandler extends BasicUnmarshaller {
+            private AcquisitionHandler() {
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                String runtimeURL = attributes.getValue("url");
+                //String portNumber = attributes.getValue("port");
+                if (runtimeURL != null) {
+                	
+                	String protocol = UrlBuilder.getProtocol(runtimeURL);
+                	String url = UrlBuilder.removeProtocol(runtimeURL,protocol);
+                	proActiveDescriptor.registerProcess(currentVM, (String) runtimeURL);
+                	ProActiveRuntime proActiveRuntimeRegistered = null;
+					try {
+						proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,protocol);
+					} catch (ProActiveException e) {
+						e.printStackTrace();
+					}
+					currentVM.setAcquired(true);
+                	currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
+                	//currentVM.setAcquisitionMethod(acquisitionMethod);
+                }
+////               if (portNumber != null) {
+/////                    currentVM.setPortNumber(portNumber);
 ////                }
-//            }
-//        }
+            }
+        }
 
         // end inner class AcquisitionHandler
 

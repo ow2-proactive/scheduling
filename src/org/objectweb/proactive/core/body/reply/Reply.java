@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.body.reply;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 public interface Reply extends Message {
 

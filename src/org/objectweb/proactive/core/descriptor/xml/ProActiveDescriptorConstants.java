@@ -56,7 +56,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String LOOKUP_TAG = "lookup"; 
   public static final String JVMS_TAG = "jvms"; 
   public static final String JVM_TAG = "jvm"; 
- // public static final String ACQUISITION_TAG = "acquisition"; 
+  public static final String ACQUISITION_TAG = "acquisition"; 
   public static final String CREATION_PROCESS_TAG = "creation"; 
   public static final String PROCESS_TAG = "process"; 
   public static final String PROCESS_DEFINITION_TAG = "processDefinition";

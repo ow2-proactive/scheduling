@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.ext.security;
 
+
 public class CommunicationForbiddenException extends Exception {
     public CommunicationForbiddenException() {
         super();

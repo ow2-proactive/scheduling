@@ -71,6 +71,7 @@ public class StartRuntime {
     }
 
     private StartRuntime(String[] args) {
+    	if ( args.length != 0) {
         this.nodeURL = args[0];
         this.creatorID = args[0].trim();
         //System.out.println(creatorID);
@@ -81,14 +82,16 @@ public class StartRuntime {
         this.nodenumber = (new Integer(nodeNumber)).intValue();
 		this.protocolId = args[3];
 		this.vmName = args[4];
+    	}
+    	
     }
 
     public static void main(String[] args) {
-        if (args.length < 3) {
-            logger.error(
-                "Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod> <portNumber>");
-            System.exit(1);
-        }
+//        if (args.length < 3) {
+ //           logger.error(
+   //             "Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod> <portNumber>");
+    //        System.exit(1);
+      //  }
         ProActiveConfiguration.load();
 
 //        System.out.println("StartRunTime.main() " + args[0] + " " + args[1] +
@@ -119,7 +122,7 @@ public class StartRuntime {
 
             //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
 			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.communication.protocol")+":");
-			
+			logger.info("Runtime started at " + System.getProperty("proactive.communication.protocol")+":" + proActiveRuntime.getURL());
 			proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 			
 /*
@@ -134,7 +137,8 @@ public class StartRuntime {
             //System.out.println("creation OK");
             //System.out.println(DefaultRuntimeURL);
 */
-            register(DefaultRuntimeURL);
+		if (DefaultRuntimeURL != null)
+            register(DefaultRuntimeURL);	
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

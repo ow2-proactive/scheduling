@@ -32,12 +32,22 @@ package org.objectweb.proactive.core.body.migration;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.ext.security.DefaultEntity;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityMigrationException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
 
 
 public class MigratableBody extends ComponentBodyImpl implements Migratable,
@@ -120,6 +130,9 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
     //
     protected UniversalBody internalMigrateTo(Node node, boolean byCopy)
         throws MigrationException {
+        UniqueID savedID = null;
+        UniversalBody migratedBody = null;
+
         if (!isAlive()) {
             throw new MigrationException(
                 "Attempt to migrate a dead body that has been terminated");
@@ -136,29 +149,96 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
         String saveNodeURL = nodeURL;
         nodeURL = node.getNodeInformation().getURL();
 
-        // stop accepting communication
-        blockCommunication();
-
-        // save the id
-        UniqueID savedID = bodyID;
-
-        if (byCopy) {
-            // if moving by copy we have to create a new unique ID
-            // the bodyID will be automatically recreate when deserialized
-            bodyID = null;
-        }
-
-        // try to migrate
-        UniversalBody migratedBody = null;
         try {
+            // security checks
+            try {
+                ProActiveRuntime pr = null;
+                pr = node.getProActiveRuntime();
+                System.out.println("internal runtime" + pr.getURL());
+                ArrayList entitiesFrom = null;
+                ArrayList entitiesTo = null;
+                try {
+                    entitiesFrom = this.getEntities();
+                } catch (SecurityNotAvailableException e1) {
+                	logger.info ("entitites from not found");
+                    entitiesFrom = new ArrayList();
+                    entitiesFrom.add(new DefaultEntity());
+                }
+
+                try {
+                    entitiesTo = pr.getEntities(node.getNodeInformation()
+                                                    .getName());
+                    logger.info("Node name " +
+                        node.getNodeInformation().getName() + " taille " +
+                        entitiesTo.size());
+                } catch (ProActiveException e1) {
+                	logger.info ("entitites to not found");
+                    entitiesTo = new ArrayList();
+                    entitiesTo.add(new DefaultEntity());
+                }
+
+                SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
+                        entitiesFrom, entitiesTo);
+
+                SecurityContext result = null;
+
+                if (isSecurityOn) {
+                    result = psm.getPolicy(sc);
+
+                    if (!result.isMigration()) {
+                        throw new SecurityMigrationException("migration denied");
+                    }
+                } else {
+                    // no local security but need to check if distant runtime accepts migration
+                    result = pr.getPolicy(sc);
+                    if (!result.isMigration()) {
+                        System.out.println("migration denied");
+                        throw new SecurityMigrationException("migration denied");
+                    }
+                }
+            } catch (SecurityNotAvailableException e1) {
+            	logger.debug("Security not availaible");
+               // e1.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            nodeURL = node.getNodeInformation().getURL();
+
+            // stop accepting communication
+            blockCommunication();
+
+            // save the id
+            savedID = bodyID;
+            if (byCopy) {
+                // if moving by copy we have to create a new unique ID
+                // the bodyID will be automatically recreate when deserialized
+                bodyID = null;
+            }
+
+            // security
+            // save opened sessions
+            if (isSecurityOn) {
+                openedSessions = psm.getOpenedConnexion();
+            }
+
+            // try to migrate
             migratedBody = migrationManager.migrateTo(node, this);
+            if (isSecurityOn) {
+                this.internalBodySecurity.setDistantBody(migratedBody);
+            }
         } catch (MigrationException e) {
+            openedSessions = null;
             nodeURL = saveNodeURL;
             bodyID = savedID;
             localBodyStrategy.getFuturePool().unsetMigrationTag();
+            this.internalBodySecurity.setDistantBody(null);
             acceptCommunication();
             throw e;
+        } catch (ProActiveException e) {
+            e.printStackTrace();
         }
+
         if (!byCopy) {
             changeBodyAfterMigration(migratedBody);
         } else {

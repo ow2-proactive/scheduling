@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 /**
@@ -124,4 +127,26 @@ public interface VirtualMachine {
      * @return String The Id of the VirtualNode that created this VirtualMachine
      */
     public String getCreatorId();
+
+	/**
+	 * Returns true if this machine has been acquired false otherwise 
+	 * @return boolean if the machine result of a lookup 
+	 */
+	public boolean isAcquired();
+	
+	/**
+     * @param isAcquired The isAcquired to set.
+     */
+    public void setAcquired(boolean isAcquired); 
+    
+	/**
+	 * @return Returns the remoteRuntime.
+	 */
+	public ProActiveRuntime getRemoteRuntime() ;
+	
+	/**
+	 * @param remoteRuntime The remoteRuntime to set.
+	 */
+	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) ;
+
 }

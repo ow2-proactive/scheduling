@@ -48,17 +48,21 @@ public class SecurityContext implements Serializable {
     public static int COMMUNICATION_RECEIVE_REPLY_FROM = 3;
     public static int MIGRATION_TO = 4;
     public static int MIGRATION_FROM = 5;
+    public static int Validate_POLICY = 5;
     protected ArrayList entitiesFrom;
     protected ArrayList entitiesTo;
     protected Communication sendRequest;
     protected Communication receiveRequest;
     protected Communication sendReply;
     protected Communication receiveReply;
+    protected Communication proposedPolicy;
+    protected int proposedPolicyValidated;
     protected boolean migration;
     protected boolean migrationTo;
     protected boolean creationActiveObjectFrom;
     protected boolean creationActiveObjectTo;
     protected int type;
+    protected long sessionID;
 
     public SecurityContext() {
     }
@@ -224,4 +228,46 @@ public class SecurityContext implements Serializable {
     public void setSendRequest(Communication communication) {
         sendRequest = communication;
     }
+	/**
+	 * @return Returns the sessionID.
+	 */
+	public long getSessionID() {
+		return sessionID;
+	}
+	/**
+	 * @param sessionID The sessionID to set.
+	 */
+	public void setSessionID(long sessionID) {
+		this.sessionID = sessionID;
+	}
+	/**
+	 * @return Returns the migrationTo.
+	 */
+	public boolean isMigrationTo() {
+		return migrationTo;
+	}
+	/**
+	 * @return Returns the proposedPolicy.
+	 */
+	public Communication getProposedPolicy() {
+		return proposedPolicy;
+	}
+	/**
+	 * @param proposedPolicy The proposedPolicy to set.
+	 */
+	public void setProposedPolicy(Communication proposedPolicy) {
+		this.proposedPolicy = proposedPolicy;
+	}
+	/**
+	 * @return Returns the proposedPolicyValidated.
+	 */
+	public int getProposedPolicyValidated() {
+		return proposedPolicyValidated;
+	}
+	/**
+	 * @param proposedPolicyValidated The proposedPolicyValidated to set.
+	 */
+	public void setProposedPolicyValidated(int proposedPolicyValidated) {
+		this.proposedPolicyValidated = proposedPolicyValidated;
+	}
 }

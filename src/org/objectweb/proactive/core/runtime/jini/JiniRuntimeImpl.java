@@ -56,6 +56,8 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.IOException;
 
@@ -461,13 +463,20 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntime.getEntities();
     }
 
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+	 */
+	public SecurityContext getPolicy(SecurityContext sc) throws SecurityNotAvailableException {
+		return proActiveRuntime.getPolicy(sc);
+	}
+	
     /**
      * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getJobID(java.lang.String)
      */
     public String getJobID(String nodeUrl) throws RemoteException {
         return proActiveRuntime.getJobID(nodeUrl);
     }
-
+	
     //
     // ---PRIVATE METHODS--------------------------------------
     //
@@ -586,4 +595,6 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             }
         }
     }
+
+
 }

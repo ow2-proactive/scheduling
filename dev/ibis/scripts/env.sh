@@ -2,7 +2,7 @@
 
 ##### 
 
-JAVA="/usr/local/sun-java/jdk1.4/bin/java  "
+JAVA="/net/home/acontes/tmp/j2sdk1.4.2_04/bin/java  "
 #JAVA="/usr/local/ibm-java/IBMJava2-141/bin/java "
 pretty_echo() {
   echo "------------ $1 -------------"
@@ -115,17 +115,17 @@ JAVA_CMD="$JAVA -Xbootclasspath:$BOOTCLASSPATH
 
 
 normal() {
-CLASSPATH="/home1/fabrice/workProActive/jem3D/bin/:\
-/home1/fabrice/workProActive/ProActive/classes:\
+CLASSPATH="$HOME/dev/ProActive/jem3D/bin/:\
+$HOME/dev/ProActive/classes:\
 /home1/fabrice/workIbis/Ibis/classes:\
-/home1/fabrice/workProActive/ProActive/lib/bcel.jar:\
-/home1/fabrice/workProActive/ProActive/lib/asm.jar:\
-/home1/fabrice/workProActive/ProActive/lib/jini-core.jar:\
-/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar:\
-/home1/fabrice/workProActive/ProActive/lib/reggie.jar:\
-/home1/fabrice/workProActive/ProActive/lib/log4j-core.jar:\
-/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar:\
-/home1/fabrice/workProActive/ProActive/lib/fractal.jar"
+$HOME/dev/ProActive/lib/bcel.jar:\
+$HOME/dev/ProActive/lib/asm.jar:\
+$HOME/dev/ProActive/lib/jini-core.jar:\
+$HOME/dev/ProActive/lib/jini-ext.jar:\
+$HOME/dev/ProActive/lib/reggie.jar:\
+$HOME/dev/ProActive/lib/log4j-core.jar:\
+$HOME/dev/ProActive/lib/xercesImpl.jar:\
+$HOME/dev/ProActive/lib/fractal.jar"
 BOOTCLASSPATH=""
 CONFIG=~/workProActive/ProActive/modelisation/scripts/common/proactiveConfiguration.xml
 
@@ -139,19 +139,20 @@ JAVA_CMD="$JAVA -cp $CLASSPATH \
 }
 
 normal_ibis() {
-CLASSPATH="/home1/fabrice/workProActive/jem3D/bin/:\
-/home1/fabrice/workProActive/ProActive/classes:\
-/home1/fabrice/workProActive/ProActive/lib/ibis.jar:\
-/home1/fabrice/workProActive/ProActive/lib/bcel.jar:\
-/home1/fabrice/workProActive/ProActive/lib/asm.jar:\
-/home1/fabrice/workProActive/ProActive/lib/jini-core.jar:\
-/home1/fabrice/workProActive/ProActive/lib/jini-ext.jar:\
-/home1/fabrice/workProActive/ProActive/lib/reggie.jar:\
-/home1/fabrice/workProActive/ProActive/lib/log4j-core.jar:\
-/home1/fabrice/workProActive/ProActive/lib/xercesImpl.jar:\
-/home1/fabrice/workProActive/ProActive/lib/fractal.jar"
+CLASSPATH="$HOME/dev/ProActive/jem3D/bin/:\
+$HOME/dev/ProActive/classes:\
+$HOME/dev/ProActive/lib/ibis.jar:\
+$HOME/dev/ProActive/lib/bcel.jar:\
+$HOME/dev/ProActive/lib/asm.jar:\
+$HOME/dev/ProActive/lib/jini-core.jar:\
+$HOME/dev/ProActive/lib/jini-ext.jar:\
+$HOME/dev/ProActive/lib/reggie.jar:\
+$HOME/dev/ProActive/lib/log4j-core.jar:\
+$HOME/dev/ProActive/lib/xercesImpl.jar:\
+$HOME/dev/ProActive/lib/bouncycastle.jar:\
+$HOME/dev/ProActive/lib/fractal.jar"
 BOOTCLASSPATH=""
-CONFIG=~/workProActive/ProActive/dev/ibis/config/proactiveConfigurationIbis.xml
+CONFIG=~/dev/ProActive/dev/ibis/config/proactiveConfigurationIbis.xml
 
 echo "XXXXXXXXXXXX NORMAL MODE XXXXXXXXXXXXXXXXX"
 pretty_echo "BOOTCLASSPATH" $BOOTCLASSPATH
@@ -159,7 +160,7 @@ pretty_echo "CLASSPATH" $CLASSPATH
 pretty_echo "CONFIG" $CONFIG
 JAVA_CMD="$JAVA -cp $CLASSPATH \
   -Dproactive.configuration=$CONFIG \
-   -Djava.library.path=$ROOT/workProActive/ProActive/lib:$LD_LIBRARY_PATH "
+   -Djava.library.path=$ROOT/dev/ProActive/lib:$LD_LIBRARY_PATH "
 }
 
 
@@ -247,7 +248,7 @@ JAVA_CMD="$JAVA -cp $CLASSPATH \
 
 ##### Variables
  JAVA_HOME=/usr/local/sun-java/jdk1.4/
- ROOT=/home1/fabrice
+ ROOT=$HOME
  workingDir=`dirname $0`
  JAVA_ROOT=$JAVA_HOME
  JAVAC=$JAVA_HOME/bin/javac

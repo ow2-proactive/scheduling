@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.security.cert.X509Certificate;
 
@@ -315,6 +317,13 @@ public interface ProActiveRuntime extends Job {
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws ProActiveException;
+
+    /**
+     * @param sc
+     * @return
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException;
 
     /**
      * @param PART

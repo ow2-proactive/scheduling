@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+     	<security file="../../descriptors/c3dAddUserPolicy.xml"></security>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="User" property="unique"/>
@@ -21,7 +22,9 @@
 	<infrastructure>
 		<processes>
 			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+  <jvmParameters>
+			<parameter value="-Dsun.rmi.server.exceptionTrace=true" />  </jvmParameters></jvmProcess>
 			</processDefinition>
 		</processes>
 	</infrastructure>

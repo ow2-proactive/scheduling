@@ -112,7 +112,8 @@ public class NodeFactory {
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
-                        false,defaultRuntime.getPolicyServer(), "currentJVM",jobID );
+                        false,defaultRuntime.getPolicyServer(), 
+						 "currentJVM",jobID );
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }

@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.Policy;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
+import org.objectweb.proactive.ext.security.SecurityContext;
 
 
 public class Session implements Serializable {
@@ -102,6 +103,9 @@ public class Session implements Serializable {
     //  public byte[] iv;
     public transient SecureRandom sec_rand;
 
+    // security context associated to the sesssion
+    public SecurityContext securityContext;
+    
     public Session() {
     }
 
@@ -161,18 +165,20 @@ public class Session implements Serializable {
         byte[] mac = null;
         if (communication.isIntegrityEnabled()) {
             cl_mac.update(in); // Update plain text into MAC
+            System.out.println("Session : integrity enabled  ");
         }
 
         if (communication.isConfidentialityEnabled()) {
             try {
                 in = cl_cipher.doFinal(in); // Encrypt data for recipient.
+                System.out.println("Session : integrity confidentiality ");
             } catch (Exception bex) {
                 bex.printStackTrace();
                 throw (new IOException("PDU failed to encrypt " +
                     bex.getMessage()));
             }
         }
-
+        
         if (communication.isIntegrityEnabled()) {
             mac = cl_mac.doFinal();
         }
@@ -350,4 +356,22 @@ public class Session implements Serializable {
      */
     public void setPolicy(Policy resultPolicy) {
     }
+    
+    public Communication getCommunication() {
+    	return communication;
+    }
+
+	/**
+	 * @return
+	 */
+	public SecurityContext getSecurityContext() {
+		
+		return securityContext;
+	}
+	/**
+	 * @param securityContext The securityContext to set.
+	 */
+	public void setSecurityContext(SecurityContext securityContext) {
+		this.securityContext = securityContext;
+	}
 }

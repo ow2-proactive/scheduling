@@ -1,42 +1,65 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ext.security;
+
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.examples.garden.Flower;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
+import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
+import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
+import org.objectweb.proactive.ext.security.crypto.Session;
+import org.objectweb.proactive.ext.security.exceptions.*;
+
+import org.xml.sax.SAXException;
+
+import sun.rmi.server.MarshalOutputStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -54,6 +77,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -64,28 +88,6 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.xml.XMLPropertiesStore;
-import org.objectweb.proactive.examples.garden.Flower;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
-import org.objectweb.proactive.ext.security.crypto.AuthenticationTicketProperty;
-import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.ext.security.crypto.RandomLongGenerator;
-import org.objectweb.proactive.ext.security.crypto.Session;
-import org.xml.sax.SAXException;
-
-import sun.rmi.server.MarshalOutputStream;
 
 
 /**
@@ -110,7 +112,7 @@ public class ProActiveSecurityManager implements Serializable {
 
     /* Active object certificate */
     protected X509Certificate certificate;
-
+    protected byte[] encodedCertificate;
     /* Active Object private Key */
     protected PrivateKey privateKey;
 
@@ -119,7 +121,8 @@ public class ProActiveSecurityManager implements Serializable {
     protected PublicKey publicKey;
     protected byte[] privateKeyEncoded;
     protected X509Certificate[] trustedCertificationAuthority;
-    protected XMLPropertiesStore policiesRules;
+
+    //protected XMLPropertiesStore policiesRules;
     protected transient UniversalBody myBody;
     protected String VNName;
 
@@ -146,8 +149,6 @@ public class ProActiveSecurityManager implements Serializable {
         this.privateKey = pk;
         publicKey = certificate.getPublicKey();
         sessions = new Hashtable();
-        logger.debug(
-            "psm +-+--+-+-++-+-+-++-++-+--+-+-+-+-+-+-+-+-+-+-+-++--+-+-+-+-+-+-+-+ ");
     }
 
     public ProActiveSecurityManager(String file) throws java.io.IOException {
@@ -156,7 +157,7 @@ public class ProActiveSecurityManager implements Serializable {
         sessions = new Hashtable();
 
         if ((new File(file)).exists()) {
-            this.policiesRules = new XMLPropertiesStore(file);
+            //this.policiesRules = new XMLPropertiesStore(file);
             try {
                 this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
             } catch (IOException e) {
@@ -164,13 +165,27 @@ public class ProActiveSecurityManager implements Serializable {
             } catch (SAXException e) {
                 e.printStackTrace();
             }
-            setCertificate();
-            setPrivateKey();
-            setTrustedCertificationAuthority();
-            publicKey = certificate.getPublicKey();
+
+            //            setCertificate();
+            //            setPrivateKey();
+            //            setTrustedCertificationAuthority();
+            //            publicKey = certificate.getPublicKey();
         }
         logger.debug("psm" + file +
             " +-+--+-+-++-+-+-++-++-+--+-+-+-+-+-+-+-+-+-+-+-++--+-+-+-+-+-+-+-+ ");
+    }
+
+    /**
+     * @param server
+     */
+    public ProActiveSecurityManager(PolicyServer server) {
+        Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+        Security.addProvider(myProvider);
+        sessions = new Hashtable();
+        this.policyServer = server;
+        this.certificate = server.getCertificate();
+        this.privateKey = server.getPrivateKey();
+        this.publicKey = certificate.getPublicKey();
     }
 
     public void setBody(UniversalBody body) {
@@ -182,32 +197,32 @@ public class ProActiveSecurityManager implements Serializable {
      * set the certificate of the active object
      */
     private void setCertificate() {
-        String certificateFile = policiesRules.getValueAsString(SecurityConstants.XML_CERTIFICATE)
-                                              .trim();
-        X509Certificate certificate = null;
 
-        try {
-            InputStream inStream = new FileInputStream(certificateFile);
-            CertificateFactory cfe = CertificateFactory.getInstance("X.509");
-            certificate = (X509Certificate) cfe.generateCertificate(inStream);
-            inStream.close();
-        } catch (IOException e) {
-            logger.warn(" Certificate file " + certificateFile + " not found");
-            e.printStackTrace();
-        } catch (java.security.cert.CertificateException e) {
-            logger.warn(
-                "An error occurs while loading active object certificate");
-            e.printStackTrace();
-        }
-
-        this.certificate = certificate;
+        /*        String certificateFile = policiesRules.getValueAsString(SecurityConstants.XML_CERTIFICATE)
+           .trim();
+           X509Certificate certificate = null;
+           try {
+               InputStream inStream = new FileInputStream(certificateFile);
+               CertificateFactory cfe = CertificateFactory.getInstance("X.509");
+               certificate = (X509Certificate) cfe.generateCertificate(inStream);
+               inStream.close();
+           } catch (IOException e) {
+               logger.warn(" Certificate file " + certificateFile + " not found");
+               e.printStackTrace();
+           } catch (java.security.cert.CertificateException e) {
+               logger.warn(
+                   "An error occurs while loading active object certificate");
+               e.printStackTrace();
+           }
+           this.certificate = certificate;
+         */
     }
 
     /**
-            * Method getPolicyTo.
-            * @param certificate the object certificate we want to get the policy from
-            * @return Policy policy attributes
-            */
+     * Method getPolicyTo.
+     * @param certificate the object certificate we want to get the policy from
+     * @return Policy policy attributes
+     */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException {
         if (policyServer == null) {
@@ -255,57 +270,47 @@ public class ProActiveSecurityManager implements Serializable {
      * Done once when the ProActiveSecurityManager is created
      */
     private void setTrustedCertificationAuthority() {
-        X509Certificate[] trustedCertificationAuthority = null;
-        X509Certificate certificate;
-        String file = "";
 
-        try {
-            org.w3c.dom.Node[] nodes = policiesRules.getAllNodes(SecurityConstants.XML_TRUSTED_CERTIFICATION_AUTHORITY);
-
-            if (nodes == null) {
-        //   logger.info(" No Trusted Certification Authority");
-
-                return;
-            }
-
-            int i = 0;
-
-            // initialize the array of trusted CA
-            trustedCertificationAuthority = new X509Certificate[nodes.length];
-
-            // prepare to read CA certificate
-            InputStream inStream = null;
-
-            // read all certificate from disk and save it in memory
-            for (; i < nodes.length; i++) {
-                // get the file path
-                file = policiesRules.getValueAsString(SecurityConstants.XML_CERTIFICATION_AUTHORITY_CERTIFICATE,
-                        nodes[i]);
-                file = file.trim();
-
-                //initialize the reader
-                inStream = new FileInputStream(file);
-
-                CertificateFactory cfe = CertificateFactory.getInstance("X.509");
-                certificate = (X509Certificate) cfe.generateCertificate(inStream);
-
-                // Add the certificate
-                trustedCertificationAuthority[i] = certificate;
-            }
-
-            // close the stream
-            if (inStream != null) {
-                inStream.close();
-            }
-        } catch (java.security.cert.CertificateException e) {
-            System.out.println(
-                "An error occurs while loading authority certification certificate");
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        this.trustedCertificationAuthority = trustedCertificationAuthority;
+        /*      X509Certificate[] trustedCertificationAuthority = null;
+           X509Certificate certificate;
+           String file = "";
+           try {
+               org.w3c.dom.Node[] nodes = policiesRules.getAllNodes(SecurityConstants.XML_TRUSTED_CERTIFICATION_AUTHORITY);
+               if (nodes == null) {
+           //   logger.info(" No Trusted Certification Authority");
+                   return;
+               }
+               int i = 0;
+               // initialize the array of trusted CA
+               trustedCertificationAuthority = new X509Certificate[nodes.length];
+               // prepare to read CA certificate
+               InputStream inStream = null;
+               // read all certificate from disk and save it in memory
+               for (; i < nodes.length; i++) {
+                   // get the file path
+                   file = policiesRules.getValueAsString(SecurityConstants.XML_CERTIFICATION_AUTHORITY_CERTIFICATE,
+                           nodes[i]);
+                   file = file.trim();
+                   //initialize the reader
+                   inStream = new FileInputStream(file);
+                   CertificateFactory cfe = CertificateFactory.getInstance("X.509");
+                   certificate = (X509Certificate) cfe.generateCertificate(inStream);
+                   // Add the certificate
+                   trustedCertificationAuthority[i] = certificate;
+               }
+               // close the stream
+               if (inStream != null) {
+                   inStream.close();
+               }
+           } catch (java.security.cert.CertificateException e) {
+               System.out.println(
+                   "An error occurs while loading authority certification certificate");
+               e.printStackTrace();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+           this.trustedCertificationAuthority = trustedCertificationAuthority;
+         */
     }
 
     private void decodePrivateKey() {
@@ -332,47 +337,44 @@ public class ProActiveSecurityManager implements Serializable {
      * sets the private key of the active object
      */
     private void setPrivateKey() {
-      //  logger.info("Loading private key ...");
+        //  logger.info("Loading private key ...");
 
-        String privateKeyFile = policiesRules.getValueAsString(SecurityConstants.XML_PRIVATE_KEY)
-                                             .trim();
-        RSAPrivateKey privateKey = null;
-        PKCS8EncodedKeySpec key_spec = null;
+        /*
+           String privateKeyFile = policiesRules.getValueAsString(SecurityConstants.XML_PRIVATE_KEY)
+                                                .trim();
+           RSAPrivateKey privateKey = null;
+           PKCS8EncodedKeySpec key_spec = null;
+           byte[] key_bytes = null;
+           try {
+               FileInputStream fis = new FileInputStream(privateKeyFile);
+               ByteArrayOutputStream key_baos = new ByteArrayOutputStream();
+               int aByte = 0;
+               while ((aByte = fis.read()) != -1) {
+                   key_baos.write(aByte);
+               }
+               fis.close();
+               key_bytes = key_baos.toByteArray();
+               key_baos.close();
+               KeyFactory key_factory = KeyFactory.getInstance("RSA", "BC");
+               key_spec = new PKCS8EncodedKeySpec(key_bytes);
+               privateKey = (RSAPrivateKey) key_factory.generatePrivate(key_spec);
+           } catch (IOException e) {
+               System.out.println("Private Key not found : file " +
+                   privateKeyFile + " not found");
+               e.printStackTrace();
+           } catch (java.security.spec.InvalidKeySpecException e) {
+               System.out.println("private key invalide :" + privateKeyFile);
+               e.printStackTrace();
+           } catch (java.security.NoSuchAlgorithmException e) {
+               e.printStackTrace();
+           } catch (java.security.NoSuchProviderException e) {
+               e.printStackTrace();
+           }
+           this.privateKeyEncoded = key_bytes;
+           this.privateKey = privateKey;
+         */
 
-        byte[] key_bytes = null;
-
-        try {
-            FileInputStream fis = new FileInputStream(privateKeyFile);
-            ByteArrayOutputStream key_baos = new ByteArrayOutputStream();
-            int aByte = 0;
-
-            while ((aByte = fis.read()) != -1) {
-                key_baos.write(aByte);
-            }
-
-            fis.close();
-            key_bytes = key_baos.toByteArray();
-            key_baos.close();
-
-            KeyFactory key_factory = KeyFactory.getInstance("RSA", "BC");
-            key_spec = new PKCS8EncodedKeySpec(key_bytes);
-            privateKey = (RSAPrivateKey) key_factory.generatePrivate(key_spec);
-        } catch (IOException e) {
-            System.out.println("Private Key not found : file " +
-                privateKeyFile + " not found");
-            e.printStackTrace();
-        } catch (java.security.spec.InvalidKeySpecException e) {
-            System.out.println("private key invalide :" + privateKeyFile);
-            e.printStackTrace();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (java.security.NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-
-        this.privateKeyEncoded = key_bytes;
-        this.privateKey = privateKey;
-     //   logger.info("Loading private key done ...");
+        //   logger.info("Loading private key done ...");
     }
 
     /**
@@ -394,57 +396,56 @@ public class ProActiveSecurityManager implements Serializable {
 
         distantBody = distantBody.getRemoteAdapter();
 
-        // get runtime Policy Server if exists
-        try {
-            runtimePolicyServer = RuntimeFactory.getDefaultRuntime()
-                                                .getPolicyServer();
-        } catch (ProActiveException e1) {
-            e1.printStackTrace();
-        }
+        
 
-        // identify local Virtual Node 
-        Node n = null;
-
-        //System.out.println ("myBody is intanceof HalfBody " + (myBody instanceof HalfBody) + myBody + " " + myBody.getClass());
-        logger.debug(" myBody.getNodeURL() : " + myBody.getNodeURL() +
-            "VNNAME " + VNName);
-        if (VNName == null) {
-            // && (! myBody.getNodeURL().equals("LOCAL"))) {
-            // can be null if security was not enable at lauching time
-            // retrieving node's virtual node name 
-            try {
-                //logger.debug (" myBody.getNodeURL() : "+ myBody.getNodeURL());
-                System.out.println("NODE LOCAL");
-                if (myBody.getNodeURL().equals ("LOCAL")) {
-                VNName = NodeFactory.getDefaultNode().getVnName();
-                	
-                } else {
-					System.out.println("NODE PAS LOCAL");
-                n = NodeFactory.getNode(myBody.getNodeURL());
-                VNName = ProActiveSecurity.retrieveVNName(n.getNodeInformation()
-                                                           .getName());
-                }
-            } catch (NodeException e2) {
-                e2.printStackTrace();
-            }
-
-            //} else {
-            //	VNName = "*"; 
-        }
-        if (n != null) {
-            logger.debug("sender : node ' " + n.getNodeInformation().getURL() +
-                "  " + n.getNodeInformation().getName() +
-                "' - virtual node : '" + VNName);
-        }
-
-        String distantOAVirtualNode = null;
-
-        try {
-            distantOAVirtualNode = distantBody.getVNName();
-        } catch (IOException e3) {
-            e3.printStackTrace();
-        }
-
+        
+        /*
+           // get runtime Policy Server if exists
+           try {
+               runtimePolicyServer = RuntimeFactory.getDefaultRuntime()
+                                                   .getPolicyServer();
+           } catch (ProActiveException e1) {
+               e1.printStackTrace();
+           }
+           // identify local Virtual Node
+           Node n = null;
+           //System.out.println ("myBody is intanceof HalfBody " + (myBody instanceof HalfBody) + myBody + " " + myBody.getClass());
+           logger.debug(" myBody.getNodeURL() : " + myBody.getNodeURL() +
+               "VNNAME " + VNName);
+        
+           if (VNName == null) {
+               // && (! myBody.getNodeURL().equals("LOCAL"))) {
+               // can be null if security was not enable at lauching time
+               // retrieving node's virtual node name
+               try {
+                   //logger.debug (" myBody.getNodeURL() : "+ myBody.getNodeURL());
+                   System.out.println("NODE LOCAL");
+                   if (myBody.getNodeURL().equals("LOCAL")) {
+                       VNName = NodeFactory.getDefaultNode().getVnName();
+                   } else {
+                       System.out.println("NODE PAS LOCAL");
+                       n = NodeFactory.getNode(myBody.getNodeURL());
+                       VNName = ProActiveSecurity.retrieveVNName(n.getNodeInformation()
+                                                                  .getName());
+                   }
+               } catch (NodeException e2) {
+                   e2.printStackTrace();
+               }
+               //} else {
+               //        VNName = "*";
+           }
+           if (n != null) {
+               logger.debug("sender : node ' " + n.getNodeInformation().getURL() +
+                   "  " + n.getNodeInformation().getName() +
+                   "' - virtual node : '" + VNName);
+           }
+           String distantOAVirtualNode = null;
+           try {
+               distantOAVirtualNode = distantBody.getVNName();
+           } catch (IOException e3) {
+               e3.printStackTrace();
+           }
+         */
         Communication runtimePolicy;
         Communication VNPolicy;
         Communication distantPolicy;
@@ -452,80 +453,120 @@ public class ProActiveSecurityManager implements Serializable {
         ArrayList arrayFrom = new ArrayList();
         ArrayList arrayTo = new ArrayList();
 
-        if (VNName == null) {
+        /*
+           if (VNName == null) {
+        
+           } else {
+        
+         */
+
+        // retrienes entities from source 
+        try {
+            arrayFrom = myBody.getEntities();
+        } catch (SecurityNotAvailableException e2) {
+            e2.printStackTrace();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
+
+        // no entity found
+        if (arrayFrom.size() == 0) {
             arrayFrom.add(new DefaultEntity());
-        } else {
-            try {
-                arrayFrom = myBody.getEntities();
-            } catch (SecurityNotAvailableException e2) {
-            } catch (IOException e2) {
-            }
-
-            //arrayFrom.add(new EntityVirtualNode(VNName));
         }
-        if (distantOAVirtualNode == null) {
+
+        //arrayFrom.add(new EntityVirtualNode(VNName));
+        //}
+        // retrieves entities from destination
+        try {
+            arrayTo = distantBody.getEntities();
+        } catch (IOException e2) {
+            e2.printStackTrace();
+        }
+
+        if (arrayTo.size() == 0) {
             arrayTo.add(new DefaultEntity());
-        } else {
-            try {
-                arrayTo = distantBody.getEntities();
-            } catch (IOException e2) {
-                e2.printStackTrace();
-            }
+        }
 
-            ///arrayTo.add(new EntityVirtualNode(distantOAVirtualNode));
-        }
-        if (runtimePolicyServer != null) {
-            if (distantOAVirtualNode == null) {
-                // distant Active Object is not security aware
-                distantOAVirtualNode = "*";
-            }
-            SecurityContext sc = new SecurityContext(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                    arrayFrom, arrayTo);
-            localPolicy = runtimePolicyServer.getPolicy(sc).getSendRequest();
-        } else {
-            logger.debug("No Runtime policy server installed : VN[ " + VNName +
-                "], node " + myBody.getNodeURL());
-            localPolicy = new Communication();
-        }
+        ///arrayTo.add(new EntityVirtualNode(distantOAVirtualNode));
+        //}
+
+        /*
+           if (runtimePolicyServer != null) {
+                   if (distantOAVirtualNode == null) {
+                       // distant Active Object is not security aware
+                       distantOAVirtualNode = "*";
+                   }
+        
+         */
+
+        // retrieve distant policy from local object
+        SecurityContext sc = new SecurityContext(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+                arrayFrom, arrayTo);
+
+        sc = policyServer.getPolicy(sc);
+
+        localPolicy = sc.getSendRequest();
+
+        /*
+           } else {
+               logger.debug("No Runtime policy server installed : VN[ " + VNName +
+                   "], node " + myBody.getNodeURL());
+               localPolicy = new Communication();
+           }
+         */
         if (!localPolicy.isCommunicationAllowed()) {
             throw new CommunicationForbiddenException(
-                "Sending request is denied to " + distantOAVirtualNode);
+                "Sending request is denied");
         }
 
+        // retrieve policy from distant object
+        SecurityContext scDistant = new SecurityContext(SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM,
+                arrayFrom, arrayTo);
+
         try {
-            SecurityContext sc = new SecurityContext(SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM,
-                    arrayFrom, arrayTo);
-            distantPolicy = distantBody.getPolicy(sc).getReceiveRequest();
+            scDistant = distantBody.getPolicy(scDistant);
+        } catch (SecurityNotAvailableException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
 
-            if (!distantPolicy.isCommunicationAllowed()) {
-                throw new CommunicationForbiddenException(
-                    "Receiving request id denied for " + distantOAVirtualNode);
-            }
+        distantPolicy = scDistant.getReceiveRequest();
 
-            if (distantBodyPolicy == null) {
-                distantBodyPolicy = new Communication();
-            }
+        if (!distantPolicy.isCommunicationAllowed()) {
+            throw new CommunicationForbiddenException(
+                "Receiving request denied ");
+        }
 
-            Communication resultPolicy = Communication.computeCommunication(localPolicy,
-                    distantBodyPolicy);
+        if (distantBodyPolicy == null) {
+            distantBodyPolicy = new Communication();
+        }
 
-            long sessionID = 0;
+        //compute policy
+        Communication resultPolicy = Communication.computeCommunication(localPolicy,
+                distantBodyPolicy);
 
-            try {
-                sessionID = distantBody.startNewSession(resultPolicy);
-            } catch (IOException e) {
-                logger.warn("can't start a new session");
-                e.printStackTrace();
-                throw new org.objectweb.proactive.ext.security.crypto.AuthenticationException();
-            }
+        //scDistant.setProposedPolicy(resultPolicy);
+        
+       //distantBody.getPolicy(scDistant);
+        
 
-            Session session = null;
 
-            try {
-                session = new Session(sessionID, resultPolicy);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        long sessionID = 0;
+        try {
+            sessionID = distantBody.startNewSession(resultPolicy);
+        } catch (IOException e) {
+            logger.warn("can't start a new session");
+            e.printStackTrace();
+            throw new org.objectweb.proactive.ext.security.crypto.AuthenticationException();
+        }
+
+        Session session = null;
+
+        try {
+            session = new Session(sessionID, resultPolicy);
 
             session.distantBody = distantBody;
             session.setDistantOACertificate(distantBodyCertificate);
@@ -537,18 +578,19 @@ public class ProActiveSecurityManager implements Serializable {
                 session.setDistantOAPublicKey(distantBody.getPublicKey());
             }
 
-            try {
-                logger.debug("VN[" + VNName + "]:" + myBody + " -> VN " +
-                    distantOAVirtualNode + "Key echange session id :" +
-                    sessionID);
+            logger.debug("VN[" + VNName + "]:" + myBody + " -> VN " +
+                "Key echange session id :" + sessionID);
+            if (session.getCommunication().isConfidentialityEnabled()) {
                 keyNegociationSenderSide(distantBody, sessionID);
-            } catch (KeyExchangeException e) {
-                logger.warn("Key exchange exception ");
-                // System.exit(0);
-                throw new CommunicationForbiddenException();
             }
+        } catch (KeyExchangeException e) {
+            logger.warn("Key exchange exception ");
+            e.printStackTrace();
+            throw new CommunicationForbiddenException();
         } catch (java.io.IOException e) {
             logger.warn("exception thrown while initiating the session");
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -602,6 +644,8 @@ public class ProActiveSecurityManager implements Serializable {
      */
     public byte[][] encrypt(long sessionID, Object object) {
         Session session = (Session) sessions.get(new Long(sessionID));
+
+
         if (session != null) {
             try {
                 ByteArrayOutputStream bout = new ByteArrayOutputStream();
@@ -637,22 +681,27 @@ public class ProActiveSecurityManager implements Serializable {
         Session session = (Session) sessions.get(new Long(sessionID));
         if (session != null) {
             try {
+                System.out.println("decrypting request");
                 return session.readPDU(message[0], message[1]);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
-            Object o;
-            if (myBody instanceof BodyImpl) {
-                o = ((Flower) ((BodyImpl) myBody).getReifiedObject()).getName();
-            } else {
-                o = "HalfBody ";
-            }
-            logger.warn(o + "I have not find " + sessionID +
-                " session to decrypt the message ");
-            throw new RenegotiateSessionException(myBody.getRemoteAdapter());
+            System.out.println("session is null");
         }
 
+        /*else {
+           Object o;
+           if (myBody instanceof BodyImpl) {
+               o = ((Flower) ((BodyImpl) myBody).getReifiedObject()).getName();
+           } else {
+               o = "HalfBody ";
+           }
+           logger.warn(o + "I have not find " + sessionID +
+               " session to decrypt the message ");
+           throw new RenegotiateSessionException(myBody.getRemoteAdapter());
+           }
+         */
         return null;
     }
 
@@ -892,7 +941,7 @@ public class ProActiveSecurityManager implements Serializable {
             //
             KeyGenerator key_gen = KeyGenerator.getInstance("AES", "BC"); // Get instance for AES
             synchronized (key_gen) {
-                key_gen.init(192, session.sec_rand); // Use a 192 bit key size.
+                key_gen.init(128, session.sec_rand); // Use a 192 bit key size.
                 session.cl_aes_key = key_gen.generateKey(); // Generate the  SecretKey
 
                 key_gen.init(160, session.sec_rand); // Set up for a 160 bit key.
@@ -941,7 +990,7 @@ public class ProActiveSecurityManager implements Serializable {
                 //
                 // Set up and instace of AES for the Signature locking data.
                 //
-                aes_lock = Cipher.getInstance("AES/CBC/PKCS7Padding");
+                aes_lock = Cipher.getInstance("AES/CBC/PKCS7Padding", "BC");
                 aes_lock.init(Cipher.ENCRYPT_MODE, session.cl_aes_key,
                     session.cl_iv, session.sec_rand);
 
@@ -1418,6 +1467,10 @@ public class ProActiveSecurityManager implements Serializable {
             session.cl_aes_key = key_gen.generateKey();
             key_gen.init(160, session.sec_rand);
             session.cl_hmac_key = key_gen.generateKey();
+
+            // initialization of IV 
+            session.cl_iv = new IvParameterSpec(new byte[16]);
+
             session.cl_cipher.init(Cipher.ENCRYPT_MODE, session.cl_aes_key,
                 session.cl_iv, session.sec_rand);
 
@@ -1471,7 +1524,7 @@ public class ProActiveSecurityManager implements Serializable {
             //
             //  System.out.println("Key exchanged and session is up");
         } catch (Exception e) {
-            System.out.println("Invalid Key Exchange !");
+            System.out.println("Invalid Key Exchange server side !");
             e.printStackTrace();
         }
 
@@ -1482,17 +1535,18 @@ public class ProActiveSecurityManager implements Serializable {
     private void writeObject(java.io.ObjectOutputStream out)
         throws IOException {
         //	privateKeyEncoded = privateKey.getEncoded();
-        out.defaultWriteObject();
-
+   
         try {
-            byte[] certE = certificate.getEncoded();
-            out.writeInt(certE.length);
-            out.write(certE);
+        	if (certificate != null ) {
+           encodedCertificate = certificate.getEncoded();
+            
+        	}
         } catch (CertificateEncodingException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } 
+    	out.defaultWriteObject();
+
+   
     }
 
     private void readObject(java.io.ObjectInputStream in)
@@ -1511,12 +1565,14 @@ public class ProActiveSecurityManager implements Serializable {
         //decodePrivateKey();
         randomLongGenerator = new RandomLongGenerator();
 
-        int i = in.readInt();
-        byte[] certEncoded = new byte[i];
-        in.read(certEncoded);
+        
+        if (encodedCertificate != null) {
+        certificate = ProActiveSecurity.decodeCertificate(encodedCertificate);
 
-        certificate = ProActiveSecurity.decodeCertificate(certEncoded);
-
+        this.certificate = policyServer.getCertificate();
+        this.privateKey = policyServer.getPrivateKey();
+        this.publicKey = certificate.getPublicKey();
+        }
         //    logger.info("creating randomgenerator " + randomLongGenerator);
         //    logger.info("Security Manager restarted");
     }
@@ -1570,11 +1626,11 @@ public class ProActiveSecurityManager implements Serializable {
             session = (Session) e.nextElement();
 
             /*
-                            System.out.println("-----------------\nsession " + session);
-                            System.out.println("session distantBody " + session.distantOACertificate.getSubjectDN());
-                            System.out.println("distantBodyCertificate " + certificate.getSubjectDN());
-                            System.out.println("-----------------\n");
-              */
+               System.out.println("-----------------\nsession " + session);
+               System.out.println("session distantBody " + session.distantOACertificate.getSubjectDN());
+               System.out.println("distantBodyCertificate " + certificate.getSubjectDN());
+               System.out.println("-----------------\n");
+             */
             if (session != null) {
                 //			System.out.println(o + "tested :" + session.distantOACertificate.getSubjectDN());
                 if ((cert != null) && (session.distantOACertificate != null) &&
@@ -1625,7 +1681,8 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-     * @param string
+     * allows to set the name of the current virtual node
+     * @param string the name of the current Virtual Node if any
      */
     public void setVNName(String string) {
         //  System.out.println("setting vn node name " + string);
@@ -1642,8 +1699,8 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-	* @return policy server
-	*/
+     * @return policy server
+     */
     public PolicyServer getPolicyServer() {
         return policyServer;
     }
@@ -1662,7 +1719,7 @@ public class ProActiveSecurityManager implements Serializable {
     }
 
     /**
-     * @param set object policy server 
+     * @param set object policy server
      */
     public void setPolicyServer(PolicyServer policyServer) {
         this.policyServer = policyServer;
@@ -1686,31 +1743,37 @@ public class ProActiveSecurityManager implements Serializable {
 
         Node n = null;
         ArrayList a = new ArrayList();
+
+        /*
+           try {
+               n = NodeFactory.getNode(myBody.getNodeURL());
+           } catch (NodeException e) {
+               e.printStackTrace();
+           }
+         */
+
+        //     PolicyServer p = proActiveRuntime.getNodePolicyServer(n.getNodeInformation()
+        //                                                            .getName());
         try {
-            n = NodeFactory.getNode(myBody.getNodeURL());
-        } catch (NodeException e) {
+            if ((policyServer != null) && (VNName != null)) {
+                EntityVirtualNode entityVirtualNode = new EntityVirtualNode(VNName,
+                        policyServer.getApplicationCertificate(),
+                        policyServer.getCertificate());
+                a.add(entityVirtualNode);
+                return a;
+            } else {
+                a.add(new DefaultEntity());
+            }
+        } catch (Exception e) {
+            //System.out.println(" exception in node " +
+            //  n.getNodeInformation().getName() + "  " +
+            //  n.getNodeInformation().getName());
             e.printStackTrace();
         }
-
-   //     PolicyServer p = proActiveRuntime.getNodePolicyServer(n.getNodeInformation()
-   //                                                            .getName());
-   
-   try {
-   
-    
-        if (policyServer != null) {
-            EntityVirtualNode entityVirtualNode = new EntityVirtualNode(VNName,
-                    policyServer.getApplicationCertificate(), policyServer.getCertificate());
-            a.add(entityVirtualNode);
-            return a;
-        } else {
-        
-        a.add(new DefaultEntity());
-        }
-   } catch (Exception e) {
-	System.out.println(" exception in node " + n.getNodeInformation().getName() + "  " + n.getNodeInformation().getName());
-  
-   }
         return a;
+    }
+
+    public Session getSession(long id) {
+        return (Session) sessions.get(new Long(id));
     }
 }

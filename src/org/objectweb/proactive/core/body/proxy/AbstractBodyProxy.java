@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public abstract class AbstractBodyProxy extends AbstractProxy

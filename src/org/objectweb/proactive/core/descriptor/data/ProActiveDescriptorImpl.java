@@ -33,11 +33,13 @@ package org.objectweb.proactive.core.descriptor.data;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
+import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
 import org.xml.sax.SAXException;
 
@@ -250,6 +252,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             //       prR.setProActiveSecurityManager(psm);
             //   } catch (ProActiveException e) {
             //       e.printStackTrace();
+            
+            // set the security policyserver to the default proactive meta object
+            PolicyServer clonedPolicyServer = null;
+            try {
+            	 clonedPolicyServer = (PolicyServer) policyServer.clone();
+            	 
+            	 clonedPolicyServer.generateEntityCertificate("HalfBody for " + policyServer.getApplicationName());
+            	 
+            	 ProActiveSecurityManager psm = new ProActiveSecurityManager(clonedPolicyServer);
+            	 ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
+            	 
+            	 
+			} catch (CloneNotSupportedException e1) {
+				e1.printStackTrace();
+			}
+            
+            
+            
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

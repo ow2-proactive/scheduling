@@ -31,9 +31,16 @@
 package org.objectweb.proactive.ext.security;
 
 import java.io.Serializable;
+
 import java.security.cert.X509Certificate;
 
 
+/**
+ * @author acontes
+ *
+ * To change the template for this generated type comment go to
+ * Window - Preferences - Java - Code Generation - Code and Comments
+ */
 /**
  * @author acontes
  *
@@ -43,8 +50,14 @@ import java.security.cert.X509Certificate;
 public class EntityVirtualNode extends Entity implements Serializable {
     protected String virtualNodeName;
 
-	public EntityVirtualNode() {}
+    public EntityVirtualNode() {
+    }
 
+    /**
+     * @param name
+     * @param application
+     * @param certificate
+     */
     /**
      * represent
      */
@@ -52,57 +65,54 @@ public class EntityVirtualNode extends Entity implements Serializable {
         X509Certificate certificate) {
         super();
         virtualNodeName = name;
-        if (application == null ) {
-        	System.out.println("APPPLICATION CERTITIFACATE IS NULLL");
-        	throw new RuntimeException();
+        if (application == null) {
+         //   System.out.println("APPPLICATION CERTITIFACATE IS NULLL");
+            throw new RuntimeException();
         }
-		if (name == null ) {
-				  System.out.println("APPPLICATION Name  IS NULLL");
-			throw new RuntimeException();
-			  }
-			  
-       System.out.println("VIRTUAL NODE ENTITY CONSTRUCTOR " + application.getSubjectDN());
+        if (name == null) {
+         //   System.out.println("APPPLICATION Name  IS NULLL");
+            throw new RuntimeException();
+        }
+
+      //  System.out.println("VIRTUAL NODE ENTITY CONSTRUCTOR " +
+       //     application.getSubjectDN());
         this.applicationCertificate = application;
         //this.certificate = certificate;
     }
 
     //public EntityVirtualNode(String name) {
-     //   super();
-     //   virtualNodeName = name;
-  //  }
-
+    //   super();
+    //   virtualNodeName = name;
+    //  }
     public String getName() {
         return virtualNodeName;
     }
-    
-    public String toString() {
-    	String s = null;
-    	s =  virtualNodeName;
-    	s +=  applicationCertificate.getSubjectDN().getName() +" |||| ";
-    	//s+= certificate.getSubjectDN().getName();
-    	return  s  ;
-    }
-    
-    public boolean equals(Entity e) {
-    	if (e instanceof EntityVirtualNode) {
-    	 if (applicationCertificate == null) {
-    	 
-    	 logger.debug("applicationCErtificate null"); 
-    	 return false;
-    	 }
-    //		logger.debug (" OP " + virtualNodeName + " OP C " + applicationCertificate.getSubjectDN().getName());	
-			if 	(((EntityVirtualNode) e).getApplicationCertificate() == null) {
-				logger.debug("distant applicationCErtificate null"); 
-				return false;
-			}
-	//		logger.debug (" DP " + ((EntityVirtualNode) e).virtualNodeName + "  DC " + ((EntityVirtualNode) e).applicationCertificate.getSubjectDN().getName());
-			
-    	  return this.virtualNodeName.equals(((EntityVirtualNode) e).virtualNodeName) && e.getApplicationCertificate().equals(applicationCertificate);
-    	}	
-    	return false;
-    }
-    
-    
 
-    
+    public String toString() {
+        String s = null;
+        s = virtualNodeName;
+        s += (applicationCertificate.getSubjectDN().getName() + " |||| ");
+        //s+= certificate.getSubjectDN().getName();
+        return s;
+    }
+
+    public boolean equals(Entity e) {
+        if (e instanceof EntityVirtualNode) {
+            if (applicationCertificate == null) {
+                logger.debug("applicationCErtificate null");
+                return false;
+            }
+
+            //		logger.debug (" OP " + virtualNodeName + " OP C " + applicationCertificate.getSubjectDN().getName());	
+            if (((EntityVirtualNode) e).getApplicationCertificate() == null) {
+                logger.debug("distant applicationCErtificate null");
+                return false;
+            }
+
+            //		logger.debug (" DP " + ((EntityVirtualNode) e).virtualNodeName + "  DC " + ((EntityVirtualNode) e).applicationCertificate.getSubjectDN().getName());
+            return this.virtualNodeName.equals(((EntityVirtualNode) e).virtualNodeName) &&
+            e.getApplicationCertificate().equals(applicationCertificate);
+        }
+        return false;
+    }
 }

@@ -28,7 +28,9 @@
 *
 * ################################################################
 */
-package org.objectweb.proactive.ext.security;
+package org.objectweb.proactive.ext.security.exceptions;
+
+import org.objectweb.proactive.core.body.migration.MigrationException;
 
 
 /**
@@ -37,34 +39,34 @@ package org.objectweb.proactive.ext.security;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public class SecurityNotAvailableException extends Exception {
+public class SecurityMigrationException extends MigrationException {
 
     /**
      *
      */
-    public SecurityNotAvailableException() {
+    public SecurityMigrationException() {
         super();
     }
 
     /**
-     * @param message
+     * @param s
      */
-    public SecurityNotAvailableException(String message) {
-        super(message);
+    public SecurityMigrationException(String s) {
+        super(s);
     }
 
     /**
-     * @param message
-     * @param cause
+     * @param s
+     * @param t
      */
-    public SecurityNotAvailableException(String message, Throwable cause) {
-        super(message, cause);
+    public SecurityMigrationException(String s, Throwable t) {
+        super(s, t);
     }
 
     /**
-     * @param cause
+     * @param t
      */
-    public SecurityNotAvailableException(Throwable cause) {
-        super(cause);
+    public SecurityMigrationException(Throwable t) {
+        super(t);
     }
 }

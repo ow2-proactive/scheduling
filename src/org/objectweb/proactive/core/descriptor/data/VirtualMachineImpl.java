@@ -1,36 +1,37 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 /**
@@ -56,9 +57,18 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     /** the acquisition method to use to find the VirtualMachine once created */
     private String acquisitionMethod;
 
-//    /** the port number used during the acquisition */
-//    private String portNumber;
+    /** the port number used during the acquisition */
+        private String portNumber;
+
+     /** the port number used during the acquisition */
+     private String protocol;
+
+        
+    /** indiquates if this machine results from a lookup or not  */
+    private boolean isAcquired = false;
     
+    private ProActiveRuntime remoteRuntime;
+
     /** the process to start in order to create the JVM */
     private transient ExternalProcess process;
 
@@ -85,7 +95,6 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         }
         this.nodeNumber = nodeNumber;
     }
-    
 
     public String getNodeNumber() {
         return this.nodeNumber;
@@ -99,23 +108,20 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         return name;
     }
 
-//    public void setAcquisitionMethod(String s) {
-//        acquisitionMethod = s;
-//    }
-//
-//    public String getAcquisitionMethod() {
-//        return acquisitionMethod;
-//    }
-
-    
-//    public void setPortNumber(String s) {
-//    	portNumber = s;
-//    }
-//    
-//    public String getPortNumber() {
-//    	return portNumber;
-//    }
-    
+    //    public void setAcquisitionMethod(String s) {
+    //        acquisitionMethod = s;
+    //    }
+    //
+    //    public String getAcquisitionMethod() {
+    //        return acquisitionMethod;
+    //    }
+    //    public void setPortNumber(String s) {
+    //    	portNumber = s;
+    //    }
+    //    
+    //    public String getPortNumber() {
+    //    	return portNumber;
+    //    }
     public void setProcess(ExternalProcess p) {
         process = p;
     }
@@ -144,4 +150,30 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     public String getCreatorId() {
         return this.creatorId;
     }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#isAcquired()
+     */
+    public boolean isAcquired() {
+        return isAcquired;
+    }
+
+    /**
+     * @param isAcquired The isAcquired to set.
+     */
+    public void setAcquired(boolean isAcquired) {
+        this.isAcquired = isAcquired;
+    }
+	/**
+	 * @return Returns the remoteRuntime.
+	 */
+	public ProActiveRuntime getRemoteRuntime() {
+		return remoteRuntime;
+	}
+	/**
+	 * @param remoteRuntime The remoteRuntime to set.
+	 */
+	public void setRemoteRuntime(ProActiveRuntime remoteRuntime) {
+		this.remoteRuntime = remoteRuntime;
+	}
 }

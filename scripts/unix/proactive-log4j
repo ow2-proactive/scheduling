@@ -1,6 +1,7 @@
 # the default logging level is INFO
 
 log4j.rootLogger=INFO, A1
+#log4j.rootCategory=INFO, A1
 
 #A1 uses PatternLayout
 #and displays the associated message (%m)
@@ -8,9 +9,28 @@ log4j.rootLogger=INFO, A1
 #Use %M for method names
 #see log4j documentation for details
 
+
 log4j.appender.A1=org.apache.log4j.ConsoleAppender
 log4j.appender.A1.layout=org.apache.log4j.PatternLayout
 log4j.appender.A1.layout.ConversionPattern=%m %n
+%log4j.appender.A1.layout.ConversionPattern=%C{1}@%M,line %L %c - %m%n
+
+
+
+#log4j.appender.org.objectweb.proactive.core.body.HalfBody=DEBUG
+#log4j.appender.org.objectweb.proactive.core.body.AbstractBody=DEBUG
+#log4j.appender.org.objectweb.proactive.ext.security=DEBUG
+#log4j.appender.org.objectweb.proactive.ext.security=%m %n
+
+
+log4j.logger.SECURITY=DEBUG
+log4j.logger.GROUP=INFO
+
+#log4j.category.SECURITY=DEBUG, dest1
+#log4j.additivity.dest1=false
+#log4j.appender.dest1=org.apache.log4j.ConsoleAppender
+#log4j.appender.dest1.layout=org.apache.log4j.PatternLayout
+#log4j.appender.dest1.layout.ConversionPattern=%r [%t] %-5p %c{2} %x - %m%n
 
 
 ########### Change here default logging level on a 

@@ -39,9 +39,9 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializable {

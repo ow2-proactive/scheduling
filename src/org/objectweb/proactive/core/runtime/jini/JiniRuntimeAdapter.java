@@ -30,6 +30,12 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.rmi.RemoteException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -42,16 +48,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.rmi.RemoteException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -110,8 +108,8 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding, PolicyServer ps, String vnname, String jobId)
-        throws NodeException {
+        boolean replacePreviousBinding, PolicyServer ps, String vnname,
+        String jobId) throws NodeException {
         try {
             return jiniRuntime.createLocalNode(nodeName,
                 replacePreviousBinding, ps, vnname, jobId);
@@ -460,6 +458,18 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
     public ArrayList getEntities() throws ProActiveException {
         try {
             return jiniRuntime.getEntities();
+        } catch (java.rmi.RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException {
+        try {
+            return jiniRuntime.getPolicy(sc);
         } catch (java.rmi.RemoteException re) {
             throw new ProActiveException(re);
         }

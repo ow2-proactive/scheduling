@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 /**

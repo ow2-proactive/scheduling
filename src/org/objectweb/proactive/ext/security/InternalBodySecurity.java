@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.exceptions.*;
 
 import java.io.IOException;
 

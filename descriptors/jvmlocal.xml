@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Policy>
+ <Certificate>/net/home/acontes/dev/ProActive/dev/security/certif/jvmlocal.cert</Certificate>
+ <PrivateKey>/net/home/acontes/dev/ProActive/dev/security/certif/jvmlocal.l</PrivateKey>
+    <CertificationAuthority>
+        <Certificate></Certificate>
+    </CertificationAuthority>
+    <TrustedCertificationAuthority>
+    </TrustedCertificationAuthority>
+    <Rules>
+  
+
+    </Rules>
+</Policy>

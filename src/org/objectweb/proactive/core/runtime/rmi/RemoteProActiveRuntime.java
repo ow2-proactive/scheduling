@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -167,6 +169,11 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
 	 */
 	public ArrayList getEntities() throws RemoteException;
 
+	/**
+	 * @param sc
+	 * @return
+	 */
+	public SecurityContext getPolicy(SecurityContext sc) throws RemoteException,SecurityNotAvailableException;
  
 
 }

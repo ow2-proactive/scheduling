@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.security.cert.X509Certificate;
 
@@ -169,6 +171,13 @@ public interface RemoteProActiveRuntime extends Remote {
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws RemoteException;
+
+    /**
+     * @param sc
+     * @return
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws RemoteException, SecurityNotAvailableException;
 
     /**
      * @return returns all entities associated to this runtime

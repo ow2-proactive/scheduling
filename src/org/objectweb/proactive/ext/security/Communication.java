@@ -205,7 +205,7 @@ public class Communication implements Serializable {
     }
 
     /**
-     * @return communication 
+     * @return communication
      */
     public int getCommunication() {
         return communication;

@@ -186,11 +186,9 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getRuntime(String proActiveRuntimeURL,
         String protocol) throws ProActiveException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
+            logger.info("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
                 protocol);
-        }
-
+        
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         RuntimeFactory factory = getFactory(protocol);

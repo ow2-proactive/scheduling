@@ -84,7 +84,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
     /** the list of remote virtual machines associated with this VirtualNode */
     private java.util.ArrayList virtualMachines;
-    
+
     /** the list of local virtual machine (normally one) associated with this VirtualNode */
     private java.util.ArrayList localVirtualMachines;
 
@@ -213,17 +213,83 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 // else the vm was already created by another virtualNode, in that case, nothing is
                 // done at this point, nodes creation will occur when the runtime associated with the jvm
                 // will register.
-                if (!vmAlreadyAssigned) {
-                    setParameters(process, vm);
-                    process.setSecurityFile(policyServerFile);
-                    // It is this virtual Node that originates the creation of the vm
-                    try {
-                        proActiveRuntimeImpl.createVM(process);
-                    } catch (java.io.IOException e) {
-                        e.printStackTrace();
-                        logger.error("cannot activate virtualNode " +
-                            this.name + " with the process " +
-                            process.getCommand());
+                if (!vmAlreadyAssigned ) {
+                    if (vm.isAcquired()) {
+                    	
+                    	String nodeName;
+                        String[] nodeNames = null;
+                        ProActiveRuntime proActiveRuntimeRegistered;
+                        String nodeHost;
+                        String protocol = null;
+                        String url = null;
+                        int port = 0;
+                       
+                    	
+//                    	gets the registered runtime
+                        proActiveRuntimeRegistered = vm.getRemoteRuntime();
+                  
+                        try {
+                            protocol = UrlBuilder.getProtocol(proActiveRuntimeRegistered.getURL());
+							url = UrlBuilder.removeProtocol(proActiveRuntimeRegistered.getURL(),protocol);
+						} catch (ProActiveException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+                       
+                        // get the host of nodes
+                        nodeHost = proActiveRuntimeRegistered.getVMInformation()
+                                                             .getInetAddress()
+                                                             .getCanonicalHostName();
+
+                        try {
+                            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+                        } catch (ProActiveException e) {
+                            logger.warn("port unknown: " + port);
+                        }
+                        try {
+                            //get the node on the registered runtime
+                            // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
+                            int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
+                            for (int j = 1; j <= nodeNumber; j++) {
+                                nodeName = this.name +
+                                    Integer.toString(new java.util.Random(
+                                            System.currentTimeMillis()).nextInt());
+                                url = buildURL(nodeHost, nodeName, protocol, port);
+
+                                // nodes are created from the registered runtime, since this virtualNode is
+                                // waiting for runtime registration to perform co-allocation in the jvm.
+                                PolicyServer nodePolicyServer = null;
+                                if (policyServer != null) {
+                                    nodePolicyServer = (PolicyServer) policyServer.clone();
+
+                                    nodePolicyServer.generateEntityCertificate(name);
+                                }
+
+                                proActiveRuntimeRegistered.createLocalNode(url, false,
+                                    nodePolicyServer, this.getName(), this.jobID);
+                                performOperations(proActiveRuntimeRegistered, url, protocol);
+                            }
+                        } catch (ProActiveException e) {
+                            e.printStackTrace();
+                        } catch (CloneNotSupportedException e) {
+                            e.printStackTrace();
+                        }
+                    
+                    	
+                    	
+                    	
+                    } else {
+                        setParameters(process, vm);
+                        process.setSecurityFile(policyServerFile);
+                        // It is this virtual Node that originates the creation of the vm
+                        try {
+                            proActiveRuntimeImpl.createVM(process);
+                        } catch (java.io.IOException e) {
+                            e.printStackTrace();
+                            logger.error("cannot activate virtualNode " +
+                                this.name + " with the process " +
+                                process.getCommand());
+                        }
                     }
                 }
 
@@ -233,12 +299,13 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 //			}
                 increaseIndex();
             }
-            
+
             // local nodes creation 
             for (int i = 0; i < localVirtualMachines.size(); i++) {
-            	String protocol = (String) localVirtualMachines.get(i);
-            	internalCreateNodeOnCurrentJvm(protocol);
+                String protocol = (String) localVirtualMachines.get(i);
+                internalCreateNodeOnCurrentJvm(protocol);
             }
+
             isActivated = true;
             if (registration) {
                 register();
@@ -410,10 +477,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
-    	localVirtualMachines.add(protocol);
-    	
+        localVirtualMachines.add(protocol);
     }
-    
+
     private void internalCreateNodeOnCurrentJvm(String protocol) {
         try {
             // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
@@ -430,8 +496,15 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                         protocol));
 
             //create the node
-            url = defaultRuntime.createLocalNode(nodeName, false, policyServer,
-                    this.getName(), ProActive.getJobId());
+            PolicyServer nodePolicyServer = null;
+            if (policyServer != null) {
+                nodePolicyServer = (PolicyServer) policyServer.clone();
+
+                nodePolicyServer.generateEntityCertificate(name);
+            }
+
+            url = defaultRuntime.createLocalNode(nodeName, false,
+                    nodePolicyServer, this.getName(), ProActive.getJobId());
             //add this node to this virtualNode
             performOperations(defaultRuntime, url, protocol);
         } catch (Exception e) {
@@ -518,7 +591,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             } catch (ProActiveException e) {
                 logger.warn("port unknown: " + port);
             }
-
             try {
                 //get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
@@ -528,13 +600,23 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                         Integer.toString(new java.util.Random(
                                 System.currentTimeMillis()).nextInt());
                     url = buildURL(nodeHost, nodeName, protocol, port);
+
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
+                    PolicyServer nodePolicyServer = null;
+                    if (policyServer != null) {
+                        nodePolicyServer = (PolicyServer) policyServer.clone();
+
+                        nodePolicyServer.generateEntityCertificate(name);
+                    }
+
                     proActiveRuntimeRegistered.createLocalNode(url, false,
-                        policyServer, this.getName(), this.jobID);
+                        nodePolicyServer, this.getName(), this.jobID);
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 }
             } catch (ProActiveException e) {
+                e.printStackTrace();
+            } catch (CloneNotSupportedException e) {
                 e.printStackTrace();
             }
         }
@@ -542,7 +624,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //Check if the virtualNode that originates the process is among awaited VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
             //gets the registered runtime
-            System.out.println("Virtual Node ready to create node");
+            System.out.println("Virtual Node ready to create node" + event.getRegisteredRuntimeName());
             proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
@@ -564,12 +646,22 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                         Integer.toString(new java.util.Random(
                                 System.currentTimeMillis()).nextInt());
                     url = buildURL(nodeHost, nodeName, protocol, port);
+
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
+                    PolicyServer nodePolicyServer = null;
+                    if (policyServer != null) {
+                        nodePolicyServer = (PolicyServer) policyServer.clone();
+
+                        nodePolicyServer.generateEntityCertificate(name);
+                    }
+
                     proActiveRuntimeRegistered.createLocalNode(url, false,
-                        policyServer, this.getName(), this.jobID);
+                        nodePolicyServer, this.getName(), this.jobID);
                     performOperations(proActiveRuntimeRegistered, url, protocol);
                 } catch (ProActiveException e) {
+                    e.printStackTrace();
+                } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
             }

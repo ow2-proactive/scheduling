@@ -46,6 +46,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
+import org.objectweb.proactive.ext.security.SecurityContext;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -367,8 +369,8 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
-     */
+    * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
+    */
     public X509Certificate getCreatorCertificate() throws ProActiveException {
         try {
             return remoteProActiveRuntime.getCreatorCertificate();
@@ -455,9 +457,9 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     */
+            * @param nodeName
+            * @return returns all entities associated to the node
+            */
     public ArrayList getEntities(String nodeName) throws ProActiveException {
         try {
             return remoteProActiveRuntime.getEntities(nodeName);
@@ -467,9 +469,9 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     */
+         * @param nodeName
+         * @return returns all entities associated to the node
+         */
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
         try {
             return remoteProActiveRuntime.getEntities(uBody);
@@ -479,11 +481,23 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @return returns all entities associated to this runtime
-     */
+         * @return returns all entities associated to this runtime
+         */
     public ArrayList getEntities() throws ProActiveException {
         try {
             return remoteProActiveRuntime.getEntities();
+        } catch (RemoteException re) {
+            throw new ProActiveException(re);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext sc)
+        throws ProActiveException, SecurityNotAvailableException {
+        try {
+            return remoteProActiveRuntime.getPolicy(sc);
         } catch (RemoteException re) {
             throw new ProActiveException(re);
         }
@@ -504,7 +518,6 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
 					throw new ProActiveException(re);
 				}
 		}
-
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -512,6 +525,4 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         throws RemoteException, AlreadyBoundException {
         return new RemoteProActiveRuntimeImpl();
     }
-
-	
 }

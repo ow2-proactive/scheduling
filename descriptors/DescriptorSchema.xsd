@@ -122,6 +122,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
+			<xs:element name="security" type="SecurityType" minOccurs="0"/>
 			<xs:element name="componentDefinition" type="ComponentDefinitionType">
 				<xs:unique name="idName">
 					<xs:selector xpath=".//*"/>
@@ -134,7 +135,6 @@ The following element ProActiveDescriptor defines the root of the schema
 				<!--This section references the vnName key defined above to ensure that the value of attribute name in virtualNodeDefinition/virtualNode element will have the corresponding definition in deployment/mapping/map@virtualNode -->
 				<!-- </xs:keyref>-->
 			</xs:element>
-			<xs:element name="security" type="SecurityType" minOccurs="0"/>
 			<xs:element name="deployment" type="DeploymentType"/>
 			<xs:element name="infrastructure" type="InfrastructureType"/>
 		</xs:sequence>
@@ -278,14 +278,17 @@ The following element ProActiveDescriptor defines the root of the schema
 				two attributes: name that must appear once and only once. It represents the name of the virtualmachine to be created
 							    nodeNumber which is optionnal and represents the number of nodes that will be created on the enclosing jvm. Default is one-->
 	<xs:complexType name="JvmType">
-		<xs:sequence>
+		 <xs:choice>
 			<xs:element name="creation" type="CreationType"/>
-			<!--<xs:element name="acquisition" type="AcquisitionType"/>-->
-		</xs:sequence>
+			<xs:element name="acquisition" type="AcquisitionType"/>
+		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="nodeNumber" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
 	<!--acquisition element has one attribute: method that must appear once and only one. It can takes three value: rmi, jini or ibis. It represents the protocol to use to acquire the  ProActiveRuntime on the jvm to be created. -->
+	<xs:complexType name="AcquisitionType">
+		<xs:attribute name="url" type="xs:string"/>
+	</xs:complexType>
 	<!--<xs:complexType name="AcquisitionType">
 		<xs:attribute name="method" use="required">
 			<xs:simpleType>

@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.ext.security.RenegotiateSessionException;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
 public class RequestReceiverForwarder implements RequestReceiver {

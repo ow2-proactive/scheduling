@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
+import org.objectweb.proactive.ext.security.PolicyServer;
 
 /**
  * <P>
@@ -124,6 +125,13 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
    * @return the last known version of the body of id uniqueID or null if not known
    */
   public UniversalBody checkNewLocation(UniqueID uniqueID);
+
+
+/**
+ * set the policy server of the active object
+ * @param server the policy server
+ */
+public void setPolicyServer(PolicyServer server);
 
 
 }
