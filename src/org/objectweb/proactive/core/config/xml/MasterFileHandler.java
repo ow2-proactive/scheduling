@@ -2,7 +2,6 @@ package org.objectweb.proactive.core.config.xml;
 
 import java.io.IOException;
 
-import org.apache.log4j.BasicConfigurator;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
@@ -12,9 +11,9 @@ import org.xml.sax.SAXException;
 public class MasterFileHandler extends AbstractUnmarshallerDecorator
     implements MasterFileConstants {
 
-    static {
-        BasicConfigurator.configure();
-    }
+//    static {
+//        BasicConfigurator.configure();
+//    }
 
     protected static ProActiveConfiguration config;
 
