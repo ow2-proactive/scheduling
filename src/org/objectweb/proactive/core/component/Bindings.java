@@ -34,7 +34,6 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 
 import java.io.Serializable;
 
@@ -60,13 +59,14 @@ public class Bindings implements Serializable {
     //	 In case of collective bindings, the interfaces of the collection can be : 
     //	  1. named (as in Fractal 2.0 spec) : they are mapped in clientInterfaceBindings according to their name
     //	  2. anonymous : they are put in a list which is mapped in clientInterfaceBindings with the type name of the collective interface 
-    private HashMap clientInterfaceBindings;
-    private HashMap parallelInternalClientInterfaceBindings;
+    private Map normalBindings;
+    private Map exportBindings;
 
     // key = interfaceName ; value = binding
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)
     public Bindings() {
-        clientInterfaceBindings = new HashMap();
+        normalBindings = new HashMap();
+        exportBindings=new HashMap();
     }
 
     /**
@@ -76,15 +76,25 @@ public class Bindings implements Serializable {
         try {
             InterfaceType client_itf_type = (InterfaceType) binding.getClientInterface()
                                                                    .getFcItfType();
-            if (client_itf_type.isFcCollectionItf()) {
-                addCollectiveBindingOnExternalClientItf(binding);
-            } else if (((ComponentParametersController) binding.getClientInterface()
-                            .getFcItfOwner().getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                            .getHierarchicalType().equals(Constants.PARALLEL)) {
-                addCollectiveBindingOnInternalClientItf(binding);
+
+            // export bindings
+            if (!client_itf_type.isFcClientItf()) {
+                if (Fractive.getComponentParametersController(
+                            binding.getClientInterface().getFcItfOwner())
+                                .getComponentParameters().getHierarchicalType()
+                                .equals(Constants.PARALLEL)) {
+                    addCollectiveBindingOnInternalClientItf(binding);
+                } else {
+                    exportBindings.put(client_itf_type.getFcItfName(),
+                        binding);
+                }
             } else {
-                clientInterfaceBindings.put(client_itf_type.getFcItfName(),
-                    binding);
+                // normal bindings
+                if (client_itf_type.isFcCollectionItf()) {
+                    addCollectiveBindingOnExternalClientItf(binding);
+                } else {
+                    normalBindings.put(client_itf_type.getFcItfName(), binding);
+                }
             }
         } catch (NoSuchInterfaceException nsie) {
             throw new ProActiveRuntimeException("interface not found : " +
@@ -98,11 +108,11 @@ public class Bindings implements Serializable {
      * removes the binding on the given client interface
      */
     public Object remove(String clientItfName) {
-        return clientInterfaceBindings.remove(clientItfName);
+        return normalBindings.remove(clientItfName);
     }
 
     public Object get(String clientItfName) {
-        return clientInterfaceBindings.get(clientItfName);
+        return normalBindings.get(clientItfName);
     }
 
     /**
@@ -111,7 +121,7 @@ public class Bindings implements Serializable {
      * @return true if binding exists
      */
     public boolean containsBindingOn(String clientItfName) {
-        return clientInterfaceBindings.containsKey(clientItfName);
+        return normalBindings.containsKey(clientItfName);
     }
 
     //	/**
@@ -144,8 +154,8 @@ public class Bindings implements Serializable {
      * only the name of the collective interface is returned.
      */
     public String[] getExternalClientBindings() {
-        return (String[]) clientInterfaceBindings.keySet().toArray(new String[clientInterfaceBindings.keySet()
-                                                                                                     .size()]);
+        return (String[]) normalBindings.keySet().toArray(new String[normalBindings.keySet()
+                                                                                   .size()]);
     }
 
     private void addCollectiveBinding(Map bindingsTable, Binding binding) {
@@ -165,13 +175,13 @@ public class Bindings implements Serializable {
     }
 
     private void addCollectiveBindingOnExternalClientItf(Binding binding) {
-        addCollectiveBinding(clientInterfaceBindings, binding);
+        addCollectiveBinding(normalBindings, binding);
     }
 
     private void addCollectiveBindingOnInternalClientItf(Binding binding) {
-        if (parallelInternalClientInterfaceBindings == null) {
-            parallelInternalClientInterfaceBindings = new HashMap();
+        if (exportBindings == null) {
+            exportBindings = new HashMap();
         }
-        addCollectiveBinding(parallelInternalClientInterfaceBindings, binding);
+        addCollectiveBinding(exportBindings, binding);
     }
 }

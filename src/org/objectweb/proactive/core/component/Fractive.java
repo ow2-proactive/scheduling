@@ -53,7 +53,6 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -154,9 +153,9 @@ public class Fractive implements GenericFactory, Component, Factory {
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if ((nodes.length > 1) && !contentDesc.uniqueInstance()) { // cyclic node + 1 instance per node
                     //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
-                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType());
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType(), componentParameters.getHierarchicalType());
                     Group group_of_components = ProActiveGroup.getGroup(components);
-                    Proxy proxy = null;
+                    
 
                     if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
                         // task = instantiate a component with a different name 
@@ -203,6 +202,7 @@ public class Fractive implements GenericFactory, Component, Factory {
             }
             ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
                                                                                                      .createComponentRepresentative(componentParameters.getComponentType(),
+                                                                                                             componentParameters.getHierarchicalType(),
                     myProxy);
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;

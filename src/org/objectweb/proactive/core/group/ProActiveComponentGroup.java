@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
 
 /**
@@ -96,7 +95,7 @@ public class ProActiveComponentGroup {
 
             //return a reference on the generated interface reference corresponding to the interface type 
             return (ProActiveInterface) (ProActiveComponentRepresentativeFactory.instance()
-                                                                                .createComponentRepresentative(component_type,
+                                                                                .createComponentRepresentative(component_type, null,
                 proxy)).getFcInterface(interfaceType.getFcItfName());
         } catch (InvalidProxyClassException e) {
             logger.error("**** InvalidProxyClassException ****");
@@ -123,22 +122,22 @@ public class ProActiveComponentGroup {
      * @throws java.lang.InstantiationException
      */
     public static ProActiveComponentRepresentative newComponentRepresentativeGroup(
-        ComponentType componentType)
+        ComponentType componentType, String hierarchicalType)
         throws ClassNotFoundException, java.lang.InstantiationException {
         try {
             ProActiveComponentRepresentative result = null;
 
             // create the stub with the appropriate parameters
             Constructor constructor = ProActiveComponentRepresentativeImpl.class.getConstructor(new Class[] {
-                        ComponentType.class
+                        ComponentType.class, String.class
                     });
             result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
-                        componentType
+                        componentType, hierarchicalType
                     });
 
             // build the constructor call for the proxy object to create
             ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(ProActiveComponentRepresentativeImpl.class,
-                    new Object[] { componentType });
+                    new Object[] { componentType, hierarchicalType });
 
             // Instanciates the proxy object
             ProxyForGroup proxy = (ProxyForGroup) MOP.createProxyObject(ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME,
@@ -150,20 +149,9 @@ public class ProActiveComponentGroup {
             proxy.className = ProActiveComponentRepresentative.class.getName();
 
             return result;
-        } catch (InvalidProxyClassException e) {
-            logger.error("**** InvalidProxyClassException ****");
-        } catch (ConstructionOfProxyObjectFailedException e) {
-            logger.error("**** ConstructionOfProxyObjectFailedException ****");
-        } catch (ConstructionOfReifiedObjectFailedException e) {
-            logger.error("**** ConstructionOfReifiedObjectFailedException ****");
-        } catch (IllegalAccessException e) {
-            logger.error("**** IllegalAccessException ****");
-        } catch (NoSuchMethodException e) {
-            logger.error("**** NoSuchMethodException ****");
-        } catch (InvocationTargetException e) {
-            logger.error("**** InvocationTargetException ****");
+        } catch (Exception e) {
+            throw new java.lang.InstantiationException("cannot create group of component representatives : " +e.getMessage());
         }
-        return null;
     }
     ///** Create an object representing a group and create members with params cycling on nodeList. */
     // ComponentBody Parameters is unique for all the group members (notably the name is the same)...

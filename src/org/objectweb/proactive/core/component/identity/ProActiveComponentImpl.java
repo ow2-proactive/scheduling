@@ -27,16 +27,15 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -45,7 +44,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
+import org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl;
 import org.objectweb.proactive.core.component.controller.ProActiveComponentParametersController;
 import org.objectweb.proactive.core.component.controller.ProActiveContentController;
 import org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController;
@@ -53,13 +52,14 @@ import org.objectweb.proactive.core.component.controller.ProActiveSuperControlle
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
-import org.objectweb.proactive.core.mop.InvalidProxyClassException;
 import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.Loggers;
 import org.objectweb.proactive.core.util.ProActiveLogger;
+
+import java.io.Serializable;
+
+import java.util.ArrayList;
 
 
 /**
@@ -70,8 +70,7 @@ import org.objectweb.proactive.core.util.ProActiveLogger;
  */
 public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     Serializable {
-    
-    protected static final Logger logger = ProActiveLogger.getLogger("components");
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     //private ComponentParameters componentParameters;
     private Interface[] interfaceReferences;
@@ -110,7 +109,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         // only exception : primitive without any client interface
         if (!(componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 (componentParameters.getClientInterfaceTypes().length == 0))) {
-            interface_references_list.add(new ProActiveBindingController(this));
+            interface_references_list.add(new ProActiveBindingControllerImpl(
+                    this));
         } else {
             //bindingController = null;
             if (logger.isDebugEnabled()) {
@@ -196,6 +196,9 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                 e.getMessage());
         } // put all in a table
         interfaceReferences = (Interface[]) interface_references_list.toArray(new Interface[interface_references_list.size()]);
+        if(logger.isDebugEnabled()) {
+            logger.debug("created component : " +componentParameters.getControllerDescription().getName());
+        }
     }
 
     // returns a generated interface reference, whose impl field is a group
@@ -353,7 +356,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         return body;
     }
 
-
     /**
      * see
      * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getID()}
@@ -370,23 +372,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         try {
             return ProActiveComponentRepresentativeFactory.instance()
                                                           .createComponentRepresentative((ComponentType) getFcType(),
+                getComponentParameters().getHierarchicalType(),
                 ((StubObject) MOP.turnReified(body.getReifiedObject().getClass()
                                                   .getName(),
                     org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
                     new Object[] { body }, body.getReifiedObject())).getProxy());
-        } catch (ConstructionOfProxyObjectFailedException e) {
-            throw new ProActiveRuntimeException("This component could not generate a reference on itself",
-                e);
-        } catch (InvalidProxyClassException e) {
-            throw new ProActiveRuntimeException("This component could not generate a reference on itself",
-                e);
-        } catch (ClassNotFoundException e) {
-            throw new ProActiveRuntimeException("This component could not generate a reference on itself",
-                e);
-        } catch (ReifiedCastException e) {
-            throw new ProActiveRuntimeException("This component could not generate a reference on itself",
-                e);
-        } catch (ClassNotReifiableException e) {
+        } catch (Exception e) {
             throw new ProActiveRuntimeException("This component could not generate a reference on itself",
                 e);
         }
