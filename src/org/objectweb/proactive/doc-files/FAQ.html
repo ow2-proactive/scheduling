@@ -60,6 +60,7 @@ happen ?</a></li>
 creation happen ?</a></li>
  <li class="textNormal"><a href="#classServer">What is a class server, why
 do we need one ?</a></li>
+<li class="textNormal"><a href="#reifiable">What is a reifiable object ?</a></li>
  <li class="textNormal"><a href="#body">What is the body of an active object
 ? What are its local and remote representations ?</a></li>
  <li class="textNormal"><a href="#stub">What is a ProActive stub, how are
@@ -81,6 +82,7 @@ of an active object ?</a></li>
 custom activity of an active object ?</a></li>
  <li class="textNormal"><a href="#liveAndActive">What did happen to the former
     <b>live()</b> method and <b>Active</b> interface ?</a></li>
+     <li class="textNormal"><a href="#asynch">Are the call to an Active Object always asynchronous ?</a></li>
  <li class="textNormal"><a href="#JiniUse">How can I use <b>Jini </b> in ProActive ?</a></li>
 <li class="textNormal"><a href="#JiniPb">Why do I get an exception when using <b>Jini </b>?</a></li>
 <li class="textNormal"><a href="#config">What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</a></li>
@@ -258,7 +260,7 @@ a new node </p>
     <p class="textNormal"> On host Y you can create an active object on host
 X </p>
  
-    <pre>  org.objectweb.proactive.core.node.Node n = fr.inria.proactive.core.node.NodeFactory.getNode("//X/node1");<br>  ProActive.turnActive(myObject, n);<br></pre>
+    <pre>  org.objectweb.proactive.core.node.Node n = org.objectweb.proactive.core.node.NodeFactory.getNode("//X/node1");<br>  ProActive.turnActive(myObject, n);<br></pre>
  
     <p class="textNormal"> You do not need to start any rmiregistry manually
 as they are started automatically as needed. </p>
@@ -321,6 +323,26 @@ is transparent to you. </p>
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
 [<a href="#answers">Answers</a>]</tt></p>
+
+<!--
+
+ Question
+
+--> <li class="textNormal"><a name="reifiable">
+    <h3>What is a reifiable object ?</h3>
+    </a> 
+    <p class="textNormal"> An object is said to be reifiable if it meets certain criterias
+		in order to become an Active Object:
+		<ul>
+					<li>The object is not of primitive type</li>
+					<li>The class of the object is not final</li>
+					<li>The object has a constructor with no arguments</li>
+		</ul>
+     </p>
+ </li>
+ <!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
    <!--
 
  Question
@@ -368,7 +390,7 @@ active object. </p>
     </a> 
     <p class="textNormal"> When you create an active object from a regular
 object, you get in return a reference on an automatically generated <b>ProActive</b>
-stub. <b>ProActive</b> uses <a href="http://jakarta.apache.org/bcel/">BCEL</a>
+stub. <b>ProActive</b> uses <a href="http://asm.objectweb.org/">ASM</a>
 to generate the stub on the fly. Suppose you have a class <code>A</code>
 and an instance <code>a</code> of this class. A way to turn the instance
     <code>a</code> into an active object is to use the method <code>ProActive.turnActive</code>
@@ -482,7 +504,7 @@ of type <code>ActiveObjectCreationException</code>. When the call to <code>newAc
 returns, the active object has been created and its active thread is started. 
     </p>
  
-    <pre>  public class A {<br><br>    private int i;<br>    private String s;<br><br>    public A() {}<br><br>    public A(int i, String s) {<br>      this.i = i;<br>      this.s = s;<br>    }<br>  }<br><br>  // instance based creation <br>  A a;<br>  Object[] params = new Object[] { new Integer (26), "astring" };<br>  try {<br>    a = (A) ProActive.newActive("A", params);<br>  } catch (ActiveObjectCreationException e) {<br>    // creation of ActiveObject failed<br>    e.printStackTrace();<br>  }<br><br>  // object based creation<br>  A a = new A(26, "astring");<br>  try {<br>    a = (A) ProActive.turnActive(a);<br>  } catch (ActiveObjectCreationException e) {<br>    // creation of ActiveObject failed<br>    e.printStackTrace();<br>  }<br></pre>
+    <pre>  public class A {<br><br>    private int i;<br>    private String s;<br><br>    public A() {}<br><br>    public A(int i, String s) {<br>      this.i = i;<br>      this.s = s;<br>    }<br>  }<br><br>  // instance based creation <br>  A a;<br>  Object[] params = new Object[] { new Integer (26), "astring" };<br>  try {<br>    a = (A) ProActive.newActive(A.class.getName(), params);<br>  } catch (ActiveObjectCreationException e) {<br>    // creation of ActiveObject failed<br>    e.printStackTrace();<br>  }<br><br>  // object based creation<br>  A a = new A(26, "astring");<br>  try {<br>    a = (A) ProActive.turnActive(a);<br>  } catch (ActiveObjectCreationException e) {<br>    // creation of ActiveObject failed<br>    e.printStackTrace();<br>  }<br></pre>
  </li>
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
@@ -652,7 +674,7 @@ active object you want to customize, you implement the corresponding interface
  href="../EndActive.html">EndActive</a></code>. Here is an example that has
 a custom initialization and activity. </p>
  
-    <pre>  import org.objectweb.proactive.*;<br><br>  public class A implements InitActive, RunActive {<br>    private String myName;<br><br>    public String getName() {<br>      return myName;<br>    }<br><br>    // -- implements InitActive<br>    public void initActivity(Body body) {<br>      myName = body.getName();<br>    }<br><br>    // -- implements RunActive for serving request in a LIFO fashion<br>    public void runActivity(Body body) {<br>      Service service = new Service(Body);<br>      while (body.isActive()) {<br>        service.blockingServeYoungest();<br>      }<br>    }<br><br>    public static void main(String[] args) throws Exception {<br>      A a = (A) ProActive.newActive("A",null);<br>      System.out.println("Name = "+a.getName());<br>    }<br>  }<br></pre>
+    <pre>  import org.objectweb.proactive.*;<br><br>  public class A implements InitActive, RunActive {<br>    private String myName;<br><br>    public String getName() {<br>      return myName;<br>    }<br><br>    // -- implements InitActive<br>    public void initActivity(Body body) {<br>      myName = body.getName();<br>    }<br><br>    // -- implements RunActive for serving request in a LIFO fashion<br>    public void runActivity(Body body) {<br>      Service service = new Service(Body);<br>      while (body.isActive()) {<br>        service.blockingServeYoungest();<br>      }<br>    }<br><br>    public static void main(String[] args) throws Exception {<br>      A a = (A) ProActive.newActive(A.class.getName,null);<br>      System.out.println("Name = "+a.getName());<br>    }<br>  }<br></pre>
  
     <h3>Passing an object implementing the interfaces when creating the active
 object</h3>
@@ -674,7 +696,7 @@ object should therefore be used when the implementation of the activity is
 generic enough not to have to access the member variables of the reified
 object. </p>
  
-    <pre>  import org.objectweb.proactive.*;<br>  public class LIFOActivity implements RunActive {<br>    // -- implements RunActive for serving request in a LIFO fashion<br>    public void runActivity(Body body) {<br>      Service service = new Service(Body);<br>      while (body.isActive()) {<br>        service.blockingServeYoungest();<br>      }<br>    }<br>  }<br><br>  import org.objectweb.proactive.*;<br>  public class A implements InitActive {<br>    private String myName;<br><br>    public String getName() {<br>      return myName;<br>    }<br><br>    // -- implements InitActive<br>    public void initActivity(Body body) {<br>      myName = body.getName();<br>    }<br><br>    public static void main(String[] args) throws Exception {<br>      // newActive(classname, constructor parameter (null = none), <br>      //           node (null = local), active, MetaObjectFactory (null = default)<br>      A a = (A) ProActive.newActive("A", null, null, new LIFOActivity(), null);<br>      System.out.println("Name = "+a.getName());<br>    }<br>  }<br></pre>
+    <pre>  import org.objectweb.proactive.*;<br>  public class LIFOActivity implements RunActive {<br>    // -- implements RunActive for serving request in a LIFO fashion<br>    public void runActivity(Body body) {<br>      Service service = new Service(Body);<br>      while (body.isActive()) {<br>        service.blockingServeYoungest();<br>      }<br>    }<br>  }<br><br>  import org.objectweb.proactive.*;<br>  public class A implements InitActive {<br>    private String myName;<br><br>    public String getName() {<br>      return myName;<br>    }<br><br>    // -- implements InitActive<br>    public void initActivity(Body body) {<br>      myName = body.getName();<br>    }<br><br>    public static void main(String[] args) throws Exception {<br>      // newActive(classname, constructor parameter (null = none), <br>      //           node (null = local), active, MetaObjectFactory (null = default)<br>      A a = (A) ProActive.newActive(A.class.getName(), null, null, new LIFOActivity(), null);<br>      System.out.println("Name = "+a.getName());<br>    }<br>  }<br></pre>
  </li>
  <!-- separation link --> 
   <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
@@ -733,10 +755,56 @@ to configure XML deployment descriptor are provided <a href="Descriptor.html">he
 [<a href="#answers">Answers</a>]</tt></p>
 
 <li class="textNormal"><a
+ name="asynch">
+<h3>Are the call to an Active Object always asynchronous</b>?</h3>
+</a>
+<p class="textNormal">No. Calls to an Active Object methods are asynchronous under some conditions. This is explained <a href="FutureObjectCreation.html">here</a>.
+If for instance the return type of a method call is not reifiable, you can use wrappers to keep asynchronism capabilities:
+suppose that one of your object  has a method</p><pre><b> int</b> getNumber()</pre> <p class="textNormal">calling this method with ProActive is sychronous since int type is not reifiable. To keep the asynchronism it is advised  to use</p><pre><b>MyInteger </b>getNumber()</pre> <p class="textNormal">where</p> 
+<pre> public class MyInteger{
+
+  protected int i;
+
+  public MyInteger(){
+  //empty constructor with no-args
+  }
+ 
+  public MyInteger(int i){
+  this.i = i;
+  }
+ 
+  public int get{
+   return i;
+  }
+ 
+}</pre>
+<p class="textNormal">In that case call to this method is asynchronous. Only the methods  return type are concerned not the parameters.</p>
+
+ </li>
+<p></p>
+
+ <!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
+
+<li class="textNormal"><a
+ name="JiniUse">
+<h3>How can I use <b>Jini </b> in ProActive ?</h3>
+</a>
+<p class="textNormal"> In order to use <b>Jini </b>in ProActive you have to configure properly the deployment descriptor. All informations on how 
+to configure XML deployment descriptor are provided <a href="Descriptor.html">here</a></p>
+ </li>
+<p></p>
+<!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
+
+<li class="textNormal"><a
  name="JiniPb">
 <h3>Why do I get an exception when using <b>Jini </b>?</h3>
 </a>
-<p class="textNormal"></p>In order to get <b>Jini </b> working properly in ProActive, you have to put in your HOME directory a copy
+<p class="textNormal">In order to get <b>Jini </b> working properly in ProActive, you have to put in your HOME directory a copy
 of proactive.java.policy located in ProActive/scripts/unix or windows. Indeed the rmid deamon needs this file to start. If you try to use Jini without this policy file, it will not work.
 Moreover, if you did it once, make sure that there is no file called machine_namejiniLockFile in your working directory. This file is usefull to avoid many Service Lookup to be created
  by concurrent threads. This file is removed automatically when a Lookup Service is created. If the application failed(for instance because of the policy file) it is possible that this file
