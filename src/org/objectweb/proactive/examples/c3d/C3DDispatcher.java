@@ -175,6 +175,10 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
    * user registers, render starts]
    */
   private boolean b_render = false;
+  /**
+   * True if a user has been registered to dispatcher
+   */
+  private boolean noUser = true;
 
 
   /**
@@ -290,7 +294,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
 
             tmp.setScene(scene);
 	    
-	    /* the two folllowing lines have been reversed  in order to correct a bug: engine[e] might be empty when requesting it */ 
+	    /* The two folllowing lines have been reversed in order to correct a bug:
+	     * engine[e] might be empty when requesting it */ 
 	    engine[e] = tmp;
 	    
             /* Triggers the calculation of this interval on engine e */
@@ -891,7 +896,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
     /**
      * Does some initialization when the first consumer registers 
      */
-    if (h_users.size() == 1) {
+    if (noUser) {
+      noUser = false;
       /* Sets the scene to the consumers wish */
       scene = newscene;
       /* Initializes image properties */
@@ -951,24 +957,25 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
    * @param number number of the consumer to be removed
    */
   public void unregisterConsumer(int number) {
-    showMessageExcept(number, "User " + nameOfUser(number) + " left");
-
-    for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
-      ((User)e.nextElement()).getObject().informUserLeft(nameOfUser(number));
-    }
-
-    try {
-      li_users.remove(nameOfUser(number) + " (" + number + ")");
-    } catch (Exception ex) {
-    }
+    String userName = nameOfUser(number);
+    showMessageExcept(number, "User " + userName + " left");
+    
     h_users.remove(new Integer(number));
     if (h_users.isEmpty()) {
       //h_engines.clear();
       //li_enginesUsed.removeAll();
       //li_enginesAvailable.removeAll();
       int_stack.removeAllElements();
-      i_lastuser = 0;
+      //i_lastuser = 0;
     }
+
+    for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
+      ((User)e.nextElement()).getObject().informUserLeft(userName);
+    }
+
+    try {
+      li_users.remove(userName + " (" + number + ")");
+    } catch (Exception ex) {}
   }
 
 
