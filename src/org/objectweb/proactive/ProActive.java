@@ -30,28 +30,25 @@
 */ 
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.Constants;
-
+import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.mop.CannotGuessProxyNameException;
-import org.objectweb.proactive.core.mop.ClassNotReifiableException;
-import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
-import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 
 /**
  * <p>
@@ -88,15 +85,12 @@ public class ProActive {
   //
 
   /**
-   * Creates a new ActiveObject based on classname attached to a default 
-   * node in the local JVM.
-   * @param classname the fully qualified name of the class to instantiate 
-   *    as an active object
+   * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
+   * @param classname the fully qualified name of the class to instantiate as an active object
    * @param constructorParameters the parameters of the constructor of the object
    *    to instantiate as active. If some parameters are primitive types, the wrapper 
    *    class types should be given here.
-   * @return a reference (possibly remote) on a Stub of the newly created 
-   *     active object
+   * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the DefaultNode cannot be created
    */
@@ -106,17 +100,14 @@ public class ProActive {
 
 
   /**
-   * Creates a new ActiveObject based on classname attached to the node  
-   * of the given URL.
-   * @param classname the fully qualified name of the class to instantiate 
-   *    as an active object
+   * Creates a new ActiveObject based on classname attached to the node of the given URL.
+   * @param classname the fully qualified name of the class to instantiate as an active object
    * @param constructorParameters the parameters of the constructor of the object
    *    to instantiate as active. If some parameters are primitive types, the wrapper 
    *    class types should be given here.
    * @param nodeURL the URL of the node where to create the active object on. If null, the active object 
    *       is created localy on a default node 
-   * @return a reference (possibly remote) on a Stub of the newly created 
-   *     active object
+   * @return a reference (possibly remote) on a Stub of the newly created active object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node URL cannot be resolved as an existing Node
    */
@@ -132,17 +123,6 @@ public class ProActive {
   /**
    * Creates a new ActiveObject based on classname attached to the given node or on
    * a default node in the local JVM if the given node is null.
-   * If the given class implements <code>org.objectweb.proactive.Active</code> or a sub-interface of 
-   * <code>org.objectweb.proactive.Active</code>, the body and proxy used will be given by the 
-   * constants defined in the interface.
-   * Else the proxy used is <code>org.objectweb.proactive.core.body.proxy.BodyProxy</code>
-   * and the body used is <code>org.objectweb.proactive.core.body.BodyImpl</code>
-   * If the specified proxy class or body class cannot be loaded, the default ones are used.
-   * The object returned is a stub class that extends the target class and that is automatically 
-   * generated on the fly. The Stub class reference a the proxy object that reference the body
-   * of the active object. The body referenced by the proxy can either be local of remote, 
-   * depending or the respective location of the object calling the newActive and the active object
-   * itself. 
    * @param classname the name of the class to instanciate as active
    * @param constructorParameters the parameters of the constructor of the object
    *    to instantiate as active. If some parameters are primitive types, the wrapper 
@@ -154,12 +134,40 @@ public class ProActive {
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
   public static Object newActive(String classname, Object[] constructorParameters, Node node) throws ActiveObjectCreationException, NodeException {
+    return newActive(classname, constructorParameters, null, node);
+  }
+
+
+  /**
+   * Creates a new ActiveObject based on classname attached to the given node or on
+   * a default node in the local JVM if the given node is null.
+   * The object returned is a stub class that extends the target class and that is automatically 
+   * generated on the fly. The Stub class reference a the proxy object that reference the body
+   * of the active object. The body referenced by the proxy can either be local of remote, 
+   * depending or the respective location of the object calling the newActive and the active object
+   * itself. 
+   * @param classname the name of the class to instanciate as active
+   * @param constructorParameters the parameters of the constructor of the object
+   *    to instantiate as active. If some parameters are primitive types, the wrapper 
+   *    class types should be given here.
+   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+   * @param node the possibly null node where to create the active object on. If null, the active object 
+   *       is created localy on a default node 
+   * @return a reference (possibly remote) on a Stub of the newly created active object
+   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+   * @exception NodeException if the node was null and that the DefaultNode cannot be created
+   */
+  public static Object newActive(String classname, Object[] constructorParameters, MetaObjectFactory factory, Node node) throws ActiveObjectCreationException, NodeException {
     //using default proactive node
     if (node == null) {
       node = NodeFactory.getDefaultNode();
     }
+    if (factory == null) {
+      factory = ProActiveMetaObjectFactory.newInstance();
+    }
     try {
-      return createStubObject(classname, constructorParameters, node);
+      return createStubObject(classname, constructorParameters, factory, node);
     } catch (MOPException e) {
       Throwable t = e;
       if (e.getTargetException() != null) t = e.getTargetException();
@@ -218,12 +226,26 @@ public class ProActive {
 
 
   /**
+   * Turns the target object into an Active Object and send it to the given Node
+   * or to a default node in the local JVM if the given node is null.
+   * The type of the stub is is the type of the target object.
+   * @param target The object to turn active
+   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+   * @param node The Node the object should be sent to or null to create the active 
+   *       object in the local JVM
+   * @return a reference (possibly remote) on a Stub of the target object
+   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+   * @exception NodeException if the node was null and that the DefaultNode cannot be created
+   */
+  public static Object turnActive(Object target, MetaObjectFactory factory, Node node) throws ActiveObjectCreationException, NodeException {
+    return turnActive(target, factory, node, target.getClass().getName());
+  }
+
+
+  /**
    * Turns a Java object into an Active Object and send it to a remote Node or to a 
    * local node if the given node is null.
-   * A Stub is dynamically generated for the existing object. The result of the call 
-   * will be an instance of the Stub class pointing to the default proxy object pointing
-   * to the default body object pointing to the existing object. The body can be remote 
-   * or local depending if the existing is sent remotely or not.
    * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
    * @param target The object to turn active
    * @param node The Node the object should be sent to or null to create the active 
@@ -235,44 +257,39 @@ public class ProActive {
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
   public static Object turnActive(Object target, Node node, String nameOfTargetType) throws ActiveObjectCreationException, NodeException {
-    if (node == null) {
-      //using default proactive node
-      node = NodeFactory.getDefaultNode();
-    }
-    try {
-      return createStubObject(target, node, nameOfTargetType);
-    } catch (MOPException e) {
-      Throwable t = e;
-      if (e.getTargetException() != null) t = e.getTargetException();
-      throw new ActiveObjectCreationException(t);
-    }
+    return turnActive(target, null, node, nameOfTargetType);
   }
 
 
   /**
    * Turns a Java object into an Active Object and send it to a remote Node or to a 
    * local node if the given node is null.
+   * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
    * A Stub is dynamically generated for the existing object. The result of the call 
-   * will be an instance of the Stub class pointing to a proxy defined by the given 
-   * proxy class (parameter <code>nameOfProxyType</code>), pointing to a body defined by
-   * the given body class (parameter <code>nameOfBodyType</code>),  pointing to the existing 
-   * object. The body can be remote or local depending if the target object is sent remotely
-   * or not.
-   * The type of the stub is the same as the one of the target object.
+   * will be an instance of the Stub class pointing to the proxy object pointing
+   * to the body object pointing to the existing object. The body can be remote 
+   * or local depending if the existing is sent remotely or not.
    * @param target The object to turn active
+   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
    * @param node The Node the object should be sent to or null to create the active 
    *       object in the local JVM
-   * @param nameOfBodyType the fully qualified name of the body type to associate with the
-   *     target object.
-   * @param nameOfProxyType the fully qualified name of the proxy type to associate with the
-   *     stub object.
+   * @param nameOfTargetType the fully qualified name of the type the stub class should
+   * inherit from. That type can be less specific than the type of the target object.
    * @return a reference (possibly remote) on a Stub of the target object
    * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
    * @exception NodeException if the node was null and that the DefaultNode cannot be created
    */
-  public static Object turnActive(Object target, Node node, String nameOfBodyType, String nameOfProxyType) throws ActiveObjectCreationException, NodeException {
+  public static Object turnActive(Object target, MetaObjectFactory factory, Node node, String nameOfTargetType) throws ActiveObjectCreationException, NodeException {
+    if (node == null) {
+      //using default proactive node
+      node = NodeFactory.getDefaultNode();
+    }
+    if (factory == null) {
+      factory = ProActiveMetaObjectFactory.newInstance();
+    }
     try {
-      return createStubObject(target, node, nameOfBodyType, nameOfProxyType);
+      return createStubObject(target, factory, node, nameOfTargetType);
     } catch (MOPException e) {
       Throwable t = e;
       if (e.getTargetException() != null) t = e.getTargetException();
@@ -383,7 +400,7 @@ public class ProActive {
    *     this method.
    */
   public static Body getBodyOnThis() {
-    return AbstractBody.getThreadAssociatedBody();
+    return AbstractBody.getCurrentThreadBody();
   }
 
 
@@ -532,7 +549,6 @@ public class ProActive {
     }
     //now we get a reference on the remoteBody of this guy
     BodyProxy destProxy = (BodyProxy)((org.objectweb.proactive.core.mop.StubObject)o).getProxy();
-    String nodeURL = null;
     return destProxy.getBody().getNodeURL();
   }
   
@@ -565,26 +581,13 @@ public class ProActive {
     return createStubObject(className, null, new Object[] { body });
   }
   
-  private static Object createStubObject(String className, Object[] constructorParameters, Node node) throws MOPException {
-    // Creates the reified object
-    Class bodyClass = null;
-    try  {
-      bodyClass = determineBodyClass(Class.forName(className));
-    } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
-    }
-    return createStubObject(className, constructorParameters, new Object[] { bodyClass, node});
+  private static Object createStubObject(String className, Object[] constructorParameters, MetaObjectFactory factory, Node node) throws MOPException {
+    return createStubObject(className, constructorParameters, new Object[] { factory, node});
   }
   
   private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters) throws MOPException {
     try {
-      try {
-        return MOP.newInstance(className, constructorParameters, proxyParameters);
-      } catch (CannotGuessProxyNameException e) {
-        // If we can't guess a proxy name, let's use the default proxy
-        // System.err.println("Cannot guess proxy name for class " + className + ", using default proxy " + Constants.DEFAULT_BODY_PROXY_CLASS_NAME);
-        return MOP.newInstance(className, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
-      }
+      return MOP.newInstance(className, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
     } catch (ClassNotFoundException e) {
       throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
     }
@@ -592,149 +595,19 @@ public class ProActive {
   
 
 
-  private static Object createStubObject(Object target, Node node, String nameOfTargetType) throws MOPException {
-    Class bodyClass = determineBodyClass(target.getClass());
-    return createStubObject(target, new Object[] { bodyClass, node}, nameOfTargetType);
+  private static Object createStubObject(Object target, MetaObjectFactory factory, Node node, String nameOfTargetType) throws MOPException {
+    return createStubObject(target, new Object[] { factory, node}, nameOfTargetType);
   }
   
-
-  private static Object createStubObject(Object target, Node node, String nameOfBodyClass, String nameOfProxyClass) throws MOPException {
-    Class bodyClass = null;
-      if (nameOfBodyClass != null) bodyClass = findBodyClassFromString(nameOfBodyClass);
-    if (bodyClass == null) bodyClass = determineBodyClass(target.getClass());
-    if (nameOfProxyClass == null) nameOfProxyClass = Constants.DEFAULT_BODY_PROXY_CLASS_NAME;
-    Object[] proxyParameters = new Object[] { bodyClass, node};
-    try {
-      return MOP.turnReified(nameOfProxyClass, proxyParameters, target);
-    } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
-    }
-  }
-
 
  private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType) throws MOPException {
    try {
-     try {
-       return (StubObject) MOP.turnReified(proxyParameters, nameOfTargetType, object);
-     } catch (CannotGuessProxyNameException e) {
-       return (StubObject) MOP.turnReified(nameOfTargetType, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
-     }
+     return (StubObject) MOP.turnReified(nameOfTargetType, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
    } catch (ClassNotFoundException e) {
      throw new ConstructionOfProxyObjectFailedException("Class can't be found e="+e);
    }
  }
  
   
- /**
-  * The class of the body object is determined as follows<BR><UL>
-  * <LI>If the reified class (whose name is contained in the ConstructorCall object
-  * passed as a parameter) has a static field of type String whose name
-  * is the same as the one given by MAGIC_STRING, then this String is used
-  * as the name of the body class.
-  * <LI>If this field does not exist in the reified class or if the
-  * instantiation of the specified skeleton fails in any way, then
-  * a defaul body is created as an instance of the class whose name is
-  * given by DEFAULT_CLASS_NAME</LI></UL>
-  */
-  private static Class determineBodyClass(Class reifiedObjectClass) throws ConstructionOfProxyObjectFailedException {
-    String s = null;
-    try {
-      java.lang.reflect.Field f = resolveAmbiguity(reifiedObjectClass);
-      if (f == null) return Constants.DEFAULT_BODY_CLASS;
-      s = (String)f.get(reifiedObjectClass);
-      Class bodyClass = Class.forName(s);
-      if (! checkBodyInheritance(bodyClass)) {
-        // The body interface has not been found
-        throw new ConstructionOfProxyObjectFailedException("Class " + bodyClass.getName() + " does not implement " + Constants.DEFAULT_BODY_INTERFACE_NAME);
-      }
-      return bodyClass;
-    } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Variable " + Constants.BODY_CLASS_NAME_FIELD + " in class " + reifiedObjectClass.getName() + " specifies class " + s + " which cannot be found. Using default body instead.");
-    } catch (IllegalArgumentException e) {
-      throw new ConstructionOfProxyObjectFailedException("Field " + Constants.BODY_CLASS_NAME_FIELD + " does not exist in class " + reifiedObjectClass.getName() + ", although getField tells the contrary");
-    } catch (IllegalAccessException e) {
-      throw new ConstructionOfProxyObjectFailedException("Field " + Constants.BODY_CLASS_NAME_FIELD + " not accessible in class " + reifiedObjectClass.getName());
-    }
-  }
-
-
-  private static Class findBodyClassFromString(String bodyClassName) throws ConstructionOfProxyObjectFailedException {
-    try {
-      Class bodyClass = Class.forName(bodyClassName);
-      if (checkBodyInheritance(bodyClass)) {
-        return bodyClass;
-      } else {
-        // The body interface has not been found
-        throw new ConstructionOfProxyObjectFailedException("Class " + bodyClassName + " does not implement " + Constants.DEFAULT_BODY_INTERFACE_NAME);
-      }
-    } catch (ClassNotFoundException e) {
-      //System.err.println("Second parameter passed to BodyProxy (name of the Body class) is invalid: class " + s + " does not exist. Proceeding.");
-      //Thread.dumpStack();
-      return null;
-    }
-  }
-  
-
-  private static boolean checkBodyInheritance(Class c) {
-    // we check if this class implements 'Body' or one of its subinterfaces
-    Class currentClass = c;
-    Class myInterface = null;
-    while ((currentClass != null) && (myInterface == null)) {
-      boolean multipleMatches = false;
-      Class[] interfaces = currentClass.getInterfaces();
-      for (int i = 0; i < interfaces.length; i++) {
-        if (Constants.DEFAULT_BODY_INTERFACE.isAssignableFrom(interfaces[i])) {
-          if (multipleMatches == false) {
-            myInterface = interfaces[i];
-            multipleMatches = true;
-          } else {
-            // There are multiple interfaces in the current class
-            // that inherit from bodyinterface.
-            System.err.println("More than one interfaces declared in class " + currentClass.getName() + " inherit from " + Constants.DEFAULT_BODY_INTERFACE + ". Using " + myInterface);
-          }
-        }
-      }
-      currentClass = currentClass.getSuperclass();
-    }
-    return (myInterface != null);
-  }
-
-
-  /**
-   * Try to solve the Multi-interface field problem
-   */
-  private static java.lang.reflect.Field resolveAmbiguity(Class reifiedObjectClass) {
-    java.lang.reflect.Field[] f;
-    java.util.Vector f2 = new java.util.Vector();
-    java.lang.reflect.Field winner = null;
-    f = reifiedObjectClass.getFields();
-    //now we look in the array for the BODY_CLASS_NAME_FIELD
-    for (int i = 0; i < f.length; i++) {
-      if (f[i].getName().equals(Constants.BODY_CLASS_NAME_FIELD)) {
-        f2.addElement(f[i]);
-        //	System.out.println("    BodyProxy: resolveAmbiguity()  found = " + f[i]);
-      }
-    }
-    //then, we try to solve the ambiguity when many different interfaces have this field, 
-    //we get the bottom most in the inheritance tree which implements active	
-    java.lang.reflect.Field tmp;
-    for (java.util.Enumeration e = f2.elements(); e.hasMoreElements();) {
-      tmp = (java.lang.reflect.Field)e.nextElement();
-      if (winner == null)
-        winner = tmp;
-      else {
-        Class tmpDeclaringClass = tmp.getDeclaringClass();
-        Class winnerDeclaringClass = winner.getDeclaringClass();
-        //System.out.println("         Comparing winner = " + winnerDeclaringClass + " and " + tmpDeclaringClass );
-        if (winnerDeclaringClass.isAssignableFrom(tmpDeclaringClass)) {
-          winner = tmp;
-          //System.out.println("          Found winner " + winner);
-        }
-      }
-    }
-    return winner;
-  }
-
-
 }
 

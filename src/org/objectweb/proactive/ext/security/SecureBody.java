@@ -27,36 +27,32 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.ext.security;
+
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.security.PublicKey;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.mop.ConstructorCall;
-
-import org.objectweb.proactive.ext.security.SecureRemoteBodyImpl;
-
-import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
-import org.objectweb.proactive.ext.security.crypto.SessionsManager;
-import org.objectweb.proactive.ext.security.crypto.Session;
-import org.objectweb.proactive.ext.security.crypto.SessionException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
-import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationTicket;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
-import org.objectweb.proactive.ext.security.crypto.PublicCertificate;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.crypto.PrivateCertificate;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
+import org.objectweb.proactive.ext.security.crypto.PublicCertificate;
+import org.objectweb.proactive.ext.security.crypto.Session;
+import org.objectweb.proactive.ext.security.crypto.SessionException;
+import org.objectweb.proactive.ext.security.crypto.SessionsManager;
+import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
 
-import java.security.*;
-import java.io.*;
-
-import org.objectweb.proactive.ext.security.crypto.*;
 
 /**
  *  An implementation of Body interface,wich allows security
@@ -65,383 +61,351 @@ import org.objectweb.proactive.ext.security.crypto.*;
  *@created    27 juillet 2001
  */
 public class SecureBody extends BodyImpl implements SessionsManagerInt {
-	/*
-	 * implements SecureBodyInterface
-	 */
-	/**
-	 *  The sessionsManager 
-	 */
-	public SessionsManager sessionsManager;
+  /*
+   * implements SecureBodyInterface
+   */
+  /**
+   *  The sessionsManager 
+   */
+  public SessionsManager sessionsManager;
 
+  //
+  // -- CONSTRUCTORS -----------------------------------------------
+  //
 
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+  /**
+   *  Constructor for the SecureBody object
+   */
+  public SecureBody() {}
 
-	/**
-	 *  Constructor for the SecureBody object
-	 */
-	public SecureBody() {
+  /**
+   *  Build the body object, then fires its service thread
+   *
+   *@param  c Description of Parameter
+   *@param  nodeURL Description of Parameter
+   *@exception  java.lang.reflect.InvocationTargetException Description of Exception
+   *@exception  org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException Description of Exception
+   */
+  public SecureBody(
+    ConstructorCall c,
+    String nodeURL,
+    MetaObjectFactory factory,
+    PublicCertificate publicCertificate,
+    PrivateCertificate privateCertificate,
+    PublicKey publicKey)
+    throws java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException {
+    super(c, nodeURL, factory);
+    setCertificate(publicCertificate, privateCertificate, publicKey);
+  }
 
-	}
-
-
-	/**
-	 *  Build the body object, then fires its service thread
-	 *
-	 *@param  c Description of Parameter
-	 *@param  nodeURL Description of Parameter
-	 *@exception  java.lang.reflect.InvocationTargetException Description of Exception
-	 *@exception  org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException Description of Exception
-	 */
-	public SecureBody(ConstructorCall c, String nodeURL,PublicCertificate publicCertificate, PrivateCertificate privateCertificate, PublicKey publicKey) throws 
-               java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException {
-		super(c, nodeURL);
-		setCertificate(publicCertificate,privateCertificate,publicKey);
-	}
-
-  public SecureBody(ConstructorCall c, String nodeURL) throws java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException  {
-    super(c, nodeURL);
+  public SecureBody(ConstructorCall c, String nodeURL, MetaObjectFactory factory)
+    throws java.lang.reflect.InvocationTargetException, org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException {
+    super(c, nodeURL, factory);
     setCertificate();
   }
 
+  /**
+   *  each active objects belongs to a Domain
+   *
+   *@return    Return the name of the Domain
+   */
+  public String getDomainName() {
+    try {
+      return sessionsManager.getDomainName();
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return null;
+  }
 
-	/**
-	 *  each active objects belongs to a Domain
-	 *
-	 *@return    Return the name of the Domain
-	 */
-	public String getDomainName() {
-		try {
-			return sessionsManager.getDomainName();
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return null;
-	}
+  /**
+   *  
+   *
+   *@return    Description of the Returned Value
+   */
+  public PublicCertificate getPublicCertificate() {
+    try {
+      return sessionsManager.getPublicCertificate();
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return null;
+  }
 
+  //
+  // -- implements SessionsManagerInt  -----------------------------------------------
+  //
 
-	/**
-	 *  
-	 *
-	 *@return    Description of the Returned Value
-	 */
-	public PublicCertificate getPublicCertificate() {
-		try {
-			return sessionsManager.getPublicCertificate();
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return null;
-	}
+  /**
+   *  Implementation of SessionsManagerInt
+   *
+   *@param  randomID              Description of Parameter
+   *@exception  SessionException  Description of Exception
+   */
+  public void initiateSession(long randomID) throws SessionException {
+    try {
+      sessionsManager.initiateSession(randomID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+  }
 
+  /**
+   *  Implementation of SessionsManagerInt
+   *
+   *@param  randomID                     Description of Parameter
+   *@return                              Description of the Returned Value
+   *@exception  AuthenticationException  Description of Exception
+   */
+  public long give_me_a_random(long randomID) throws AuthenticationException {
+    try {
+      return sessionsManager.give_me_a_random(randomID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return 0;
+  }
 
+  /**
+   *  Implementation of SessionsManagerInt
+   *
+   *@param  authenticationTicket         Description of Parameter
+   *@param  randomID                     Description of Parameter
+   *@return                              Description of the Returned Value
+   *@exception  AuthenticationException  Description of Exception
+   */
+  public AuthenticationTicket authenticate_mutual(AuthenticationTicket authenticationTicket, long randomID) throws AuthenticationException {
+    try {
+      return sessionsManager.authenticate_mutual(authenticationTicket, randomID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return null;
+  }
 
-	//
-	// -- implements SessionsManagerInt  -----------------------------------------------
-	//
+  /**
+   *  Description of the Method
+   *
+   *@param  randomID                     Description of Parameter
+   *@param  rb                           Description of Parameter
+   *@param  emittor                      Description of Parameter
+   *@return                              Description of the Returned Value
+   *@exception  AuthenticationException  Description of Exception
+   */
+  public AuthenticationTicket authenticate_unilateral(long randomID, long rb, String emittor) throws AuthenticationException {
+    try {
+      return sessionsManager.authenticate_unilateral(randomID, rb, emittor);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return null;
+  }
 
-	/**
-	 *  Implementation of SessionsManagerInt
-	 *
-	 *@param  randomID              Description of Parameter
-	 *@exception  SessionException  Description of Exception
-	 */
-	public void initiateSession(long randomID) throws SessionException {
-		try {
-			sessionsManager.initiateSession(randomID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-	}
+  /**
+   *  Description of the Method
+   *
+   *@param  confidentialityTicket     Description of Parameter
+   *@param  randomID                  Description of Parameter
+   *@return                           Description of the Returned Value
+   *@exception  KeyExchangeException  Description of Exception
+   */
+  public ConfidentialityTicket negociate_key(ConfidentialityTicket confidentialityTicket, long randomID) throws KeyExchangeException {
+    try {
+      return sessionsManager.negociate_key(confidentialityTicket, randomID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return null;
+  }
 
+  //   public void set_publicCertificate(PublicCertificate publicCertificate) {
 
-	/**
-	 *  Implementation of SessionsManagerInt
-	 *
-	 *@param  randomID                     Description of Parameter
-	 *@return                              Description of the Returned Value
-	 *@exception  AuthenticationException  Description of Exception
-	 */
-	public long give_me_a_random(long randomID) throws AuthenticationException {
-		try {
-			return sessionsManager.give_me_a_random(randomID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return 0;
-	}
+  // try {
+  // 	sessionsManager.set_publicCertificate(publicCertificate);
+  // 	} catch (Exception e) {
+  // 	    System.out.println("Exception in SecureBody " +e);
+  //     }
 
+  //    }
 
-	/**
-	 *  Implementation of SessionsManagerInt
-	 *
-	 *@param  authenticationTicket         Description of Parameter
-	 *@param  randomID                     Description of Parameter
-	 *@return                              Description of the Returned Value
-	 *@exception  AuthenticationException  Description of Exception
-	 */
-	public AuthenticationTicket authenticate_mutual(AuthenticationTicket authenticationTicket, long randomID) throws AuthenticationException {
-		try {
-			return sessionsManager.authenticate_mutual(authenticationTicket, randomID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return null;
-	}
+  //     public void set_privateCertificate(PrivateCertificate privateCertificate) {
+  // try {
+  // 	sessionsManager.set_privateCertificate(privateCertificate);
+  // 	} catch (Exception e) {
+  // 	    System.out.println("Exception in SecureBody " +e);
+  //     }
 
+  //     }
 
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  randomID                     Description of Parameter
-	 *@param  rb                           Description of Parameter
-	 *@param  emittor                      Description of Parameter
-	 *@return                              Description of the Returned Value
-	 *@exception  AuthenticationException  Description of Exception
-	 */
-	public AuthenticationTicket authenticate_unilateral(long randomID, long rb, String emittor) throws AuthenticationException {
-		try {
-			return sessionsManager.authenticate_unilateral(randomID, rb, emittor);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return null;
-	}
+  /**
+   *  Adds a feature to the Session attribute of the SecureBody object
+   *
+   *@param  sessionID                     The feature to be added to the Session
+   *      attribute
+   *@param  newSession                    The feature to be added to the Session
+   *      attribute
+   *@exception  SessionException          Description of Exception
+   */
+  public void addSession(long sessionID, Session newSession) throws SessionException {
+    try {
+      sessionsManager.addSession(sessionID, newSession);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
 
+  }
 
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  confidentialityTicket     Description of Parameter
-	 *@param  randomID                  Description of Parameter
-	 *@return                           Description of the Returned Value
-	 *@exception  KeyExchangeException  Description of Exception
-	 */
-	public ConfidentialityTicket negociate_key(ConfidentialityTicket confidentialityTicket, long randomID) throws KeyExchangeException {
-		try {
-			return sessionsManager.negociate_key(confidentialityTicket, randomID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return null;
-	}
+  /**
+   *  Description of the Method
+   *
+   *@param  randomID                      Description of Parameter
+   *@exception  SessionException          Description of Exception
+   */
+  public void killSession(long randomID) throws SessionException {
+    try {
+      sessionsManager.killSession(randomID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
 
-	//   public void set_publicCertificate(PublicCertificate publicCertificate) {
+  }
 
-// try {
-// 	sessionsManager.set_publicCertificate(publicCertificate);
-// 	} catch (Exception e) {
-// 	    System.out.println("Exception in SecureBody " +e);
-//     }
+  /**
+   *  Description of the Method
+   *
+   *@param  object                        Description of Parameter
+   *@param  ID                            Description of Parameter
+   *@return                               Description of the Returned Value
+   *@exception  SessionException          Description of Exception
+   */
+  public Object encrypt(Serializable object, long ID) throws SessionException {
 
-	//    }
+    Object o = null;
 
-//     public void set_privateCertificate(PrivateCertificate privateCertificate) {
-// try {
-// 	sessionsManager.set_privateCertificate(privateCertificate);
-// 	} catch (Exception e) {
-// 	    System.out.println("Exception in SecureBody " +e);
-//     }
+    try {
+      o = sessionsManager.encrypt(object, ID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return o;
+  }
 
-//     }
+  /**
+   *  Description of the Method
+   *
+   *@param  object                        Description of Parameter
+   *@param  ID                            Description of Parameter
+   *@return                               Description of the Returned Value
+   *@exception  SessionException          Description of Exception
+   */
+  public Object decrypt(Object object, long ID) throws SessionException {
+    Object o = null;
+    try {
+      o = sessionsManager.decrypt(object, ID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return o;
+  }
 
+  /**
+   *  Description of the Method
+   *
+   *@param  object                        Description of Parameter
+   *@return                               Description of the Returned Value
+   *@exception  SessionException          Description of Exception
+   */
+  public Object signObject(Serializable object) throws SessionException {
+    Object o = null;
+    try {
+      o = sessionsManager.signObject(object);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return o;
+  }
 
-
-	/**
-	 *  Adds a feature to the Session attribute of the SecureBody object
-	 *
-	 *@param  sessionID                     The feature to be added to the Session
-	 *      attribute
-	 *@param  newSession                    The feature to be added to the Session
-	 *      attribute
-	 *@exception  SessionException          Description of Exception
-	 */
-	public void addSession(long sessionID, Session newSession) throws SessionException {
-		try {
-			sessionsManager.addSession(sessionID, newSession);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-
-	}
-
-
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  randomID                      Description of Parameter
-	 *@exception  SessionException          Description of Exception
-	 */
-	public void killSession(long randomID) throws SessionException {
-		try {
-			sessionsManager.killSession(randomID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-
-	}
-
-
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  object                        Description of Parameter
-	 *@param  ID                            Description of Parameter
-	 *@return                               Description of the Returned Value
-	 *@exception  SessionException          Description of Exception
-	 */
-	public Object encrypt(Serializable object, long ID) throws SessionException {
-
-		Object o = null;
-
-		try {
-			o = sessionsManager.encrypt(object, ID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return o;
-	}
-
-
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  object                        Description of Parameter
-	 *@param  ID                            Description of Parameter
-	 *@return                               Description of the Returned Value
-	 *@exception  SessionException          Description of Exception
-	 */
-	public Object decrypt(Object object, long ID) throws SessionException {
-		Object o = null;
-		try {
-			o = sessionsManager.decrypt(object, ID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return o;
-	}
-
-
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  object                        Description of Parameter
-	 *@return                               Description of the Returned Value
-	 *@exception  SessionException          Description of Exception
-	 */
-	public Object signObject(Serializable object) throws SessionException {
-		Object o = null;
-		try {
-			o = sessionsManager.signObject(object);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return o;
-	}
-
-
-	/**
-	 *  Description of the Method
-	 *
-	 *@param  signedObject                  Description of Parameter
-	 *@param  ID                            Description of Parameter
-	 *@return                               Description of the Returned Value
-	 *@exception  SessionException          Description of Exception
-	 */
-	public boolean checkSignature(Object signedObject, long ID) throws SessionException {
-		boolean b = false;
-		try {
-			b = sessionsManager.checkSignature(signedObject, ID);
-		}
-		catch (Exception e) {
-			System.out.println("Exception in SecureBody " + e);
-		}
-		return b;
-	}
-
+  /**
+   *  Description of the Method
+   *
+   *@param  signedObject                  Description of Parameter
+   *@param  ID                            Description of Parameter
+   *@return                               Description of the Returned Value
+   *@exception  SessionException          Description of Exception
+   */
+  public boolean checkSignature(Object signedObject, long ID) throws SessionException {
+    boolean b = false;
+    try {
+      b = sessionsManager.checkSignature(signedObject, ID);
+    } catch (Exception e) {
+      System.out.println("Exception in SecureBody " + e);
+    }
+    return b;
+  }
 
   //
   // -- PROTECTED METHODS ----------------------------------------------------------------------------
   //
 
-	protected ReplyReceiver createReplyReceiver() {
-		return new SecureReplyReceiverImpl();
-	}
+  protected ReplyReceiver createReplyReceiver() {
+    return new SecureReplyReceiverImpl();
+  }
 
+  protected UniversalBody createRemoteBody() {
+    try {
+      return new SecureRemoteBodyAdapter(this);
+    } catch (ProActiveException e) {
+      throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
+    }
+  }
 
-	protected UniversalBody createRemoteBody() {
-	  try {
-	    return new SecureRemoteBodyAdapter(this);
-	  } catch (ProActiveException e) {
-	    throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
-	  }
-	}  
-	
+  //
+  // -- PRIVATE METHODS ----------------------------------------------------------------------------
+  //
 
-	//
-	// -- PRIVATE METHODS ----------------------------------------------------------------------------
-	//
+  /**
+   *  Sets the Certificate attribute of the SecureBody object
+   */
+  private void setCertificate() {
 
-	/**
-	 *  Sets the Certificate attribute of the SecureBody object
-	 */
-	private void setCertificate() {
+    try {
+      FileInputStream fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/certif_public2");
+      ObjectInputStream in = new ObjectInputStream(fin);
 
-		try {
-			FileInputStream fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/certif_public2");
-			ObjectInputStream in = new ObjectInputStream(fin);
+      PublicCertificate publicCertificate = (PublicCertificate) in.readObject();
+      in.close();
 
-			PublicCertificate publicCertificate = (PublicCertificate) in.readObject();
-			in.close();
+      fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/certif_private2");
+      in = new ObjectInputStream(fin);
+      PrivateCertificate privateCertificate = (PrivateCertificate) in.readObject();
 
-			fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/certif_private2");
-			in = new ObjectInputStream(fin);
-			PrivateCertificate privateCertificate = (PrivateCertificate) in.readObject();
+      in.close();
 
-			in.close();
+      System.out.println("SessionsManager instanciation...");
 
-			System.out.println("SessionsManager instanciation...");
+      //creation du serveur
+      //	SessionsManagerImpl sessionsManagerImpl;
+      // sessionsManagerImpl = new SessionsManagerImpl();
 
-			//creation du serveur
-			//	SessionsManagerImpl sessionsManagerImpl;
-			// sessionsManagerImpl = new SessionsManagerImpl();
+      //	sessionsManager.set_publicCertificate(publicCertificate);
+      //	sessionsManager.set_privateCertificate(privateCertificate);
 
-			//	sessionsManager.set_publicCertificate(publicCertificate);
-			//	sessionsManager.set_privateCertificate(privateCertificate);
+      fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/acPublicKey");
+      in = new ObjectInputStream(fin);
+      PublicKey acPublicKey = (PublicKey) in.readObject();
 
+      in.close();
 
-			fin = new FileInputStream("/net/home/acontes/dev/ProActive/classes/acPublicKey");
-			in = new ObjectInputStream(fin);
-			PublicKey acPublicKey = (PublicKey) in.readObject();
+      this.sessionsManager = new SessionsManager(publicCertificate, privateCertificate, acPublicKey);
 
-			in.close();
+    } catch (Exception e) {
+      System.out.println("Exception in setting certificates" + e);
+    }
 
-			this.sessionsManager = new SessionsManager(publicCertificate, privateCertificate, acPublicKey);
-
-		}
-		catch (Exception e) {
-			System.out.println("Exception in setting certificates" + e);
-		}
-
-	}
+  }
 
   private void setCertificate(PublicCertificate publicCertificate, PrivateCertificate privateCertificate, PublicKey publicKey) {
-	  this.sessionsManager = new SessionsManager(publicCertificate, privateCertificate, publicKey);
+    this.sessionsManager = new SessionsManager(publicCertificate, privateCertificate, publicKey);
   }
-  
-  
-}
 
+}

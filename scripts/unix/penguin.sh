@@ -7,9 +7,7 @@ workingDir=`dirname $0`
 . $workingDir/env.sh
 $JAVACMD org.objectweb.proactive.StartNode //localhost/one &
 $JAVACMD org.objectweb.proactive.StartNode //localhost/two &
-sleep 3
-
-$JAVACMD org.objectweb.proactive.examples.penguin.AdvancedPenguinControler //localhost/one //localhost/two
+$JAVACMD org.objectweb.proactive.examples.penguin.PenguinControler //localhost/one //localhost/two
 
 killall java
 

@@ -59,18 +59,6 @@ public interface Constants  {
   public static final Class DEFAULT_FUTURE_PROXY_CLASS = org.objectweb.proactive.core.body.future.FutureProxy.class;
   /** The name of the explicit local body default class */
   public static final String DEFAULT_FUTURE_PROXY_CLASS_NAME = DEFAULT_FUTURE_PROXY_CLASS.getName();
-
-  /**
-   * The name of the String static variable the reified class should declare
-   * or override in order to specify which body class it needs.
-   */
-  public static final String BODY_CLASS_NAME_FIELD = "BODY_CLASS_NAME";
-  
-  /**
-   * The name of the String static variable the reified class should declare
-   * or override in order to specify which proxy class it needs.
-   */
-  public static final String PROXY_CLASS_NAME_FIELD = "PROXY_CLASS_NAME";
   
   /**
    * The interface implemented by all proxies featuring 'future' semantics,
@@ -87,8 +75,5 @@ public interface Constants  {
   
   /** default protocol identifier */
   public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
-  
-  /** default class for starting a node */
-  public static final String DEFAULT_START_NODE_CLASS = "org.objectweb.proactive.StartNode";
   
 }

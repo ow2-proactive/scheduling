@@ -128,21 +128,26 @@ public class Tree {
 
   public StringBuffer dump(int level, boolean draw) {
     StringBuffer str = new StringBuffer();
-    StringBuffer indent = new StringBuffer();
-    for (int i = 0; i < level; i++)
-      indent.append("  ");
-    if (draw)
-      indent.setCharAt(indent.length() - 1, '|');
-    str.append("[" + key + "] --> " + value + "\n");
+    str.append("[").append(key).append("] --> ").append(value).append("\n");
+    
+    String spaces = "";
+    if (right != null || left != null) {
+      StringBuffer indent = new StringBuffer();
+      for (int i = 0; i < level; i++) 
+        indent.append("  ");
+      if (draw) indent.setCharAt(indent.length() - 1, '|');
+      spaces = indent.toString();
+    }
+    
     if (left != null) {
-      str.append(indent + " |\n");
-      str.append(indent + " +->");
-      str.append(left.dump(level + 1, (right != null)));
+      str.append(spaces).append(" |\n");
+      str.append(spaces).append(" +->");
+      str.append(left.dump(level + 1, (right != null)).toString());
     }
     if (right != null) {
-      str.append(indent + " |\n");
-      str.append(indent + " +->");
-      str.append(right.dump(level + 1, false));
+      str.append(spaces).append(" |\n");
+      str.append(spaces).append(" +->");
+      str.append(right.dump(level + 1, false).toString());
     }
     return str;
   }

@@ -47,13 +47,13 @@ public class TreeDisplay {
 
 
   public void displayMessage(String s) {
-    applet.displayMessage(s);
+    applet.receiveMessage(s);
   }
 
 
   public void add(String key, String value) {
     if (tree == null) {
-      applet.displayMessage("Creating initial tree");
+      applet.receiveMessage("Creating initial tree");
       try {
         tree = (Tree)org.objectweb.proactive.ProActive.newActive(Tree.class.getName(), new Object[]{key, value, org.objectweb.proactive.ProActive.getStubOnThis()});
       } catch (Exception e) {
@@ -62,21 +62,25 @@ public class TreeDisplay {
     } else {
       tree.insert(key, value);
     }
-    dump();
+    display();
   }
 
 
-  public void dump() {
-    if (tree == null)
-      return;
-    StringBuffer str = tree.dump(0, false);
-    applet.displayTree(str.toString());
+  public void display() {
+    if (tree == null) return;
+    try {
+      StringBuffer sb = tree.dump(0, false);
+      applet.displayTree(sb.toString());
+    } catch (Throwable t) {
+      System.out.println(t.toString());
+      t.printStackTrace();
+      Thread.dumpStack();
+    }
   }
 
 
   public String search(String key) {
-    if (tree == null)
-      return null;
+    if (tree == null) return null;
     return tree.search(key);
   }
 }

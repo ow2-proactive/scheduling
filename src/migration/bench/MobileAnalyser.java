@@ -1,6 +1,5 @@
 package migration.bench;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ext.migration.NodeDestination;
 import org.objectweb.proactive.ext.migration.MigrationStrategy;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManager;
@@ -12,7 +11,7 @@ import org.objectweb.proactive.Body;
 import java.io.Serializable;
 import java.util.Calendar;
 
-public class MobileAnalyser extends Object implements Active, Serializable {
+public class MobileAnalyser extends Object implements Serializable {
 
   SearchResult results;
   String fileToAnalyze;
@@ -94,7 +93,6 @@ public class MobileAnalyser extends Object implements Active, Serializable {
 
   public static void main(String args[]) {
     //	char result[] = {};
-    SearchResult localResult;
     // 	long startTime;
     // 	long endTime;
 

@@ -1,11 +1,10 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class LiveAgent implements Active, Serializable {
+public class LiveAgent implements Serializable {
 
   int etape = 0;
 
@@ -35,9 +34,8 @@ public class LiveAgent implements Active, Serializable {
 
 
   public static void main(String args[]) {
-    LiveAgent l = null;
     try {
-      l = (LiveAgent)ProActive.newActive("migration.test.LiveAgent", null);
+      LiveAgent l = (LiveAgent)ProActive.newActive("migration.test.LiveAgent", null);
     } catch (Exception e) {
     }
 

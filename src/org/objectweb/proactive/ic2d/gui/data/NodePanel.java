@@ -170,7 +170,7 @@ public class NodePanel extends AbstractDataObjectPanel implements NodeObjectList
           javax.swing.JOptionPane.PLAIN_MESSAGE                                               // int messageType,
         );
     if (result == null || (! (result instanceof String))) return;
-    Object o = nodeObject.createNewRemoteObject((String) result);
+    nodeObject.createNewRemoteObject((String) result);
   }
 
 

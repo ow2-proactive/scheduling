@@ -29,7 +29,7 @@
 
 package modelisation.server.fakebench;
 
-import org.objectweb.proactive.Active;
+import modelisation.statistics.ExponentialLaw;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -38,7 +38,6 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-import modelisation.statistics.ExponentialLaw;
 
 public class FakeBench2 {
     //we put here the stats for the agent and the source
@@ -97,7 +96,7 @@ public class FakeBench2 {
 
     }
 
-    static public class DummyObject implements Active {
+    static public class DummyObject {
         protected UniqueID id;
         protected UniversalBody body;
 

@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.binarytree;
 /**
  * A standard implementation of a node in a binary tree.
  */
-public class BinaryTree extends Object {
+public class BinaryTree {
 
   protected int key;              // The key for accessing the value contained in this node
   protected Object value;         // The actual value contained in this node

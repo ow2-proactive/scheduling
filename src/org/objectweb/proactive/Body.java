@@ -71,13 +71,6 @@ import org.objectweb.proactive.core.mop.MethodCall;
 public interface Body extends UniversalBody, MessageEventProducer {
 
   /** 
-   * Sets the request factory for this body 
-   * @param the request factory associated to this body
-   */ 
-  public void setRequestFactory(RequestFactory requestFactory);
-
-
-  /** 
    * Returns the request queue associated to this body 
    * @return the request queue associated to this body
    */ 

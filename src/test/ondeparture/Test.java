@@ -1,11 +1,10 @@
 package test.ondeparture;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   private org.objectweb.proactive.ext.migration.MigrationStrategyManager myStrategyManager;
 

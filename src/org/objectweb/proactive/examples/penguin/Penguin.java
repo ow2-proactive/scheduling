@@ -31,17 +31,18 @@
 package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.ext.migration.Destination;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
 
 
-public class Penguin implements java.io.Serializable { //, ActivePenguin {
+public class Penguin implements java.io.Serializable {
 
   private boolean onItinerary,initialized;
   private transient PenguinFrame myFrame;
-  private PenguinControler controler;
+  private PenguinMessageReceiver controler;
   private Penguin otherPenguin;
   private javax.swing.ImageIcon face;
   private org.objectweb.proactive.ext.migration.MigrationStrategy myStrategy;
@@ -112,14 +113,13 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
   }
 
 
-  public void setControler(PenguinControler c) {
+  public void setControler(PenguinMessageReceiver c) {
     this.controler = c;
     this.initialized = true;
   }
 
 
   public void setOther(Penguin penguin) {
-    //	System.out.println("setOther " + penguin);
     this.otherPenguin = penguin;
   }
 
@@ -135,18 +135,17 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
 
 
   public void live(Body b) {
-    BlockingRequestQueue queue = b.getRequestQueue();
+    Service service = new Service(b);
     if (!initialized) {
-      b.serve(queue.blockingRemoveOldest());
+      service.blockingServeOldest();
     }
-
     rebuild();
     Destination r = null;
     //first we empty the RequestQueue
-    while (!queue.isEmpty()) {
-      b.serve(queue.removeOldest());
-    }
     while (b.isActive()) {
+      while (service.hasRequestToServe()) {
+        service.serveOldest();
+      }
       if (onItinerary) {
         r = nextHop();
         try {
@@ -155,7 +154,7 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
           e.printStackTrace();
         }
       } else {
-        b.serve(queue.blockingRemoveOldest());
+        service.blockingServeOldest();
       }
     }
   }
@@ -178,7 +177,7 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
 
 
   public Message getPosition() {
-    return new Message("I am working on node " + ProActive.getBodyOnThis().getNodeURL() + "\n");
+    return new Message("I am working on node " + ProActive.getBodyOnThis().getNodeURL());
   }
 
 
@@ -191,7 +190,7 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
 
   public void sendMessageToControler() {
     if (controler != null)
-      controler.receiveMessage(ProActive.getBodyOnThis().getNodeURL() + "\n");
+      controler.receiveMessage(ProActive.getBodyOnThis().getNodeURL());
   }
 
 
@@ -208,7 +207,7 @@ public class Penguin implements java.io.Serializable { //, ActivePenguin {
       //	n.startItinerary();
       Object[] param = new Object[1];
       param[0] = n;
-      PenguinControler controler = (PenguinControler) org.objectweb.proactive.ProActive.newActive(PenguinControler.class.getName(), param, (org.objectweb.proactive.core.node.Node) null);
+      org.objectweb.proactive.ProActive.newActive(PenguinMessageReceiver.class.getName(), param, (org.objectweb.proactive.core.node.Node) null);
       //	n.setOther(n2);
       //	n2.setOther(null);
       //	n2.startItinerary();

@@ -1,12 +1,11 @@
 package test.listener;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 
-public class Test implements Active {
+public class Test {
 
   private DummyObject other;
 

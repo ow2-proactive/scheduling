@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.ic2d.gui;
 
 import java.awt.Color;
@@ -46,26 +46,21 @@ public class Legend extends JFrame {
 
   private static Legend uniqueInstance;
 
-
   public static Legend uniqueInstance() {
-    return uniqueInstance == null?uniqueInstance = new Legend():uniqueInstance;
+    return uniqueInstance == null ? uniqueInstance = new Legend() : uniqueInstance;
   }
-
 
   private Legend() {
     super("Legend");
     setSize(300, 300);
     {
-      JPanel panel = new JPanel();
-
-      getContentPane().setLayout(new GridLayout(0, 2, 10, 10));
+       getContentPane().setLayout(new GridLayout(0, 2, 10, 10));
 
       {
         JComponent comp = new JPanel() {
 
           private int w = 100;
           private int h = 50;
-
 
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
@@ -86,7 +81,6 @@ public class Legend extends JFrame {
 
           private int w = 100;
           private int h = 50;
-
 
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
@@ -121,7 +115,6 @@ public class Legend extends JFrame {
           private int w = 100;
           private int h = 50;
 
-
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
             int w = dim.width;
@@ -139,7 +132,6 @@ public class Legend extends JFrame {
 
           private int w = 100;
           private int h = 50;
-
 
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
@@ -163,14 +155,12 @@ public class Legend extends JFrame {
     });
   }
 
-
   private void add(String name, JComponent comp) {
     JPanel pan = new JPanel(new FlowLayout());
     pan.add(new JLabel(name));
     pan.add(comp);
     getContentPane().add(pan);
   }
-
 
   public static void main(String[] argv) {
     Legend.uniqueInstance().show();

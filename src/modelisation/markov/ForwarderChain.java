@@ -179,7 +179,6 @@ public class ForwarderChain {
 
     public String generateMapleFile() {
         StringBuffer tmp = new StringBuffer();
-        State s;
         Object[] stateArray = stateList.toArray();
 
         tmp.append("with(linalg):\n");

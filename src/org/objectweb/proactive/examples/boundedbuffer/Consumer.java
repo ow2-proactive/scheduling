@@ -58,7 +58,7 @@ public class Consumer extends ConsumerProducer {
     } else {
       if (wasSuspended)
         listener.consumerStartRunning();
-      String str = buffer.get(); // Get the datas --> returns a future object.
+      buffer.get(); // Get the datas --> returns a future object.
       // The call is synchronous as String is final
     }
   }

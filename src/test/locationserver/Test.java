@@ -1,12 +1,11 @@
 package test.locationserver;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ext.locationserver.ActiveWithLocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-import org.objectweb.proactive.ext.locationserver.BodyWithLocationServer;
+import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 
-public class Test implements ActiveWithLocationServer {
+public class Test {
 
   public Test() {
   }
@@ -25,7 +24,8 @@ public class Test implements ActiveWithLocationServer {
     System.out.println("== Test: creating an ObjectWithLocationServer");
     ObjectWithLocationServer obj1 = null;
     try {
-      obj1 = (ObjectWithLocationServer)ProActive.newActive("test.locationserver.ObjectWithLocationServer", null);
+      obj1 = (ObjectWithLocationServer)ProActive.newActive("test.locationserver.ObjectWithLocationServer", null, 
+                                                           LocationServerMetaObjectFactory.newInstance(), null);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -36,7 +36,7 @@ public class Test implements ActiveWithLocationServer {
     System.out.println("== Test: creating active object Test");
     Test test = null;
     try {
-      test = (Test)ProActive.newActive("test.locationserver.Test", null);
+      test = (Test)ProActive.newActive("test.locationserver.Test", null, LocationServerMetaObjectFactory.newInstance(), null);
     } catch (Exception e) {
       e.printStackTrace();
     }

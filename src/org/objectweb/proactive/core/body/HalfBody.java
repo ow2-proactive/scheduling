@@ -44,8 +44,8 @@ public class HalfBody extends AbstractBody {
 
   private static final String NAME = "Other thread";
 
-  public synchronized static HalfBody getHalfBody() {
-    return new HalfBody();
+  public synchronized static HalfBody getHalfBody(MetaObjectFactory factory) {
+    return new HalfBody(factory);
   }
 
 
@@ -53,8 +53,8 @@ public class HalfBody extends AbstractBody {
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  private HalfBody() {
-    super(new Object(),"LOCAL");
+  private HalfBody(MetaObjectFactory factory) {
+    super(new Object(),"LOCAL", factory);
   }
 
 
@@ -91,23 +91,5 @@ public class HalfBody extends AbstractBody {
     throw new ProActiveRuntimeException("The method 'fifoPolicy' is not implemented in class HalfBody.");
   }
 
-
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-
-  protected ReplyReceiver createReplyReceiver() {
-    return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
-  }
-
-
-  protected RequestReceiver createRequestReceiver() {
-    return null;
-  }
-
-
-  protected BlockingRequestQueue createRequestQueue() {
-    return null;
-  }
 
 }

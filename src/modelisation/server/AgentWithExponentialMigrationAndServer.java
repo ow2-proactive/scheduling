@@ -5,9 +5,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import modelisation.statistics.ExponentialLaw;
 
-import java.io.Serializable;
-
-public class AgentWithExponentialMigrationAndServer implements TimedActive, Serializable {
+public class AgentWithExponentialMigrationAndServer implements java.io.Serializable {
 
     protected ExponentialLaw expo;
     protected Node[] nodes;

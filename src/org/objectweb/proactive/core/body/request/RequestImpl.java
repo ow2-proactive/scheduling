@@ -119,9 +119,15 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     try {
       result = methodCall.execute(targetBody.getReifiedObject());
     } catch (MethodCallExecutionFailedException e) {
-      throw new ServeException("serve method " + methodCall.getName() + " failed", e);
+      e.printStackTrace();
+      throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed", e);
     } catch (java.lang.reflect.InvocationTargetException e) {
-      result = e;
+      e.printStackTrace();
+      if (isOneWay) {
+        throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed", e.getTargetException());
+      } else {
+        result = e;
+      }
     }
     return result;  
   }

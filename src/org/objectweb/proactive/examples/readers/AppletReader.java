@@ -30,7 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.readers;
 
-public class AppletReader extends org.objectweb.proactive.examples.AppletWrapper {
+public class AppletReader extends org.objectweb.proactive.examples.StandardFrame {
 
   public ReadCanvas readerPanel;
   private ReaderDisplay display;
@@ -43,17 +43,17 @@ public class AppletReader extends org.objectweb.proactive.examples.AppletWrapper
 
 
   public static void main(String arg[]) {
-    AppletReader applet = new AppletReader("Reader/Writer", 350, 300);
+    new AppletReader("Reader/Writer", 350, 300);
   }
 
 
   public void start() {
-    displayMessage("Creating active objects");
+    receiveMessage("Creating active objects");
     try {
       display = new ReaderDisplay(this);
       display = (ReaderDisplay)org.objectweb.proactive.ProActive.turnActive(display);
       display.init();
-      displayMessage("Running...");
+      receiveMessage("Running...");
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -30,10 +30,9 @@
 */ 
 package org.objectweb.proactive.examples.readers;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
-public class Writer implements Active {
+public class Writer {
 
   private ReaderDisplay display;
   private ReaderWriter rw;

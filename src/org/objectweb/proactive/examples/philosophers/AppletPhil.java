@@ -27,106 +27,53 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.examples.philosophers;
 
+public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
 
-public class AppletPhil extends org.objectweb.proactive.examples.AppletWrapper {
-
-//  private javax.swing.JButton bStart;
+  //  private javax.swing.JButton bStart;
   private String url;
   private DinnerLayout theLayout;
   private javax.swing.JPanel theLayoutPanel;
 
   public AppletPhil(String name, int width, int height) {
-    /* 
-     * Everything is done in AppletWrapper
-     */
     super(name, width, height);
   }
 
-
   public static void main(String args[]) {
-	/* 
-	 * Builds the root Frame, including "createRootPanel"
-	 *
-	 * this includes:
-		this.init()			(builds graphic objects)
-		AppletWrapper.createParentFrame (creates main Frame)
-		  calls this.createRootPanel()
-		this.start()
-		this.repaint()
-	 */
     AppletPhil phil = new AppletPhil("Philosophers", 450, 300);
-    phil.displayMessage("Applet running...");
+    phil.receiveMessage("Applet running...");
     if (args.length == 1) {
       phil.setURL(args[0]);
     }
     phil.go();
   }
 
-    private void go () {
+  private void go() {
     try {
       /* le Layout est necessairement actif, puisqu'il est referencé par tous les autres objets.
        */
-      theLayout = (DinnerLayout)org.objectweb.proactive.ProActive.turnActive(theLayout);
+      theLayout = (DinnerLayout) org.objectweb.proactive.ProActive.turnActive(theLayout);
       if (url != null)
         theLayout.setNode(url);
-	/*
-	 * Builds the active Table and Philosophers:
-	 */
+      /*
+       * Builds the active Table and Philosophers:
+       */
       org.objectweb.proactive.ProActive.waitFor(theLayout.init());
       theLayout.activateButtons();
-      displayMessage("Objects activated...");
+      receiveMessage("Objects activated...");
     } catch (Exception ex) {
       ex.printStackTrace();
     }
   }
-
 
   public void setURL(String url) {
     this.url = url;
   }
 
   /* Called by AppletWrapper before creating the toplevel Frame: */
-
-  public void init() {
-    // Get the images
-    javax.swing.Icon imgArray[] = new javax.swing.Icon[5];
-    if (isApplet) {
-      String imgThink = getParameter("IMGTHINK");
-      String imgWait = getParameter("IMGWAIT");
-      String imgEat = getParameter("IMGEAT");
-      String imgFork0 = getParameter("IMGFORK0");
-      String imgFork1 = getParameter("IMGFORK1");
-
-      // Beware: AppletWrapper.displayMessage is not available at this point
-      //						(during bootstrap)
-      // displayMessage("Loading images");
-      
-      // Create the layout
-  
-      imgArray[0] = new javax.swing.ImageIcon(getImage(getDocumentBase(), imgThink));
-      imgArray[1] = new javax.swing.ImageIcon(getImage(getDocumentBase(), imgWait));
-      imgArray[2] = new javax.swing.ImageIcon(getImage(getDocumentBase(), imgEat));
-      imgArray[3] = new javax.swing.ImageIcon(getImage(getDocumentBase(), imgFork0));
-      imgArray[4] = new javax.swing.ImageIcon(getImage(getDocumentBase(), imgFork1));
-    } else {
-      // displayMessage("Loading alternate images");
-      try {
-        ClassLoader c = this.getClass().getClassLoader();
-        imgArray[0] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/think.gif"));
-        imgArray[1] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/wait.gif"));
-        imgArray[2] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/eat.gif"));
-        imgArray[3] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/fork0.gif"));
-        imgArray[4] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/fork1.gif"));
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-    // the DinnerLayout constructor creates the graphical objects:
-    theLayout = new DinnerLayout(imgArray);
-    theLayoutPanel = theLayout.getDisplay();
+  protected void start() {
   }
 
   //
@@ -138,7 +85,20 @@ public class AppletPhil extends org.objectweb.proactive.examples.AppletWrapper {
    */
 
   protected javax.swing.JPanel createRootPanel() {
-    javax.swing.JPanel rootPanel = theLayoutPanel;
-    return rootPanel;
+    // Get the images
+    javax.swing.Icon imgArray[] = new javax.swing.Icon[5];
+    try {
+      ClassLoader c = this.getClass().getClassLoader();
+      imgArray[0] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/think.gif"));
+      imgArray[1] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/wait.gif"));
+      imgArray[2] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/eat.gif"));
+      imgArray[3] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/fork0.gif"));
+      imgArray[4] = new javax.swing.ImageIcon(c.getResource("org/objectweb/proactive/examples/philosophers/fork1.gif"));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    // the DinnerLayout constructor creates the graphical objects:
+    theLayout = new DinnerLayout(imgArray);
+    return theLayout.getDisplay();
   }
 }

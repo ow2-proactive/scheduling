@@ -1,6 +1,5 @@
 package test.itinerary;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.ext.migration.MigrationStrategyImpl;
@@ -11,7 +10,7 @@ import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   private MigrationStrategyManager migrationStrategyManager;
   private MigrationStrategy migrationStrategy;

@@ -1,18 +1,11 @@
 package test.multiplequeueserver;
 
-import org.objectweb.proactive.Active;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.BodyImpl;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.mop.StubObject;
 import modelisation.multiqueueserver.MultiQueueServer;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 
 
-public class Test implements Active {
+public class Test {
     protected MultiQueueServer l;
  
     public Test() {}

@@ -33,13 +33,8 @@ package org.objectweb.proactive.core.body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.AbstractMigratableBody;
-import org.objectweb.proactive.core.body.migration.MigrationManager;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
-
 
 /**
  * This class is the default implementation of the Body interface.
@@ -84,9 +79,9 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   /**
    * Build the body object, then fires its service thread
    */
-  public BodyImpl(ConstructorCall c, String nodeURL) throws java.lang.reflect.InvocationTargetException, ConstructorCallExecutionFailedException {
+  public BodyImpl(ConstructorCall c, String nodeURL, MetaObjectFactory factory) throws java.lang.reflect.InvocationTargetException, ConstructorCallExecutionFailedException {
     // Creates the reified object
-    super(c.execute(), nodeURL);
+    super(c.execute(), nodeURL, factory);
     startBody();
   }
 
@@ -157,42 +152,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-
-  /**
-   * Creates the component in charge of storing incoming requests.
-   * @return the component in charge of storing incoming requests.
-   */
-  protected BlockingRequestQueue createRequestQueue() {
-    return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(bodyID);
-  }
-
-
-  /**
-   * Creates the component in charge of receiving incoming requests.
-   * @return the component in charge of receiving incoming requests.
-   */
-  protected RequestReceiver createRequestReceiver() {
-    return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
-  }
-
-
-  /**
-   * Creates the component in charge of receiving incoming replies.
-   * @return the component in charge of receiving incoming replies.
-   */
-  protected ReplyReceiver createReplyReceiver() {
-    return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
-  }
-
-
-  /**
-   * Creates the component in charge of migration.
-   * @return the component in charge of migration.
-   */
-  protected MigrationManager createMigrationManager() {
-    return MetaObjectFactory.createMigrationManager();
-  }
-
 
   /**
    * Launches the proper live method on the reified object if one is defined.

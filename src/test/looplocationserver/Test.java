@@ -1,27 +1,19 @@
 package test.looplocationserver;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ext.locationserver.ActiveWithLocationServer;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.BodyWithLocationServer;
-import java.io.Serializable;
+import org.objectweb.proactive.ext.locationserver.LocationServerMetaObjectFactory;
 
-public class Test implements ActiveWithLocationServer {
+public class Test {
 
-  public Test() {
-  }
-
+  public Test() {}
 
   public void callOther(ObjectWithLocationServer o) {
     o.echo();
   }
 
-
-
   public static void main(String args[]) {
     if (args.length < 2) {
-      System.out.println("Usage: " +  Test.class.getName() + "<locationServer> <destination1> ... <destinationN>");
+      System.out.println("Usage: " + Test.class.getName() + "<locationServer> <destination1> ... <destinationN>");
       System.exit(-1);
     }
 
@@ -35,7 +27,7 @@ public class Test implements ActiveWithLocationServer {
     param[0] = stringParam;
 
     try {
-      obj1 = (ObjectWithLocationServer)ProActive.newActive(Test.class.getName(), param);
+      obj1 = (ObjectWithLocationServer) ProActive.newActive(Test.class.getName(), param, LocationServerMetaObjectFactory.newInstance(), null);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -44,7 +36,7 @@ public class Test implements ActiveWithLocationServer {
 
     Test test = null;
     try {
-      test = (Test)ProActive.newActive(Test.class.getName(), null);
+      test = (Test) ProActive.newActive(Test.class.getName(), null, LocationServerMetaObjectFactory.newInstance(), null);
     } catch (Exception e) {
       e.printStackTrace();
     }

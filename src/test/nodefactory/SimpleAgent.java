@@ -1,11 +1,10 @@
 package test.nodefactory;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class SimpleAgent implements Active, Serializable {
+public class SimpleAgent implements Serializable {
 
   public SimpleAgent() {
   }

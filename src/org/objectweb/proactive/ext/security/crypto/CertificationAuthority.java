@@ -117,7 +117,7 @@ public class CertificationAuthority {
 	 * @since
 	 */
 	public static void main(String[] args) {
-		CertificationAuthority certificationAuthority1 = new CertificationAuthority();
+		new CertificationAuthority();
 		writeKeys();
 	}
 

@@ -1,12 +1,11 @@
 package test.loopmigrationwithforwarder;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 
 import java.io.Serializable;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   private String[] destinations;
   int index;

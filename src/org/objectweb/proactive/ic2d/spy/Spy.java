@@ -80,7 +80,7 @@ public class Spy {
 
 
   public void sendEventsForAllActiveObjects() {
-    SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(AbstractBody.getThreadAssociatedBody());
+    SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(AbstractBody.getCurrentThreadBody());
     notifyListener(spyEvents);
   }
 

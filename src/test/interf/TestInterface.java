@@ -1,9 +1,8 @@
 package test.interf;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
-public class TestInterface implements MyInt, Active {
+public class TestInterface implements MyInt {
 
   public TestInterface() {
 

@@ -1,0 +1,115 @@
+/*
+* ################################################################
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
+*            Concurrent computing with Security and Mobility
+*
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+*
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+*
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s):
+*
+* ################################################################
+*/
+package org.objectweb.proactive.core.util;
+
+/**
+ * <p>
+ * A straightford implementation of the threadstore interface.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/05
+ * @since   ProActive 0.9.2
+ */
+public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
+
+  private int counter;
+  private boolean open;
+
+  /**
+   * Creates a new ThreadStore that is opened after creation.
+   */
+  public ThreadStoreImpl() {
+    this(true);
+  }
+
+
+  /**
+   * Constructor for ThreadStoreImpl.
+   * @param isOpened true is the store is opened after creation
+   */
+  public ThreadStoreImpl(boolean isOpened) {
+    open = isOpened;
+  }
+
+
+  /**
+   * @see ThreadStore#threadCount()
+   */
+  public int threadCount() {
+    return counter;
+  }
+
+
+  /**
+   * @see ThreadStore#enter()
+   */
+  public synchronized void enter() {
+    while (!open) {
+      try {
+        wait();
+      } catch (InterruptedException e) {}
+    }
+    counter++;
+  }
+
+
+  /**
+   * @see ThreadStore#exit()
+   */
+  public synchronized void exit() {
+    counter--;
+    notifyAll();
+  }
+
+
+  /**
+   * @see ThreadStore#close()
+   */
+  public synchronized void close() {
+    open = false;
+    while (counter != 0 && !open) {
+      try {
+        wait();
+      } catch (InterruptedException e) {}
+    }
+  }
+
+
+  /**
+   * @see ThreadStore#open()
+   */
+  public synchronized void open() {
+    open = true;
+    notifyAll();
+  }
+
+}

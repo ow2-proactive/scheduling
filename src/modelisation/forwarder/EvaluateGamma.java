@@ -1,12 +1,11 @@
 package modelisation.forwarder;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class EvaluateGamma implements Active, Serializable {
+public class EvaluateGamma implements Serializable {
 
     private String[] destinations;
     int index;

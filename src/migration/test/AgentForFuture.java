@@ -1,6 +1,5 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.body.future.FutureList;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.ProActive;
@@ -9,7 +8,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Vector;
 
-public class AgentForFuture implements Active, Serializable {
+public class AgentForFuture implements Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
   SimpleAgentForFuture agent;

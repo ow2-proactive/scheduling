@@ -80,7 +80,7 @@ public class IC2D {
       System.exit(1);
     }
     IC2DObject ic2dObject = new IC2DObject();
-    IC2DFrame ic2dFrame = new IC2DFrame(ic2dObject, options);
+    new IC2DFrame(ic2dObject, options);
     if (hosts != null) {
       WorldObject worldObject = ic2dObject.getWorldObject();
       for (int i = 0; i<hosts.length; i++) {

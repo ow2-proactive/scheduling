@@ -32,156 +32,81 @@ package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.CircularArrayList;
+import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 
-import javax.swing.*;
-import java.awt.*;
 
-public class PenguinControler implements org.objectweb.proactive.Active {
+public class PenguinControler implements PenguinMessageReceiver, java.io.Serializable {
 
   //The image panel
-  private Penguin penguin;
-  private PenguinControlerFrame controlerFrame;
+  private transient PenguinApplet display;
+  protected CircularArrayList penguinList;
+  String[] args;
+  private PenguinControler activeRef;
+  private MigrationStrategyManagerImpl myStrategyManager;
 
 
   public PenguinControler() {
   }
 
 
-  public PenguinControler(Penguin penguin) {
-    this.penguin = penguin;
-
+  public PenguinControler(String[] args) {
+    this.penguinList = new CircularArrayList(20);
+    this.args = args;
+    try {
+      ProActive.turnActive(this);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
 
-  public void startPenguin() {
-    this.penguin.startItinerary();
+  public void rebuild() {
+    this.display = new PenguinApplet((PenguinControler) ProActive.getStubOnThis(), penguinList);
   }
 
 
-  public void stopPenguin() {
-    this.penguin.stopItinerary();
-  }
-
-
-  public void continuePenguin() {
-    this.penguin.continueItinerary();
-  }
-
-
-  public void askLocation() {
-    Message m = this.penguin.getPosition();
-    controlerFrame.displayAgentMessage(m.getMessage());
-  }
-
-
-  public void askToCallOther() {
-    this.penguin.callOther();
+  public void clean() {
+    if (display != null) {
+      display.dispose();
+      display = null;
+    }
   }
 
 
   public void receiveMessage(String s) {
-    this.controlerFrame.displayMessage(s);
+    display.receiveMessage(s);
+  }
+
+  public Penguin createPenguin(int n) {
+    try {
+      Penguin newPenguin = (Penguin) org.objectweb.proactive.ProActive.newActive(Penguin.class.getName(), new Object[] { new Integer(n) });
+      newPenguin.initialize(args);
+      newPenguin.setControler(activeRef);
+      return newPenguin;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
   }
 
 
   public void live(Body b) {
-    this.controlerFrame = new PenguinControlerFrame((PenguinControler) ProActive.getStubOnThis());
-    penguin.setControler((PenguinControler) ProActive.getStubOnThis());
+    myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) b);
+    myStrategyManager.onDeparture("clean");
+    rebuild();
     b.fifoPolicy();
   }
 
 
-  protected class PenguinControlerFrame extends javax.swing.JFrame implements java.awt.event.ActionListener {
-    private PenguinControler controler;
-    private javax.swing.JPanel buttonPanel;
-    private JPanel textPanel;
-    private JPanel agentPanel;
-    protected javax.swing.JTextArea textArea;
-    protected javax.swing.JTextArea agentTextArea;
-    protected javax.swing.JButton bStop;
-    protected javax.swing.JButton bStart;
-    protected javax.swing.JButton bResume;
-    protected javax.swing.JButton bCall;
-    protected javax.swing.JButton bCallOther;
-
-
-    protected PenguinControlerFrame(PenguinControler c) {
-      this.controler = c;
-
-      buttonPanel = new JPanel(new java.awt.GridLayout(0, 1));
-
-      bStart = new javax.swing.JButton("Start");
-      bStart.addActionListener(this);
-      buttonPanel.add(bStart);
-
-      bResume = new javax.swing.JButton("Resume");
-      bResume.addActionListener(this);
-      buttonPanel.add(bResume);
-
-      bStop = new javax.swing.JButton("Stop");
-      bStop.addActionListener(this);
-      buttonPanel.add(bStop);
-
-
-      javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.GridLayout(1, 1));
-      textArea = new JTextArea(10, 0);
-      panel.add(new JScrollPane(textArea));
-      this.getContentPane().setLayout(new BorderLayout());
-      this.getContentPane().add(panel, BorderLayout.NORTH);
-
-
-      agentPanel = new JPanel(new java.awt.BorderLayout());
-      agentTextArea = new JTextArea(5, 30);
-      bCall = new javax.swing.JButton("Call Agent");
-      bCall.addActionListener(this);
-      bCallOther = new javax.swing.JButton("Call Other Agent");
-      bCallOther.addActionListener(this);
-
-      //JPanel agentButtonPanel=new JPanel();
-      //agentButtonPanel.add(bCall,BorderLayout.NORTH);
-      // agentButtonPanel.add(bCallOther,BorderLayout.NORTH);
-      agentPanel.add(bCall, BorderLayout.WEST);
-      agentPanel.add(new JScrollPane(agentTextArea), BorderLayout.EAST);
-
-      this.getContentPane().add(agentPanel, BorderLayout.CENTER);
-      this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
-      //setSize(350, 300);
-      this.pack();
-      this.setVisible(true);
-    }
-
-
-    public void displayMessage(String s) {
-      this.textArea.append(s);
-    }
-
-
-    public void displayAgentMessage(String s) {
-      this.agentTextArea.append(s);
-    }
-
-
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-      Object source = e.getSource();
-      if (source == bStart) {
-        this.displayMessage("Start pressed\n");
-        this.controler.startPenguin();
-      } else if (source == bStop) {
-        this.displayMessage("Stop pressed\n");
-        this.controler.stopPenguin();
-      } else if (source == bResume) {
-        this.controler.continuePenguin();
-      } else if (source == bCall) {
-        this.controler.askLocation();
-      } else {
-        this.controler.askToCallOther();
-      }
-    }
-  }
 
 
   public static void main(String args[]) {
-    PenguinControler pc = new PenguinControler(null);
-
+    try {
+      // ProActive.newActive(AdvancedPenguinControler.class.getName(),null,(Node) null);
+      new PenguinControler(args);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 }

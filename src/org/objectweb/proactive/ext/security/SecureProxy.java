@@ -31,19 +31,25 @@
 package org.objectweb.proactive.ext.security;
 
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
+import java.security.PublicKey;
+
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.ext.security.crypto.*;
+import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.ext.security.crypto.PrivateCertificate;
+import org.objectweb.proactive.ext.security.crypto.PublicCertificate;
+import org.objectweb.proactive.ext.security.crypto.SessionInitializer;
+import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
 
-import java.security.*;
-import java.io.*;
 
 /**
  *  Description of the Class
@@ -173,7 +179,7 @@ public class SecureProxy extends UniversalBodyProxy {
 
   private class SecureRequestFactory implements RequestFactory {
   
-    public Request createRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
       SecureRequestImpl request = new SecureRequestImpl(methodCall, sourceBody, isOneWay, sequenceID, sessionInitializer.get_sessionID());
       request.encrypt(sessionInitializer);
       if (! isLocal) request.sign(sessionInitializer);

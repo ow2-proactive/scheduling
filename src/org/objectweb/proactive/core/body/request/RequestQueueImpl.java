@@ -151,10 +151,11 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     }
 
     public synchronized void add(Request request) {
-        requestQueue.add(request);
-        if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
-        }
+      //System.out.println("  --> RequestQueue.add m="+request.getMethodName());
+      requestQueue.add(request);
+      if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+          notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
+      }
     }
 
     public synchronized void addToFront(Request request) {

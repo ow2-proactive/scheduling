@@ -187,8 +187,6 @@ public class C3DRenderingEngine implements java.io.Serializable {
    * Returns the shaded color
    */
   Vec shade(int level, double weight, Vec P, Vec N, Vec I, Isect hit) {
-    double n1, n2, eta, c1, cs2;
-    Vec r;
     Vec tcol;
     Vec R;
     double t, diff, spec;

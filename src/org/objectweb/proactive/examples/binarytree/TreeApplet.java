@@ -43,7 +43,7 @@ package org.objectweb.proactive.examples.binarytree;
  * @since   ProActive 0.9
  *
  */
-public class TreeApplet extends org.objectweb.proactive.examples.AppletWrapper {
+public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 
   private javax.swing.JButton bAdd;
   private javax.swing.JButton bSearch;
@@ -56,28 +56,6 @@ public class TreeApplet extends org.objectweb.proactive.examples.AppletWrapper {
 
   public TreeApplet(String name, int width, int height) {
     super(name, width, height);
-  }
-
-
-  public static void main(String arg[]) {
-    TreeApplet applet = new TreeApplet("Binary Tree", 600, 300);
-  }
-
-
-  public void displayTree(final String s) {
-    if (treeArea != null) {
-      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-
-        public void run() {
-          treeArea.setText(s);
-          //treeArea.repaint();
-        }
-      });
-    }
-  }
-
-
-  public void init() {
     // Create the DisplayManager
     try {
       display = new TreeDisplay(this);
@@ -87,6 +65,25 @@ public class TreeApplet extends org.objectweb.proactive.examples.AppletWrapper {
     }
   }
 
+
+  public static void main(String arg[]) {
+    new TreeApplet("Binary Tree", 600, 300);
+  }
+
+
+  public void displayTree(final String s) {
+    if (treeArea != null) {
+      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+        public void run() {
+          treeArea.setText(s);
+        }
+      });
+    }
+  }
+
+  protected void start() {
+  }
 
   protected javax.swing.JPanel createRootPanel() {
     javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
@@ -116,7 +113,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.AppletWrapper {
         String key = tKey.getText();
         String value = tValue.getText();
         if (key == null || value == null) {
-          displayMessage("You must specify a Key/Value couple!!!");
+          receiveMessage("You must specify a Key/Value couple!!!");
         } else {
           display.add(key, value);
         }
@@ -140,7 +137,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.AppletWrapper {
     bDump.addActionListener(new java.awt.event.ActionListener() {
 
       public void actionPerformed(java.awt.event.ActionEvent e) {
-        display.dump();
+        display.display();
       }
     });
     panel.add(bDump);

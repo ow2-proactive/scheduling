@@ -30,60 +30,78 @@
 */
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.migration.MigrationManager;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.util.ProActiveProperties;
+import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
+import org.objectweb.proactive.core.body.request.RequestQueueFactory;
+import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
+import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
 /**
- * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * <p>
- * This class is a invoked to create some of the components of the body. Using a factory
- * allows to specialize the component of the body without subclassing it.
+ * A class implementing this interface if able to provide instances of factories
+ * that can create MetaObjects used in the Body.
  * </p>
  *
  * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
+ * @version 1.0,  2002/05
+ * @since   ProActive 0.9.2
  */
-public class MetaObjectFactory {
+public interface MetaObjectFactory {
 
-  //
-  // -- PUBLIC MEMBERS -----------------------------------------------
-  //
+  /**
+   * Creates or reuses a RequestFactory
+   * @return a new or existing RequestFactory
+   * @see RequestFactory
+   */
+  public RequestFactory newRequestFactory();
+  
 
+  /**
+   * Creates or reuses a ReplyReceiverFactory
+   * @return a new or existing ReplyReceiverFactory
+   * @see ReplyReceiverFactory
+   */
+  public ReplyReceiverFactory newReplyReceiverFactory();
+  
 
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
+  /**
+   * Creates or reuses a RequestReceiverFactory
+   * @return a new or existing RequestReceiverFactory
+   * @see RequestReceiverFactory
+   */
+  public RequestReceiverFactory newRequestReceiverFactory();
+  
 
-  private MetaObjectFactory()  {
-  }
+  /**
+   * Creates or reuses a RequestQueueFactory
+   * @return a new or existing RequestQueueFactory
+   * @see RequestQueueFactory
+   */
+  public RequestQueueFactory newRequestQueueFactory();
+  
 
-  //
-  // -- PUBLIC METHOD -----------------------------------------------
-  //
+  /**
+   * Creates or reuses a MigrationManagerFactory
+   * @return a new or existing MigrationManagerFactory
+   * @see MigrationManagerFactory
+   */
+  public MigrationManagerFactory newMigrationManagerFactory();
+  
 
+  /**
+   * Creates or reuses a RemoteBodyFactory
+   * @return a new or existing RemoteBodyFactory
+   * @see RemoteBodyFactory
+   */
+  public RemoteBodyFactory newRemoteBodyFactory();
+  
 
-   public static RequestReceiver createRequestReceiver() {
-    try {
-      Class c = Class.forName(ProActiveProperties.getRequestReceiverClass());
-      java.lang.reflect.Constructor constr = c.getConstructor(new Class[0]);
-      return (RequestReceiver)constr.newInstance(new Object[0]);
-    } catch (Exception e) {
-      throw new ProActiveRuntimeException(e.toString());
-    }
-  }
-
-  public static MigrationManager createMigrationManager() {
-    try {
-      Class c = Class.forName(ProActiveProperties.getMigrationManagerClass());
-      java.lang.reflect.Constructor constr = c.getConstructor(new Class[0]);
-      return (MigrationManager)constr.newInstance(new Object[0]);
-    } catch (Exception e) {
-      throw new ProActiveRuntimeException(e.toString());
-    }
-  }
-
+  /**
+   * Creates or reuses a ThreadStoreFactory
+   * @return a new or existing ThreadStoreFactory
+   * @see ThreadStoreFactory
+   */
+  public ThreadStoreFactory newThreadStoreFactory();
 
 }

@@ -107,7 +107,6 @@ public class Server extends StreamServer {
 
   /**serves a ProStream <code>n</code> times*/
   public void startStream() {
-    int i,j;
     Server myself = (Server) ProActive.getStubOnThis();
     Body body = (Body) ProActive.getBodyOnThis();
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);

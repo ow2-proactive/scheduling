@@ -1,6 +1,5 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.request.Request;
@@ -10,7 +9,7 @@ import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
 
-public class AgentForThread implements Active, Serializable {
+public class AgentForThread implements Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
 

@@ -1,13 +1,12 @@
 package test.activermiobject;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-public class Test extends UnicastRemoteObject implements RemoteTest, Active {
+public class Test extends UnicastRemoteObject implements RemoteTest {
 
   public Test() throws RemoteException {
 

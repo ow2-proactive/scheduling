@@ -30,15 +30,13 @@
 */ 
 package org.objectweb.proactive.ext.security;
 
-import org.objectweb.proactive.Active;
-
 /**
  *  The interface implemented by objects who deal with security
  *
  *@author     Arnaud Contes
  *@created    27 juillet 2001
  */
-public interface SecureActive extends Active {
+public interface SecureActive {
 
 	/**
 	 *  The name of the body class used for enable security

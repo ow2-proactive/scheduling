@@ -28,12 +28,28 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.ext.locationserver;
+package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.Active;
+import org.objectweb.proactive.Body;
 
-public interface ActiveWithLocationServer extends Active {
+/**
+ * <p>
+ * A class implementing this interface is a factory of RequestReceiver objects.
+ * It is able to create RequestReceiver tailored for a particular purpose.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/05
+ * @since   ProActive 0.9.2
+ *
+ */
+public interface RemoteBodyFactory {
 
-  public static String BODY_CLASS_NAME = "org.objectweb.proactive.ext.locationserver.BodyWithLocationServer";
-  public static String PROXY_CLASS_NAME =org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME;
+  /**
+   * Creates or reuses a RequestReceiver object 
+   * @param body the body that remote body is mode for.
+   * @return the newly created or already existing RequestReceiver object.
+   */
+  public UniversalBody newRemoteBody(Body body);
+  
 }

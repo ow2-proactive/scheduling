@@ -30,23 +30,14 @@
 */ 
 package org.objectweb.proactive.examples.matrix;
 
-
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 
-
-import org.objectweb.proactive.core.mop.*;
-import org.objectweb.proactive.core.body.future.*;
-
-
-public class Matrix implements Active, java.io.Serializable {
+public class Matrix implements java.io.Serializable {
 
 
     private int width;
@@ -82,7 +73,6 @@ public class Matrix implements Active, java.io.Serializable {
     public Matrix(Matrix mr, int w) {
 
 	int index = 0;
-	int width = 0;
 	Matrix result = null;
 
 	int size =  ProActiveGroup.size(mr) ;

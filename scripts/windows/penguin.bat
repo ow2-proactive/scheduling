@@ -14,9 +14,8 @@ SETLOCAL
 call init.bat
 start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/one 
 start %JAVA_CMD% org.objectweb.proactive.StartNode //localhost/two
-pause
 
-%JAVA_CMD% org.objectweb.proactive.examples.penguin.AdvancedPenguinControler //localhost/one //localhost/two
+%JAVA_CMD% org.objectweb.proactive.examples.penguin.PenguinControler //localhost/one //localhost/two
 ENDLOCAL
 
 :end

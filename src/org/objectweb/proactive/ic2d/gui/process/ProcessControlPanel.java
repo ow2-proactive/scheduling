@@ -152,7 +152,6 @@ public class ProcessControlPanel extends javax.swing.JPanel {
     public void removeProcess(int index) {
       JVMProcessWrapper wrapper = (JVMProcessWrapper) processesList.remove(index);
       wrapper.stopProcess();
-      int n = processesList.size()-1;
       fireIntervalRemoved(this, index, index);
     }
 

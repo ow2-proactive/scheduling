@@ -1,6 +1,5 @@
 package migration.bench2;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
@@ -8,7 +7,7 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.Vector;
 
-public class Agent implements Active, Serializable {
+public class Agent implements Serializable {
 
   public static int MAXINTVALUE = 100;
   private int id;

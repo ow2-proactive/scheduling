@@ -1,10 +1,9 @@
 package test.samevmmigration;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ProActive;
 
-public class MobileObject implements Active {
+public class MobileObject {
 
   public MobileObject() {
 

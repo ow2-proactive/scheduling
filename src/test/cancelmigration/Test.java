@@ -1,12 +1,11 @@
 package test.cancelmigration;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   public Test() {
     System.out.println("Test constructor");

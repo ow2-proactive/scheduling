@@ -66,9 +66,6 @@ public class CertificateReader {
 		catch (Exception e) {
 			System.out.println("Usage : java CertificateReader mycertificate");
 		}
-		PrivateCertificate privateCertificate;
-		PublicCertificate publicCertificate;
-		CertificateIdentity certificateIdentity;
 		try {
 			FileInputStream fin = new FileInputStream(file_name);
 			ObjectInputStream in = new ObjectInputStream(fin);

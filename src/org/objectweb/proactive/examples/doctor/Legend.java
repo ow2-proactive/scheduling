@@ -54,10 +54,7 @@ public class Legend extends Dialog {
 
 
     public void update(Graphics g) {
-      Color bg = getBackground();
-
       FontMetrics fm = g.getFontMetrics();
-      int w = fm.stringWidth("Patient " + Office.MAX_PAT);
       int h = fm.getAscent();
 
       g.setColor(display.wellOn);

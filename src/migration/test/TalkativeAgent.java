@@ -1,6 +1,5 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.BufferedReader;
@@ -10,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.rmi.NotBoundException;
 
-public class TalkativeAgent implements Active, Serializable {
+public class TalkativeAgent implements Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
 

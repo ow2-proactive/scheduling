@@ -27,38 +27,33 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.core.event.RequestQueueEventListener;
 
-public interface RequestQueue  {
+public interface RequestQueue {
 
- 
   /**
    *   Returns an iterator over all the requests in the request queue. It is up to the programmer
    *   to protect himself against any change in the request queue while using this iterator.
    */
-    public java.util.Iterator iterator();
+  public java.util.Iterator iterator();
 
-    public  boolean isEmpty();
+  public boolean isEmpty();
 
+  public int size();
 
-    public  int size();
+  public boolean hasRequest(String s);
 
-
-    public boolean hasRequest(String s) ;
-  
-  
-    public  void clear(); 
+  public void clear();
 
   /**
    * Returns the oldest request from the queue or null if the queue is empty
    * Do not remove it from the queue
    * @return the oldest request or null
    */
-    public  Request getOldest();
-
+  public Request getOldest();
 
   /**
    * Returns the oldest request whose method name is s or null if no match
@@ -66,8 +61,7 @@ public interface RequestQueue  {
    * @param methodName the name of the method to look for
    * @return the oldest matching request or null
    */
-    public  Request getOldest(String methodName);
-
+  public Request getOldest(String methodName);
 
   /**
    * Returns the oldest request that matches the criteria defined by the given filter
@@ -75,17 +69,14 @@ public interface RequestQueue  {
    * @param requestFilter the filter accepting request on a given criteria
    * @return the oldest matching request or null
    */
-    public  Request getOldest(RequestFilter requestFilter);
-
+  public Request getOldest(RequestFilter requestFilter);
 
   /**
    * Removes the oldest request from the queue and returns it
    * Null is returned is the queue is empty
    * @return the oldest request or null
    */
-    public  Request removeOldest();
-    
-  
+  public Request removeOldest();
 
   /**
    * Removes the oldest request whose method name is s and returns it.
@@ -93,7 +84,7 @@ public interface RequestQueue  {
    * @param methodName the name of the method to look for
    * @return the oldest matching request or null
    */
-    public  Request removeOldest(String methodName);
+  public Request removeOldest(String methodName);
 
   /**
    * Removes the oldest request that matches the criteria defined by the given filter
@@ -101,21 +92,22 @@ public interface RequestQueue  {
    * @param requestFilter the filter accepting request on a given criteria
    * @return the oldest matching request or null
    */
-    public  Request removeOldest(RequestFilter requestFilter);
+  public Request removeOldest(RequestFilter requestFilter);
 
   /**
    * Returns the youngest request from the queue or null if the queue is empty
    * Do not remove it from the request line
    * @return the youngest request or null
    */
-    public  Request getYoungest();
+  public Request getYoungest();
+
   /**
    * Returns the youngest request whose method name is s or null if no match
    * Do not remove it from the request line
    * @param methodName the name of the method to look for
    * @return the youngest matching request or null
    */
-    public  Request getYoungest(String methodName);
+  public Request getYoungest(String methodName);
 
   /**
    * Returns the youngest request that matches the criteria defined by the given filter
@@ -123,16 +115,14 @@ public interface RequestQueue  {
    * @param requestFilter the filter accepting request on a given criteria
    * @return the youngest matching request or null
    */
-    public  Request getYoungest(RequestFilter requestFilter);
-
+  public Request getYoungest(RequestFilter requestFilter);
 
   /**
    * Removes the youngest request from the queue and returns it
    * Null is returned is the queue is empty
    * @return the youngest request or null
    */
-    public  Request removeYoungest();
-  
+  public Request removeYoungest();
 
   /**
    * Removes the youngest request whose method name is s and returns it.
@@ -140,7 +130,7 @@ public interface RequestQueue  {
    * @param methodName the name of the method to look for
    * @return the youngest matching request or null
    */
-    public  Request removeYoungest(String methodName);
+  public Request removeYoungest(String methodName);
 
   /**
    * Removes the youngest request that matches the criteria defined by the given filter
@@ -148,20 +138,20 @@ public interface RequestQueue  {
    * @param requestFilter the filter accepting request on a given criteria
    * @return the youngest matching request or null
    */
-    public  Request removeYoungest(RequestFilter requestFilter);
+  public Request removeYoungest(RequestFilter requestFilter);
+
   /**
    * Adds the given request to the end of the queue
    * @param request the request to add
    */
-    public  void add(Request request);
+  public void add(Request request);
 
   /**
    * Adds the given request to the front of the queue before all 
    * other request already in the queue
    * @param request the request to add
    */
-    public  void addToFront(Request request);
-
+  public void addToFront(Request request);
 
   /**
    * Processes all requests in the queue using  the given RequestProcessor.
@@ -169,9 +159,9 @@ public interface RequestQueue  {
    * processor return true.
    * @param processor the RequestProcessor to use
    */
-    public  void processRequests(RequestProcessor processor);
+  public void processRequests(RequestProcessor processor);
 
-    public void addRequestQueueEventListener(RequestQueueEventListener listener);
+  public void addRequestQueueEventListener(RequestQueueEventListener listener);
 
-    public void removeRequestQueueEventListener(RequestQueueEventListener listener);
+  public void removeRequestQueueEventListener(RequestQueueEventListener listener);
 }

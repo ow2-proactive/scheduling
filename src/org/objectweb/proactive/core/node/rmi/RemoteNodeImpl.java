@@ -84,7 +84,6 @@ public class RemoteNodeImpl extends java.rmi.server.UnicastRemoteObject implemen
     } catch (java.net.MalformedURLException e) {
       throw new java.rmi.RemoteException("Cannot bind in registry at "+url, e);
     }
-    //System.out.println ("ClassLoader is "+this.getClass().getClassLoader().getClass().getName());
   }
 
   //

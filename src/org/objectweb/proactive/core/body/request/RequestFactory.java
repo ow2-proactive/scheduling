@@ -30,7 +30,6 @@
 */ 
 package org.objectweb.proactive.core.body.request;
 
-import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.MethodCall;
 
@@ -51,6 +50,6 @@ public interface RequestFactory {
    * Creates a request object based on the given parameter
    * @return the newly created Request object.
    */
-  public Request createRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID);
+  public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID);
   
 }

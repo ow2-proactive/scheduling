@@ -75,7 +75,6 @@ public class NodeJini extends RemoteNodeImpl {
 
   public static void main(String[] args) {
     String url;
-    NodeJini myNode;
     // Try to guess localhost
     // First, let's find local host name
     if (args.length > 0)
@@ -84,8 +83,8 @@ public class NodeJini extends RemoteNodeImpl {
     System.out.println("The URL is " + url);
     try {
       //we use a join manager to renew leases
-      JoinManager joinMn = new JoinManager(new NodeJini(url), null, (ServiceID) null, null, new LeaseRenewalManager());
-      myNode = new NodeJini(url);
+      new JoinManager(new NodeJini(url), null, (ServiceID) null, null, new LeaseRenewalManager());
+      new NodeJini(url);
     } catch (Exception e) {
       System.err.println("Cannot instantiate Node - Fatal Error" + e.getMessage());
       e.printStackTrace();

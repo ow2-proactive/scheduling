@@ -215,7 +215,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     try {
       java.io.File fTmp = java.io.File.createTempFile("proactive-", "-" + host);
       String tmpDirPath = fTmp.getAbsolutePath();
-      System.out.println(">> TEMP directory = " + tmpDirPath);
+      //System.out.println(">> TEMP directory = " + tmpDirPath);
       return tmpDirPath;
     } catch (Exception e) {
       System.err.println("Cannot create the TEMP directory : " + e.toString());

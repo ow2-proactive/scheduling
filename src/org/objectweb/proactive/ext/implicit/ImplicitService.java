@@ -72,9 +72,6 @@ public class ImplicitService extends BlockingRequestQueueImpl implements Implici
    */
   public void forbid(String shortcut, String condition) throws InvalidAssociateDeclaration {
     java.lang.reflect.Method cond;
-    int index, size;
-    int number = 0;
-
     System.out.println("ImplicitBody: forbid() for " + shortcut);
 
     if (this.shortcuts == null) {
@@ -89,7 +86,6 @@ public class ImplicitService extends BlockingRequestQueueImpl implements Implici
     }
 
     //try {
-      Class[] argstype = new Class[0];
       //cond = body.getReifiedObject().getClass().getMethod(condition, argstype);
       cond = null;
     //} catch (NoSuchMethodException e) {

@@ -43,7 +43,7 @@ public interface Proxy {
    * @param c The MethodCall object corresponding to the method
    * @return The object returned by the method [wrapper class if it is a primitive or null if no return] 
    */
-  public abstract Object reify(MethodCall c) throws InvocationTargetException, IllegalAccessException;
+  public abstract Object reify(MethodCall c) throws Throwable;
 }
 
 

@@ -1,13 +1,12 @@
 package test.defaultnode;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   public static void main(String[] args) {
     // 	if (args.length<2)

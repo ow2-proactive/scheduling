@@ -1,6 +1,5 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -9,7 +8,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-public class SimpleAgent implements Active, Serializable {
+public class SimpleAgent implements Serializable {
 
   AgentForThread agent = null; //to test the equality between stubs
 

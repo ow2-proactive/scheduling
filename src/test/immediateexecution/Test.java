@@ -1,12 +1,11 @@
 package test.immediateexecution;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
 import java.util.Vector;
 
-public class Test implements Active {
+public class Test {
 
   public Test() {
 

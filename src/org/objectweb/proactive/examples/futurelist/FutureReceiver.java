@@ -142,7 +142,6 @@ public class FutureReceiver implements java.io.Serializable {
 
 
   public void waitAndDisplayAllFuture() {
-    Object tmp;
     if (futureList != null) {
       this.waitAllFuture();
       this.displayAllFutures();

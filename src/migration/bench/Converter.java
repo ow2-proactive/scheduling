@@ -1,8 +1,5 @@
 package migration.bench;
 
-import org.objectweb.proactive.Active;
-import org.objectweb.proactive.ProActive;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,7 +10,9 @@ import java.io.ObjectOutputStream;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipOutputStream;
 
-public class Converter extends Object implements Active {
+import org.objectweb.proactive.ProActive;
+
+public class Converter {
 
   public void echo() {
     System.out.println("Ta mere");
@@ -42,9 +41,7 @@ public class Converter extends Object implements Active {
   public char[] getLocalFileWithoutCompression(String fileName) {
     StringBuffer total = new StringBuffer();
     String s;
-    int i = 0;
     File theInputFile = findFile(fileName);
-    SearchResult theBigResult = new SearchResult();
 
     // Aborts if no input file
     if (theInputFile == null) {
@@ -83,9 +80,7 @@ public class Converter extends Object implements Active {
   public byte[] getLocalFile(String fileName) {
     StringBuffer total = new StringBuffer();
     String s;
-    int i = 0;
     File theInputFile = findFile(fileName);
-    SearchResult theBigResult = new SearchResult();
 
     // Aborts if no input file
     if (theInputFile == null) {
@@ -95,10 +90,7 @@ public class Converter extends Object implements Active {
 
     // Gets an input stream
     FileReader fr;
-    FileInputStream fi;
     BufferedReader br;
-    ZipOutputStream zip;
-    ByteArrayOutputStream bytes = null;
     ByteArrayOutputStream byteArrayOutputStream = null;
     try {
       fr = new FileReader(theInputFile);

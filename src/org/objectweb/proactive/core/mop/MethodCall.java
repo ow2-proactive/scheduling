@@ -229,10 +229,6 @@ public final class MethodCall implements java.io.Serializable {
       return reifiedMethod.invoke(targetObject, effectiveArguments);
     } catch (IllegalAccessException e) {
       throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
-    } catch (IllegalArgumentException e) {
-      throw new MethodCallExecutionFailedException("Illegal method arguments: " + e);
-    } catch (ExceptionInInitializerError e) {
-      throw new MethodCallExecutionFailedException("Cannot invoke method because it triggered the initialization of a class that failed: " + e);
     }
   }
 

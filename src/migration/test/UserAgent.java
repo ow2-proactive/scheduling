@@ -1,6 +1,5 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 //import org.objectweb.proactive.ext.migration.Destination;
@@ -8,7 +7,7 @@ import org.objectweb.proactive.ext.migration.MigrationStrategyManager;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.body.migration.Migratable;
 
-public class UserAgent implements Active, java.io.Serializable {
+public class UserAgent implements java.io.Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
   MigrationStrategyManager migrationStrategyManager;

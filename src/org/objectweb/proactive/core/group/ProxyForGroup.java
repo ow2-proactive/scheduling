@@ -131,7 +131,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
     /*                          */
     
     /** The proxy's method, implements the semantic of communication */
-    public Object reify (MethodCall c) throws InvocationTargetException {
+    public Object reify (MethodCall c) throws Throwable {
 
 	/* result will be a stub on a proxy for group representing the group of results */
 	Object result = null;
@@ -157,23 +157,16 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
     /**
      * Create and initialize (and return) the group of result, then launch threads for asynchronous call of each member
      */
-    protected Object asynchronousCallOnGroup(MethodCall c) {
+    protected Object asynchronousCallOnGroup(MethodCall c) throws Throwable {
 	Object result;
 	int size = memberListProxy.size();
 	/* Creates a stub + ProxyForGroup for representing the result */
-	try
-	    {
 		Object[] paramProxy = new Object[0];
 		result = MOP.newInstance (c.getReifiedMethod().getReturnType().getName(),
 					  null,
 					  "org.objectweb.proactive.core.group.ProxyForGroup",
 					  paramProxy);
 		((ProxyForGroup)((StubObject)result).getProxy()).className = c.getReifiedMethod().getReturnType().getName();
-	    }
-	catch (Exception e) {
-	    e.printStackTrace();
-	    return null;
-	}
 	
 	// Init the lists of result with null value to permit the "set(index)" operation
 	List memberListStubOfResult  = ((ProxyForGroup)((StubObject)result).getProxy()).memberListStub;
@@ -525,7 +518,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		Object tmp = ((Proxy)(listOfFather.get(index))).reify(mc);
 		addToListOfResult(listOfResultProxy,listOfResultStub,tmp,index);
 		
-	    } catch (Exception e) {
+	    } catch (Throwable e) {
 		e.printStackTrace();
 	    }
 	}
@@ -552,7 +545,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		
 		((Proxy)(listOfFather.get(index))).reify(mc);
 		
-	    } catch (Exception e) {
+	    } catch (Throwable e) {
 		e.printStackTrace();
 	    }
 	}

@@ -105,7 +105,7 @@ public class ActiveDisplay implements ConsumerProducerListener {
 
 
   public void toggleCons() {
-    applet.displayMessage("toggle Consumer");
+    applet.receiveMessage("toggle Consumer");
     consumer.toggle();
   }
 
@@ -130,7 +130,7 @@ public class ActiveDisplay implements ConsumerProducerListener {
   // -- implements ConsumerProducerListener ----------------------------------------------------------------------
   // 
   public void displayMessage(String msg) {
-    applet.displayMessage(msg);
+    applet.receiveMessage(msg);
   }
 
 

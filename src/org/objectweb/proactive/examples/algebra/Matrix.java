@@ -347,7 +347,7 @@ public class Matrix implements java.io.Serializable {
 
   public Matrix getInverse() {
     Matrix source, result;
-    int i, j, p, r, s, a, b;
+    int i, p, r, s;
     double alpha,beta, gamma;
 
     source = new Matrix(this);

@@ -58,7 +58,7 @@ public class Producer extends ConsumerProducer {
     } else {
       if (wasSuspended)
         listener.producerStartRunning();
-      String str = buffer.put(new String("@" + (int)(Math.random() * 100)));
+      buffer.put(new String("@" + (int)(Math.random() * 100)));
       // The call is synchronous as String is final
     }
   }

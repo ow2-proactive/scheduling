@@ -1,12 +1,11 @@
 package test.asynchronouscreation;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
 
 import java.util.Random;
 
-public class Test implements Active {
+public class Test {
 
   private Integer[] tablo;
 

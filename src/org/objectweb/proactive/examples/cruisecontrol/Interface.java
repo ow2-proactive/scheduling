@@ -131,7 +131,7 @@ public class Interface {
   ///////////////////////////////////////////////////////////////////
 
   public void displayMessage(String msg) {
-    applet.displayMessage(msg);
+    applet.receiveMessage(msg);
   }
 
 

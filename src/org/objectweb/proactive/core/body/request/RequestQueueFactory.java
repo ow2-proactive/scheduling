@@ -28,30 +28,28 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive;
+package org.objectweb.proactive.core.body.request;
+
+import org.objectweb.proactive.core.UniqueID;
 
 /**
- * The root of all interfaces that declare an active object behavior. If a reifiable
- * class implements this interface, any of its reified instances will by default use
- * a BodyProxy proxy and an Body body. It is the responsibily of interfaces
- * extending Active to override PROXY_CLASS_NAME and BODY_CLASS_NAME
+ * <p>
+ * A class implementing this interface is a factory of RequestQueue objects.
+ * It is able to create RequestQueue tailored for a particular purpose.
+ * </p>
  *
  * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
+ * @version 1.0,  2002/05
+ * @since   ProActive 0.9.2
+ *
  */
-public interface Active extends org.objectweb.proactive.core.mop.Reflect {
+public interface RequestQueueFactory {
 
-    /**
-     *   The name of the default proxy class used for reified instances of classes
-     *   implementing Active.
-     */
-    public static String PROXY_CLASS_NAME = org.objectweb.proactive.core.Constants.DEFAULT_BODY_PROXY_CLASS_NAME;
-
-
-    /**
-     *   The name of the default body class used for active instances of classes
-     *   implementing Active.
-     */
-    public static String BODY_CLASS_NAME = org.objectweb.proactive.core.Constants.DEFAULT_BODY_CLASS_NAME;
+  /**
+   * Creates or reuses a RequestQueue object 
+   * @param the unique id of the object that request queue is owned by
+   * @return the newly created or already existing RequestQueue object.
+   */
+  public BlockingRequestQueue newRequestQueue(UniqueID ownerID);
+  
 }

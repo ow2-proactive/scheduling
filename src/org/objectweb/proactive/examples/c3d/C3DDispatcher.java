@@ -30,14 +30,6 @@
 */ 
 package org.objectweb.proactive.examples.c3d;
 
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.examples.c3d.geom.Vec;
-import org.objectweb.proactive.examples.c3d.prim.Primitive;
-import org.objectweb.proactive.examples.c3d.prim.Sphere;
-
 import java.awt.Button;
 import java.awt.Color;
 import java.awt.Font;
@@ -66,6 +58,15 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Stack;
+
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.examples.c3d.C3DDispatcher.C3DDispatcherFrame.MyWindowListener;
+import org.objectweb.proactive.examples.c3d.geom.Vec;
+import org.objectweb.proactive.examples.c3d.prim.Primitive;
+import org.objectweb.proactive.examples.c3d.prim.Sphere;
 
 /**
  * This class decouples the set of user frames from the set of rendering
@@ -861,15 +862,12 @@ public class C3DDispatcher {
      */
         
     // Updates the remote h_users
-    int i;
-    User oldUser;
     for (Enumeration e = h_users.keys(); e.hasMoreElements();) {
-      i = ((Integer)e.nextElement()).intValue();
-      oldUser = ((User)h_users.get(new Integer(i)));
+      int i = ((Integer)e.nextElement()).intValue();
+      User oldUser = ((User)h_users.get(new Integer(i)));
       if (i != i_lastuser) {
         // Inform the old users
-        oldUser.getObject().informNewUser(i_lastuser, s_name);
-	
+        oldUser.getObject().informNewUser(i_lastuser, s_name);	
         // Inform the new user
         newUser.getObject().informNewUser(i, oldUser.getName());
       }
@@ -912,7 +910,7 @@ public class C3DDispatcher {
       // Performs pings on the remote engines
       int engPingTotal = 0;
       for (int n = 0; n < engines; n++) {
-        for (i = 1; i < max; i++) {
+        for (int i = 1; i < max; i++) {
           engPingTotal++;
           start = System.currentTimeMillis();
           if (engine[n].ping() == 1) {
@@ -963,16 +961,13 @@ public class C3DDispatcher {
       li_users.remove(nameOfUser(number) + " (" + number + ")");
     } catch (Exception ex) {
     }
-
     h_users.remove(new Integer(number));
-
     if (h_users.isEmpty()) {
-      h_engines.clear();
-      li_enginesUsed.removeAll();
-      li_enginesAvailable.removeAll();
+      //h_engines.clear();
+      //li_enginesUsed.removeAll();
+      //li_enginesAvailable.removeAll();
       int_stack.removeAllElements();
       i_lastuser = 0;
-
     }
   }
 

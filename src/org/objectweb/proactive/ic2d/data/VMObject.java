@@ -340,7 +340,7 @@ public class VMObject extends AbstractDataObject {
   
     public void activeObjectChanged(UniqueID id, boolean isActive, boolean isAlive) {
       ActiveObject object = findActiveObject(id);
-      System.out.println("activeObjectChanged object="+object.getName()+" isActive="+isActive);
+      //System.out.println("activeObjectChanged object="+object.getName()+" isActive="+isActive);
       if (object == null) return;
       if (! isAlive) {
         object.destroyObject();

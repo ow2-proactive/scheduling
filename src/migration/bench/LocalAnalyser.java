@@ -21,11 +21,9 @@ public class LocalAnalyser extends Object {
     char result[] = {};
 
     byte zippedResult[] = {};
-    byte unzippedResult[] = {};
     ByteArrayInputStream in = null;
 
     String resultString;
-    SearchResult finalResult;
 
     long startTime;
     long executionTime = 0;
@@ -37,17 +35,14 @@ public class LocalAnalyser extends Object {
     try {
       //First we get the reference on the converter
       Converter converter = (Converter)ProActive.lookupActive("migration.bench.Converter", args[0]);
-      Object temp;
 
       startTime = System.currentTimeMillis();
 
       if (COMPRESSION) {
         zippedResult = converter.getLocalFile(args[1]);
         in = new ByteArrayInputStream(zippedResult);
-
         ObjectInputStream objectIn = new ObjectInputStream(new InflaterInputStream(in));
-
-        temp = objectIn.readObject();
+        Object temp = objectIn.readObject();
         objectIn.close();
       } else {
         result = converter.getLocalFileWithoutCompression(args[1]);
@@ -56,9 +51,7 @@ public class LocalAnalyser extends Object {
  
       //now we unzip it
       resultString = new String(result);
-
-      finalResult = DataBase.searchInString(resultString, args[2]);
-
+      SearchResult finalResult = DataBase.searchInString(resultString, args[2]);
       executionTime = System.currentTimeMillis() - startTime;
       Calendar rightNow = Calendar.getInstance();
       System.out.println("Bench over at " + rightNow.getTime());

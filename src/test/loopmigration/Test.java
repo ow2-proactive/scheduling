@@ -1,15 +1,11 @@
 package test.loopmigration;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.Active;
-import org.objectweb.proactive.ext.locationserver.ActiveWithLocationServer;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.BodyWithLocationServer;
 import java.io.Serializable;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   private String[] destinations;
   int index;

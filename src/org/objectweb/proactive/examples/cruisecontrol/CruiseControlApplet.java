@@ -39,7 +39,7 @@ package org.objectweb.proactive.examples.cruisecontrol;
  * recieve the user interaction on the 2 panes and send the corresponding messages to the Interface Dispatcher
  *
  */
-public class CruiseControlApplet extends org.objectweb.proactive.examples.AppletWrapper {
+public class CruiseControlApplet extends org.objectweb.proactive.examples.StandardFrame {
 
   // components
   /**
@@ -62,7 +62,7 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Applet
 
 
   public static void main(String arg[]) {
-    CruiseControlApplet applet = new CruiseControlApplet("Cruise Control", 840, 420);
+    new CruiseControlApplet("Cruise Control", 840, 420);
   }
 
 
@@ -74,7 +74,7 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Applet
    *
    * then creates the object Interface
    */
-  public void init() {
+  public void start() {
     Interface inter;
     try {
       inter = new Interface(this);

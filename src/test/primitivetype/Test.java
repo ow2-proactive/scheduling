@@ -1,10 +1,9 @@
 package test.primitivetype;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
 
-public class Test implements Active {
+public class Test {
 
   public Test() {
   }

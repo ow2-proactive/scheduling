@@ -67,10 +67,7 @@ public class JiniNodeFactory extends NodeFactory {
       System.setSecurityManager(new java.rmi.RMISecurityManager());
     }
     random = new java.util.Random(System.currentTimeMillis());
-    //System.out.println("------------------------ JiniNodeFactory ------------------------");
     serviceLocatorHelper.initializeServiceLocator();
-
-    System.out.println ("ClassLoader is "+this.getClass().getClassLoader().getClass().getName());
   }
 
 

@@ -1,6 +1,5 @@
 package test.serialization;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 
@@ -9,7 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Vector;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   Vector v = new Vector();
   transient java.io.ObjectOutputStream oos;

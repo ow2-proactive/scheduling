@@ -1,12 +1,11 @@
 package test.remotecreation;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Test implements Active, Serializable {
+public class Test implements Serializable {
 
   public Test() {
 

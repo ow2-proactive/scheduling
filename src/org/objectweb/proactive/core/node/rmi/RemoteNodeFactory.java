@@ -57,9 +57,7 @@ public class RemoteNodeFactory extends NodeFactory {
       System.setSecurityManager(new java.rmi.RMISecurityManager());
     }
     random = new java.util.Random(System.currentTimeMillis());
-    System.out.println("------------------------ RemoteNodeFactory ------------------------");
     registryHelper.initializeRegistry();
-    System.out.println ("ClassLoader is "+this.getClass().getClassLoader().getClass().getName());
   }
 
 

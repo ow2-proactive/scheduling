@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.hello;
 
 import org.objectweb.proactive.ProActive;
 
-public class HelloApplet extends org.objectweb.proactive.examples.AppletWrapper {
+public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame {
 
   /** The active Hello object */
   private Hello activeHello;
@@ -72,18 +72,18 @@ public class HelloApplet extends org.objectweb.proactive.examples.AppletWrapper 
 
 
   public void start() {
-    displayMessage("Applet creating active objects");
-    displayMessage("on node "+(node == null ? "local" : node.getNodeInformation().getURL()));
+    receiveMessage("Applet creating active objects");
+    receiveMessage("on node "+(node == null ? "local" : node.getNodeInformation().getURL()));
     try {
       activeHello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), null, node);
     } catch (Exception e) {
       // There has been a problem...
-      displayMessage("Error while initializing");
+      receiveMessage("Error while initializing");
       lMessage.setText("Error... Did you set the security attributes?");
       e.printStackTrace(); // Print the exception to stderr
       return;
     }
-    displayMessage("Ok");
+    receiveMessage("Ok");
     Thread t = new Thread(new HelloTimer(), "Hello clock");
     t.start();
   }

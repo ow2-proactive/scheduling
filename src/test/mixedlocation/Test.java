@@ -2,11 +2,11 @@ package test.mixedlocation;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ext.mixedlocation.ActiveWithMixedLocation;
+import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 
 import java.io.Serializable;
 
-public class Test implements ActiveWithMixedLocation, Serializable {
+public class Test implements Serializable {
 
     protected int index;
 
@@ -36,8 +36,8 @@ public class Test implements ActiveWithMixedLocation, Serializable {
         arg[0] = args;
 
         try {
-            t = (Test) ProActive.newActive(Test.class.getName(), null);
-            s = (Source) ProActive.newActive(Source.class.getName(), arg);
+            t = (Test) ProActive.newActive(Test.class.getName(), null, MixedLocationMetaObjectFactory.newInstance(), null);
+            s = (Source) ProActive.newActive(Source.class.getName(), arg, MixedLocationMetaObjectFactory.newInstance(), null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,7 +45,7 @@ public class Test implements ActiveWithMixedLocation, Serializable {
         s.start(args[0]);
     }
 
-    public static class Source implements ActiveWithMixedLocation {
+    public static class Source {
 
         protected Test t;
         protected String[] destinations;

@@ -53,8 +53,6 @@ public class Main {
 
   public void doStuff() {
     BinaryTree myTree = null;
-    Object value;
-
     // This is the code for instanciating a passive version of the binary tree
     //        myTree = new BinaryTree ();
 

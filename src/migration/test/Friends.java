@@ -1,11 +1,10 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class Friends implements Active, Serializable {
+public class Friends implements Serializable {
 
   public Friends friend = null;
 

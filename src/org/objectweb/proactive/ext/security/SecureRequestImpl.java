@@ -171,7 +171,6 @@ public class SecureRequestImpl extends RequestImpl implements SecureRequest {
 	//
 	
 	protected Object serveInternal(Body targetBody) throws ServeException {
-	  Object result = null;
     try {
       decrypt((SecureBody) targetBody);
       checkSignature((SecureBody) targetBody);

@@ -1,11 +1,10 @@
 package migration.test;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
 import java.io.Serializable;
 
-public class RegisteredAgent implements Active, Serializable {
+public class RegisteredAgent implements Serializable {
 
   int etape = 0; // this is to count the jumps we have made so far
   public RegisteredAgent friend;

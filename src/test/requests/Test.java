@@ -1,9 +1,8 @@
 package test.requests;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
-public class Test implements Active {
+public class Test {
 
   private int counter = 0;
 

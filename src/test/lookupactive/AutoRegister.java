@@ -1,9 +1,8 @@
 package test.lookupactive;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
-public class AutoRegister implements Active {
+public class AutoRegister {
 
   public AutoRegister() {
 

@@ -72,7 +72,7 @@ public class MigrationStrategyImpl implements java.io.Serializable, MigrationStr
     }
     // on ouvre un "lecteur" sur ce fichier
     java.io.BufferedReader _in = new java.io.BufferedReader(f_in);
-	
+
     // on lit a partir de ce fichier
     // NB : a priori on ne sait pas combien de lignes on va lire !!
     try {
@@ -83,7 +83,7 @@ public class MigrationStrategyImpl implements java.io.Serializable, MigrationStr
         java.util.StringTokenizer tokens = new java.util.StringTokenizer(s, " ");
         this.add(new NodeDestination(new String(tokens.nextToken()), tokens.nextToken()));
       }
-    }// catch (IOException e) {} 
+    }// catch (IOException e) {}
     catch (Exception e) {
     }
 
@@ -105,6 +105,26 @@ public class MigrationStrategyImpl implements java.io.Serializable, MigrationStr
     table.addElement(new NodeDestination(nodeURL, method));
   }
 
+  /**
+  * Adds a Destination for the next migration
+  *
+  */
+  public void addNext(Destination r) {
+    if (index == -1 || index==table.size()-1)
+table.addElement(r);
+    else
+table.add(index+1,r);
+
+  }
+
+
+  public void addNext(String nodeURL, String method) {
+    if (index == -1 || index==table.size()-1)
+table.addElement(new NodeDestination(nodeURL, method));
+    else table.add(index+1,new NodeDestination(nodeURL, method));
+
+  }
+
 
   public void remove(String nodeURL, String method) {
     removeFromItinerary(new NodeDestination(nodeURL, method));
@@ -117,7 +137,7 @@ public class MigrationStrategyImpl implements java.io.Serializable, MigrationStr
 
   //Maybe we should return something
   private void removeFromItinerary(Destination r) {
-    //	System.out.println("MigrationStrategyImpl: removeFromItinerary() the result is " + table.removeElement(r));
+    //System.out.println("MigrationStrategyImpl: removeFromItinerary() the result is " + table.removeElement(r));
     int i = 0;
     Destination r2;
     while (i < table.size()) {

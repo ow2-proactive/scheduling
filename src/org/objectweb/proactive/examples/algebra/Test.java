@@ -39,7 +39,7 @@ public class Test extends Object {
       m = Integer.decode(args[0]).intValue();
 
     Matrix m0, m1, m2;
-    Vector v0, v1, v2, v3;
+    Vector v0, v1, v2;
     
     // Creates and randomly fills in both matrix and vector
     m0 = new Matrix(n, n);
@@ -64,7 +64,7 @@ public class Test extends Object {
       v1 = m1.rightProduct(v0);
       v2 = m2.rightProduct(v0);    
       // Creates result vector
-      v3 = v1.concat(v2);
+      v1.concat(v2);
       long end = System.currentTimeMillis();
       ;
 

@@ -42,7 +42,7 @@ package org.objectweb.proactive.examples.boundedbuffer;
  * @since   ProActive 0.9
  *
  */
-public class AppletBuffer extends org.objectweb.proactive.examples.AppletWrapper {
+public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame {
 
   /**
    * The graphic panes
@@ -56,22 +56,12 @@ public class AppletBuffer extends org.objectweb.proactive.examples.AppletWrapper
 
   public AppletBuffer(String name, int width, int height) {
     super(name, width, height);
+    this.max = 7;
   }
 
 
   public static void main(String args[]) {
-    AppletBuffer ab = new AppletBuffer("Bounded Buffer", 500, 300);
-  }
-
-
-  public void init() {
-    String Max = null;
-    if (isApplet)
-      Max = getParameter("MAX");
-    if (Max == null)
-      max = 7;
-    else
-      max = Integer.parseInt(Max);
+    new AppletBuffer("Bounded Buffer", 500, 300);
   }
 
 
@@ -80,7 +70,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.AppletWrapper
     cells[0].setOut(true);
     try {
       display = (ActiveDisplay)org.objectweb.proactive.ProActive.turnActive(new ActiveDisplay(max, this));
-      displayMessage("ActiveDisplay created : " + display.getClass().getName());
+      receiveMessage("ActiveDisplay created : " + display.getClass().getName());
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -88,13 +78,8 @@ public class AppletBuffer extends org.objectweb.proactive.examples.AppletWrapper
   }
 
 
-  public void stop() {
-    display.done();
-  }
-
-
   public void kill() {
-    stop();
+    display.done();
   }
 
 
@@ -120,25 +105,25 @@ public class AppletBuffer extends org.objectweb.proactive.examples.AppletWrapper
 
 
   public void consumerStartRunning() {
-    displayMessage("consumer now start running");
+    receiveMessage("consumer now start running");
     bCons.setText("Stop");
   }
 
 
   public void consumerStopRunning() {
-    displayMessage("consumer now stop running");
+    receiveMessage("consumer now stop running");
     bCons.setText("Start");
   }
 
 
   public void producerStartRunning() {
-    displayMessage("producer now start running");
+    receiveMessage("producer now start running");
     bProd.setText("Stop");
   }
 
 
   public void producerStopRunning() {
-    displayMessage("producer now stop running");
+    receiveMessage("producer now stop running");
     bProd.setText("Start");
   }
 

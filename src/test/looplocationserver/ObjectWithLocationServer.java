@@ -1,23 +1,16 @@
 package test.looplocationserver;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ext.locationserver.ActiveWithLocationServer;
-import org.objectweb.proactive.ext.locationserver.LocationServer;
-import org.objectweb.proactive.ext.locationserver.BodyWithLocationServer;
+import org.objectweb.proactive.ProActive;
 
-import java.io.Serializable;
+public class ObjectWithLocationServer implements java.io.Serializable {
 
-public class ObjectWithLocationServer implements ActiveWithLocationServer, Serializable {
-  
   private String[] destinations;
   int index;
 
-  public ObjectWithLocationServer() {
+  public ObjectWithLocationServer() {}
 
-  }
-
-    public ObjectWithLocationServer(String[] s) {  
+  public ObjectWithLocationServer(String[] s) {
     this.destinations = s;
     this.index = 0;
   }
@@ -30,7 +23,7 @@ public class ObjectWithLocationServer implements ActiveWithLocationServer, Seria
     }
   }
 
-    public void live(Body body) {
+  public void live(Body body) {
     try {
       while (body.isActive()) {
         if (index < destinations.length) {
@@ -43,15 +36,13 @@ public class ObjectWithLocationServer implements ActiveWithLocationServer, Seria
           } catch (Exception e) {
             e.printStackTrace();
           }
-          index = 0;     
+          index = 0;
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
-
-
 
   public void echo() {
     System.out.println("------------------ I am here");

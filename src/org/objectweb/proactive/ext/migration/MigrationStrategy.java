@@ -36,6 +36,10 @@ public interface MigrationStrategy {
 
   public void add(String nodeURL, String method);
 
+  public void addNext(Destination d);
+
+  public void addNext(String nodeURL, String method);
+
   public void remove(Destination d);
 
   public void remove(String nodeURL, String method);

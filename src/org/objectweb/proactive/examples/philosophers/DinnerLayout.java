@@ -37,7 +37,7 @@ import org.objectweb.proactive.ObjectForSynchronousCall;
  * This class acts as a wrapper for the ui.
  * It is there also that the active objects are initialized.
  */
-public class DinnerLayout implements org.objectweb.proactive.Active {
+public class DinnerLayout {
 
   /**
    * Reference to the philosopher's stub in order to dispatch messages from the UI
@@ -301,9 +301,6 @@ public class DinnerLayout implements org.objectweb.proactive.Active {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       Object source = e.getSource();
-
-      int index = 0;
-
       if (source == bAuto) {
         if (!autopilot) {
           bAuto.setText("Manual");

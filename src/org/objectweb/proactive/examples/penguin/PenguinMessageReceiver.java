@@ -30,17 +30,6 @@
 */ 
 package org.objectweb.proactive.examples.penguin;
 
-/**
- *   The root of all interfaces that declare an active object behavior. If a reifiable
- *   class implements this interface, any of its reified instances will by default use
- *   a BodyProxy proxy and an Body body. It is the responsibily of interfaces
- *   extending Active to override PROXY_CLASS_NAME and BODY_CLASS_NAME
- */
-public interface ActivePenguin extends org.objectweb.proactive.Active {
-
-  /**
-   *   The name of the default body class used for active instances of classes
-   *   implementing ActiveCompagnon.
-   */
-  public static String BODY_CLASS_NAME = "org.objectweb.proactive.ext.locationserver.BodyWithLocationServer";
+public interface PenguinMessageReceiver {
+  public void receiveMessage(String s);
 }

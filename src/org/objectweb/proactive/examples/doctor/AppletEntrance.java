@@ -44,7 +44,7 @@ package org.objectweb.proactive.examples.doctor;
  * @since   ProActive 0.9
  *
  */
-public class AppletEntrance extends org.objectweb.proactive.examples.AppletWrapper {
+public class AppletEntrance extends org.objectweb.proactive.examples.StandardFrame {
 
   public AppletEntrance(String name, int width, int height) {
     super(name, width, height);
@@ -52,17 +52,16 @@ public class AppletEntrance extends org.objectweb.proactive.examples.AppletWrapp
 
 
   public static void main(String arg[]) {
-    AppletEntrance applet = new AppletEntrance("The salishan problems", 600, 300);
+    new AppletEntrance("The salishan problems", 600, 300);
   }
 
 
   public void start() {
-    displayMessage("Please wait while initializing remote objects");
+    receiveMessage("Please wait while initializing remote objects");
     try {
       Office off = (Office)org.objectweb.proactive.ProActive.newActive(Office.class.getName(), new Object[]{new Integer(0)});
-      Object params[] = {off};
       Receptionnist recept = (Receptionnist)org.objectweb.proactive.ProActive.newActive(Receptionnist.class.getName(), new Object[]{off});
-      displayMessage("The doctors' office is open!");
+      receiveMessage("The doctors' office is open!");
       off.init(off, recept);
     } catch (Exception e) {
       e.printStackTrace();

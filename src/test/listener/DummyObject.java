@@ -1,13 +1,6 @@
 package test.listener;
 
-import org.objectweb.proactive.Active;
-
-public class DummyObject implements Active {
-
-  public DummyObject() {
-
-  }
-
+public class DummyObject {
 
   public Object getObject() {
     try {

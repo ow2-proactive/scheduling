@@ -1,9 +1,8 @@
 package test.lookupactive;
 
-import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ProActive;
 
-public class Test implements Active {
+public class Test {
 
   public Test() {
 

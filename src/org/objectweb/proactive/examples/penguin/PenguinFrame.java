@@ -38,7 +38,7 @@ public class PenguinFrame extends javax.swing.JFrame {
 
 
   public PenguinFrame(javax.swing.ImageIcon f, String location, int index) {
-    super("Compagnon " + index);
+    super("Agent " + index);
     imagePanel = buildImagePanel(f);
     this.addWindowListener(new java.awt.event.WindowAdapter() {
       public void windowClosing(java.awt.event.WindowEvent e) {
