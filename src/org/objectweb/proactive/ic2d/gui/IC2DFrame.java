@@ -1,3 +1,5 @@
+
+
 /* 
 * ################################################################
 * 
@@ -33,15 +35,22 @@ package org.objectweb.proactive.ic2d.gui;
 import org.objectweb.proactive.ic2d.IC2D;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
 import org.objectweb.proactive.ic2d.util.ActiveObjectFilter;
+import org.objectweb.proactive.ic2d.gui.ActiveObjectCommunicationRecorder;
+import org.objectweb.proactive.ic2d.gui.EventListsPanel;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.gui.Legend;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.IC2DObjectListener;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.gui.process.FileChooser;
 import org.objectweb.proactive.ic2d.gui.process.ProcessControlFrame;
+import org.objectweb.proactive.ic2d.gui.process.GlobusProcessControlFrame;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.ic2d.gui.util.DialogUtils;
+import org.objectweb.proactive.core.process.ExternalProcess;   
 
 public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener {
 
@@ -58,7 +67,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
   private EventListsPanel eventListsPanel;
   private javax.swing.JFrame eventListsFrame;
   private javax.swing.JFrame processesFrame;
-  
+  private javax.swing.JFrame globusProcessFrame;  
+  private javax.swing.JFrame fileChooserFrame;  
+  private  ExternalProcess  externalProcess;
   
   //
   // -- CONTRUCTORS -----------------------------------------------
@@ -105,6 +116,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     setVisible(true);
     eventListsFrame = createEventListFrame(eventListsPanel);
     processesFrame = createProcessesFrame();
+    fileChooserFrame = createFileChooserFrame();
+
+
     logger.log("IC2D ready !");
   }
   
@@ -206,7 +220,31 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     });
     return frame;
   }
-  
+
+  private javax.swing.JFrame createFileChooserFrame() {
+    final javax.swing.JFrame frame = new FileChooser(externalProcess);
+    //frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
+    // Listeners
+    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      public void windowClosing(java.awt.event.WindowEvent e) {
+        frame.setVisible(! frame.isVisible());
+      }
+    });
+    return frame;
+  }
+
+
+  private javax.swing.JFrame createGlobusProcessFrame() {
+    final javax.swing.JFrame frame = new GlobusProcessControlFrame(externalProcess);
+    //frame.setLocation(new java.awt.Point(DEFAULT_WIDTH, 0));
+    // Listeners
+    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+      public void windowClosing(java.awt.event.WindowEvent e) {
+        frame.setVisible(! frame.isVisible());
+      }
+    });
+    return frame;
+  }
   
   
   private javax.swing.JMenuBar createMenuBar() {
@@ -258,24 +296,24 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
 	});
       monitoringMenu.add(b);
     }
-
     
     monitoringMenu.addSeparator();
     
     // Add new GLOBUS host 
-    /*
+   
     {
     javax.swing.JMenuItem b = new javax.swing.JMenuItem("Monitor new GLOBUS host");
     b.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          DialogUtils.openNewGlobusHostDialog(IC2DFrame.this, ic2dObject.getWorldObject(), logger);
+          DialogUtils.openNewGlobusHostDialog((java.awt.Component) IC2DFrame.this, ic2dObject.getWorldObject(), logger);
         }
       });
-    b.setEnabled((options & IC2D.GLOBUS) != 0);
-    monitoringMenu.add(b);
+    	//b.setEnabled((options & IC2D.GLOBUS) != 0);
+    	monitoringMenu.add(b);
     }
+
     monitoringMenu.addSeparator();
-    */
+   
     
     // Edit the filter list
     {
@@ -360,6 +398,7 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
       });
     windowMenu.add(b);
     }
+
     {
     javax.swing.JMenuItem b = new javax.swing.JMenuItem("Hide/Show Processes windows");
     b.addActionListener(new java.awt.event.ActionListener() {
@@ -373,7 +412,44 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
       });
     windowMenu.add(b);
     }
+
     menuBar.add(windowMenu);
+
+    //
+    // Globus
+    //
+    javax.swing.JMenu globusMenu = new javax.swing.JMenu("Globus");
+    {
+	javax.swing.JMenuItem b = new javax.swing.JMenuItem("Start a new Node with Globus");
+	b.addActionListener(new java.awt.event.ActionListener() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+		if (fileChooserFrame.isVisible()) {
+		    fileChooserFrame.hide();
+		} else {
+		    fileChooserFrame.show();
+		}
+	    }
+	});
+	globusMenu.add(b);
+    }
+    
+    {
+	javax.swing.JMenuItem b = new javax.swing.JMenuItem("Hide/Show Globus Process Frame");
+	b.addActionListener(new java.awt.event.ActionListener() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+		if (((FileChooser)fileChooserFrame).ready()){
+		    ((FileChooser)fileChooserFrame).changeVisibilityGlobusProcessFrame();
+		}
+		else {
+		    logger.log("Please select the deployment file with the file chooser in the window menu!");
+		}
+	    }
+	});
+	globusMenu.add(b);
+    }
+    
+    menuBar.add(globusMenu);
+ 
 
     return menuBar;
   }
