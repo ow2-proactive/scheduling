@@ -45,10 +45,13 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -114,7 +117,25 @@ public class ProActiveContentController extends ProActiveController
     }
 
     public boolean isSubComponent(Component component) {
-        return fcSubComponents.contains(component);
+        // parse list and see if the given component has an equivalent
+        Iterator it = fcSubComponents.iterator();
+        ProActiveComponent current;
+        Group group = null;
+        if (ProActiveGroup.isGroup(component)) {
+            group = ProActiveGroup.getGroup(component);
+        }
+        while (it.hasNext()) {
+            current = (ProActiveComponent) it.next();
+            if (current.equals(component)) {
+                return true;
+            }
+            if ((group != null) && ProActiveGroup.isGroup(current)) {
+                if (ProActiveGroup.getGroup(current).equals(group)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -125,7 +146,7 @@ public class ProActiveContentController extends ProActiveController
         checkLifeCycleIsStopped();
 
         // check whether the subComponent is the component itself
-        if (getFcItfOwner().equals((ProActiveComponent) subComponent)) {
+        if (getFcItfOwner().equals(subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
                     Fractive.getComponentParametersController(getFcItfOwner())
@@ -154,7 +175,9 @@ public class ProActiveContentController extends ProActiveController
         fcSubComponents.add(subComponent);
         // add a ref on the current component
         try {
-            ((ProActiveSuperController) subComponent.getFcInterface(Constants.SUPER_CONTROLLER)).addParent(((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis());
+            Object itf = subComponent.getFcInterface(Constants.SUPER_CONTROLLER);
+
+            ((ProActiveSuperController) itf).addParent(((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis());
         } catch (NoSuchInterfaceException e) {
             throw new IllegalContentException(
                 "Cannot add component : cannot find super-controller interface.");
