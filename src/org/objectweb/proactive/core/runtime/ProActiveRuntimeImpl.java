@@ -68,8 +68,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
  
   //the Unique instance of ProActiveRuntime
   private static ProActiveRuntime proActiveRuntime = new ProActiveRuntimeImpl();
-  // name of the default Node created when creating the ProActiveRuntime
-  //private static final String DEFAULT_NODE_NAME = "DefaultNode";
+  
   
   //
   // -- PRIVATE MEMBERS -----------------------------------------------------------
@@ -77,7 +76,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
   private VMInformation vmInformation;
   
-  // map nodes and their names
+  // map nodes and an ArrayList of Active Objects Id 
   private java.util.Hashtable nodeMap;
   
   //map VirtualNodes and their names
@@ -86,8 +85,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
   // map proActiveRuntime registered on this VM and their names
   private java.util.Hashtable proActiveRuntimeMap;
 	
-	// name of the default node 
-	//private String defaultNodeName;
+	
    
 
   //
