@@ -49,7 +49,6 @@ public class ProcessReferenceHandler extends BasicUnmarshaller
     String refid = attributes.getValue("refid");
     //System.out.println("refid "+refid);
     if (checkNonEmpty(refid)) {
-    	System.out.println("refid not empty "+refid );
       setResultObject(refid);
    	}else throw new org.xml.sax.SAXException("The Id of the referenced process cannot be set to an empty string");
   }
