@@ -293,7 +293,13 @@ public class ActiveObjectCommunicationRecorder {
             }
             g2.setStroke(new java.awt.BasicStroke(strokeWidth));
             boolean sameNode = sourcePanel.getActiveObject().isInsideSameNode(destPanel.getActiveObject());
-            if (sameNode) {
+//            System.out.println(nb + "------------------------------" );
+//            System.out.println("source: " + sourcePanel.getActiveObject().toString());
+//            System.out.println("dest: " + destPanel.getActiveObject().toString());
+//            System.out.println("Source x,y: " + xSource + ","  + ySource);
+//            System.out.println("Dest x,y: " + xDest + ","  + yDest);
+//            System.out.println("---");
+           if (sameNode) {
                 drawOneArcSameNode(xSource, ySource, sourceWidth, xDest, yDest,
                     destWidth, g2);
             } else {
@@ -426,7 +432,13 @@ public class ActiveObjectCommunicationRecorder {
     private void drawOneArcSameNode(int xSource, int ySource, int sourceWidth,
         int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
         //Shape changing...
-        int shape = Math.abs(ySource - yDest) / 3;
+    	int shape = Math.abs(ySource - yDest) / 3;
+    	  // ebe 13 sept 2004 AO can calls themselves -> jacobi examples
+    	if ((xSource == xDest) && (ySource == yDest)) {
+    		g2.drawOval(xSource - shape -24, ySource+7 , 20, 10);
+		}
+    	else {
+    	   
         if (ySource > yDest) {
             g2.drawArc(xSource - shape + sourceWidth, yDest + 13, shape * 2,
                 Math.abs(ySource - yDest), 90, -180);
@@ -434,6 +446,7 @@ public class ActiveObjectCommunicationRecorder {
             g2.drawArc(xSource - shape, ySource + 13, shape * 2,
                 Math.abs(ySource - yDest), 90, 180);
         }
+    	}
         drawCommunicationPointSameNode(xSource, ySource, sourceWidth, xDest,
             yDest, destWidth, g2);
     }
