@@ -80,5 +80,5 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/dev/lib/xml-apis.jar
 fi
 fi
-echo CLASSPATHWS=$CLASSPATH
+
 
