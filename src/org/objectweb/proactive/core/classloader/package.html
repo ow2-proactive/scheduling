@@ -84,7 +84,7 @@ also created.
 <h3>How does it work?</h3>
 <p>The ProActive class downloading mechanism works as follows : <br>
 - new runtimes/jvms are created with the parameter
-"java.system.class.loader=org.objectweb.proactive.core.netclassloader.ProActiveClassLoader"<br>
+"java.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader"<br>
 - The java.system.class.loader property sets ProActiveClassLoader as
 the system classloader, thus ProActiveClassLoader loads all non-system
 classes. It first tries to load a class from the classpath, and if this
