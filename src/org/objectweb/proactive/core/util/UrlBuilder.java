@@ -320,7 +320,7 @@ public class UrlBuilder {
 
         String name = urlToRead.substring(n + 1);
 
-        return buildUrl(hostInetAddress.getHostName(), name, protocol,
+        return buildUrl(hostInetAddress.getCanonicalHostName(), name, protocol,
             portNumber);
     }
 
