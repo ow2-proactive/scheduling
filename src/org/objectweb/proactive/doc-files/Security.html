@@ -45,7 +45,7 @@ font-weight: bold;
 color: #000066;
 }
 .syntax10 {
-color: #999999;
+color: #000000;
 font-weight: bold;
 }
 .syntax11 {
@@ -85,7 +85,7 @@ color: #666699;
             <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
  href="index.html">back to index</a>&nbsp;&nbsp;</td>
             <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
- href="components/intro.html">prev</a>&nbsp;&nbsp;</td>
+ href="AC.html">prev</a>&nbsp;&nbsp;</td>
             <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
  href="guided_tour/index.html">next</a>&nbsp;&nbsp;</td>
           </tr>
@@ -102,8 +102,8 @@ color: #666699;
 <h1>ProActive Security Mechanism<br>
 </h1>
 <h2>Overview</h2>
-<p class="textNormal">Usually, applications and security are developped
-for a specific use. We propose here a security framework that alllows
+<p class="textNormal">Usually, applications and security are developed
+for a specific use. We propose here a security framework that allows
 to dynamically deploy
 applications and to configure security according to this deployment.<br>
 </p>
@@ -117,12 +117,62 @@ applications.<br>
 </p>
 <p class="textNormal">It is possible to attach security policies to
 Runtimes, Virtual Nodes, Nodes and Active Objects. Policies are
-expressed inside an XML descriptor. <br>
+expressed inside an <a href="#descriptors">XML descriptor</a>. <br>
 </p>
 <br>
-<h2>Security architecture</h2>
+<h2>Security Architecture</h2>
+<h3>Base model</h3>
+A distributed or concurrent application built using <i>ProActive</i>&nbsp;is
+composed of a number of medium-grained entities called
+<i>active objects</i>. Each active object has one distinguished
+element, the <i>root</i>, which is the only entry point to the
+active object; all other objects inside the active object are called
+<i>passive objects</i> and cannot be referenced directly from objects
+which are outside this active object (see Figure <a
+ href="../../../../../../../work/esorics2004/esorics2004/node15.html#graphe">8</a>);
+the absence of sharing is important with respect to security.
+<div align="center"><a name="graphe"></a><a name="419"></a>
+<table>
+  <caption align="bottom"><strong>Figure 8:</strong>
+A typical object graph with active objects </caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="security_images/img22.png"
+ alt="\includegraphics[width=11cm,height=3cm]{graphe}"
+ style="border: 0px solid ; width: 477px; height: 133px;"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+The security is based on Public Key Infrastructure. Each entity owns a
+certificate and an private key generated from the certificate of a
+user. <br>
+Certificates are&nbsp; generated automatically by the security
+mechanism. The validity of a certificate is checked by validating its
+certificate chain. As shown in figure 2, before validating the
+certificate of an active object, application certificate and user
+certificate will be checked. If a valid path is found so object
+certificate is validated.<br>
+<br>
+<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
+ cellspacing="2">
+  <tbody>
+    <tr align="center">
+      <td style="vertical-align: top;"><img alt="Certificate chain"
+ src="certificateChain.png" style="width: 289px; height: 266px;"></td>
+    </tr>
+    <tr align="center">
+      <td style="vertical-align: top;">Figure 2 : Certificate chain</td>
+    </tr>
+  </tbody>
+</table>
+<h3><br>
 Security is expressed at different level according to who wants to set
 policy :<br>
+</h3>
 <ul>
   <li>Administrators set policy at domain level. It contains general
 security rules.</li>
@@ -135,8 +185,6 @@ through an XML descriptor.<br>
   </li>
 </ul>
 <br>
-<div style="text-align: left;">
-<div style="text-align: center;"></div>
 <div style="text-align: center;">
 <table style="width: 100%; text-align: left;" border="0" cellpadding="2"
  cellspacing="2">
@@ -146,7 +194,7 @@ through an XML descriptor.<br>
  src="security-hierarchy.png" style="width: 390px; height: 328px;"></td>
     </tr>
     <tr align="center">
-      <td style="vertical-align: top;">figure 1 : hierarchical security<br>
+      <td style="vertical-align: top;">Figure 1 : Hierarchical security<br>
       </td>
     </tr>
   </tbody>
@@ -154,38 +202,403 @@ through an XML descriptor.<br>
 <br>
 </div>
 When an interaction is happening, all participating entities' security
-policy are verified and combined to find the policy to inforce to the
+policy are verified and combined to find the policy to enforce to the
 interaction.<br>
+<h3>
+</h3>
 <br>
+<h2>Detailed Security Architecture</h2>
+<h3>Virtual Nodes and Nodes
+</h3>
+<p>
+The security architecture relies on two
+related abstractions for deploying Grid applications: <i>Node</i> and <i>Virtual
+Node</i>. A node gathers several objects in a logical entity. It
+provides an abstraction for the physical location of a
+set of activities. Objects are bound to a node at creation or after
+migration.
+In order to have a flexible deployment (eliminating from the source
+code
+machine names, creation protocols), the system relies on <i>Virtual
+Nodes</i> (VNs). A VN is identified as a name (a
+simple string), used in a program source, defined and configured in
+an descriptor. The user can attach policy to these virtual nodes.
+Virtual Nodes are used within application code to structure it. By
+example, an object which will be used as a server will be set inside a
+virtual node named Server_VN, client objects will be set inside
+Client_VN. The user expresses policy between server and client object
+inside a descriptor file. The correspondence between Virtual Nodes and
+Nodes, the mapping, is done at application starting time.
+</p>
 <br>
-The security is based on Public Key Infrastructure. Each entity owns a
-certificate and an private key generated from the certificate of a
-user. <br>
-Certificates are&nbsp; generated automatically by the security
-mechanismh. The validity of a certificate is checked by validating its
-certificate chain. As shown in figure 2, before validating the
-certificate of an active object, application certificate and user
-certificate will be checked. If a valid path is found so object
-certificate is validated.<br>
+<h3><a name="SECTION00033000000000000000">Hierarchical Security Entities</a></h3>
+Grid programming is about deploying processes (activities) on various
+machines.
+In the end, the security policy that must be ensured for those
+processes
+depends upon many factors:
+first of all, the application policy that is needed, but also the
+machine locations, the security policies of their administrative
+domain, and the network being used to reach those machines.
+<p>Previous section defined the notions of <i>Virtual Nodes</i>, and <i>Nodes</i>.
+Virtual Nodes are application abstractions, and nodes are only a
+run-time entity
+resulting from the deployment: a mapping of Virtual Nodes to processes
+and hosts.
+A first decisive feature
+allows to define application-level security on those application-level
+abstractions:
 <br>
-<div style="text-align: center;">
-<table style="width: 100%; text-align: left;" border="0" cellpadding="2"
- cellspacing="2">
-  <tbody>
-    <tr align="center">
-      <td style="vertical-align: top;"><img alt="Certificate chain"
- src="certificateChain.png" style="width: 289px; height: 266px;"></td>
-    </tr>
-    <tr align="center">
-      <td style="vertical-align: top;">figure 2 : Certificate chain<br>
+<img src="security_images/img3.png"
+ alt="\begin{definition}{Virtual Node Security}\\
+Security policies can be defined at...
+...esulting
+from the mapping of Virtual Nodes to JVMs, and Hosts.
+\end{definition}"
+ style="border: 0px solid ; width: 556px; height: 72px;">
+<br>
+</p>
+<p>As such, virtual nodes are the support for intrinsic application
+level security. If, at design time, it appears that a process
+always requires a specific level of security (e.g. authenticated and
+encrypted communications at all time), then that process should be
+attached
+to a virtual node on which those security features are imposed.
+It is the designer responsibility to structure his/her application or
+components into virtual node abstractions compatible with the required
+security.
+Whatever deployment occurs, those security features will be maintained.
+We expect this usage to be rather occasional, for instance in very
+sensitive applications where even an intranet deployment calls for
+encrypted
+communications.
+</p>
+<p>The second decisive feature deals with a major Grid aspect:
+deployment-specific security.
+The issue is actually twofold:
+</p>
+<ol>
+  <li>allowing organizations (security domains) to specify general
+security policies, </li>
+  <li>allowing application security to be specifically adapted to a
+given deployment environment. </li>
+</ol>
+Domains are a standard way to structure (virtual) organizations
+involved in a Grid infrastructure; they are organized in a hierarchical
+manner. They are the logical concept
+allowing to express security policies in a hierarchical way.
+<p><br>
+<img src="security_images/img4.png"
+ alt="\begin{definition}{Declarative Domain Security}\\
+Fine grain and declarative se...
+...to which a certificate and a set of rules are
+associated.
+\par
+\end{definition}"
+ style="border: 0px solid ; width: 556px; height: 69px;">
+<br>
+This principle allows to deal with the two issues mentioned
+above:
+<br>
+(1) the administrator of a domain can define specific policy rules
+that must be obeyed by the applications running within the
+domain. However, a general rule expressed inside a domain may prevent
+the
+deployment of a specific application. To solve this issue, a policy
+rule can allow a well-defined entity to weaken it. As we are in a
+hierarchical organization, allowing an entity to weaken a rule means
+allowing all entities included to weaken the rule. The entity can be
+identified by its certificate;
+<br>
+(2) a Grid user can, at the time he runs an application, specify
+additional security based on the domains being deployed onto.
+</p>
+<p>The Grid user can specify additional rules directly in his
+deployment descriptor for the domains he deploys onto.
+Note that those domains are actually dynamic as they can be obtained
+through external allocators, or even Web Services in an OGSA
+infrastructure [<a
+ href="../../../../../../../work/esorics2004/esorics2004/node18.html#foster98security">5</a>].
+Joker rules might be important in that case to cover all cases, and to
+provide a conservative security strategy for un-forecasted deployments.
+</p>
+<br>
+<p>Finally, as active objects are active and mobile entities, there is
+a
+need
+to specify security at the level of such entities.
+<br>
+<img src="security_images/img6.png"
+ alt="\begin{definition}{Active Object Security} \\
+Security policies can be defined ...
+... activity, the security policy attached to that object
+follows.
+\end{definition}"
+ style="border: 0px solid ; width: 558px; height: 54px;">
+<br>
+In open applications, e.g. several principals interacting in a
+collaborative Grid application, a JVM (a process) launched by a given
+principal can actually host an activity executing under another
+principal. The principle above allows to keep specific security
+privileges in such case.
+Moreover, it can also serve as a basis to offer, in a secure manner,
+hosting environments for mobile agents.
+</p>
+<div align="center"><a name="hierarchy"></a><a name="170"></a>
+<table>
+  <caption align="bottom"><strong>Figure 4:</strong>
+Hierarchical Security Entities </caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="security_images/img7.png"
+ alt="\includegraphics[height=6.1cm]{hierarchy}"
+ style="border: 0px solid ; width: 331px; height: 276px;"></div>
       </td>
     </tr>
   </tbody>
 </table>
-&nbsp;<br>
+</div>
+<p>
+</p>
+<div style="text-align: center;"><a name="onesecurityrule"></a><a
+ name="172"></a>
+</div>
+<table style="width: 1221px;">
+  <caption align="bottom"><strong>Figure 5:</strong>
+Syntax and attributes for policy rules</caption> <tbody align="center">
+    <tr>
+      <td> <img src="security_images/img8.png"
+ alt="\includegraphics[width=11cm,height=5cm]{onesecurityrule}"
+ style="border: 0px solid ; width: 498px; height: 228px;"> </td>
+    </tr>
+  </tbody>
+</table>
+<div style="text-align: center;"><br>
+</div>
+<br>
+<h3><a name="SECTION00034000000000000000">Resource provider security
+features</a></h3>
+Prior to start application on a Grid, a user needs to acquire some
+resources (CPU time, disk storage, bandwidth) from the Grid.
+A <i>Resource provider</i> is an individual, a research institute, an
+organization who wants to offer some resources under a certain
+security policy to a restricted set of peoples. According to our
+definition, resource provider will set up one or more runtime where
+clients will be able do perform computation. Each runtime is set with
+its
+own policy. Theses runtimes could be worldwide distributed. <br>
+<br>
+<h3><a name="SECTION00034000000000000000">Resource provider security
+features</a></h3>
+Prior to start application on a Grid, a user needs to acquire some
+resources (CPU time, disk storage, bandwidth) from the Grid.
+A <i>Resource provider</i> is an individual, a research institute, an
+organization who wants to offer some resources under a certain
+security policy to a restricted set of peoples. According to our
+definition, resource provider will set up one or more runtime where
+clients will be able do perform computation. Each runtime is set with
+its
+own policy. Theses runtimes could be worldwide distributed. <br>
+<br>
+<h3><a name="SECTION00037000000000000000">Interactions, Security
+Attributes</a></h3>
+Security policies are able to control all the
+<i>interactions</i> that can occur when deploying and
+executing a multi-principals Grid application. With this goal in mind,
+interactions span over the creation of processes,
+to the monitoring of activities (Objects) within processes, including
+of course the communications.
+Here is a brief description of those interactions: <br>
+<ul>
+  <li>RuntimeCreation (RC): creation of a new Runtime process </li>
+  <li>NodeCreation (NC): creation of a new Node within a Runtime (as
+the result of Virtual Node mapping) </li>
+  <li>CodeLoading (CL): loading of bytecode within a Node, used in
+presence of object migration. </li>
+  <li>ObjectCreation (OC): creation of a new activity
+(active object) within a Node </li>
+  <li>ObjectMigration (OM): migration of an existing activity object to
+a Node </li>
+  <li>Request (Q), Reply (P): communications, method calls and
+replies to method calls </li>
+  <li>Listing (L): list the content of an entity; for Domain/Node
+provides the list of
+Node/Objects, for an Object allows to monitor its activity. </li>
+</ul>
+<p>
+For instance, a domain is able to specify that it accepts
+downloading of code from a given set of domains, provided
+the transfers are authenticated and guaranteed not to be tampered with.
+As a policy might leave open the integrity of communications, and also
+because not allowing confidentiality can be a
+domain (or even a country) policy, those 3 security attributes can be
+specified in 3 modes: Required (<b>+</b>), Optional (<b>?</b>),
+Disallowed (<b>-</b>)
+<br>
+For a given interaction, a tuple [+A,?I,-C] means that authentication
+is required, integrity is accepted but not required, and
+confidentiality is not allowed.
+</p>
+<p>As a Grid operates in decentralized mode, without a central
+administrator controlling the correctness of all security policies,
+these policies must be <i>combined</i>, <i>checked</i>, and <i>negotiated</i>
+dynamically.
+The next two sections present that aspect.
+</p>
+<br>
+<h3><a name="SECTION00038000000000000000">Combining Policies</a></h3>
+As the proposed infrastructure takes into account different actors of
+the Grid (domain administrator, Grid user), even for a single-principal
+single-domain application, there are potentially several security
+policies activated. This section deals with the
+combination of those policies to obtain the final security tuples of a
+single entity.
+An important principle being that a sub-domain cannot weaken a
+super-domain's rule.
+<p>During execution, each activity (Active Object) is always included
+in a <i>Node</i> (due to the Virtual Node mapping) and at least in one
+<i>Domain</i>, the one used to launch a JVM (<img
+ src="../../../../../../../work/esorics2004/esorics2004/img9.png"
+ alt="$D_0$" align="middle" border="0" height="30" width="24">).
+Figure <a
+ href="../../../../../../../work/esorics2004/esorics2004/node11.html#hierarchicalsecurityrule">6</a>
+hierarchically represents the security rules that can be activated at
+execution: from the top, hierarchical domains (<img
+ src="../../../../../../../work/esorics2004/esorics2004/img10.png"
+ alt="$D_n$" align="middle" border="0" height="30" width="26"> to <img
+ src="../../../../../../../work/esorics2004/esorics2004/img9.png"
+ alt="$D_0$" align="middle" border="0" height="30" width="24">), the
+virtual node policy (VN), and the Object
+(O) policy. Of course, such policies can be inconsistent, and there
+must be clear principles to combine the various sets of rules.
+</p>
+<div align="center"><a name="hierarchicalsecurityrule"></a><a name="312"></a>
+<table>
+  <caption align="bottom"><strong>Figure 6:</strong>
+Hierarchical Security Levels</caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="security_images/img11.png"
+ alt="\includegraphics[width=8cm]{schemahierarchicalrules}"
+ style="border: 0px solid ; width: 362px; height: 312px;"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>
+There are three main principles: (1) choosing the <i>most specific
+rules</i>
+within a given domain (as a single Grid actor is responsible for it),
+(2) an interaction is valid only if all levels accept it (absence of
+weakening of authorizations), (3) the security attributes retained are
+the most constrained
+based on a partial order (absence of weakening of security).
+</p>
+<pre> <br>Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C] <br>Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C]<br></pre>
+within the CardPlus domain, the second rule will be chosen (integrity
+and confidentiality will be optional).
+Of course, comparison of rules is
+only a partial order, and several incompatible most specific rules can
+exist within a single level (e.g. both ACCEPT and DENY most specific
+rules for the same interaction, or both +A and -A).
+<p>Between levels, an incompatibility can also occur, especially if a
+sub-level attempts to weaken the policy on a given interaction
+(e.g. a domain prohibits confidentiality [-C] while a sub-domain or the
+Virtual Node requires it [+C], a domain&nbsp; D<sub>i</sub> prohibits
+loading of code while D<sub>j</sub> (j &lt;= i) authorizes it).
+In all incompatible cases, the interaction is not authorized and an
+error is reported.
+</p>
+<br>
+<h3>Dynamic Policy Negotiation
+</h3>
+<p>During execution, entities interact by pair with each other.
+Each entity, for each interaction (JVM creation, communication,
+migration, ...), will want to apply a security policy based on the
+resolution presented in the previous section.
+Before starting an interaction,
+a <i>negotiation</i> occurs between the two entities involved.
+Figure <a
+ href="../../../../../../../work/esorics2004/esorics2004/node12.html#sac">7</a>
+shows the result of such negotiation. For example, if for a given
+interaction, entity A's policy is
+[+A,?I,?C], and B's policy is [+A,?I,-C], the negotiated policy will be
+[A,?I,-C]. If, for a result rule, one of the
+communication attributes is optional, the attribute is not activated.
+</p>
+<p>Besides the interactions not being accepted by an entity,
+two other cases lead to an error: when an attribute is required by one,
+and disallowed by the other. In such cases, the interaction is not
+authorized and an error is reported.
+If a valid security policy is found between two
+entities, the interaction can occur.
+In the case that the agreed security policy includes confidentiality,
+the two entities negotiate a session key.
+</p>
+<div align="center"><a name="policynegotiation"></a><a name="sac"></a><a
+ name="374"></a>
+<table>
+  <caption align="bottom"><strong>Figure 7:</strong>
+Result of security negotiations</caption> <tbody>
+    <tr>
+      <td>
+      <div align="center"><img src="security_images/img21.png"
+ alt="\includegraphics[width=8cm]{policynegotiation}"
+ style="border: 0px solid ; width: 360px; height: 220px;"></div>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<br>
+<br>
+<h3>Migration and Negotiation
+</h3>
+In large scale Grid applications, migration of activities is an
+important issue. The migration of Active Objects must not weaken the
+security policy being applied.
+<br>
+When an active object migrates to a new location,
+three cases may happen :
+<ul>
+  <li>the object migrates to a node belonging to the same virtual node
+and included inside the same domain. In this case, all already
+negotiated sessions remain valid. </li>
+  <li>the object migrates to a known node (created during the
+deployment
+step) but which belongs to another virtual node. In this case, all
+already negotiated sessions can be invalid. This kind of migration
+imposes re-establishing the object policy, and upon a change,
+re-negotiating with interacting entities. </li>
+  <li>The object migrates to an unknown node (not known at the
+deployment step). In this case, the object migrates with a copy of the
+application security policy. When a secured interaction will take
+place, the security system retrieves not only the object's application
+policy but also policies rules attached to the node on which the
+object is to compute the policy. </li>
+</ul>
+<br>
+<br>
+<div style="text-align: left;">
+<div align="center"><a name="securitySchema"></a><a name="168"></a>
+<table>
+  <caption align="bottom"><strong>Figure 3:</strong>
+Security layer detailed</caption> <tbody>
+    <tr>
+      <td>
+      <div style="text-align: center;"> </div>
+      <div style="text-align: center;"><img
+ src="security_images/img5.png"
+ alt="\includegraphics[height=13cm]{securitySchema}"
+ style="border: 0px solid ; width: 778px; height: 894px;"> </div>
+      </td>
+    </tr>
+  </tbody>
+</table>
 </div>
 </div>
-<h2>Activating security mechanism
+<h2><a name="descriptors"></a>Activating security mechanism
 </h2>
 <p class="textNormal">Within descriptor, the tag &lt;security&gt; is
 used to specify the policy for the deployed application. It will be the
@@ -193,144 +606,22 @@ policy for all Nodes and active that will be created.<br>
 </p>
 <p class="textNormal">the descriptor is: <br>
 </p>
-<pre>   1:<span class="syntax8">&lt;?</span><span class="syntax8">xml</span><span
- class="syntax125"> </span><span class="syntax8">version="1.0"</span><span
- class="syntax125"> </span><span class="syntax8">encoding="UTF-8"?</span><span
- class="syntax8">&gt;</span><br><span class="gutter">   2:</span><span
- class="syntax10">&lt;</span><span class="syntax10">ProActiveDescriptor</span><span
- class="syntax125"> </span><span class="syntax5">xmlns</span><span
- class="syntax10">:</span><span class="syntax10">xsi</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">http://www.w3.org/2001/XMLSchema-instance</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax5">xsi</span><span class="syntax10">:</span><span
- class="syntax10">noNamespaceSchemaLocation</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">DescriptorSchema.xsd</span><span
- class="syntax3">"</span><span class="syntax10">&gt;</span><br><span
+<pre>   1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>   2:&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>                          xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;<br><span
  class="gutter">   3:</span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span style="color: rgb(51, 51, 255);"
- class="syntax10">&lt;security</span><span
- style="color: rgb(51, 51, 255);" class="syntax125"> </span><span
- style="color: rgb(51, 51, 255);" class="syntax10">file=</span><span
- style="color: rgb(51, 51, 255);" class="syntax3">"../../descriptors/applicationPolicy.xml"</span><span
- style="color: rgb(51, 51, 255);" class="syntax10">&gt;&lt;/security&gt;</span><br><span
- class="gutter">   4:</span><span class="syntax126">    </span><span
- class="syntax10">&lt;</span><span class="syntax10">componentDefinition</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">   5:</span><span
- class="syntax126"> </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">virtualNodesDefinition</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   6:</span><span
- class="syntax126"></span><span class="syntax126">       </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">virtualNode</span><span class="syntax125"> </span><span
- class="syntax10">name</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">Locale</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">property</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">unique</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   7:</span><span
- class="syntax126"></span><span class="syntax126">       </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">virtualNode</span><span class="syntax125"> </span><span
- class="syntax10">name</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">vm1</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">property</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">unique</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   8:</span><span
- class="syntax126"></span><span class="syntax126">       </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">virtualNode</span><span class="syntax125"> </span><span
- class="syntax10">name</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">vm2</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">property</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">unique</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   9:</span><span
- class="syntax126"> </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">virtualNodesDefinition</span><span class="syntax10">&gt;</span><br><span
- class="gutterH">  10:</span><span class="syntax125"> </span><span
- class="syntax125"></span><span class="syntax125"></span><span
- class="syntax125"></span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">componentDefinition</span><span class="syntax10">&gt;<br>  11:   ....<br>  </span>           <br><span
- class="gutterH"> </span><span class="syntax126"> </span><span
- class="syntax10">50:            &lt;</span><span class="syntax10">infrastructure</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  51:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">processes</span><span
- class="syntax10">&gt;</span><span class="syntax125"> </span><br><span
- class="gutter">  52:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">processDefinition</span><span
- class="syntax125"> </span><span class="syntax10">id</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">linuxJVM</span><span class="syntax3">"</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  53:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">jvmProcess</span><span
- class="syntax125"> </span><span class="syntax10">class</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">org.objectweb.proactive.core.process.JVMNodeProcess</span><span
- class="syntax3">"</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  54:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">classpath</span><span
- class="syntax10">&gt;</span><br><span class="gutterH"></span><span
- class="syntax10"></span>                                              ....<br><span
- class="gutter">  74:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">classpath</span><span class="syntax10">&gt;</span><br><span
- class="gutterH">  75:</span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax126">     </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax10">&lt;</span><span class="syntax10">jvmParameters</span><span
- class="syntax10">&gt;</span><br><span class="gutter"></span><span
- class="syntax125"> </span><span class="syntax126">       </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span style="color: rgb(51, 51, 255);"
- class="syntax10">&lt;parameter</span><span
- style="color: rgb(51, 51, 255);" class="syntax125"> </span><span
- style="color: rgb(51, 51, 255);" class="syntax10">value=</span><span
- style="color: rgb(51, 51, 255);" class="syntax3">"-Dproactive.runtime.security=/net/home/acontes/dev/ProActive/descriptors/jvm1-sec.xml"</span><span
- style="color: rgb(51, 51, 255);" class="syntax125"> </span><span
- style="color: rgb(51, 51, 255);" class="syntax10">/&gt;</span><span
- class="gutter"></span><span class="syntax10"></span><br><span
- class="gutter">  82:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax125"> </span><span
- class="syntax125"> </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">jvmParameters</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  83:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">jvmProcess</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  84:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">processDefinition</span><span class="syntax10">&gt;<br>       ....<br></span><span
- class="syntax10"></span></pre>
+ style="font-weight: bold;" class="syntax125"></span><span
+ style="color: rgb(51, 51, 255); font-weight: bold;">&lt;security file="../../descriptors/applicationPolicy.xml"&gt;&lt;/security&gt;</span><br
+ style="color: rgb(51, 51, 255);">   4: &lt;componentDefinition&gt;<br>   5:  &lt;virtualNodesDefinition&gt;<br>   6:   &lt;virtualNode name="<span
+ style="font-weight: bold;">Locale</span>" property="unique"/&gt;<br>   7:   &lt;virtualNode name="<span
+ style="font-weight: bold;">vm1</span>" property="unique"/&gt;<br>   8:   &lt;virtualNode name="<span
+ style="font-weight: bold;">vm2</span>" property="unique"/&gt;<br>   9:  &lt;/virtualNodesDefinition&gt;<br>  10: &lt;/componentDefinition&gt;<br>  11:   ....<br>             <br>  50:&lt;infrastructure&gt;<br>  51: &lt;processes&gt; <br>  52:  &lt;processDefinition id="linuxJVM"&gt;<br>  53:   &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;<br>  54:     &lt;classpath&gt;<br>           ....<br>  74:     &lt;/classpath&gt;<br>  75:     &lt;jvmParameters&gt;<br><span
+ class="gutter"></span><span class="syntax125"> </span><span
+ class="syntax126">       </span><span class="syntax126">  <span
+ style="font-weight: bold;"> </span></span><span
+ style="font-weight: bold;" class="syntax126"></span><span
+ style="font-weight: bold;" class="syntax125"></span><span
+ style="color: rgb(51, 51, 255); font-weight: bold;">&lt;parameter value="-Dproactive.runtime.security=/.../descriptors/jvm1-sec.xml" /&gt;</span><span
+ class="gutter"></span><span class="syntax10"></span><br>  82:     &lt;/jvmParameters&gt;<br>  83:    &lt;/jvmProcess&gt;<br>  84: &lt;/processDefinition&gt;<span
+ class="syntax10"><br>       ....<br></span><span class="syntax10"></span></pre>
 <p class="textNormal">Inside the policy file, you can express policy
 between entities (domain, runtime, node, active object).<br>
 The entity tag can be used to :<br>
@@ -339,410 +630,88 @@ The entity tag can be used to :<br>
   <li>express policies on entities described inside the descriptor
 (lines 13, 15)<br>
   </li>
-  <li>express policies on existing entities by specifyiing theirs
+  <li>express policies on existing entities by specifying theirs
 certificates (line 32). <br>
   </li>
 </ul>
-&lt;From&gt; and &lt;To&gt; can contain multiple entities to specify
-fine-grained policies.<br>
+<h3>Construction of an XML policy :</h3>
+A policy file must begin with : <br>
+<pre>  1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>  2:&lt;Policy&gt;</pre>
+next, application specific informations are given.<br>
+<pre><br>   3: &lt;ApplicationName&gt;<span style="font-weight: bold;">Garden</span>&lt;/ApplicationName&gt;<br><br>&lt;ApplicationName&gt; sets the application name.  This allows to identify easily which application an entity belongs to.<br><br>   4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;<br>   5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;<br><br>&lt;Certificate&gt; is the X509 certificate of the application, generated from a user certificate, and <br>&lt;PrivateKey&gt; the private key associated to the certificate.<br><br>  &nbsp;6: &lt;CertificationAuthority&gt;<br>   7:  &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;<br>   8: &lt;/CertificationAuthority&gt;<br><br>&lt;CertificationAuthority&gt; contains all trusted certificate authority. Each &lt;Certificate&gt; contains a certification authority certificate. <br></pre>
+&nbsp;&nbsp;&nbsp; 10: &lt;Rules&gt;<br>
+Then we can define policy rules. All rules are located within
+the &lt;Rules&gt;<br>
+<br>
+A &lt;Rule&gt; is constructed according the following syntax : <br>
+<pre>  11: &lt;Rule&gt;</pre>
+<br>
+&lt;From&gt; tag contains all entities from which the interaction is
+made. It is possible to specify many entities in order to match a
+specific fine-grained policy.<br>
+<pre>  12: &lt;From&gt;<br>  13:  &lt;Entity type="VN" name="vm2"/&gt;<br>  14: &lt;/From&gt;</pre>
+&lt;Entity&gt; is used to define an entity. the "type" parameter can be
+"VN", "certificate". <br>
+<ul>
+  <li>"VN" (Virtual Node) referrers to virtual nodes defined inside the
+deployment descriptor.</li>
+  <li>"DefaultVirtualNode" is a special tag. It allows to specify a
+default policy.<br>
+  </li>
+  <li>"certificate" supposes that a path to a file is set inside the
+"name" parameters.</li>
+</ul>
+<br>
+&lt;To&gt; tag contains all entities onto the interaction is made. As
+&lt;From&gt; tag, many entities can be specified.<br>
+<pre>  15: &lt;To&gt;<br>  16:  &lt;Entity type="VN" name="Locale"/&gt;<br>  17: &lt;/To&gt;</pre>
+<br>
 The &lt;Communication&gt; tag defines security policies to apply to
 requests and replies. <br>
+<pre>  18: &lt;Communication&gt;</pre>
+&lt;Request&gt; sets the policy associated a request. the "value"
+parameter can be : <br>
+<ul>
+  <li>"authorized" means a request is authorized.</li>
+  <li>"denied" means a request is denied.</li>
+</ul>
+<pre><br></pre>
+Each &lt;Attribute&gt; (authentication,integrity, confidentiality) can
+be
+required, optional or denied. <br>
+<br>
+&nbsp;&nbsp;&nbsp; 19: &lt;Request value="authorized"&gt;<br>
+&nbsp;&nbsp;&nbsp; 20: &nbsp; &lt;Attributes authentication="required"
+integrity="optional" confidentiality="optional"/&gt;&nbsp;&nbsp;&nbsp; <br>
+&nbsp;&nbsp;&nbsp; 21: &lt;/Request&gt;
+<br>
+<br>
+&lt;Reply&gt; tag has the same parameters that &lt;Request&gt;<br>
+<pre>  22:&lt;Reply value="authorized"&gt;<br>  23: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  24:&lt;/Reply&gt;</pre>
+<pre>  25:&lt;/Communication&gt;</pre>
+<br>
 &lt;Migration&gt; allows or not migration from &lt;from&gt; entities to
-&lt;To&gt; entities.<br>
-&lt;OACreation&gt; allows or not creation on active objects by
-&lt;From&gt; entities to &lt;To&gt; entities.<br>
-&lt;Certificate&gt; and &lt;PrivateKey&gt; tags contain path to the
-X509 certificate and the private key of the application. <br>
-<pre><span class="gutter">   1:</span><span class="syntax8">&lt;?</span><span
- class="syntax8">xml</span><span class="syntax125"> </span><span
- class="syntax8">version="1.0"</span><span class="syntax125"> </span><span
- class="syntax8">encoding="UTF-8"?</span><span class="syntax8">&gt;</span><br><span
- class="gutter">   2:</span><span class="syntax10">&lt;</span><span
- class="syntax10">Policy</span><span class="syntax10">&gt;</span><br><span
- class="gutter">   3:</span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">ApplicationName</span><span
- class="syntax10">&gt;</span>Garden<span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">ApplicationName</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   4:</span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Certificate</span><span class="syntax10">&gt;</span>/net/home/acontes/certif/appli.cert<span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Certificate</span><span class="syntax10">&gt;</span><br><span
- class="gutterH">   5:</span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">PrivateKey</span><span
- class="syntax10">&gt;</span>/net/home/acontes/certif/appli.key<span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">PrivateKey</span><span class="syntax10">&gt;</span><br><span
- class="gutter">   6:</span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">CertificationAuthority</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   7:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Certificate</span><span
- class="syntax10">&gt;</span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Certificate</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   8:</span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">CertificationAuthority</span><span
- class="syntax10">&gt;</span><br><span class="gutter">   9:</span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">TrustedCertificationAuthority</span><span
- class="syntax10">&gt;</span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">TrustedCertificationAuthority</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  10:</span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Rules</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  11:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Rule</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  12:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">From</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  13:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">VN</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">vm2</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  14:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">From</span><span class="syntax10">&gt;</span><br><span
- class="gutterH">  15:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">To</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  16:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">VN</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">Locale</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  17:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">To</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  18:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Communication</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  19:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Request</span><span
- class="syntax125"> </span><span class="syntax10">value</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">denied</span><span class="syntax3">"</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  20:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Attributes</span><span class="syntax125"> </span><span
- class="syntax10">authentication</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">integrity</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">confidentiality</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  21:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Request</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  22:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Reply</span><span class="syntax125"> </span><span
- class="syntax10">value</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">denied</span><span
- class="syntax3">"</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  23:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Attributes</span><span
- class="syntax125"> </span><span class="syntax10">authentication</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">integrity</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">confidentiality</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  24:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Reply</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  25:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Communication</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  26:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Migration</span><span class="syntax10">&gt;</span>denied<span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Migration</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  27:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">OACreation</span><span
- class="syntax10">&gt;</span>denied<span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">OACreation</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  28:</span><br><span
- class="gutter">  29:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Rule</span><span
- class="syntax10">&gt;</span><span class="gutterH"></span><br><span
- class="gutter">  30:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Rule</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  31:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">From</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  32:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">certificate</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">certificateRuntime1.cert</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  33:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">From</span><span class="syntax10">&gt;</span><br><span
- class="gutterH">  34:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">To</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  35:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">VN</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">Locale</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  36:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">To</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  37:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Communication</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  38:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Request</span><span
- class="syntax125"> </span><span class="syntax10">value</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">denied</span><span class="syntax3">"</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  39:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Attributes</span><span class="syntax125"> </span><span
- class="syntax10">authentication</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">integrity</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">confidentiality</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  40:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Request</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  41:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Reply</span><span class="syntax125"> </span><span
- class="syntax10">value</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">denied</span><span
- class="syntax3">"</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  42:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Attributes</span><span
- class="syntax125"> </span><span class="syntax10">authentication</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">integrity</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">confidentiality</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  43:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Reply</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  44:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Communication</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  45:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Migration</span><span class="syntax10">&gt;</span>denied<span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Migration</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  46:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">OACreation</span><span
- class="syntax10">&gt;</span>denied<span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">OACreation</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  47:</span><br><span
- class="gutter">  48:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Rule</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  </span><span
- class="gutter">                      ...</span><span class="gutter"></span><br><span
- class="gutterH">  90:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Rule</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  91:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">From</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  92:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">DefaultVirtualNode</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">*</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  93:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">From</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  94:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">To</span><span
- class="syntax10">&gt;</span><br><span class="gutterH">  95:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Entity</span><span
- class="syntax125"> </span><span class="syntax10">type</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">DefaultVirtualNode</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">name</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">*</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  96:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">To</span><span class="syntax10">&gt;</span><br><span
- class="gutter">  97:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Communication</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  98:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Request</span><span
- class="syntax125"> </span><span class="syntax10">value</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">denied</span><span class="syntax3">"</span><span
- class="syntax10">&gt;</span><br><span class="gutter">  99:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Attributes</span><span class="syntax125"> </span><span
- class="syntax10">authentication</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">required</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">integrity</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">deny</span><span
- class="syntax3">"</span><span class="syntax125"> </span><span
- class="syntax10">confidentiality</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">deny</span><span
- class="syntax3">"</span><span class="syntax10">/</span><span
- class="syntax10">&gt;</span><br><span class="gutterH"> 100:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Request</span><span class="syntax10">&gt;</span><br><span
- class="gutter"> 101:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">Reply</span><span class="syntax125"> </span><span
- class="syntax10">value</span><span class="syntax10">=</span><span
- class="syntax3">"</span><span class="syntax3">denied</span><span
- class="syntax3">"</span><span class="syntax10">&gt;</span><br><span
- class="gutter"> 102:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Attributes</span><span
- class="syntax125"> </span><span class="syntax10">authentication</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">required</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">integrity</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">deny</span><span class="syntax3">"</span><span
- class="syntax125"> </span><span class="syntax10">confidentiality</span><span
- class="syntax10">=</span><span class="syntax3">"</span><span
- class="syntax3">deny</span><span class="syntax3">"</span><span
- class="syntax10">/</span><span class="syntax10">&gt;</span><br><span
- class="gutter"> 103:</span><br><span class="gutter"> 104:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Reply</span><span class="syntax10">&gt;</span><br><span
- class="gutterH"> 105:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Communication</span><span class="syntax10">&gt;</span><br><span
- class="gutter"> 106:</span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">Migration</span><span
- class="syntax10">&gt;</span>denied<span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Migration</span><span
- class="syntax10">&gt;</span><br><span class="gutter"> 107:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">OACreation</span><span class="syntax10">&gt;</span>authorized<span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">OACreation</span><span class="syntax10">&gt;</span><br><span
- class="gutter"> 108:</span><br><span class="gutter"> 109:</span><span
- class="syntax126">        </span><span class="syntax126">        </span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Rule</span><span class="syntax10">&gt;</span><br><span
- class="gutterH"> 110:</span><br><span class="gutter"> 111:</span><span
- class="syntax126">        </span><span class="syntax10">&lt;</span><span
- class="syntax10">/</span><span class="syntax10">Rules</span><span
- class="syntax10">&gt;</span><br><span class="gutter"> 112:</span><span
- class="syntax10">&lt;</span><span class="syntax10">/</span><span
- class="syntax10">Policy</span><span class="syntax10">&gt;</span>
-</pre>
-<pre> Note that the JVM that reads the deployment descriptor should be started with security policy. In order to start a secure JVM, you need to use the property proactive.runtime.security and give a path a security file descriptor.<br> Here an example :  java -Dproactive.runtime.security=jvmlocal.xml TestSecureDeployment secureDeployment.xml<br><br></pre>
+&lt;To&gt; entities. Values can be "denied" or "authorized".<br>
+<pre>  26: &lt;Migration&gt;denied&lt;/Migration&gt;</pre>
+&lt;OACreation&gt; allows or not creation of active objects by
+&lt;From&gt; entities onto &lt;To&gt; entities.<br>
+Values can be "denied" or "authorized".<br>
+<span ="">
+<pre>27: &lt;OACreation&gt;denied&lt;/OACreation&gt;</pre>
+<br>
+<pre>   1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>   2:&lt;Policy&gt;<br>   3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;<br>   4: &lt;Certificate&gt;/net/home/acontes/certif/appli.cert&lt;/Certificate&gt;<br>   5: &lt;PrivateKey&gt;/net/home/acontes/certif/appli.key&lt;/PrivateKey&gt;<br>   6: &lt;CertificationAuthority&gt;<br>   7:  &lt;Certificate&gt;&lt;/Certificate&gt;<br>   8: &lt;/CertificationAuthority&gt;<br>  <br>  10: &lt;Rules&gt;<br>  11:  &lt;Rule&gt;<br>  12:    &lt;From&gt;<br>  13:      &lt;Entity type="VN" name="vm2"/&gt;<br>  14:    &lt;/From&gt;<br>  15:    &lt;To&gt;<br>  16:      &lt;Entity type="VN" name="Locale"/&gt;<br>  17:    &lt;/To&gt;<br>  18:    &lt;Communication&gt;<br>  19:     &lt;Request value="authorized"&gt;<br>  20:      &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  21:     &lt;/Request&gt;<br>  22:     &lt;Reply value="authorized"&gt;<br>  23:      &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  24:     &lt;/Reply&gt;<br>  25:    &lt;/Communication&gt;<br>  26:    &lt;Migration&gt;denied&lt;/Migration&gt;<br>  27:    &lt;OACreation&gt;denied&lt;/OACreation&gt;<br>  28:<br>  29:  &lt;/Rule&gt;<br>  30:  &lt;Rule&gt;<br>  31:   &lt;From&gt;<br>  32:    &lt;Entity type="certificate" name="certificateRuntime1.cert"/&gt;<br>  33:   &lt;/From&gt;<br>  34:   &lt;To&gt;<br>  35:    &lt;Entity type="VN" name="Locale"/&gt;<br>  36:   &lt;/To&gt;<br>  37:   &lt;Communication&gt;<br>  38:    &lt;Request value="authorized"&gt;<br>  39:     &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  40:    &lt;/Request&gt;<br>  41:    &lt;Reply value="authorized"&gt;<br>  42:     &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  43:    &lt;/Reply&gt;<br>  44:   &lt;/Communication&gt;<br>  45:   &lt;Migration&gt;denied&lt;/Migration&gt;<br>  46:   &lt;OACreation&gt;denied&lt;/OACreation&gt;<br>  47:<br>  48:  &lt;/Rule&gt;<br>                        ...<br>  90:  &lt;Rule&gt;<br>  91:   &lt;From&gt;<br>  92:    &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br>  93:   &lt;/From&gt;<br>  94:   &lt;To&gt;<br>  95:    &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br>  96:   &lt;/To&gt;<br>  97:   &lt;Communication&gt;<br>  98:    &lt;Request value="denied"&gt;<br>  99:     &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 100:    &lt;/Request&gt;<br> 101:    &lt;Reply value="denied"&gt;<br> 102:     &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 103:<br>&nbsp;104:    &lt;/Reply&gt;<br> 105:   &lt;/Communication&gt;<br> 106:   &lt;Migration&gt;denied&lt;/Migration&gt;<br> 107:   &lt;OACreation&gt;authorized&lt;/OACreation&gt;<br> 108:<br> 109:   &lt;/Rule&gt;<br> 110:<br> 111: &lt;/Rules&gt;<br> 112:&lt;/Policy&gt;<br></pre>
+Note that the JVM that reads the deployment descriptor should be
+started with security policy. In order to start a secure JVM, you need
+to use the property proactive.runtime.security and give a path a
+security file descriptor.<br>
+<br>
+Here an example : java -Dproactive.runtime.security=jvmlocal.xml
+TestSecureDeployment secureDeployment.xml<br>
+<br>
 <p class="textNormal"><span style="text-decoration: underline;">How to
 quickly generate certificate ?</span><br>
 </p>
-<p class="textNormal">under linux : <br>
+<p class="textNormal">under Linux : <br>
 </p>
 <p class="textNormal">openssl req -x509 -newkey rsa:1024 -keyout
 application.key -out application.cert -outform PEM<br>
@@ -754,13 +723,68 @@ mv application.key.der application.key<br>
 <p class="textNormal">under windows : ?<br>
 </p>
 <br>
+<h2><a name="SECTION00060000000000000000">Bibliography</a>
+</h2>
+<dl compact="compact">
+  <dt><a name="CPE">1</a> </dt>
+  <dd>Caromel, D., Klauser, W., Vayssi&egrave;re, J.: <br>
+Towards Seamless Computing and Metacomputing in Java. <br>
+Concurrency Practice and Experience <b>10</b> (1998) 1043-1061 </dd>
+  <dt><a name="HPDC-11">2</a> </dt>
+  <dd>Baude, F., Caromel, D., Mestre, L., Huet, F., Vayssi&egrave;re,
+J.: <br>
+Interactive and descriptor-based deployment of object-oriented grid
+applications. <br>
+In: Proceedings of the 11th IEEE International Symposium on High
+Performance Distributed Computing, Edinburgh, Scotland, IEEE Computer
+Society (2002) 93-102 </dd>
+  <dt><a name="legion">3</a> </dt>
+  <dd>Grimshaw, A., et&nbsp;al., W.W.: <br>
+The Legion Vision of a World-wide Virtual Computer. <br>
+Communications of the ACM <b>40</b> (1997) </dd>
+  <dt><a name="foster99globus">4</a> </dt>
+  <dd>Foster, I., Kesselman, C.: <br>
+The Globus project: a status report. <br>
+Future Generation Computer Systems <b>15</b> (1999) 607-621 </dd>
+  <dt><a name="foster98security">5</a> </dt>
+  <dd>Foster, I.T., Kesselman, C., Tsudik, G., Tuecke, S.: <br>
+A Security Architecture for Computational Grids. <br>
+In: ACM Conference on Computer and Communications Security. (1998)
+83-92 </dd>
+  <dt><a name="dotnetsecurity">6</a> </dt>
+  <dd>Wesley, A., ed.: <br>
+.NET Framework Security. <br>
+Addison Wesley Professional (2002) </dd>
+  <dt><a name="puliafito00security">7</a> </dt>
+  <dd>Puliafito, A., Tomarchio, O.: <br>
+Security Mechanisms for the MAP Agent System (2000) In 8th Euromicro
+Workshop on Parallel and Distributed Processing (PDP2000), 2000. </dd>
+  <dt><a name="karnik99security">8</a> </dt>
+  <dd>Karnik, N.M., Tripathi, A.R.: <br>
+Security in the Ajanta Mobile Agent System. <br>
+Software, Practice and Experience <b>31</b> (2001) 301-329 </dd>
+  <dt><a name="kalaos97">9</a> </dt>
+  <dd>Karjoth, G., Lange, D., Oshima, M.: <br>
+A Security Model for Aglets. <br>
+IEEE Internet Computing <b>1</b> (1997) 68-77 </dd>
+  <dt><a name="baumann97mole">10</a> </dt>
+  <dd>Baumann, J., Hohl, F., Rothermel, K.: <br>
+Mole - Concepts of a Mobile Agent System. <br>
+Technical Report TR-1997-15, University of Stuttgart, Institute of
+Parallel and Distributed High-Performance Systems, Distributed Systems
+(1997) </dd>
+  <dt><a name="rmi00java">11</a> </dt>
+  <dd>Sun Microsystems: <br>
+Remote methode invocation http://java.sun.com/products/jdk/rmi (2000) </dd>
+</dl>
+<br>
 To learn more, see the <a href="../../../../index.html">JavaDoc</a><!--
  Footer : start 
 ~~~ -->.
 <br>
 <hr>
 <div class="textSmall" align="right">Copyright &copy; October 2003
-INRIA All Rights Reserved.
-<!-- Footer : end --></div>
+INRIA All Rights Reserved.<!-- Footer : end --></div>
+</span>
 </body>
 </html>
