@@ -26,6 +26,13 @@ public class Test extends FunctionalTest {
 	}
 
 	public void action() throws Exception {
+		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
+		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
+		Object[][] paramsParameter = {{"AgentA"}, {"AgentB"}, {"AgentC"}};
+		Node[] nodesParameter = {TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(), TestNodes.getLocalVMNode()};
+		this.parameterGroup = (A) ProActiveGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
+
 		ProActiveGroup.setScatterGroup(this.parameterGroup);
 		this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
 		ProActiveGroup.unsetScatterGroup(this.parameterGroup);
@@ -36,12 +43,6 @@ public class Test extends FunctionalTest {
 	}
 
 	public void initTest() throws Exception {
-		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
-		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
-		Object[][] paramsParameter = {{"AgentA"}, {"AgentB"}, {"AgentC"}};
-		Node[] nodesParameter = {TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(), TestNodes.getLocalVMNode()};
-		this.parameterGroup = (A) ProActiveGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
 	}
 
 	public boolean postConditions() throws Exception {

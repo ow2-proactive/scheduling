@@ -37,9 +37,6 @@ public class Test extends FunctionalTest {
 	}
 
 	public void initTest() throws Exception {
-		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
-		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
 	}
 
 	public boolean postConditions() throws Exception {
@@ -53,6 +50,10 @@ public class Test extends FunctionalTest {
 	}
 
 	public boolean preConditions() throws Exception {
+		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
+		Node[] nodes = {TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode()};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
+
 		boolean NoOnewayCallDone = true;
 		Group group = ProActiveGroup.getGroup(this.typedGroup);
 		Iterator it = group.iterator();

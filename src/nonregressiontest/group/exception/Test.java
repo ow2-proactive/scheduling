@@ -28,6 +28,18 @@ public class Test extends FunctionalTest {
     }
 
     public void action() throws Exception {
+		Object[][] params = {
+			{ "Agent0" },
+			{ "Agent1" },
+			{ "Agent2" }
+		};
+		Node[] nodes = {
+			TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
+			TestNodes.getRemoteVMNode()
+		};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
+				params, nodes);
+
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();
     }
 
@@ -36,17 +48,6 @@ public class Test extends FunctionalTest {
     }
 
     public void initTest() throws Exception {
-        Object[][] params = {
-            { "Agent0" },
-            { "Agent1" },
-            { "Agent2" }
-        };
-        Node[] nodes = {
-            TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-            TestNodes.getRemoteVMNode()
-        };
-        this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
-                params, nodes);
     }
 
     public boolean postConditions() throws Exception {
