@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import org.objectweb.proactive.core.group.*;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 
 
@@ -26,19 +28,33 @@ public class Main {
     public static void main (String args[]) {
 
 	if (args.length != 2) {
-	    System.err.println("missing argument : <nodesListFile> <MatrixSize>");
+	    System.err.println("missing argument : <MatrixSize>");
 	    System.exit(0);
 	}
-	
-	String[] nodesList = readNodesList(args[0]);	
-	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
+//	
+//	String[] nodesList = readNodesList(args[0]);	
+//	//String targetNode = nodesList[0].substring(0, nodesList[0].length()-1)+"2";
+	ProActiveDescriptor proActiveDescriptor=null;
+	String[] nodesList = null;
+		try{
+     	proActiveDescriptor=ProActive.getProactiveDescriptor("file:"+args[1]);
+     	proActiveDescriptor.activateMappings(); 
+   		VirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
+    	//Thread.sleep(15000);
+			 nodesList = vn1.getNodesURL();
+     	}catch(Exception e){
+    e.printStackTrace();
+    System.out.println("Pb when reading descriptor");
+    }
+     	
+			
 	Launcher l = null;
 
 	try {
 	    l = (Launcher) ProActive.newActive("org.objectweb.proactive.examples.matrix.Launcher", new Object[] {nodesList});//,targetNode);
 	} catch (Exception e) {System.err.println("\nUnable to create the Launcher !!!!!\n"); e.printStackTrace();}
 
-	int matrixSize=Integer.parseInt(args[1]);
+	int matrixSize=Integer.parseInt(args[0]);
 
 	Matrix m1;
 	Matrix m2 = new Matrix(matrixSize,matrixSize);
