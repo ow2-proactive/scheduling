@@ -57,6 +57,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * The main role of ProActiveGroup is to provide methods to create typed group. It is possible to create a typed
  * group (empty or not) through instantiation using one of the version of newActive.
  * It is also possible to create an active typed group from an existing using using the turnActive methods.<br>
+ * The default behavior is a broadcast call, with a unique serialization of parameters.<br><br>
  * <b>Warning !!!</b> When a typed group is turned active, it looses the ability to switch to the
  * <code>Group</code> representation. So an active typed group acquire the abilites of any active object
  * (remote reference, migration, ...) but is no more able to evolve : no modification of the membership is possible.<br>
@@ -122,8 +123,10 @@ public class ProActiveGroup {
  	catch (ConstructionOfProxyObjectFailedException e) { System.err.println("**** ConstructionOfProxyObjectFailedException ****"); }
  	catch (ConstructionOfReifiedObjectFailedException e) { System.err.println("**** ConstructionOfReifiedObjectFailedException ****"); }
 
-	((org.objectweb.proactive.core.group.ProxyForGroup)(((StubObject)result).getProxy())).className = className;
-	
+	ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup)((StubObject)result).getProxy();
+	proxy.className = className;
+	proxy.stub = (StubObject)result;
+
 	return result;
     }
 
@@ -422,7 +425,7 @@ public class ProActiveGroup {
     
     /**
      * Allows the typed group to dispatch parameters
-     * @param <code>ogroup</code> the typed group who will change is semantic of communication.
+     * @param <code>ogroup</code> the typed group who will change his semantic of communication.
      */
     public static void setScatterGroup(Object ogroup) {
 		Proxy proxytmp = findProxyForGroup(ogroup);
@@ -432,13 +435,34 @@ public class ProActiveGroup {
     
     /**
      * Allows the typed group to broadcast parameters
-     * @param <code>ogroup</code> the typed group who will change is semantic of communication.
+     * @param <code>ogroup</code> the typed group who will change his semantic of communication.
      */
     public static void unsetScatterGroup(Object ogroup) {
  		Proxy proxytmp = findProxyForGroup(ogroup);
 		if (proxytmp != null)
 			((ProxyForGroup)proxytmp).setDispatchingOff();
    }
+
+   /**
+	* Allows the typed group to make an unique serialization of parameters when a broadcast call occurs.
+	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
+	*/
+   public static void setUniqueSerialization(Object ogroup) {
+	   Proxy proxytmp = findProxyForGroup(ogroup);
+	   if (proxytmp != null)
+		   ((ProxyForGroup)proxytmp).setUniqueSerializationOn();
+   }
+    
+   /**
+	* Removes the ability of a typed group to make an unique serialization
+	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
+	*/
+   public static void unsetUniqueSerialization(Object ogroup) {
+	   Proxy proxytmp = findProxyForGroup(ogroup);
+	   if (proxytmp != null)
+		   ((ProxyForGroup)proxytmp).setUniqueSerializationOff();
+  }
+
    
     /**
      * Checks the semantic of communication of the typed group <code>ogroup</code>.

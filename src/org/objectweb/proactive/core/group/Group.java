@@ -83,5 +83,53 @@ public interface Group extends java.util.Collection {
     public ListIterator listIterator();
 
 
+	/**
+	 * Waits that all the members are arrived.
+	 */
+	public void waitAll();
+	
+	/**
+	 * Waits that at least one member is arrived.
+	 */
+	public void waitOne();
+
+	/**
+	 * Waits that the member at the specified rank is arrived.
+	 * @param <code>index</code> the rank of the awaited member.
+	 */
+
+	public void waitTheNth(int n);
+
+	/**
+	 * Waits that at least <code>n</code> members are arrived.
+	 * @param <code>n</code> the number of awaited members.
+	 */
+	public void waitN(int n);
+
+	/**
+	 * Waits that at least one member is arrived and returns it.
+	 * @return a non-awaited member of the Group.
+	 */
+	public Object waitAndGetOne();
+
+	/**
+	 * Waits that the member at the specified rank is arrived and returns it.
+	 * @param <code>n</code> the rank of the wanted member.
+	 * @return the member (non-awaited) at the rank <code>n</code> in the Group.
+	 */
+
+	public Object waitAndGetTheNth(int n);
+
+	/**
+	 * Checks if all the members of the Group are awaited.
+	 * @return <code>true</code> if all the members of the Group are awaited.
+	 */
+	public boolean allAwaited();
+
+	/**
+	 * Checks if all the members of the Group are arrived.
+	 * @return <code>true</code> if all the members of the Group are arrived.
+	 */
+	public boolean allArrived();
     
 }

@@ -1,3 +1,33 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/
 package org.objectweb.proactive.core.group;
 
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +67,12 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	protected int waited = 0;
 	/** Flag to deternime the semantic of communication (broadcast or dispatching) */
 	protected boolean dispatching = false;
+	/** Flag to deternime the semantic of communication (unique serialization of parameters or not) */
+	protected boolean uniqueSerialization = true;
+	/** The stub of the typed group */
+	protected StubObject stub;
+
+
 
 	/* ----------------------- CONSTRUCTORS ----------------------- */
 	public ProxyForGroup(String nameOfClass) throws ConstructionOfReifiedObjectFailedException {
@@ -79,6 +115,20 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 	/**
+	 * Allows the Group to make an unique serialization of parameters.
+	 */
+	protected void setUniqueSerializationOn() {
+		this.uniqueSerialization = true;
+	}
+
+	/**
+	 * Removes the ability of the Group to make an unique serialization of parameters..
+	 */
+	protected void setUniqueSerializationOff() {
+		this.uniqueSerialization = false;
+	}
+
+	/**
 	 * Checks the semantic of communication of the Group.
 	 * @return <code>true</code> if the "scatter option" is enabled.
 	 */
@@ -106,6 +156,9 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
 	 */
 	public Object reify(MethodCall mc) throws InvocationTargetException {
+
+		if (memberList.size() == 0) {System.out.println("TABLEAU VIDE !!!!");} 
+
 		/* result will be a stub on a proxy for group representing the group of results */
 		Object result = null;
 
@@ -180,7 +233,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 
 		// Creating Threads
 		if (isDispatchingCall(mc) == false) {
-			mc.transformEffectiveArgumentsIntoByteArray();
+			if (uniqueSerialization)
+				mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
 				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);			
 		}
@@ -237,7 +291,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		// Creating Threads
 
 		if (isDispatchingCall(mc) == false) {
-			mc.transformEffectiveArgumentsIntoByteArray();
+			if (uniqueSerialization)
+				mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
 				this.createThreadForOneWay(this.memberList, index, mc, body);
 		}
@@ -283,7 +338,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			if ((MOP.forName(this.className)).isAssignableFrom(o.getClass())) {
 				/* if o is an reified object and if it is "assignableFrom" the class of the group, ... add it into the group */
 				if (MOP.isReifiedObject(o)) {
-					return this.memberList.add(o);
+					boolean result = this.memberList.add(o);
+					if (o instanceof org.objectweb.proactive.core.group.GroupMember) {
+						((org.objectweb.proactive.core.group.GroupMember)o).setMyGroup(stub);
+					}
+					return result;
 				} /* if o is a Group */
 				else if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
 					/* like an addMerge call */
@@ -592,14 +651,14 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/**
 	 * Waits that all the members are arrived.
 	 */
-	protected void waitAll() {
+	public void waitAll() {
 		ProActive.waitForAll(this.memberList);
 	}
 	
 	/**
 	 * Waits that at least one member is arrived.
 	 */
-	protected void waitOne() {
+	public void waitOne() {
 		ProActive.waitForAny(this.memberList);
 	}
 
@@ -607,7 +666,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * Waits that the member at the specified rank is arrived.
 	 * @param <code>index</code> the rank of the awaited member.
 	 */
-	protected void waitTheNth(int n) {
+	public void waitTheNth(int n) {
 		ProActive.waitFor(this.memberList.get(n));
 	}
 
@@ -615,7 +674,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * Waits that at least <code>n</code> members are arrived.
 	 * @param <code>n</code> the number of awaited members.
 	 */
-	protected void waitN(int n) {
+	public void waitN(int n) {
 		for (int i = 0; i < n ; i++) {
 			this.waitTheNth(i);
 		}
@@ -625,7 +684,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * Waits that at least one member is arrived and returns it.
 	 * @return a non-awaited member of the Group.
 	 */
-	protected Object waitAndGetOne() {
+	public Object waitAndGetOne() {
 		return this.memberList.get(ProActive.waitForAny(this.memberList));
 	}
 
@@ -634,7 +693,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @param <code>n</code> the rank of the wanted member.
 	 * @return the member (non-awaited) at the rank <code>n</code> in the Group.
 	 */
-	protected Object waitAndGetTheNth(int n) {
+	public Object waitAndGetTheNth(int n) {
 		ProActive.waitForTheNth(this.memberList,n);
 		return this.memberList.get(n);
 	}
@@ -643,7 +702,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * Checks if all the members of the Group are awaited.
 	 * @return <code>true</code> if all the members of the Group are awaited.
 	 */
-	protected boolean allAwaited() {
+	public boolean allAwaited() {
 		for (int i = 0 ; i < this.memberList.size() ; i++)
 			if (!(ProActive.isAwaited(this.memberList.get(i))))
 				return false;
@@ -654,7 +713,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * Checks if all the members of the Group are arrived.
 	 * @return <code>true</code> if all the members of the Group are arrived.
 	 */
-	protected boolean allArrived() {
+	public boolean allArrived() {
 		for (int i = 0 ; i < this.memberList.size() ; i++)
 			if (ProActive.isAwaited(this.memberList.get(i)))
 				return false;
