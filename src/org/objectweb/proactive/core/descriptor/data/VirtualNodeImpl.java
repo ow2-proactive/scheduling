@@ -1228,8 +1228,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 nodeUrl, e);
         }
         if (remoteAO.size() == 1) {
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
-            remoteNodeManager.leaveNode(node);
+        	// FIXME CLASS CAST EXCEPTION
+           // P2PNodeManager remoteNodeManager = (P2PNodeManager) remoteAO.get(0);
+           // remoteNodeManager.leaveNode(node);
             if (P2P_LOGGER.isInfoEnabled()) {
                 P2P_LOGGER.info("Node at " + nodeUrl + " succefuly killed");
             }
