@@ -49,7 +49,7 @@
 		<echo message="  modelisation"/>
 		<echo message="  util"/>
 		<echo message="  alljunk  : means all of the above"/>
-        <echo message="  ibis     : everything related to proactive ibis"/>	
+		<echo message="  ibis     : everything related to proactive ibis"/>
 		<echo message=""/>
 		<echo message="=========================================="/>
 	</target>
@@ -140,7 +140,9 @@
       ================================================================
 	-->
 	<target name="examples" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" debug="${debug}">
+		<classpath refid="project.classpath"/>
+		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/examples">
 				<exclude name="**/*.java"/>
@@ -156,7 +158,7 @@
 	-->
 	<target name="test" depends="ext">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="test/**" deprecation="on" debug="${debug}">
-		<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
 	<!--
@@ -168,7 +170,7 @@
 	-->
 	<target name="essai" depends="ext">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on" debug="${debug}">
-		<classpath refid="project.classpath"/>
+			<classpath refid="project.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/essai" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/essai">
@@ -344,42 +346,29 @@
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
 	</target>
-	
-	
 	<!--
 	   ================================================================
 	   ==
       ==  Ibisc to generate stubs/skels
       ==
       ================================================================
-	-->	
-	<target name="ibis"> <!-- depends="ipl"> -->		
- 
-       
-       <delete>
-           <fileset dir="${classes.dir}" includes="**/rmi*.java"/>
-       </delete>
-       <java classname="ibis.frontend.rmi.Main" 
-      	fork="true" 
-      	dir="${classes.dir}/org/objectweb/proactive/core/body/ibis/">
-      	<classpath refid="project.classpath"/>
-      	 <arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl"/>
-    
-       </java> 
-        <java classname="ibis.frontend.rmi.Main" 
-      	fork="true" 
-      	dir="${classes.dir}/org/objectweb/proactive/core/runtime/ibis/">
-      	<classpath refid="project.classpath"/>
-      	 <arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl"/>
-    
-       </java> 
-       <javac srcdir="${classes.dir}" destdir="${classes.dir}" 
-       	       	   deprecation="on" debug="${debug}">
-       	   <include name="**/*.java" />
-          <classpath refid="project.classpath"/>
-       </javac>
-      
-	</target>	
-	
-	
+	-->
+	<target name="ibis">
+		<!-- depends="ipl"> -->
+		<delete>
+			<fileset dir="${classes.dir}" includes="**/rmi*.java"/>
+		</delete>
+		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/body/ibis/">
+			<classpath refid="project.classpath"/>
+			<arg value="org.objectweb.proactive.core.body.ibis.IbisRemoteBodyImpl"/>
+		</java>
+		<java classname="ibis.frontend.rmi.Main" fork="true" dir="${classes.dir}/org/objectweb/proactive/core/runtime/ibis/">
+			<classpath refid="project.classpath"/>
+			<arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl"/>
+		</java>
+		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+			<include name="**/*.java"/>
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
 </project>
