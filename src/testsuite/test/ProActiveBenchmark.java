@@ -6,6 +6,8 @@ package testsuite.test;
 
 import org.objectweb.proactive.core.node.Node;
 
+import testsuite.manager.ProActiveBenchManager;
+
 import java.io.Serializable;
 
 
@@ -78,5 +80,17 @@ public abstract class ProActiveBenchmark extends Benchmark
 
     public void setActiveObject(ProActiveBenchmark activeObject) {
         this.activeObject = activeObject;
+    }
+
+    public Node getSameVMNode() {
+        return ((ProActiveBenchManager) manager).getSameVMNode();
+    }
+
+    public Node getLocalVMNode() {
+        return ((ProActiveBenchManager) manager).getLocalVMNode();
+    }
+
+    public Node getRemoteVMNode() {
+        return ((ProActiveBenchManager) manager).getRemoteVMNode();
     }
 }

@@ -8,6 +8,8 @@ package testsuite.test;
 
 import org.objectweb.proactive.core.node.Node;
 
+import testsuite.manager.ProActiveFuncTestManager;
+
 import java.io.Serializable;
 
 
@@ -70,5 +72,17 @@ public abstract class ProActiveFunctionalTest extends FunctionalTest
      */
     public void setNode(Node node) {
         this.node = node;
+    }
+
+    public Node getSameVMNode() {
+        return ((ProActiveFuncTestManager) manager).getSameVMNode();
+    }
+
+    public Node getLocalVMNode() {
+        return ((ProActiveFuncTestManager) manager).getLocalVMNode();
+    }
+
+    public Node getRemoteVMNode() {
+        return ((ProActiveFuncTestManager) manager).getRemoteVMNode();
     }
 }
