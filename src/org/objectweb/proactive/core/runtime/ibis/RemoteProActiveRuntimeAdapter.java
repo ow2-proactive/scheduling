@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 /**
- *   An adapter for a RemoteProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
+ *   An adapter for a RemoteProActiveRuntime to be able to receive remote calls. This helps isolate Ibis-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to another remote objects library.
  * 	 @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
