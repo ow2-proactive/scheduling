@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.gui.util;
 
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.gui.data.IC2DPanel;
 import org.objectweb.proactive.ic2d.gui.dialog.FilteredClassesPanel;
@@ -79,7 +80,8 @@ public class DialogUtils {
                     skippedObjects, logger);
             explorator.setMaxDepth(rmihostdialog.getJTextFielddepth());
             explorator.startExploration();
-            explorator.exploreHost(host, 1099);
+            			
+            explorator.exploreHost(UrlBuilder.removePortFromHost(host), UrlBuilder.getPortFromUrl(host));
             explorator.endExploration();
             Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
             while (it.hasNext()) {
