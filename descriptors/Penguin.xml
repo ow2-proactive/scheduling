@@ -29,7 +29,7 @@
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
-				<acquisition method="jini"/>
+				<acquisition method="rmi"/>
 				<creation>
 					<process refid="linuxJVM"/>
 				</creation>
@@ -41,7 +41,7 @@
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
-				<acquisition method="jini"/>
+				<acquisition method="rmi"/>
 				<creation>
 					<process refid="linuxJVM"/>
 				</creation>
