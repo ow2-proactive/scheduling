@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/ProcessSchema.xsd">
 	<infrastructure>
 		<processes>
 			<processDefinition id="linuxJVM">
@@ -21,11 +21,11 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="globusProcess">
-				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess">
-					<processReference refid="linuxJVM"/>
+				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
 					<environment>
 						<variable name="DISPLAY" value="sea.inria.fr:0.0"/>
 					</environment>
+					<processReference refid="linuxJVM"/>
 					<globusOption>
 						<gramPort>2119</gramPort>
 						<gisPort>2135</gisPort>
