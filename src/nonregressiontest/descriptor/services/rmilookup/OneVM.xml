@@ -28,7 +28,7 @@
 					<jvmParameters>
 						<parameter value="-Dproactive.runtime.name=PA_JVM1" />  
 						<parameter value="-Dproactive.communication.protocol=rmi" />  						
-						<parameter value="-Dproactive.rmi.port=2020" />  
+						<parameter value="-Dproactive.rmi.port=3020" />  
 					</jvmParameters> 
 				 </jvmProcess>
 			</processDefinition>
