@@ -87,7 +87,7 @@ class PathHandler extends BasicUnmarshaller {
     String origin = attributes.getValue(ORIGIN_ATTRIBUTE);
     if (! checkNonEmpty(origin)) origin = DEFAULT_ORIGIN;
     String value = attributes.getValue(VALUE_ATTRIBUTE);
-    System.out.println("Found Path Element type="+type+" origin="+origin+" value="+value);
+    //System.out.println("Found Path Element type="+type+" origin="+origin+" value="+value);
     if (! checkNonEmpty(value)) throw new org.xml.sax.SAXException("Path element defined without a value");
     // build the associated string
     if (type.equals(ABSOLUTE_TYPE)) {
