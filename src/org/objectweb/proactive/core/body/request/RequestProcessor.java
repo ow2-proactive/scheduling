@@ -63,7 +63,7 @@ public interface RequestProcessor {
   /**
    * Returns one of the constants indicating the desired treatment for the request.
    * @param request the request to process
-   * @return 
+   * @return one of the three constants above
    */
   public int processRequest(Request request);
   
