@@ -244,15 +244,15 @@ public class ProActive {
     }
 
     /**
-            * Creates a new set of active objects based on classname attached to the given virtualnode.
-            * @param classname classname the name of the class to instanciate as active
-            * @param constructorParameters constructorParameters the parameters of the constructor.
-            * @param virtualnode The virtualnode where to create active objects. Active objects will be created
-            * on each node mapped to the given virtualnode in XML deployment descriptor.
-            * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
-            * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
-            * @throws NodeException if the virtualnode was null
-            */
+     * Creates a new set of active objects based on classname attached to the given virtualnode.
+     * @param classname classname the name of the class to instanciate as active
+     * @param constructorParameters constructorParameters the parameters of the constructor.
+     * @param virtualnode The virtualnode where to create active objects. Active objects will be created
+     * on each node mapped to the given virtualnode in XML deployment descriptor.
+     * @return Object a Group of references (possibly remote) on  Stub of newly created active objects
+     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+     * @throws NodeException if the virtualnode was null
+     */
     public static Object newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
@@ -309,27 +309,27 @@ public class ProActive {
     }
 
     /**
-      * Creates a new ProActive component over the specified base class, according to the
-      * given component parameters, and returns a reference on the component of type Component.
-      * A reference on the active object base class can be retreived through the component parameters controller's
-      * method "getStubOnReifiedObject".
-      *
-      * @param classname the name of the base class. "Composite" if the component is a composite,
-      * "ParallelComposite" if the component is a parallel composite component
-      * @param constructorParameters the parameters of the constructor of the object
-      *    to instantiate as active. If some parameters are primitive types, the wrapper
-      *    class types should be given here. null can be used to specify that no parameter
-      *    are passed to the constructor.
-      * @param node the possibly null node where to create the active object. If null, the active object
-      *       is created localy on a default node
-      * @param activity the possibly null activity object defining the different step in the activity of the object.
-      *               see the definition of the activity in the javadoc of this classe for more information.
-      * @param factory should be null for components (automatically created)
-      * @param componentParameters the parameters of the component
-      * @return a component representative of type Component
-      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
-      * @exception NodeException if the node was null and that the DefaultNode cannot be created
-      */
+     * Creates a new ProActive component over the specified base class, according to the
+     * given component parameters, and returns a reference on the component of type Component.
+     * A reference on the active object base class can be retreived through the component parameters controller's
+     * method "getStubOnReifiedObject".
+     *
+     * @param classname the name of the base class. "Composite" if the component is a composite,
+     * "ParallelComposite" if the component is a parallel composite component
+     * @param constructorParameters the parameters of the constructor of the object
+     *    to instantiate as active. If some parameters are primitive types, the wrapper
+     *    class types should be given here. null can be used to specify that no parameter
+     *    are passed to the constructor.
+     * @param node the possibly null node where to create the active object. If null, the active object
+     *       is created localy on a default node
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this classe for more information.
+     * @param factory should be null for components (automatically created)
+     * @param componentParameters the parameters of the component
+     * @return a component representative of type Component
+     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
     public static Component newActiveComponent(String classname,
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory, ComponentParameters componentParameters)
@@ -683,6 +683,7 @@ public class ProActive {
      * asynchronous call. Usually the the wait by necessity model take care
      * of blocking the caller thread asking for a result not yet available.
      * This method allows to block before the result is first used.
+     * @param future object to wait for
      */
     public static void waitFor(Object future) {
         // If the object is not reified, it cannot be a future
@@ -696,6 +697,33 @@ public class ProActive {
                 return;
             } else {
                 ((Future) theProxy).waitFor();
+            }
+        }
+    }
+
+    /**
+     * Blocks the calling thread until the object <code>future</code>
+     * is available or until the timeout expires. <code>future</code> must be the result object of an
+     * asynchronous call. Usually the the wait by necessity model take care
+     * of blocking the caller thread asking for a result not yet available.
+     * This method allows to block before the result is first used.
+     * @param future object to wait for
+     * @param timeout to wait in ms
+     * @throws ProActiveException if the timeout expire
+     */
+    public static void waitFor(Object future, long timeout)
+        throws ProActiveException {
+        // If the object is not reified, it cannot be a future
+        if ((MOP.isReifiedObject(future)) == false) {
+            return;
+        } else {
+            org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+
+            // If it is reified but its proxy is not of type future, we cannot wait
+            if (!(theProxy instanceof Future)) {
+                return;
+            } else {
+                ((Future) theProxy).waitFor(timeout);
             }
         }
     }
@@ -985,6 +1013,26 @@ public class ProActive {
      * @return index of the available future in the vector
      */
     public static int waitForAny(java.util.Vector futures) {
+        try {
+            return waitForAny(futures, 0);
+        } catch (ProActiveException e) {
+            //Exception above should never be thrown since timeout=0 means no timeout
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    /**
+     * Blocks the calling thread until one of the futures in the vector is available
+     * or until the timeout expires.
+     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+     * @param futures vector of futures
+     * @param timeout to wait in ms
+     * @return index of the available future in the vector
+     * @throws ProActiveException if the timeout expires
+     */
+    public static int waitForAny(java.util.Vector futures, long timeout)
+        throws ProActiveException {
         FuturePool fp = getBodyOnThis().getFuturePool();
 
         synchronized (fp) {
@@ -1001,7 +1049,7 @@ public class ProActive {
 
                     index++;
                 }
-                fp.waitForReply();
+                fp.waitForReply(timeout);
             }
         }
     }
@@ -1012,6 +1060,24 @@ public class ProActive {
      * @param futures vector of futures
      */
     public static void waitForAll(java.util.Vector futures) {
+        try {
+            ProActive.waitForAll(futures, 0);
+        } catch (ProActiveException e) {
+            //Exception above should never be thrown since timeout=0 means no timeout
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Blocks the calling thread until all futures in the vector are available or until
+     * the timeout expires.
+     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+     * @param futures vector of futures
+     * @param timeout to wait in ms
+     * @throws ProActiveException if the timeout expires
+     */
+    public static void waitForAll(java.util.Vector futures, long timeout)
+        throws ProActiveException {
         FuturePool fp = getBodyOnThis().getFuturePool();
 
         synchronized (fp) {
@@ -1031,7 +1097,7 @@ public class ProActive {
                 }
 
                 if (oneIsMissing) {
-                    fp.waitForReply();
+                    fp.waitForReply(timeout);
                 }
             }
         }
@@ -1050,6 +1116,27 @@ public class ProActive {
 
             if (isAwaited(current)) {
                 waitFor(current);
+            }
+        }
+    }
+
+    /**
+     * Blocks the calling thread until the N-th of the futures in the vector is available.
+     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+     * @param futures vector of futures
+     * @param n
+     * @param timeout to wait in ms
+     * @throws ProActiveException if the timeout expires
+     */
+    public static void waitForTheNth(java.util.Vector futures, int n,
+        long timeout) throws ProActiveException {
+        FuturePool fp = getBodyOnThis().getFuturePool();
+
+        synchronized (fp) {
+            Object current = futures.get(n);
+
+            if (isAwaited(current)) {
+                waitFor(current, timeout);
             }
         }
     }
@@ -1209,13 +1296,13 @@ public class ProActive {
     }
 
     /**
-       * Search an appropriate handler for a given non functional exception.
-       * The search starts in the highest level and continue in lower levels. When no
-       * handler is available in one level, the search steps down into the hierarchy.
-       * @param ex Exception for which we search a handler.
-       * @param target An object which contains its own level.
-       * @return A reliable handler or null if no handler is available
-       */
+     * Search an appropriate handler for a given non functional exception.
+     * The search starts in the highest level and continue in lower levels. When no
+     * handler is available in one level, the search steps down into the hierarchy.
+     * @param ex Exception for which we search a handler.
+     * @param target An object which contains its own level.
+     * @return A reliable handler or null if no handler is available
+     */
     public static Handler searchExceptionHandler(NonFunctionalException ex,
         Object target) {
         // Temporary handler
