@@ -174,6 +174,8 @@ public class ProxyForGroup extends AbstractProxy
      */
     public Object reify(MethodCall mc) throws InvocationTargetException {
 
+		//System.out.println("A method is called : " + mc.getName());
+
         /* if the method called is toString, apply it to the proxy, not to the members */
         if ("toString".equals(mc.getName())) {
             return this.toString();
@@ -791,17 +793,18 @@ public class ProxyForGroup extends AbstractProxy
 		}
 	}
 
-//	/**
-//	 * Strongly synchronizes all the members of the group
-//	 */
-//	public void barrier () {
-//		try {
-//			this.reify(new MethodCallControlForGroup()); }
-//		catch (InvocationTargetException e) {
-//			logger.info("Unable to invoke the \"barrier\" method");
-//			e.printStackTrace();
-//		}
-//	}
+	/**
+	 * Strongly synchronizes all the members of the group
+	 */
+	public void barrier () {
+		System.out.println("BARRIER est invoque");
+		try {
+			this.reify(new MethodCallControlForGroup()); }
+		catch (InvocationTargetException e) {
+			logger.info("Unable to invoke the \"barrier\" method");
+			e.printStackTrace();
+		}
+	}
 
 
     /**

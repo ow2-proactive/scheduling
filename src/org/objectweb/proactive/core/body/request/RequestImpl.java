@@ -208,7 +208,7 @@ public class RequestImpl extends MessageImpl implements Request,
 			  } catch (SecurityNotAvailableException e) {
 				  // do nothing
 			  }
-        
+
         destinationBody.receiveRequest(this);
         
         if (logger.isDebugEnabled()) {

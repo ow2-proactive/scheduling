@@ -193,8 +193,8 @@ public interface Group extends java.util.Collection {
      */
     public Group range(int begin, int end);
     
-//	/**
-//	 * Strongly synchronizes all the members of the group
-//	 */
-//    public void barrier ();
+	/**
+	 * Strongly synchronizes all the members of the group
+	 */
+    public void barrier ();
 }

@@ -95,7 +95,7 @@ public class MethodCall implements java.io.Serializable {
      * Initializes the recycling of MethodCall objects to be enabled by default.
      */
     static {
-        MethodCall.setRecycleMethodCallObject(true);
+        MethodCall.setRecycleMethodCallObject(false);
     }
 
     //
@@ -321,8 +321,9 @@ public class MethodCall implements java.io.Serializable {
 	 * Builds a new MethodCall object.
 	 */
 	protected MethodCall() {
-//		this.reifiedMethod = null;
-//		this.effectiveArguments = null;
+		this.reifiedMethod = null;
+		this.effectiveArguments = null;
+		this.serializedEffectiveArguments = null;
 	}
 
 
@@ -481,6 +482,11 @@ public class MethodCall implements java.io.Serializable {
     // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
     //
     private void writeObject(java.io.ObjectOutputStream out)
+		throws java.io.IOException {
+    		this.writeTheObject(out);
+    }
+
+	protected void writeTheObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
         // The Method object needs to be converted
@@ -489,7 +495,14 @@ public class MethodCall implements java.io.Serializable {
         out.writeObject(fixBugWrite(reifiedMethod.getParameterTypes()));
     }
 
-    private void readObject(java.io.ObjectInputStream in)
+
+	private void readObject(java.io.ObjectInputStream in)
+		throws java.io.IOException, ClassNotFoundException {
+			this.readTheObject(in);
+	}
+
+
+    protected void readTheObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         reifiedMethod = (Method) reifiedMethodsTable.get(key);
