@@ -89,7 +89,6 @@ public class ProActiveWSUtils {
      *
      * @param message
      * @param file
-     * @return
      */
     public static SOAPMessage attachFile(SOAPMessage message, File file,
         String contentId) {
@@ -115,7 +114,7 @@ public class ProActiveWSUtils {
    
 
     /**
-     * @return
+     *
      */
     public static SOAPMessage createMessage() throws SOAPException {
         init();
@@ -127,7 +126,6 @@ public class ProActiveWSUtils {
 
     /**
      * @param string
-     * @return
      */
     public static Name createName(String string) throws SOAPException {
         init();

@@ -48,7 +48,6 @@ public class PAProfilerEngine implements Runnable {
      * Remove a profiler from this engine
      * It's dump() method will thus never be called
      * @param papr
-     * @return
      */
     public static boolean removeTimer(Timer papr) {
         synchronized (engine.profilerList) {

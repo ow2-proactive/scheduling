@@ -12,12 +12,11 @@ public class StubGenerator {
     /**
      * Turn a file name into a class name if necessary. Remove the ending .class and change all the '/' into '.'
      * @param name
-     * @return
      */
     protected static String processClassName(String name) {
         int i = name.indexOf(".class");
         String tmp = name;
-System.out.println(name);
+        System.out.println(name);
         if (i < 0) {
             return name;
         } else {
@@ -75,8 +74,8 @@ System.out.println(name);
     }
 
     /**
-     * @param args
-     * @param fileName
+     * @param arg
+     * @param directoryName
      */
     protected static void generateClass(String arg, String directoryName) {
         String className = processClassName(arg);

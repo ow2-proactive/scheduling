@@ -53,7 +53,6 @@ public class ProActiveXMLUtils {
     /**
     *
     * @param o
-    * @return
     */
     public static byte[] serializeObject(Object o) {
         String result = null;
@@ -82,9 +81,7 @@ public class ProActiveXMLUtils {
     }
 
     /**
-     *
-     * @param str
-     * @return
+     * @param buffer
      */
     public static Object deserializeObject(byte[] buffer) {
         Object o = null;
@@ -135,7 +132,8 @@ public class ProActiveXMLUtils {
     /**
      *
      * @param url
-     * @param table
+     * @param port
+     * @param obj
      * @param action
      */
     public static Object sendMessage(String url, int port, Object obj,
@@ -228,8 +226,8 @@ public class ProActiveXMLUtils {
     /**
      *
      * @param msg
-     * @return
-     * @throws ProActiveException
+     * @param action
+     * @throws Exception
      */
     public static Object unwrapp(byte[] msg, String action)
         throws Exception {
@@ -285,7 +283,6 @@ public class ProActiveXMLUtils {
     /**
      *
      * @param id
-     * @return
      */
     public static Body getBody(UniqueID id) {
         LocalBodyStore bodyStore = LocalBodyStore.getInstance();

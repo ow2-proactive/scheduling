@@ -88,7 +88,6 @@ public class UrlBuilder {
      * looks like jini://host/name.
      * @param host
      * @param name
-     * @param protocol
      * @return an Url built from properties
      */
     public static String buildUrlFromProperties(String host, String name) {
