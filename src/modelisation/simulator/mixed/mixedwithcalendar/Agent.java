@@ -2,7 +2,6 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-import modelisation.statistics.RandomNumberGenerator;
 import org.apache.log4j.Logger;
 
 
@@ -17,18 +16,20 @@ public class Agent extends SimulatorElement {
     public final static int BLOCKED = 7;
     public static final boolean NO = false;
     public static final boolean YES = true;
+    
+    
+	static {
+		   Agent.callServer = !"NO".equals(System.getProperties().getProperty("agent.performcallserver"));
+		   if (logger.isInfoEnabled()) {
+			   logger.info("--- Agent will perform call to server " +
+				   Agent.callServer);
+		   }
+	   }
+
+    
     protected static boolean callServer;
     protected Event currentEvent;
-
-    static {
-        Agent.callServer = !"NO".equals(System.getProperties().getProperty(
-                                                "agent.performcallserver"));
-        if (logger.isInfoEnabled()) {
-            logger.info(
-                    "--- Agent will perform call to server " + 
-                    Agent.callServer);
-        }
-    }
+    protected TtlGenerator ttlGenerator;
 
     //    protected UniqueID id;
     protected double startTime;
@@ -40,10 +41,13 @@ public class Agent extends SimulatorElement {
     protected Averagator averagatorDelta;
     protected Averagator averagatorNu;
     protected Averagator averagatorGamma2;
+ 
     protected double delta;
     protected double nu;
-    private RandomNumberGenerator expoDelta;
-    private RandomNumberGenerator expoNu;
+    protected double initialTtl;
+    protected double currentTtl;
+//    private RandomNumberGenerator expoDelta;
+ //   private RandomNumberGenerator expoNu;
 
     public Agent() {
     }
@@ -64,21 +68,30 @@ public class Agent extends SimulatorElement {
         this.delta = delta;
         this.nu = nu;
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    " AgentWithExponentialMigrationAndServer: waited " + 
-                    this.remainingTime + " before migration");
+            logger.debug(" AgentWithExponentialMigrationAndServer: waited " +
+                this.remainingTime + " before migration");
         }
         this.averagatorNu.add(this.remainingTime);
         this.remainingTime = this.waitTime();
         this.notifyEvent("Wait");
     }
 
+    public Agent(Simulator simulator, double nu, double delta, double ttl,
+        int maxMigration, int i) {
+        this(simulator, nu, delta, maxMigration, i);
+        //System.out.println("XXXX");
+        this.initialTtl = ttl;
+        this.currentTtl = ttl;
+        this.ttlGenerator = new TtlGenerator(this.initialTtl);
+  
+    }
+
     public void notifyEvent(String description) {
         if (this.currentEvent != null) {
             this.simulator.removeEvent(this.currentEvent);
         }
-        this.timeNextEvent = this.remainingTime + 
-                             this.simulator.getCurrentTime();
+        this.timeNextEvent = this.remainingTime +
+            this.simulator.getCurrentTime();
         this.currentEvent = new Event(this.timeNextEvent, this, description);
         this.simulator.addEvent(currentEvent);
     }
@@ -97,23 +110,25 @@ public class Agent extends SimulatorElement {
         }
         if (this.state == WAITING) {
             return Agent.WAITING;
-        } else
+        } else {
             return Agent.BLOCKED;
+        }
     }
 
     public void update(double time) {
         this.currentEvent = null;
         switch (this.state) {
-            case WAITING:
-                this.startMigration(time);
-                break;
-            case MIGRATING:
-                this.endMigration(time);
-                break;
-            case CALLING_SERVER:
-                this.endOfCallServer(time);
-                break;
+        case WAITING:
+            this.startMigration(time);
+            break;
+        case MIGRATING:
+            this.endMigration(time);
+            break;
+        case CALLING_SERVER:
+            this.endOfCallServer(time);
+            break;
         }
+
         //  }
     }
 
@@ -150,12 +165,10 @@ public class Agent extends SimulatorElement {
     public void endMigration(double endTime) {
         if (logger.isDebugEnabled()) {
             logger.debug("Agent: Migration ended ");
-            logger.debug(
-                    "Agent: length of the migration " + 
-                    (endTime - startTime));
-            logger.debug(
-                    "Agent: will call server " + 
-                    (((this.migrationCounter + 1) % maxMigrations) == 0));
+            logger.debug("Agent: length of the migration " +
+                (endTime - startTime));
+            logger.debug("Agent: will call server " +
+                (((this.migrationCounter + 1) % maxMigrations) == 0));
         }
         this.averagatorDelta.add(endTime - startTime);
         if (((this.migrationCounter + 1) % maxMigrations) == 0) {
@@ -168,21 +181,19 @@ public class Agent extends SimulatorElement {
     protected void _endOfMigration(double endTime) {
         this.migrationCounter++;
         this.state = WAITING;
-        this.forwarderChain.add(new Forwarder(this.migrationCounter - 1, 
-                                              this.server, this.simulator, 
-                                              this.id));
+   //     this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
+     //           this.server, this.simulator, this.id), this.simulator.generateForwarderLifeTime());
+	 this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
+		            this.server, this.simulator, this.id), this.currentTtl);
         this.remainingTime = this.waitTime();
         this.notifyEvent("Wait");
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "Agent._endOfMigration migrationCounter " + 
-                    this.migrationCounter);
-            logger.debug(
-                    "Agent._endOfMigration total time " + 
-                    (endTime - startTime));
-            logger.debug(
-                    "Agent: waited " + this.remainingTime + 
-                    " before migration");
+            logger.debug("Agent._endOfMigration migrationCounter " +
+                this.migrationCounter);
+            logger.debug("Agent._endOfMigration total time " +
+                (endTime - startTime));
+            logger.debug("Agent: waited " + this.remainingTime +
+                " before migration");
         }
         this.averagatorNu.add(this.remainingTime);
     }
@@ -215,18 +226,19 @@ public class Agent extends SimulatorElement {
      * Called by the ForwarderChain when a tensioning is initiated
      */
     public void startTensioning(double length) {
+
         //the agent can only be waiting when a tensioning is initiated
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                    "Tensioning requested length " + length + " next event " + 
-                    this.currentEvent.getTime());
+            logger.debug("Tensioning requested length " + length +
+                " next event " + this.currentEvent.getTime());
         }
-        if (this.currentEvent.getTime() < (length + this.simulator.getCurrentTime())) {
+        if (this.currentEvent.getTime() < (length +
+                this.simulator.getCurrentTime())) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                        "Simulator: agent wait end of tensioning " + 
-                        (length - this.remainingTime));
+                logger.debug("Simulator: agent wait end of tensioning " +
+                    (length - this.remainingTime));
             }
+
             //this is because of a nasty assumption in the model
             //it should be      this.remainingTime = time;
             this.remainingTime = length + this.waitTime();
@@ -243,30 +255,30 @@ public class Agent extends SimulatorElement {
     }
 
     public void end() {
+        ;
         if (logger.isInfoEnabled()) {
-            logger.debug("########## Agent ##################");
-            logger.debug("* nu = " + 1000 / this.averagatorNu.average());
-            logger.debug(
-                    "* delta  = " + 1000 / this.averagatorDelta.average() + 
-                    " " + this.averagatorDelta.getCount());
-            logger.debug(
-                    "gamma2 server = " + 
-                    1000 / this.averagatorGamma2.average());
-            logger.debug(" gamma2 count " + this.averagatorGamma2.getCount());
-            logger.debug(
-                    "* Real delta = " + 
-                    1000 / ((this.averagatorDelta.getTotal() + this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount()));
+            logger.info("########## Agent ##################");
+            logger.info("* nu = " + (1000 / this.averagatorNu.average()));
+            logger.info("* delta  = " +
+                (1000 / this.averagatorDelta.average()) + " " +
+                this.averagatorDelta.getCount());
+            logger.info("gamma2 server = " +
+                (1000 / this.averagatorGamma2.average()));
+            logger.info(" gamma2 count " + this.averagatorGamma2.getCount());
+            logger.info("* Real delta = " +
+                (1000 / ((this.averagatorDelta.getTotal() +
+                this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount())));
         }
     }
 
     public String getStateAsLetter() {
         switch (this.state) {
-            case WAITING:
-                return "w";
-            case MIGRATING:
-                return "m";
-            case CALLING_SERVER:
-                return "u";
+        case WAITING:
+            return "w";
+        case MIGRATING:
+            return "m";
+        case CALLING_SERVER:
+            return "u";
         }
         return "";
     }
@@ -287,18 +299,18 @@ public class Agent extends SimulatorElement {
 
         StringBuffer tmp = new StringBuffer("Agent: ");
         switch (this.state) {
-            case WAITING:
-                tmp.append("WAITING");
-                break;
-            case MIGRATING:
-                tmp.append("MIGRATING");
-                break;
-            case MIGRATED:
-                tmp.append("MIGRATED");
-                break;
-            case CALLING_SERVER:
-                tmp.append("CALLING_SERVER");
-                break;
+        case WAITING:
+            tmp.append("WAITING");
+            break;
+        case MIGRATING:
+            tmp.append("MIGRATING");
+            break;
+        case MIGRATED:
+            tmp.append("MIGRATED");
+            break;
+        case CALLING_SERVER:
+            tmp.append("CALLING_SERVER");
+            break;
         }
         tmp.append(" remainingTime = ").append(remainingTime);
         return tmp.toString();
@@ -307,13 +319,23 @@ public class Agent extends SimulatorElement {
     public double getRemainingTime() {
         if (this.currentEvent != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("current event is " + 
-                             this.currentEvent.toString());
+                logger.debug("current event is " +
+                    this.currentEvent.toString());
             }
-            return this.currentEvent.getTime() - 
-                   this.simulator.getCurrentTime();
+            return this.currentEvent.getTime() -
+            this.simulator.getCurrentTime();
         } else {
             return Double.MAX_VALUE;
         }
+    }
+
+    public void previousCommunicationTime(double d, int tries) {
+    	
+    	if (this.ttlGenerator.newCommunicationTime(d)) { 	
+    		this.currentTtl = this.ttlGenerator.getNewTtl();
+			System.out.println("Getting new value for ttl = " + this.currentTtl);
+		
+    	}
+        //System.out.println("Agent: previous communication time " + d);
     }
 }

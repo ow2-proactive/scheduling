@@ -12,7 +12,7 @@ public abstract class SimulatorElement {
 
     public SimulatorElement() {
     }
-
+    
     /**
      * Get the value of state.
      * @return Value of state.

@@ -1,0 +1,17 @@
+log4j.rootLogger=FATAL
+
+# logger for the simulator
+log4j.logger.modelisation.simulator.mixed.mixedwithcalendar.Simulator=DEBUG, A1
+log4j.appender.A1=org.apache.log4j.ConsoleAppender
+
+#logger for the agent
+log4j.logger.modelisation.simulator.mixed.mixedwithcalendar.Agent=INFO, A1
+
+
+#logger for the source
+log4j.logger.modelisation.simulator.mixed.mixedwithcalendar.Source=INFO, A1
+
+
+#A1 uses PatternLayout
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%m %n

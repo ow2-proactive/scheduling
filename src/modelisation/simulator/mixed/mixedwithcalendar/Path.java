@@ -46,6 +46,11 @@ public class Path {
             + " count = " + this.averagator.getCount());            
         }
     }
+    
+    public int size() {
+    	return this.path.size();
+    
+    }
 
     public String toString() {
         StringBuffer tmp = new StringBuffer();
