@@ -30,6 +30,9 @@
 */
 package org.objectweb.proactive.core.jini;
 
+import java.io.File;
+import java.io.IOException;
+
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
 import net.jini.core.lookup.ServiceRegistrar;
@@ -83,7 +86,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         try {
             host = java.net.InetAddress.getLocalHost().getCanonicalHostName();
             String policyLocation = System.getProperty("java.security.policy");
-            if(policyLocation != null) policy = policyLocation;
+            if(policyLocation != null) policy = getAbsolutePath(policyLocation);
             else policy = DEFAULT_POLICY;
             DEFAULT_RMID_PARAMS = DEFAULT_RMID_PARAMS.concat(policy);
         } catch (java.net.UnknownHostException e) {
@@ -420,4 +423,17 @@ public class ServiceLocatorHelper implements DiscoveryListener {
             return true;
         }
     }
+    
+	private static String getAbsolutePath(String path) {
+			if (path.startsWith("file:")) {
+				//remove file part to build absolute path
+				path = path.substring(5);
+			}
+			try {
+				return new File(path).getCanonicalPath();
+			} catch (IOException e) {
+				logger.error(e.getMessage());
+				return path;
+			}
+		}
 }
