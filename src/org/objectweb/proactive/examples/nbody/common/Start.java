@@ -146,9 +146,9 @@ public class Start implements Serializable{
      * @param e the Exception which triggered the abrupt end of the program
      */
     public void abort (Exception e) {
+        System.err.println("This is an unhandled behavior!");
         e.printStackTrace();
-        System.exit(-1);
-    }
+        }
     /**
      * End the program, removing extra JVM that have been created with the deployment of the Domains
      */    
