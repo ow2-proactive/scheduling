@@ -46,7 +46,6 @@ public interface Handlerizable {
 
 	/**
 	 * Get information about the handlerizable object
-	 * @return
 	 */
 	public String getHandlerizableInfo() throws java.io.IOException;
 

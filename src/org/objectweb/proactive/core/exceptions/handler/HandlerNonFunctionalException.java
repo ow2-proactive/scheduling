@@ -92,7 +92,7 @@ public class HandlerNonFunctionalException implements Handler {
 
     /**
      * Provide a treatment for the handled exception(s)
-     * @param e The exception to be handled
+     * @param nfe The exception to be handled
      */
     public void handle(NonFunctionalException nfe, Object info) {
         if (HandlerManager.isGraph()) {

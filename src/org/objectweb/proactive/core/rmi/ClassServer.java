@@ -90,7 +90,7 @@ public class ClassServer implements Runnable {
     /**
      * Constructs a ClassServer that listens on <b>port</b> and
      * obtains a class's bytecodes using the method <b>getBytes</b>.
-     * @param port the port number
+     * @param port_ the port number
      * @exception java.io.IOException if the ClassServer could not listen
      *            on <b>port</b>.
      */
@@ -102,7 +102,7 @@ public class ClassServer implements Runnable {
 
     /**
      * Constructs a ClassFileServer.
-     * @param classpath the classpath where the server locates classes
+     * @param paths the classpath where the server locates classes
      */
     public ClassServer(String paths) throws java.io.IOException {
         this(0, paths);

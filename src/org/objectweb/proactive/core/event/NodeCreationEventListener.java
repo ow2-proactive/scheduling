@@ -12,7 +12,6 @@ package org.objectweb.proactive.core.event;
  * A class implementating this interface is listener of <code>NodeCreationEvent</code>.
  * </p>
  *
- * @see NodeCreation
  * @version 1.0,  2004/07/06
  * @since   ProActive 2.0.1
  *

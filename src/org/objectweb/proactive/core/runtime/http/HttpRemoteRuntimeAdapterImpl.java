@@ -42,7 +42,6 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
 
     /**
      *
-     * @param url
      */
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
         String newurl) {
@@ -460,7 +459,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     }
 
     /**
-     * @param nodeName
+     * @param uBody
      * @return returns all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {

@@ -92,7 +92,7 @@ public class HandlerManager {
     }
 
     /**
-     * @param isGraph The isGraph to set.
+     * @param graph The isGraph to set.
      */
     static public void setGraph(boolean graph) {
         isGraph = graph;
@@ -106,7 +106,7 @@ public class HandlerManager {
     }
 
     /**
-     * @param isQuiet The isQuiet to set.
+     * @param quiet The isQuiet to set.
      */
     static public void setQuiet(boolean quiet) {
         isQuiet = quiet;

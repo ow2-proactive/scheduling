@@ -1009,9 +1009,6 @@ public class ProxyForGroup extends AbstractProxy
      * @param className - the name of the Class of the members.
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
-     * @param className - the name of the Class of the members.
-     * @param params - an array that contains the parameters for the constructor of members.
-     * @param nodeList - the nodes where the member will be created.
      */
     protected void createMemberWithMultithread(String className,
         Object[][] params, String[] nodeList) {

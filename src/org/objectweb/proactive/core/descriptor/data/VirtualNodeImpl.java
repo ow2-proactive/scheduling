@@ -182,7 +182,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /**
      * Sets the property attribute to the given value
-     * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
+     * @param value property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
      */
     public void setProperty(String value) {
         this.property = value;

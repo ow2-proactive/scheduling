@@ -51,8 +51,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     /**
-     *
-     * @param url
+     * @param newurl
      */
     public HttpRuntimeAdapter(String newurl) {
         this.url = newurl;
@@ -232,7 +231,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     /**
-     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#updateLocalNodeVirtualName()
+     * 
      */
     public void listVirtualNodes() throws ProActiveException {
         //  remoteProActiveRuntime.updateLocalNodeVirtualName();
@@ -264,15 +263,15 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
     /**
      * @param nodeName
-     * @return returns all entities associated to the node
+     * @return all entities associated to the node
      */
     public ArrayList getEntities(String nodeName) throws ProActiveException {
         return runtimestrategyadapter.getEntities(nodeName);
     }
 
     /**
-     * @param nodeName
-     * @return returns all entities associated to the node
+     * @param uBody
+     * @return all entities associated to the node
      */
     public ArrayList getEntities(UniversalBody uBody) throws ProActiveException {
         return runtimestrategyadapter.getEntities(uBody);

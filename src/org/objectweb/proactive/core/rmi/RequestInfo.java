@@ -72,7 +72,6 @@ public class RequestInfo {
     /**
      * Read the InputStream, which points to the beginning of a HTTP Request,
      * and extract the necessary information
-     * @return true on success, false if the connection was closed it could read anything
      **/
     public void read(HTTPInputStream in) throws IOException {
         String line;
