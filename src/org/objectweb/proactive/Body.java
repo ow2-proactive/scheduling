@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.message.MessageEventProducer;
  * is a remote representation of Body that can be accessed by distant object.
  * </P><P>
  * <code>UniversalBody</code> defines the remote accessible part of the body while
- * <code>LocalBody</code> defines the remote accessible part of the body.
+ * <code>LocalBody</code> defines the local accessible part of the body.
  * </P><P>
  * The body of an ActiveObject provides needed services such as a the ability to sent and
  * receive request and reply.
