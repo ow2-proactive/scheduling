@@ -120,7 +120,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      */
     public static void register(RemoteBodyAdapter paBody, String urn)
         throws java.io.IOException {
-        urn = urn.substring(urn.lastIndexOf('/'));
+        urn = urn.substring(urn.lastIndexOf('/') + 1);
         urnBodys.put(urn, paBody);
 
         if (logger.isInfoEnabled()) {
@@ -154,7 +154,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
                 //                          urn.lastIndexOf(':') + 5));
             }
 
-            urn = urn.substring(urn.lastIndexOf('/'));
+            urn = urn.substring(urn.lastIndexOf('/') + 1);
 
             HttpLookupMessage message = new HttpLookupMessage(urn);
             message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
