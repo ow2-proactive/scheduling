@@ -275,21 +275,7 @@ public class ProActive {
     public static Object[] newActive(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        if (virtualnode != null) {
-            Node[] nodeTab = virtualnode.getNodes();
-            Object[] aoTab = new Object[nodeTab.length];
-
-            for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = newActive(classname, constructorParameters,
-                        (Node) nodeTab[i]);
-                aoTab[i] = tmp;
-            }
-
-            return aoTab;
-        } else {
-            throw new NodeException(
-                "VirtualNode is null, unable to activate the object");
-        }
+        	return ProActive.newActive(classname, constructorParameters, virtualnode, null, null);
     }
 
     
