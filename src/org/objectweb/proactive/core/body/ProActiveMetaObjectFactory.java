@@ -67,6 +67,8 @@ package org.objectweb.proactive.core.body;
  * @since   ProActive 0.9.2
  */
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ibis.ProActiveIbisMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
@@ -85,28 +87,16 @@ import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
 
-public abstract class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable {
+public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
-    static {
-        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Factory is ibis");
-            }
-            ProActiveMetaObjectFactory.instance = new ProActiveIbisMetaObjectFactory();
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Factory is rmi");
-            }
-            ProActiveMetaObjectFactory.instance = new ProActiveRmiMetaObjectFactory();
-        }
-    }
+    
 
     // private static final MetaObjectFactory instance = new ProActiveMetaObjectFactory();
-    private static MetaObjectFactory instance;
+    private static MetaObjectFactory instance = new ProActiveMetaObjectFactory();
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -206,9 +196,9 @@ public abstract class ProActiveMetaObjectFactory implements MetaObjectFactory, j
       }
       
     
-      protected abstract RemoteBodyFactory newRemoteBodyFactorySingleton() ;
-//        return new RemoteBodyFactoryImpl();
-//      }
+      protected  RemoteBodyFactory newRemoteBodyFactorySingleton() {
+        return new RemoteBodyFactoryImpl();
+      }
     
     
       protected ThreadStoreFactory newThreadStoreFactorySingleton() {
@@ -256,15 +246,25 @@ public abstract class ProActiveMetaObjectFactory implements MetaObjectFactory, j
       } // end inner class MigrationManagerFactoryImpl
     
     
-//      protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
-//        public UniversalBody newRemoteBody(UniversalBody body) {
-//          try {
-//              return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
-//          } catch (ProActiveException e) {
-//              throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
-//          }
-//        }
-//      } // end inner class RemoteBodyFactoryImpl
+      protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
+        public UniversalBody newRemoteBody(UniversalBody body) {
+			try {
+				if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Factory is ibis");
+					}
+					return new org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter(body);
+				} else {
+					if (logger.isDebugEnabled()) {
+						logger.debug("Factory is rmi");
+					}
+					return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+				}
+			} catch (ProActiveException e) {
+				throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
+			}
+		}
+	} // end inner class RemoteBodyFactoryImpl
     
     
       protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
