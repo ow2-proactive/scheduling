@@ -61,12 +61,12 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	
 	public void toggleHighlighted(int key) {
 		if (key != NO_KEY)
-			highlighted[key] = !highlighted[key];
+			highlighted[KEY2INDEX[key]] = !highlighted[KEY2INDEX[key]];
 	}
 	
 	public boolean isHighlighted(int key) {
 		if (key != NO_KEY)
-			return highlighted[key];
+			return highlighted[KEY2INDEX[key]];
 
 		return false;
 	}

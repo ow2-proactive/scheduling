@@ -111,7 +111,7 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 	
 	public String toString() {
 		if (name == null && key != NO_KEY)
-			return NAMES[key];
+			return NAMES[KEY2INDEX[key]];
 		
 		return name;
 	}

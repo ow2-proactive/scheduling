@@ -8,11 +8,12 @@ public interface JobMonitorConstants
 	public static final int JVM    = 1;
 	public static final int NODE   = 2;
 	public static final int AO     = 3;
-	public static final int JOB    = 100;
-	public static final int VN     = 200;
+	/* The hole is important here because we don't have a real tree */
+	public static final int JOB    = 5;
+	public static final int VN     = 6;
 	
-	public static final String[] NAMES = new String[] {"Job", "VN", "Host", "JVM", "Node", "Active Object"};
+	public final int[] SPECIAL_KEYS = {VN, JOB};
+	public static final String[] NAMES = new String[] {"Host", "JVM", "Node", "Active Object", "Job", "VN"};
 	public static final int NB_KEYS = NAMES.length;
-	public static final int FIRST_KEY = 0;
-	public static final int LAST_KEY = NB_KEYS - 1;
+	public static final int[] KEY2INDEX = {0, 1, 2, 3, -1, 4, 5};
 }

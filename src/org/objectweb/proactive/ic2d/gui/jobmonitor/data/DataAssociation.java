@@ -30,6 +30,10 @@ class AssoKey implements Comparable {
 	public String getName() {
 		return name;
 	}
+	
+	public String toString() {
+		return name + "(" + lkey + "->" + rkey + ")";
+	}
 }
 
 /*
@@ -49,17 +53,27 @@ class AssoKey implements Comparable {
 public class DataAssociation implements JobMonitorConstants {
 	private Map asso;
 	private Set[] sets;
-	private final int[] specialCases = {VN, JOB};
-
+	
 	public DataAssociation() {
 		clear();
 	}
 	
+	private Set getSetForKey(int key) {
+		int index = KEY2INDEX[key];
+		return sets[index];
+	}
+	
+	private void makeSet(int key) {
+		int index = KEY2INDEX[key];
+		sets[index] = new TreeSet();
+	}
+	
 	private void addToSet(int key, String value) {
-		if (sets[key] == null)
-			sets[key] = new TreeSet();
+		int index = KEY2INDEX[key];
+		if (getSetForKey(key) == null)
+			makeSet(key);
 		
-		sets[key].add(value);
+		getSetForKey(key).add(value);
 	}
 	
 	private void addAsso(int fromKey, String fromValue, int toKey, String toValue) {
@@ -81,14 +95,17 @@ public class DataAssociation implements JobMonitorConstants {
 		addAsso(toKey, toValue, fromKey, fromValue);
 	}
 
-	/* Exemple : addChild(HOST, "camel.inria.fr", "PA_JVM_0123456798") */
+	/* Example : addChild(HOST, "camel.inria.fr", "PA_JVM_0123456798") */
 	public void addChild(int key, String lvalue, String rvalue) {
-		addChild(key, lvalue, key + 1, rvalue);
+		if (isSpecialKey(key))
+			throw new RuntimeException("This key does not have any child");
+		else
+			addChild(key, lvalue, key + 1, rvalue);
 	}
 
-	private boolean isSpecialCase(int key) {
-		for (int i = 0; i < specialCases.length; i++)
-			if (key == specialCases[i])
+	private boolean isSpecialKey(int key) {
+		for (int i = 0; i < SPECIAL_KEYS.length; i++)
+			if (key == SPECIAL_KEYS[i])
 				return true;
 
 		return false;
@@ -105,8 +122,10 @@ public class DataAssociation implements JobMonitorConstants {
 		return (Set) res;
 	}
 	
-	private Set handleSpecialCase(int from, String name, int to) {
-		Set toNode = getAsso(from, name, NODE);
+	private Set handleSpecialKey(int from, String name, int to) {
+//		dumpMap();
+		Set toNode;
+		toNode = getValues(from, name, NODE);
 		Set res = new TreeSet();
 		Iterator iter = toNode.iterator();
 		while (iter.hasNext()) {
@@ -121,6 +140,7 @@ public class DataAssociation implements JobMonitorConstants {
 	 * Exemple : getValues(VN, "myVN", AO) ==> {"Object1", "Object2"}
 	 */
 	public Set getValues(int from, String name, int to) {
+		System.out.println(from + " - " + to);
 		if (to == from) {
 			Set res = new TreeSet();
 			res.add(name);
@@ -130,12 +150,18 @@ public class DataAssociation implements JobMonitorConstants {
 		if (from == NO_KEY)
 			return list(to);
 		
+		if (isSpecialKey(from) && to != NODE)
+			return handleSpecialKey(from, name, to);
+		
+		if ((from == NODE || to == NODE) && (isSpecialKey(from) || isSpecialKey(to)))
+			return getAsso(from, name, to);
+
+		if (isSpecialKey(from) || isSpecialKey(to))
+			return handleSpecialKey(from, name, to);
+		
 		if (to == from + 1 || to == from - 1)
 			return getAsso(from, name, to);
 
-		if (isSpecialCase(from) || isSpecialCase(to))
-			return handleSpecialCase(from, name, to);
-		
 		int inc = (to > from) ? 1 : -1;
 		Set step = getValues(from, name, to - inc);
 		if (step.isEmpty())
@@ -153,10 +179,10 @@ public class DataAssociation implements JobMonitorConstants {
 	}
 	
 	private Set list(int key) {
-		if (sets[key] == null)
-			sets[key] = new TreeSet();
+		if (getSetForKey(key) == null)
+			makeSet(key);
 		
-		return sets[key];
+		return getSetForKey(key);
 	}
 	
 	public void clear() {
@@ -172,24 +198,36 @@ public class DataAssociation implements JobMonitorConstants {
 	}
 	
 	public void removeItem(int key, String name) {
-		if (sets[key] == null || !sets[key].remove(name))
+		if (getSetForKey(key) == null || !getSetForKey(key).remove(name))
 			return;
 		
-		if (key != LAST_KEY) {
-			Set desc = getValues(key, name, key + 1);
-			Iterator iter = desc.iterator();
-			while (iter.hasNext()) {
-				String childName = (String) iter.next();
-				removeItem(key + 1, childName);
-			}
+		if  (isSpecialKey(key))
+			/* If we had a reference count : associatedNode.ref-- */
+			return;
+		
+		Set desc = getValues(key, name, key + 1);
+		Iterator iter = desc.iterator();
+		while (iter.hasNext()) {
+			String childName = (String) iter.next();
+			removeItem(key + 1, childName);
 		}
 		
-		if (key != FIRST_KEY) {
-			Set parent = getValues(key, name, key - 1);
-			Iterator iter = parent.iterator();
-			while (iter.hasNext()) {
-				String parentName = (String) iter.next();
-				removeChild(key - 1, parentName, name);
+		Set parent = getValues(key, name, key - 1);
+		iter = parent.iterator();
+		while (iter.hasNext()) {
+			String parentName = (String) iter.next();
+			removeChild(key - 1, parentName, name);
+		}
+	}
+	
+	public void dumpMap() {
+		Iterator keys = asso.keySet().iterator();
+		while (keys.hasNext()) {
+			AssoKey key = (AssoKey) keys.next();
+			System.out.println(key);
+			Iterator values = ((Set) asso.get(key)).iterator();
+			while (values.hasNext()) {
+				System.out.println(" " + values.next());
 			}
 		}
 	}

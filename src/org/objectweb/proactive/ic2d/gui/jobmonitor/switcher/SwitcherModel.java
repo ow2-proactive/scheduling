@@ -25,7 +25,7 @@ public class SwitcherModel implements JobMonitorConstants
 		keys = new ArrayList();
 		
 		for (int i = 0; i < _keys.length; i++) {
-			labels.add(NAMES[_keys[i]]);
+			labels.add(NAMES[KEY2INDEX[_keys[i]]]);
 			keys.add(new Integer(_keys[i]));
 		}
 

@@ -403,9 +403,6 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			String nodeName = nodes [i];
 			String vnName = pr.getVNName (nodeName);
 
-			if (vnName == null)
-				vnName = "NoVirtualNodeName";
-
 //			System.out.println ("node " + (i + 1) + " / " + nodes.length + ": " + nodes [i] + 	" - vn name: " + vnName);
 			
 			ArrayList activeObjects = null;
@@ -418,12 +415,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 				controller.log ("Unexpected ProActive exception caught while obtaining the active objects list", e);
 			}
 			
-			asso.addChild(JOB, jobId, vnName);
-			asso.addChild(VN, vnName, hostname);
 			asso.addChild(JVM, vmName, nodeName);
-			asso.addChild(JOB, jobId, HOST, hostname);
-			asso.addChild(JOB, jobId, JVM, vmName);
-			asso.addChild(VN, vnName, JVM, vmName);
+			if (vnName != null)
+				asso.addChild(VN, vnName, NODE, nodeName);
+			asso.addChild(JOB, jobId, NODE, nodeName);
 			handleActiveObjects(nodeName, activeObjects);
 		}
 	}

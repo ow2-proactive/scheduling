@@ -50,12 +50,12 @@ public class DataModelTraversal implements JobMonitorConstants
 	
 	public void toggleHidden(int key) {
 		if (key != NO_KEY)
-			hidden[key] = !hidden[key];
+			hidden[KEY2INDEX[key]] = !hidden[KEY2INDEX[key]];
 	}
 	
 	public boolean isHidden(int key) {
 		if (key != NO_KEY)
-			return hidden[key];
+			return hidden[KEY2INDEX[key]];
 		
 		return false;
 	}

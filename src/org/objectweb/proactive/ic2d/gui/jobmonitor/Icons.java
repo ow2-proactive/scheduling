@@ -19,7 +19,7 @@ public class Icons implements JobMonitorConstants {
 	private static Icon NODE_ICON = createImageIcon (NODE_ICON_GIF);
 	private static Icon AO_ICON = createImageIcon (AO_ICON_GIF);
 	
-	private static Icon[] ICONS = new Icon[] {JOB_ICON, VN_ICON, HOST_ICON, JVM_ICON, NODE_ICON, AO_ICON};
+	private static Icon[] ICONS = new Icon[] {HOST_ICON, JVM_ICON, NODE_ICON, AO_ICON, JOB_ICON, VN_ICON};
 	
 	public static ImageIcon createImageIcon (String path)
 	{
@@ -34,8 +34,8 @@ public class Icons implements JobMonitorConstants {
 	}
 
 	public static Icon getIconForKey(int key) {
-		if (key >= 0 && key < ICONS.length)
-			return ICONS[key];
+		if (key != NO_KEY)
+			return ICONS[KEY2INDEX[key]];
 		
 		return null;
 	}
