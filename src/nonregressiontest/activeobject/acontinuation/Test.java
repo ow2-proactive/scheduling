@@ -62,11 +62,14 @@ public class Test extends FunctionalTest {
      */
     public void action() throws Exception {
        	//System.out.println( "Property "+System.getProperty("proactive.future.ac"));
-				System.setProperty("proactive.future.ac","enable");
-				ACThread acthread = new ACThread();
-				acthread.start();
-				acthread.join();
-        System.setProperty("proactive.future.ac","disable");
+        String initial_ca_setting = System.getProperty("proactive.future.ac");
+        if (!"enable".equals(initial_ca_setting)) {
+    		System.setProperty("proactive.future.ac","enable");
+        }
+		ACThread acthread = new ACThread();
+		acthread.start();
+		acthread.join();
+        System.setProperty("proactive.future.ac",initial_ca_setting);
     }
 
     /**
