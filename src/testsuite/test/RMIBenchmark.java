@@ -21,7 +21,7 @@ import java.rmi.Remote;
  */
 public abstract class RMIBenchmark extends ProActiveBenchmark
     implements Serializable, Remote {
-    private String rmiObjectName = "RMIBenchmark";
+    private String rmiObjectName = "RMIBenchmark"+System.currentTimeMillis();
     private RMIBenchmark rmiObject = null;
 
     /**
