@@ -54,6 +54,8 @@ public abstract class StandardFrame extends javax.swing.JFrame {
   protected DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
   protected transient JTextPane messageArea;
   protected transient Style regularStyle;
+  protected javax.swing.JSplitPane verticalSplitPane;
+
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -70,6 +72,7 @@ public abstract class StandardFrame extends javax.swing.JFrame {
     this.name = name;
   }
 
+  public StandardFrame(){}
 
   //
   // -- PUBLIC METHODS -----------------------------------------------
@@ -177,7 +180,7 @@ public abstract class StandardFrame extends javax.swing.JFrame {
     javax.swing.JPanel bottomPanel = createMessageZonePanel(messageArea);
 
     // create an vertical split Panel
-    javax.swing.JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     verticalSplitPane.setDividerLocation(height);
     verticalSplitPane.setTopComponent(topPanel);
     verticalSplitPane.setBottomComponent(bottomPanel);
