@@ -12,7 +12,7 @@ public class ProActiveTestSuite extends junit.framework.TestSuite {
 	public static Test suite() {
 		TestSuite suite = new TestSuite();
 		suite.addTestSuite(org.objectweb.proactive.core.util.test.CircularArrayListTest.class);
-		suite.addTestSuite(org.objectweb.proactive.core.node.test.NodeFactoryTest.class);
+		suite.addTestSuite(org.objectweb.proactive.core.node.test.NodeFactoryTest1.class);
 		return suite;	
 	}
 }
