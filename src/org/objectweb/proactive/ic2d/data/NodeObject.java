@@ -87,6 +87,10 @@ public class NodeObject extends AbstractDataObject {
     return getTypedParent().getID().equals(o.getTypedParent().getID());
   }
 
+  public boolean isInsideSameNode(NodeObject o) {
+    return getTypedParent().getID().equals(o.getTypedParent().getID()) &&
+    	    getURL().equals(o.getURL());
+  }
 
   public ActiveObject findActiveObjectById(UniqueID id) {
     return getActiveObject(id);  

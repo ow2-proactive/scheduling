@@ -111,7 +111,11 @@ public class ActiveObject extends AbstractDataObject {
     return getTypedParent().isInsideSameVM(o.getTypedParent());
   }
  
-  
+  public boolean isInsideSameNode(ActiveObject o) {
+    if (isDestroyed || o.isDestroyed) return false;
+    return getTypedParent().isInsideSameNode(o.getTypedParent());
+  }
+   
   public void setServingStatus(int value) {
     if (isDestroyed) return;
     if (value != servingStatus) {

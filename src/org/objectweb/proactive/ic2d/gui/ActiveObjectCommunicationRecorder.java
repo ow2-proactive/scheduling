@@ -72,7 +72,7 @@ public class ActiveObjectCommunicationRecorder {
     if (source.isDestroyed() || dest.isDestroyed()) return;
     // try to find a mapping source <-> dest
     java.util.HashMap destMap = (java.util.HashMap) panelToPanelsMap.get(source);
-    if (destMap == null) { // leads to weird results???
+/*    if (destMap == null) { // leads to weird results???
       // try to find a mapping dest <-> source
       destMap = (java.util.HashMap) panelToPanelsMap.get(dest);
       if (destMap != null) {
@@ -81,7 +81,7 @@ public class ActiveObjectCommunicationRecorder {
         source = dest;
         dest = temp;
       }
-    } 
+    } */
     if (destMap == null) {
       // new association source <-> dest
       destMap = new java.util.HashMap();
@@ -219,7 +219,7 @@ public class ActiveObjectCommunicationRecorder {
       case FILAIRE_DRAWING_STYLE:
       default:
         // just draw 1 pixel tick line
-        ratio = ((float)1) / maxCommunicationCounter;
+        ratio = -1;
         break;
     }
     //System.out.println("ratio = "+ratio+"  proportionalLinks="+proportionalLinks+" maxCommunicationCounter="+maxCommunicationCounter);
@@ -267,60 +267,81 @@ public class ActiveObjectCommunicationRecorder {
       int destWidth = destPanel.getWidth();
       // drawing line
       g2.setPaint(STROKE_COLOR);
-      float strokeWidth = communicationCount * ratio + 1;
+      float strokeWidth;
+      if (ratio == -1) strokeWidth = 2;
+      else strokeWidth = communicationCount * ratio + 1;
       g2.setStroke(new java.awt.BasicStroke(strokeWidth));
-      boolean sameVM =  sourcePanel.getActiveObject().isInsideSameVM(destPanel.getActiveObject());
-      if (sameVM) {
-        drawOneArcSameVM(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
+      boolean sameNode =  sourcePanel.getActiveObject().isInsideSameNode(destPanel.getActiveObject());
+      if (sameNode) {
+        drawOneArcSameNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
       } else {
-        drawOneArcDifferentVM(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
+        drawOneArcDifferentNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
       }
       // drawing dot
+      if (sameNode) {
+        drawCommunicationPointSameNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
+      } else {
+        drawCommunicationPointDifferentNode(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
+      }
       g2.setStroke(oldStroke);
       g2.setPaint(java.awt.Color.black);
-      if (sameVM) {
-        drawCommunicationPointSameVM(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
-      } else {
-        drawCommunicationPointDifferentVM(xSource, ySource, sourceWidth, xDest, yDest, destWidth, g2);
-      }
     } // end while
   }
   
+  private void drawArrowHead(int xSource, int ySource, int xDest, int yDest, java.awt.Graphics2D g2) {
+  	double angle;
+  	if (xSource == xDest) {
+  	  angle = Math.PI / 2;
+  	} else {
+  	  angle = Math.atan((yDest-ySource)/((double)xDest-xSource));	
+  	}
+  	if (xDest < xSource) angle += Math.PI;
+  	g2.drawLine(xDest, yDest, xDest-(int)(Math.cos(angle-Math.PI/4) * 6), 
+  	                          yDest-(int)(Math.sin(angle-Math.PI/4) * 6));
+  	g2.drawLine(xDest, yDest, xDest-(int)(Math.cos(angle+Math.PI/4) * 6), 
+  	                          yDest-(int)(Math.sin(angle+Math.PI/4) * 6));
+  }
   
-  private void drawCommunicationPointDifferentVM(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
+  
+  private void drawCommunicationPointDifferentNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
     // Look for the good corner to join...
     if (Math.abs(xSource - xDest) > Math.abs(xSource + sourceWidth - xDest)) {
       xSource += sourceWidth;
-    } else if (Math.abs(xDest - xSource) > Math.abs(xDest + destWidth - xSource)) {
+    }
+    if (Math.abs(xDest - xSource) > Math.abs(xDest + destWidth - xSource)) {
       xDest += destWidth;
     }
-    g2.fillOval(xDest - 4, yDest + 9, 8, 8);  // xySource before, but that was obviously wrong
+//    g2.fillOval(xDest - 4, yDest + 9, 8, 8);  // xySource before, but that was obviously wrong
+      drawArrowHead(xSource, ySource+13, xDest, yDest+13, g2);
   }
 
-  private void drawCommunicationPointSameVM(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
+  private void drawCommunicationPointSameNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
     // draw a little black circle meaning : com point
     if (ySource > yDest) {
-      g2.fillOval(xSource - 4 + sourceWidth, yDest + 9, 8, 8);
+//      g2.fillOval(xDest - 4 + destWidth, yDest + 9, 8, 8);
+      drawArrowHead(xDest + destWidth + 100, yDest+13, xDest + destWidth, yDest+13, g2);
     } else {
-      g2.fillOval(xDest - 4, yDest + 9, 8, 8);
+//      g2.fillOval(xDest - 4, yDest + 9, 8, 8);
+      drawArrowHead(xDest - 100, yDest+13, xDest, yDest+13, g2);
     }
   }
 
-  private void drawOneArcDifferentVM(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
+  private void drawOneArcDifferentNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
     // Look for the good corner to join...
     if (Math.abs(xSource - xDest) > Math.abs(xSource + sourceWidth - xDest)) {
       xSource += sourceWidth;
-    } else if (Math.abs(xDest - xSource) > Math.abs(xDest + destWidth - xSource)) {
+    } 
+    if (Math.abs(xDest - xSource) > Math.abs(xDest + destWidth - xSource)) {
       xDest += destWidth;
     }
     g2.drawLine(xSource, ySource + 13, xDest, yDest + 13);
   }
 
-  private void drawOneArcSameVM(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
+  private void drawOneArcSameNode(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
     //Shape changing...
     int shape = Math.abs(ySource - yDest) / 3;
     if (ySource > yDest) {
-      g2.drawArc(xSource - shape + sourceWidth, ySource + 13 - Math.abs(ySource - yDest), shape * 2, Math.abs(ySource - yDest), 90, -180);
+      g2.drawArc(xSource - shape + sourceWidth, yDest + 13, shape * 2, Math.abs(ySource - yDest), 90, -180);
     } else {
       g2.drawArc(xSource - shape, ySource + 13, shape * 2, Math.abs(ySource - yDest), 90, 180);
     }
