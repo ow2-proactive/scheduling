@@ -505,20 +505,6 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-	<!--PiseProcess-->
-	<xs:complexType name="PiseProcessType">
-		<xs:sequence>
-			<xs:element ref="processReference"/>
-		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.pise.PiseProcess"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="hostname" type="xs:string" use="optional"/>
-	</xs:complexType>
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">
 		<xs:sequence>
@@ -569,19 +555,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="prunOption" type="prunOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess"/>
-		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
-		<xs:attribute name="queue" use="optional">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="normal"/>
-					<xs:enumeration value="priority"/>
-					<xs:enumeration value="night"/>
-					<xs:enumeration value="short"/>
-					<xs:enumeration value="idle"/>
-					<xs:enumeration value="exclusive"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
 	<xs:complexType name="prunOptionType">
@@ -589,7 +563,6 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="hostlist" type="ListType" minOccurs="0"/>
 			<xs:element name="hostsNumber" type="xs:positiveInteger" minOccurs="0"/>
 			<xs:element name="processorPerNode" type="xs:positiveInteger" minOccurs="0"/>
-			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
 			<xs:element name="bookingDuration" type="xs:string" minOccurs="0"/>
 			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
