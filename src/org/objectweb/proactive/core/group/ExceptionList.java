@@ -58,7 +58,7 @@ public class ExceptionList extends RuntimeException {
 	 * @param exception - the exception to add
 	 */
 	public void add (ExceptionInGroup exception) {
-		this.add(exception);
+		this.list.add(exception);
 	}
 	
 	/**
