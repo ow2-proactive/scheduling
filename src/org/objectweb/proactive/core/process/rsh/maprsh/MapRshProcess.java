@@ -4,6 +4,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.SimpleExternalProcess;
 
 
 /**
@@ -106,7 +107,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         String targetCommand = targetProcess.getCommand();
 
         newScriptText.append(scriptText);
-        newScriptText.append("\ntime " + targetCommand + " ) &");
+        newScriptText.append("\ntime " + targetCommand + " ) & \n");
         return newScriptText.toString();
     }
 
