@@ -51,11 +51,12 @@ public interface CheckpointServer extends Remote {
     /**
      * Store a checkpoint in the checkpoint server.
      * @param c the checkpoint to stored
+     * @param incarnation incarnation number of the caller
      * @return the last global state of the system, i.e. the index of the latest completed
      * image of the system.
      * @throws RemoteException
      */
-    public int storeCheckpoint(Checkpoint c) throws RemoteException;
+    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException;
 
     /**
      * Return a checkpoint of the object identified by id.
@@ -80,10 +81,11 @@ public interface CheckpointServer extends Remote {
      * @param ci informations that have to be added
      * @param id owner of the considered checkpoint
      * @param sequenceNumber index of the considered checkpoint
+     * @param incarnation incarnation number of the caller
      * @throws RemoteException
      */
     public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id,
-        int sequenceNumber) throws RemoteException;
+        int sequenceNumber, int incarnation) throws RemoteException;
 
     /**
      * Return informations on the given checkpoint

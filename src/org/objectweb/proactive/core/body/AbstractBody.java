@@ -220,7 +220,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (this.ftmanager != null) {
             ftres = this.ftmanager.onReceiveRequest(request);
             if (request.ignoreIt()) {
-                return ftres;
+                if (this.isDead){
+                    throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                }else{
+                    return ftres;
+                }
             }
         }
         try {
@@ -262,7 +266,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         if (this.ftmanager != null) {
             ftres = this.ftmanager.onReceiveReply(reply);
             if (reply.ignoreIt()) {
-                return ftres;
+                if (this.isDead){
+                    throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+                }else{
+                    return ftres;
+                }
             }
         }
 
@@ -1068,10 +1076,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
                 if (toKill != null) {
                     //this body is still alive
+                    toKill.blockCommunication();
                     BodyAdapter ba = (RemoteBodyAdapter) (toKill.getRemoteAdapter());
                     ba.changeProxiedBody(this);
                     this.remoteBody = ba;
                     toKill.terminate();
+                    toKill.acceptCommunication();
                 }
             }
         }

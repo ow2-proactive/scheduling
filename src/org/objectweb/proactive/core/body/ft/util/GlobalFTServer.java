@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
+import org.objectweb.proactive.core.body.ft.protocols.cic.CheckpointInfoCIC;
 import org.objectweb.proactive.core.body.ft.util.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.util.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
@@ -97,7 +98,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     
     /**
      * Create a new FTServer.
-     * @param startGC if true, the checkpoint garbage collector is started
+     * @param fdPeriod the period of fault detection
      * @throws RemoteException
      */
 	public GlobalFTServer(int fdPeriod) throws RemoteException{
@@ -168,10 +169,14 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	
 
 
-	/**
-	 * @see 
-	 */
-	public synchronized int storeCheckpoint(Checkpoint c){
+
+	public synchronized int storeCheckpoint(Checkpoint c, int inc){
+	    
+	    if (inc<this.globalIncarnation){
+	        logger.warn("Object with old incarnation " + inc + " is trying to store checkpoint");
+	        return 0;
+	    }
+	    
 		ArrayList ckptList = (ArrayList)storage.get(c.getBodyID());	    
 	    // the first checkpoint ...
 	    if (ckptList == null){
@@ -209,9 +214,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 
 
-	/**
-	 * @see
-	 */
+
 	public Checkpoint getCheckpoint(UniqueID id, int index){
 		ArrayList checkpoints = (java.util.ArrayList)(storage.get(id));
 		Iterator it = checkpoints.iterator();
@@ -225,9 +228,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 	
 	
-	/**
-	 * @see
-	 */
+
 	public Checkpoint getLastCheckpoint(UniqueID id){
 		ArrayList checkpoints = (java.util.ArrayList)(storage.get(id));
 		int size=checkpoints.size();
@@ -235,9 +236,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 	
 	
-	/**
-	 * @see
-	 */
+
 	public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) {
 		ArrayList checkpoints = (ArrayList)(storage.get(id));
 		// WARNING : list(1)=ckpt 1 
@@ -247,8 +246,13 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 
 
 	// set infos for the id-th checkpoints of id
-	public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber) throws RemoteException {
-		ArrayList checkpoints = (ArrayList)(storage.get(id));
+	public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int inc) throws RemoteException {	    
+	    if (inc < this.globalIncarnation){
+	        logger.warn("Object with old incarnation " + inc + " is trying to store checkpoint infos");
+	        return;
+	    }
+	    
+	    ArrayList checkpoints = (ArrayList)(storage.get(id));
 		// WARNING : list(1)=ckpt 1
 		Checkpoint c = (Checkpoint)(checkpoints.get(sequenceNumber)); 
 		if (c.getCheckpointInfo() != null){
@@ -268,9 +272,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 	
 	
-	/**
-	 * @see
-	 */
+
 	public String getServerCodebase(){
 	    return this.codebase;
 	}
@@ -369,9 +371,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	private ArrayList freeNodes; // ProActiveRuntimes
 	
 	
-	/**
-     * @see org.objectweb.proactive.core.body.ft.util.location.LocationServer#searchObject(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
-     */
+
 	public synchronized UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller) throws RemoteException {        
 	    UniversalBody currentLocation = (UniversalBody)(this.locations.get(id));
 	    if (currentLocation == null){
@@ -387,17 +387,13 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	    }
 	}
 
-	/**
-	 * @see
-	 */
+
 	public synchronized ArrayList getAllLocations(){
 	    return new ArrayList(locations.values());
 	}
 	
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.location.LocationServer#updateLocation(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
-     */
+
     public synchronized void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException {
         UniversalBody currentLocation = (UniversalBody)(this.locations.get(id));
         if (currentLocation == null){
@@ -417,24 +413,23 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     }
 
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.location.LocationServer#addFreeRT(org.objectweb.proactive.core.runtime.ProActiveRuntime)
-     */
+
     public void addFreeNode(Node n){   
         logger.info("[RESSOURCE] A node is added : " + n.getNodeInformation().getURL());
         this.freeNodes.add(n);       
     }
 
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.location.LocationServer#getFreeRT()
-     */
+
+    private int nodeCounter = 0;
+    
     public Node getFreeNode(){
+        this.nodeCounter++;
         if (this.freeNodes.isEmpty()){
-            logger.error("[RESSOURCE] **ERROR** There is no free nodes !");
+            logger.error("[RESSOURCE] **ERROR** There is no free node !");
             return null;
         } else {
-            Node n = (Node)(this.freeNodes.remove(this.freeNodes.size()-1));
+            Node n = (Node)(this.freeNodes.get(nodeCounter%(this.freeNodes.size())));
             logger.info("[RESSOURCE] Return a free node : " + n.getNodeInformation().getURL());
             return n;
         }
@@ -463,13 +458,14 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 			}		    
 			
 			logger.info("[RECOVERY] Recovering system from " + globalState);
+			this.globalIncarnation++;
 		    Enumeration itBodies = this.storage.keys();
 			this.lastGlobalState = globalState;
 			this.lastRegisteredCkpt = globalState;
 			this.recoveryLine = globalState;
 			this.stateMonitor = new int[NB_CKPT_MAX];
 			this.recoveryLineMonitor = new int[NB_CKPT_MAX];
-			this.globalIncarnation++;
+			
 			
 			// delete unusable checkpoints
 			Iterator it = this.storage.values().iterator();
@@ -572,11 +568,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 	
 
-	/**
-	 * @see
-	 * In this implementation, register is called by the location server 
-	 * at the first updateLocation() call
-	 */
+
 	public void register(UniqueID id){
 		//register with RUNNING default state
 		bodies.put(id, new Integer(RUNNING));
@@ -584,10 +576,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	}
 	
 	
-	
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess#failureDetected(org.objectweb.proactive.core.body.UniversalBody)
-     */
+
     public synchronized void failureDetected(UniqueID id) throws RemoteException {
      
         // id is recovering ??
@@ -604,9 +593,6 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     }
 
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess#updateState(org.objectweb.proactive.core.UniqueID, int)
-     */
     public synchronized void updateState(UniqueID id, int state) throws RemoteException {
         logger.info("[RECOVERY]  " + id + " is updating its state : " + state);
         this.bodies.put(id, new Integer(state));
@@ -614,9 +600,6 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 
 
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess#broadcastFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
-     */
     public void broadcastFTEvent(FTMessage fte) throws RemoteException {
         new BroadcastThread(this.getAllLocations(), fte).start();
     }
@@ -661,9 +644,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     private long faultDetectionPeriod;
     
     
-    /**
-     * @see
-     */
+
     public boolean isUnreachable(UniversalBody body) throws RemoteException {        
         try {
             int res = body.receiveFTMessage(this.hbe);
@@ -675,29 +656,20 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 
 
 
-    /**
-     * @see org.objectweb.proactive.core.body.ft.util.faultdetection.FaultDetector#startFailureDetector(org.objectweb.proactive.core.body.ft.util.location.LocationServer, org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess)
-     */
     public void startFailureDetector(LocationServer ls, RecoveryProcess rp) throws RemoteException {
         this.fdt = new FaultDetectorThread(ls,rp,this);
         this.fdt.start();
     }
 
-    /**
-     * @see
-     */
+
     public void suspendFailureDetector() throws RemoteException {
     }
 
-    /**
-     * @see
-     */
+
     public void stopFailureDetector() throws RemoteException {
     }
 
-    /**
-     * @see
-     */
+
     public void forceDetection(){
         this.fdt.wakeUp();
     }

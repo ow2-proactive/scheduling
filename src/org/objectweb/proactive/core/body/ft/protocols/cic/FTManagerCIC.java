@@ -70,6 +70,7 @@ import java.net.UnknownHostException;
 
 import java.rmi.RemoteException;
 
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -118,9 +119,9 @@ public class FTManagerCIC
     private int historyIndex; // index of the latest closed history
 
     // logged messages
-    private Vector requestToResend;
+    private Hashtable requestToResend;
     private int latestRequestLog;
-    private Vector replyToResend;
+    private Hashtable replyToResend;
     private int latestReplyLog;
 
     // history
@@ -131,7 +132,7 @@ public class FTManagerCIC
     private Vector awaitedRequests;
 
     // infos of ckpt with opened history
-    private Vector awaitedCheckpointInfo;
+    private Hashtable awaitedCheckpointInfo;
 
     // pool of MessageInfo
     private char[] forSentRequest;
@@ -149,16 +150,13 @@ public class FTManagerCIC
         this.nextMin = 0;
         this.lastRecovery = 0;
         this.checkpointTimer = System.currentTimeMillis();
-        this.requestToResend = new Vector();
-        this.requestToResend.add(new Vector(0)); //dummy padding (no checkpoint 0)
+        this.requestToResend = new Hashtable();
         this.latestRequestLog = 0;
-        this.replyToResend = new Vector();
-        this.replyToResend.add(new Vector(0)); //dummy padding (no checkpoint 0)
+        this.replyToResend = new Hashtable();
         this.latestReplyLog = 0;
         this.history = new Vector();
         this.awaitedRequests = new Vector();
-        this.awaitedCheckpointInfo = new Vector();
-        this.awaitedCheckpointInfo.add(new CheckpointInfoCIC()); //dummy padding (no checkpoint 0)
+        this.awaitedCheckpointInfo = new Hashtable();
         this.forSentRequest = new char[INFOS_SIZE];
         this.forSentReply = new char[INFOS_SIZE];
 
@@ -193,6 +191,7 @@ public class FTManagerCIC
             int inc = mi[INCARNATION];
             if (inc > localInc) {
                 reply.setIgnoreIt();
+                //((AbstractBody)this.owner).terminate();
                 return FTManagerCIC.RESEND_MESSAGE;
             } else if (inc < localInc) {
                 reply.setIgnoreIt();
@@ -214,7 +213,6 @@ public class FTManagerCIC
         if (mi[FROM_HALF_BODY] == IS_ACTIVE) {
             // history closure
             if (mi[HISTO_INDEX] > this.historyIndex) {
-                //System.out.println("[CIC] history closure on message reception ");
                 try {
                     this.closeHistories(mi[HISTO_INDEX]);
                 } catch (RemoteException e) {
@@ -225,7 +223,6 @@ public class FTManagerCIC
             // udpate checkpoint index
             if (mi[CKPT_INDEX] > currentCheckpointIndex) {
                 this.nextMax = Math.max(this.nextMax, mi[CKPT_INDEX]);
-                //System.out.println("[CIC] orphan reply for checkpoint " + mi[CKPT_INDEX]);
             }
         }
         return currentCheckpointIndex;
@@ -246,6 +243,7 @@ public class FTManagerCIC
             if (inc > localInt) {
                 request.setIgnoreIt();
                 //((AbstractBody)this.owner).terminate();
+                // this OA will be killed by the its new incarnation (see read() AbstractBody)
                 return FTManagerCIC.RESEND_MESSAGE;
             } else if (inc < localInt) {
                 // force the sender to recover and ignore this message
@@ -253,14 +251,14 @@ public class FTManagerCIC
                 return FTManagerCIC.RECOVER;
             }
         } else {
-            // from a halfbody, nothinh to do
+            // from a halfbody, nothing to do
         }
         request.setFTManager(this);
         return 0; //This value is not returned to the sender
     }
 
+    
     public synchronized int onDeliverRequest(Request request) {
-        //System.out.println("[CIC] onDeliverRequest");
         int currentCheckpointIndex = this.checkpointIndex;
         char[] mi = request.getMessageInfo();
 
@@ -272,20 +270,16 @@ public class FTManagerCIC
         if (mi[FROM_HALF_BODY] == IS_ACTIVE) {
             // history closure
             if (mi[HISTO_INDEX] > this.historyIndex) {
-                //System.out.println("[CIC] history closure on message reception ");
-                //if (currentCheckpointIndex!=0){
                 try {
                     this.closeHistories(mi[HISTO_INDEX]);
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-
-                //}
             }
 
             //is there any corresponding awaited request ?	
             if (!(this.updateAwaitedRequests(request))) {
-                //if no, an awaited request is added to history
+                //if not, an awaited request is added to history
                 history.add(request.getSourceBodyID());
             } else {
                 //this request must be then ignored..
@@ -318,11 +312,10 @@ public class FTManagerCIC
 
     public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
-        //System.out.println("[CIC] onSendReplyAfter");
         // if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
-                //System.out.println("[CIC] " + this.hostname+" Receiver is recovering : reply is resent");
+                //System.out.println("[CIC] " + this.hostname +" :  Receiver is recovering : reply is resent");
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendReply(reply, destination);
                 return this.onSendReplyAfter(reply, rdvValueBis, destination);
@@ -350,9 +343,9 @@ public class FTManagerCIC
                             reply.getSequenceNumber(), reply.getMethodName(),
                             (FutureResult) Utils.makeDeepCopy(reply.getResult()), null);
                 }
-                MessageLog log = new ReplyLog(toLog, destination);
+                MessageLog log = new ReplyLog(toLog, destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
-                    ((Vector) (this.replyToResend.get(i))).add(log);
+                    ((Vector) (this.replyToResend.get(new Integer(i)))).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -375,11 +368,9 @@ public class FTManagerCIC
 
     public synchronized int onSendRequestAfter(Request request, int rdvValue,
         UniversalBody destination) throws RenegotiateSessionException {
-        //System.out.println("[CIC] onSendRequestAfter");
         //	if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
-                //System.out.println("[CIC] Receiver is recovering : request is resent");
                 request.resetSendCounter();
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendRequest(request, destination);
@@ -399,14 +390,13 @@ public class FTManagerCIC
             // log this in-transit message in the rdvValue-currentIndex next checkpoints
             this.extendRequestLog(rdvValue);
             try {
-                //System.out.println(">>>>>> LOGGING REQUEST IN " + (currentCheckpointIndex+1));
                 //must make deep copy of paramteres
                 request.getMethodCall().makeDeepCopyOfArguments();
                 //must reset the send counter (this request has not been forrwarded)
                 request.resetSendCounter();
-                MessageLog log = new RequestLog(request, destination);
+                MessageLog log = new RequestLog(request, destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
-                    ((Vector) (this.requestToResend.get(i))).add(log);
+                    ((Vector) (this.requestToResend.get(new Integer(i)))).add(log);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -416,21 +406,18 @@ public class FTManagerCIC
     }
 
     public int onServeRequestBefore(Request request) {
-        //System.out.println("[CIC] onServeReqeuustBefore");
-        while (this.haveToCheckpoint()) {
+        while (this.haveToCheckpoint()) {            
             this.checkpoint(request);
         }
         return 0;
     }
 
     public int onServeRequestAfter(Request request) {
-        //System.out.println("[CIC] onServeReqeusteAfter");
         return 0;
     }
 
     // Active Object is created but not started 
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
-        //System.out.println("FTManagerCIC.beforeRestartAfterRecovery(inc = " + inc + ")");
         CheckpointInfoCIC cic = (CheckpointInfoCIC) ci;
         BlockingRequestQueue queue = ((AbstractBody) owner).getRequestQueue();
         int index = cic.checkpointIndex;
@@ -438,6 +425,9 @@ public class FTManagerCIC
         //	reinit ft values
         this.history = new Vector();
         this.awaitedRequests = new Vector();
+        this.awaitedCheckpointInfo = new Hashtable();
+        this.replyToResend = new Hashtable();
+        this.requestToResend = new Hashtable();
         this.checkpointIndex = index;
         this.nextMax = index;
         this.checkpointTimer = System.currentTimeMillis();
@@ -562,36 +552,57 @@ public class FTManagerCIC
                 CheckpointInfoCIC ci = new CheckpointInfoCIC();
                 this.extendReplyLog(this.checkpointIndex + 1);
                 this.extendRequestLog(this.checkpointIndex + 1);
-                ci.replyToResend = (Vector) (this.replyToResend.get(this.checkpointIndex +
-                        1));
-                ci.requestToResend = (Vector) (this.requestToResend.get(this.checkpointIndex +
-                        1));
+                ci.replyToResend = (Vector) (this.replyToResend.get(new Integer(this.checkpointIndex +
+                        1)));
+                ci.requestToResend = (Vector) (this.requestToResend.get(new Integer(this.checkpointIndex +
+                        1)));
                 ci.pendingRequest = pendingRequest;
                 ci.checkpointIndex = this.checkpointIndex + 1;
 
                 // delete logs
-                this.replyToResend.remove(this.checkpointIndex + 1);
-                this.replyToResend.add(this.checkpointIndex + 1, null);
-                this.requestToResend.remove(this.checkpointIndex + 1);
-                this.requestToResend.add(this.checkpointIndex + 1, null);
+                this.replyToResend.remove(new Integer(this.checkpointIndex + 1));
+                this.requestToResend.remove(new Integer(this.checkpointIndex + 1));
 
                 // inc checkpoint index
                 this.checkpointIndex++;
 
                 // store infos for further sending to the server
-                this.awaitedCheckpointInfo.add(this.checkpointIndex, ci);
+                this.awaitedCheckpointInfo.put(new Integer(this.checkpointIndex), ci);
 
+                // current informations are not stored in the checkpoint 
+                Hashtable awaitedCheckpointTMP = this.awaitedCheckpointInfo;
+                this.awaitedCheckpointInfo = null;
+                Hashtable requestToSendTMP = this.requestToResend;
+                this.requestToResend = null;
+                Hashtable replyToSendTMP = this.replyToResend;
+                this.replyToResend = null;
+                this.history = new Vector();
+                
+  
+                
                 // checkpoint the active object
                 this.setCheckpointTag(true);
                 c = new Checkpoint((Body) owner, this.checkpointIndex,
                         this.additionalCodebase);
+                
+                // debug
+                if (!this.owner.isActive()){
+                    throw new ProtocolErrorException("Checkpointing a dead body");
+                }
+                
                 // send it to server
-                int resStorage = this.storage.storeCheckpoint(c);
+                int resStorage = this.storage.storeCheckpoint(c, this.incarnation);
                 this.setCheckpointTag(false);
 
+                // restore current informations               
+                this.awaitedCheckpointInfo = awaitedCheckpointTMP;
+                this.replyToResend = replyToSendTMP;
+                this.requestToResend = requestToSendTMP;
+                
+                
                 // reninit checkpoint values
                 this.checkpointTimer = System.currentTimeMillis();
-                this.history = new Vector();
+                
             }
             ((AbstractBody) owner).acceptCommunication();
             end = System.currentTimeMillis();
@@ -619,10 +630,10 @@ public class FTManagerCIC
                     this.historyIndex + ")");
             }
             for (int i = this.historyIndex + 1; i <= to; i++) {
-                CheckpointInfoCIC currentCi = (CheckpointInfoCIC) (this.awaitedCheckpointInfo.get(i));
+                CheckpointInfoCIC currentCi = (CheckpointInfoCIC) (this.awaitedCheckpointInfo.get(new Integer(i)));
                 currentCi.history = this.history;
                 this.storage.addInfoToCheckpoint(currentCi, this.owner.getID(),
-                    i);
+                    i, this.incarnation);
             }
 
             this.historyIndex = to;
@@ -710,7 +721,6 @@ public class FTManagerCIC
 
     // replace request that are orphan for cic.checkpointIndex by awaitedRequest
     private void filterQueue(BlockingRequestQueue queue, CheckpointInfoCIC cic) {
-        //System.err.println("[RequestQueueImpl.filterQueue] size of queue before = " + this.size());
         java.util.Iterator itQueue = queue.iterator();
         java.util.ArrayList toChange = new java.util.ArrayList();
         while (itQueue.hasNext()) {
@@ -732,7 +742,6 @@ public class FTManagerCIC
             AwaitedRequest ar = new AwaitedRequest(r.getSourceBodyID());
             internalQueue.add(index, ar);
             this.awaitedRequests.add(ar);
-            //System.out.println("[CIC] Adding awaited request...");
         }
     }
 
@@ -740,7 +749,7 @@ public class FTManagerCIC
         if (this.latestRequestLog < size) {
             //the log vector must grow
             for (int j = this.latestRequestLog + 1; j <= size; j++) {
-                this.requestToResend.add(j, new Vector());
+                this.requestToResend.put(new Integer(j), new Vector());
             }
             this.latestRequestLog = size;
         }
@@ -750,7 +759,7 @@ public class FTManagerCIC
         if (this.latestReplyLog < size) {
             //the log vector must grow
             for (int j = this.latestReplyLog + 1; j <= size; j++) {
-                this.replyToResend.add(j, new Vector());
+                this.replyToResend.put(new Integer(j), new Vector());
             }
             this.latestReplyLog = size;
         }
@@ -830,8 +839,8 @@ public class FTManagerCIC
 
     /**
      * Closing history.
-     * @param fte
-     * @return
+     * @param fte Message that contains the last complete global state
+     * @return index of the last closed history
      */
     public int HandlingGSCEEvent(GlobalStateCompletion fte) {
         try {
@@ -845,8 +854,8 @@ public class FTManagerCIC
 
     /**
      * Heartbeat message. Do nothing.
-     * @param fte
-     * @return
+     * @param fte heartbeat message.
+     * @return unused value.
      */
     public int HandleHBEvent(Heartbeat fte) {
         return 0;
