@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
@@ -146,11 +147,13 @@ public class StartNode {
     	try{
     	//ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file://Z:/test/ProActive/classes/GlobusSetupWithRlogin.xml");
     	ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file:"+XML_LOCATION);
-			JVMProcess jvmProcess = (JVMProcess)pad.getProcess("linuxJVM");
+    	ExternalProcess rLoginProcess = pad.getProcess("rLoginProcess");
+			JVMProcess jvmProcess = (JVMProcess)pad.getProcess("globusJVM");
 			jvmProcess.setParameters(args[1]);
-			pad.activateMappings();
+			//pad.activateMappings();
+			rLoginProcess.startProcess();
 			//gp.startNodeWithGlobus(args[1]);
-    	}catch(ProActiveException e){
+    	}catch(Exception e){
     		e.printStackTrace();
     	}
     }else{
