@@ -121,7 +121,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-        parallelizedComponents = (Component) ProActiveGroup.newGroup(Component.class.getName());
     }
 
     private class ACThread extends Thread {
