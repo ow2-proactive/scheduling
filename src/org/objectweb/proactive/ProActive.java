@@ -297,7 +297,9 @@ public class ProActive {
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
+        
         if (virtualnode != null) {
+        	if(! virtualnode.isActivated()) virtualnode.activate();
             Node[] nodeTab = virtualnode.getNodes();
             Object[] aoTab = new Object[nodeTab.length];
 
@@ -683,10 +685,10 @@ public class ProActive {
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
-        if ("rmi".equals(System.getProperty("proactive.rmi"))) {
-            b = RemoteBodyAdapter.lookup(url);
+        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+			b = IbisRemoteBodyAdapter.lookup(url);
         } else {
-            b = IbisRemoteBodyAdapter.lookup(url);
+			b = RemoteBodyAdapter.lookup(url);
         }
 
         try {
@@ -828,7 +830,7 @@ public class ProActive {
         //VirtualNode vn = ((VirtualNodeStrategy)virtualNode).getVirtualNode();
         if (!(virtualNode instanceof VirtualNodeImpl)) {
             throw new ProActiveException(
-                "Cannot register such virtualNode since it results from a lookup!");
+                "Cannot unregister such virtualNode since it results from a lookup!");
         }
         String virtualNodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(((VirtualNodeImpl) virtualNode).getRegistrationProtocol());
