@@ -74,8 +74,8 @@ public class Bench implements org.objectweb.proactive.RunActive {
                 v.addElement(NodeFactory.getNode(s));
                 //   this.add(new NodeDestination(new String (tokens.nextToken()),tokens.nextToken()));
             }
-//        } catch (IOException e) {//} catch (Exception e) {
-//            e.printStackTrace();
+       } catch (Exception e) {//} catch (Exception e) {
+            e.printStackTrace();
        }
         Node[] result = new Node[v.size()];
         v.copyInto(result);
