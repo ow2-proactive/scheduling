@@ -137,9 +137,11 @@ a ProActiveDescriptor file, it is specified:</b>
       <li class="textNormal">the
 mapping of VN to JVMs</li>
       <li class="textNormal">the
-way to create, acquire JVMs</li>
-      <li class="textNormal">Example</li>
-    </ul>
+way to create, acquire JVMs using processes defined in the lower infrastructure part</li>
+      <li class="textNormal">local, remote processes or combination of both to create remote jvms. <br>For instance defining an <b>sshProcess</b> that itself references a local <b>jvmProcess</b>. At
+      execution, the ssh process will launch a jvm on the remote machine specified in hostname attribute of <b>sshProcess</b> definition.</li>
+    </ul><br></br>
+    <b>Example</b>
     <pre>&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" <br>xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd"&gt;<br> &lt;componentDefinition&gt;<br> &lt;virtualNodesDefinition&gt;<br> &lt;virtualNode name="<b>Dispatcher</b>"/&gt;<br> &lt;/virtualNodesDefinition&gt;<br> &lt;componentDefinition/&gt;<br> &lt;deployment&gt;<br> &lt;mapping&gt;<br> &lt;map virtualNode="<b>Dispatcher</b>"&gt;<br> &lt;jvmSet&gt;<br> &lt;vmName value="<b>Jvm1</b>"/&gt;<br> &lt;/jvmSet&gt;<br> &lt;/map&gt;<br> &lt;/mapping&gt;<br> &lt;jvms&gt;<br> &lt;jvm name="<b>Jvm1</b>"&gt;<br> &lt;creation&gt;<br> &lt;processReference refid="<b>jvmProcess</b>"/&gt;<br> &lt;/creation&gt;<br> &lt;/jvm&gt;<br> &lt;/jvms&gt;<br> &lt;/deployment&gt;<br> &lt;infrastructure&gt;<br> &lt;processes&gt;<br> &lt;processDefinition id="<b>jvmProcess</b>"&gt;<br> &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;<br> &lt;/processDefinition&gt;<br> &lt;/processes&gt;<br> &lt;/infrastructure&gt;<br>&lt;/ProActiveDescriptor&gt;<br>	</pre>
 This example shows a VirtualNode called <b>Dispatcher</b>,
 that is mapped to a jvm called <b>Jvm1</b><br>
