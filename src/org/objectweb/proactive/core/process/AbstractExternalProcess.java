@@ -364,7 +364,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
         threadMonitor.setActive(false);
         try {
           in.close();
-        } catch (java.io.IOException e) {}
+        } catch (java.io.IOException e) {
+        	e.printStackTrace();
+        }
         logger.log("Process finished Thread="+Thread.currentThread().getName());
       }
     }
@@ -410,6 +412,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
         try {
           out.close();
         } catch (java.io.IOException e) {
+        	e.printStackTrace();
         }
       }
     }
