@@ -22,6 +22,10 @@
 			<include name="*.jar"/>
 			<include name="components/*.jar"/>
 		</fileset>
+		<fileset dir="${base}/lib/ws">
+			<include name="*.jar"/>
+			<include name="components/*.jar"/>
+		</fileset>
 	</path>
 	<path id="test.classpath">
 		<path refid="project.classpath"/>
