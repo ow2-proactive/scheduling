@@ -58,4 +58,13 @@ public class HandlerCreationException extends HandlerNonFunctionalException {
     public void handle(NonFunctionalException e) {
 		super.handle(e);
     }
+    
+	/**
+	 * Provide a treatment for the handled exception(s)
+	 * @param e The exception to be handled
+	 */
+	public void handle(NonFunctionalException nfe, Exception e)
+		throws Exception {
+		super.handle(nfe, e);
+	}
 }

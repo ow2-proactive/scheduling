@@ -1,37 +1,38 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.exceptions.handler;
 
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException;
+
 
 /**
  * Handle all service exceptions
@@ -43,19 +44,28 @@ import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException
  */
 public class HandlerServiceException extends HandlerNonFunctionalException {
 
-    /** 
+    /**
      * Is the exception reliable for the handler ?
-     * @param e The exception checked for handler reliability 
+     * @param e The exception checked for handler reliability
      */
     public boolean isHandling(NonFunctionalException e) {
-		return (e instanceof ProActiveServiceException);
+        return (e instanceof ProActiveServiceException);
     }
 
     /**
-     * Provide a treatment for the handled exception(s) 
+     * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
     public void handle(NonFunctionalException e) {
-		super.handle(e);
+        super.handle(e);
+    }
+
+    /**
+     * Provide a treatment for the handled exception(s)
+     * @param e The exception to be handled
+     */
+    public void handle(NonFunctionalException nfe, Exception e)
+        throws Exception {
+        super.handle(nfe, e);
     }
 }
