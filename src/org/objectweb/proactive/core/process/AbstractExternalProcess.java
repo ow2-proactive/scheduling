@@ -171,6 +171,11 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess i
   }
 
 
+	protected int internalWaitFor() throws InterruptedException{
+	 return externalProcess.waitFor();
+	}
+	
+	
   protected void handleProcess(java.io.BufferedReader in, java.io.BufferedWriter out, java.io.BufferedReader err) {
     handleInput(in);
     handleOutput(out);

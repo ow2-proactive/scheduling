@@ -116,6 +116,10 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     if (isFinished) return;
     internalStopProcess();
   }
+  
+  public int waitFor() throws InterruptedException{
+  	return internalWaitFor();
+  }
 
 
   public boolean isStarted() {
@@ -176,6 +180,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
   
   
   protected abstract void internalStopProcess();
+  
+  protected abstract int internalWaitFor() throws InterruptedException;
   
 
   
