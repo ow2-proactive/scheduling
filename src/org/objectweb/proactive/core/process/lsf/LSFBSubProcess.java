@@ -38,16 +38,16 @@ import org.objectweb.proactive.core.util.MessageLogger;
 
 /**
  * <p>
- * The PrunSubProcess class is able to start any class, of the ProActive library, 
- * on a cluster managed by LSF prtocol. An instance of this class can be coupled for instance with
+ * The LSFBSubProcess class is able to start any class, of the ProActive library, 
+ * on a cluster managed by LSF prtocol. An istance of this class can be coupled for instance with
  * RlLoginProcess or SSHProcess classes in order to log into the cluster's front end with rlogin or
- * ssh and then to run a job with PrunSubProcess.
+ * ssh and then to run a job with LSFBSubProcess.
  * </p>
  * <p>
  * For instance:
  * </p><pre>
  * ..............
- * PrunSubProcess lsf = new PrunSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
  * RLoginProcess p = new RLoginProcess(lsf, false);
  * p.setHostname("cluster_front_end_name");
  * p.startProcess();
@@ -266,7 +266,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   		bSubCommand.append("-m "+hostList+" ");
   	}
   	if(getCompositionType() == GIVE_COMMAND_AS_PARAMETER){
-  	bSubCommand.append("-R span[ptile=2] "+scriptLocation+" "+getTargetProcess().getCommand());
+  	bSubCommand.append(scriptLocation+" "+getTargetProcess().getCommand());
   	}
   	
   	logger.info("bsub command is "+bSubCommand.toString());
