@@ -325,17 +325,4 @@ public class NodeExploration implements JobMonitorConstants {
         visitedVM = null;
         asso.updateReallyDeleted();
     }
-
-    private void killJob(MonitoredJob job) {
-    	MonitoredObjectSet objects = asso.getValues(job, AO, null);
-    	
-    }
-
-    public void killJobs(MonitoredObjectSet jobs) {
-        Iterator iter = jobs.iterator();
-        while (iter.hasNext()) {
-            MonitoredJob job = (MonitoredJob) iter.next();
-            killJob(job);
-        }
-    }
 }
