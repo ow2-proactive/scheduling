@@ -70,8 +70,10 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 		this.key = key;
 		this.name = name;
 		DataModelTraversal traversal = model.getTraversal();
-		if (!traversal.hasFollowingKey(key))
+		if (!traversal.hasFollowingKey(key)) {
+			handleRemovedChildren(model);
 			return;
+		}
 		
 		int nextKey = traversal.getFollowingKey(key);
 		if (key == NO_KEY)
