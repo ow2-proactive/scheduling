@@ -42,6 +42,12 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home")+FILE_SEPARATOR+"ProActive"+FILE_SEPARATOR+"scripts"+FILE_SEPARATOR+"unix"+FILE_SEPARATOR+"cluster"+FILE_SEPARATOR+"startRuntime.sh ";
   
+  public final static String DEFAULT_LSFPATH =FILE_SEPARATOR+"usr"+FILE_SEPARATOR+"local"+FILE_SEPARATOR+"lsf"+FILE_SEPARATOR+"bin";
+  
+  public final static String DEFAULT_BSUBPATH=DEFAULT_LSFPATH+FILE_SEPARATOR+"bsub";
+  
+  public final static String DEFAULT_BJOBPATH=DEFAULT_LSFPATH+FILE_SEPARATOR+"bjobs";
+  
   public static final String DEFAULT_QUEUE_NAME = "normal";
   
   protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
@@ -151,7 +157,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   protected String buildBSubCommand() {
   	StringBuffer bSubCommand = new StringBuffer();
-  	bSubCommand.append("bsub -n "+processor+" -q "+queueName+" ");
+  	bSubCommand.append(DEFAULT_BSUBPATH+" -n "+processor+" -q "+queueName+" ");
   	if(hostList != null){
   		bSubCommand.append("-m "+hostList+" ");
   	}
@@ -164,7 +170,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   
   protected String buildBJobsCommand() {
-    return "bjobs "+jobID;
+    return DEFAULT_BJOBPATH+" "+jobID;
   }
   
   /**
