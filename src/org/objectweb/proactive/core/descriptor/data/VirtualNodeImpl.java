@@ -50,9 +50,18 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+/**
+ * A <code>VirtualNode</code> is a conceptual entity that represents one or several nodes. After activation
+ * a <code>VirtualNode</code> represents one or several nodes.
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
+ * @see ProActiveDescriptor
+ * @see VirtualMachine
+ */
+
 public class VirtualNodeImpl extends RuntimeDeploymentProperties implements VirtualNode,Serializable,RuntimeRegistrationEventListener
-
-
 
 {
 //

@@ -50,13 +50,19 @@ public interface VirtualNode extends java.io.Serializable
 	
 	
 	static Logger logger = Logger.getLogger(VirtualNode.class.getName());
+	
 	/**
-	 * Method setProperty.
+	 * Sets the property attribute to the given value
 	 * @param property the value of property attribute, this value can be "unique", "unique_singleAO", "multiple", "multiple_cyclic" or nothing
 	 */
 	public void setProperty(String property);
 	
 	
+	/**
+	 * Sets the timeout variable to the given value. 
+	 * Calling this method will force this VirtualNode to wait until the timeout expires
+	 * before giving access to its nodes.
+	 */
 	public void setTimeout(String timeout);
 	
 	
@@ -69,7 +75,7 @@ public interface VirtualNode extends java.io.Serializable
 	
 
 	/**
-	 * Method setName.
+	 * Sets the name of this VirtualNode
 	 * @param s
 	 */
 	public void setName(String s);

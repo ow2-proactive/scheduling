@@ -61,7 +61,7 @@ public interface VirtualMachine {
 
 
 	/**
-	 * Method setName.
+	 * Sets the name of this VirtualMachine
 	 * @param s
 	 */
   public void setName(String s);
