@@ -39,13 +39,13 @@
 			<jvm name="Jvm3">
 				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="sshInriaCluster"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4">
 				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="linuxJVM"/>
+					<processReference refid="globusProcess"/>
 				</creation>
 			</jvm>
 		</jvms>
@@ -73,22 +73,10 @@
 					</policyFile>
 				</jvmProcess>
 			</processDefinition>
-			<processDefinition id="bsubInriaCluster">
-				<bsubProcess class="org.objectweb.proactive.core.process.lsf.LSFBSubProcess">
+			<processDefinition id="globusProcess">
+				<globusProcess class="org.objectweb.proactive.core.process.globus.GlobusProcess" hostname="globus1.inria.fr">
 					<processReference refid="linuxJVM1"/>
-					<bsubOption>
-						<hostlist>pf10.inria.fr</hostlist>
-						<processor>2</processor>
-						<scriptPath>
-							<absolutePath type="absolute" value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
-						</scriptPath>
-					</bsubOption>
-				</bsubProcess>
-			</processDefinition>
-			<processDefinition id="sshInriaCluster">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="cluster.inria.fr">
-					<processReference refid="bsubInriaCluster"/>
-				</sshProcess>
+				</globusProcess>
 			</processDefinition>
 		</processes>
 	</infrastructure>

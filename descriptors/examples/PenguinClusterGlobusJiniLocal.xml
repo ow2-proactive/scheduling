@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
-	<virtualNodes>
-		<virtualNode name="penguinNode" property="multiple"/>
-	</virtualNodes>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="penguinNode" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
 	<deployment>
 		<mapping>
 			<map virtualNode="penguinNode">
 				<jvmSet>
-					<vmName value="currentJVM"/>
 					<vmName value="Jvm1"/>
 					<vmName value="Jvm2"/>
 					<vmName value="Jvm3"/>
@@ -17,12 +18,6 @@
 			</map>
 		</mapping>
 		<jvms>
-			<jvm name="currentJVM">
-				<acquisition method="rmi"/>
-				<creation>
-					<processReference refid="linuxJVM"/>
-				</creation>
-			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>
@@ -91,7 +86,7 @@
 				</bsubProcess>
 			</processDefinition>
 			<processDefinition id="sshInriaCluster">
-				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="galere1.inria.fr">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="cluster.inria.fr">
 					<processReference refid="bsubInriaCluster"/>
 				</sshProcess>
 			</processDefinition>

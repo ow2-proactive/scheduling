@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
-	<virtualNodes>
-		<virtualNode name="Dispatcher" property="unique"/>
-		<virtualNode name="Renderer" property="multiple"/>
-	</virtualNodes>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Dispatcher" property="unique_singleAO"/>
+			<virtualNode name="Renderer"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
 	<deployment>
+		<register virtualNode="Dispatcher" protocol="rmi"/>
 		<mapping>
 			<map virtualNode="Dispatcher">
 				<jvmSet>
-					<vmName value="currentJvm"/>
+					<currentJVM protocol="rmi"/>
 				</jvmSet>
 			</map>
 			<map virtualNode="Renderer">
@@ -16,16 +19,11 @@
 					<vmName value="Jvm1"/>
 					<vmName value="Jvm2"/>
 					<vmName value="Jvm3"/>
+					<vmName value="Jvm4"/>
 				</jvmSet>
 			</map>
 		</mapping>
 		<jvms>
-			<jvm name="currentJvm">
-				<acquisition method="rmi"/>
-				<creation>
-					<processReference refid="linuxJVM"/>
-				</creation>
-			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>
@@ -39,6 +37,12 @@
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
+				<acquisition method="rmi"/>
+				<creation>
+					<processReference refid="linuxJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
 				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="linuxJVM"/>
