@@ -63,12 +63,12 @@
 					</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rshProcess">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="scurra">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
 					<processReference refid="linuxJVM"/>
 				</rshProcess>
 			</processDefinition>
 				<processDefinition id="rshProcess-AC">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="scurra">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
 					<processReference refid="linuxJVM-AC"/>
 				</rshProcess>
 			</processDefinition>
