@@ -112,44 +112,59 @@ if [ -f $PROACTIVE/lib/components/fractal-adl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-adl.jar
 fi
-if [ -f $PROACTIVE/lib/components/dtdparser.jar ]
+
+
+
+if [ -f $PROACTIVE/lib/dtdparser.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/dtdparser.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/dtdparser.jar
 fi
-if [ -f $PROACTIVE/lib/components/ow_deployment_scheduling.jar ]
+if [ -f $PROACTIVE/lib/ow_deployment_scheduling.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/ow_deployment_scheduling.jar
-fi
-if [ -f $PROACTIVE/lib/components/fractal-gui.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-gui.jar
-fi
-if [ -f $PROACTIVE/lib/components/fractal-swing.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-swing.jar
-fi
-if [ -f $PROACTIVE/lib/components/julia-runtime.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-runtime.jar
-fi
-if [ -f $PROACTIVE/lib/components/julia-asm.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-asm.jar
-fi
-if [ -f $PROACTIVE/lib/components/julia-mixins.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/julia-mixins.jar
-fi
-if [ -f $PROACTIVE/lib/components/SVGGraphics.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/SVGGraphics.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ow_deployment_scheduling.jar
 fi
 if [ -f $PROACTIVE/lib/jsch.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jsch.jar
 fi
 
+if [ -f $PROACTIVE/lib/soap.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/soap.jar
+fi
+if [ -f $PROACTIVE/lib/wsdl4j.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/wsdl4j.jar
+fi
 
+if [ -f $PROACTIVE/lib/axis.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/axis.jar
+fi
+if [ -f $PROACTIVE/lib/jaxrpc.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jaxrpc.jar
+fi
+if [ -f $PROACTIVE/lib/activation.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/activation.jar
+fi
+if [ -f $PROACTIVE/lib/saaj-api.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/saaj-api.jar
+fi
+if [ -f $PROACTIVE/lib/commons-logging.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-logging.jar
+fi
+if [ -f $PROACTIVE/lib/commons-discovery.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/commons-discovery.jar
+fi
+if [ -f $PROACTIVE/lib/mail.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/mail.jar
+fi
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
 
