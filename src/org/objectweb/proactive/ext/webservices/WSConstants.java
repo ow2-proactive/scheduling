@@ -66,7 +66,7 @@ public class WSConstants {
         disallowedMethods.addElement("getFcItfName");
         disallowedMethods.addElement("getFcItfType");
         disallowedMethods.addElement("getFcItfOwner");
-        disallowedMethods.addElement("IsFcInternalItf");
+        disallowedMethods.addElement("isFcInternalItf");
         disallowedMethods.addElement("setFcItfImpl");
         disallowedMethods.addElement("getFcItfImpl");
         disallowedMethods.addElement("setFcType");
