@@ -31,10 +31,13 @@
 package org.objectweb.proactive.core.group;
 
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -247,8 +250,25 @@ public class ProActiveGroup {
 	}
 	
 	return result;
-    }
 
+
+    }
+	/**
+	 * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the virtual node.
+	 * @param <code>className</code> the name of the (upper) class of the group's member.
+	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * If <code>params</code> is <code>null</code>, builds an empty group. 
+	 * @param <code>virtualNode</code> the virtual where the members are created.
+	 * @return a typed group with its members.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object newGroup(String className, Object[][] params, VirtualNode virtualNode)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		return ProActiveGroup.newGroup(className,params,virtualNode.getNodes());
+	}
 
 
 	/**
@@ -363,8 +383,56 @@ public class ProActiveGroup {
 	proxy.createMemberWithMultithread(className, params, nodeList);
 
 	return result;
-    }
 
+
+    }
+	/**
+	 * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
+	 * Threads are used to build the group's members. This methods returns when all members were created.
+	 * @param <code>className</code> the name of the (upper) class of the group's member.
+	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * If <code>params</code> is <code>null</code>, builds an empty group.
+	 * @param <code>virtualNode</code> the virtual node where the members are created.
+	 * @return a typed group with its members.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	 public static Object newGroupBuildWithMultithreading(String className, Object[][] params, VirtualNode virtualNode)
+	 throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		 return ProActiveGroup.newGroupBuildWithMultithreading(className, params, virtualNode.getNodes());
+	 }
+
+
+	/**
+	 * Gives a view of the group
+	 * @param ogroup - a typed group
+	 * @return a typed group, the view of the group
+	 */
+	public static Object captureView (Object ogroup) {
+		Object result = null;
+		
+		try {
+			result = ProActiveGroup.newGroup(ProActiveGroup.getType(ogroup));
+		} catch (ClassNotReifiableException e) {
+			logger.error("**** ClassNotReifiableException ****");
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			logger.error("**** ClassNotFoundException ****");
+			e.printStackTrace();
+		}
+		
+		Group go = ProActiveGroup.getGroup(ogroup);
+		Group gr = ProActiveGroup.getGroup(result);
+
+		Iterator it = go.iterator();
+		while (it.hasNext()) {
+			gr.add(it.next());
+		}
+
+		return result;
+	}
    
     /**
      * Waits for all the futures are arrived.
