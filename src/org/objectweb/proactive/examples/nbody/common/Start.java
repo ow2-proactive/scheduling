@@ -1,3 +1,33 @@
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/
 package org.objectweb.proactive.examples.nbody.common;
 
 import java.io.IOException;
@@ -14,7 +44,7 @@ import org.objectweb.proactive.core.node.NodeException;
 
 public class Start implements Serializable{
     
-    private static ProActiveDescriptor staticPad; // is set as static, to use with quit() which calls killall
+    private static ProActiveDescriptor descriptorPad; 
     /**
      * Options should be "java Start xmlFile [-nodisplay|-displayft] totalNbBodies maxIter"
      * @param -nodisplay, which is not compulsory, specifies whether a graphic display is to be created.
@@ -24,7 +54,7 @@ public class Start implements Serializable{
      * @param maxIter The number of iterations before the program stops.
      */
     public static void main(String[] args) {
-        new Start ().run(args);
+        new Start().run(args);
     }
     
     public void run (String[] args) {
@@ -118,12 +148,12 @@ public class Start implements Serializable{
             catch (NodeException e) { abort (e);}
         }
         // Construct deployment-related variables: pad & nodes
-        staticPad = null;
+        descriptorPad = null;
         VirtualNode vnode;
-        try { staticPad = ProActive.getProactiveDescriptor(xmlFileName); }
+        try { descriptorPad = ProActive.getProactiveDescriptor(xmlFileName); }
         catch (ProActiveException e) { abort(e); }
-        staticPad.activateMappings();
-        vnode = staticPad.getVirtualNode("Workers");
+        descriptorPad.activateMappings();
+        vnode = descriptorPad.getVirtualNode("Workers");
         Node[] nodes = null;
         try { nodes = vnode.getNodes(); }
         catch (NodeException e) { abort(e); }
@@ -138,7 +168,7 @@ public class Start implements Serializable{
     /**
      * Shows what are the possible options to this program.
      */
-    private static void usage() {
+    private void usage() {
         String options = "[-nodisplay | -displayft] totalNbBodies maxIter";
         System.out.println("        Usage : nbody.[bat|sh] " + options);
         System.out.println("        from the command line, it would be   java Start xmlFile " + options);
@@ -155,9 +185,9 @@ public class Start implements Serializable{
      * End the program, removing extra JVM that have been created with the deployment of the Domains
      */    
     public void quit (){
-        System.out.println(" PROGRAM ENDS " + staticPad);
+        System.out.println(" PROGRAM ENDS " + descriptorPad);
         try {
-            staticPad.killall(true);            
+            descriptorPad.killall(true);            
         } catch (ProActiveException e) { e.printStackTrace(); }
         System.exit(0);
     }
