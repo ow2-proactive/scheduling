@@ -116,7 +116,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     try {
     	getOrCreateServiceLocator();
     	//delete the lock file
-      if(jiniLockFile.exists()) jiniLockFile.delete();
+      if(jiniLockFile != null){
+        if(jiniLockFile.exists()) jiniLockFile.delete();
+      }
     } catch(java.io.IOException e) {
       e.printStackTrace();
       System.exit(1);
