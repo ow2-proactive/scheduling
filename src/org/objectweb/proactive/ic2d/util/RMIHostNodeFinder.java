@@ -30,13 +30,14 @@
 */ 
 package org.objectweb.proactive.ic2d.util;
 
-import org.objectweb.proactive.core.node.rmi.RemoteNode;
-import org.objectweb.proactive.core.node.rmi.RemoteNodeAdapter;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
-
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
+import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 
 /**
  * This class talks to ProActive nodes
@@ -85,7 +86,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
 
     // Hook the registry
     Registry registry = LocateRegistry.getRegistry(hostname, port);
-    return findNodes(registry);
+    return findNodes(registry,host);
   }
   
   
@@ -93,7 +94,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
   // -- PRIVATE METHODS -----------------------------------------------
   //
 
-  private Node[] findNodes(Registry registry) throws java.io.IOException {
+  private Node[] findNodes(Registry registry, String host) throws java.io.IOException {
     // enumarate through the rmi binding on the registry
     log("Listing bindings for " + registry);
     String[] list = registry.list();
@@ -103,6 +104,9 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     java.util.ArrayList nodes = new java.util.ArrayList(list.length);
     for (int i = 0; i < list.length; i++) {
       Object obj;
+      //-----------------added lines-------------------------------
+      if(list[i].indexOf("PA_RT")== -1){
+      //-----------------added lines---------------------------- 	
       try {
         obj = registry.lookup(list[i]);
       } catch (java.rmi.NotBoundException e) {
@@ -111,15 +115,19 @@ public class RMIHostNodeFinder implements HostNodeFinder {
         continue;
       }
       // If we've found a node..
-      if (obj instanceof org.objectweb.proactive.core.node.rmi.RemoteNode) {
+      //if (obj instanceof org.objectweb.proactive.core.node.rmi.RemoteNode) {
+      //---------------added lines ------------------------
+      if (obj instanceof org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime) {
+      //--------------added lines --------------------------
         log("  -> Found remote node " + list[i]);
         //Node realNode = NodeFactory.getNode(fullName);
         try {
-          nodes.add(new RemoteNodeAdapter((RemoteNode)obj));
-        } catch (NodeException e) {
+          nodes.add(new NodeImpl(new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj),"//"+host+"/"+list[i],"rmi"));
+        } catch (ProActiveException e) {
           log("Error while trying to create a RemoteNodeAdapter for "+list[i]);
         }
       }
+     }
     }
     Node[] nodeArray = new Node[nodes.size()];
     if (nodes.size() > 0) {

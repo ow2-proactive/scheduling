@@ -30,33 +30,18 @@
 */ 
 package org.objectweb.proactive.ic2d.util;
 
-import java.rmi.RemoteException;
-
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.mop.ConstructorCall;
-import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.core.node.jini.JiniNode;
-import org.objectweb.proactive.core.node.jini.JiniNodeAdapter;
-
 import java.rmi.RMISecurityManager;
-import net.jini.discovery.LookupDiscovery;
-import net.jini.discovery.DiscoveryListener;
-import net.jini.discovery.DiscoveryEvent;
-import net.jini.core.lookup.ServiceRegistrar;
-import net.jini.core.lookup.ServiceItem;
-import net.jini.core.lookup.ServiceTemplate;
+
 import net.jini.core.lookup.ServiceMatches;
-import net.jini.core.lookup.ServiceRegistration;
-import net.jini.core.lease.Lease;
-import net.jini.lease.LeaseRenewalManager;
-import net.jini.lease.LeaseListener;
-import net.jini.lease.LeaseRenewalEvent;
-import net.jini.core.entry.Entry;
-import net.jini.lookup.entry.Name;
+import net.jini.core.lookup.ServiceRegistrar;
+import net.jini.core.lookup.ServiceTemplate;
+import net.jini.discovery.DiscoveryEvent;
+import net.jini.discovery.DiscoveryListener;
+import net.jini.discovery.LookupDiscovery;
+import org.objectweb.proactive.core.node.NodeImpl;
+import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
+import org.objectweb.proactive.core.runtime.jini.JiniRuntimeAdapter;
 
 
 
@@ -90,14 +75,15 @@ public class JiniNodeListener  implements DiscoveryListener {
   }
     
     
-    public void discovered(DiscoveryEvent evt) {
+  public void discovered(DiscoveryEvent evt) {
 
 	ServiceRegistrar[] registrars = evt.getRegistrars();
-	Class[] classes = new Class[] {JiniNode.class};
-	JiniNode node = null;
+	System.out.println("registar lenght :"+registrars.length);
+	Class[] classes = new Class[] {JiniRuntime.class};
+	JiniRuntime runtime = null;
 	ServiceMatches matches = null;
 	ServiceTemplate template= new ServiceTemplate(null, classes, null);
-	NodeInformation info = null;
+	VMInformation info = null;
 
 	for (int n=0; n<registrars.length; n++){
 	  //System.out.println("JiniNodeListener:  Service found");
@@ -106,54 +92,69 @@ public class JiniNodeListener  implements DiscoveryListener {
 	      //System.out.println("JiniNodeListener:  lookup registrar");
 	      matches = registrar.lookup(template,Integer.MAX_VALUE);
 	      if (matches.totalMatches >0 ){
-		//System.out.println("JiniNodeListener: JiniNode trouvee");
-		for (int i=0;i< matches.items.length; i++) {
-		  try{
-		    if (matches.items[i].service == null) {
-		      //System.out.println("Service : NULL !!!");	
-		    } else {
-		      node = (JiniNode) matches.items[i].service;
-		      //System.out.println("JiniNodeListener: node "+node);
-		      info = node.getNodeInformation();
-		      if (info != null){
-			//System.out.println("JiniNodeListener: Node name "+info.getName());
-			//System.out.println("JiniNodeListener: Inet Address "+info.getInetAddress());
-			try {
-			  //System.out.println("JiniNodeListener: on gere le host");
-			  if (host != null){
-			    //System.out.println("host non null: "+host+"  "+info.getInetAddress().getHostName());
-			    if (info.getInetAddress().getHostName().equals(host)){
-			      //System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
-			      nodes.add(new JiniNodeAdapter(node));
-			    }
-			  } else {
-			    //System.out.println("host null: ");
-			    //System.out.println("JiniNodeListener: ajout du noeud");
-			    nodes.add(new JiniNodeAdapter(node));
-			  }
-			} catch (org.objectweb.proactive.core.node.NodeException e){
-			  e.printStackTrace();
-			}
-		      }
-		    }
-		  } catch (java.rmi.ConnectException e) {
-		    System.err.println("JiniNodeListener ConnectException ");
-		    continue;
-		    //e.printStackTrace();
-		  } 
-		}
-	      } else{
-		//System.out.println("JiniNodeListener: Pas de JiniNode");
+					System.out.println("matches "+matches.items.length);
+					for (int i=0;i< matches.items.length; i++){
+						//check if it is really a node and not a ProactiveRuntime
+						String jiniName = matches.items[i].attributeSets[0].toString();
+						System.out.println("name of the node "+jiniName);
+						if(jiniName.indexOf("PA_RT") == -1){
+							// it is a node
+							int k = jiniName.indexOf("=");
+							String name = jiniName.substring(k+1,jiniName.length()-1);
+							System.out.println("-----------------name "+name);
+		  				try{
+		    				if (matches.items[i].service == null){
+		      			//System.out.println("Service : NULL !!!");	
+		    				}else {
+		      				runtime = (JiniRuntime) matches.items[i].service;
+		      				//System.out.println("JiniNodeListener: node "+node);
+		      				info = runtime.getVMInformation();
+		      				if (info != null){
+									//System.out.println("JiniNodeListener: Node name "+info.getName());
+									//System.out.println("JiniNodeListener: Inet Address "+info.getInetAddress());
+										try {
+			  						//System.out.println("JiniNodeListener: on gere le host");
+			  							if (host != null){
+			    						//System.out.println("host non null: "+host+"  "+info.getInetAddress().getHostName());
+			    							//if (info.getInetAddress().getHostName().equals(host)){
+			    							try{
+			    								if((info.getInetAddress()).equals(java.net.InetAddress.getByName(host))){
+			      							//System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
+			      							nodes.add(new NodeImpl(new JiniRuntimeAdapter(runtime),name,"jini"));
+			    								}
+			    							}catch(java.net.UnknownHostException e){
+			    								System.err.println("Unknown host "+host);
+			    							}
+			  							}else{
+			    						//System.out.println("host null: ");
+			    						//System.out.println("JiniNodeListener: ajout du noeud");
+			    							nodes.add(new NodeImpl(new JiniRuntimeAdapter(runtime),name,"jini"));
+			  							}
+										}catch (org.objectweb.proactive.core.ProActiveException e){
+			 							 	e.printStackTrace();
+										}
+		      				}
+		    				}
+		  					}catch (java.rmi.ConnectException e) {
+		    				System.err.println("JiniNodeListener ConnectException ");
+		    				//e.printStackTrace();
+		    				continue;
+		    			//e.printStackTrace();
+		  				}
+						} 
+					}
+	      }else{
+					//System.out.println("JiniNodeListener: Pas de JiniNode");
 	      }
-	    } catch (java.rmi.RemoteException e) {
-	      //System.err.println("JiniNodeListener RemoteException ");
+	    }catch (java.rmi.RemoteException e){
+	    //System.err.println("JiniNodeListener RemoteException ");
 	      continue;
-	      //e.printStackTrace();
+	    //e.printStackTrace();
 	    }
-	} 
+		} 
 	
 	//System.out.println("JiniNodeListener: Fin recherche multicast");
-    }
+  }
   
   
   

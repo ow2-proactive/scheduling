@@ -82,7 +82,7 @@ public class JiniNodeFinder implements AllNodeFinder {
     //System.out.println("JiniNodeFinder: on  recupere "+nodes.size()+" noeuds");
     Node[] nodeArray = new Node[nodes.size()];
     if (nodes.size() > 0) {
-      //System.out.println("JiniNodeFinder: copie du tableau");
+      System.out.println("JiniNodeFinder: copie du tableau");
       for (int i=0; i<nodes.size();i++){
 	Node node = (Node)  nodes.get(i);
 	nodeArray[i] = node;
