@@ -30,9 +30,6 @@
 */
 package nonregressiontest.descriptor.lookupregister;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 
 /**

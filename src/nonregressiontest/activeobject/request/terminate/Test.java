@@ -33,11 +33,8 @@ package nonregressiontest.activeobject.request.terminate;
 import nonregressiontest.activeobject.request.A;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 
 import testsuite.test.ProActiveFunctionalTest;
-
-import java.io.IOException;
 
 
 /**

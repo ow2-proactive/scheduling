@@ -30,9 +30,7 @@
 */
 package nonregressiontest.stub.stubgeneration;
 
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
-import org.objectweb.proactive.core.mop.MOP;
 
 import testsuite.test.FunctionalTest;
 

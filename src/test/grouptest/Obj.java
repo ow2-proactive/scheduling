@@ -31,6 +31,11 @@ public class Obj implements Active, java.io.Serializable {
 	System.out.println("My name is " + getName());
     }
 
+	public void sayYourNameNTimes (int n) throws Exception {
+	for (int i=0 ; i<n ; i++)
+		System.out.println("My name is " + getName());
+	}
+
 	public void say (MyString s) {
 	System.out.println(getName() + " says : \"" + s + "\"");
 	}

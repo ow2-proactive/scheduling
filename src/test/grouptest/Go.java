@@ -56,7 +56,10 @@ public class Go {
 //	((org.objectweb.proactive.core.group.ProxyForGroup)groupForm).testClass();
 
 
-	group.sayYourName();
+	try {
+		group.sayYourNameNTimes(3);
+	}
+	catch (Exception e) { System.err.println("EXCEPTION : group.sayYourNameNTimes();"); }
 	group.say(new MyString("hello !!!"));
 //	MyString msg = group.getName();
 //	msg.display();

@@ -30,12 +30,11 @@
 */
 package nonregressiontest.activeobject.migration.simplemigration;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.UrlBuilder;
-
-import java.io.Serializable;
 
 
 /**

@@ -30,9 +30,7 @@
 */
 package nonregressiontest.activeobject.acontinuation;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.node.NodeException;
 
 
 public class A implements java.io.Serializable {

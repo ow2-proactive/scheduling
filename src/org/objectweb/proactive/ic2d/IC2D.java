@@ -83,7 +83,7 @@ public class IC2D {
       WorldObject worldObject = ic2dObject.getWorldObject();
       for (int i = 0; i<hosts.length; i++) {
         try {
-        	//TODO should decide wether we want rmi as default protocol
+        	// to do : should decide wether we want rmi as default protocol
           worldObject.addHostObject(hosts[i], "rmi");
         } catch (java.rmi.RemoteException e) {
           System.out.println("Can't create the host "+hosts[i]+", e="+e);

@@ -30,10 +30,9 @@
 */
 package nonregressiontest.activeobject.node.getactiveobject;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.ProActive;
 
 
 /**

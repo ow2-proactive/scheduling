@@ -30,14 +30,13 @@
 */
 package nonregressiontest.activeobject.migration.loopmigration;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.migration.MigrationException;
-
-import java.io.IOException;
-import java.io.Serializable;
 
 
 /**

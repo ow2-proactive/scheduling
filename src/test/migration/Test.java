@@ -64,7 +64,7 @@ public class Test implements Serializable, EndActive { //  , RunActive {
 
 
 public void endActivity(Body body) {
-	// TODO Auto-generated method stub
+	// to do : Auto-generated method stub
 	
 }
 

@@ -35,10 +35,7 @@ import nonregressiontest.activeobject.creation.A;
 import org.objectweb.proactive.ProActive;
 
 import testsuite.manager.ProActiveFuncTestManager;
-
 import testsuite.test.ProActiveFunctionalTest;
-
-import java.net.InetAddress;
 
 
 /**
