@@ -53,6 +53,7 @@ public class Launcher implements java.io.Serializable {
     // MAIN !!!
     public void start(Matrix m1, Matrix m2, int i) {	
 	// DISTRIBUTED MULTIPLICATION      
+
 	int matrixSize=m1.getWidth();
 
 

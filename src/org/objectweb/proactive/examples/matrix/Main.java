@@ -40,7 +40,7 @@ public class Main {
 	Launcher l = null;
 
 	try {
-	    l = (Launcher) ProActive.newActive("org.objectweb.proactive.examples.matrix.Launcher", new Object[] {nodesList});//,targetNode);
+	    l = (Launcher) ProActive.newActive(Launcher.class.getName(), new Object[] {nodesList});//,targetNode);
 	} catch (Exception e) {logger.error("\nUnable to create the Launcher !!!!!\n"); e.printStackTrace();}
 
 	int matrixSize=Integer.parseInt(args[0]);
