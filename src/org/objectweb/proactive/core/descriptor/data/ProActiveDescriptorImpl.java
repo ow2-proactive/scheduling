@@ -195,7 +195,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         virtualNode.activate();
     }
 
-    public void killall() throws ProActiveException {
+    public void killall(boolean softly) throws ProActiveException {
 //        ProActiveRuntime proactiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 //        ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
 //        for (int i = 0; i < runtimeArray.length; i++) {
@@ -212,7 +212,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 //        }
 		VirtualNode [] vnArray = getVirtualNodes();
 		for (int i = 0; i < vnArray.length; i++){
-			vnArray[i].killAll();
+			vnArray[i].killAll(softly);
 			vnArray[i] = null;		
 		}
     }

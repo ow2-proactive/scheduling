@@ -206,11 +206,11 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void killRT() throws java.rmi.RemoteException {
+    public void killRT(boolean softly) throws java.rmi.RemoteException {
         killAllNodes();
         unregisterAllVirtualNodes();
         unregisterService(proActiveRuntimeURL, jiniRuntimeMap);
-        proActiveRuntime.killRT();
+        proActiveRuntime.killRT(false);
     }
 
     public String getURL() {
@@ -338,7 +338,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
 
     public void notify(LeaseRenewalEvent evt) {
         logger.info("Lease expired " + evt.toString());
-        evt.getException().printStackTrace();
+       logger.info( evt.getException().getMessage());
     }
 
     //

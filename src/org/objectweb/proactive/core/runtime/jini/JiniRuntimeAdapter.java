@@ -249,10 +249,10 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 
 	
-	public void killRT() throws Exception
+	public void killRT(boolean softly) throws Exception
 	{
 		try{
-		jiniRuntime.killRT();
+		jiniRuntime.killRT(softly);
 		}catch(java.rmi.RemoteException re){
 			throw new ProActiveException(re);
 //			re.printStackTrace();

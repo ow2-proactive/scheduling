@@ -150,9 +150,15 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   
 	/**
 	 * Kills all Nodes and JVMs(local or remote) created when activating the descriptor
+	 * @param softly if false, all jvms created when activating the descriptor are killed abruptely
+	 * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
+	 * dying. To be more precise a thread is created to ask periodically the registry if objects are still
+	 * registered.
 	 * @throws ProActiveException if a problem occurs when terminating all jvms
 	 */
-  public void killall() throws ProActiveException;
+  public void killall(boolean softly) throws ProActiveException;
+  
+  
   
 //  /**
 //   * Kills all Nodes mapped to VirtualNodes in the XML Descriptor

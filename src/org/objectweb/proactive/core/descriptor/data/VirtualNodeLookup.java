@@ -216,7 +216,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         return virtualNode.getNode(url);
     }
 
-    public void killAll() {
+    public void killAll(boolean softly) {
         logger.warn(message);
     }
 

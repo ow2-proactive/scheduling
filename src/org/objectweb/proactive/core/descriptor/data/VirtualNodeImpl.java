@@ -342,7 +342,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         }
     }
 
-    public void killAll() {
+    public void killAll(boolean softly) {
         Node node;
         ProActiveRuntime part = null;
         if (isActivated) {
@@ -355,7 +355,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 // so if the node is local, we just unregister this node from any registry
                 if (!NodeFactory.isNodeLocal(node)) {
                     try {
-                        part.killRT();
+                        part.killRT(softly);
                     } catch (ProActiveException e1) {
                         e1.printStackTrace();
                     } catch (Exception e) {
@@ -722,9 +722,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 logger.debug("processImplDecorator " +
                     processImplDecorator.getClass().getName());
             }
-
         }
-		protocolId = protocolId + "jvm";
+        protocolId = protocolId + "jvm";
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
         jvmProcess = (JVMProcess) processImpl;
@@ -732,21 +731,20 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
             if ((bsub == null) && (prun == null) && (globus == null)) {
-				//if bsub and prun and globus are null we can increase the nodeCount
-
+                //if bsub and prun and globus are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
 
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
             String acquisitionMethod = vm.getAcquisitionMethod();
+
             //String portNumber = vm.getPortNumber();
             if (logger.isDebugEnabled()) {
                 logger.debug("Aquisition method : " + acquisitionMethod);
                 //logger.debug("Port Number : " + portNumber);
                 logger.debug(vnName);
             }
-
 
             String localruntimeURL = null;
             try {
@@ -756,26 +754,29 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 e.printStackTrace();
             }
 
-
-//            String localruntimeURL = null;
-//
-//            if (portNumber != null) {
-//                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
-//                            portNumber));
-//            } else {
-//                localruntimeURL = proActiveRuntimeImpl.getURL();
-//            }
-
+            //            String localruntimeURL = null;
+            //
+            //            if (portNumber != null) {
+            //                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
+            //                            portNumber));
+            //            } else {
+            //                localruntimeURL = proActiveRuntimeImpl.getURL();
+            //            }
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
+
                 acquisitionMethod + ":" + " " + nodeNumber+" "+protocolId + " " + vm.getName());
       
 //            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
 //                localruntimeURL + " " + acquisitionMethod + ":" + " " +
 //                nodeNumber + " " + portNumber);
 
+
+            //            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
+            //                localruntimeURL + " " + acquisitionMethod + ":" + " " +
+            //                nodeNumber + " " + portNumber);
         }
     }
 

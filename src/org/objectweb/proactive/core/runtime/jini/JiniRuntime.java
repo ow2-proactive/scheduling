@@ -108,7 +108,7 @@ public interface JiniRuntime extends java.rmi.Remote
   
   
  
-  public void killRT() throws java.rmi.RemoteException;
+  public void killRT(boolean softly) throws java.rmi.RemoteException;
   
   
   

@@ -160,8 +160,12 @@ public interface VirtualNode extends java.io.Serializable {
      * Kills all nodes mapped to this VirtualNode.
      * It is in fact the runtime(so the jvm) on which the node is running that is killed.
      * Nodes are previously unregistered from any registry.
+     * @param softly if false, all jvms created when activating this VirtualNode are killed abruptely
+	 * if true a jvm that originates the creation of  a rmi registry waits until registry is empty before
+	 * dying. To be more precise a thraed is created to ask periodically the registry if objects are still
+	 * registered.
      */
-    public void killAll();
+    public void killAll(boolean softly);
 
     /**
      * Returns the unique active object created on the unique node mapped to this VirtualNode.

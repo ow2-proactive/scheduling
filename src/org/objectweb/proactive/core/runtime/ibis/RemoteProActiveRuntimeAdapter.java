@@ -238,9 +238,9 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         }
     }
 
-    public void killRT() throws Exception {
+    public void killRT(boolean softly) throws Exception {
         try {
-            remoteProActiveRuntime.killRT();
+            remoteProActiveRuntime.killRT(softly);
         } catch (RemoteException re) {
             throw new ProActiveException(re);
         }

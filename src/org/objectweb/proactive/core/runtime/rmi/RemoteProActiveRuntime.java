@@ -83,7 +83,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws java.rmi.RemoteException;
 
-    public void killRT() throws java.rmi.RemoteException;
+    public void killRT(boolean softly) throws java.rmi.RemoteException;
 
     public String getURL() throws java.rmi.RemoteException;
 
@@ -103,6 +103,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
         throws java.rmi.RemoteException;
 
     public void unregisterAllVirtualNodes() throws java.rmi.RemoteException;
+
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)

@@ -152,11 +152,11 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void killRT() throws RemoteException {
+    public void killRT(boolean softly) throws RemoteException {
         killAllNodes();
         unregisterAllVirtualNodes();
         unregister(proActiveRuntimeURL);
-        proActiveRuntime.killRT();
+        proActiveRuntime.killRT(false);
     }
 
     public String getURL() {
