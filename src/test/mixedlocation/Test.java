@@ -1,10 +1,9 @@
 package test.mixedlocation;
 
-import org.objectweb.proactive.Body;
+import java.io.Serializable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
-
-import java.io.Serializable;
 
 public class Test implements Serializable {
 
@@ -75,14 +74,14 @@ public class Test implements Serializable {
 
             t.migrateTo("//tuba/Node2");
             try {
-                Thread.currentThread().sleep(2000);
+                Thread.sleep(2000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             System.out.println("Second call");
             t.echo();
             try {
-                Thread.currentThread().sleep(5000);
+                Thread.sleep(5000);
 
             } catch (Exception e) {
                 e.printStackTrace();

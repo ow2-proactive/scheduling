@@ -8,7 +8,12 @@
  */
 package modelisation.simulator.mixed;
 
+import org.apache.log4j.Logger;
+
 public class Forwarder extends Agent {
+
+protected static Logger logger = Logger.getLogger(Forwarder.class.getName());
+
     public static final int DEAD = 0;
     public static final int ACTIF = 1;
     public static final int UPDATING_SERVER = 2;
@@ -25,7 +30,9 @@ public class Forwarder extends Agent {
         } else {
             Forwarder.defaultState = ACTIF;
         }
-        System.out.println("--- Forwarders are " + Forwarder.defaultState);
+if (logger.isDebugEnabled()) {
+        logger.debug("--- Forwarders are " + Forwarder.defaultState);
+}
     }
 
     public Forwarder() {
@@ -68,23 +75,31 @@ public class Forwarder extends Agent {
     //        this.lifeTime -= l;
     //    }
     public int receiveMessage() {
-        //        System.out.println("Forwarder.receiveMessage state = " + this.state);
-        //        System.out.println("Forwarder.receiveMessage " + this);
+if (logger.isDebugEnabled()) {
+        //        logger.debug("Forwarder.receiveMessage state = " + this.state);
+        //        logger.debug("Forwarder.receiveMessage " + this);
+}
         return this.state;
     }
 
     public void startCommunicationServer() {
-//              System.out.println("Forwarder.startCommunicationServer");
+if (logger.isDebugEnabled()) {
+//              logger.debug("Forwarder.startCommunicationServer");
+}
         this.state = UPDATING_SERVER;
         this.remainingTime = simulator.generateCommunicationTimeServer();
     }
 
     public void endCommunicationServer() {
-        //        System.out.println("Forwarder.endCommunication");
+if (logger.isDebugEnabled()) {
+        //        logger.debug("Forwarder.endCommunication");
+}
         this.state = DEAD;
         this.remainingTime = 50000000;
         //we send the number of the next forwarder
-        //      System.out.println(
+if (logger.isDebugEnabled()) {
+        //      logger.debug(
+}
         //         "Forwarder: calling server, next number is " + (this.number + 1));
         this.server.receiveRequestFromForwarder(this.migrationCounter + 1, 
                                                 this.id);

@@ -117,16 +117,16 @@ public class Simulator {
 
     public void serverBehaviour() {
         boolean serviceOk = true;
-        if (this.server.getState() == server.IDL_EMPTY) {
+        if (this.server.getState() == Server.IDL_EMPTY) {
             this.server.setRemainingTime(50000000);
             return;
         }
 
-        if (this.server.getState() == server.IDL_REQUEST) {
+        if (this.server.getState() == Server.IDL_REQUEST) {
             this.server.serveNextRequest(this.currentTime);
             return;
         }
-        if (this.server.getState() == server.SERVING_AGENT) {
+        if (this.server.getState() == Server.SERVING_AGENT) {
             this.server.endOfService(this.currentTime, getNextGamma2Int());
             //we need to check if a reply is needed
 //            if (this.server.getState() == server.REPLY_NEEDED) {
@@ -135,7 +135,7 @@ public class Simulator {
             return;
         }
 
-        if (this.server.getState() == server.SERVING_SOURCE) {
+        if (this.server.getState() == Server.SERVING_SOURCE) {
             this.server.endOfService(this.currentTime, getNextGamma2Int());
             //   this.server.endOfSendReply(this.currentTime);
 //            if (serviceOk) {
@@ -147,7 +147,7 @@ public class Simulator {
             return;
         }
 
-        if (this.server.getState() == server.SENDING_REPLY) {
+        if (this.server.getState() == Server.SENDING_REPLY) {
             if (!this.server.hasRequestFromAgent()) {
                 this.agent.foundYou();
             }
@@ -159,12 +159,12 @@ public class Simulator {
     }
 
     public void agentBehaviour() {
-        if ((this.agent.getState() == agent.WAITING) ||
-                (this.agent.getState() == agent.MIGRATED)) {
+        if ((this.agent.getState() == Agent.WAITING) ||
+                (this.agent.getState() == Agent.MIGRATED)) {
             agent.startMigration(this.currentTime);
             return;
         }
-        if (this.agent.getState() == agent.MIGRATING) {
+        if (this.agent.getState() == Agent.MIGRATING) {
             agent.endMigration(this.currentTime);
             server.receiveRequestFromAgent();
 //            agent.callServer(this.getNextGamma2Int());
@@ -182,22 +182,22 @@ public class Simulator {
     }
 
     public void sourceBehaviour() {
-        if (this.source.getState() == source.WAITING) {
+        if (this.source.getState() == Source.WAITING) {
             source.startCommunication(this.currentTime, getNextGamma1Int());
             return;
         }
-        if (this.source.getState() == source.COMMUNICATION) {
+        if (this.source.getState() == Source.COMMUNICATION) {
             if (agent.migrated) {
 //                System.out.println("XXXXX Source found agent migrated");
                 source.startCommunicationServer(getNextGamma2Int());
                 return;
             }
-            if (agent.getState() == agent.WAITING) {
+            if (agent.getState() == Agent.WAITING) {
                 source.endCommunication(this.currentTime);
                 source.waitBeforeCommunication();
                 return;
             }
-            if (agent.getState() == agent.MIGRATING) {
+            if (agent.getState() == Agent.MIGRATING) {
 //                System.out.println("XXXXX Source found agent migrating");
                 //System.out.println("agent.getRemainingTime() " + agent.getRemainingTime());
                 //System.out.println("source.getRemainingTime() " + source.getRemainingTime());
@@ -205,7 +205,7 @@ public class Simulator {
             }
             return;
         }
-        if (this.source.getState() == source.WAITING_FOR_AGENT) {
+        if (this.source.getState() == Source.WAITING_FOR_AGENT) {
             //  this.source.continueCommunication(getNextGamma1Int());
             if (agent.migrated) {
                 source.startCommunicationServer(getNextGamma2Int());
@@ -215,17 +215,17 @@ public class Simulator {
             }
             return;
         }
-        if (this.source.getState() == source.WAITING_ERROR_MESSAGE) {
+        if (this.source.getState() == Source.WAITING_ERROR_MESSAGE) {
             source.startCommunicationServer(getNextGamma2Int());
             return;
         }
 
-        if (this.source.getState() == source.CALLING_SERVER) {
+        if (this.source.getState() == Source.CALLING_SERVER) {
             source.waitForServer();
             this.server.receiveRequestFromSource();
             return;
         }
-        if (this.source.getState() == source.WAITING_FOR_SERVER) {
+        if (this.source.getState() == Source.WAITING_FOR_SERVER) {
             return;
         }
 

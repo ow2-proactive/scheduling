@@ -1,7 +1,6 @@
 package test.rsh;
 
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
-import org.objectweb.proactive.core.process.AbstractExternalProcess;
 
 public class Test {
     

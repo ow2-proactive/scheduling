@@ -2,7 +2,6 @@ package modelisation.util;
 
 import org.objectweb.proactive.core.process.rsh.RSHJVMProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
-import java.io.BufferedReader;
 
 public class RSHNodeProcessImpl extends RSHJVMProcess {
 

@@ -23,7 +23,7 @@ public class Test implements org.objectweb.proactive.RunActive {
     System.out.println("Live() won't do anything");
     while (body.isActive()) {
       try {
-        Thread.currentThread().sleep(10000);
+        Thread.sleep(10000);
       } catch (Exception e) {
         e.printStackTrace();
       }

@@ -1,14 +1,8 @@
 package modelisation.mixed;
 
-import modelisation.forwarder.AgentWithExponentialMigrationAndForwarder;
 import modelisation.forwarder.DummyObject;
-
 import modelisation.server.AgentWithExponentialMigrationAndServer;
-
 import modelisation.statistics.ExponentialLaw;
-
-import org.objectweb.proactive.Active;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
 

@@ -2,12 +2,18 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
-import modelisation.statistics.RandomNumberFactory;
-import modelisation.statistics.RandomNumberGenerator;
+import org.apache.log4j.Logger;
 
 
 public class Source extends SimulatorElement {
+
+    static Logger logger = Logger.getLogger(Source.class.getName());
+    static Logger timeLogger = Logger.getLogger(Source.class.getName() + 
+                                                "Time");
+
+    static {
+        System.out.println(timeLogger.getName());
+    }
 
     public static final int WAITING = 0;
     public static final int COMMUNICATION = 1;
@@ -25,14 +31,16 @@ public class Source extends SimulatorElement {
     protected Server server;
     protected int currentLocation;
     protected double communicationServerStartTime;
+    protected double waitTime;
     protected double processingServerStartTime;
-    protected double tries;
+    protected int tries;
     protected Averagator averagatorLambda;
     protected Averagator averagatorT;
     protected Averagator averagatorTries;
     protected Averagator averagatorGamma2;
     protected Averagator averagatorMu;
     protected Averagator averagatorCommunicationFailed;
+    protected Averagator averagatorFirstForwarder;
 
     //   protected RandomNumberGenerator expoLambda;
     public Source() {
@@ -50,6 +58,7 @@ public class Source extends SimulatorElement {
         this.averagatorGamma2 = new Averagator();
         this.averagatorMu = new Averagator();
         this.averagatorCommunicationFailed = new Averagator();
+        this.averagatorFirstForwarder = new Averagator();
         this.simulator = s;
         this.waitBeforeCommunication();
         this.id = ID;
@@ -87,9 +96,10 @@ public class Source extends SimulatorElement {
 
     public void waitBeforeCommunication() {
         this.remainingTime = simulator.generateSourceWaitingTime();
+        this.waitTime = this.remainingTime;
         this.notifyEvent("Wait");
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     " Source: will call the agent in " + this.remainingTime);
         }
         this.averagatorLambda.add(this.remainingTime);
@@ -111,6 +121,23 @@ public class Source extends SimulatorElement {
         this.endCommunication(simulator.getCurrentTime());
     }
 
+    //    public int getTries() {
+    //        return this.tries;
+    //    }
+    public void firstForwarderReached() {
+        //if (this.tries ==1) {
+        this.averagatorFirstForwarder.add(
+                simulator.getCurrentTime() - this.startTime + this.waitTime);
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "First Forwarder reached after " + 
+                    (simulator.getCurrentTime() - this.startTime + 
+                        this.waitTime));
+        }
+       // System.out.println(this.simulator.getVisitedStates());
+        //}
+    }
+
     public void update(double time) {
         //    if (this.remainingTime == 0) {
         switch (this.state) {
@@ -120,8 +147,8 @@ public class Source extends SimulatorElement {
             case COMMUNICATION:
                 break;
             case COMMUNICATION_FAILED:
-                if (log) {
-                    this.simulator.log(
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
                             "Communication failed after " + 
                             (time - startTime));
                 }
@@ -140,11 +167,11 @@ public class Source extends SimulatorElement {
             case WAITING_SERVER:
                 this.state = COMMUNICATION;
                 // this.remainingTime = 5000000;
-                if (log) {
-                    this.simulator.log(
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
                             "Source: reply from server total " + 
                             (time - communicationServerStartTime));
-                    this.simulator.log(
+                    logger.debug(
                             "Source: processing for server total " + 
                             (time - processingServerStartTime));
                 }
@@ -169,8 +196,11 @@ public class Source extends SimulatorElement {
     }
 
     public void receiveReplyFromServer(int location) {
-               if (log) this.simulator.log("Source.receiveReplyFromServer currentLocation " +
-                         location);
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "Source.receiveReplyFromServer currentLocation " + 
+                    location);
+        }
         this.currentLocation = location;
         this.remainingTime = 0;
         this.notifyEvent("Reply From Server");
@@ -183,10 +213,11 @@ public class Source extends SimulatorElement {
         this.forwarderChain.startCommunication(currentLocation);
         this.startTime = startTime;
         this.tries = 1;
-        if (log)
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     ">>>>> Source: communication started at time " + 
                     startTime);
+        }
     }
 
     public void endCommunication(double endTime) {
@@ -195,14 +226,14 @@ public class Source extends SimulatorElement {
         this.endTime = endTime;
         //        this.remainingTime = simulator.getSourceWaitingTime();
         //       if (log) this.simulator.log("<<<<< Source: communication finished at time " + endTime);
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "TimedProxyWithLocationServer:  .............. done after " + 
                     (endTime - startTime));
+            logger.debug("Number of tries= " + tries);
         }
-        //   System.out.println("XXXX " + (endTime - startTime));
-        if (log) {
-            this.simulator.log("Number of tries= " + tries);
+        if (timeLogger.isDebugEnabled()) {
+            timeLogger.debug("" + (endTime - startTime));
         }
         this.averagatorTries.add(tries);
         this.averagatorT.add(endTime - startTime);
@@ -226,40 +257,52 @@ public class Source extends SimulatorElement {
     }
 
     public void end() {
-    	  System.out.println("########## Source ##################");
-        System.out.println(
-                "* lambda = " + 1000 / this.averagatorLambda.average());
-        System.out.println(
+        logger.info("########## Source ##################");
+        logger.info("* lambda = " + 1000 / this.averagatorLambda.average());
+        logger.info(
                 "* T Source  = " + this.averagatorT.average() + " count " + 
                 this.averagatorT.getCount());
-        System.out.println("* Tries  = " + this.averagatorTries.average());
-        System.out.println(
+        logger.info("* Tries  = " + this.averagatorTries.average());
+        logger.info(
                 "* Failed = " + this.averagatorCommunicationFailed.average() + 
                 " count " + this.averagatorCommunicationFailed.getCount());
-        System.out.println(
+        logger.info(
                 "* gamma2  = " + 1000 / this.averagatorGamma2.average() + 
                 " count " + this.averagatorGamma2.getCount());
-        System.out.println(
-                "* Chain failed on first try " + this.failedOnfirstTry);
-        System.out.println(
+        logger.info("* Chain failed on first try " + this.failedOnfirstTry);
+        logger.info(
                 "* Chain success rate " + 
                 (((float)this.averagatorT.getCount() - (float)this.failedOnfirstTry) / (float)this.averagatorT.getCount()) * 100.0 + 
                 " %");
-        System.out.println(
+        logger.info(
                 "* mu with gamma2 from source = " + 
                 this.averagatorMu.average() + " count " + 
                 this.averagatorMu.getCount());
-        System.out.println(
-                "Operation for mu : " + this.averagatorMu.average() + " - " + 
+        logger.info(
+                " Operation for mu : " + this.averagatorMu.average() + " - " + 
                 this.averagatorGamma2.average());
-        System.out.println(
+        logger.info(
                 "* mu from source = " + 
                 1000 / (this.averagatorMu.average() - this.averagatorGamma2.average()) + 
                 " count " + this.averagatorMu.getCount());
+//        logger.info(
+//                "* First forwarder time : " + 
+//                this.averagatorFirstForwarder.average() + " count " + 
+//                this.averagatorFirstForwarder.getCount());
     }
 
     public String getName() {
         return "Source" + this.id;
+    }
+
+    /**
+     *  works only in the case of full forwarding scheme
+     */
+    public String getStateAsString() {
+        if (this.getState() == Source.WAITING) {
+           return "0";
+        }
+        return "1" + this.forwarderChain.getStateAsString();
     }
 
     public String toString() {

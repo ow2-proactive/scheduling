@@ -1,7 +1,6 @@
 package modelisation.mixed;
 
 import modelisation.server.TimedRequestWithLocationServer;
-
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
@@ -11,7 +10,6 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-import org.objectweb.proactive.ext.mixedlocation.MigrationManagerWithMixedLocation;
 import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 
 

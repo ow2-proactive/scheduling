@@ -1,7 +1,5 @@
 package modelisation.simulator.mixed.multiqueue;
 
-import modelisation.simulator.common.SimulatorElement;
-
 import modelisation.simulator.mixed.Agent;
 import modelisation.simulator.mixed.ForwarderChain;
 import modelisation.simulator.mixed.Source;

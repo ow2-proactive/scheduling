@@ -2,9 +2,13 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 
+import org.apache.log4j.Logger;
+
 
 public class AgentWithMaxTime extends Agent {
 
+    static Logger logger = Logger.getLogger(AgentWithMaxTime.class.getName());
+    
     protected double maxTime;
     protected double remainingTimeOnSite;
     protected Averagator averagatorMaxTimeReached;
@@ -21,9 +25,9 @@ public class AgentWithMaxTime extends Agent {
     }
 
     public void endMigration(double endTime) {
-        if (log) {
-            this.simulator.log("Agent: Migration ended ");
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            AgentWithMaxTime.logger.debug("Agent: Migration ended ");
+            AgentWithMaxTime.logger.debug(
                     "Agent: length of the migration " + 
                     (endTime - startTime));
         }
@@ -41,14 +45,14 @@ public class AgentWithMaxTime extends Agent {
     protected void _endOfMigration(double endTime) {
         this.migrationCounter++;
         this.state = WAITING;
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            AgentWithMaxTime.logger.debug(
                     "AgentWithMaxTime_endOfMigration migrationCounter " + 
                     this.migrationCounter);
-            this.simulator.log(
+            AgentWithMaxTime.logger.debug(
                     "AgentWithMaxTime_endOfMigration total time " + 
                     (endTime - startTime));
-            //            this.simulator.log(
+            //            this.logger.debug(
             //                    " AgentWithMaxTime: waited " +
             //                    this.remainingTime + " before migration");
         }
@@ -59,11 +63,11 @@ public class AgentWithMaxTime extends Agent {
         //when we have the new waiting time, we compare it to the maxTime
         //if needed, we schedule an update of the server
         this.remainingTime = this.waitTime();
-        //          System.out.println("Remaining Time = " + this.remainingTime);
-        //          System.out.println("maxTime = " + maxTime);
+        //          this.logger.debug("Remaining Time = " + this.remainingTime);
+        //          this.logger.debug("maxTime = " + maxTime);
         if (this.remainingTime > maxTime && !serverCalledOnArrival) {
             this.remainingTimeOnSite = this.remainingTime - maxTime;
-            //            System.out.println(
+            //            this.logger.debug(
             //                    "RemainingTimeOnSite " + this.remainingTimeOnSite);
             this.remainingTime = maxTime;
             //  this.notifyEvent("Call server");
@@ -76,30 +80,32 @@ public class AgentWithMaxTime extends Agent {
     }
 
     public void end() {
-        System.out.println("########### AgentWithMaxTime ###### ");
-        System.out.println(
-                "* Max time reached, remaining = " + 
-                this.averagatorMaxTimeReached.getTotal() / this.averagatorMaxTimeReached.getCount() + 
-                " " + this.averagatorMaxTimeReached.getCount());
+        if (logger.isInfoEnabled()) {
+            AgentWithMaxTime.logger.info("########### AgentWithMaxTime ###### ");
+            AgentWithMaxTime.logger.info(
+                    "* Max time reached, remaining = " + 
+                    this.averagatorMaxTimeReached.getTotal() / this.averagatorMaxTimeReached.getCount() + 
+                    " " + this.averagatorMaxTimeReached.getCount());
+        }
         super.end();
     }
 
     public void endOfCallServer(double time) {
-        if (log) {
-            this.simulator.log("AgentWithMaxTime.endOfCallServer");
+        if (logger.isDebugEnabled()) {
+            AgentWithMaxTime.logger.debug("AgentWithMaxTime.endOfCallServer");
         }
         if (this.serverCalledOnArrival) {
             this._endOfMigration(time);
             this.server.receiveRequestFromAgent(migrationCounter + 1, id);
         } else {
-        	 this.server.receiveRequestFromAgent(migrationCounter, id);
+            this.server.receiveRequestFromAgent(migrationCounter, id);
             if (this.remainingTimeOnSite > this.remainingTime) {
                 this.averagatorNu.add(this.maxTime + 
                                       this.remainingTimeOnSite);
                 this.remainingTime = this.remainingTimeOnSite - 
                                      this.remainingTime;
             } else {
-                //System.out.println("XXXXX");
+                //this.logger.debug("XXXXX");
                 this.averagatorNu.add(this.maxTime + this.remainingTime);
                 this.remainingTime = 0;
             }

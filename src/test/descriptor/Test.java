@@ -10,12 +10,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorConstants;
-import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
-import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
-import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.examples.migration.Agent;
 
 /**

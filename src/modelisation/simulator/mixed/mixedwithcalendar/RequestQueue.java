@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.ListIterator;
 
 import modelisation.simulator.common.SimulatorElement;
-
-import org.objectweb.proactive.core.UniqueID;
+import org.apache.log4j.Logger;
 
 
 public class RequestQueue extends SimulatorElement {
+	
+	protected static Logger logger = Logger.getLogger(Request.class.getName());
+  
+	
     protected ArrayList list;
     protected double youngestRequestCreationTime;
 
@@ -159,32 +162,32 @@ public class RequestQueue extends SimulatorElement {
     }
 
     public static void main(String[] args) {
-        System.out.println("Creating requestQueue");
+        logger.info("Creating requestQueue");
         RequestQueue rq = new RequestQueue();
-        System.out.println("Adding a request from agent");
+        logger.info("Adding a request from agent");
         rq.addRequest(new Request(Request.AGENT, 2));
-        System.out.println("Adding a request from source");
+        logger.info("Adding a request from source");
         rq.addRequest(new Request(Request.SOURCE, 5));
-        System.out.println("------");
-        System.out.println("Length of the list " + rq.length());
-        System.out.println(rq);
-        System.out.println("------");
-        System.out.println("Adding a request from agent, should not be added");
+        logger.info("------");
+        logger.info("Length of the list " + rq.length());
+        logger.info(rq);
+        logger.info("------");
+        logger.info("Adding a request from agent, should not be added");
         rq.addRequest(new Request(Request.AGENT, 1));
-        System.out.println("------");
-        System.out.println("Length of the list " + rq.length());
-        System.out.println(rq);
-        System.out.println("------");
-        System.out.println("Adding a request from agent, should be added");
+        logger.info("------");
+        logger.info("Length of the list " + rq.length());
+        logger.info(rq);
+        logger.info("------");
+        logger.info("Adding a request from agent, should be added");
         rq.addRequest(new Request(Request.AGENT, 7));
-        System.out.println("------");
-        System.out.println("Length of the list " + rq.length());
-        System.out.println(rq);
-        System.out.println("------");
-        System.out.println("Removing request from agent");
-        System.out.println("Request is " + rq.removeRequestFromAgent());
-        System.out.println("Removing request fromm source");
-        System.out.println("Request is " + rq.removeRequestFromSource());
-        System.out.println("Length of the list " + rq.length());
+        logger.info("------");
+        logger.info("Length of the list " + rq.length());
+        logger.info(rq);
+        logger.info("------");
+        logger.info("Removing request from agent");
+        logger.info("Request is " + rq.removeRequestFromAgent());
+        logger.info("Removing request fromm source");
+        logger.info("Request is " + rq.removeRequestFromSource());
+        logger.info("Length of the list " + rq.length());
     }
 }

@@ -1,6 +1,5 @@
 package modelisation.simulator.common;
 
-import java.math.BigDecimal;
 
 
 public class Averagator {

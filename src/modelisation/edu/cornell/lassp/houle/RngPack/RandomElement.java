@@ -1,6 +1,5 @@
 package modelisation.edu.cornell.lassp.houle.RngPack;
 
-import java.util.*;
 
 
 //

@@ -8,8 +8,12 @@
  */
 package modelisation.simulator.mixed.mixedwithcalendar;
 
+import org.apache.log4j.Logger;
+
+
 public class Forwarder extends Agent {
 
+    static Logger logger = Logger.getLogger(Forwarder.class.getName());
     public static final int DEAD = 0;
     public static final int ACTIF = 1;
     public static final int UPDATING_SERVER = 2;
@@ -28,7 +32,9 @@ public class Forwarder extends Agent {
         } else {
             Forwarder.DefaultState = ACTIF;
         }
-        System.out.println("--- Forwarders are " + Forwarder.DefaultState);
+        if (logger.isInfoEnabled()) {
+            logger.info("--- Forwarders are " + Forwarder.DefaultState);
+        }
     }
 
     public Forwarder() {
@@ -64,7 +70,9 @@ public class Forwarder extends Agent {
                 //we do nothing, the forwarder is born dead
             }
         }
-        //      this.simulator.log("Forwarder: setLifeTime " + l);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Forwarder: setLifeTime " + l);
+        }
     }
 
     public void endLife() {
@@ -115,8 +123,11 @@ public class Forwarder extends Agent {
         //this.remainingTime = 50000000;
         //this.notifyEvent();
         //we send the number of the next forwarder
-        //      System.out.println(
-        //         "Forwarder: calling server, next number is " + (this.number + 1));
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "Forwarder: calling server, next number is " + 
+                    (this.migrationCounter + 1));
+        }
         this.server.receiveRequestFromForwarder(this.migrationCounter + 1, 
                                                 this.id);
     }

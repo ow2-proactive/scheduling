@@ -2,15 +2,13 @@ package modelisation.simulator.mixed;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
-import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
-
-import org.objectweb.proactive.core.UniqueID;
+import org.apache.log4j.Logger;
 
 
 public class Agent extends SimulatorElement {
 
+    protected static Logger logger = Logger.getLogger(Agent.class.getName());
     public final static int WAITING = 0;
     public final static int MIGRATING = 1;
     public final static int MIGRATED = 2;
@@ -24,8 +22,11 @@ public class Agent extends SimulatorElement {
     static {
         Agent.callServer = !"NO".equals(System.getProperties().getProperty(
                                                 "agent.performcallserver"));
-        System.out.println(
-                "--- Agent will perform call to server " + Agent.callServer);
+        if (logger.isDebugEnabled()) {
+            logger.debug(
+                    "--- Agent will perform call to server " + 
+                    Agent.callServer);
+        }
     }
 
     //    protected UniqueID id;
@@ -80,7 +81,9 @@ public class Agent extends SimulatorElement {
     }
 
     public int receiveMessage() {
-        //        System.out.println("Agent.receiveMessage " + this);
+        if (logger.isDebugEnabled()) {
+            //        logger.debug("Agent.receiveMessage " + this);
+        }
         if (this.state == WAITING) {
             return Agent.WAITING;
         } else
@@ -105,18 +108,24 @@ public class Agent extends SimulatorElement {
 
     public double generateMigrationTime() {
         //        if (this.expoDelta == null) {
-        //            System.out.println(
+        if (logger.isDebugEnabled()) {
+            //            logger.debug(
+        }
         //                    "Agent " + this.id + " getting random generator");
         //            this.expoDelta = RandomNumberFactory.getGenerator("delta");
         //            this.expoDelta.initialize(delta,
         //                                      System.currentTimeMillis() +
         //                                      395672917);
-        //            System.out.println("Agent " + this.id +
+        if (logger.isDebugEnabled()) {
+            //            logger.debug("Agent " + this.id +
+        }
         //                               " got  random generator");
         //            //            this.expoDelta.initialize(delta, 58373435);
         //        }
         //        //        double tmp = expoDelta.next() * 1000;
-        //        //        System.out.println("Agent: migration started, will last " + tmp);
+        if (logger.isDebugEnabled()) {
+            //        //        logger.debug("Agent: migration started, will last " + tmp);
+        }
         //        //        return tmp;
         //        return this.expoDelta.next() * 1000;
         return this.simulator.generateMigrationTime();
@@ -124,13 +133,17 @@ public class Agent extends SimulatorElement {
 
     public double generateAgentWaitingTime() {
         //        if (this.expoNu == null) {
-        //                      System.out.println(
+        if (logger.isDebugEnabled()) {
+            //                      logger.debug(
+        }
         //                    "Agent " + this.id + " getting random generator for waitTime with parameter " + nu);
         //            this.expoNu = RandomNumberFactory.getGenerator("nu");
         //            //            this.expoNu.initialize(nu, System.currentTimeMillis() + 39566417);
         //            this.expoNu.initialize(nu, 39566417);
         //        }
-        //    //  System.out.println(expoNu.next() * 1000);
+        if (logger.isDebugEnabled()) {
+            //    //  logger.debug(expoNu.next() * 1000);
+        }
         //        return expoNu.next() * 1000;
         return this.simulator.generateAgentWaitingTime();
     }
@@ -212,7 +225,7 @@ public class Agent extends SimulatorElement {
     }
 
     public void endOfCallServer(double time) {
-        this.server.receiveRequestFromAgent(migrationCounter +1, id);
+        this.server.receiveRequestFromAgent(migrationCounter + 1, id);
         this._endOfMigration(time);
     }
 
@@ -242,17 +255,19 @@ public class Agent extends SimulatorElement {
     }
 
     public void end() {
-        System.out.println("* nu = " + 1000 / this.averagatorNu.average());
-        System.out.println(
-                "* delta  = " + 1000 / this.averagatorDelta.average());
-        System.out.println("delta count " + this.averagatorDelta.getCount());
-        System.out.println(
-                "gamma2 server = " + 1000 / this.averagatorGamma2.average());
-        System.out.println(" gamma2 count " + 
-                           this.averagatorGamma2.getCount());
-        System.out.println(
-                "* Real delta = " + 
-                1000 / ((this.averagatorDelta.getTotal() + this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount()));
+        if (logger.isDebugEnabled()) {
+            logger.debug("* nu = " + 1000 / this.averagatorNu.average());
+            logger.debug("* delta  = " + 
+                         1000 / this.averagatorDelta.average());
+            logger.debug("delta count " + this.averagatorDelta.getCount());
+            logger.debug(
+                    "gamma2 server = " + 
+                    1000 / this.averagatorGamma2.average());
+            logger.debug(" gamma2 count " + this.averagatorGamma2.getCount());
+            logger.debug(
+                    "* Real delta = " + 
+                    1000 / ((this.averagatorDelta.getTotal() + this.averagatorGamma2.getTotal()) / this.averagatorDelta.getCount()));
+        }
     }
 
     public String getStateAsLetter() {

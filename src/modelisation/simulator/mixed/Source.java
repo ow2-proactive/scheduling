@@ -2,13 +2,13 @@ package modelisation.simulator.mixed;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
-import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
+import org.apache.log4j.Logger;
 
 
 public class Source extends SimulatorElement {
 
+    protected static Logger logger = Logger.getLogger(Source.class.getName());
     public static final int WAITING = 0;
     public static final int COMMUNICATION = 1;
     public static final int WAITING_FOR_AGENT = 2;
@@ -137,7 +137,9 @@ public class Source extends SimulatorElement {
                                 "Source: processing for server total " + 
                                 (time - processingServerStartTime));
                     }
-                    //      System.out.println("Source: processing for server total " +
+                    if (logger.isDebugEnabled()) {
+                        //      logger.debug("Source: processing for server total " +
+                    }
                     //                                (time - processingServerStartTime));
                     this.averagatorMu.add(time - processingServerStartTime);
                     this.tries++;
@@ -178,15 +180,19 @@ public class Source extends SimulatorElement {
         this.endTime = endTime;
         //        this.remainingTime = simulator.getSourceWaitingTime();
         //       if (log) this.simulator.log("<<<<< Source: communication finished at time " + endTime);
-//        System.out.println(
-//                    "TimedProxyWithLocationServer:  .............. done after " + 
-//                    (endTime - startTime));
+        if (logger.isDebugEnabled()) {
+            //        logger.debug(
+        }
+        //                    "TimedProxyWithLocationServer:  .............. done after " +
+        //                    (endTime - startTime));
         if (log) {
             this.simulator.log(
                     "TimedProxyWithLocationServer:  .............. done after " + 
                     (endTime - startTime));
         }
-        //   System.out.println("XXXX " + (endTime - startTime));
+        if (logger.isDebugEnabled()) {
+            //   logger.debug("XXXX " + (endTime - startTime));
+        }
         if (log) {
             this.simulator.log("Number of tries= " + tries);
         }
@@ -212,35 +218,38 @@ public class Source extends SimulatorElement {
     }
 
     public void end() {
-        System.out.println(
-                "* lambda = " + 1000 / this.averagatorLambda.average());
-        System.out.println(
-                "* T Source  = " + this.averagatorT.average() + " count " + 
-                this.averagatorT.getCount());
-        System.out.println("* Tries  = " + this.averagatorTries.average());
-        System.out.println(
-                "* Failed = " + this.averagatorCommunicationFailed.average() + 
-                " count " + this.averagatorCommunicationFailed.getCount());
-        System.out.println(
-                "* gamma2  = " + 1000 / this.averagatorGamma2.average() + 
-                " count " + this.averagatorGamma2.getCount());
-        System.out.println(
-                "* Chain failed on first try " + this.failedOnfirstTry);
-        System.out.println(
-                "* Chain success rate " + 
-                (((float)this.averagatorT.getCount() - (float)this.failedOnfirstTry) / (float)this.averagatorT.getCount()) * 100.0 + 
-                " %");
-        System.out.println(
-                "* mu with gamma2 from source = " + 
-                this.averagatorMu.average() + " count " + 
-                this.averagatorMu.getCount());
-        System.out.println(
-                "Operation for mu : " + this.averagatorMu.average() + " - " + 
-                this.averagatorGamma2.average());
-        System.out.println(
-                "* mu from source = " + 
-                1000 / (this.averagatorMu.average() - this.averagatorGamma2.average()) + 
-                " count " + this.averagatorMu.getCount());
+        if (logger.isDebugEnabled()) {
+            logger.debug("* lambda = " + 
+                         1000 / this.averagatorLambda.average());
+            logger.debug(
+                    "* T Source  = " + this.averagatorT.average() + 
+                    " count " + this.averagatorT.getCount());
+            logger.debug("* Tries  = " + this.averagatorTries.average());
+            logger.debug(
+                    "* Failed = " + 
+                    this.averagatorCommunicationFailed.average() + " count " + 
+                    this.averagatorCommunicationFailed.getCount());
+            logger.debug(
+                    "* gamma2  = " + 1000 / this.averagatorGamma2.average() + 
+                    " count " + this.averagatorGamma2.getCount());
+            logger.debug("* Chain failed on first try " + 
+                         this.failedOnfirstTry);
+            logger.debug(
+                    "* Chain success rate " + 
+                    (((float)this.averagatorT.getCount() - (float)this.failedOnfirstTry) / (float)this.averagatorT.getCount()) * 100.0 + 
+                    " %");
+            logger.debug(
+                    "* mu with gamma2 from source = " + 
+                    this.averagatorMu.average() + " count " + 
+                    this.averagatorMu.getCount());
+            logger.debug(
+                    "Operation for mu : " + this.averagatorMu.average() + 
+                    " - " + this.averagatorGamma2.average());
+            logger.debug(
+                    "* mu from source = " + 
+                    1000 / (this.averagatorMu.average() - this.averagatorGamma2.average()) + 
+                    " count " + this.averagatorMu.getCount());
+        }
     }
 
     //

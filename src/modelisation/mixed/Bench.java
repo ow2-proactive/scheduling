@@ -3,20 +3,13 @@ package modelisation.mixed;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-
 import java.util.Vector;
 
-import modelisation.server.AgentWithExponentialMigrationAndServer;
-import modelisation.server.TimedLocationServerMetaObjectFactory;
-
 import modelisation.statistics.ExponentialLaw;
-
 import modelisation.util.NodeControler;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 

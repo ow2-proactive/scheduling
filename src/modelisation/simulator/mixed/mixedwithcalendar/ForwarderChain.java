@@ -1,15 +1,13 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 import modelisation.simulator.common.Averagator;
-import modelisation.simulator.common.SimulatorElement;
+import org.apache.log4j.Logger;
 
 
 public class ForwarderChain
     extends modelisation.simulator.mixed.ForwarderChain {
 
+    static Logger logger = Logger.getLogger(ForwarderChain.class.getName());
     public static final int IDLE = 0;
     public static final int COMMUNICATING = 1;
     public static final int WAITING_AGENT = 2;
@@ -29,7 +27,9 @@ public class ForwarderChain
     protected Averagator averagatorExpectedForwarderCount;
     protected Averagator averagatorWaitTimeAgent;
     protected Averagator averagatorRemainingLifeTime;
+    protected Averagator averagatorAgentMigration;
     protected Event currentEvent;
+    protected boolean migratingAgentReached;
 
     /**
      * Create a forwarding chain
@@ -39,12 +39,12 @@ public class ForwarderChain
         this.list = new Forwarder[10];
         this.simulator = s;
         this.position = 0;
-        this.source = source;
         this.setRemainingTime(500000);
         this.averagatorGamma1 = new Averagator();
         this.averagatorForwarderCount = new Averagator();
         this.averagatorWaitTimeAgent = new Averagator();
-        averagatorExpectedForwarderCount = new Averagator();
+        this.averagatorAgentMigration = new Averagator();
+        this.averagatorExpectedForwarderCount = new Averagator();
         this.averagatorRemainingLifeTime = new Averagator();
     }
 
@@ -76,8 +76,8 @@ public class ForwarderChain
 
     public void add(Forwarder f) {
         f.setLifeTime(this.simulator.generateForwarderLifeTime());
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "ForwarderChain.add with lifetime " + 
                     f.getRemainingTime() + " with number " + 
                     f.migrationCounter);
@@ -121,22 +121,19 @@ public class ForwarderChain
      */
     public void reachElement() {
         this.position = getPositionFromNumber(objectNumber);
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "reachElement " + objectNumber + " at position " + 
                     this.position + " lookin for agent " + 
-                    this.agent.getNumber());
+                    this.agent.getNumber() + " listSize " + this.listSize);
         }
         if (this.position < 0) {
             //the element we are looking for in not in the
             //forwarder chain, we check to see if it is the agent
             if (this.agent.getNumber() == objectNumber) {
-                if (log) {
-                    this.simulator.log(
-                            "ForwarderChain.reachElement agent reached");
-                }
-                if (log) {
-                    this.simulator.log(
+                if (logger.isDebugEnabled()) {
+                    logger.debug("ForwarderChain.reachElement agent reached");
+                    logger.debug(
                             "ForwarderChain.reachElement hasBeenForwarded " + 
                             this.hasBeenForwarded);
                 }
@@ -170,20 +167,25 @@ public class ForwarderChain
                 break;
             case Agent.BLOCKED:
                 this.state = WAITING_AGENT;
+                if (this.forwarderCount == 0) {
+                    //System.out.println(""+(this.simulator.currentTime - source.startTime));
+                    this.averagatorAgentMigration.add(
+                            this.simulator.currentTime - source.startTime);
+                }
                 this.setRemainingTime(a.getRemainingTime());
                 this.notifyEvent("Wait for Agent");
-                if (log) {
-                    this.simulator.log(
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
                             " Source: waiting for the agent will last " + 
                             this.remainingTime);
                 }
                 this.averagatorWaitTimeAgent.add(this.remainingTime);
+                this.migratingAgentReached = true;
                 break;
         }
     }
 
     protected void reachElementForwarder(Forwarder f) {
-
         double tmp;
         int returnValue = f.receiveMessage();
         // this.simulator.log("Forwarder reached");
@@ -198,6 +200,11 @@ public class ForwarderChain
                 this.averagatorRemainingLifeTime.add(f.getRemainingTime());
                 // this.averagatorForwarderCount.add(1);
                 this.forwarderCount++;
+                if (this.forwarderCount == 1 && !this.migratingAgentReached && 
+                    this.listSize == 1 && (this.agent.getState() == Agent.WAITING)) {
+                    //System.out.println("this.listSize = " + this.listSize);
+                    this.source.firstForwarderReached();
+                }
                 break;
             default:
                 this.communicationFailed();
@@ -214,8 +221,9 @@ public class ForwarderChain
         this.objectNumber = forwarderNumber;
         this.hasBeenForwarded = false;
         this.forwarderCount = 0;
-        if (log) {
-            this.simulator.log("ForwarderChain.startCommunication");
+        this.migratingAgentReached = false;
+        if (logger.isDebugEnabled()) {
+            logger.debug("ForwarderChain.startCommunication");
         }
         this.averagatorExpectedForwarderCount.add(getChainLength(
                                                           forwarderNumber));
@@ -223,20 +231,20 @@ public class ForwarderChain
         this.setRemainingTime(tmp);
         this.notifyEvent("First hop");
         this.averagatorGamma1.add(tmp);
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "ForwarderChain.startCommunication will last " + 
                     this.remainingTime);
             //            this.simulator.log(
             //                    "ForwarderChain.startCommunication length of the chain is " +
             //                    this.list.size());
-            this.simulator.log(
+            logger.debug(
                     "ForwarderChain.startCommunication looking for object " + 
                     forwarderNumber);
         }
         this.position = this.getPositionFromNumber(forwarderNumber);
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "ForwarderChain.startCommunication position " + 
                     this.position);
         }
@@ -269,8 +277,8 @@ public class ForwarderChain
         //    this.notifyEvent();
         this.source.communicationFailed();
         this.state = IDLE;
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "Communication failed after " + this.forwarderCount + 
                     " forwarders");
         }
@@ -287,8 +295,8 @@ public class ForwarderChain
         // this.list = new Forwarder[10];
         this.flush();
         this.source.agentReached(this.agent.getNumber());
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "Communication succeeded after " + this.forwarderCount + 
                     " forwarders");
         }
@@ -301,8 +309,8 @@ public class ForwarderChain
      * after having been through forwarders
      */
     public void startTensioning() {
-        if (log) {
-            this.simulator.log("ForwarderChain.startTensioning");
+        if (logger.isDebugEnabled()) {
+            logger.debug("ForwarderChain.startTensioning");
         }
         this.state = TENSIONING;
         this.setRemainingTime(simulator.generateCommunicationTimeForwarder());
@@ -329,8 +337,8 @@ public class ForwarderChain
 
     public void update(double time) {
         //           this.currentEvent = null;
-        if (log) {
-            this.simulator.log(this.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug(this.toString());
         }
         //      this.updateForwarders(time);
         //   if (this.remainingTime == 0) {
@@ -339,12 +347,15 @@ public class ForwarderChain
                 this.reachElement();
                 break;
             case WAITING_AGENT:
+             
                 if (this.agent.getState() == Agent.CALLING_SERVER) {
                     //         oooopsss, we have to be carreful here, the agent is actually calling the server
                     //         so its migration is not over yet
                     this.setRemainingTime(this.agent.getRemainingTime());
                     this.notifyEvent("Next hop");
                 } else {
+                	//FAb 10/02/03
+                	this.state=COMMUNICATING;
                     this.reachElement();
                 }
                 break;
@@ -354,7 +365,7 @@ public class ForwarderChain
         }
         // }
     }
-    
+
     //    /**
     //     * Decrease the remaining time of the forwarder chain
     //     * and its associated forwarders
@@ -384,31 +395,65 @@ public class ForwarderChain
     //        }
     //    }
     public void end() {
-        System.out.println("########## ForwarderChain ##################");
-        System.out.println(
-                "* gamma1 = " + 1000 / this.averagatorGamma1.average());
-        System.out.println(
-                "* ForwarderCount = " + 
-                this.averagatorForwarderCount.average() + " " + 
-                this.averagatorForwarderCount.getCount());
-        System.out.println(
-                "* ExpectedForwarderCount = " + 
-                this.averagatorExpectedForwarderCount.average() + " " + 
-                this.averagatorExpectedForwarderCount.getCount());
-        System.out.println(
-                "* wait for agent = " + 
-                this.averagatorWaitTimeAgent.average() + " " + 
-                this.averagatorWaitTimeAgent.getCount());
-        System.out.println(
-                "* Remaining life forwarder = " + 
-                this.averagatorRemainingLifeTime.average() + " " + 
-                this.averagatorRemainingLifeTime.getCount());
+        if (logger.isInfoEnabled()) {
+            logger.info("########## ForwarderChain ##################");
+            logger.info("* gamma1 = " + 
+                        1000 / this.averagatorGamma1.average());
+            logger.info(
+                    "* ForwarderCount = " + 
+                    this.averagatorForwarderCount.average() + " " + 
+                    this.averagatorForwarderCount.getCount());
+            logger.info(
+                    "* ExpectedForwarderCount = " + 
+                    this.averagatorExpectedForwarderCount.average() + " " + 
+                    this.averagatorExpectedForwarderCount.getCount());
+            logger.info(
+                    "* wait for agent = " + 
+                    this.averagatorWaitTimeAgent.average() + " " + 
+                    this.averagatorWaitTimeAgent.getCount());
+            logger.info(
+                    "* agent on migration first try = " + 
+                    this.averagatorAgentMigration.average() + " " + 
+                    this.averagatorAgentMigration.getCount());
+            logger.info(
+                    "* Remaining life forwarder = " + 
+                    this.averagatorRemainingLifeTime.average() + " " + 
+                    this.averagatorRemainingLifeTime.getCount());
+        }
     }
 
     public String getName() {
         return "Fchain" + this.id;
     }
 
+    public int getNumberOfHops() {
+    	int tmpPosition = this.getPositionFromNumber(this.objectNumber);
+    //		System.out.println(this + " tmpPosition " + tmpPosition);
+        if (tmpPosition < 0) {
+            if (this.agent.getNumber() == objectNumber) {
+                if ((this.state == ForwarderChain.WAITING_AGENT) || 
+                (this.state == ForwarderChain.TENSIONING)) {
+                    return 0;
+                } else {
+                    return 1;
+                }
+            } else
+                return this.listSize;
+        }
+        return this.listSize - tmpPosition +1;
+        // return n;
+    }
+
+    public String getStateAsString() {
+        if ((this.objectNumber == this.agent.getNumber()) && 
+            (!hasBeenForwarded) && (this.getNumberOfHops() != 0)) {
+            return "*";
+        } else {
+            return "";
+        }
+    }
+    
+ 
     public String toString() {
 
         StringBuffer tmp = new StringBuffer("Fchain: ");

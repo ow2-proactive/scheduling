@@ -2,9 +2,12 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 
+import org.apache.log4j.Logger;
+
 
 public class MultiqueueServer extends Server {
 
+    static Logger logger = Logger.getLogger(MultiqueueServer.class.getName());
     protected RequestQueue[] requestQueueArray;
     protected int[] currentLocation;
     protected Source[] sourceArray;
@@ -44,8 +47,8 @@ public class MultiqueueServer extends Server {
      */
     public void receiveRequestFromAgent(int number, int id) {
         // super.receiveRequestFromAgent(number, id);
-        if (log) {
-            this.simulator.log("Server.receiveRequestFromAgent " + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Server.receiveRequestFromAgent " + id);
         }
 
         Request r = new Request(Request.AGENT, number, id, 
@@ -74,8 +77,8 @@ public class MultiqueueServer extends Server {
     public void receiveRequestFromForwarder(int number, int id) {
         //        super.receiveRequestFromForwarder(number, id);
         //        System.out.println("XXXXX");
-        if (log) {
-            this.simulator.log("Server.receiveRequestFromForwarder " + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Server.receiveRequestFromForwarder " + id);
         }
         this.requestQueueArray[id].addRequest(new Request(Request.AGENT, number, 
                                                           id, 
@@ -88,8 +91,8 @@ public class MultiqueueServer extends Server {
      */
     public void receiveRequestFromSource(int id) {
         //        super.receiveRequestFromSource(id);
-        if (log) {
-            this.simulator.log("Server.receiveRequestFromSource " + id);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Server.receiveRequestFromSource " + id);
         }
         this.requestQueueArray[id].addRequest(new Request(Request.SOURCE, 0, id, 
                                                           this.simulator.getCurrentTime()));
@@ -104,8 +107,8 @@ public class MultiqueueServer extends Server {
     public void requestReceived() {
         this.averagatorActiveQueue.add(this.getNonEmptyQueueNumber());
         //        this.simulator.log("AQ " + this.getNonEmptyQueueNumber());
-        if (log) {
-            this.simulator.log("Server.receiveRequest");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Server.receiveRequest");
         }
         if (this.state == IDLE) {
             //            this.state = IDL_REQUEST;
@@ -122,11 +125,11 @@ public class MultiqueueServer extends Server {
             this.state = SERVING_AGENT;
             this.remainingTime = simulator.generateServiceTimeMu1();
             this.notifyEvent("Serving Agent");
-            if (log) {
-                this.simulator.log(
+            if (logger.isDebugEnabled()) {
+                logger.debug(
                         "Server.serveNextRequest will last " + 
                         this.remainingTime);
-                this.simulator.log(
+                logger.debug(
                         "getNextRequestQueueFifo: the request waited " + 
                         (this.simulator.getCurrentTime() - this.currentRequest.getCreationTime()));
             }
@@ -200,30 +203,29 @@ public class MultiqueueServer extends Server {
         if (this.state == SERVING_AGENT) {
             if (this.currentLocation[this.currentRequest.getSenderID()] < this.currentRequest.getNumber()) {
                 this.currentLocation[this.currentRequest.getSenderID()] = this.currentRequest.getNumber();
-                //                if (log) {
-                //                    this.simulator.log(
-                //                            "MultiqueueServer: end of service for agent ");
-                //                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("MultiqueueServer: end of service for agent ");
+                }
                 if (this.currentRequest.getCreationTime() > 0) {
                     this.averagatorMuForAgent[this.currentRequest.getSenderID()].add(
                             endTime - this.currentRequest.getCreationTime() - 
                             this.currentRequest.timeToSubstract);
-                    if (log) {
-                        this.simulator.log(
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
                                 "MultiqueueServer: end of service for agent " + 
                                 this.currentRequest.getSenderID() + 
                                 " lasted " + 
                                 (endTime - this.currentRequest.getCreationTime() - 
                                     this.currentRequest.timeToSubstract));
-                        this.simulator.log(
+                        logger.debug(
                                 "MultiqueueServer: known location " + 
                                 this.currentLocation[this.currentRequest.getSenderID()]);
                     }
                 }
             } else {
-                if (log) {
-                    this.simulator.log("Server: ignoring request from agent");
-                    this.simulator.log(
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Server: ignoring request from agent");
+                    logger.debug(
                             "CurrentLocation " + currentLocation + " new " + 
                             this.currentRequest.getNumber());
                 }
@@ -231,8 +233,10 @@ public class MultiqueueServer extends Server {
             this.stateAfterService();
         } else {
             if (this.requestQueueArray[this.currentRequest.getSenderID()].hasRequestFromAgent()) {
-                //we put the request back in the queue
-                //                this.log("Server.endOfService puting request in the queue");
+                if (logger.isDebugEnabled()) {
+                    logger.debug(
+                            "Server.endOfService puting request in the queue");
+                }
                 this.requestQueueArray[this.currentRequest.getSenderID()].addRequest(
                         this.currentRequest);
                 this.stateAfterService();
@@ -257,12 +261,12 @@ public class MultiqueueServer extends Server {
     }
 
     public void endOfSendReply(double endTime) {
-        if (log) {
-            this.simulator.log(
+        if (logger.isDebugEnabled()) {
+            logger.debug(
                     "SelectiveServer: time microtimer = " + 
                     (endTime - startTime) * 1000 + " for method " + 
                     "searchObject");
-            this.simulator.log(
+            logger.debug(
                     "MultiqueueServer: last known position " + 
                     this.currentLocation[this.currentRequest.getSenderID()]);
         }
@@ -278,7 +282,7 @@ public class MultiqueueServer extends Server {
     public void stateAfterService() {
         //   super.stateAfterService();
         this.state = Server.IDLE;
-//        System.out.println(this.getNonEmptyQueueNumber());
+        //        System.out.println(this.getNonEmptyQueueNumber());
         if (this.getNonEmptyQueueNumber() != 0) {
             this.remainingTime = 0;
             this.notifyEvent("IDLE");
@@ -289,18 +293,21 @@ public class MultiqueueServer extends Server {
 
     public void end() {
         super.end();
-        System.out.println(
-                "* active queues " + this.averagatorActiveQueue.average());
-        for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
-            System.out.println(
-                    "* mu for agent " + i + "  = " + 
-                    1000 / this.averagatorMuForAgent[i].average() + " " + 
-                    this.averagatorMuForAgent[i].getCount());
-        }
-        for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
-            System.out.println(
-                    "* arrival rate " + i + " " + 
-                    this.averagatorArrivalRate[i].getCount() / this.simulator.getCurrentTime() * 1000);
+        if (logger.isInfoEnabled()) {
+            logger.info(
+                    "* active queues " + 
+                    this.averagatorActiveQueue.average());
+            for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
+                logger.info(
+                        "* mu for agent " + i + "  = " + 
+                        1000 / this.averagatorMuForAgent[i].average() + " " + 
+                        this.averagatorMuForAgent[i].getCount());
+            }
+            for (int i = 0; i < this.averagatorMuForAgent.length; i++) {
+                logger.info(
+                        "* arrival rate " + i + " " + 
+                        this.averagatorArrivalRate[i].getCount() / this.simulator.getCurrentTime() * 1000);
+            }
         }
     }
 

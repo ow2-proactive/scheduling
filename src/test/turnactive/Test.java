@@ -1,9 +1,8 @@
 package test.turnactive;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.Service;
 
 public class Test implements org.objectweb.proactive.RunActive, java.io.Serializable {
 

@@ -1,6 +1,5 @@
 package modelisation.simulator.forwarder;
 
-import modelisation.statistics.ExponentialLaw;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
 

@@ -1,6 +1,10 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
+import org.apache.log4j.Logger;
+
 public class SimulatorWithMaxTime extends Simulator {
+	
+	    static Logger logger = Logger.getLogger(SimulatorWithMaxTime.class.getName());
 	
 	protected int maxTime;
 	
@@ -20,7 +24,7 @@ public class SimulatorWithMaxTime extends Simulator {
         sourceArray = new Source[maxCouples];
         agentArray = new AgentWithMaxTime[maxCouples];
         forwarderChainArray = new ForwarderChain[maxCouples];
-        System.out.println("initialise() for " + maxCouples + "  couples");
+        logger.info("initialise() for " + maxCouples + "  couples");
         this.server = new MultiqueueServer(this, maxCouples);
         for (int i = 0; i < maxCouples; i++) {
             this.sourceArray[i] = new Source(this, lambda, i);
@@ -52,19 +56,20 @@ public class SimulatorWithMaxTime extends Simulator {
                     " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
             System.exit(-1);
         }
-        System.out.println("Starting Simulator");
-        System.out.println("     lambda = " + args[0]);
-        System.out.println("         nu = " + args[1]);
-        System.out.println("      delta = " + args[2]);
-        System.out.println("      gamma1 = " + args[3]);
-        System.out.println("      gamma2 = " + args[4]);
-        System.out.println("      mu1 = " + args[5]);
-        System.out.println("      mu2 = " + args[6]);
-        System.out.println("     ttl = " + args[7]);
-        System.out.println("   max migrations = " + args[8]);
-           System.out.println("   max time on site = " + args[9]);
-        System.out.println("     couples = " + args[10]);
-        System.out.println("     length = " + args[11]);
+        
+        logger.info("Starting Simulator");
+        logger.info("     lambda = " + args[0]);
+        logger.info("         nu = " + args[1]);
+        logger.info("      delta = " + args[2]);
+        logger.info("      gamma1 = " + args[3]);
+        logger.info("      gamma2 = " + args[4]);
+        logger.info("      mu1 = " + args[5]);
+        logger.info("      mu2 = " + args[6]);
+        logger.info("     ttl = " + args[7]);
+        logger.info("   max migrations = " + args[8]);
+           logger.info("   max time on site = " + args[9]);
+        logger.info("     couples = " + args[10]);
+        logger.info("     length = " + args[11]);
 
         SimulatorWithMaxTime simulator = new SimulatorWithMaxTime(Double.parseDouble(
                                                                                           args[0]), 

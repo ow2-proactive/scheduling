@@ -5,9 +5,12 @@ import modelisation.simulator.common.SimulatorElement;
 import modelisation.simulator.mixed.Agent;
 import modelisation.simulator.mixed.ForwarderChain;
 import modelisation.simulator.mixed.Source;
+import org.apache.log4j.Logger;
 
 
 public class Simulator extends modelisation.simulator.mixed.Simulator {
+
+ static Logger logger = Logger.getLogger(Simulator.class.getName());
 
     protected Source[] sourceArray;
     protected Agent[] agentArray;
@@ -172,18 +175,18 @@ public class Simulator extends modelisation.simulator.mixed.Simulator {
                     " <mu1> <mu2>  <alpha> <migration> <couples> <length> ");
             System.exit(-1);
         }
-        System.out.println("Starting Simulator");
-        System.out.println("     lambda = " + args[0]);
-        System.out.println("         nu = " + args[1]);
-        System.out.println("      delta = " + args[2]);
-        System.out.println("      gamma1 = " + args[3]);
-        System.out.println("      gamma2 = " + args[4]);
-        System.out.println("      mu1 = " + args[5]);
-        System.out.println("      mu2 = " + args[6]);
-        System.out.println("     ttl = " + args[7]);
-        System.out.println("   max migrations = " + args[8]);
-        System.out.println("     couples = " + args[9]);
-        System.out.println("     length = " + args[10]);
+        logger.info("Starting Simulator");
+        logger.info("     lambda = " + args[0]);
+        logger.info("         nu = " + args[1]);
+        logger.info("      delta = " + args[2]);
+        logger.info("      gamma1 = " + args[3]);
+        logger.info("      gamma2 = " + args[4]);
+        logger.info("      mu1 = " + args[5]);
+        logger.info("      mu2 = " + args[6]);
+        logger.info("     ttl = " + args[7]);
+        logger.info("   max migrations = " + args[8]);
+        logger.info("     couples = " + args[9]);
+        logger.info("     length = " + args[10]);
 
         Simulator simulator = new Simulator(Double.parseDouble(args[0]), 
                                             Double.parseDouble(args[1]), 

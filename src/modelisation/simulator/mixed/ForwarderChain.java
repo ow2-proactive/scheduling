@@ -1,13 +1,13 @@
 package modelisation.simulator.mixed;
 
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
-
+import org.apache.log4j.Logger;
 
 public class ForwarderChain extends SimulatorElement {
+
+protected static Logger logger = Logger.getLogger(ForwarderChain.class.getName());
+
 
     public static final int IDLE = 0;
     public static final int COMMUNICATING = 1;
@@ -40,7 +40,6 @@ public class ForwarderChain extends SimulatorElement {
         this.list = new Forwarder[10];
         this.simulator = s;
         this.position = 0;
-        this.source = source;
         this.setRemainingTime(Double.MAX_VALUE);
         this.averagatorGamma1 = new Averagator();
         this.averagatorForwarderCount = new Averagator();
@@ -228,7 +227,9 @@ public class ForwarderChain extends SimulatorElement {
                     "Communication failed after " + this.forwarderCount + 
                     " forwarders");
         }
-        //            System.out.println("FFF " + this.forwarderCount);
+if (logger.isDebugEnabled()) {
+        //            logger.debug("FFF " + this.forwarderCount);
+}
     }
 
     protected void endOfCommunication() {
@@ -242,7 +243,9 @@ public class ForwarderChain extends SimulatorElement {
                     "Communication succeeded after " + this.forwarderCount + 
                     " forwarders");
         }
-        //        System.out.println("FFF " + this.forwarderCount);
+if (logger.isDebugEnabled()) {
+        //        logger.debug("FFF " + this.forwarderCount);
+}
         this.averagatorForwarderCount.add(this.forwarderCount);
     }
 
@@ -326,24 +329,25 @@ public class ForwarderChain extends SimulatorElement {
     }
 
     public void end() {
-        System.out.println(
-                "* gamma1 = " + 1000 / this.averagatorGamma1.average());
-        System.out.println(
+if (logger.isDebugEnabled()) {
+        logger.debug("* gamma1 = " + 1000 / this.averagatorGamma1.average());
+        logger.debug(
                 "* ForwarderCount = " + 
                 this.averagatorForwarderCount.average() + " " + 
                 this.averagatorForwarderCount.getCount());
-        System.out.println(
+        logger.debug(
                 "* ExpectedForwarderCount = " + 
                 this.averagatorExpectedForwarderCount.average() + " " + 
                 this.averagatorExpectedForwarderCount.getCount());
-        System.out.println(
+        logger.debug(
                 "* wait for agent = " + 
                 this.averagatorWaitTimeAgent.average() + " " + 
                 this.averagatorWaitTimeAgent.getCount());
-        System.out.println(
+        logger.debug(
                 "* Remaining life forwarder = " + 
                 this.averagatorRemainingLifeTime.average() + " " + 
                 this.averagatorRemainingLifeTime.getCount());
+}
     }
 
     public String toString() {

@@ -88,7 +88,7 @@ public class Agent implements org.objectweb.proactive.RunActive, Serializable {
   private void chooseValue() {
     //first we sleep a bit to loose some time
     try {
-      Thread.currentThread().sleep(500 + randomGenerator.nextInt(1000));
+      Thread.sleep(500 + randomGenerator.nextInt(1000));
     } catch (Exception e) {
       e.printStackTrace();
     }

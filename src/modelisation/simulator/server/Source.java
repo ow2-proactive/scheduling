@@ -1,9 +1,8 @@
 package modelisation.simulator.server;
 
-import modelisation.statistics.ExponentialLaw;
-import modelisation.statistics.RandomNumberGenerator;
-import modelisation.statistics.RandomNumberFactory;
 import modelisation.simulator.common.SimulatorElement;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 public class Source  extends SimulatorElement {
 

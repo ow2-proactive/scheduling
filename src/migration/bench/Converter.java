@@ -3,12 +3,10 @@ package migration.bench;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.ZipOutputStream;
 
 import org.objectweb.proactive.ProActive;
 

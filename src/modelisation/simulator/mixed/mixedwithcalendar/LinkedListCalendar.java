@@ -1,11 +1,20 @@
 package modelisation.simulator.mixed.mixedwithcalendar;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Locale;
 
 
 public class LinkedListCalendar implements Calendar {
+
+  static DecimalFormat df ;
+  static { 
+  	df = (DecimalFormat) NumberFormat.getInstance(Locale.US);
+  	df.applyPattern("###.00");	
+  }
 
     protected LinkedList list;
 
@@ -75,7 +84,7 @@ public class LinkedListCalendar implements Calendar {
         Event tmp = null;
         while (li.hasNext()) {
             tmp = (Event)li.next();
-            buff.append("(").append(tmp.getObject().getName()).append(",").append(tmp.getTime()).append(",").append(tmp.toString()).append(")");
+            buff.append("(").append(tmp.getObject().getName()).append(",").append(df.format(tmp.getTime())).append(",").append(tmp.toString()).append(")");
             //
         }
         return buff.toString();
