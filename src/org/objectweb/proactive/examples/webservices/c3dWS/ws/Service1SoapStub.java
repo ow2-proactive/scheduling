@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 
+import org.apache.axis.enum.Style;
+import org.apache.axis.enum.Use;
+
+
 public class Service1SoapStub extends org.apache.axis.client.Stub
     implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap {
     static org.apache.axis.description.OperationDesc[] _operations;
@@ -37,7 +41,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
     static {
         _operations = new org.apache.axis.description.OperationDesc[7];
         _initOperationDesc1();
-    }
+    } 
 
     private java.util.Vector cachedSerClasses = new java.util.Vector();
     private java.util.Vector cachedSerQNames = new java.util.Vector();
@@ -45,7 +49,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
     private java.util.Vector cachedDeserFactories = new java.util.Vector();
 
     public Service1SoapStub() throws org.apache.axis.AxisFault {
-        this(null);
+        this(null); 
     }
 
     public Service1SoapStub(java.net.URL endpointURL,
@@ -91,8 +95,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "string"), java.lang.String.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[0] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -118,8 +122,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "int"), int.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[1] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -135,8 +139,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "string"), java.lang.String.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[2] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -152,8 +156,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "string"), java.lang.String.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[3] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -174,8 +178,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "string"), java.lang.String.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[4] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -196,8 +200,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "int"), int.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[5] = oper;
 
         oper = new org.apache.axis.description.OperationDesc();
@@ -213,8 +217,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub
                 "string"), java.lang.String.class,
             org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
-        oper.setStyle(org.apache.axis.enum.Style.WRAPPED);
-        oper.setUse(org.apache.axis.enum.Use.LITERAL);
+        oper.setStyle(Style.WRAPPED);
+        oper.setUse(Use.LITERAL);
         _operations[6] = oper;
     }
 

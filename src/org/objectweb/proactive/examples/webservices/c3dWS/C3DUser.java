@@ -492,7 +492,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                 // 16 renderings 
                 if (nRotate < 15) {
                     nRotate++;
-                    c3ddispatcher.rotateLeft();
+                    c3ddispatcher.rotateLeft(0);
                 } else {
                     c3ddispatcher.doBenchmarks();
                     exit();
@@ -1090,25 +1090,25 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                 /* Request 'rotate left' on button click */
                 if (c3ddispatcher != null) {
                     //b_left.setBackground(Color.yellow);
-                    c3ddispatcher.rotateLeft();
+                    c3ddispatcher.rotateLeft(i_user);
                 }
             } else if (source == b_right) {
                 /* Request 'rotate right' on button click */
                 if (c3ddispatcher != null) {
                     //b_right.setBackground(Color.yellow);
-                    c3ddispatcher.rotateRight();
+                    c3ddispatcher.rotateRight(i_user);
                 }
             } else if (source == b_up) {
                 // Go up
                 if (c3ddispatcher != null) {
                     //b_up.setBackground(Color.yellow);
-                    c3ddispatcher.rotateUp();
+                    c3ddispatcher.rotateUp(i_user);
                 }
             } else if (source == b_down) {
                 // Go down
                 if (c3ddispatcher != null) {
                     //b_down.setBackground(Color.yellow);
-                    c3ddispatcher.rotateDown();
+                    c3ddispatcher.rotateDown(i_user);
                 }
             } else if (source == b_clock) {
                 // Go clockwise

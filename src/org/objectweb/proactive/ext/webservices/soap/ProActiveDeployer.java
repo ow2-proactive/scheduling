@@ -158,7 +158,8 @@ public class ProActiveDeployer extends WSConstants {
     private static void deploy(String urn, String url, Object o, Component c,
         String[] methods, boolean componentInterface) {
         /* first we need to generate a WSDL description of the object we want to deploy */
-        String wsdl = WSDLGenerator.getWSDL(o, urn, url + ROUTER,
+        
+        String wsdl = WSDLGenerator.getWSDL(o.getClass().getSuperclass(), urn, url + ROUTER,
                 DOCUMENTATION, methods);
 
         /*For deploying an active object we need a ServiceManagerClient that will contact the Serlvet */

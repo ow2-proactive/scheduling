@@ -79,8 +79,9 @@ public class WSUser implements User, Serializable {
      */
     public void setPixels(int[] newPix, Interval inter) {
         ArrayOfInt aoi = new ArrayOfInt();
+        
         aoi.set_int(newPix);
-
+        //System.out.println("length = " + newPix.length);
         try {
             service.setPixels(this.name, aoi, inter.number, inter.total);
         } catch (RemoteException e) {
@@ -96,7 +97,8 @@ public class WSUser implements User, Serializable {
      */
     public void showMessage(String s) {
         try {
-            service.showDialog(this.name, s);
+            if (s.length() > 0)
+                service.showDialog(this.name, s);
         } catch (RemoteException e) {
             e.printStackTrace();
         }

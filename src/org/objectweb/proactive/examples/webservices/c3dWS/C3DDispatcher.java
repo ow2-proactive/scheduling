@@ -477,12 +477,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         //  public void setPixels(int[] newpix, Interval interval, C3DRenderingEngine currentEngine) {
         long elapsed;
 
-        System.out.println("SET PIXELS");
+        //System.out.println("SET PIXELS");
 
         /* Delivers the new pixels to all user frames */
         for (Enumeration e = h_users.elements(); e.hasMoreElements();) {
             User user = (User) e.nextElement();
-            System.out.println("classe user = " + user.getClass().getName());
+            //System.out.println("classe user = " + user.getClass().getName());
             user.setPixels(newpix, interval);
         }
 
@@ -627,7 +627,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      *        value used for the synchronization and notification of several
      *        users
      */
-    public void rotateLeft() {
+    public void rotateLeft(int i) {
         rotateSceneY(-Math.PI / 4);
     }
 
@@ -638,7 +638,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      *        value used for the synchronization and notification of several
      *        users
      */
-    public void rotateRight() {
+    public void rotateRight(int i) {
         rotateSceneY(Math.PI / 4);
     }
 
@@ -649,7 +649,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      *        value used for the synchronization and notification of several
      *        users
      */
-    public void rotateUp() {
+    public void rotateUp(int i) {
         rotateSceneX(Math.PI / 4);
     }
 
@@ -660,7 +660,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      *        value used for the synchronization and notification of several
      *        users
      */
-    public void rotateDown() {
+    public void rotateDown(int i) {
         rotateSceneX(-Math.PI / 4);
     }
 
@@ -686,6 +686,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         rotateSceneZ(-Math.PI / 4);
     }
 
+ 
     /*
         public void changeColorAll() {
             logger.info("changeColorAll()");
@@ -993,7 +994,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * @param name
      * @return
      */
-    public void registerWSUser(String name, String url) {
+    public int  registerWSUser(String name, String url) {
         /* Adds this User to the list */
         User newUser = new WSUser(name, url);
         h_users.put(new Integer(i_lastuser), newUser);
@@ -1032,7 +1033,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             newUser.setPixels(pixels, inter);
         }
 
-        i_lastuser++;
+      return   i_lastuser++;
     }
 
     /**
@@ -1045,7 +1046,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         ProActiveConfiguration.load();
 
         String hostWS = "localhost:8080";
-        System.out.println("host = " + hostWS);
+        //System.out.println("host = " + hostWS);
 
         if (argv.length == 2) {
             hostWS = argv[1];
@@ -1084,7 +1085,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             String[] methods = {
                     "rotateRight", "getPicture", "rotateLeft", "rotateUp",
                     "rotateDown", "getPixels", "getPixelMax", "waitForImage",
-                    "spinClock", "spinUnclock", "addRandomSphere", "resetScene",
+                    "spinClock", "spinUnclock", "addRandomSphere", "resetSceneWS",
                     "registerWSUser", "unregisterWSUser"
                 };
 
@@ -1108,7 +1109,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         x = (Math.random() - 0.5) * 20.0;
         y = (Math.random() - 0.5) * 20.0;
         z = (Math.random() - 0.5) * 20.0;
-        r = (Math.random()) * 10.0;
+        r = (Math.random()) * 10.0; 
 
         Sphere sphere = new Sphere(new Vec(x, y, z), r);
 
@@ -1280,7 +1281,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     }
 
     //Method for WS
-    public void resetScene() {
+    public void resetSceneWS() {
         this.scene = createScene();
         render();
     }
@@ -1398,9 +1399,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     removedUser = user;
                 }
 
-                System.out.println("Unregister WSUser : " + name + "--" +
-                    urlUser);
-                System.out.println("User = " + number);
+               // System.out.println("Unregister WSUser : " + name + "--" +
+                //    urlUser);
+                //System.out.println("User = " + number);
                 unregisterConsumer(number);
 
                 break;
@@ -1679,7 +1680,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             try {
                 //				org.objectweb.proactive.ProActive.unregisterVirtualNode(
                 //					vn);
-                System.out.println("undeploy : " + urn + " at : " + url);
+               // System.out.println("undeploy : " + urn + " at : " + url);
                 ProActive.unExposeAsWebService(urn, url);
                 proActiveDescriptor.killall(false);
             } catch (Exception e) {
@@ -1841,7 +1842,7 @@ class Election extends Thread {
             c3ddispatcher.showMessageAll("   The scene will be rotated up.");
             Election.running = false;
             Election.wishes.clear();
-            c3ddispatcher.rotateUp();
+            c3ddispatcher.rotateUp(0);
 
             break;
 
@@ -1849,7 +1850,7 @@ class Election extends Thread {
             c3ddispatcher.showMessageAll("   The scene will be rotated down.");
             Election.running = false;
             Election.wishes.clear();
-            c3ddispatcher.rotateDown();
+            c3ddispatcher.rotateDown(0);
 
             break;
 
@@ -1857,7 +1858,7 @@ class Election extends Thread {
             c3ddispatcher.showMessageAll("   The scene will be rotated left.");
             Election.running = false;
             Election.wishes.clear();
-            c3ddispatcher.rotateLeft();
+            c3ddispatcher.rotateLeft(0);
 
             break;
 
@@ -1865,7 +1866,7 @@ class Election extends Thread {
             c3ddispatcher.showMessageAll("   The scene will be rotated right.");
             Election.running = false;
             Election.wishes.clear();
-            c3ddispatcher.rotateRight();
+            c3ddispatcher.rotateRight(0);
 
             break;
 
