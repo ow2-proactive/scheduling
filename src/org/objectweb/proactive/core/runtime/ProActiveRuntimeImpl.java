@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -42,8 +43,12 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 
+
 import java.util.ArrayList;
+
+
 import java.util.Random;
+
 
 
 /**
@@ -151,9 +156,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
+
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#DeleteAllNodes()
      */
-    public void DeleteAllNodes() {
+    public void killAllNodes() {
         nodeMap.clear();
     }
 
@@ -276,6 +282,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     public String getURL() {
         return "//" + vmInformation.getInetAddress().getHostName() + "/" +
         vmInformation.getName();
+        //		String protocol = System.getProperty("proactive.rmi")+":";
+        //		System.out.println(protocol);
+        //		String port = System.getProperty("proactive.rmi.port");
+        //		if ( port != null){
+        //			return UrlBuilder.buildUrl(vmInformation.getInetAddress().getHostName(), vmInformation.getName(),protocol, new Integer(port).intValue());
+        //		}else{
+        //			return UrlBuilder.buildUrl(vmInformation.getInetAddress().getHostName(), vmInformation.getName(),protocol);
+        //        		
+        //		} 
     }
 
     /**
@@ -332,7 +347,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {
+        removeRuntimeRegistrationEventListener((VirtualNodeImpl) virtualNodesMap.get(
+                virtualNodeName));
         virtualNodesMap.remove(virtualNodeName);
+    }
+
+    public void unregisterAllVirtualNodes() {
+        virtualNodesMap.clear();
     }
 
     public ArrayList getActiveObjects(String nodeName, String objectName) {
@@ -495,12 +516,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         //the Unique ID of the JVM
         private java.rmi.dgc.VMID uniqueVMID;
         private String name;
+        private String processCreatorId;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
             hostInetAddress = java.net.InetAddress.getLocalHost();
             String hostName = hostInetAddress.getHostName();
-
+            this.processCreatorId = "jvm";
             //this.name = "PA_RT"+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt())+"_"+hostName;
 //                        this.name = "PA_RT" +
 //                            Integer.toString(new java.security.SecureRandom().nextInt()) +
@@ -529,6 +551,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         public java.net.InetAddress getInetAddress() {
             return hostInetAddress;
+        }
+
+        public String getCreationProtocolID() {
+            return this.processCreatorId;
+        }
+
+        public void setCreationProtocolID(String protocolId) {
+            this.processCreatorId = protocolId;
         }
     }
 }

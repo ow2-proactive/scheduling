@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.runtime;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**
@@ -61,7 +62,9 @@ public class StartRuntime {
     protected String acquisitionMethod;
     protected String nodeNumber;
     protected int nodenumber; //it is only the int value of nodeNumber
- //   protected int portNumber;
+
+	protected String protocolId;
+
 
     protected StartRuntime() {
     }
@@ -75,6 +78,7 @@ public class StartRuntime {
         this.nodeNumber = args[3];
      //   this.portNumber = Integer.parseInt(args[4]);
         this.nodenumber = (new Integer(nodeNumber)).intValue();
+		this.protocolId = args[4];
     }
 
     public static void main(String[] args) {
@@ -84,8 +88,10 @@ public class StartRuntime {
             System.exit(1);
         }
         ProActiveConfiguration.load();
-        System.out.println("StartRunTime.main() " + args[0] + " " + args[1] +
-            " " + args[2] + " " + args[3]);
+
+//        System.out.println("StartRunTime.main() " + args[0] + " " + args[1] +
+//            " " + args[2] + " " + args[3]);
+
         try {
             logger.info("**** Starting jvm on " +
                 java.net.InetAddress.getLocalHost().getHostName());
@@ -108,8 +114,11 @@ public class StartRuntime {
      */
     private void run() {
         try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
-           // System.out.println(proActiveRuntime.getClass().getName());
+
+            //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
+			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.rmi")+":");
+			proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
+
             for (int i = 1; i <= nodenumber; i++) {
                 proActiveRuntime.createLocalNode(nodeURL +
                     Integer.toString(
@@ -140,16 +149,17 @@ public class StartRuntime {
             //          System.out.println("//"+hostName+"/"+DefaultRuntimeName);
             //            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
             //                    Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
-                    System.getProperty("proactive.rmi") + ":");
-
+//            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
+//                    System.getProperty("proactive.rmi") + ":");
+			ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
+								UrlBuilder.getProtocol(DefaultRuntimeURL));
             //System.out.println("get ok");
             //System.out.println(PART.getClass());
             //System.out.println(PART.getURL());
             //System.out.println(proActiveRuntime.getURL());
             //PART.killRT();
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID, acquisitionMethod);
+                creatorID, System.getProperty("proactive.rmi")+":");
             //System.out.println("coucou");
             //System.out.println("register ok");
             //System.out.println(PART.getProActiveRuntime("renderer").getURL());

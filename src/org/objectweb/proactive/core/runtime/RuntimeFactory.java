@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 
 
@@ -82,6 +83,7 @@ public abstract class RuntimeFactory {
     public static boolean IBIS_ENABLED;
 
     static {
+		ProActiveConfiguration.load();
         createClassServer();
         JINI_ENABLED = isJiniEnabled();
         IBIS_ENABLED = isIbisEnabled();
@@ -192,7 +194,7 @@ public abstract class RuntimeFactory {
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         RuntimeFactory factory = getFactory(protocol);
-        proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
+        //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
         if (logger.isDebugEnabled()) {
             logger.debug("factory = " + factory);
         }
@@ -251,7 +253,7 @@ public abstract class RuntimeFactory {
             // test if Jini is available
             Class.forName("net.jini.discovery.DiscoveryManagement");
             if (logger.isInfoEnabled()) {
-                logger.info("Jini enabled");
+                logger.info("Jini enabled");     
             }
             return true;
         } catch (ClassNotFoundException e) {
