@@ -104,6 +104,11 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
   }
 
 
+  public MethodCall getMethodCall() {
+		return methodCall;
+  }
+
+
   public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
   }
   

@@ -98,6 +98,12 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
   public Object getParameter(int index) {
     return methodCall.getParameter(index);
   }
+
+
+  public MethodCall getMethodCall() {
+		return methodCall;
+  }
+
   
   public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
     if (! hasBeenForwarded()) return;

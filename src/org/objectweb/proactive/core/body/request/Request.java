@@ -34,6 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.Message;
 import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 /**
  * <p>
@@ -68,7 +69,14 @@ public interface Request extends Message {
    * the given position or null if no match.
    */
   public Object getParameter(int index);
-  
+
+
+  /**
+   * Returns the MethodCall embedded in the request
+   * @return the MethodCall embedded in the request
+   */
+  public MethodCall getMethodCall();
+
   
   /**
    * Returns the sender of this request
