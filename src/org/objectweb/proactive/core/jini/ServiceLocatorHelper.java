@@ -62,7 +62,7 @@ protected static Logger logger = Logger.getLogger(ServiceLocatorHelper.class.get
   protected static int MAX_RETRY = 8;
   protected static long MAX_WAIT = 10000L;
   
-  private static String policy = System.getProperty("user.home") + System.getProperty("file.separator") + "proactive.java.policy";
+  private static String policy = System.getProperty("user.dir") + System.getProperty("file.separator") + "proactive.java.policy";
   
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
   private static String DEFAULT_RMID_LOCATION = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"rmid";
