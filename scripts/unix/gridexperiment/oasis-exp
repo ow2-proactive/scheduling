@@ -26,9 +26,3 @@ idle=${idle##* }
     exit 1
 }
 
-used=$(ldf -fused /0)
-
-[ "$used" ] && ((used>10000000)) && {
-  echo >&2 "Trop de donnees sous /0 ($used): Abandon"
-  exit 1
-}
