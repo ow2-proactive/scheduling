@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.awt.RenderingHints;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.event.ActiveObjectListener;
@@ -117,16 +119,20 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
 
     /** Redraw the component */
     public void paintComponent(java.awt.Graphics g) {
-        super.paintComponent(g);
-        java.awt.Color old = g.getColor();
+    	java.awt.Graphics2D g2 = (java.awt.Graphics2D) g; // ebe subtypying for antialiasing and better rendering
+    	super.paintComponent(g2);
+        
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        java.awt.Color old = g2.getColor();
         if (isGhost) {
-            g.setColor(COLOR_WHEN_MIGRATING);
+            g2.setColor(COLOR_WHEN_MIGRATING);
         } else {
-            g.setColor(getBackground());
+            g2.setColor(getBackground());
         }
 
         // 	g.fillRoundRect(0,0,getWidth(),getHeight(),20,20);
-        g.fillOval(0, 0, getWidth(), getHeight());
+        g2.fillOval(0, 0, getWidth(), getHeight());
 
         // paint request queue information    
         int length = activeObject.getRequestQueueLength();
@@ -143,28 +149,28 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
         if (numSingle > 0) {
             int requestQueueX = (getWidth() - (6 * numSingle)) / 2;
             int requestQueueY = 2;
-            g.setColor(COLOR_REQUEST_SINGLE);
+            g2.setColor(COLOR_REQUEST_SINGLE);
             for (int i = 0; i < numSingle; i++)
-                g.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
+                g2.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
         }
         if (numSeveral > 0) {
             int requestQueueX = (getWidth() - (6 * (numSeveral + numMany))) / 2;
             int requestQueueY = getHeight() - 6;
-            g.setColor(COLOR_REQUEST_SEVERAL);
+            g2.setColor(COLOR_REQUEST_SEVERAL);
             for (int i = 0; i < numSeveral; i++)
-                g.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
+                g2.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
         }
         if (numMany > 0) {
             int requestQueueX = ((getWidth() - (6 * (numSeveral + numMany))) / 2) +
                 (6 * numSeveral);
             int requestQueueY = getHeight() - 6;
-            g.setColor(COLOR_REQUEST_MANY);
+            g2.setColor(COLOR_REQUEST_MANY);
             for (int i = 0; i < numMany; i++)
-                g.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
+                g2.fillRect(requestQueueX + (i * 6), requestQueueY, 4, 4);
         }
 
-        g.setColor(old);
-        paintChildren(g);
+        g2.setColor(old);
+       // paintChildren(g2);
     }
 
     //
