@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.binding.remote.composite;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
@@ -38,7 +39,6 @@ import nonregressiontest.component.PrimitiveComponentB;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 
-import testsuite.test.FunctionalTest;
 
 /**
  * @author Matthieu Morel
@@ -58,7 +58,7 @@ import testsuite.test.FunctionalTest;
  * 
  * 
   */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
 	public static String MESSAGE = "-->Main";
 	Component p1;
 	Component p2;
@@ -84,57 +84,40 @@ public class Test extends FunctionalTest {
 		p2 = components[1];
 		c1 = components[2];
 		c2 = components[3];
-		System.setProperty("proactive.future.ac", "enable");
-		// start a new thread so that automatic continuations are enabled for components
-		ACThread acthread = new ACThread();
-		acthread.start();
-		acthread.join();
-		System.setProperty("proactive.future.ac", "disable");
+		// BINDING
+		Fractal.getBindingController(c2).bindFc(
+			"i1",
+			c1.getFcInterface("i1"));
+		Fractal.getBindingController(c1).bindFc(
+			"i1",
+			p1.getFcInterface("i1"));
+		Fractal.getBindingController(p1).bindFc(
+			"i2",
+			c1.getFcInterface("i2"));
+		Fractal.getBindingController(c1).bindFc(
+			"i2",
+			c2.getFcInterface("i2"));
+		Fractal.getBindingController(c2).bindFc(
+			"i2",
+			p2.getFcInterface("i2"));
+
+		// START LIFE CYCLE
+		
+		Fractal.getLifeCycleController(c2).startFc();
+		Fractal.getLifeCycleController(p2).startFc();
+
+		// INVOKE INTERFACE METHOD
+		I1 i1 = (I1) c2.getFcInterface("i1");
+		//I1 i1= (I1)p1.getFcInterface("i1");
+		message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
 		return (new Component[] { p1, p2, c1, c2 });
 	}
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
-
-	private class ACThread extends Thread {
-
-		public void run() {
-			try {
-			// BINDING
-			Fractal.getBindingController(c2).bindFc(
-				"i1",
-				c1.getFcInterface("i1"));
-			Fractal.getBindingController(c1).bindFc(
-				"i1",
-				p1.getFcInterface("i1"));
-			Fractal.getBindingController(p1).bindFc(
-				"i2",
-				c1.getFcInterface("i2"));
-			Fractal.getBindingController(c1).bindFc(
-				"i2",
-				c2.getFcInterface("i2"));
-			Fractal.getBindingController(c2).bindFc(
-				"i2",
-				p2.getFcInterface("i2"));
-
-			// START LIFE CYCLE
-			
-			Fractal.getLifeCycleController(c2).startFc();
-			Fractal.getLifeCycleController(p2).startFc();
-
-			// INVOKE INTERFACE METHOD
-			I1 i1 = (I1) c2.getFcInterface("i1");
-			//I1 i1= (I1)p1.getFcInterface("i1");
-			message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
 	/**
 	 * @see testsuite.test.AbstractTest#endTest()

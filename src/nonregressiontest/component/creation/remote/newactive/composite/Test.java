@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.creation.remote.newactive.composite;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.I2;
 import nonregressiontest.component.Message;
@@ -50,8 +51,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.type.Composite;
-
-import testsuite.test.FunctionalTest;
 
 
 /**
@@ -84,7 +83,7 @@ import testsuite.test.FunctionalTest;
  *                 c1 and p2 are on a remote JVM
  *
   */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     private static final String P1_NAME = "primitive-component-1";
     private static final String P2_NAME = "primitive-component-2";
     private static final String C1_NAME = "composite-component1";
@@ -116,12 +115,41 @@ public class Test extends FunctionalTest {
      * @param obj
      */
     public Component[] action(Object obj) throws Exception {
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
+                    type_factory.createFcItfType("i1",
+                        I1.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                    type_factory.createFcItfType("i2",
+                        I2.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                });
+
+        p1 = cf.newFcInstance(i1_i2_type,
+                new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
+                new ContentDescription(
+                    PrimitiveComponentA.class.getName(),
+                    new Object[] {  }));
+        p2 = cf.newFcInstance(type_factory.createFcType(
+                    new InterfaceType[] {
+                        type_factory.createFcItfType("i2",
+                            I2.class.getName(), TypeFactory.SERVER,
+                            TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                    }),
+                new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
+                new ContentDescription(
+                    PrimitiveComponentB.class.getName(),
+                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+        c1 = cf.newFcInstance(i1_i2_type,
+                new ControllerDescription(C1_NAME, Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }, TestNodes.getRemoteACVMNode()));
+        c2 = cf.newFcInstance(i1_i2_type,
+                new ControllerDescription(C2_NAME, Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }));
         return (new Component[] { p1, p2, c1, c2 });
     }
 
@@ -129,51 +157,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-    }
-
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                Component boot = Fractal.getBootstrapComponent();
-                TypeFactory type_factory = Fractal.getTypeFactory(boot);
-                GenericFactory cf = Fractal.getGenericFactory(boot);
-                ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
-                            type_factory.createFcItfType("i1",
-                                I1.class.getName(), TypeFactory.SERVER,
-                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                            type_factory.createFcItfType("i2",
-                                I2.class.getName(), TypeFactory.CLIENT,
-                                TypeFactory.MANDATORY, TypeFactory.SINGLE)
-                        });
-
-                p1 = cf.newFcInstance(i1_i2_type,
-                        new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
-                        new ContentDescription(
-                            PrimitiveComponentA.class.getName(),
-                            new Object[] {  }));
-                p2 = cf.newFcInstance(type_factory.createFcType(
-                            new InterfaceType[] {
-                                type_factory.createFcItfType("i2",
-                                    I2.class.getName(), TypeFactory.SERVER,
-                                    TypeFactory.MANDATORY, TypeFactory.SINGLE)
-                            }),
-                        new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
-                        new ContentDescription(
-                            PrimitiveComponentB.class.getName(),
-                            new Object[] {  }, TestNodes.getRemoteACVMNode()));
-                c1 = cf.newFcInstance(i1_i2_type,
-                        new ControllerDescription(C1_NAME, Constants.COMPOSITE),
-                        new ContentDescription(Composite.class.getName(),
-                            new Object[] {  }, TestNodes.getRemoteACVMNode()));
-                c2 = cf.newFcInstance(i1_i2_type,
-                        new ControllerDescription(C2_NAME, Constants.COMPOSITE),
-                        new ContentDescription(Composite.class.getName(),
-                            new Object[] {  }));
-            } catch (Exception e) {
-                logger.error("cannot create component : " + e.getMessage());
-                e.printStackTrace();
-            }
-        }
     }
 
     /**

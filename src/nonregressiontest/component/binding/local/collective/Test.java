@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.binding.local.collective;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.I2;
 import nonregressiontest.component.Message;
@@ -48,7 +49,6 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
-import testsuite.test.FunctionalTest;
 
 
 /**
@@ -56,7 +56,7 @@ import testsuite.test.FunctionalTest;
  *
  * a test for bindings on client collective interfaces between remote components
  */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;
@@ -72,71 +72,55 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
-    }
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        GenericFactory cf = Fractal.getGenericFactory(boot);
+        ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
+                    type_factory.createFcItfType("i1",
+                        I1.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                    type_factory.createFcItfType("i2",
+                        I2.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.COLLECTION)
+                });
+        ComponentType B_Type = type_factory.createFcType(new InterfaceType[] {
+                    type_factory.createFcItfType("i2",
+                        I2.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE)
+                });
 
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                Component boot = Fractal.getBootstrapComponent();
-                TypeFactory type_factory = Fractal.getTypeFactory(boot);
-                GenericFactory cf = Fractal.getGenericFactory(boot);
-                ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
-                            type_factory.createFcItfType("i1",
-                                I1.class.getName(), TypeFactory.SERVER,
-                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                            type_factory.createFcItfType("i2",
-                                I2.class.getName(), TypeFactory.CLIENT,
-                                TypeFactory.MANDATORY, TypeFactory.COLLECTION)
-                        });
-                ComponentType B_Type = type_factory.createFcType(new InterfaceType[] {
-                            type_factory.createFcItfType("i2",
-                                I2.class.getName(), TypeFactory.SERVER,
-                                TypeFactory.MANDATORY, TypeFactory.SINGLE)
-                        });
+        // instantiate the components
+        pD1 = cf.newFcInstance(D_Type,
+                new ControllerDescription("pD1", Constants.PRIMITIVE),
+                new ContentDescription(
+                    PrimitiveComponentD.class.getName(),
+                    new Object[] {}));
+        pB1 = cf.newFcInstance(B_Type,
+                new ControllerDescription("pB1", Constants.PRIMITIVE),
+                new ContentDescription(
+                    PrimitiveComponentB.class.getName(),
+                    new Object[] {  }));
+        pB2 = cf.newFcInstance(B_Type,
+                new ControllerDescription("pB2", Constants.PRIMITIVE),
+                new ContentDescription(
+                    PrimitiveComponentB.class.getName(),
+                    new Object[] {  }));
 
-                // instantiate the components
-                pD1 = cf.newFcInstance(D_Type,
-                        new ControllerDescription("pD1", Constants.PRIMITIVE),
-                        new ContentDescription(
-                            PrimitiveComponentD.class.getName(),
-                            new Object[] {}));
-                pB1 = cf.newFcInstance(B_Type,
-                        new ControllerDescription("pB1", Constants.PRIMITIVE),
-                        new ContentDescription(
-                            PrimitiveComponentB.class.getName(),
-                            new Object[] {  }));
-                pB2 = cf.newFcInstance(B_Type,
-                        new ControllerDescription("pB2", Constants.PRIMITIVE),
-                        new ContentDescription(
-                            PrimitiveComponentB.class.getName(),
-                            new Object[] {  }));
+        // bind the components
+        Fractal.getBindingController(pD1).bindFc("i2",
+            pB1.getFcInterface("i2"));
+        Fractal.getBindingController(pD1).bindFc("i2",
+            pB2.getFcInterface("i2"));
 
-                // bind the components
-                Fractal.getBindingController(pD1).bindFc("i2",
-                    pB1.getFcInterface("i2"));
-                Fractal.getBindingController(pD1).bindFc("i2",
-                    pB2.getFcInterface("i2"));
+        // start them
+        Fractal.getLifeCycleController(pD1).startFc();
+        Fractal.getLifeCycleController(pB1).startFc();
+        Fractal.getLifeCycleController(pB2).startFc();
 
-                // start them
-                Fractal.getLifeCycleController(pD1).startFc();
-                Fractal.getLifeCycleController(pB1).startFc();
-                Fractal.getLifeCycleController(pB2).startFc();
-
-                message = null;
-                I1 i1 = (I1) pD1.getFcInterface("i1");
-                Message msg1 = i1.processInputMessage(new Message(MESSAGE));
-                message = msg1.append(MESSAGE);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                e.printStackTrace();
-            }
-        }
+        message = null;
+        I1 i1 = (I1) pD1.getFcInterface("i1");
+        Message msg1 = i1.processInputMessage(new Message(MESSAGE));
+        message = msg1.append(MESSAGE);
     }
 
     /**

@@ -30,13 +30,13 @@
 */
 package nonregressiontest.component.assembly.local.composite;
 
+import nonregressiontest.component.ComponentTest;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 
 
 import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
-
 import java.util.Arrays;
 
 
@@ -63,7 +63,7 @@ import java.util.Arrays;
  *                 i2 represents an interface of type I2
  *
   */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     public static String MESSAGE = "-->Main";
     Component p1;
     Component p2;
@@ -90,12 +90,14 @@ public class Test extends FunctionalTest {
         p2 = components[1];
         c1 = components[2];
         c2 = components[3];
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
+        // ASSEMBLY
+        Fractal.getContentController(c1).addFcSubComponent(p1);
+        Fractal.getContentController(c2).addFcSubComponent(c1);
+
+        c2SubComponents = Fractal.getContentController(c2)
+                                 .getFcSubComponents();
+        c1SubComponents = Fractal.getContentController(c1)
+                                 .getFcSubComponents();
         return (new Component[] { p1, p2, c1, c2 });
     }
 
@@ -105,22 +107,6 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
     }
 
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                // ASSEMBLY
-                Fractal.getContentController(c1).addFcSubComponent(p1);
-                Fractal.getContentController(c2).addFcSubComponent(c1);
-
-                c2SubComponents = Fractal.getContentController(c2)
-                                         .getFcSubComponents();
-                c1SubComponents = Fractal.getContentController(c1)
-                                         .getFcSubComponents();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()

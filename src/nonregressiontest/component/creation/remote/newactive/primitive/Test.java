@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.creation.remote.newactive.primitive;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.creation.ComponentA;
 import nonregressiontest.component.creation.ComponentInfo;
 
@@ -45,7 +46,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 
-import testsuite.test.FunctionalTest;
 
 
 /**
@@ -53,7 +53,7 @@ import testsuite.test.FunctionalTest;
  *
  * creates a primitive component on a remote node with ACs
  */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     Component componentA;
     String name;
     String nodeUrl;
@@ -90,15 +90,15 @@ public class Test extends FunctionalTest {
         nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
     }
 
-    public boolean preConditions() throws Exception {
-        remoteHost = TestNodes.getRemoteHostname();
-        return (remoteHost != null);
-    }
-
     /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
+    }
+
+    public boolean preConditions() throws Exception {
+        remoteHost = TestNodes.getRemoteHostname();
+        return (super.preConditions() && remoteHost != null);
     }
 
     /**

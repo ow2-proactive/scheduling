@@ -30,6 +30,7 @@
  */
 package nonregressiontest.component.binding.local;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.Setup;
 
 import org.objectweb.fractal.api.Component;
@@ -42,7 +43,6 @@ import org.objectweb.proactive.core.component.Binding;
 import org.objectweb.proactive.core.component.Bindings;
 
 import testsuite.test.Assertions;
-import testsuite.test.FunctionalTest;
 
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +54,7 @@ import java.util.Vector;
  *
  * a test for bindings / rebindings on client collective interfaces between remote components
  */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     Component compA;
     Component compB1;
     Component compB2;

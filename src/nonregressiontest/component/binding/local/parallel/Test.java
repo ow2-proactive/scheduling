@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.binding.local.parallel;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
@@ -38,8 +39,6 @@ import nonregressiontest.component.PrimitiveComponentB;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.group.ProActiveGroup;
-
-import testsuite.test.FunctionalTest;
 
 
 /**
@@ -61,7 +60,7 @@ import testsuite.test.FunctionalTest;
  *
  *
   */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     public static String MESSAGE = "-->Main";
     Component p1;
     Component p2;
@@ -87,12 +86,28 @@ public class Test extends FunctionalTest {
         p2 = components[1];
         p3 = components[2];
         pr1 = components[3];
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
+        // BINDING
+        Fractal.getBindingController(pr1).bindFc("i1",
+            p1.getFcInterface("i1"));
+        Fractal.getBindingController(pr1).bindFc("i1",
+            p2.getFcInterface("i1"));
+        Fractal.getBindingController(p1).bindFc("i2",
+            pr1.getFcInterface("i2"));
+        Fractal.getBindingController(p2).bindFc("i2",
+            pr1.getFcInterface("i2"));
+        Fractal.getBindingController(pr1).bindFc("i2",
+            p3.getFcInterface("i2"));
+
+        // START LIFE CYCLE
+        Fractal.getLifeCycleController(pr1).startFc();
+        Fractal.getLifeCycleController(p3).startFc();
+
+        // INVOKE INTERFACE METHOD
+        I1 i1 = (I1) pr1.getFcInterface("i1");
+
+        //I1 i1= (I1)p1.getFcInterface("i1");
+        message = null;
+        message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
         return (new Component[] { p1, p2, p3, pr1 });
     }
 
@@ -100,37 +115,6 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-    }
-
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                // BINDING
-                Fractal.getBindingController(pr1).bindFc("i1",
-                    p1.getFcInterface("i1"));
-                Fractal.getBindingController(pr1).bindFc("i1",
-                    p2.getFcInterface("i1"));
-                Fractal.getBindingController(p1).bindFc("i2",
-                    pr1.getFcInterface("i2"));
-                Fractal.getBindingController(p2).bindFc("i2",
-                    pr1.getFcInterface("i2"));
-                Fractal.getBindingController(pr1).bindFc("i2",
-                    p3.getFcInterface("i2"));
-
-                // START LIFE CYCLE
-                Fractal.getLifeCycleController(pr1).startFc();
-                Fractal.getLifeCycleController(p3).startFc();
-
-                // INVOKE INTERFACE METHOD
-                I1 i1 = (I1) pr1.getFcInterface("i1");
-
-                //I1 i1= (I1)p1.getFcInterface("i1");
-                message = null;
-                message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     /**

@@ -33,8 +33,8 @@ package nonregressiontest.component.assembly.remote.parallel;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
 
-
 import testsuite.test.FunctionalTest;
+
 
 import java.util.Arrays;
 
@@ -89,12 +89,9 @@ public class Test extends FunctionalTest {
         p2 = components[1];
         p3 = components[2];
         pr1 = components[3];
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
+        // ASSEMBLY
+        Fractal.getContentController(pr1).addFcSubComponent(p1);
+        Fractal.getContentController(pr1).addFcSubComponent(p2);
         return (new Component[] { p1, p2, p3, pr1 });
     }
 
@@ -104,22 +101,17 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
     }
 
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                // ASSEMBLY
-                Fractal.getContentController(pr1).addFcSubComponent(p1);
-                Fractal.getContentController(pr1).addFcSubComponent(p2);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
+    }
+
+    public boolean preConditions() throws Exception {
+        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
+            throw new Exception("The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'enable') to be operative");
+        }
+        return true;
     }
 
     public boolean postConditions() throws Exception {

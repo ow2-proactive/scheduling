@@ -4,6 +4,7 @@
  */
 package nonregressiontest.component.descriptor.fractaladl;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.I1;
 import nonregressiontest.component.Message;
 import nonregressiontest.component.PrimitiveComponentA;
@@ -18,7 +19,6 @@ import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
-import testsuite.test.FunctionalTest;
 
 
 /**
@@ -30,7 +30,7 @@ import testsuite.test.FunctionalTest;
  *
  * @author Matthieu Morel
  */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     public static String MESSAGE = "-->m";
     private Message message;
 
@@ -46,6 +46,9 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
+        if (!"enable".equals(System.getProperty("proactive.future.ac"))) {
+            throw new Exception("automatic continuations are not set");
+        }
         org.objectweb.proactive.core.component.adl.Launcher.main(new String[] {
                 "-fractal",
                 "nonregressiontest.component.descriptor.fractaladl.MessagePassingExample",
@@ -64,7 +67,7 @@ public class Test extends FunctionalTest {
         message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
     }
 
-    /* (non-Javadoc)
+    /**
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {

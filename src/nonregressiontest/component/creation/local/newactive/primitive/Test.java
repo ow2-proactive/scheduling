@@ -30,6 +30,7 @@
 */
 package nonregressiontest.component.creation.local.newactive.primitive;
 
+import nonregressiontest.component.ComponentTest;
 import nonregressiontest.component.creation.ComponentA;
 import nonregressiontest.component.creation.ComponentInfo;
 
@@ -43,7 +44,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 
-import testsuite.test.FunctionalTest;
 
 import java.net.InetAddress;
 
@@ -53,7 +53,7 @@ import java.net.InetAddress;
  *
  * creates a new component
  */
-public class Test extends FunctionalTest {
+public class Test extends ComponentTest {
     Component componentA;
     String name;
     String nodeUrl;
@@ -67,45 +67,29 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        System.setProperty("proactive.future.ac", "enable");
-        // start a new thread so that automatic continuations are enabled for components
-        ACThread acthread = new ACThread();
-        acthread.start();
-        acthread.join();
-        System.setProperty("proactive.future.ac", "disable");
-    }
+        Component boot = Fractal.getBootstrapComponent();
+        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        GenericFactory cf = Fractal.getGenericFactory(boot);
 
-    private class ACThread extends Thread {
-        public void run() {
-            try {
-                Component boot = Fractal.getBootstrapComponent();
-                TypeFactory type_factory = Fractal.getTypeFactory(boot);
-                GenericFactory cf = Fractal.getGenericFactory(boot);
-
-                componentA = cf.newFcInstance(type_factory.createFcType(
-                            new InterfaceType[] {
-                                type_factory.createFcItfType("componentInfo",
-                                    ComponentInfo.class.getName(),
-                                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                                    TypeFactory.SINGLE),
-                            }),
-                        new ControllerDescription("componentA",
-                            Constants.PRIMITIVE),
-                        new ContentDescription(ComponentA.class.getName(),
-                            new Object[] { "toto" }));
-                //logger.debug("OK, instantiated the component");
-                // start the component!
-                Fractal.getLifeCycleController(componentA).startFc();
-                ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
-                        "componentInfo");
-                name = ref.getName();
-                nodeUrl = ((ComponentInfo) componentA.getFcInterface(
-                        "componentInfo")).getNodeUrl();
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-                e.printStackTrace();
-            }
-        }
+        componentA = cf.newFcInstance(type_factory.createFcType(
+                    new InterfaceType[] {
+                        type_factory.createFcItfType("componentInfo",
+                            ComponentInfo.class.getName(),
+                            TypeFactory.SERVER, TypeFactory.MANDATORY,
+                            TypeFactory.SINGLE),
+                    }),
+                new ControllerDescription("componentA",
+                    Constants.PRIMITIVE),
+                new ContentDescription(ComponentA.class.getName(),
+                    new Object[] { "toto" }));
+        //logger.debug("OK, instantiated the component");
+        // start the component!
+        Fractal.getLifeCycleController(componentA).startFc();
+        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
+                "componentInfo");
+        name = ref.getName();
+        nodeUrl = ((ComponentInfo) componentA.getFcInterface(
+                "componentInfo")).getNodeUrl();
     }
 
     /**
