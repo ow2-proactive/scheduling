@@ -317,7 +317,7 @@
 		<!-- 
 			create zip version of ProActive without source
 		-->
-		<zip zipfile="${dist.dir}/ProActive_1_0_2.zip">
+		<zip zipfile="${dist.dir}/ProActive_1_0_3.zip">
 			<zipfileset dir="${PAdist.dir}/docs" prefix="ProActive/docs"/>
 			<zipfileset dir="${PAdist.dir}/scripts" prefix="ProActive/scripts"/>
 			<zipfileset dir="${PAdist.dir}/lib" prefix="ProActive/lib"/>
@@ -326,7 +326,7 @@
 		<!-- 
 			create zip version of ProActive with source
 		-->
-		<zip zipfile="${dist.dir}/ProActive-src_1_0_2.zip">
+		<zip zipfile="${dist.dir}/ProActive-src_1_0_3.zip">
 			<zipfileset dir="${PAdist.dir}" prefix="ProActive"/>
 		</zip>
 		<!-- 
@@ -357,7 +357,7 @@
 		<mkdir dir="${docs.dir}"/>
 		<mkdir dir="${docs.dir}/api"/>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 1.0.2&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; May 2003 INRIA All Rights Reserved.&lt;/i>">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 1.0.3&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS">
 			<classpath refid="project.classpath"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
@@ -365,7 +365,7 @@
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 1.0.2 - IC2D" bottom="&lt;i>Copyright &#169; May 2003 INRIA All Rights Reserved.&lt;/i>">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 1.0.3 - IC2D" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>">
 			<classpath refid="project.classpath"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
