@@ -42,8 +42,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private Thread refresher;
     private volatile boolean refresh = true;
     private int ttr = 60;
+    private IC2DGUIController controller;
 
     public JobMonitorPanel(IC2DGUIController _controller) {
+    	this.controller = _controller;
         asso = new DataAssociation();
 
         views = new TreeView[] {
@@ -68,7 +70,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
-        explorator = new NodeExploration(asso, filteredJobs, _controller);
+        explorator = new NodeExploration(asso, filteredJobs);
 
         add(tabs);
 
@@ -163,7 +165,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
     public void setTtr(int _ttr) {
         ttr = _ttr;
-        refresher.interrupt();
+        if (refresh)
+        	refresher.interrupt();
+        else
+        	createRefresher();
     }
 
     public void addMonitoredHost(String host) {
@@ -181,6 +186,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         new Thread(new Runnable() {
                 public void run() {
                     handleHosts();
+                    for (int i = 0; i < views.length; i++)
+                        views[i].expandFirst();
                 }
             }).start();
     }
@@ -243,7 +250,15 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             hostname = host.substring(0, pos);
         }
 
-        explorator.exploreHost(hostname, port);
+        try {
+        	explorator.exploreHost(hostname, port);
+        } catch (RuntimeException e) {
+        	throw e;
+        } catch (Exception e) {
+        	controller.log(e);
+        	stopRefreshing();
+        }
+		
     }
 
     private void dump(Object o) {
@@ -275,7 +290,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         private JPopupMenu popupmenu;
 
         public TreeView(String label, int[] keys, boolean allowExchange) {
-        	this.label = label;
+            this.label = label;
             DataModelTraversal traversal = new DataModelTraversal(keys);
             DataTreeModel model = new DataTreeModel(asso, traversal);
 
@@ -423,6 +438,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         public DataTreeModel getModel() {
             return (DataTreeModel) tree.getModel();
+        }
+
+        public void expandFirst() {
+            tree.expandRow(0);
         }
     }
 }
