@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.migration;
  *
  */
 public class OnArrivalMigrationException extends ProActiveMigrationException {
-  
+
+	/**
+	* Constructs a <code>OnArrivalMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public OnArrivalMigrationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "On Arrival -> ";
+	}
+
+	/**
+	* Constructs a <code>OnArrivalMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public OnArrivalMigrationException(Throwable ex) {
+		super(ex);
+		description = description + "On Arrival -> ";
+	}     
 }

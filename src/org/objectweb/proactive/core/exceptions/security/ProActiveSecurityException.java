@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.security;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Generic exception for every security exception 
@@ -40,6 +40,26 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveSecurityException extends ProActiveException {
-  
+public class ProActiveSecurityException extends NonFunctionalException {
+
+	/**
+	* Constructs a <code>ProActiveSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ProActiveSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Security -> ";
+	}
+
+	/**
+	* Constructs a <code>ProActiveSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ProActiveSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Security -> ";
+	}     
 }

@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.group;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Generic exception for every group exception 
@@ -40,6 +40,26 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveGroupException extends ProActiveException {
-  
+public class ProActiveGroupException extends NonFunctionalException {
+
+	/**
+	* Constructs a <code>ProActiveGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ProActiveGroupException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "= Group -> ";
+	}
+
+	/**
+	* Constructs a <code>ProActiveGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ProActiveGroupException(Throwable ex) {
+		super(ex);
+		description = description + "= Group -> ";
+	}           
 }

@@ -40,4 +40,24 @@ package org.objectweb.proactive.core.exceptions.communication;
  */
 public class SendRequestCommunicationException extends SendCommunicationException {
   
+	/**
+			* Constructs a <code>SendRequestCommunicationException</code> with the specified
+			* detail message and nested exception.
+			* @param s the detail message
+			* @param ex the nested exception
+			*/
+		public SendRequestCommunicationException(String s, Throwable ex) {
+			super(s, ex);
+			description = description + "Request -> ";
+		}
+
+		/**
+		* Constructs a <code>SendRequestCommunicationException</code> with the specified
+		* detail message and nested exception.
+		* @param ex the nested exception
+		*/
+		public SendRequestCommunicationException(Throwable ex) {
+			super(ex);
+			description = description + "Request -> ";
+		}
 }

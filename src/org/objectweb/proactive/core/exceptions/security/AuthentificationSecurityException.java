@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class AuthentificationSecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>AuthentificationSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public AuthentificationSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Authentification -> ";
+	}
+
+	/**
+	* Constructs a <code>AuthentificationSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public AuthentificationSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Authentification -> ";
+	}     
 }

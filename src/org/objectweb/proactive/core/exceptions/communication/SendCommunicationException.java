@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.exceptions.communication;
 
 /**
@@ -38,6 +38,27 @@ package org.objectweb.proactive.core.exceptions.communication;
  * @since   ProActive 0.9.3
  *
  */
+
 public class SendCommunicationException extends ProActiveCommunicationException {
-  
+
+	/**
+	* Constructs a <code>SendCommunicationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public SendCommunicationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Send -> ";
+	}
+
+	/**
+	* Constructs a <code>SendCommunicationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SendCommunicationException(Throwable ex) {
+		super(ex);
+		description = description + "Send -> ";
+	}
 }

@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.service;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Service exception  
@@ -40,6 +40,26 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveServiceException extends ProActiveException {
-  
+public class ProActiveServiceException extends NonFunctionalException {
+
+	/**
+	* Constructs a <code>ProActiveServiceException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ProActiveServiceException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Service -> ";
+	}
+
+	/**
+	* Constructs a <code>ProActiveServiceException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ProActiveServiceException(Throwable ex) {
+		super(ex);
+		description = description + "Service -> ";
+	}     
 }

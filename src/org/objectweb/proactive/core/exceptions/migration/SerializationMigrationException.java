@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.migration;
  *
  */
 public class SerializationMigrationException extends ProActiveMigrationException {
-  
+
+	/**
+	* Constructs a <code>SerializationMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public SerializationMigrationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Serialization -> ";
+	}
+
+	/**
+	* Constructs a <code>SerializationMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SerializationMigrationException(Throwable ex) {
+		super(ex);
+		description = description + "Serialization -> ";
+	}     
 }

@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class IntegritySecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>IntegritySecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public IntegritySecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Integrity -> ";
+	}
+
+	/**
+	* Constructs a <code>IntegritySecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public IntegritySecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Integrity -> ";
+	}     
 }

@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.group;
  *
  */
 public class CreationGroupException extends ProActiveGroupException {
-  
+
+	/**
+	* Constructs a <code>CreationGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public CreationGroupException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Group -> ";
+	}
+
+	/**
+	* Constructs a <code>CreationGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public CreationGroupException(Throwable ex) {
+		super(ex);
+		description = description + "Group -> ";
+	}           
 }

@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class ReceiveSecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>ReceiveSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ReceiveSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Receive -> ";
+	}
+
+	/**
+	* Constructs a <code>ReceiveSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ReceiveSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Receive -> ";
+	}     
 }

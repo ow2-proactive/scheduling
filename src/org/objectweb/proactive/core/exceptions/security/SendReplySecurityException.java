@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class SendReplySecurityException extends SendSecurityException {
-  
+
+	/**
+	* Constructs a <code>SendReplySecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public SendReplySecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Reply -> ";
+	}
+
+	/**
+	* Constructs a <code>SendReplySecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SendReplySecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Reply -> ";
+	}     
 }

@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.communication;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Generic exception for every communication exception 
@@ -40,20 +40,36 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveCommunicationException extends ProActiveException {
+public class ProActiveCommunicationException extends NonFunctionalException {
    
-    /**
-     * Default constructor
-     */
-    public ProActiveCommunicationException() {
-    }
+	/**
+	 * Constructs a <code>NonFunctionalException</code> with no specified
+	 * detail message.
+	 */
+	public ProActiveCommunicationException() {
+		super();
+		description += "Communication -> ";
+	}
+		
+	/**
+		* Constructs a <code>ProActiveCommunicationException</code> with the specified
+		* detail message and nested exception.
+		* @param s the detail message
+		* @param ex the nested exception
+		*/
+	public ProActiveCommunicationException(String s, Throwable ex) {
+		super(s,ex);
+		description = description + "Communication -> ";
+	  }
 
-    /**
-     * Constructs a <code>ProActiveCommunicationException</code> with the specified
-     * detail message and nested exception.
-     * @param ex the nested exception
-     */
-    public ProActiveCommunicationException(Throwable ex) {
-	super(ex);
-    }
+
+	  /**
+	  * Constructs a <code>ProActiveCommunicationException</code> with the specified
+	  * detail message and nested exception.
+	  * @param ex the nested exception
+	  */
+	  public ProActiveCommunicationException(Throwable ex) {
+		super(ex);
+		description = description + "Communication -> ";
+	  }
 }

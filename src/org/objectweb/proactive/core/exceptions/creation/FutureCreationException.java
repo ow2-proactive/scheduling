@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.creation;
  *
  */
 public class FutureCreationException extends ProActiveCreationException {
-  
+
+	/**
+	* Constructs a <code>FutureCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public FutureCreationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Future Object -> ";
+	}
+
+	/**
+	* Constructs a <code>FutureCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public FutureCreationException(Throwable ex) {
+		super(ex);
+		description = description + "Future Object -> ";
+	}         
 }

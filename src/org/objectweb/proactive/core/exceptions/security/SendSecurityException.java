@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class SendSecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>SendSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public SendSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Send -> ";
+	}
+
+	/**
+	* Constructs a <code>SendSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SendSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Send -> ";
+	}     
 }

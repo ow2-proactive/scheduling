@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.exceptions.communication;
 
 /**
@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.communication;
  *
  */
 public class SendReplyCommunicationException extends SendCommunicationException {
-  
+
+	/**
+		* Constructs a <code>SendReplyCommunicationException</code> with the specified
+		* detail message and nested exception.
+		* @param s the detail message
+		* @param ex the nested exception
+		*/
+	public SendReplyCommunicationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Reply -> ";
+	}
+
+	/**
+	* Constructs a <code>SendReplyCommunicationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SendReplyCommunicationException(Throwable ex) {
+		super(ex);
+		description = description + "Reply -> ";
+	}
 }

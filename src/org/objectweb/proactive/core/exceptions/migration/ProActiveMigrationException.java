@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.migration;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Generic exception for every migration exception 
@@ -40,6 +40,26 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveMigrationException extends ProActiveException {
-  
+public class ProActiveMigrationException extends NonFunctionalException {
+
+	/**
+	* Constructs a <code>ProActiveMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ProActiveMigrationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Migration -> ";
+	}
+
+	/**
+	* Constructs a <code>ProActiveMigrationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ProActiveMigrationException(Throwable ex) {
+		super(ex);
+		description = description + "Migration -> ";
+	}   
 }

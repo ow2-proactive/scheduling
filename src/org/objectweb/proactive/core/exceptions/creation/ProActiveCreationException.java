@@ -29,8 +29,8 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.creation;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 /**
  * Generic exception for every creation exception 
@@ -40,6 +40,26 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9.3
  *
  */
-public class ProActiveCreationException extends ProActiveException {
-  
+public class ProActiveCreationException extends NonFunctionalException {
+
+	/**
+	* Constructs a <code>ProActiveCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ProActiveCreationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Creation -> ";
+	}
+
+	/**
+	* Constructs a <code>ProActiveCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ProActiveCreationException(Throwable ex) {
+		super(ex);
+		description = description + "Creation -> ";
+	}     
 }

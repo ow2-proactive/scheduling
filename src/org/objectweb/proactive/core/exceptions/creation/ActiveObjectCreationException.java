@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.creation;
  *
  */
 public class ActiveObjectCreationException extends ProActiveCreationException {
-  
+
+	/**
+	* Constructs a <code>ActiveObjectCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ActiveObjectCreationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Active Object -> ";
+	}
+
+	/**
+	* Constructs a <code>ActiveObjectCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ActiveObjectCreationException(Throwable ex) {
+		super(ex);
+		description = description + "Active Object -> ";
+	}       
 }

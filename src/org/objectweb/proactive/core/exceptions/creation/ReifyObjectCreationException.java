@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.creation;
  *
  */
 public class ReifyObjectCreationException extends ProActiveCreationException {
-  
+
+	/**
+	* Constructs a <code>ReifyObjectCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ReifyObjectCreationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Reify Object -> ";
+	}
+
+	/**
+	* Constructs a <code>ReifyObjectCreationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ReifyObjectCreationException(Throwable ex) {
+		super(ex);
+		description = description + "Reify Object -> ";
+	}         
 }

@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.exceptions.communication;
 
 /**
@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.communication;
  *
  */
 public class ReceiveCommunicationException extends ProActiveCommunicationException {
-  
+
+	/**
+	* Constructs a <code>ReceiveCommunicationException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ReceiveCommunicationException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Receive -> ";
+	}
+
+	/**
+	* Constructs a <code>ReceiveCommunicationException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ReceiveCommunicationException(Throwable ex) {
+		super(ex);
+		description = description + "Receive -> ";
+	}
 }

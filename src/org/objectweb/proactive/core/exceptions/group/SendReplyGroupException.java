@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.group;
  *
  */
 public class SendReplyGroupException extends SendGroupException {
-  
+
+	/**
+	* Constructs a <code>SendReplyGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public SendReplyGroupException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Reply -> ";
+	}
+
+	/**
+	* Constructs a <code>SendReplyGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public SendReplyGroupException(Throwable ex) {
+		super(ex);
+		description = description + "Reply -> ";
+	}           
 }

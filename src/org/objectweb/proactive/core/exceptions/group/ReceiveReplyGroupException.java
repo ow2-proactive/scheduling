@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.group;
  *
  */
 public class ReceiveReplyGroupException extends ReceiveGroupException {
-  
+
+	/**
+	* Constructs a <code>ReceiveReplyGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ReceiveReplyGroupException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Reply -> ";
+	}
+
+	/**
+	* Constructs a <code>ReceiveReplyGroupException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ReceiveReplyGroupException(Throwable ex) {
+		super(ex);
+		description = description + "Reply -> ";
+	}           
 }

@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class MigrationSecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>MigrationSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public MigrationSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Migration -> ";
+	}
+
+	/**
+	* Constructs a <code>MigrationSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public MigrationSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Migration -> ";
+	}       
 }

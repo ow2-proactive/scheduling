@@ -39,5 +39,25 @@ package org.objectweb.proactive.core.exceptions.security;
  *
  */
 public class DecryptionSecurityException extends ProActiveSecurityException {
-  
+
+	/**
+	* Constructs a <code>DecryptionSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public DecryptionSecurityException(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Decryption -> ";
+	}
+
+	/**
+	* Constructs a <code>DecryptionSecurityException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public DecryptionSecurityException(Throwable ex) {
+		super(ex);
+		description = description + "Decryption -> ";
+	}     
 }
