@@ -65,7 +65,12 @@ public class StreamReader implements XMLReader {
     }
 
     public StreamReader(org.xml.sax.InputSource inputSource,
-        XMLHandler xmlHandler) throws java.io.IOException {
+            XMLHandler xmlHandler) throws java.io.IOException {
+    	this(inputSource, xmlHandler, null, null);
+    }
+    
+    public StreamReader(org.xml.sax.InputSource inputSource,
+        XMLHandler xmlHandler, java.io.File schema, org.xml.sax.ErrorHandler errorHandler) throws java.io.IOException {
         this.inputSource = inputSource;
         DefaultHandlerAdapter adaptor = new DefaultHandlerAdapter(xmlHandler);
 
@@ -74,13 +79,16 @@ public class StreamReader implements XMLReader {
         parser = new SAXParser();
         //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
         parser.setContentHandler(adaptor);
-        if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
+        if (schema != null || errorHandler != null || "enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
             try {
-                parser.setErrorHandler(new SAXParserErrorHandler());
+                parser.setErrorHandler(errorHandler == null ? new SAXParserErrorHandler() : errorHandler);
+                if (schema != null)
+                	parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", schema);
+                
                 parser.setFeature("http://xml.org/sax/features/validation", true);
                 parser.setFeature("http://apache.org/xml/features/validation/schema",
                     true);
-
+                	
                 //            parser.parse(inputSource);
             } catch (SAXNotRecognizedException e) {
                 logger.error("unrecognised feature: ");
