@@ -162,7 +162,7 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
                 try {
                     entitiesFrom = this.getEntities();
                 } catch (SecurityNotAvailableException e1) {
-                	logger.info ("entitites from not found");
+                	logger.debug ("entitites from not found");
                     entitiesFrom = new ArrayList();
                     entitiesFrom.add(new DefaultEntity());
                 }
@@ -170,11 +170,11 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
                 try {
                     entitiesTo = pr.getEntities(node.getNodeInformation()
                                                     .getName());
-                    logger.info("Node name " +
+                    logger.debug("Node name " +
                         node.getNodeInformation().getName() + " taille " +
                         entitiesTo.size());
                 } catch (ProActiveException e1) {
-                	logger.info ("entitites to not found");
+                	logger.debug ("entitites to not found");
                     entitiesTo = new ArrayList();
                     entitiesTo.add(new DefaultEntity());
                 }
