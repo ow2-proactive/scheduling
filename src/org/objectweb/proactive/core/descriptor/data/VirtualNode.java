@@ -30,15 +30,14 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
-import org.apache.log4j.Logger;
+import java.security.cert.X509Certificate;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ext.security.PolicyServer;
-
-import java.security.cert.X509Certificate;
 
 
 /**
@@ -205,7 +204,8 @@ public interface VirtualNode extends java.io.Serializable, Job {
      */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException;
-
+    
+    
     /**
      * Returns the minimum number of nodes needed for this VirtualNode.
      * This number represents the minimum number of nodes,  this VirtualNode needs in order to be

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.security.cert.X509Certificate;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
@@ -38,8 +40,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
-
-import java.security.cert.X509Certificate;
 
 
 /**
@@ -286,6 +286,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         this.lookupProtocol = protocol;
         this.portForLookup = port;
     }
+
 
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()

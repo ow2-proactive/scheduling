@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
@@ -229,12 +230,17 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         processMapping.put(serviceID, service);
     }
 
-    public void registerService(VirtualMachine virtualMachine, String serviceID) {
+    public void registerService(ServiceUser serviceUser, String serviceID) {
         UniversalService service = getService(serviceID);
         if (service == null) {
-            addPendingService(serviceID, virtualMachine);
+            addPendingService(serviceID, serviceUser);
         } else {
-            virtualMachine.setService(service);
+            try {
+                serviceUser.setService(service);
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+                logger.error("the given service "+service.getServiceName()+ " cannot be set for class "+serviceUser.getUserClass());
+            }
         }
     }
 
@@ -364,8 +370,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     
 
     private void addPendingService(String serviceID,
-        VirtualMachine virtualMachine) {
-        ServiceUpdater updater = new VirtualMachineUpdater(virtualMachine);
+        ServiceUser serviceUser) {
+        ServiceUpdater updater = null;
+    	if(serviceUser instanceof VirtualNode){
+    	    updater = new VirtualNodeUpdater(serviceUser);
+    	}else if (serviceUser instanceof VirtualMachine){
+    	    updater = new VirtualMachineUpdater((VirtualMachine)serviceUser);
+    	}
         addServiceUpdater(serviceID, updater);
     }
 
@@ -471,4 +482,24 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             virtualMachine.setService(s);
         }
     }
+    private class VirtualNodeUpdater implements 
+    ServiceUpdater {
+    private ServiceUser serviceUser;
+
+    public VirtualNodeUpdater(ServiceUser serviceUser) {
+        this.serviceUser = serviceUser;
+    }
+
+    public void updateService(UniversalService s) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Updating VirtualMachine Service");
+        }
+        try {
+            serviceUser.setService(s);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+            logger.error("the given service "+s.getServiceName()+ " cannot be set for class "+serviceUser.getUserClass());
+        }
+    }
+}
 }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
@@ -147,10 +148,10 @@ public interface ProActiveDescriptor extends java.io.Serializable {
 
     /**
      * Maps the service given by the specified serviceID with the specified virtualMachine.
-     * @param virtualMachine
+     * @param serviceUser
      * @param serviceId
      */
-    public void registerService(VirtualMachine virtualMachine, String serviceId);
+    public void registerService(ServiceUser serviceUser, String serviceId);
 
     /**
      * Activates all VirtualNodes defined in the XML Descriptor.

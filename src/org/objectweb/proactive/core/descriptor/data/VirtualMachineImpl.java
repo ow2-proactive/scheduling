@@ -155,6 +155,13 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     }
 
     /**
+     * @see org.objectweb.proactive.core.descriptor.services.ServiceUser#getUserClass()
+     */
+    public String getUserClass() {
+        return this.getClass().getName();
+    }
+
+    /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine#getService()
      */
     public UniversalService getService() {

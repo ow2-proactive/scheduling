@@ -34,6 +34,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.P2PLookupService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
+import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
@@ -76,7 +77,8 @@ import java.util.Hashtable;
  * @see VirtualMachine
  */
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
-    implements VirtualNode, Serializable, RuntimeRegistrationEventListener {
+    implements VirtualNode, Serializable, RuntimeRegistrationEventListener,
+        ServiceUser {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -199,8 +201,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Sets the timeout variable to the given value.
      * Using waitForTimeout = true will force this VirtualNode to wait until the timeout expires
-     * before giving access to its nodes, waitForTimeout = false allows this VirtualNode to give 
-     * access to its node when number of nodes expected are really created or the timeout 
+     * before giving access to its nodes, waitForTimeout = false allows this VirtualNode to give
+     * access to its node when number of nodes expected are really created or the timeout
      * has expired
      * @param timeout the timeout to set in ms
      * @param waitForTimeout to force or not this VirtualNode to wait untile timeout's expiration
@@ -678,6 +680,20 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         // at runtime on a VNImpl. This might change in the future.
         throw new ProActiveException(
             "No property can be set at runtime on this VirtualNode");
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setService(org.objectweb.proactive.core.descriptor.services.UniversalService)
+     */
+    public void setService(UniversalService service) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.descriptor.services.ServiceUser#getUserClass()
+     */
+    public String getUserClass() {
+        return this.getClass().getName();
     }
 
     public void setRegistrationProtocol(String protocol) {

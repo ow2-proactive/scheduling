@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.IOException;
 
+import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
 
@@ -46,7 +47,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  * @see ProActiveDescriptor
  * @see VirtualNode
  */
-public interface VirtualMachine {
+public interface VirtualMachine extends ServiceUser {
 
     /**
      * Sets the number of nodes that will be created on this VirtualMachine.
