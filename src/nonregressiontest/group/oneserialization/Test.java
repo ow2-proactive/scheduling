@@ -1,7 +1,7 @@
 /*
- * Created on Sep 12, 2003
+ * Created on Sep 22, 2003
  */
-package nonregressiontest.group.onewaycall;
+package nonregressiontest.group.oneserialization;
 
 import java.util.Iterator;
 
@@ -16,16 +16,19 @@ import testsuite.test.ProActiveFunctionalTest;
 /**
  * @author Laurent Baduel
  */
-public class Test  extends ProActiveFunctionalTest {
+public class Test extends ProActiveFunctionalTest {
 
 	private A typedGroup = null;
 
+
 	public Test() {
-		super("oneway call on group", "do a oneway call on a previously created group");
+		super("one serialization of the methodcall object in a group communication", "do only serialization of the MethodCall object (in broadcast call only)");
 	}
 
 	public void action() throws Exception {
+		ProActiveGroup.setUniqueSerialization(this.typedGroup);
 		this.typedGroup.onewayCall();
+		ProActiveGroup.unsetUniqueSerialization(this.typedGroup);
 	}
 
 	public void endTest() throws Exception {

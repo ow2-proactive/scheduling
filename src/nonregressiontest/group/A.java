@@ -28,7 +28,11 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
 		this.onewayCallReceived = true;
 	}
 
-	public boolean onewayCallReceived () {
+	public void onewayCall(A a) {
+		this.onewayCallReceived = true;
+	}
+
+	public boolean isOnewayCallReceived () {
 		return this.onewayCallReceived;
 	}
 	
@@ -84,5 +88,10 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
     public void endActivity(Body body) {
         // System.out.println("End of the activity of this Active Object");
     }
+
+	public A asynchronousCallException() throws Exception {
+		throw new Exception();		
+	}
+
 }
  

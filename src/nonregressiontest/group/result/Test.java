@@ -1,5 +1,5 @@
 /*
- * Created on Sep 10, 2003
+ * Created on Sep 15, 2003
  */
 package nonregressiontest.group.result;
 
@@ -15,7 +15,6 @@ import testsuite.test.ProActiveFunctionalTest;
 
 /**
  * @author Laurent Baduel
- *
  */
 public class Test extends ProActiveFunctionalTest {
 
@@ -51,7 +50,7 @@ public class Test extends ProActiveFunctionalTest {
 		boolean allOnewayCallDone = true;
 		Iterator it = group.iterator();
 		while (it.hasNext()) {
-			allOnewayCallDone &= ((A) it.next()).onewayCallReceived();
+			allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
 		}
 		if (!allOnewayCallDone) return false;
 
@@ -73,7 +72,7 @@ public class Test extends ProActiveFunctionalTest {
 		Group group = ProActiveGroup.getGroup(this.resultTypedGroup);
 		Iterator it = group.iterator();
 		while (it.hasNext()) {
-			NoOnewayCallDone &= !((A) it.next()).onewayCallReceived();
+			NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();
 		}
 		return (NoOnewayCallDone && (this.resultResultTypedGroup == null));
 	}

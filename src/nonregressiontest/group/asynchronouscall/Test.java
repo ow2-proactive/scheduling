@@ -1,5 +1,5 @@
 /*
- * Created on Sep 10, 2003
+ * Created on Sep 12, 2003
  */
 package nonregressiontest.group.asynchronouscall;
 
@@ -13,7 +13,6 @@ import testsuite.test.ProActiveFunctionalTest;
 
 /**
  * @author Laurent Baduel
- *
  */
 public class Test extends ProActiveFunctionalTest {
 
