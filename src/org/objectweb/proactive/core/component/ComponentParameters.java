@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.type.ProActiveComponentType;
 
 /** Contains the configuration of a component :
  * - type
@@ -19,6 +20,7 @@ public class ComponentParameters implements Serializable {
 	public final static String COMPOSITE = "composite";
 	public final static String PRIMITIVE = "primitive";
 	public final static String PARALLEL = "parallel-composite";
+	public final static String CYCLIC_NODE_APPENDIX = "-cyclicInstanceNumber-";
 	private String name;
 	private Object stubOnReifiedObject;
 	private ComponentType componentType;
@@ -38,6 +40,16 @@ public class ComponentParameters implements Serializable {
 	}
 
 	public ComponentParameters() {
+	}
+	
+	/**
+	 * copy constructor
+	 * @param componentParameters
+	 */
+	public ComponentParameters(final ComponentParameters componentParameters) {
+		this.name = new String(componentParameters.getName());
+		this.hierarchicalType = new String(componentParameters.getHierarchicalType());
+		this.componentType = new ProActiveComponentType(componentParameters.getComponentType());
 	}
 	/**
 	 * Returns the generatedClassName.
