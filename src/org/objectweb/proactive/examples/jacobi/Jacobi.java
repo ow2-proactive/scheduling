@@ -75,19 +75,13 @@ public class Jacobi {
 		ProActiveDescriptor proActiveDescriptor=null;
 		String[] nodes = null;
 		try {
-			proActiveDescriptor=ProActive.getProactiveDescriptor("file:"+args[0]);
-		} catch (ProActiveException e) {
-			System.err.println("** ProActiveException **");
-			e.printStackTrace();
-		}
+			proActiveDescriptor = ProActive.getProactiveDescriptor("file:"+args[0]); }
+		catch (ProActiveException e) { System.err.println("** ProActiveException **"); }
 		proActiveDescriptor.activateMappings(); 
 		VirtualNode vn = proActiveDescriptor.getVirtualNode("matrixNode");
-		 try {
-			nodes = vn.getNodesURL();
-		} catch (NodeException e) {
-			System.err.println("** NodeException **");
-			e.printStackTrace();
-		}
+		try {
+			nodes = vn.getNodesURL(); }
+		catch (NodeException e) { System.err.println("** NodeException **"); }
 
 		Object[][] params = new Object[Jacobi.WIDTH * Jacobi.HEIGHT][];
 		for (int i = 0 ; i < params.length ; i++) {
@@ -98,10 +92,10 @@ public class Jacobi {
 		SubMatrix matrix = null;
 		try {
 			matrix = (SubMatrix) ProSPMD.newSPMDGroup(SubMatrix.class.getName(), params, nodes); }
-		catch (ClassNotFoundException e) { System.out.println("** ClassNotFoundException **"); }
-		catch (ClassNotReifiableException e) { System.out.println("** ClassNotReifiableException **"); }
-		catch (ActiveObjectCreationException e) { System.out.println("** ActiveObjectCreationException **"); }
-		catch (NodeException e) { System.out.println("** NodeException **"); }
+		catch (ClassNotFoundException e) { System.err.println("** ClassNotFoundException **"); }
+		catch (ClassNotReifiableException e) { System.err.println("** ClassNotReifiableException **"); }
+		catch (ActiveObjectCreationException e) { System.err.println("** ActiveObjectCreationException **"); }
+		catch (NodeException e) { System.err.println("** NodeException **"); }
 
 		matrix.compute();
 	}

@@ -484,18 +484,7 @@ public class SubMatrix {
 		// decrement the iteration counter
 		this.iterationsToStop--;
 		// send the borders to neighbors
-		if (this.north != null) {
-			this.north.setSouthBorder(this.buildNorthBorder());
-		}
-		if (this.south != null) {
-			this.south.setNorthBorder(this.buildSouthBorder());
-		}
-		if (this.west != null) {
-			this.west.setEastBorder(this.buildWestBorder());
-		}
-		if (this.east != null) {
-			this.east.setWestBorder(this.buildEastBorder());
-		}
+		this.sendBordersToNeighbors();
 		// continue or stop ?
 		if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
 			this.me.exchange();
