@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.ext.webservices.utils;
 
 import org.apache.log4j.Logger;
@@ -27,6 +57,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.UnknownHostException;
 
+/**
+ *  ProActive HTTP Utilities class
+ * @author virginie
+ */
 
 public class ProActiveXMLUtils {
     public static final String MESSAGE = "Message";
@@ -51,8 +85,8 @@ public class ProActiveXMLUtils {
     public static final String SERVICE_REQUEST_CONTENT_TYPE = "application/java";
 
     /**
-    *
-    * @param o
+    * Serialize an object into a byte array
+    * @param o The object you want to serialize
     */
     public static byte[] serializeObject(Object o) {
         String result = null;
@@ -81,7 +115,8 @@ public class ProActiveXMLUtils {
     }
 
     /**
-     * @param buffer
+     * Unmarshall an object from a byte array
+     * @param buffer The byte array containing the serialized object
      */
     public static Object deserializeObject(byte[] buffer) {
         Object o = null;
@@ -109,6 +144,7 @@ public class ProActiveXMLUtils {
         return null;
     }
 
+
     public static byte[] getMessage(Object obj) {
         //        String message = createMessage(action);
         return serializeObject(obj);
@@ -121,7 +157,8 @@ public class ProActiveXMLUtils {
         //        return message;
     }
 
-    public static String getName() {
+    
+    private static String getName() {
         try {
             return java.net.InetAddress.getLocalHost() + "";
         } catch (Exception e) {
@@ -130,20 +167,22 @@ public class ProActiveXMLUtils {
     }
 
     /**
-     *
-     * @param url
-     * @param port
-     * @param obj
-     * @param action
+     * Sends a message to the given url This message contains a serialized object.
+     * @param url The targeted url
+     * @param port The destination port
+     * @param obj The objet contained in the message
+     * @param action What to do with this object ?
      */
     public static Object sendMessage(String url, int port, Object obj,
         String action) throws Exception, HTTPRemoteException {
         byte[] message = getMessage(obj);
-
+        
+        //logger.info("sending Message to " + url);
+        
         return sendMessage(url, port, message, action);
     }
 
-    public static Object sendMessage(String url, int port, byte[] message,
+    private static Object sendMessage(String url, int port, byte[] message,
         String action) throws Exception, HTTPRemoteException {
         try {
         	String nodename = null;
@@ -224,9 +263,9 @@ public class ProActiveXMLUtils {
     }
 
     /**
-     *
-     * @param msg
-     * @param action
+     *  Unmarshalles a message and performs an action according to the action field
+     * @param msg The message contained in a byte array
+     * @param action The action to perform with this message
      * @throws Exception
      */
     public static Object unwrapp(byte[] msg, String action)
@@ -281,11 +320,13 @@ public class ProActiveXMLUtils {
     }
 
     /**
-     *
-     * @param id
+     *  Search a Body matching with a given unique ID
+     * @param id The unique id of the body we are searching for
+     * @return The body associated with the ID
      */
     public static Body getBody(UniqueID id) {
-        LocalBodyStore bodyStore = LocalBodyStore.getInstance();
+  
+    	LocalBodyStore bodyStore = LocalBodyStore.getInstance();
 
         
         Body body = bodyStore.getLocalBody(id);
@@ -296,8 +337,10 @@ public class ProActiveXMLUtils {
 
         if (body == null) {
             body = LocalBodyStore.getInstance().getForwarder(id);
+
         }
         
+   
         return body;
     }
 }
