@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.ic2d.gui.util;
 
+import java.awt.Component;
+
 import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.util.IC2DMessageLogger;
@@ -168,4 +170,20 @@ public class DialogUtils {
     }    
   }
   
+//  public static void openNewGlobusHostDialog(java.awt.Component parentComponent, IC2DPanel ic2dPanel, ActiveObjectFilter filter) {
+//  }
+  
+	/**
+	 * Method openNewGlobusHostDialog.
+	 * @param component
+	 * @param worldObject
+	 * @param logger
+	 */
+	public static void openNewGlobusHostDialog(
+		Component component,
+		WorldObject worldObject,
+		IC2DMessageLogger logger)
+	{
+	}
+
 }
