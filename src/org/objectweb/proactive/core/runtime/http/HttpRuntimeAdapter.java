@@ -73,7 +73,6 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
                 try {
                     nodeURL = buildNodeURL(nodeName);
-                    System.out.println(nodeURL);
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
                 }
