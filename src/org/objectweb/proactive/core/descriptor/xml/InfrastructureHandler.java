@@ -33,12 +33,14 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
+
 /**
  * This class receives deployment events
  *
  * @author       Lionel Mestre
  * @version      1.0
  */
+
 class InfrastructureHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
 
   private ProActiveDescriptor proActiveDescriptor;

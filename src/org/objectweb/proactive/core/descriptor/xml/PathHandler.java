@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * @author       Lionel Mestre
  * @version      1.0
  */
+
 class PathHandler extends BasicUnmarshaller {
 
   //

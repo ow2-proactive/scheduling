@@ -48,9 +48,11 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
 
 /**
+ * This class receives deployment events
  *
- * Receives SAX event and pass them on
- *
+ * @author  ProActive Team
+ * @version 1.0,  2003/04/20
+ * @since   ProActive 1.0.2
  */
 import org.apache.log4j.Logger;
 

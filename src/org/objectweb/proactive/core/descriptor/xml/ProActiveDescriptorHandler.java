@@ -40,9 +40,11 @@ import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
 /**
+ * This class receives deployment events
  *
- * Receives SAX event and pass them on
- *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
  */
 
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator implements ProActiveDescriptorConstants {
