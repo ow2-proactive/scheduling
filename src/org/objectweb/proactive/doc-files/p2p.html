@@ -27,42 +27,72 @@
 <hr> 
 <!-- Link to index : end --> 
 <h1>ProActive Peer-to-Peer Infrastructure</h1> 
-<p>Computational Peer-To-Peer (P2P) is becoming a key execution environment. The potential of 100,000 of nodes interconnected to execute a single application is rather appealing, especially for Grid computing. Mimicking data P2P, one could start a computation that that no failure would ever be able to stop (and maybe nobody).</p> 
-<p>The ProActive P2P aims to use sparse CPU cycles from organizations or institutions desktop workstations.</p> 
-<p>This short document explains to create a simple computational P2P networks. This network is a dynamic JVMs network which use like computation nodes.</p> 
-<p>The P2P infrastructure is working like an overlay network. It is working with a <b>P2P Service</b>. A P2P Service is a peer (computation node). The P2P Service is implemented with a ProActive JVM and few Actives Objects. The next figure is showing an example of a network of hosts where some JVMs are running and several of them are the P2P Service running.</p> 
+<p>Computational Peer-To-Peer (P2P) is becoming a key execution environment. The potential of 100,000 of nodes interconnected to execute a single application is rather appealing, especially for Grid computing. Mimicking data P2P, one could start a computation that no failure would ever be able to stop (and maybe nobody).</p> 
+<p>The ProActive P2P aims to use sparse CPU cycles from organizations or institution's desktop workstations.</p> 
+<p>This short document explains to create a simple computational P2P network. This network is a dynamic JVMs network which works like, computational nodes.</p> 
+<p>The P2P infrastructure works like an overlay network. It works with
+      a <b>P2P Service</b> which is a peer which in turn is
+      computational node. The P2P Service is implemented with a
+      ProActive JVM and few Actives Objects. The next figure
+      shows an example of a network of hosts where some JVMs are
+      running and several of them are running the P2P Service.</p> 
+
 <div align="center"> <img src="p2p_files/overlaynetwork.jpg" alt="Overlay Network"> 
   <p><b class="legend">Example of a ProActive P2P infrastructure.</b></p> 
 </div> 
-<p>When the P2P infrastructure is running it is very easy to obtain some nodes (JVMs). The next section is describing how to use it.</p> 
-<p>Further research information are available <a
+
+<p>When the P2P infrastructure is running, it is very easy to obtain some nodes (JVMs). The next section describes how to use it.</p> 
+<p>Further research informations are available <a
 href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</a>.</p> 
+    
+
 <p>The outline of this short handbook:</p> 
 <ul> 
   <li><a href="#network">Create your P2P Network</a></li> 
   <li><a href="#appli">Launch your Application</a></li> 
   <li><a href="#limitations">Limitations</a></li> 
 </ul> 
+
 <!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--> 
-<h2><a name=network></a>Create your P2P Network</h2> 
-<p>The P2P infrastructure is self-organized and tunable. When the infrastructure is running you have nothing to do to keep it up. There are 4 parameters to tune:</p> 
+    
+
+<h2><a name=network></a>Create your P2P Network</h2>
+ 
+<p>The P2P infrastructure is self-organized and tunable. When the
+      infrastructure is running you have nothing to do to keep it
+      up. There are 4 parameters to tune:</p> 
+
 <ul type=disc> 
-  <li><b>Time To Update (TTU)</b>: each peer checks if its known peers were available when TTU expire. By default its value is 10 minutes.</li> 
-  <li><b>Number Of Acquaintances (NOA)</b>: is the minimal number of peers, one peer needs to know to keep up the infrastructure. By default its value is 5 peers.</li> 
-  <li><b>Time To Live (TTL)</b>: in hops for JVMs (node) depth search (acquisition). By default its value is 5 hops.</li> 
-  <li><b>Max Load</b>: is the number of applications can use the peer at the same time. By default its value is 1 user.</li> 
+  <li><b>Time To Update (TTU)</b>: each peer checks if its known peers are available when TTU expires. By default, its value is 10 minutes.</li> 
+  <li><b>Number Of Acquaintances (NOA)</b>: is the minimal number of peers one peer needs to know to keep up the infrastructure. By default, its value is 5 peers.</li> 
+  <li><b>Time To Live (TTL)</b>: in hops for JVMs (node) depth search (acquisition). By default, its value is 5 hops.</li> 
+  <li><b>Max Load</b>: is the number of applications which can use the peer at the same time. By default, its value is 1 user.</li> 
 </ul> 
-<p>Parameters are placed in the Java class <i>org.objectweb.proactive.p2p.core.service.P2PService</i>. You are free to modify values as you which.</p> 
-<p>The bootstrapping or first contact problem is how a new peer can join the p2p infrastructure. We solved this problem by just specify one or several addresses of supposed peers which are running in the p2p infrastructure. Next, we will explain how and where you can specify this list of peers.</p> 
+
+<p>Parameters are placed in the Java class
+      <i>org.objectweb.proactive.p2p.core.service.P2PService</i>. You
+      are free to modify values as you need in the source code itself.</p>
+ 
+<p>The bootstrapping or first contact problem is how a new peer can
+      join the p2p infrastructure. We solved this problem by just
+      specifying one or several addresses of supposed peers which are
+      running in the p2p infrastructure. Next, we will explain how and
+      where you can specify this list of peers.</p> 
+
 <p>Now, you have just to start peers. There are two ways to do it:</p> 
+    
+
 <h3>Quick Start Peer</h3> 
-<p>This method explains how to launch rapidly a simple P2P Service on one host.</p> 
+
+<p>This method explains how to rapidly launch a simple P2P Service on
+      one host.</p> 
+
 <p>ProActive provides a very simple <i>script</i> to start a P2P Service on your local host. The name of this script is <b>startP2PService</b>.</p> 
 <ul> 
-  <li> UNIX and GNU/Linux and BSD and MacOsX systems: the script is located in <code>ProActive/p2p/scripts/unix/startP2PService.sh</code> file.</li> 
+  <li> UNIX, GNU/Linux, BSD and MacOsX systems: the script is located in <code>ProActive/p2p/scripts/unix/startP2PService.sh</code> file.</li> 
   <li> Microsoft Windows system: the script is located in <code> ProActive/p2p/scripts/windows/startP2PService.bat</code> file.</li> 
 </ul> 
-<p>Before to launch this script you have to specify some arguments to this command:</p> 
+<p>Before launching this script, you have to specify some arguments to this command:</p> 
 <p><b>startP2PService</b> <code>[acquisitionMethod [portNumber]] [-s Server]... [-f ServerListFile]</code></p> 
 <ul> 
   <li> <b>acquisitionMethod</b> the ProActive Runtime communication protocol used. Examples: rmi, ibis, ... By default it is <i>rmi</i>.</li> 
@@ -71,9 +101,10 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
   <li> <b>-f ServerListFile</b> same of <code>-s</code> but peers are specified in file <code>ServerListFile</code>. One by line.</li> 
 </ul> 
 <p>All arguments are optional.</p> 
-<p><b>Comment: </b>With the UNIX version of the startP2PService script, the P2P service is persistent and runs like a UNIX nice process. If the JVMs that are running the P2P service stop (for an Java exception) the script re-started a new one.</p> 
+<p><b>Comment: </b>With the UNIX version of the startP2PService script, the P2P service is persistent and runs like a UNIX <i>nice</i> process. If the JVMs that are running the P2P service stop (for a Java exception) the script re-starts a new one.</p> 
 <h4>Usage Example</h4> 
-<p>In this illustration, we will explain how to start a first peer and after how new peers can create a P2P network with the first one.</p> 
+<p>In this illustration, we will explain how to start a first peer and
+      thenafter how new peers can create a P2P network with the first one.</p> 
 <p>Start the first peer with <i>rmi</i> protocol and listening on port <i>2410</i>:</p> 
 <code>first.peer.host$ startP2PService.sh rmi 2410</code> 
 <p>Now, start new peers and connect them to the first peer to create a tiny P2P network:</p> 
@@ -93,9 +124,11 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <div align="center"> <img src="p2p_files/example.jpg" alt="Example" > 
   <p><b class="legend">Usage example P2P network (after firsts connections).</b></p> 
 </div> 
-<h3>The P2P Daemon</h3> 
+
+<h3>The P2P Daemon</h3>
+ 
 <p>The daemon aim to use computers in Peer-to-Peer computations, there will be a Java virtual machine sleeping on your computers and waking up at scheduled times to get some work done.</p> 
-<p>The JVM is scheduled by default to wake up the weekend and during the night. Next, we will explain how to change the schedule. The JVM is running with the lowest priority.</p> 
+<p>By default, the JVM is scheduled to wake up during the weekend and during the night. Next, we will explain how to change the schedule. The JVM is running with the lowest priority.</p> 
 <h4>Installation</h4>
  
 <h5>UNIX</h5>
@@ -103,6 +136,10 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <p>Go to the directory: <code>ProActive/compile</code> and run this
       command:</p>
 <code>$ ./build damon</code>
+
+<p>Before compile you should change some parameter like the daemon
+      user or the port in the file:
+      <code>ProActive/p2p/src/common/proactivep2p.h</code>.</p>
 
 <h5>Micorsoft Windows</h5>
 
@@ -118,14 +155,15 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <p>To remove the daemon:</p> 
 <code>C:&gt; ProActive\p2p\scripts\windows\Service\remove.bat</code>
 
-<p><b>Comment</b>: By default the port number of the daemon is <b>9301</b>.</p> 
+<p><b>Comment</b>: By default the port number of the daemon is <b>9015</b>.</p> 
 <h4>Configuration</h4> 
+
 <p>The daemon is configured with XML files in the <code>ProActive/p2p/config/</code> directory. To find the correct configuration file, the daemon will first try with a host dependant file: <code>config/proactivep2p.${HOST}.xml</code> for example: <code>config/proactivep2p.camel.inria.fr.xml</code> if the daemon is running on the host named <code>camel.inria.fr.</code></p> 
 <p>If this host specific file is not found, the daemon will load <code>config/proactivep2p.xml</code>. This mechanism can be useful to setup a default configuration and have a specific configuration for some hosts.</p> 
-<p>The reference is the XML Schema in <a href="p2p_files/proactivep2p.xsd">proactivep2p.xsd</a>. For those not fluent in XML Schema here is a description of every markup tags.</p> 
+<p>The reference is the XML Schema in <a href="p2p_files/proactivep2p.xsd">proactivep2p.xsd</a>. For those not fluent in XML Schema, here is a description of every markup tags--</p> 
 <p>The root element in <b>&lt;configFile&gt;</b> it contains one or many <b>&lt;p2pconfig&gt;</b> . This latter element can start with some <b>&lt;loadconfig path=&quot;path/to/xml&quot;/&gt;</b> they will include the designated XML file. After these file inclusions, you can with <b>&lt;host name=&quot;name.domain&quot;&gt;</b> specify which hosts are concerned by the configuration. Then there can be a <b>&lt;configForHost&gt;</b> element containing a configuration for the selected hosts and/or a <b>&lt;default&gt;</b> element if no suitable configuration was already found.</p> 
 <p>Keep in mind that the XML parser sees a lot of configuration and the first that matches is used and the parsing is finished. This means that the elements we have just seen are tightly linked together. For example if an XML file designated by a <b>&lt;loadconfig&gt;</b> contains a <b>&lt;default&gt;</b> element, then after this file no other element will be evaluated. This is because either a configuration was already found so the parsing stops, or no configuration matched and the <b>&lt;default&gt;</b> does, so the parsing ends.</p> 
-<p>The configuration proper is contained in a <b>&lt;configForHost&gt;</b> or <b>&lt;default&gt;</b> element. It consists of the scheduled times for work and the hosts where we register ourselves. Here is an example:</p> 
+<p>The proper configuration is contained in a <b>&lt;configForHost&gt;</b> or <b>&lt;default&gt;</b> element. It consists of the scheduled times for work and the hosts where we register ourselves. Here is an example:</p> 
 <pre>
 &lt;periods&gt;
         &lt;period&gt;
@@ -147,7 +185,8 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <p>In this example we clearly see that the JVM will wake up Monday evening and shut down Tuesday morning. It will also work during the weekend. In the <b>&lt;register&gt;</b> part we put the URL in which we will register ourselves, in the example we used the short form which is equivalent to <i>rmi://host:9301</i>.</p> 
 <h4>Control</h4> 
 <ul> 
-  <li><b>Stop the JVM</b>: This command will stop the JVM and make it restart for the next scheduled time, which is the day after:<br> 
+  <li><b>Stop the JVM</b>: This command will stop the JVM and will
+	restart it at the next scheduled time, which is the day after:<br> 
     <code>$ ProActive/p2p/build/p2pctl stop</code> </li> 
   <li><b>Kill the daemon</b>:<br> 
     <code>$ ProActive/p2p/build/p2pctl killdaemon</code></li> 
@@ -162,9 +201,9 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
     <li>The number of node you want from the P2P infrastructure. Setting "MAX"
     as value is equivalent to an infinite number of node. (attribute "nodeNumber")</li>
     <li>The timeout for a node request. (attribute "timeout")</li>
-    <li>The lookup Frequence that determines how many time must be elapsed
-    before asking the infrastructure for new node. (attribute "lookupFrequence")</li>
-    <li>The TTL that specifies how deeper in the P2P hierarchy the search for node must be done.</li>
+    <li>The lookup Frequence that determines how much time must be elapsed
+    before asking the infrastructure to look for new node. (attribute "lookupFrequence")</li>
+    <li>The TTL specifies how deeper in the P2P hierarchy the search for node must be done.</li>
     </ul>
     
     <p>
@@ -175,8 +214,8 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 
     <p>
     You can get nodes from the P2P Infrastructure using the ProActive
-    Deployement Descriptor as describe above. <br>
-    In fact you will ask for a certain number of node and ProActive will
+    Deployement Descriptor as described above. <br>
+    In fact you will ask for a certain number of nodes and ProActive will
     notify a "listener" (one of your class), every time a new node is
     available.
     </p>
@@ -244,7 +283,7 @@ href="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications
 <p>For more information about ProActive XML Deployment Descriptor see this <a
 href="http://www-sop.inria.fr/oasis/ProActive/doc/api/org/objectweb/proactive/doc-files/Descriptor.html">page</a>.</p> 
 <h3>Access from your Application to the P2P Infrastructure</h3> 
-<p>The next little sample of code explain how from an application you can start a P2P Service and deploy on it ProActive nodes:</p> 
+<p>The next little sample of code explains how from an application you can start a P2P Service and deploy on it ProActive nodes:</p> 
 <pre>
 <code>
 import org.objectweb.proactive.ProActive;
