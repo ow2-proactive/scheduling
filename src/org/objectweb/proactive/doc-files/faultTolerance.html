@@ -79,11 +79,15 @@ implemented in the current version as a unique server
 (<code>ft.util.GlobalFTServer</code>), that implements the interfaces of each
 server (<code>ft.util.*.*</code>). This server is still a prototype version:
 it is implemented using Java RMI, and it is not persistent. An enhanced active
-object version with persistence will come soon.
+object version with persistence will come soon. 
+<BR>
+This server is also a classfile server for recovered active objects. It must
+thus have access to all classes of the application, i.e. it must be started
+with <b>all classes of the application in its classpath</b>.
 </p>
 <p class="textNormal">
 The global fault-tolerance server can be launched using the
-<code>startGlobalFTServer.sh</code> script, with 3 optional parameters:
+<code>ProActive/scripts/[unix|windows]/ft/startGlobalFTServer.[sh|bat]</code> script, with 3 optional parameters:
 <ul>
 <li>the server name: <code>-name &lt;serverName&gt;</code>. The default name
 	is FTServer.
@@ -334,7 +338,7 @@ public void runActivity(Body body) {
       ...
       /* CODE A */
       ...
-      /* CHECKPOINT OCCURENCE */
+      /* CHECKPOINT OCCURRENCE */
       service.serve(r);
    }
 }
@@ -344,7 +348,7 @@ public void runActivity(Body body) {
 <p>
 If a checkpoint is triggered before the service of <code>r</code>, it
 characterizes the state of the active object at the point <code>/* CHECKPOINT
-OCCURENCE */</code>. If a failure occurs, this active object is restarted by
+OCCURRENCE */</code>. If a failure occurs, this active object is restarted by
 calling the <code>runActivity()</code> method, <i>from a state in which the
 code <code>/* CODE A */</code> has been already executed</i>. As a
 consequence, the execution looks like if <code>/* CODE A */</code> was executed
@@ -379,6 +383,109 @@ Fault-tolerance in ProActive is still not compliant with the following
 
 
 
+
+<h2><A NAME="nbody">A complete example</A></h2>
+
+<h3>Description</h3>
+
+<p class="textNormal">
+You can find in
+<code>ProActive/scripts/[unix|windows]/ft/nbodyft.[sh|bat]</code> a script
+that starts a fault-tolerant version of the <a
+href="http://www-sop.inria.fr/oasis/ProActive/apps/nbody.html">ProActive
+NBody</a> example. This script actually call the
+<code>ProActive/scripts/[unix|windows]/nbody.[sh|bat]</code> script with the
+option <code>-displayft</code>. The java source code is the same as the
+standard version. The only difference is the "Execution Control" panel added
+in the graphical interface, which allows the user to remotely kill Java
+Virtual Machine so as to trigger a failure by sending a <code>killall
+java</code> signal. Note that this panel will not work with Windows operating
+system, since the <code>killall</code> does not exist. But a failure can be
+triggered for example by killing the JVM process on one of the hosts.
+</p>
+
+<img src="./pics/nbodyft.jpg">
+
+
+
+<p class="textNormal">
+This snapshot shows a fault-tolerant execution with 4 bodies on 3 different
+hosts. Clicking on the "Execute" button will trigger the failure of the host
+called Nahuel and the recovery of the 4 bodies.
+</p>
+
+
+<h3>Running NBody example</h3>
+
+<p class="textNormal">
+Before starting the fault-tolerant body example, you have to edit the
+<code>ProActive/descriptors/FaultTolerantWorkers.xml</code> deployment
+descriptor so as to deploy on your own hosts (<B>HOSTNAME</B>), as follow:
+</p>
+
+<pre>
+...
+&nbsp;&lt;processDefinition id="jvmAppli1"&gt;
+&nbsp;&nbsp;&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="<B>HOSTNAME</B>"&gt;
+&nbsp;&nbsp;&nbsp;&lt;processReference refid="jvmProcess"/&gt;
+&nbsp;&nbsp;&lt;/rshProcess&gt;
+&nbsp;&lt;/processDefinition&gt;
+...
+</pre>
+<p class="textNormal">
+Of course, more than one host is needed to run this example, as failure are
+triggered by killing all Java processes on the selected host.
+<br>
+The deployment descriptor must also specify the GlobalFTServer location as
+follow, assuming that the script <code>startGlobalFTServer.sh</code> has been
+started on the host <B>SERVER_HOSTAME</B>:
+</p>
+
+<pre>
+...
+&nbsp;&lt;services&gt;
+&nbsp;&nbsp;&lt;serviceDefinition id="appli"&gt;
+&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;
+&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;
+&nbsp;&nbsp;&lt;/serviceDefinition&gt;
+&nbsp;&nbsp;&lt;serviceDefinition id="ressource"&gt;
+&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/resourceServer&gt;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;
+&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;
+&nbsp;&nbsp;&lt;/serviceDefinition&gt;
+&nbsp;&lt;/services&gt;
+...
+</pre>
+
+<p class="textNormal">
+Finally, you can start the fault-tolerant ProActive NBody and choose the
+      version you want to run :
+</p>
+
+<pre>
+~/ProActive/scripts/unix/FT> ./nbodyFT.sh
+Starting Fault-Tolerant version of ProActive NBody...
+
+--- N-body with ProActive ---------------------------------
+ **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET WITH EXISTING HOSTNAMES !
+ 1 : Simplest version, one-to-one communication and master
+ 2 : group communication and master
+ 3 : group communication, odd-even-synchronization
+Choose which version you want to run [123] : 3
+Thank you!
+ --> This ClassFileServer is reading resources from classpath
+Jini enabled
+Ibis enabled
+Created a new registry on port 1099
+//tranquility.inria.fr/Node-157559959 successfully bound in registry at //tranquility.inria.fr/Node-157559959
+Generating class : pa.stub.org.objectweb.proactive.examples.nbody.common.Stub_Displayer
+************* Reading deployment descriptor: file:./../../.././descriptors/FaultTolerantWorkers.xml ********************
+
+<pre>
 
 <!--
  Footer : start 
