@@ -754,9 +754,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 */
 	public ExceptionList getExceptionList() {
 		ExceptionList exceptionList = new ExceptionList();
-		for (int i = 0 ; i < this.memberList.size() ; i++)
-			if (this.memberList.get(i) instanceof Throwable)
+		for (int i = 0 ; i < this.memberList.size() ; i++) {
+			if (this.memberList.get(i) instanceof Throwable) {
 				exceptionList.add(new ExceptionInGroup(null, (Throwable) this.memberList.get(i)));
+			}
+		}
 		return exceptionList;
 	}
 
@@ -767,9 +769,12 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * (After this operation the size of the Group decreases)
 	 */
 	public void purgeExceptionAndNull() {
-		for (int i = 0 ; i < this.memberList.size() ; i++)
-			if ((this.memberList.get(i) instanceof Throwable) || (this.memberList.get(i) == null))
+		for (int i = 0 ; i < this.memberList.size() ; i++) {
+			if ((this.memberList.get(i) instanceof Throwable) || (this.memberList.get(i) == null)) {
 				this.memberList.remove(i);
+				i--;
+			}
+		}
 	}
 
 
