@@ -61,14 +61,14 @@ public class ProActiveComponentGroup {
                     ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME,
                     new Object[] { null, null, null });
         } catch (ClassNotReifiableException e) {
-            System.err.println("**** ClassNotReifiableException ****");
+            logger.error("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
-            System.err.println("**** InvalidProxyClassException ****");
+            logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
-            System.err.println(
+			logger.error(
                 "**** ConstructionOfProxyObjectFailedException ****");
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            System.err.println(
+			logger.error(
                 "**** ConstructionOfReifiedObjectFailedException ****");
         }
 

@@ -661,9 +661,9 @@ public class ProxyForGroup extends AbstractProxy
      * To debug, display the size of the Group and all its members with there position
      */
     public void display() {
-        System.out.println("Number of member : " + memberList.size());
+        logger.info("Number of member : " + memberList.size());
         for (int i = 0; i < memberList.size(); i++)
-            System.out.println("  " + i + " : " +
+            logger.info("  " + i + " : " +
                 memberList.get(i).getClass().getName());
     }
 
