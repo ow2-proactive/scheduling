@@ -61,11 +61,8 @@ public final class MethodCall implements java.io.Serializable {
    */
   private static int index;
   
-  /**
-   *	Indicates if the recycling of MethodCall object is on.
-   */
+  /**	Indicates if the recycling of MethodCall object is on. */
   private static boolean recycleMethodCallObject;
-
 
   private static java.util.Hashtable reifiedMethodsTable = new java.util.Hashtable();
  
@@ -90,39 +87,36 @@ public final class MethodCall implements java.io.Serializable {
   /**
    * The method corresponding to the call
    */
-  private Method reifiedMethod;
-  
-  /**
-   * The hypothetic result
-   */
-  private Object methodCallResult;
-  
+  private transient Method reifiedMethod;
+ 
   /**
    * The internal ID of the methodcall
    */
   private long methodCallID;
+  
+  private String key;
+  
 
   /**
    * Sets recycling of MethodCall objects on/off. Note that turning the recycling
    * off and on again results in the recycling pool being flushed, thus damaging
    * performances.
-   *
    * @param value	sets the recycling on if <code>true</code>, otherwise turns it off.
    */
   public static synchronized void setRecycleMethodCallObject(boolean value) {
-    if (MethodCall.recycleMethodCallObject == value)
+    if (recycleMethodCallObject == value)
       return;
     else {
-      MethodCall.recycleMethodCallObject = value;
+      recycleMethodCallObject = value;
       if (value) {
         // Creates the recycle poll for MethodCall objects
-        MethodCall.recyclePool = new MethodCall[RECYCLE_POOL_SIZE];
-        MethodCall.index = 0;
+        recyclePool = new MethodCall[RECYCLE_POOL_SIZE];
+        index = 0;
       } else {
         // If we do not want to recycle MethodCall objects anymore,
         // let's free some memory by permitting the reyclePool to be
         // garbage-collecting
-        MethodCall.recyclePool = null;
+        recyclePool = null;
       }
     }
   }
@@ -151,24 +145,19 @@ public final class MethodCall implements java.io.Serializable {
    *	@return	a MethodCall object representing an invocation of method
    *	<code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
    */
-
   public synchronized static MethodCall getMethodCall(Method reifiedMethod, Object[] effectiveArguments) {
     if (MethodCall.getRecycleMethodCallObject()) {
       // Finds a recycled MethodCall object in the pool, cleans it and
       // eventually returns it
       if (MethodCall.index > 0) {
-        MethodCall result;
-
         // gets the object from the pool
         MethodCall.index--;
-        result = MethodCall.recyclePool[MethodCall.index];
+        MethodCall result = MethodCall.recyclePool[MethodCall.index];
         MethodCall.recyclePool[MethodCall.index] = null;
-
         // Refurbishes the object
         result.reifiedMethod = reifiedMethod;
         result.effectiveArguments = effectiveArguments;
-        result.methodCallResult = null;
-
+        result.key = buildKey(reifiedMethod);
         return result;
       } else
         return new MethodCall(reifiedMethod, effectiveArguments);
@@ -183,7 +172,6 @@ public final class MethodCall implements java.io.Serializable {
    *	is ready for recycling. It is the responsibility of the caller of this
    *	method to make sure that this object can safely be disposed of.
    */
-
   public synchronized static void setMethodCall(MethodCall mc) {
     if (MethodCall.getRecycleMethodCallObject()) {
       // If there's still one slot left in the pool
@@ -194,7 +182,7 @@ public final class MethodCall implements java.io.Serializable {
         // garbage-collecting the objects referenced in here
         mc.reifiedMethod = null;
         mc.effectiveArguments = null;
-        mc.methodCallResult = null;
+        mc.key = null;
         // Inserts the object in the pool
         MethodCall.recyclePool[MethodCall.index] = mc;
         MethodCall.index++;
@@ -210,11 +198,10 @@ public final class MethodCall implements java.io.Serializable {
    *	because we want to enforce the use of factory methods for getting fresh
    * instances of this class (see <I>Factory</I> pattern in GoF).
    */
-
   private MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
     this.reifiedMethod = reifiedMethod;
     this.effectiveArguments = effectiveArguments;
-    this.methodCallResult = null;
+    this.key = buildKey(reifiedMethod);
   }
 
 
@@ -259,7 +246,7 @@ public final class MethodCall implements java.io.Serializable {
 
 
   public String getName() {
-    return this.reifiedMethod.getName();
+    return reifiedMethod.getName();
   }
 
 
@@ -301,59 +288,43 @@ public final class MethodCall implements java.io.Serializable {
   }
 
 
+  private static String buildKey(Method reifiedMethod) {
+    StringBuffer sb = new StringBuffer();
+    sb.append(reifiedMethod.getDeclaringClass().getName());
+    sb.append(reifiedMethod.getName());
+    Class[] parameters = reifiedMethod.getParameterTypes();
+    for (int i = 0; i < parameters.length; i++) {
+      sb.append(parameters[i].getName());
+    }
+    return sb.toString();
+  }
+
 
   //
   // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
   //
 
-
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-    out.writeObject(this.effectiveArguments);
+    out.defaultWriteObject();
     // The Method object needs to be converted
-    Class declaringClass = this.reifiedMethod.getDeclaringClass();
-    out.writeObject(declaringClass);
+    out.writeObject(reifiedMethod.getDeclaringClass());
     out.writeObject(reifiedMethod.getName());
-    out.writeObject(fixBugWrite(this.reifiedMethod.getParameterTypes()));
-    out.writeObject(methodCallResult);
-    out.writeLong(methodCallID);
+    out.writeObject(fixBugWrite(reifiedMethod.getParameterTypes()));
   }
 
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-    Class declaringClass;
-    String simpleName;
-    Class[] parameters;
-    // Reads the effective arguments
-    this.effectiveArguments = (Object[])in.readObject();
-
-    // Reads several pieces of data that we need for looking
-    // up the method
-    declaringClass = (Class)in.readObject();
-    simpleName = (String)in.readObject();
-    parameters = this.fixBugRead((FixWrapper[])in.readObject());
-
-  
-    // Reads the methodCallResult instance variable
-    this.methodCallResult = (Object)in.readObject();
-    this.methodCallID = in.readLong();
-        
-    //this.forwarded=in.readBoolean();
-
-    // Builds a key
-    StringBuffer sb = new StringBuffer();
-    sb.append(declaringClass.getName());
-    sb.append(simpleName);
-    for (int i = 0; i < parameters.length; i++) {
-      sb.append(parameters[i].getName());
-    }
-    String key = sb.toString();
-
-    this.reifiedMethod = (Method)reifiedMethodsTable.get(key);
-    if (this.reifiedMethod == null) {
+    in.defaultReadObject();
+    reifiedMethod = (Method)reifiedMethodsTable.get(key);
+    if (reifiedMethod == null) {
+      // Reads several pieces of data that we need for looking up the method
+      Class declaringClass = (Class)in.readObject();
+      String simpleName = (String)in.readObject();
+      Class[] parameters = this.fixBugRead((FixWrapper[])in.readObject());
       // Looks up the method
       try {
-        this.reifiedMethod = declaringClass.getMethod(simpleName, parameters);
-        reifiedMethodsTable.put(key, this.reifiedMethod);
+        reifiedMethod = declaringClass.getMethod(simpleName, parameters);
+        reifiedMethodsTable.put(key, reifiedMethod);
       } catch (NoSuchMethodException e) {
         throw new InternalException("Lookup for method failed: " + e + ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
       }
@@ -414,7 +385,7 @@ public final class MethodCall implements java.io.Serializable {
       if (encapsulated.equals(Integer.class)) return Integer.TYPE;
       if (encapsulated.equals(Long.class)) return Long.TYPE;
       if (encapsulated.equals(Short.class)) return Short.TYPE;
-      throw new RuntimeException("FixWrapper encapsulated class unkown "+encapsulated);
+      throw new InternalException("FixWrapper encapsulated class unkown "+encapsulated);
     }
 
 
