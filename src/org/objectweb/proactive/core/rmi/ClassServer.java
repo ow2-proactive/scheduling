@@ -78,7 +78,7 @@ public class ClassServer implements Runnable {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
-
+        System.out.println("port = " +port );
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
         newListener();
 

@@ -63,7 +63,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         //In fact it oly consists with the creation of an adapter 
         //with the specified url;
         ProActiveRuntime remoteProActiveRuntime = new HttpRuntimeAdapter(s);
-//      distant
+//      remote
         return remoteProActiveRuntime;
     }
 
