@@ -127,7 +127,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   private String jobOutput;  
 
   // Attribute used to shyncronise
-  private static boolean READY=false;
+  private boolean READY=false;
 
   //===========================================================
   // Constructor
@@ -222,7 +222,14 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   }
 
   public void setJobOutput(String output){
-      jobOutput=output;
+      if(jobOutput==null)
+	  jobOutput=new String(output);
+      else{
+	  jobOutput = jobOutput + output;
+      }
+      System.out.println("GlobusProcess seting the output:");
+      System.out.println("New output:"+output);
+      System.out.println("Final output:"+jobOutput);
   }
   
   public void setGramPort(String gramPort){
@@ -237,6 +244,9 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   	this.globusHostAdviser.addHost(host);
   }
 
+    public void setReady(boolean b){
+	READY=b;
+    }
 
   //===========================================================
   // Redefine method from AbstracUnniversalProcess
@@ -268,8 +278,8 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
 
   
   protected void internalStartProcess(String rslCommand) throws java.io.IOException{
-   //	startGlobusProcess( rslCommand, this.hostname);
-   		startGlobusProcessWithoutOutput(rslCommand,this.hostname);
+      startGlobusProcess( rslCommand, this.hostname);
+      //startGlobusProcessWithoutOutput(rslCommand,this.hostname);
   }
 
 //  protected String buildCommand(){
@@ -453,22 +463,32 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       gassServer.registerDefaultDeactivator();
       jos = new JobOutputStream(new MyJobOutputListener(jobListener,this));
       gassServer.registerJobOutputStream("out",jos);
-      job.addListener(jobListener);
-
-
+      job.addListener( new GramJobListener() {
+	  public void statusChanged(GramJob job) {
+	      // react to state change
+	      // to do : switch on the status job ...
+	      System.out.println("***** JOB STATUS CHANGE ***** ");
+	      System.out.println("ID     : " + job.getID());
+	      System.out.println("RSL    : " + job.getRSL());
+	      System.out.println("STATUS : " + job.getStatusAsString());
+	      //if (job.getStatusAsString()=="ACTIVE"){LAUNCHED=true;}
+	      //System.out.println("representation : " + job.toString());
+	  }
+      });
+      
       job.request(contact);
       System.out.println("job submited : "+ job.getIDAsString());
     } catch (GramException e) {
-      System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
-      e.printStackTrace();
-      return;
+	System.out.println("Error : "+ e.getMessage(e.getErrorCode()));
+	e.printStackTrace();
+	return;
     } catch (GlobusProxyException e) {
-      System.out.println("Erreur : "+ e.getMessage());
-      return;
+	System.out.println("Erreur : "+ e.getMessage());
+	return;
     } 
   }
 
-  /**
+   /**
    * This method launch a class on a remote host (by default satura.inria.fr)
    * @param rslCommand to generate with buildRSLCommand
    */
@@ -489,6 +509,9 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
         System.out.println("STATUS : " + job.getStatusAsString());
         //if (job.getStatusAsString()=="ACTIVE"){LAUNCHED=true;}
         //System.out.println("representation : " + job.toString());
+	if  (job.getStatus() == GramJob.STATUS_ACTIVE) {
+	    READY=true;
+	}
       }
     });
  
@@ -596,8 +619,6 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
     private MyJobListener jobListener;
     private GlobusProcess gp;
 
-    // this variable is used to get the good output of a job launch by jini.
-    private boolean haveChanged=false;
 
     public MyJobOutputListener(MyJobListener jl,GlobusProcess g) {
       jobListener = jl;
@@ -613,11 +634,11 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
 
     public void outputChanged(String output) {
       System.out.println("output changed:" + output);
-      if(haveChanged==false){
+      //if(haveChanged==false){
         jobListener.setOutput(output);
         gp.setJobOutput(output);
-        haveChanged=true;
-      }
+        gp.setReady(true);
+	//}
     }
   }
 
@@ -639,9 +660,9 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
       else if (job.getStatus() == GramJob.STATUS_FAILED) {
         setError( (job.getError() == 0) ? 1 : job.getError() );
       }
-      else if  (job.getStatus() == GramJob.STATUS_ACTIVE) {
-        READY=true;
-      }
+      //else if  (job.getStatus() == GramJob.STATUS_ACTIVE) {
+	  //  READY=true;
+      //}
     }
 
     public int getError() {
