@@ -210,5 +210,5 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
      * Change the body referenced by this adapter
      * @param newBody the body referenced after the call
      */
-    public void changeProxiedBody(Body newBody);
+    public void changeProxiedBody(Body newBody)  throws IOException;
 }

@@ -50,6 +50,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
@@ -101,7 +102,7 @@ public interface RemoteProActiveRuntime extends Remote {
 
     public String[] getAcquaintances() throws RemoteException;
 
-    public void rmAcquaintance(String proActiveRuntimeName);
+    public void rmAcquaintance(String proActiveRuntimeName)  throws RemoteException;
 
     public void killRT(boolean softly) throws RemoteException;
 

@@ -449,7 +449,11 @@ public class IbisRemoteBodyAdapter implements BodyAdapter, java.io.Serializable 
     // Implements Adapter
     //
     public void changeProxiedBody(Body newBody) {
+    	try {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     //
