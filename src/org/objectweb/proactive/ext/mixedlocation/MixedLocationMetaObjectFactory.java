@@ -52,8 +52,8 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class MixedLocationMetaObjectFactory extends ProActiveRmiMetaObjectFactory {
-
+public class MixedLocationMetaObjectFactory
+    extends ProActiveRmiMetaObjectFactory {
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -64,8 +64,8 @@ public class MixedLocationMetaObjectFactory extends ProActiveRmiMetaObjectFactor
     //
 
     /**
-   * Constructor for LocationServerMetaObjectFactory.
-   */
+    * Constructor for LocationServerMetaObjectFactory.
+    */
     protected MixedLocationMetaObjectFactory() {
         super();
     }
@@ -95,20 +95,21 @@ public class MixedLocationMetaObjectFactory extends ProActiveRmiMetaObjectFactor
     // -- INNER CLASSES -----------------------------------------------
     //
     protected class RequestWithMixedLocationFactory implements RequestFactory,
-                                                               java.io.Serializable {
+        java.io.Serializable {
+        transient private LocationServer server = LocationServerFactory.getLocationServer();
 
-       transient private LocationServer server = LocationServerFactory.getLocationServer();
-
-        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-            return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server);
+        public Request newRequest(MethodCall methodCall,
+            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+            return new RequestWithMixedLocation(methodCall, sourceBody,
+                isOneWay, sequenceID, server);
         }
-    } // end inner class RequestWithMixedLocationFactory
+    }
 
-    protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
-                                                                  java.io.Serializable {
+    protected static class MigrationManagerFactoryImpl
+        implements MigrationManagerFactory, java.io.Serializable {
         public MigrationManager newMigrationManager() {
             System.out.println("BodyWithMixedLocation.createMigrationManager");
             return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());
         }
-    } // end inner class MigrationManagerFactoryImpl
+    }
 }

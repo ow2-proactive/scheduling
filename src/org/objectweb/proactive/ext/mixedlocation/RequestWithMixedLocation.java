@@ -30,74 +30,90 @@
 */
 package org.objectweb.proactive.ext.mixedlocation;
 
+import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
+import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
-public class RequestWithMixedLocation extends RequestImpl implements java.io.Serializable {
 
-  private static final int MAX_TRIES = 30;
-  private static int counter = 0;
+public class RequestWithMixedLocation extends RequestImpl
+    implements java.io.Serializable {
+    static Logger logger = Logger.getLogger(RequestWithMixedLocation.class.getName());
+    private static final int MAX_TRIES = 30;
+    private static int counter = 0;
+    private int tries;
+    transient protected LocationServer server;
 
-  private int tries;
-  transient protected LocationServer server;
-
-  public RequestWithMixedLocation(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID, LocationServer server) {
-    super(methodCall, sender, isOneWay, nextSequenceID);
-    System.out.println("RequestWithMixedLocation.RequestWithMixedLocation " + ++counter);
-    this.server = server;
-  }
-
-  protected void sendRequest(UniversalBody destinationBody) throws java.io.IOException {
-    System.out.println("RequestWithMixedLocation: sending to universal " + counter);
-    try {
-      destinationBody.receiveRequest(this);
-    } catch (Exception e) {
-      //  e.printStackTrace();
-      this.backupSolution(destinationBody);
+    public RequestWithMixedLocation(MethodCall methodCall,
+        UniversalBody sender, boolean isOneWay, long nextSequenceID,
+        LocationServer server) {
+        super(methodCall, sender, isOneWay, nextSequenceID);
+        System.out.println("RequestWithMixedLocation.RequestWithMixedLocation " +
+            ++counter);
+        this.server = server;
     }
-  }
 
-  /**
-   * Implements the backup solution
-   */
-  protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
-    boolean ok = false;
-    tries = 0;
-
-    System.out.println("RequestWithMixedLocationr: backupSolution() contacting server " + server);
-    System.out.println("RequestWithMixedLocation.backupSolution() : looking for " + destinationBody);
-    //get the new location from the server
-    while (!ok && (tries < MAX_TRIES)) {
-      UniversalBody mobile = (UniversalBody) server.searchObject(destinationBody.getID());
-      System.out.println("RequestWithMixedLocation: backupSolution() server has sent an answer");
-      //we want to bypass the stub/proxy
-      UniversalBody newDestinationBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
-      // !!!!
-      // !!!! should put a counter here to stop calling if continuously failing
-      // !!!!
-      try {
-        // sendRequest(newDestinationBody);
-        newDestinationBody.receiveRequest(this);
-        //everything went fine, we have to update the current location of the object
-        //so that next requests don't go through the server
-        System.out.println("RequestWithMixedLocation: backupSolution() updating location");
-        if (sender != null) {
-          sender.updateLocation(newDestinationBody.getID(), newDestinationBody.getRemoteAdapter());
-        }
-        ok = true;
-      } catch (Exception e) {
-        System.out.println("RequestWithMixedLocation: backupSolution() failed");
-        tries++;
+    protected void sendRequest(UniversalBody destinationBody)
+        throws java.io.IOException {
+        System.out.println("RequestWithMixedLocation: sending to universal " +
+            counter);
         try {
-          Thread.sleep(500);
-        } catch (Exception e2) {
-          e2.printStackTrace();
+            destinationBody.receiveRequest(this);
+        } catch (Exception e) {
+            this.backupSolution(destinationBody);
         }
-      }
     }
-  }
+
+    /**
+     * Implements the backup solution
+     */
+    protected void backupSolution(UniversalBody destinationBody)
+        throws java.io.IOException {
+        boolean ok = false;
+        tries = 0;
+        //get the new location from the server
+        UniqueID bodyID = destinationBody.getID();
+        while (!ok && (tries < MAX_TRIES)) {
+            UniversalBody remoteBody = null;
+            UniversalBody mobile = queryServer(bodyID);
+
+            //we want to bypass the stub/proxy
+            remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
+
+            try {
+                remoteBody.receiveRequest(this);
+
+                //everything went fine, we have to update the current location of the object
+                //so that next requests don't go through the server
+                if (sender != null) {
+                    sender.updateLocation(bodyID, remoteBody);
+                } else {
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
+                                  .updateLocation(bodyID, remoteBody);
+                }
+                ok = true;
+            } catch (Exception e) {
+                logger.debug("FAILED = " + " for method " + methodName);
+                tries++;
+            }
+        }
+    }
+
+    protected UniversalBody queryServer(UniqueID bodyID) {
+        if (server == null) {
+            server = LocationServerFactory.getLocationServer();
+        }
+        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        logger.debug("backupSolution() server has sent an answer");
+        ProActive.waitFor(mobile);
+        return mobile;
+    }
 }

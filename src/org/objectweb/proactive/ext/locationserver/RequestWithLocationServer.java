@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.ext.locationserver;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -45,12 +47,12 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 public class RequestWithLocationServer extends RequestImpl
     implements java.io.Serializable {
+    static Logger logger = Logger.getLogger(RequestWithLocationServer.class.getName());
     private static final int MAX_TRIES = 30;
 
     /**
      * the number of time we try before reporting a failure
      */
-    protected long startTime;
     private int tries;
     private transient LocationServer server;
 
@@ -69,10 +71,10 @@ public class RequestWithLocationServer extends RequestImpl
     protected void sendRequest(UniversalBody destinationBody)
         throws java.io.IOException {
         try {
-            startTime = System.currentTimeMillis();
+            //   startTime = System.currentTimeMillis();
             destinationBody.receiveRequest(this);
 
-            long endTime = System.currentTimeMillis();
+            //    long endTime = System.currentTimeMillis();
         } catch (Exception e) {
             this.backupSolution(destinationBody);
         }
@@ -90,11 +92,12 @@ public class RequestWithLocationServer extends RequestImpl
         while (!ok && (tries < MAX_TRIES)) {
             UniversalBody remoteBody = null;
             UniversalBody mobile = queryServer(bodyID);
+
             //we want to bypass the stub/proxy
             remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
-
             try {
                 remoteBody.receiveRequest(this);
+
                 //everything went fine, we have to update the current location of the object
                 //so that next requests don't go through the server
                 if (sender != null) {
@@ -105,8 +108,8 @@ public class RequestWithLocationServer extends RequestImpl
                 }
                 ok = true;
             } catch (Exception e) {
-                System.out.println(
-                    "TimedRequestWithLocationServer:  .............. FAILED = " +
+                logger.debug(
+                    "RequestWithLocationServer:  .............. FAILED = " +
                     " for method " + methodName);
                 tries++;
             }
@@ -114,14 +117,12 @@ public class RequestWithLocationServer extends RequestImpl
     }
 
     protected UniversalBody queryServer(UniqueID bodyID) {
-        long startTimeBackupSolution = System.currentTimeMillis();
         if (server == null) {
             server = LocationServerFactory.getLocationServer();
         }
         UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
-        long endTimeBackupSolution = System.currentTimeMillis();
-        System.out.println(
-            "TimedRequestWithLocationServer: backupSolution() server has sent an answer");
+        logger.debug(
+            "RequestWithLocationServer: backupSolution() server has sent an answer");
         ProActive.waitFor(mobile);
         return mobile;
     }
