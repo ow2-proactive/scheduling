@@ -157,12 +157,19 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		Object result = null;
 
 		/* if OneWay : do not construct result */
-		if (AbstractProxy.isOneWayCall(mc))
-			oneWayCallOnGroup(mc);
+		if (AbstractProxy.isOneWayCall(mc)) {
+			this.oneWayCallOnGroup(mc);
+		}
+		
+		/* Special case : the method returns void but is Synchronous because it throws Exception */
+		else if (mc.getReifiedMethod().getReturnType() == Void.TYPE) {
+			this.oneWayCallOnGroup(mc);
+		}
 
 		/* if the call is asynchronous the group of result will be a group a future */
-		else // with group : SYNC == ASYNC !!!!
-			result = asynchronousCallOnGroup(mc);
+		else { // with group in general case : SYNC == ASYNC !!!!
+			result = this.asynchronousCallOnGroup(mc);
+		}
 
 		/* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
 		this.waitForAllCallsDone();
@@ -209,7 +216,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		Object result;
 		Body body = ProActive.getBodyOnThis();		
 
-		int size = this.memberList.size();
 		// Creates a stub + ProxyForGroup for representing the result
 		try {
 			Object[] paramProxy = new Object[0];
@@ -219,6 +225,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			e.printStackTrace();
 			return null;
 		}
+
+		int size = this.memberList.size();
 		// Init the lists of result with null value to permit the "set(index)" operation
 		Vector memberListOfResultGroup = ((ProxyForGroup) ((StubObject) result).getProxy()).memberList;
 		for (int i = 0; i < size; i++) {
