@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.ext.util;
 
+import java.net.UnknownHostException;
+
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.ProActive;
@@ -37,6 +39,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 
 
@@ -88,15 +91,12 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         String tmp = url;
 
         //if it starts with rmi we remove it
-        if (url.startsWith("rmi:")) {
-            tmp = url.substring(4);
-        }
-		if (url.startsWith("ibis:")) {
-				   tmp = url.substring(5);
-			   }
-
-        if (!tmp.startsWith("//")) {
-            tmp = "//" + tmp;
+        String temp = null;
+        try {
+            tmp =  UrlBuilder.checkUrl(url);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return tmp;
     }
