@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.event;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.message.Message;
 
 /**
@@ -137,7 +138,30 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   public boolean isOneWay() {
     return getMessage().isOneWay();
   }
-
+  
+  public char[] getMessageInfo() {
+      return getMessage().getMessageInfo();
+  }
+  
+  public void setMessageInfo(char[] mi) {
+      getMessage().setMessageInfo(mi);
+  }
+  
+  public void setIgnoreIt(){
+      getMessage().setIgnoreIt();
+  }
+  
+  public boolean ignoreIt(){
+      return getMessage().ignoreIt();
+  }
+  
+  public void setFTManager(FTManager ft) {
+      getMessage().setFTManager(ft);
+  }
+  
+  public FTManager getFTManager() {
+      return getMessage().getFTManager();
+  }
 
   //
   // -- PRIVATE METHODS -----------------------------------------------
