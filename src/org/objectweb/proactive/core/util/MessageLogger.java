@@ -30,7 +30,11 @@
 */ 
 package org.objectweb.proactive.core.util;
 
+import org.apache.log4j.Logger;
+
 public interface MessageLogger {
+	
+	static Logger messageLogger = Logger.getLogger(MessageLogger.class.getName());
 
   public void log(String message);
 

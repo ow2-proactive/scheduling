@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.util;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>
  * Originally written by Dr. Heinz Kabutz in the very excellent 
@@ -46,6 +48,8 @@ package org.objectweb.proactive.core.util;
 public class CircularArrayList
 	extends java.util.AbstractList
 	implements java.util.List, java.io.Serializable {
+		
+	static Logger logger = Logger.getLogger(CircularArrayList.class.getName());
 
 	private static final int DEFAULT_SIZE = 5;
 
@@ -93,23 +97,23 @@ public class CircularArrayList
 	public static void main(String[] args) {
 		CircularArrayList c = new CircularArrayList(5);
 		c.add(0, new Integer(8));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(7));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(6));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(5));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(4));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(3));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(2));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(1));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 		c.add(0, new Integer(0));
-		System.out.println(c.toString());
+		logger.info(c.toString());
 	}
 
 	public boolean isEmpty() {

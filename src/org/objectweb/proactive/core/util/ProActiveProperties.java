@@ -42,7 +42,11 @@ public final class ProActiveProperties {
 	 * default state (enable or disable) of the automatic continuation mechanism 
 	 */
 	public static final String PROACTIVE_DEFAULT_AC_STATE = "proactive.future.ac";
-  
+	
+  /**
+   * default state(enable or disable) of the schema validation mechanism for deployment descriptors 
+   */
+  public static final String PROACTIVE_DEFAULT_SCHEMA_VALIDATION = "schema.validation";
   
   private static java.util.Properties defaultProperties;
 
@@ -55,6 +59,7 @@ public final class ProActiveProperties {
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER, "org.objectweb.proactive.ext.locationserver.LocationServer");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER_RMI, "//localhost/LocationServer");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_AC_STATE,"disable");
+    defaultProperties.setProperty(PROACTIVE_DEFAULT_SCHEMA_VALIDATION,"enable");
     ProActiveProperties.addPropertiesToSystem(defaultProperties);
   }
 
@@ -83,5 +88,9 @@ public final class ProActiveProperties {
   
   public static String getACState() {
   	return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_AC_STATE);
+  }
+  
+  public static String getSchemaValidationState() {
+  	return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_SCHEMA_VALIDATION);
   }
 }
