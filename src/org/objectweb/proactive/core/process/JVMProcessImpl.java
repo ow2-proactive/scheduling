@@ -202,7 +202,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
     }
 	// append jvmParameters
 	if ((jvmParameters != null) && (jvmParameters.length() > 0)) {
-	  javaCommand.append(" " + jvmParameters + " ");
+	  javaCommand.append(" " + jvmParameters);
 	} 
     // append classpath
     if ((classpath != null) && (classpath.length() > 0)) {
@@ -221,6 +221,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
       javaCommand.append(" ");
       javaCommand.append(parameters);
     }
+    System.out.println(javaCommand.toString());
     return javaCommand.toString();
   }
 
