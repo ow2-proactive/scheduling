@@ -3,8 +3,11 @@
  */
 package nonregressiontest.group.onewaycall;
 
+import java.util.Iterator;
+
 import nonregressiontest.group.A;
 
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
@@ -12,23 +15,17 @@ import testsuite.test.ProActiveFunctionalTest;
 
 /**
  * @author Laurent Baduel
- *
  */
 public class Test  extends ProActiveFunctionalTest {
 
-	/**
-	 * 
-	 */
+	private A typedGroup = null;
+
 	public Test() {
 		super("oneway call on group", "do a oneway call on a previously created group");
 	}
 
 	public void action() throws Exception {
-		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
-
-		A group = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
-		group.onewayCall();
+		this.typedGroup.onewayCall();
 	}
 
 	public void endTest() throws Exception {
@@ -36,7 +33,29 @@ public class Test  extends ProActiveFunctionalTest {
 	}
 
 	public void initTest() throws Exception {
-		// nothing to do
+		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
+		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
+	}
+
+	public boolean postConditions() throws Exception {
+		boolean allOnewayCallDone = true;
+		Group group = ProActiveGroup.getGroup(this.typedGroup);
+		Iterator it = group.iterator();
+		while (it.hasNext()) {
+			allOnewayCallDone &= ((A) it.next()).onewayCallReceived();
+		}
+		return allOnewayCallDone;
+	}
+
+	public boolean preConditions() throws Exception {
+		boolean NoOnewayCallDone = true;
+		Group group = ProActiveGroup.getGroup(this.typedGroup);
+		Iterator it = group.iterator();
+		while (it.hasNext()) {
+			NoOnewayCallDone &= !((A) it.next()).onewayCallReceived();
+		}
+		return NoOnewayCallDone;
 	}
 
 }

@@ -9,7 +9,8 @@ import org.objectweb.proactive.RunActive;
 public class A implements InitActive, RunActive, EndActive, java.io.Serializable {
     
     private String name = "anonymous";
-    private String nodename;
+	private boolean onewayCallReceived = false;
+	private String nodename;
     private String hostname;
 
     public A() {
@@ -24,10 +25,19 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
     }
 
 	public void onewayCall() {
+		this.onewayCallReceived = true;
+	}
+
+	public boolean onewayCallReceived () {
+		return this.onewayCallReceived;
 	}
 	
 	public A asynchronousCall() {
 		return new A(this.name + "_Clone");
+	}
+
+	public A asynchronousCall (A a) {
+		return new A(a.getName() + "_Clone");
 	}
     
     public String getHostName() {
@@ -50,9 +60,9 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
     }
 
     public void moveTo(String nodeURL) throws Exception {
-            System.out.println(" I am going to migate");
+            // System.out.println(" I am going to migate");
             ProActive.migrateTo(nodeURL);
-            System.out.println("migration done");
+            // System.out.println("migration done");
     }
 
     public void endBodyActivity() {
@@ -60,7 +70,7 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
     }
 
     public void initActivity(Body body) {
-        System.out.println("Initialization of the Activity");
+        // System.out.println("Initialization of the Activity");
     }
 
     public void runActivity(Body body) {
@@ -72,7 +82,7 @@ public class A implements InitActive, RunActive, EndActive, java.io.Serializable
     }
 
     public void endActivity(Body body) {
-        System.out.println("End of the activity of this Active Object");
+        // System.out.println("End of the activity of this Active Object");
     }
 }
  

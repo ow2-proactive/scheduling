@@ -48,7 +48,7 @@ public class Test extends ProActiveFunctionalTest {
 
 		Group group = ProActiveGroup.getGroup(this.typedGroup);
 		Group groupOfResult = ProActiveGroup.getGroup(this.resultTypedGroup);
-		// has the result group the same size as the cller group ?
+		// has the result group the same size as the caller group ?
 		if (groupOfResult.size() != group.size()) {
 			return false;
 		}
