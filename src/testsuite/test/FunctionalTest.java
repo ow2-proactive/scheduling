@@ -30,14 +30,12 @@
 */
 package testsuite.test;
 
-import testsuite.exception.NotStandAloneException;
-
-import testsuite.result.TestResult;
-
 import java.io.Serializable;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import testsuite.exception.NotStandAloneException;
+import testsuite.result.TestResult;
 
 
 
@@ -59,6 +57,8 @@ public abstract class FunctionalTest extends AbstractTest
 
     /** The result of the output of the test. Only if postconditions are verified. Null if method action return void. */
     private Object out = null;
+    
+	
 
     /** Precedents tests, their out will be use in method action as parameters. Must be in the same oder of the
      *  parameters.
@@ -140,9 +140,9 @@ public abstract class FunctionalTest extends AbstractTest
         // test
         try {
             action();
-            if (logger.isInfoEnabled()) {
-                logger.info("Test runs with success");
-            }
+//            if (logger.isInfoEnabled()) {
+//                logger.info("Test runs with success");
+//            }
         } catch (NotStandAloneException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Not executed Test : not a standalone test.");
@@ -177,11 +177,8 @@ public abstract class FunctionalTest extends AbstractTest
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("The test [SUCCESS]");
-            }
             return new TestResult(this, TestResult.RESULT,
-                "Test run with success");
+                " runs with success");
         }
     }
 
@@ -269,11 +266,8 @@ public abstract class FunctionalTest extends AbstractTest
             return new TestResult(this, TestResult.GLOBAL_RESULT,
                 "Test run with success but Postconditions not verified");
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("The test [SUCCESS]");
-            }
             return new TestResult(this, TestResult.RESULT,
-                "Test run with success");
+                " runs with success");
         }
     }
 
