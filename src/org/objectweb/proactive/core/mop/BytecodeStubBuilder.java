@@ -65,8 +65,6 @@ public class BytecodeStubBuilder {
     protected static final Type METHOD_ARRAY_TYPE = new ArrayType(METHOD_TYPE, 1);
     protected static final Type PROXY_TYPE = convertClassNameToType("org.objectweb.proactive.core.mop.Proxy");
     protected static final Type METHODCALL_TYPE = convertClassNameToType("org.objectweb.proactive.core.mop.MethodCall");
-
-
     protected static final String STUB_INTERFACE_NAME = "org.objectweb.proactive.core.mop.StubObject";
     protected static final String PROXY_FIELD_NAME = "myProxy";
     
@@ -86,22 +84,33 @@ public class BytecodeStubBuilder {
 
     protected ClassGen createClassGenerator() {
         String superclassName;
-        String[] interfaces = new String[2];
-        interfaces[0] = "java.io.Serializable";
-        interfaces[1] = STUB_INTERFACE_NAME;
+        String[] interfaces;
 
-        if (this.cl.isInterface()) {
-            superclassName = "java.lang.Object";
-        } else {
-            superclassName = this.className;
-        }
+	// If we generate a stub for an interface type, we have to explicitely declare
+	// that we implement the interface. Also, the name of the superclass is not the reified
+	// type, but java.lang.Object
+        if (this.cl.isInterface())
+	    {
+		superclassName = "java.lang.Object";
+		interfaces = new String[3];
+		interfaces[0] = "java.io.Serializable";
+		interfaces[1] = STUB_INTERFACE_NAME;
+		interfaces[2] = this.cl.getName();
+	    }
+	else
+	    {
+		superclassName = this.className;
+		interfaces = new String[2];
+		interfaces[0] = "java.io.Serializable";
+		interfaces[1] = STUB_INTERFACE_NAME;
+	    }
 
         return new ClassGen(this.stubClassFullName, // Fully-qualified class name
                             superclassName, // Superclass
                             "<generated>",
                             Constants.ACC_PUBLIC |
                             Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
-                            interfaces); // No declared implemented interfaces
+                            interfaces); // declared interfaces
     }
 
     public byte[] create() {
@@ -412,13 +421,17 @@ public class BytecodeStubBuilder {
 
         // Creates the boolean field that indicates whether or not
         // we are currently inside the constructor of the stub
-        int flags1 = Constants.ACC_PROTECTED;
-        Type type1 = Type.BOOLEAN;
-        String name1 = "outsideConstructor";
-        FieldGen f1 = new FieldGen(flags1, type1, name1, cp);
-
-        this.classGenerator.addField(f1.getField());
-
+	// This is only necessary if we are generating a stub for
+	// a type that is not an interface
+	if (!this.cl.isInterface())
+	    {
+		int flags1 = Constants.ACC_PROTECTED;
+		Type type1 = Type.BOOLEAN;
+		String name1 = "outsideConstructor";
+		FieldGen f1 = new FieldGen(flags1, type1, name1, cp);
+		
+		this.classGenerator.addField(f1.getField());
+	    }
         // Creates the field that points to the handler inside the MOP
         int flags2 = Constants.ACC_PROTECTED;
         Type type2 = PROXY_TYPE;
