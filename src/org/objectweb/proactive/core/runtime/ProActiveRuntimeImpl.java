@@ -393,37 +393,36 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public ArrayList getActiveObjects(String nodeName) {
-        // we have to clone the array otherwise modifications done on nodeMap
-        // would be reflected on the temp variable bodyArray
-        ArrayList bodyArray = (ArrayList) ((ArrayList) nodeMap.get(nodeName)).clone();
-
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        for (int i = 0; i < bodyArray.size(); i++) {
-            UniqueID bodyID = (UniqueID) bodyArray.get(i);
+        ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        synchronized (bodyList) {
+        	for (int i = 0; i < bodyList.size(); i++) {
+        		UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-            //check if the body is still on this vm
-            Body body = localBodystore.getLocalBody(bodyID);
-            if (body == null) {
-                runtimeLogger.warn("body null");
-                // the body with the given ID is not any more on this ProActiveRuntime
-                // unregister it from this ProActiveRuntime
-                unregisterBody(nodeName, bodyID);
-            } else {
-                //the body is on this runtime then return adapter and class name of the reified
-                //object to enable the construction of stub-proxy couple.
-                ArrayList bodyAndObjectClass = new ArrayList(2);
+        		//check if the body is still on this vm
+        		Body body = localBodystore.getLocalBody(bodyID);
+        		if (body == null) {
+        			runtimeLogger.warn("body null");
+        			// the body with the given ID is not any more on this ProActiveRuntime
+        			// unregister it from this ProActiveRuntime
+        			unregisterBody(nodeName, bodyID);
+        		} else {
+        			//the body is on this runtime then return adapter and class name of the reified
+        			//object to enable the construction of stub-proxy couple.
+        			ArrayList bodyAndObjectClass = new ArrayList(2);
 
-                //adapter
-                bodyAndObjectClass.add(0, body.getRemoteAdapter());
-                //className
-                bodyAndObjectClass.add(1,
-                    body.getReifiedObject().getClass().getName());
-                localBodies.add(bodyAndObjectClass);
-            }
+        			//adapter
+        			bodyAndObjectClass.add(0, body.getRemoteAdapter());
+        			//className
+        			bodyAndObjectClass.add(1,
+        					body.getReifiedObject().getClass().getName());
+        			localBodies.add(bodyAndObjectClass);
+        		}
+        	}
+        	return localBodies;
         }
-        return localBodies;
     }
 
     public VirtualNode getVirtualNode(String virtualNodeName) {
@@ -455,35 +454,34 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return (String) nodeJobIdMap.get(name);
     }
 
-    public ArrayList getActiveObjects(String nodeName, String objectName) {
-        // we have to clone the array otherwise modifications done on nodeMap
-        // would be reflected on the temp variable bodyArray
-        ArrayList bodyArray = (ArrayList) ((ArrayList) nodeMap.get(nodeName)).clone();
-
+    public ArrayList getActiveObjects(String nodeName, String className) {
         //the array to return
         ArrayList localBodies = new ArrayList();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
-        for (int i = 0; i < bodyArray.size(); i++) {
-            UniqueID bodyID = (UniqueID) bodyArray.get(i);
+    	ArrayList bodyList = (ArrayList) nodeMap.get(nodeName);
+        synchronized (bodyList) {
+        	for (int i = 0; i < bodyList.size(); i++) {
+        		UniqueID bodyID = (UniqueID) bodyList.get(i);
 
-            //check if the body is still on this vm
-            Body body = localBodystore.getLocalBody(bodyID);
-            if (body == null) {
-                runtimeLogger.warn("body null");
-                // the body with the given ID is not any more on this ProActiveRuntime
-                // unregister it from this ProActiveRuntime
-                unregisterBody(nodeName, bodyID);
-            } else {
-                String objectClass = body.getReifiedObject().getClass().getName();
+        		//check if the body is still on this vm
+        		Body body = localBodystore.getLocalBody(bodyID);
+        		if (body == null) {
+        			runtimeLogger.warn("body null");
+        			// the body with the given ID is not any more on this ProActiveRuntime
+        			// unregister it from this ProActiveRuntime
+        			unregisterBody(nodeName, bodyID);
+        		} else {
+        			String objectClass = body.getReifiedObject().getClass().getName();
 
-                // if the reified object is of the specified type
-                // return the body adapter 
-                if (objectClass.equals((String) objectName)) {
-                    localBodies.add(body.getRemoteAdapter());
-                }
-            }
+        			// if the reified object is of the specified type
+        			// return the body adapter 
+        			if (objectClass.equals((String) className)) {
+        				localBodies.add(body.getRemoteAdapter());
+        			}
+        		}
+        	}
+        	return localBodies;
         }
-        return localBodies;
     }
 
     /**

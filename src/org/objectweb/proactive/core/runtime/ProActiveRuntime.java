@@ -184,7 +184,7 @@ public interface ProActiveRuntime extends Job {
      * Returns all Active Objects deployed on the node with the given name on
      * this ProActiveRuntime
      * @param nodeName the name of the node
-     * @return Object[] Active Objects deployed on this ProactiveRuntime
+     * @return ArrayList of ArrayList. The latter contains [body, classname].
      */
     public ArrayList getActiveObjects(String nodeName)
         throws ProActiveException;
@@ -194,7 +194,7 @@ public interface ProActiveRuntime extends Job {
      * this ProActiveRuntime
      * @param nodeName the name of the node
      * @param className class of the Active Objects to look for
-     * @return Object[] Active Objects of the specified class name deployed on this ProactiveRuntime
+     * @return Active Objects of the specified class name deployed on this ProactiveRuntime
      */
     public ArrayList getActiveObjects(String nodeName, String className)
         throws ProActiveException;
