@@ -403,7 +403,17 @@ public abstract class Utils extends Object {
   }
 
   public static String convertClassNameToStubClassName(String classname) {
-    return STUB_DEFAULT_PACKAGE + Utils.getPackageName(classname) + "." + STUB_DEFAULT_PREFIX + Utils.getSimpleName(classname);
+    if (classname.length() == 0) {
+            return classname;
+	}
+    int n = classname.lastIndexOf('.');
+    if (n == -1) {
+        // no package
+        return STUB_DEFAULT_PACKAGE + STUB_DEFAULT_PREFIX + classname;
+    } else {
+        return STUB_DEFAULT_PACKAGE + classname.substring(0, n + 1) + 
+               STUB_DEFAULT_PREFIX + classname.substring(n + 1);
+    }
   }
 
   public static boolean isStubClassName(String classname) {
@@ -426,7 +436,14 @@ public abstract class Utils extends Object {
       String packageName = Utils.getPackageName(temp);
       String stubClassSimpleName = Utils.getSimpleName(temp);
       String classsimplename = stubClassSimpleName.substring(Utils.STUB_DEFAULT_PREFIX.length());
-      String result = packageName + "." + classsimplename;
+      // consider the "no package" case
+      String result;
+      if (packageName.equals("")) {
+      //no package
+		result = classsimplename;
+      } else {
+        result = packageName + "." + classsimplename;
+      }
       //	     System.out.println ("CONVERT "+stubclassname+" -> "+result);
       return result;
     } else {
