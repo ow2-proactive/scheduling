@@ -146,11 +146,13 @@ public class GroupHandler {
             if (name.equalsIgnoreCase(UNIT_TEST_TAG)) {
                 AbstractTest test = (AbstractTest) activeHandler.getResultObject();
                 int index = group.indexOf(test);
-                if (index < group.size()-1) {
-                    group.remove(index);
-                    group.add(index, group.get(this.indexGlobal));
-                    group.remove(this.indexGlobal);
+                if (index < group.size()) {
+                	
+                    //group.add(index, group.get(this.indexGlobal));
                     group.add(this.indexGlobal, test);
+                    group.remove(index+1);
+                    //group.remove(this.indexGlobal);
+                    
                     this.indexGlobal++;
                 }
             }
