@@ -156,5 +156,11 @@ public interface Group extends java.util.Collection {
 	 * (After this operation the size of the Group decreases)
 	 */
 	public void purgeExceptionAndNull ();
-    
+ 
+	/**
+	 * Modifies the number of members served by one thread
+	 * @param i - the new ratio
+	 */
+	public void setRatioNemberToThread (int i);
+
 }

@@ -33,38 +33,32 @@ package org.objectweb.proactive.core.group.threadpool;
 
 /** The threads that compose a thread pool. */
 public class ThreadInThePool extends Thread {
+    protected static int counter;
 
-	
-	
-	protected static int counter;
-	
-	
-	protected synchronized static int getNextValue() {
-	   return counter++;
-	}
-	
-	/** The threadpool owner of this thread. */
-	public ThreadPool myPool;
+    protected synchronized static int getNextValue() {
+        return counter++;
+    }
 
-	/** The constructor associates the thread with a thread pool.
-	 * @param o the thread pool
-	 */
+    /** The threadpool owner of this thread. */
+    public ThreadPool myPool;
+
+    /** The constructor associates the thread with a thread pool.
+     * @param o the thread pool
+     */
     public ThreadInThePool(ThreadPool o) {
         this.myPool = o;
         this.setName("ThreadInThePool " + ThreadInThePool.getNextValue());
     }
 
-	/** Looks for a pending job and executes it. */
-	public void run() {
-		Runnable target = null;
+    /** Looks for a pending job and executes it. */
+    public void run() {
+        Runnable target = null;
         do {
-			target = this.myPool.getJobForThePendingQueue();
-				if (target != null) {
-				target.run();
-				this.myPool.controler.jobFinish();
-			}
-		}
-		while (target != null);
-	}
-	
+            target = this.myPool.getJobForThePendingQueue();
+            if (target != null) {
+                target.run();
+                this.myPool.controler.jobFinish();
+            }
+        } while (target != null);
+    }
 }

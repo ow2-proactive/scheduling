@@ -1,34 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
-
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.group;
 
 import org.apache.log4j.Logger;
@@ -52,6 +51,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
+
 
 public class ProxyForGroup extends AbstractProxy
     implements org.objectweb.proactive.core.mop.Proxy, Group,
@@ -186,6 +186,9 @@ public class ProxyForGroup extends AbstractProxy
 
         /* result will be a stub on a proxy for group representing the group of results */
         Object result = null;
+
+        /* check if the threadpool is big enough to make the call (is there is not enough thread, create new ones) */
+        this.threadpool.checkNumberOfThreads(this.memberList.size());
 
         /* if OneWay : do not construct result */
         if (AbstractProxy.isOneWayCall(mc)) {
@@ -351,6 +354,7 @@ public class ProxyForGroup extends AbstractProxy
                     return result;
                 }
                 // COMPONENTS
+
                 /* if o is a reference on a component interface*/
                 else if (o instanceof ProActiveInterface) {
                     return this.memberList.add(o);
@@ -359,19 +363,7 @@ public class ProxyForGroup extends AbstractProxy
                     /* like an addMerge call */
                     return this.memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
                 } /* o is a standard Java object */ else {
-                    Object tmp = null;
-                    try {
-                        tmp = MOP.newInstance(o.getClass().getName(), null,
-                                org.objectweb.proactive.core.body.future.FutureProxy.class.getName(),
-                                null);
-                    } catch (Exception e) {
-                        if (logger.isInfoEnabled()) {
-                            logger.info(
-                                "Unable to create a stub+proxy for the new member of the group");
-                        }
-                    }
-                    ((org.objectweb.proactive.core.body.future.FutureProxy) ((StubObject) tmp).getProxy()).setResult(o);
-                    return this.add(tmp);
+                    return this.memberList.add(o);
                 }
             } else {
                 if (logger.isInfoEnabled()) {
@@ -786,6 +778,14 @@ public class ProxyForGroup extends AbstractProxy
                 it.remove();
             }
         }
+    }
+
+    /**
+     * Modifies the number of members served by one thread
+     * @param i - the new ratio
+     */
+    public void setRatioNemberToThread(int i) {
+        this.threadpool.ratio(i);
     }
 
     /* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */

@@ -42,7 +42,7 @@ import java.util.ArrayList;
 public class ThreadPool {
 
     /** The set of threads. */
-    protected Thread[] threads = null;
+    private Thread[] threads = null;
 
     /** The queue of pending jobs waiting to be served by a thread. */
     private ArrayList pendingJobs = null;
@@ -51,7 +51,7 @@ public class ThreadPool {
     protected EndControler controler = new EndControler();
 
     /** the member to thread ratio, i.e. the number of members served by a single thread */
-    protected int memberToThreadRatio = 1;
+    private int memberToThreadRatio = 4;
 
     /** Builds a ThreadPool.
      * By default, the number of thread in the pool is 10.
@@ -89,36 +89,44 @@ public class ThreadPool {
      * is sufficient compared to the number of members in the group
      * @param <code> members </code> the number of members in the group
      */
-    protected void checkNumberOfThreads(int members) {
-        //	float f = ((float) members)/((float) threads.length);
-        //    	System.out.println("---------------------------------------- members is "  + members);
-        //    	System.out.println("---------------------------------------- members is "  + members);
-        //    	System.out.println("---------------------------------------- Ceiling of f is "  + Math.ceil(f));
+    public void checkNumberOfThreads(int members) {
         if (members > (this.memberToThreadRatio * this.threads.length)) {
-            //            System.out.println("----- Increasing threads number in the group");
-            //            System.out.println("-----                         was " +
-            //       this.threads.length);
-            int f = (int) Math.ceil(((float) members) / ((float) threads.length));
+            int i;
+            int f = (int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio));
             Thread[] tmp = new Thread[f];
-            for (int i = 0; i < this.threads.length; i++) {
+
+            for (i = 0; i < this.threads.length; i++) {
                 tmp[i] = this.threads[i];
             }
-            tmp[f - 1] = new ThreadInThePool(this);
-            tmp[f - 1].start();
+            for (; i < f; i++) {
+                tmp[i] = new ThreadInThePool(this);
+                tmp[i].start();
+            }
             this.threads = tmp;
-            //   System.out.println("-----                         now " +
-            //                this.threads.length);
-            //TODO
-            //we increase the the number of threads
-            //   float f = members/threads.length;
-            // System.out.println("---------------------------------------- Ceiling of f is "  + Math.ceil(f));
-            //	int finalNumber = Math.cemember/thread
+        } else if (members < (this.memberToThreadRatio * this.threads.length)) {
+            int i;
+            int f = (int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio));
+            Thread[] tmp = new Thread[f];
+            for (i = 0; i < f; i++) {
+                tmp[i] = this.threads[i];
+            }
+            for (; i < this.threads.length; i++) {
+                this.threads[i] = null;
+            }
+            this.threads = tmp;
         }
+    }
+
+    /**
+     * Modifies the number of members served by one thread
+     * @param i - the new ratio
+     */
+    public void ratio(int i) {
+        this.memberToThreadRatio = i;
     }
 
     /** Adds a job to the pending queue of the thread pool. */
     public synchronized void addAJob(AbstractProcessForGroup r) {
-        this.checkNumberOfThreads(r.getMemberListSize());
         this.controler.jobStart();
         this.pendingJobs.add(r);
         this.notify();
