@@ -143,7 +143,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
 
         // try to migrate
         UniversalBody migratedBody = null;
-
         try {
             migratedBody = migrationManager.migrateTo(node, this);
         } catch (MigrationException e) {
@@ -153,8 +152,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
             acceptCommunication();
             throw e;
         }
-		activityStopped();
-
         if (!byCopy) {
             changeBodyAfterMigration(migratedBody);
         } else {

@@ -92,7 +92,7 @@ public class MigrationManagerImpl extends AbstractEventProducer implements Migra
       ProActiveRuntime part = node.getProActiveRuntime();
       UniversalBody remoteBody = part.receiveBody(node.getNodeInformation().getName(),body);
       //--------------------added lines--------------------------
-		
+	  //activityStopped();
       	
 //      long l2 = System.currentTimeMillis();
       //System.out.println("Migration took "+(l2-l1));
