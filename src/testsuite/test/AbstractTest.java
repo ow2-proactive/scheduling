@@ -133,6 +133,18 @@ public abstract class AbstractTest implements Serializable, Beanable {
      * @throws Exception if an error is up during the ending
      */
     public abstract void endTest() throws Exception;
+    
+    /**
+     * This method is called at the beginning of a group of tests.<br>
+     * Override it to use it.
+     */
+    public void uponInitOfGroupOfTests() throws Exception {};
+
+    /**
+     * This method is called at the end of a group of tests.<br>
+     * Override it to use it.
+     */
+    public void uponEndOfGroupOfTests() throws Exception {};
 
     /**
      * Run a test.
@@ -272,4 +284,5 @@ public abstract class AbstractTest implements Serializable, Beanable {
             return false;
         }
     }
+
 }
