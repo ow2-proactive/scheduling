@@ -47,6 +47,13 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
+//------------------------------------------------
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+//import org.objectweb.proactive.core.runtime.node.Node;
+//import org.objectweb.proactive.core.runtime.node.NodeFactory;
+//------------------------------------------------
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
@@ -92,17 +99,29 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       // instantiate the body locally or remotely
       Class bodyClass = Constants.DEFAULT_BODY_CLASS;
       Node node = (Node) p0;
+      //added lines--------------------------
+      //ProActiveRuntime part = node.getProActiveRuntime();
+      //added lines----------------------------
       Active activity = (Active) parameters[1];
       MetaObjectFactory factory = (MetaObjectFactory) parameters[2];
       Class[] argsClass = new Class[] { ConstructorCall.class, String.class, Active.class, MetaObjectFactory.class };
       Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
+      //added lines--------------------------
+      //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };
+      //added lines--------------------------
       ConstructorCall bodyConstructorCall = buildBodyConstructorCall(bodyClass, argsClass, args);
       if (NodeFactory.isNodeLocal(node)) {
         // the node is local
-        this.universalBody = createLocalBody(bodyConstructorCall, constructorCall);
+        //added line -------------------------
+        //if (RuntimeFactory.isRuntimeLocal(part)){
+        	//added line -------------------------
+        this.universalBody = createLocalBody(bodyConstructorCall, constructorCall, node);
         isLocal = true;
       } else {
         this.universalBody = createRemoteBody(bodyConstructorCall, node);
+        //added line -------------------------
+        //this.universalBody = createRemoteBody(bodyConstructorCall, part , node);
+        //added line -------------------------
         isLocal = false;
       }
       this.bodyID = universalBody.getID();
@@ -137,11 +156,17 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
-  protected UniversalBody createLocalBody(ConstructorCall bodyConstructorCall, ConstructorCall reifiedObjectConstructorCall)
+  protected UniversalBody createLocalBody(ConstructorCall bodyConstructorCall, ConstructorCall reifiedObjectConstructorCall,Node node)
     throws ProActiveException {
     try {
       reifiedObjectConstructorCall.makeDeepCopyOfArguments();
-      return (UniversalBody) bodyConstructorCall.execute();
+      //The node is local, so is the proActiveRuntime
+      // acessing it direclty avoids to get a copy of the body
+      ProActiveRuntime part = ProActiveRuntimeImpl.getProActiveRuntime();
+      //return (UniversalBody) bodyConstructorCall.execute();
+      //---------------------added lines--------------------------
+      return part.createBody(node.getNodeInformation().getName(),bodyConstructorCall,true);
+      //---------------------added lines------------------------------
       //System.out.println("LocalBodyProxy created using " + body + " from ConstructorCall");
     } catch (ConstructorCallExecutionFailedException e) {
       throw new ProActiveException(e);
@@ -153,10 +178,17 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   }
 
   protected UniversalBody createRemoteBody(ConstructorCall bodyConstructorCall, Node node)
+  // added lines---------------------------------
+  //protected UniversalBody createRemoteBody(ConstructorCall bodyConstructorCall, ProActiveRuntime part, Node node)
+  // added lines------------------------------------
     throws ProActiveException {
     try {
+    	ProActiveRuntime part = node.getProActiveRuntime();
       //System.out.println("UniversalBodyProxy.createRemoteBody bodyClass="+bodyClass+"  node="+node);
-      return node.createBody(bodyConstructorCall);
+      //return node.createBody(bodyConstructorCall);
+      //--------------added lines
+      return part.createBody(node.getNodeInformation().getName(),bodyConstructorCall,false);
+      //--------------added lines
       //System.out.println("RemoteBodyProxy created bodyID=" + bodyID + " from ConstructorCall");
     } catch (ConstructorCallExecutionFailedException e) {
       throw new ProActiveException(e);
