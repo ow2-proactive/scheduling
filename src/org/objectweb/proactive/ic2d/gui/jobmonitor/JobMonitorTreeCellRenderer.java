@@ -1,7 +1,7 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
@@ -12,6 +12,8 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implements JobMonitorConstants
 {
+	private static Font highlightFont = null;
+	
 	public Component getTreeCellRendererComponent (JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row,boolean hasFocus)
 	{
 		super.getTreeCellRendererComponent (tree, value, sel, expanded, leaf, row, hasFocus);
@@ -23,7 +25,11 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implemen
 			setIcon (icon);
 
 		DataTreeModel model = (DataTreeModel) tree.getModel();
-		setForeground(model.isHighlighted(key) ? Color.RED : null);
+		
+		if (highlightFont == null)
+			highlightFont = getFont().deriveFont(Font.BOLD);
+
+		setFont(model.isHighlighted(key) ? highlightFont : null);
 		return this;
 	}
 }
