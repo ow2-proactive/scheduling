@@ -95,6 +95,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel
 
         // Popup menu
         PanelPopupMenu popup = new PanelPopupMenu("Object " + name);
+        popup.addGenericMenu();
         popup.add(new javax.swing.AbstractAction("Filter class " + name, null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     boolean b = activeObjectFilter.addClass(activeObject.getClassName());
