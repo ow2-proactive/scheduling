@@ -49,7 +49,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        Assertions.assertEquals("hello world",
+        Assertions.assertEquals("This component is storing the info : hello world",
             ((Action) dummy.getFcInterface("action")).doSomething());
     }
 
@@ -68,7 +68,7 @@ public class Test extends ComponentTest {
         try {
             test.action();
             Component dummy = test.getDummy();
-            System.out.println("returning info : " + ((Action) dummy.getFcInterface("action")).doSomething());
+            System.out.println(((Action) dummy.getFcInterface("action")).doSomething());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
