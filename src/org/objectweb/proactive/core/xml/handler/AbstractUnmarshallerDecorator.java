@@ -102,7 +102,7 @@ public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandl
     }
   }
 
-
+ 
   public void endElement(String name) throws org.xml.sax.SAXException {
     //System.out.println("AbstractCompositeUnmarshaller "+this.getClass().getName()+" endElement="+name+"  elementCounter="+elementCounter);
     checkActiveHandler();
