@@ -155,7 +155,7 @@ public class Test extends FunctionalTest {
                 parallelComponent = ProActive.newActiveComponent(ParallelComposite.class.getName(),
                         new Object[] {  }, TestNodes.getRemoteACVMNode(), null,
                         null, parallel_component_parameters);
-                System.out.println();
+                
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 e.printStackTrace();

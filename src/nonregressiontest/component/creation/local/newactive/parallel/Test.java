@@ -161,7 +161,7 @@ public class Test extends FunctionalTest {
                         new Object[] {  }, null, null, null, p3_parameters);
                 pr1 = ProActive.newActiveComponent(ParallelComposite.class.getName(),
                         new Object[] {  }, null, null, null, pr1_parameters);
-                        System.out.println();
+                        
             } catch (Exception e) {
                 logger.error(e.getMessage());
                 e.printStackTrace();
