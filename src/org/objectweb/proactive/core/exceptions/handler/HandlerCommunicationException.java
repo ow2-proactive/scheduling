@@ -72,8 +72,8 @@ public class HandlerCommunicationException extends HandlerNonFunctionalException
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException nfe, Exception e, Object info)
+    public void handle(NonFunctionalException nfe, Object info, Exception e)
         throws Exception {
-        super.handle(nfe, e, info);
+        super.handle(nfe, info, e);
     }
 }

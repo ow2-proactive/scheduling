@@ -30,14 +30,13 @@
 */
 package benchmark.nfe;
 
+import java.io.Serializable;
+import java.util.HashMap;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
-
-import java.io.Serializable;
-
-import java.util.HashMap;
 
 
 //import benchmark.util.ReifiableObject;
@@ -78,13 +77,18 @@ public class A /*extends ReifiableObject*/ implements Serializable {
             } else {
                 return false;
             }
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             return false;
         }
     }
 
     public int getHandlerNumber() throws ProActiveException {
-        HashMap table = ProActive.getBodyOnThis().getHandlersLevel();
+		HashMap table;
+    	try {
+	        table = ProActive.getBodyOnThis().getHandlersLevel();
+    	} catch (Exception e) {
+    		return -1;
+    	}
         if (table == null) {
             return -1;
         } else if (table.isEmpty()) {
@@ -98,7 +102,7 @@ public class A /*extends ReifiableObject*/ implements Serializable {
         HashMap handlers;
         try {
             handlers = ProActive.getBodyOnThis().getHandlersLevel();
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             return null;
         }
         return handlers;

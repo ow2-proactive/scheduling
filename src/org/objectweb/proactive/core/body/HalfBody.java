@@ -138,6 +138,7 @@ public class HalfBody extends AbstractBody {
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected void internalReceiveReply(Reply reply) throws java.io.IOException {
+    	//System.out.print("Half-Body receives Reply -> ");
         try {
             if (reply.isCiphered()) {
                 reply.decrypt(psm);
@@ -145,6 +146,11 @@ public class HalfBody extends AbstractBody {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        /*if (reply.getResult() != null) {
+        	System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
+        } else {
+        	System.out.println("Reply is : " + reply);
+        }*/
         replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 

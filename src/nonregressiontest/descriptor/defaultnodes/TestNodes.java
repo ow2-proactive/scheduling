@@ -71,7 +71,7 @@ public class TestNodes extends FunctionalTest {
      *
      */
     public TestNodes() {
-        super(" Default deployment descriptor",
+        super("Default deployment descriptor",
             " Test reading a descriptor file to create nodes needed by other tests.");
     }
 

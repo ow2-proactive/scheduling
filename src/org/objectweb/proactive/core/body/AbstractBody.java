@@ -30,10 +30,19 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -63,20 +72,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 
 /**
@@ -244,7 +239,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public void receiveReply(Reply reply) throws java.io.IOException {
         //System.out.println("  --> receiveReply m="+reply.getMethodName());
-        try {
+       try {
+    	//System.out.println("Body receives Reply on NODE : " + this.nodeURL); 
             enterInThreadStore();
             if (isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
@@ -262,7 +258,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             this.registerIncomingFutures();
             internalReceiveReply(reply);
         } finally {
-            exitFromThreadStore();
+        	exitFromThreadStore();
         }
     }
 
@@ -849,24 +845,39 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
+	/**
+	 * Get information about the handlerizable object
+	 * @return information about the handlerizable object
+	 */
+	public String getHandlerizableInfo() throws java.io.IOException {
+		return "BODY (URL=" + this.nodeURL + ") of CLASS ["+ this.getClass()  +"]";
+	}
+	
     /** Give a reference to a local map of handlers
                * @return A reference to a map of handlers
                */
-    public HashMap getHandlersLevel() throws ProActiveException {
+    public HashMap getHandlersLevel() throws java.io.IOException {
         return bodyLevel;
     }
+
+	/** 
+	 * Clear the local map of handlers
+	 */
+	public void clearHandlersLevel() throws java.io.IOException {
+		 bodyLevel.clear();
+	}
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
     public void setExceptionHandler(Handler handler, Class exception)
-        throws ProActiveException {
+        throws java.io.IOException {
         // add handler to body level
         if (bodyLevel == null) {
             bodyLevel = new HashMap();
         }
-		bodyLevel.put(exception, handler);
+        bodyLevel.put(exception, handler);
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -874,16 +885,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
              * @return The removed handler or null
              */
     public Handler unsetExceptionHandler(Class exception)
-        throws ProActiveException {
+        throws java.io.IOException {
         // remove handler from body level
         if (bodyLevel != null) {
             Handler handler = (Handler) bodyLevel.remove(exception);
             return handler;
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "[NFE_REMOVE_BODY_WARNING] : handler for exception " +
-                    exception.getName() + "did not exist in BODY level");
+                logger.debug("[NFE_WARNING] No handler for [" +
+                    exception.getName() + "] can be removed from BODY level");
             }
             return null;
         }

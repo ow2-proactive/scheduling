@@ -30,11 +30,10 @@
 */
 package nonregressiontest.nfe;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-
 import java.io.Serializable;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
 /**
@@ -80,7 +79,7 @@ public class A implements Serializable {
             } else {
                 return false;
             }
-        } catch (ProActiveException e) {
+        } catch (Exception e) {
             return false;
         }
     }

@@ -40,13 +40,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.ext.benchsocket.BenchSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -152,17 +150,29 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     // implements Handlerizable
 
+	/**
+	 * Get information about the handlerizable object
+	 * @return
+	 */
+	public String getHandlerizableInfo() throws java.io.IOException {
+		return "REMOTE BODY (URL=" + body.getNodeURL() + ") of CLASS ["+ this.getClass()  +"]";
+	}
+
+
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
     public HashMap getHandlersLevel() throws java.io.IOException {
-        try {
             HashMap map = body.getHandlersLevel();
             return map;
-        } catch (ProActiveException e) {
-            throw new java.io.IOException();
-        }
     }
+
+	/** 
+	 * Clear the local map of handlers
+	 */
+	public void clearHandlersLevel() throws java.io.IOException {
+			body.clearHandlersLevel();
+	}
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
@@ -170,12 +180,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
      */
     public void setExceptionHandler(Handler handler, Class exception)
         throws java.io.IOException {
-        try {
             body.setExceptionHandler(handler, exception);
-        } catch (ProActiveException e) {
-            throw new java.io.IOException(
-                "Error in setExceptionHandler for Remote Body");
-        }
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -184,13 +189,8 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
      */
     public Handler unsetExceptionHandler(Class exception)
         throws java.io.IOException {
-        try {
             Handler handler = body.unsetExceptionHandler(exception);
             return handler;
-        } catch (ProActiveException e) {
-            throw new java.io.IOException(
-                "Error in unsetExceptionHandler for Remote Body");
-        }
     }
 
     // SECURITY

@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.exceptions.handler;
 
 import org.apache.log4j.Logger;
+
+import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 
@@ -43,9 +45,8 @@ import org.objectweb.proactive.core.exceptions.NonFunctionalException;
  *
  */
 public class HandlerNonFunctionalException implements Handler {
-	
     // Logger
-    protected static Logger logger = Logger.getLogger("NFE");
+    protected static Logger loggerNFE = Logger.getLogger("NFE");
 
     /**
      * Contains a suggestion to resolve the problem
@@ -56,7 +57,7 @@ public class HandlerNonFunctionalException implements Handler {
      * Construct a handler with a suggestion to handle the problem more properly
      */
     public HandlerNonFunctionalException() {
-        suggestion = "=> (solution 1) UPDATE HANDLER [" +
+        suggestion = "Solution 1: UPDATE HANDLER [" +
             this.getClass().getName() + "]";
     }
 
@@ -93,27 +94,50 @@ public class HandlerNonFunctionalException implements Handler {
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException e, Object info) {
-		logger.info("PROBLEM ON " + ((String) info));
-        logger.info("EXCEPTION [" + e.getDescription() + "] HANDLED WITH [" +
-            this.getClass().getName() + "]");
-        logger.info(suggestion);
-        logger.info("=> (solution 2) SET HANDLER FOR EXCEPTION [" +
-            e.getClass().getName() + "]");
-        logger.error("NFE", e);
+    public void handle(NonFunctionalException nfe, Object info) {
+        if (HandlerManager.isGraph()) {
+            HandlerManager.handleWindow(nfe, this, info);
+        } else {
+            loggerNFE.info("");
+            loggerNFE.info(
+                "******************************************************************************************************************************************");
+            loggerNFE.info("ERROR on NODE " + ((String) info));
+            loggerNFE.info("PROBLEM is " + nfe.getMessage());
+            loggerNFE.info("EXCEPTION [" + nfe.getDescription() +
+                "] HANDLED with [" + this.getClass().getName() + "]");
+            loggerNFE.info(suggestion);
+            loggerNFE.info("Solution 2: SET a new HANDLER for NFE [" +
+                nfe.getClass().getName() + "]");
+            loggerNFE.info(
+                "******************************************************************************************************************************************");
+            loggerNFE.info("");
+            //loggerNFE.error("NFE", e);
+        }
     }
 
     /**
      * Provide a treatment for the handled exception(s)
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException nfe, Exception e, Object info)
+    public void handle(NonFunctionalException nfe, Object info, Exception e)
         throws Exception {
-        logger.debug("EXCEPTION [" + nfe.getDescription() + "] HANDLED WITH [" +
-            this.getClass().getName() + "]");
-        logger.debug(suggestion);
-        logger.debug("=> (solution 2) SET HANDLER FOR EXCEPTION [" +
-            nfe.getClass().getName() + "]");
+        if (HandlerManager.isGraph() && !HandlerManager.isQuiet()) {
+            HandlerManager.handleWindow(nfe, this, info);
+        } else {
+            loggerNFE.info("");
+            loggerNFE.info(
+                "******************************************************************************************************************************************");
+            loggerNFE.info("ERROR on NODE " + ((String) info));
+            loggerNFE.info("PROBLEM is " + nfe.getMessage());
+            loggerNFE.info("EXCEPTION [" + nfe.getDescription() +
+                "] HANDLED with [" + this.getClass().getName() + "]");
+            loggerNFE.info(suggestion);
+            loggerNFE.info("Solution 2: SET a new HANDLER for NFE [" +
+                nfe.getClass().getName() + "]");
+            loggerNFE.info(
+                "******************************************************************************************************************************************");
+            loggerNFE.info("");
+        }
         throw e;
     }
 }

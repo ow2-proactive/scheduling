@@ -45,7 +45,7 @@ public class NonFunctionalException extends ProActiveException {
 	/**
 	* separator for exception description
 	 */
-	static protected String separator = " :: ";
+	static protected String separator = "::";
 		
 	/**
 	 * self description of the non functional exception

@@ -391,25 +391,39 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
         return proxiedRemoteBody.getEntities();
     }
 
+	/**
+	 * Get information about the handlerizable object
+	 * @return information about the handlerizable object
+	 */
+	public String getHandlerizableInfo() throws java.io.IOException {
+		return "BODY of CLASS ["+ this.getClass()  +"]";
+	}
+
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
-    public HashMap getHandlersLevel() {
+    public HashMap getHandlersLevel() throws java.io.IOException {
         return null;
     }
 
+	/** 
+	 * Clear the local map of handlers
+	 */
+	public void clearHandlersLevel() throws java.io.IOException {
+	}
+	
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
-    public void setExceptionHandler(Handler handler, Class exception) {
+    public void setExceptionHandler(Handler handler, Class exception) throws java.io.IOException {
     }
 
     /** Remove a handler from the table of the Handlerizable Object
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @return The removed handler or null
      */
-    public Handler unsetExceptionHandler(Class exception) {
+    public Handler unsetExceptionHandler(Class exception) throws java.io.IOException {
         return null;
     }
 

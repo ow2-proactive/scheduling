@@ -28,77 +28,50 @@
 *
 * ################################################################
 */
-package nonregressiontest.stub.stubinterface;
+package org.objectweb.proactive.core.exceptions;
 
-import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.mop.*;
-
-import java.lang.reflect.*;
 import java.util.HashMap;
 
+import org.objectweb.proactive.core.exceptions.handler.Handler;
 
-public class ProxyOne implements org.objectweb.proactive.core.mop.Proxy {
-    protected Object target;
 
-    public ProxyOne(ConstructorCall constructorCall, Object[] parameters) {
-        try {
-            this.target = constructorCall.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-            this.target = null;
-        }
-    }
+/**
+ * An interface to add handlerizable behaviour to reified object
+ * @author  ProActive Team
+ * @version 1.0,  2004/07/01
+ * @since   ProActive 2.0
+ *
+ */
+public interface Handlerizable {
 
-    public Object reify(MethodCall c)
-        throws InvocationTargetException, IllegalAccessException {
-        try {
-            Object o = c.execute(target);
-            return o;
-        } catch (MethodCallExecutionFailedException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
 	/**
 	 * Get information about the handlerizable object
 	 * @return
 	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return null;
-	}
+	public String getHandlerizableInfo() throws java.io.IOException;
 
 	/** 
 	 * Give a reference to a local map of handlers
 	 * @return A reference to a map of handlers
 	 */
-	public HashMap getHandlersLevel() throws java.io.IOException {
-		return null;
-	}
+	public HashMap getHandlersLevel() throws java.io.IOException;
 
 	/** 
 	 * Clear the local map of handlers
 	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-	
-	}
+	public void clearHandlersLevel() throws java.io.IOException;
 
 	/** Set a new handler within the table of the Handlerizable Object
 		 * @param handler A handler associated with a class of non functional exception.
 		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
 		 */
 	public void setExceptionHandler(Handler handler, Class exception)
-		throws java.io.IOException {
-			
-		}
+		throws java.io.IOException;
 
 	/** Remove a handler from the table of the Handlerizable Object
 		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
 		 * @return The removed handler or null
 		 */
 	public Handler unsetExceptionHandler(Class exception)
-		throws java.io.IOException {
-		return null;
-	}
-
+		throws java.io.IOException;
 }

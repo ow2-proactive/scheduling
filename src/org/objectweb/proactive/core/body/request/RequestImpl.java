@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
@@ -55,6 +56,7 @@ import sun.rmi.server.MarshalInputStream;
 public class RequestImpl extends MessageImpl implements Request,
     java.io.Serializable {
     public static Logger logger = Logger.getLogger(RequestImpl.class.getName());
+	public static Logger loggerNFE = Logger.getLogger("NFE");
     protected MethodCall methodCall;
     
     
@@ -101,7 +103,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
     public Reply serve(Body targetBody) throws ServeException {
         if (logger.isDebugEnabled()) {
-            logger.debug("serving " + this.getMethodName());
+            logger.debug("Serving " + this.getMethodName());
         }
         Object result = serveInternal(targetBody);
         if (logger.isDebugEnabled()) {
@@ -116,6 +118,23 @@ public class RequestImpl extends MessageImpl implements Request,
         }
         return createReply(targetBody, result);
     }
+
+	public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
+		if (loggerNFE.isDebugEnabled()) {
+			loggerNFE.debug("*** Serving an alternate version of " + this.getMethodName());
+		}
+		if (loggerNFE.isDebugEnabled()) {
+			if (nfe != null) {
+				loggerNFE.debug("*** Result  " + nfe.getClass().getName());
+			} else {
+				loggerNFE.debug("*** Result null");
+			}
+		}
+		if (isOneWay || (sender == null)) {
+			return null;
+		}
+		return createReply(targetBody, nfe);
+	}
 
     public boolean hasBeenForwarded() {
         return sendCounter > 1;
@@ -148,10 +167,12 @@ public class RequestImpl extends MessageImpl implements Request,
     // -- PROTECTED METHODS -----------------------------------------------
     //
     protected Object serveInternal(Body targetBody) throws ServeException {
+    	
         try {
+        	//loggerNFE.warn("CALL to " + targetBody);
             return methodCall.execute(targetBody.getReifiedObject());
         } catch (MethodCallExecutionFailedException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
             throw new ServeException("serve method " +
                 methodCall.getReifiedMethod().toString() + " failed", e);
         } catch (java.lang.reflect.InvocationTargetException e) {

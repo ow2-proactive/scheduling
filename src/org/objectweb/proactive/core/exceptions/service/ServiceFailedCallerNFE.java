@@ -28,42 +28,36 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.core.mop;
-
-import org.objectweb.proactive.core.exceptions.Handlerizable;
-
+package org.objectweb.proactive.core.exceptions.service;
 
 /**
- * The proxy interface
- * This interface only defines one method.
+ * Service exception  
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/07/08
+ * @since   ProActive 0.9.3
+ *
  */
-public interface Proxy extends Handlerizable {
+public class ServiceFailedCallerNFE extends ProActiveServiceException {
 
-  /**
-   * Reifies a method call invoked on the object
-   * @param c The MethodCall object corresponding to the method
-   * @return The object returned by the method [wrapper class if it is a primitive or null if no return] 
-   */
-  public abstract Object reify(MethodCall c) throws Throwable;
+	/**
+	* Constructs a <code>ServiceFailedServiceException</code> with the specified
+	* detail message and nested exception.
+	* @param s the detail message
+	* @param ex the nested exception
+	*/
+	public ServiceFailedCallerNFE(String s, Throwable ex) {
+		super(s, ex);
+		description = description + "Failed" + separator;
+	}
+
+	/**
+	* Constructs a <code>ServiceFailedServiceException</code> with the specified
+	* detail message and nested exception.
+	* @param ex the nested exception
+	*/
+	public ServiceFailedCallerNFE(Throwable ex) {
+		super(ex);
+		description = description + "Failed" + separator;
+	}     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

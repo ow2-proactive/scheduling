@@ -1,17 +1,15 @@
 package org.objectweb.proactive.core.util.timer;
 
-import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
-import org.objectweb.proactive.core.util.profiling.Timer;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Timer;
 
 
 /**

@@ -30,11 +30,16 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.exceptions.Handlerizable;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -45,14 +50,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -66,7 +63,7 @@ import java.util.HashMap;
  * @see java.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
  */
-public interface RemoteBody extends java.rmi.Remote {
+public interface RemoteBody extends java.rmi.Remote, Handlerizable {
 
     /**
      * Receives a request for later processing. The call to this method is non blocking
@@ -129,25 +126,6 @@ public interface RemoteBody extends java.rmi.Remote {
      * An immediate service is a method that will bw excecuted by the calling thread.
      */
     public void setImmediateService(String methodName)
-        throws java.io.IOException;
-
-    /** Give a reference to a local map of handlers
-             * @return A reference to a map of handlers
-             */
-    public HashMap getHandlersLevel() throws java.io.IOException;
-
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException;
-
-    /** Remove a handler from the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @return The removed handler or null
-     */
-    public Handler unsetExceptionHandler(Class exception)
         throws java.io.IOException;
 
     // SECURITY
