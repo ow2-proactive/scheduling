@@ -306,10 +306,10 @@ In this example, <b>jvm1 </b>will be created using the process called <b>jvmProc
 <br></br>	
 <h2>Validation against XML Schema</h2>
 To avoid mistake when building XML descriptors, ProActive provides an XML Schema called <a href="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">DescriptorSchema</a>. Then to validate your file against this schema, the following line must be put at the top of the xml document as it is done for all ProActive examples.
-	<blockquote><pre>
-	&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation=
-"Location_of_DescriptorSchema.xsd"&gt;
-	</blockquote></pre>
+	<pre>
+&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:noNamespaceSchemaLocation="Location_of_DescriptorSchema.xsd"&gt;
+	</pre>
 Note that this schema is available in the ProActive distribution package under ProActive\descriptor directory. Using descriptors related methods (Proactive.getProActiveDescriptor(file)) triggers automatic and transparent validation of the file using  <a href="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</a> if the ProActive property <b>schema.validation</b> is set to <b>enable</b>(see <a href="Configuration.html">configuration file</a> for more details). If a problem occurs during the validation, an error message is displayed otherwise if the validation is successful no message appear.
 An XML validation tool such as XMLSPY5.0(windows) can also be used to validate XML descriptors.
 <h2>Complete description and examples</h2>
