@@ -45,12 +45,12 @@ import java.util.Map;
 
 
 /**
- * A class to launch a component from its definition from the command line.<br>
- * Usage:
- * Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ] [deployment-descriptor])
- * where &lt;definition&gt; is the name of the component to be instantiated
- * and started,  &lt;itf&gt; is the name of its Runnable interface, if it
- * has one, and deployment-descriptor the location of the ProActive deployment descriptor to use. <br>
+ * A class to launch a component from its definition from the command line. <br>
+ * Usage: Launcher [-java|-fractal] &lt;definition&gt; [ &lt;itf&gt; ]
+ * [deployment-descriptor]) where &lt;definition&gt; is the name of the
+ * component to be instantiated and started, &lt;itf&gt; is the name of its
+ * Runnable interface, if it has one, and deployment-descriptor the location of
+ * the ProActive deployment descriptor to use. <br>
  * It is also possible to use this class directly from its static main method.
  */
 public class Launcher {
@@ -97,9 +97,9 @@ public class Launcher {
             return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
         } else {
             Factory f;
-            if ((System.getProperty("fractal.provider") != null) &&
-                    System.getProperty("fractal.provider").equals("org.objectweb.proactive.core.component.Fractive")) {
-                // return the ProActive factory as defined in org.objectweb.proactive.core.component.adl.FactoryFactory
+            if ("org.objectweb.proactive.core.component.Fractive".equals(System.getProperty("fractal.provider"))) {
+                // return the ProActive factory as defined in
+                // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
             } else {
                 f = FactoryFactory.getFactory(FactoryFactory.FRACTAL_BACKEND);
@@ -112,7 +112,18 @@ public class Launcher {
                 context.put("deployment-descriptor", deploymentDescriptor);
                 return f.newComponent(pargs[1], context);
             } else {
-                return f.newComponent(pargs[1], new HashMap());
+                try {
+                    return f.newComponent(pargs[1], new HashMap());
+                } catch (ClassCastException e) {
+                    if (e.getMessage().contains("attribute_controller_representative")) {
+                        System.out.println(
+                            "Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
+                        throw e;
+                    } else {
+                    	e.printStackTrace();
+                    	return null;
+                    }
+                }
             }
         }
     }
