@@ -1529,7 +1529,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			String s_localhost = "";
 			try
 			{
-				s_localhost = InetAddress.getLocalHost().getHostName();
+				s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
 			}
 			catch (UnknownHostException e)
 			{

@@ -96,7 +96,7 @@ public class StartRuntime {
 
         try {
             logger.info("**** Starting jvm on " +
-                java.net.InetAddress.getLocalHost().getHostName());
+                java.net.InetAddress.getLocalHost().getCanonicalHostName());
             if (logger.isDebugEnabled()) {
                 logger.debug("**** Starting jvm with classpath " +
                     System.getProperty("java.class.path"));

@@ -222,7 +222,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
 
   private static String getLocalHost() {
     try {
-      return java.net.InetAddress.getLocalHost().getHostName();
+      return java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (java.net.UnknownHostException e) {
       return "localhost";
     }

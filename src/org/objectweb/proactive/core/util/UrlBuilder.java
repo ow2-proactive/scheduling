@@ -227,13 +227,13 @@ public class UrlBuilder {
                 String name = urlToRead.substring(LOCAL_URLS[i].length());
                 if (name.startsWith("/")) {
                     //there is no port and the name starts with /
-                    return buildUrl(hostInetAddress.getHostName(),
+                    return buildUrl(hostInetAddress.getCanonicalHostName(),
                         name.substring(1), protocol);
                 } else {
                 	//there is no port and only the name 
-                	if (name.indexOf(":")<0) return buildUrl(hostInetAddress.getHostName(),name, protocol);
+                	if (name.indexOf(":")<0) return buildUrl(hostInetAddress.getCanonicalHostName(),name, protocol);
                     //port is define, extract port and build url
-                    return buildUrl(hostInetAddress.getHostName(),
+                    return buildUrl(hostInetAddress.getCanonicalHostName(),
                         name.substring(name.lastIndexOf("/")+1, name.length()),
                         protocol,
                         new Integer(name.substring(1, name.lastIndexOf("/"))).intValue());

@@ -81,7 +81,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
 
     static {
         try {
-            host = java.net.InetAddress.getLocalHost().getHostName();
+            host = java.net.InetAddress.getLocalHost().getCanonicalHostName();
             String policyLocation = System.getProperty("java.security.policy");
             if(policyLocation != null) policy = policyLocation;
             else policy = DEFAULT_POLICY;

@@ -631,7 +631,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
       s_localhost = "";
       try {
-        s_localhost = InetAddress.getLocalHost().getHostName();
+        s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
       } catch (UnknownHostException e) {
         s_localhost = "unknown!";
       }
@@ -646,7 +646,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       c3duser = c3d;
       s_localhost = "";
       try {
-        s_localhost = InetAddress.getLocalHost().getHostName();
+        s_localhost = InetAddress.getLocalHost().getCanonicalHostName();
       } catch (UnknownHostException e) {
         s_localhost = "unknown!";
       }

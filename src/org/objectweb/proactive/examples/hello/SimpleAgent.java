@@ -54,7 +54,7 @@ public class SimpleAgent implements java.io.Serializable {
 
   public String whereAreYou() {
     try {
-      return java.net.InetAddress.getLocalHost().getHostName();
+      return java.net.InetAddress.getLocalHost().getCanonicalHostName();
     } catch (Exception e) {
       return "Localhost lookup failed";
     }

@@ -60,7 +60,7 @@ public class Agent implements InitActive, RunActive, EndActive, java.io.Serializ
     try {
       //System.out.println("getName called");
       //return the name of the Host  
-      return java.net.InetAddress.getLocalHost().getHostName().toUpperCase();
+      return java.net.InetAddress.getLocalHost().getCanonicalHostName().toUpperCase();
     } catch (Exception e) {
       e.printStackTrace();
       return "getName failed";

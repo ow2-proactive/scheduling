@@ -318,7 +318,7 @@ public class StartNode {
     private void printUsage() {
         String localhost = "localhost";
         try {
-            localhost = java.net.InetAddress.getLocalHost().getHostName();
+            localhost = java.net.InetAddress.getLocalHost().getCanonicalHostName();
         } catch (java.net.UnknownHostException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();
