@@ -122,13 +122,15 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
       }
     });
 
-    setVisible(true);
-    eventListsFrame = createEventListFrame(eventListsPanel);
+    jobMonitorFrame = createJobMonitorFrame ();
     processesFrame = createProcessesFrame();
+    
+    setVisible(true);
+    
+    eventListsFrame = createEventListFrame(eventListsPanel);
+    
     //fileChooserFrame = createFileChooserFrame();
-	jobMonitorFrame = createJobMonitorFrame ();
-
-
+	
     logger.log("IC2D ready !");
   }
   
