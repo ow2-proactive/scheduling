@@ -32,7 +32,6 @@ import java.util.HashMap;
 public abstract class ComponentHandler extends AbstractUnmarshallerDecorator {
     public static Logger logger = Logger.getLogger(ComponentHandler.class.getName());
 
-    //protected ComponentParameters componentParameters;
     protected ControllerDescription controllerDescription;
     protected String virtualNode;
     protected ProActiveDescriptor deploymentDescriptor;
@@ -55,9 +54,6 @@ public abstract class ComponentHandler extends AbstractUnmarshallerDecorator {
             Component boot = Fractal.getBootstrapComponent();
             typeFactory = Fractal.getTypeFactory(boot);
             cf = Fractal.getGenericFactory(boot);
-            if (cf == null) {
-            	System.out.println("PB!!!!!!!!!!!!!!!11");
-            }
         } catch (InstantiationException e1) {
             throw new ProActiveRuntimeException("Cannot find Fractal boot component",
                 e1);
