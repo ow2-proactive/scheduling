@@ -37,7 +37,7 @@
 		
 		<!-- ***************************************************** -->
 		<!-- DO NOT EDIT P2P PROPERTIES VALUE IN THIS FILE -->
-		<!-- THESE IS DEFAULT VALUE -->
+		<!-- THESE ARE DEFAULT VALUE -->
 		
 		<!-- ProActive P2P Service properties -->
 		<!-- Acquisition method -->
@@ -46,13 +46,13 @@
 		<prop key="proactive.p2p.port" value="2410" />
 		<!-- NOA is in number of peers -->
 		<prop key="proactive.p2p.noa" value="10" />
-		<!-- TTU is in minutes -->
-		<prop key="proactive.p2p.ttu" value="5000" />
+		<!-- TTU is in ms -->
+		<prop key="proactive.p2p.ttu" value="60000" />
 		<!-- TTL is in hops -->
-		<prop key="proactive.p2p.ttl" value="10" />
+		<prop key="proactive.p2p.ttl" value="5" />
 		<!-- List capacity of message sequence number -->
 		<prop key="proactive.p2p.msg_capacity" value="1000" />
-		<!-- Percentage of agree response to determine response to exploring message -->
+		<!-- Percentage of agree responses -->
 		<prop key="proactive.p2p.expl_msg" value="66" />
 		<!-- Expiration time for booking without use a shared node -->
 		<prop key="proactive.p2p.booking_max" value="180000" />
