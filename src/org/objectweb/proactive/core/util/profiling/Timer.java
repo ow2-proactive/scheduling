@@ -20,6 +20,10 @@ public interface Timer {
 	
 	public long getAverage(); 
 	
+	public String getName();
+	
+	public void setName(String name); 
+	
 	public void dump();
 	
 }

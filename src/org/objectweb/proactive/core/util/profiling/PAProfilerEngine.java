@@ -78,7 +78,7 @@ public class PAProfilerEngine implements Runnable {
 		System.out.println("Creating a profiler and registering it");
 		PAProfilerEngine.createTimer();
 		System.out.println("Creating an AverageTimeProfiler and registering it");
-		Timer avg = new AverageMicroTimer();
+		Timer avg = new AverageMicroTimer("Test ");
 		PAProfilerEngine.registerTimer(avg);
 	
 		for (int i=0; i< 10;i++) {
