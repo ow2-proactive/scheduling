@@ -30,16 +30,15 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import java.io.Serializable;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.ExceptionList;
 import org.objectweb.proactive.core.group.Group;
@@ -49,6 +48,10 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.util.Iterator;
 
 
 /**
@@ -144,8 +147,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 long endTime = System.currentTimeMillis() + TTU;
                 service.blockingServeOldest(TTU);
                 while (System.currentTimeMillis() < endTime) {
-                    service.blockingServeOldest(endTime -
-                        System.currentTimeMillis());
+                    try {
+                        service.blockingServeOldest(endTime -
+                            System.currentTimeMillis());
+                    } catch (ProActiveRuntimeException e) {
+                        logger.debug("Certainly because the body is not active",
+                            e);
+                    }
                 }
                 logger.debug("End waiting");
             } catch (ExceptionList e) {
