@@ -61,7 +61,7 @@ public class Hello implements org.objectweb.proactive.RunActive, java.io.Seriali
     service.fifoServing();
   }
 
-  /*
+  
   public static void main(String[] args) {
     // Registers it with an URL
     try {
@@ -74,5 +74,5 @@ public class Hello implements org.objectweb.proactive.RunActive, java.io.Seriali
       e.printStackTrace();
     }
   }
-  */
+  
 }
