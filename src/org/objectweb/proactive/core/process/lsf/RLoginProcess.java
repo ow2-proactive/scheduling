@@ -141,7 +141,6 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
   
   protected void internalStartProcess(String command) throws java.io.IOException {
   	
-  	System.out.println("-----------------------command "+command);
     super.internalStartProcess(command);
     if (exitAfterCommand) {
       outputMessageSink.setMessage(null);
