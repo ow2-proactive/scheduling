@@ -624,7 +624,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
 
             // Create the known table
             this.knownProActiveJVM = (KnownTable) ProActive.newActive(KnownTable.class.getName(),
-                    null, P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
+                    null, this.acquisitionMethod+ P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
 
             ProActive.enableAC(this.knownProActiveJVM);
 
@@ -635,7 +635,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                 };
 
             ProActive.newActive(Updater.class.getName(), params,
-                P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
+                    this.acquisitionMethod+ P2PServiceImpl.urlAdderP2PNodeName(this.peerUrl));
         } catch (ActiveObjectCreationException e) {
             logger.error("Could't create the Updater");
         } catch (NodeException e) {
