@@ -8,6 +8,7 @@ import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 
 
@@ -110,6 +111,11 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
+    private void addChild(int fromKey, String fromName, int toKey, String toName) {
+    	asso.addChild(BasicMonitoredObject.create(fromKey, fromName),
+    			BasicMonitoredObject.create(toKey, toName));
+    }
+    
     private void handleProActiveRuntime(ProActiveRuntime pr, int depth)
         throws Exception {
         if (pr instanceof RemoteProActiveRuntime &&
@@ -129,8 +135,8 @@ public class NodeExploration implements JobMonitorConstants {
         String hostname = pr.getVMInformation().getInetAddress()
                             .getCanonicalHostName();
 
-        asso.addChild(HOST, hostname, JVM, vmName);
-        asso.addChild(JOB, pr.getJobID(), JVM, vmName);
+        addChild(HOST, hostname, JVM, vmName);
+        addChild(JOB, pr.getJobID(), JVM, vmName);
 
         String[] nodes = pr.getLocalNodeNames();
 
@@ -142,10 +148,10 @@ public class NodeExploration implements JobMonitorConstants {
             ArrayList activeObjects = null;
             activeObjects = pr.getActiveObjects(nodeName);
 
-            asso.addChild(JVM, vmName, NODE, nodeName);
-            asso.addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE, nodeName);
+            addChild(JVM, vmName, NODE, nodeName);
+            addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE, nodeName);
             if (vnName != null) {
-                asso.addChild(VN, vnName, NODE, nodeName);
+                addChild(VN, vnName, NODE, nodeName);
                 
                 // Currently broken in ProActiveRuntimeImpl
                 // asso.addChild(JOB, pr.getVirtualNode(vnName).getJobID(), VN, vnName);
@@ -183,8 +189,8 @@ public class NodeExploration implements JobMonitorConstants {
                 aos.put(rba.getID(), aoName);
             }
 
-            asso.addChild(NODE, nodeName, AO, aoName);
-            // Job de l'AO
+            addChild(NODE, nodeName, AO, aoName);
+            addChild(JOB, rba.getJobID(), AO, aoName);
         }
     }
 

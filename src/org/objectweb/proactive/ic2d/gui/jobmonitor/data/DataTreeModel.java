@@ -27,7 +27,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	
 	public void rebuild(DataTreeNode node) {
 		node.setAllStates(DataTreeNode.STATE_REMOVED);
-		node.rebuild(this, node.getKey(), node.getName(), node.makeConstraints());
+		node.rebuild(this, node.getObject(), node.makeConstraints());
 	}
 
 	public DataModelTraversal getTraversal() {
@@ -40,6 +40,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		
 	public void setHighlighted(int key, boolean highlight) {
 		traversal.setHighlighted(key, highlight);
+		root().keyDisplayChanged(this, key);
 	}
 	
 	public boolean isHighlighted(int key) {

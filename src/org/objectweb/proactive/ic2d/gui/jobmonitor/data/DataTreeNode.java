@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -16,16 +17,15 @@ public class DataTreeNode extends DefaultMutableTreeNode
     public static final int STATE_REMOVED = 1;
     public static final int STATE_KEPT = 2;
     private int state = STATE_NEW;
-    private int key = NO_KEY;
-    private String name;
+    private BasicMonitoredObject object;
 
     public DataTreeNode(DataModelTraversal traversal) {
-        key = traversal.getFollowingKey(NO_KEY);
+    	int key = traversal.getFollowingKey(NO_KEY);
+    	object = BasicMonitoredObject.create(key, null);
     }
 
-    public DataTreeNode(DataTreeModel model, int key, String name,
-        Map constraints) {
-        rebuild(model, key, name, constraints);
+    public DataTreeNode(DataTreeModel model, BasicMonitoredObject value, Set constraints) {
+        rebuild(model, value, constraints);
     }
 
     public int getState() {
@@ -44,7 +44,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
     }
 
-    public DataTreeNode getChild(int key, String childName) {
+    public DataTreeNode getChild(BasicMonitoredObject value) {
         int length = getChildCount();
 
         if (length == 0) {
@@ -52,13 +52,13 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
 
         DataTreeNode firstChild = (DataTreeNode) getChildAt(0);
-        if (firstChild.getKey() != key) {
+        if (firstChild.getKey() != value.getKey()) {
             return null;
         }
 
         for (int i = 0; i < length; i++) {
             DataTreeNode child = (DataTreeNode) getChildAt(i);
-            if (child.getName().equals(childName)) {
+            if (child.getObject().equals(value)) {
                 return child;
             }
         }
@@ -81,84 +81,85 @@ public class DataTreeNode extends DefaultMutableTreeNode
     }
 
     /* key : la cle de cette branche, les fils sont donc des traversal.getFollowingKey(key) */
-    public void rebuild(DataTreeModel model, int key, String name,
-        Map constraints) {
+    public void rebuild(DataTreeModel model, BasicMonitoredObject value, Set constraints) {
         DataModelTraversal traversal = model.getTraversal();
-        this.name = name;
-        this.key = key;
-
+        this.object = value;
         DataAssociation asso = model.getAssociations();
-        int nextKey = key;
-        Set children;
+        int nextKey = value.getKey();
+        Set children = null;
 
         do {
             nextKey = traversal.getFollowingKey(nextKey);
-            children = asso.getValues(key, name, nextKey, constraints);
-        } while ((nextKey != NO_KEY) && children.isEmpty());
-
-        if (key == NO_KEY) {
-            this.key = nextKey;
-            if (this.key == NO_KEY) {
-                this.key = traversal.getFollowingKey(key);
-            }
-        }
+            if (nextKey == NO_KEY)
+            	break;
+            children = asso.getValues(value, nextKey, constraints);
+        } while (children.isEmpty());
 
         if (nextKey != NO_KEY) {
             Iterator iter = children.iterator();
             while (iter.hasNext()) {
-                String childName = (String) iter.next();
-                DataTreeNode child = getChild(nextKey, childName);
-                Integer constraintKey = (key == NO_KEY) ? null : new Integer(key);
-                if (constraintKey != null) {
-                    constraints.put(constraintKey, name);
-                }
+            	BasicMonitoredObject childValue = (BasicMonitoredObject) iter.next();
+                DataTreeNode child = getChild(childValue);
+
+                if (value.getFullName() != null)
+                	constraints.add(value);
+                
                 if (child != null) {
                     child.state = STATE_KEPT;
-                    child.rebuild(model, nextKey, childName, constraints);
+                    child.rebuild(model, childValue, constraints);
                 } else {
-                    DataTreeNode newChild = new DataTreeNode(model, nextKey,
-                            childName, constraints);
+                    DataTreeNode newChild = new DataTreeNode(model, childValue, constraints);
                     model.insertNodeInto(newChild, this, getChildCount());
                 }
-                if (constraintKey != null) {
-                    constraints.remove(constraintKey);
-                }
+
+                if (value.getFullName() != null)
+                	constraints.remove(value);
             }
         }
 
         handleRemovedChildren(model);
+        model.nodeChanged(this);
     }
 
+    public void keyDisplayChanged(DataTreeModel model, int key) {
+    	if (getKey() == key)
+    		model.nodeChanged(this);
+    	else {
+    		int length = getChildCount();
+    		for (int i = 0; i < length; i++) {
+    			DataTreeNode child = (DataTreeNode) getChildAt(i);
+    	        child.keyDisplayChanged(model, key);
+    		}
+    	}
+    }
+    
     public int getKey() {
-
-        /* For the TreeCellRenderer */
-        if (name == null) {
-            return NO_KEY;
-        }
-
-        return key;
+        return object.getKey();
     }
 
     public String getName() {
-        return name;
+        return object.getPrettyName();
     }
 
     public String toString() {
-        if ((name == null) && (key != NO_KEY)) {
-            return NAMES[KEY2INDEX[key]];
+        if ((getName() == null) && (getKey() != NO_KEY)) {
+            return NAMES[KEY2INDEX[getKey()]];
         }
 
-        return name;
+        return getName();
     }
 
-    public Map makeConstraints() {
-        if (isRoot()) {
-            return new HashMap(NB_KEYS);
-        }
+    public BasicMonitoredObject getObject() {
+    	return object;
+    }
+    
+    public Set makeConstraints() {
+        if (isRoot())
+            return new TreeSet();
 
         DataTreeNode parent = (DataTreeNode) getParent();
-        Map constraints = parent.makeConstraints();
-        constraints.put(new Integer(key), name);
+        Set constraints = parent.makeConstraints();
+        constraints.add(object);
 
         return constraints;
     }
