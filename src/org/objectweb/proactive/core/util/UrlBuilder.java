@@ -234,12 +234,19 @@ public class UrlBuilder {
             }
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
-            return DEFAULT_REGISTRY_PORT;
+            int n = url.indexOf("//");
+            int m = url.lastIndexOf("/");
+            if (m == (n + 1)) {
+                return getPortNumber(url.substring(n + 2));
+            } else {
+                return getPortNumber(url.substring(n + 2, m));
+            }
         }
     }
-    
+
     public static String getHostNameorIP(InetAddress address) {
-        if ((System.getProperty("proactive.useIPaddress") != null) && (System.getProperty("proactive.useIPaddress").equals("true"))) {
+        if ((System.getProperty("proactive.useIPaddress") != null) &&
+                (System.getProperty("proactive.useIPaddress").equals("true"))) {
             return address.getHostAddress();
         } else {
             return address.getCanonicalHostName();
@@ -399,6 +406,4 @@ public class UrlBuilder {
         }
         return url;
     }
-
-    
 }
