@@ -1,10 +1,9 @@
 package modelisation.simulator.forwarder;
 
-import modelisation.statistics.ExponentialLaw;
-import modelisation.statistics.RandomNumberGenerator;
-import modelisation.statistics.RandomNumberFactory;
-
 import java.util.ArrayList;
+
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 
 public class Simulator {
@@ -81,8 +80,8 @@ public class Simulator {
     }
 
     public void agentBehaviour() {
-        if (this.agent.getState() == agent.WAITING) {
-            if (this.source.getState() == source.TENSIONING) {
+        if (this.agent.getState() == Agent.WAITING) {
+            if (this.source.getState() == Source.TENSIONING) {
                 System.out.println("Simulator: agent wait end of tensioning "
                                    + source.getRemainingTime());
                 this.agent.waitEndOfTensioning(source.getRemainingTime());
@@ -91,14 +90,14 @@ public class Simulator {
             }
             return;
         }
-        if (this.agent.getState() == agent.MIGRATING) {
+        if (this.agent.getState() == Agent.MIGRATING) {
             agent.endMigration();
             this.numberOfHops++;
             this.forwarded = true;
             agent.waitBeforeMigration();
             return;
         }
-        if (this.agent.getState() == agent.WAITING_FOR_TENSIONING) {
+        if (this.agent.getState() == Agent.WAITING_FOR_TENSIONING) {
 //          agent.startMigration();
             agent.waitBeforeMigration();
             return;
@@ -106,14 +105,14 @@ public class Simulator {
     }
 
     public void sourceBehaviour() {
-        if (this.source.getState() == source.WAITING) {
+        if (this.source.getState() == Source.WAITING) {
             source.startCommunication(this.currentTime, getNextGammaInt());
             return;
         }
-        if (this.source.getState() == source.COMMUNICATION) {
+        if (this.source.getState() == Source.COMMUNICATION) {
             this.numberOfHops--;
             if (this.numberOfHops == 0) {
-                if (agent.getState() == agent.WAITING) {
+                if (agent.getState() == Agent.WAITING) {
                     if (this.forwarded) {
                         source.tensioning(getNextGammaInt());
                     } else {
@@ -134,7 +133,7 @@ public class Simulator {
             }
             return;
         }
-        if (this.source.getState() == source.TENSIONING) {
+        if (this.source.getState() == Source.TENSIONING) {
             source.endCommunication(this.currentTime);
             this.forwarded = false;
             this.numberOfHops = 1;
@@ -142,7 +141,7 @@ public class Simulator {
             return;
         }
 
-        if (this.source.getState() == source.WAITING_FOR_AGENT) {
+        if (this.source.getState() == Source.WAITING_FOR_AGENT) {
             this.source.continueCommunication(getNextGammaInt());
             return;
         }
@@ -156,7 +155,7 @@ public class Simulator {
         switch (this.source.getState()) {
             case Source.WAITING:
                 {
-                    if (this.agent.getState() == agent.WAITING) {
+                    if (this.agent.getState() == Agent.WAITING) {
                         //we have to deal with the P2 state by hand
                         if (this.numberOfHops == 1) {
                             stateNumber = 2;
@@ -175,7 +174,7 @@ public class Simulator {
                 }
             case Source.COMMUNICATION:
                 {
-                    if (this.agent.getState() == agent.WAITING) {
+                    if (this.agent.getState() == Agent.WAITING) {
                         //if no tensioning is needed...
                         if ((this.numberOfHops == 1) && (!this.forwarded)) {
                             stateNumber = 3;
@@ -184,7 +183,7 @@ public class Simulator {
                         }
                         break;
                     }
-                    if (this.agent.getState() == agent.MIGRATING) {
+                    if (this.agent.getState() == Agent.MIGRATING) {
                         stateNumber = (4 * numberOfHops) + 2;
                     }
                     break;

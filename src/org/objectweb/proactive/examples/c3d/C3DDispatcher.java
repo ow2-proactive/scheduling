@@ -30,21 +30,7 @@
 */
 package org.objectweb.proactive.examples.c3d;
 
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Label;
-import java.awt.List;
-import java.awt.Menu;
-import java.awt.MenuBar;
-import java.awt.MenuItem;
-import java.awt.Panel;
-import java.awt.TextArea;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -65,11 +51,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
-import org.objectweb.proactive.core.process.JVMNodeProcess;
 
 /**
  * This class decouples the set of user frames from the set of rendering
@@ -764,7 +748,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			if (Election.isRunning())
 			{
 				// There is an election
-				int i_votes = election.vote(i_user, new Integer(Election.LEFT));
+				int i_votes = Election.vote(i_user, new Integer(Election.LEFT));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -798,7 +782,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			{
 				// there is an election
 				int i_votes =
-					election.vote(i_user, new Integer(Election.RIGHT));
+					Election.vote(i_user, new Integer(Election.RIGHT));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -831,7 +815,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			if (Election.isRunning())
 			{
 				// There is an election
-				int i_votes = election.vote(i_user, new Integer(Election.UP));
+				int i_votes = Election.vote(i_user, new Integer(Election.UP));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -864,7 +848,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			if (Election.isRunning())
 			{
 				// there is an election
-				int i_votes = election.vote(i_user, new Integer(Election.DOWN));
+				int i_votes = Election.vote(i_user, new Integer(Election.DOWN));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -898,7 +882,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			{
 				// There is an election
 				int i_votes =
-					election.vote(i_user, new Integer(Election.CLOCKWISE));
+					Election.vote(i_user, new Integer(Election.CLOCKWISE));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -935,7 +919,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			{
 				// there is an election
 				int i_votes =
-					election.vote(i_user, new Integer(Election.UNCLOCKWISE));
+					Election.vote(i_user, new Integer(Election.UNCLOCKWISE));
 				if (i_votes == h_users.size())
 				{
 					election.finish();
@@ -1579,8 +1563,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 
 			p_eng.setLayout(p_gl);
 			c.gridy++;
-			c.fill = c.BOTH;
-			c.gridwidth = c.REMAINDER;
+			c.fill = GridBagConstraints.BOTH;
+			c.gridwidth = GridBagConstraints.REMAINDER;
 			//c.weightx=1.0;
 			//      p_eng.setBackground(Color.blue);
 			gridbag.setConstraints(p_eng, c);
@@ -1594,42 +1578,42 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			pc.gridx = 0;
 			pc.gridy = 0;
 			pc.insets = new Insets(5, 5, 5, 5);
-			pc.gridwidth = pc.RELATIVE;
+			pc.gridwidth = GridBagConstraints.RELATIVE;
 			p_gl.setConstraints(l_engines, pc);
 			p_eng.add(l_engines);
 
 			Label l_used = new Label("Engines used:", Label.CENTER);
 			pc.gridx = 1;
-			pc.gridwidth = pc.REMAINDER;
+			pc.gridwidth = GridBagConstraints.REMAINDER;
 			p_gl.setConstraints(l_used, pc);
 			p_eng.add(l_used);
 
 			li_enginesAvailable = new List(5);
 			li_enginesAvailable.setMultipleMode(true);
-			pc.fill = pc.BOTH;
+			pc.fill = GridBagConstraints.BOTH;
 			pc.gridy = 1;
 			pc.gridx = 0;
-			pc.gridwidth = pc.RELATIVE;
+			pc.gridwidth = GridBagConstraints.RELATIVE;
 			p_gl.setConstraints(li_enginesAvailable, pc);
 			p_eng.add(li_enginesAvailable);
 
 			li_enginesUsed = new List(5);
 			li_enginesUsed.setMultipleMode(true);
 			pc.gridx = 1;
-			pc.gridwidth = pc.REMAINDER;
+			pc.gridwidth = GridBagConstraints.REMAINDER;
 			p_gl.setConstraints(li_enginesUsed, pc);
 			p_eng.add(li_enginesUsed);
 
 			b_addEng.addActionListener(this);
-			pc.fill = pc.NONE;
+			pc.fill = GridBagConstraints.NONE;
 			pc.gridx = 0;
 			pc.gridy = 2;
-			pc.gridwidth = pc.RELATIVE;
+			pc.gridwidth = GridBagConstraints.RELATIVE;
 			p_gl.setConstraints(b_addEng, pc);
 			p_eng.add(b_addEng);
 
 			b_rmEng.addActionListener(this);
-			pc.gridwidth = pc.REMAINDER;
+			pc.gridwidth = GridBagConstraints.REMAINDER;
 			pc.gridx = 1;
 			p_gl.setConstraints(b_rmEng, pc);
 			p_eng.add(b_rmEng);
@@ -1759,8 +1743,8 @@ class Election extends Thread
 
 	public Election(int i_user, Integer wish, C3DDispatcher c3ddispatcher)
 	{
-		this.c3ddispatcher = c3ddispatcher;
-		this.running = true;
+		Election.c3ddispatcher = c3ddispatcher;
+		Election.running = true;
 		wishes = new Hashtable();
 		vote(i_user, wish);
 		c3ddispatcher.showMessage(
@@ -1846,43 +1830,43 @@ class Election extends Thread
 			case UP :
 				c3ddispatcher.showMessageAll(
 					"   The scene will be rotated up.");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.rotateUp(0);
 				break;
 			case DOWN :
 				c3ddispatcher.showMessageAll(
 					"   The scene will be rotated down.");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.rotateDown(0);
 				break;
 			case LEFT :
 				c3ddispatcher.showMessageAll(
 					"   The scene will be rotated left.");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.rotateLeft(0);
 				break;
 			case RIGHT :
 				c3ddispatcher.showMessageAll(
 					"   The scene will be rotated right.");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.rotateRight(0);
 				break;
 			case CLOCKWISE :
 				c3ddispatcher.showMessageAll(
 					"  The scene will be spinned right");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.spinClock(0);
 				break;
 			case UNCLOCKWISE :
 				c3ddispatcher.showMessageAll(
 					"  The scene will be spinned left");
-				this.running = false;
-				this.wishes.clear();
+				Election.running = false;
+				Election.wishes.clear();
 				c3ddispatcher.spinUnclock(0);
 				break;
 			default :
@@ -1890,8 +1874,8 @@ class Election extends Thread
 					"   No consensus found, vote again please!");
 		}
 
-		this.running = false;
-		this.wishes.clear();
+		Election.running = false;
+		Election.wishes.clear();
 	}
 
 	public synchronized static int vote(int i_user, Integer wish)
