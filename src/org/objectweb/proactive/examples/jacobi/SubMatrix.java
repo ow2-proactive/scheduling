@@ -480,14 +480,14 @@ public class SubMatrix {
 		// synchronization to be sure that all submatrix have exchanged borders
 		ProSPMD.barrier("SynchronizationWithNeighbors"+this.iterationsToStop, this.neighbors);
 		// compute the border values
-		this.me.borderCompute();
+		this.borderCompute();
 		// decrement the iteration counter
 		this.iterationsToStop--;
 		// send the borders to neighbors
 		this.sendBordersToNeighbors();
 		// continue or stop ?
 		if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
-			this.me.exchange();
+			this.exchange();
 			this.me.loop();
 		}
 		else {
