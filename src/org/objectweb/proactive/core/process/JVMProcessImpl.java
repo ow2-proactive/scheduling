@@ -268,7 +268,9 @@ public class JVMProcessImpl extends AbstractExternalProcess
         }
         
         // dynamic classloading through runtimes
-        if ("enable".equals(System.getProperty("proactive.classloader"))) {
+        // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
+        if ("enable".equals(System.getProperty("proactive.classloader")) 
+                || "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System.getProperty("java.system.class.loader"))) {
             javaCommand.append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
             // to avoid clashes due to multiple classloader, we initiate the
             // configuration of log4j ourselves 
