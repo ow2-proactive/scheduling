@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="matrixNode" property="multiple"/>
@@ -8,7 +8,7 @@
 	<deployment>
 		<mapping>
 			<map virtualNode="matrixNode">
-				<jvmSet>	
+				<jvmSet>
 					<vmName value="Jvm1"/>
 					<vmName value="Jvm2"/>
 					<vmName value="Jvm3"/>
