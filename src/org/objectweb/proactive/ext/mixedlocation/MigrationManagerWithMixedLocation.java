@@ -20,6 +20,7 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiverForwarder;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverForwarder;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
+import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
 public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
@@ -58,10 +59,10 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
     }
 
     public void updateLocation(Body body) {
-        //        System.out.println("MigrationManagerWithMixedLocation.updateLocation " +
-        //        locationServer);
+		if (locationServer == null) {
+			   this.locationServer = LocationServerFactory.getLocationServer();
+		   }
         if (locationServer != null) {
-            //            System.out.println("MigrationManagerWithMixedLocation.updateLocation");
             locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
         }
     }
@@ -70,11 +71,8 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
         super.startingAfterMigration(body);
         //we update our location
         this.migrationCounter++;
-        System.out.println("XXX counter == " + this.migrationCounter);
-        //          if (this.migrationCounter > 3) {
+  //      System.out.println("XXX counter == " + this.migrationCounter);
         updateLocation(body);
-        //              this.migrationCounter = 0;
-        //          }
     }
 
     private void readObject(ObjectInputStream in)
