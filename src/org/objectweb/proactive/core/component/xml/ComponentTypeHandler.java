@@ -28,6 +28,15 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
 		addHandler(ComponentsDescriptorConstants.PROVIDES_TAG, new ProvidesHandler());
 		addHandler(ComponentsDescriptorConstants.REQUIRES_TAG, new RequiresHandler());
 	}
+	
+	/**
+	 * resets the variables so that this handler can be reused properly for the next type
+	 * occurence
+	 */
+	public void reset() {
+		interfaceTypes.removeAllElements();
+		typeName=null;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
@@ -110,7 +119,6 @@ public class ComponentTypeHandler extends AbstractUnmarshallerDecorator {
 			} else if (role.equals(ComponentsDescriptorConstants.PROVIDES_TAG)) {
 				isClient = false;
 			} else {
-				// TODO : a bit too straight!
 				throw new RuntimeException("none of the following tags was found : " + ComponentsDescriptorConstants.REQUIRES_TAG + ',' + ComponentsDescriptorConstants.PROVIDES_TAG);
 			}
 		}
