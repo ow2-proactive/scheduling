@@ -38,5 +38,6 @@ public interface ComponentsDescriptorConstants {
 	public static final String BINDING_TAG = "binding";
 	public static final String BINDING_CLIENT_TAG = "client";
 	public static final String BINDING_SERVER_TAG = "server";
+	public static final String NULL = "null";
 
 }
