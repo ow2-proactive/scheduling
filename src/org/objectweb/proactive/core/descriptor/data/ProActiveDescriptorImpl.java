@@ -1,47 +1,52 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityDescriptorHandler;
+
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+
+import java.security.cert.X509Certificate;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /**
@@ -74,12 +79,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
 
     /** map process id and process updater for later update of the process */
     private java.util.HashMap pendingProcessMapping;
-    
-	/** security rules */
-	 public PolicyServer policyServer;
-	 public X509Certificate creatorCertificate;
-	 public String securityFile;
 
+    /** Location of the xml file */
+    private String url;
+
+    /** security rules */
+    public PolicyServer policyServer;
+    public X509Certificate creatorCertificate;
+    public String securityFile;
 
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
@@ -88,11 +95,12 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     /**
      * Contructs a new intance of ProActiveDescriptor
      */
-    public ProActiveDescriptorImpl() {
+    public ProActiveDescriptorImpl(String url) {
         virtualNodeMapping = new java.util.HashMap();
         virtualMachineMapping = new java.util.HashMap();
         processMapping = new java.util.HashMap();
         pendingProcessMapping = new java.util.HashMap();
+        this.url = url;
     }
 
     //
@@ -127,7 +135,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
-                vn = new VirtualNodeImpl(vnName, creatorCertificate, policyServer);
+                vn = new VirtualNodeImpl(vnName, creatorCertificate,
+                        policyServer);
             }
 
             virtualNodeMapping.put(vnName, vn);
@@ -207,40 +216,15 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
     }
 
     public void killall(boolean softly) throws ProActiveException {
-//        ProActiveRuntime proactiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
-//        ProActiveRuntime[] runtimeArray = proactiveRuntime.getProActiveRuntimes();
-//        for (int i = 0; i < runtimeArray.length; i++) {
-//            try {
-//            	System.out.println("ProActiveDescriptorImpl.killall() on " + i);
-//            	System.out.println("ProActiveDescriptorImpl.killall() on " +  runtimeArray[i].getURL());
-//                runtimeArray[i].killRT();
-//            } catch (Exception e) {
-//                logger.info(" Virutal Machine " +
-//                    runtimeArray[i].getVMInformation().getVMID() + " on host " +
-//                    runtimeArray[i].getVMInformation().getInetAddress()
-//                                   .getHostName() + " terminated!!!");
-//            }
-//        }
-		VirtualNode [] vnArray = getVirtualNodes();
-		for (int i = 0; i < vnArray.length; i++){
-			vnArray[i].killAll(softly);
-			vnArray[i] = null;		
-		}
+        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        part.removeDescriptor(this.url);
+        VirtualNode[] vnArray = getVirtualNodes();
+        for (int i = 0; i < vnArray.length; i++) {
+            vnArray[i].killAll(softly);
+            virtualNodeMapping.remove(vnArray[i].getName());
+            //vnArray[i] = null;		
+        }
     }
-
-    //  public void desactivateMapping(){
-    //  	VirtualNode[] virtualNodeArray = getVirtualNodes();
-    //			for (int i = 0; i < virtualNodeArray.length; i++)
-    //			{
-    //				virtualNodeArray[i].desactivate();
-    //			}
-    //  }
-    //  
-    //  
-    //  public void desactivateMapping(String virtualNodeName){
-    //  	VirtualNode virtualNode = getVirtualNode(virtualNodeName);
-    //  	virtualNode.desactivate();
-    //  }
 
     /**
      * Returns the size of virualNodeMapping HashMap
@@ -250,40 +234,42 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor {
         return virtualNodeMapping.size();
     }
 
-	// SECURITY
-	/**
-	   * Intialize application security policy
-	   * @param file
-	   */
-	 public void createPolicyServer(String file) {
-		 securityFile = file;
-		 try {
-		 policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-   //      policyServer = ps;
-	//         ProActiveRuntime prR = RuntimeFactory.getDefaultRuntime();
-	 //        ProActiveSecurityManager psm = new ProActiveSecurityManager(file);
-	  //       prR.setProActiveSecurityManager(psm);
-	  //   } catch (ProActiveException e) {
-	  //       e.printStackTrace();
-		 } catch (IOException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 } catch (SAXException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 }
-	 }
+    // SECURITY
 
- public PolicyServer getPolicyServer() {
-	 return policyServer;
- }
-	
- /* (non-Javadoc)
-  * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getSecurityFilePath()
-  */
- public String getSecurityFilePath() {
-	 return securityFile;
- }
+    /**
+     * Intialize application security policy
+     * @param file
+     */
+    public void createPolicyServer(String file) {
+        securityFile = file;
+        try {
+            policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
+            //      policyServer = ps;
+            //         ProActiveRuntime prR = RuntimeFactory.getDefaultRuntime();
+            //        ProActiveSecurityManager psm = new ProActiveSecurityManager(file);
+            //       prR.setProActiveSecurityManager(psm);
+            //   } catch (ProActiveException e) {
+            //       e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (SAXException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public PolicyServer getPolicyServer() {
+        return policyServer;
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor#getSecurityFilePath()
+     */
+    public String getSecurityFilePath() {
+        return securityFile;
+    }
+
     //
     //  ----- PROTECTED METHODS -----------------------------------------------------------------------------------
     //

@@ -99,13 +99,13 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         return name;
     }
 
-    public void setAcquisitionMethod(String s) {
-        acquisitionMethod = s;
-    }
-
-    public String getAcquisitionMethod() {
-        return acquisitionMethod;
-    }
+//    public void setAcquisitionMethod(String s) {
+//        acquisitionMethod = s;
+//    }
+//
+//    public String getAcquisitionMethod() {
+//        return acquisitionMethod;
+//    }
 
     
 //    public void setPortNumber(String s) {

@@ -70,17 +70,17 @@ public interface VirtualMachine {
      */
     public String getName();
 
-    /**
-     * Sets the acquisitionMethod field to the given value
-     * @param s
-     */
-    public void setAcquisitionMethod(String s);
-
-    /**
-     * Returns the AcquisitionMethod value
-     * @return String
-     */
-    public String getAcquisitionMethod();
+//    /**
+//     * Sets the acquisitionMethod field to the given value
+//     * @param s
+//     */
+//    public void setAcquisitionMethod(String s);
+//
+//    /**
+//     * Returns the AcquisitionMethod value
+//     * @return String
+//     */
+//    public String getAcquisitionMethod();
 
 //    /**
 //     * Sets the port number of the acquisition process

@@ -115,7 +115,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     private X509Certificate creatorCertificate;
     private PolicyServer policyServer;
     private String policyServerFile;
-   
     private String jobID = ProActive.getJobId();
 
     //
@@ -160,9 +159,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return property;
     }
 
-    public void setTimeout(String timeout) {
+    public void setTimeout(String timeout, boolean waitForTimeout) {
         MAX_RETRY = new Integer(timeout).intValue();
-        waitForTimeout = true;
+        this.waitForTimeout = waitForTimeout;
     }
 
     public void setName(String s) {
@@ -238,12 +237,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             logger.info("VirtualNode " + this.name + " already activated !!!");
         }
     }
-
-    //  /**
-    //   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
-    //   */
-    //  public void desactivate(){
-    //  }
 
     /**
      * Returns the number of Nodes mapped to this VirtualNode in the XML Descriptor
@@ -417,14 +410,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 Integer.toString(new java.util.Random(
                         System.currentTimeMillis()).nextInt());
 
-            //String nodeHost = java.net.InetAddress.getLocalHost().getHostName();
-            //            String port = System.getProperty("proactive.rmi.port");
-            //            if ( port != null){
-            //            	url = buildURL(nodeHost, nodeName, protocol, new Integer(port).intValue());
-            //        	}else{
-            //        		url = buildURL(nodeHost, nodeName, protocol,0);
-            //        		
-            //       		}
             // get the Runtime for the given protocol
             ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
                         protocol));
@@ -433,9 +418,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             url = defaultRuntime.createLocalNode(nodeName, false, policyServer,
                     this.getName(), ProActive.getJobId());
             //add this node to this virtualNode
-            //  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
-            //		nodeCreated = true;
-            //  	nodeCountCreated ++ ;
             performOperations(defaultRuntime, url, protocol);
         } catch (Exception e) {
             e.printStackTrace();
@@ -473,11 +455,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     public boolean isActivated() {
         return isActivated;
     }
+
     //
     //-------------------IMPLEMENTS Job-----------------------------------
     //
-    public String getJobID(){
-    	return this.jobID;
+    public String getJobID() {
+        return this.jobID;
     }
 
     //
@@ -512,7 +495,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
             // get the host of nodes
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                 .getInetAddress().getCanonicalHostName();
+                                                 .getInetAddress()
+                                                 .getCanonicalHostName();
 
             try {
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
@@ -531,7 +515,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     url = buildURL(nodeHost, nodeName, protocol, port);
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
-					
                     proActiveRuntimeRegistered.createLocalNode(url, false,
                         policyServer, this.getName(), this.jobID);
                     performOperations(proActiveRuntimeRegistered, url, protocol);
@@ -539,14 +522,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             } catch (ProActiveException e) {
                 e.printStackTrace();
             }
-
-            /*
-                        for (int i = 0; i < nodeNames.length; i++) {
-                            nodeName = nodeNames[i];
-                            url = buildURL(nodeHost, nodeName, protocol, port);
-                            performOperations(proActiveRuntimeRegistered, url, protocol);
-                        }
-                        */
         }
 
         //Check if the virtualNode that originates the process is among awaited VirtualNodes
@@ -556,7 +531,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                 .getInetAddress().getCanonicalHostName();
+                                                 .getInetAddress()
+                                                 .getCanonicalHostName();
             protocol = event.getProtocol();
             try {
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
@@ -759,14 +735,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
-            String acquisitionMethod = vm.getAcquisitionMethod();
-
-            //String portNumber = vm.getPortNumber();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Aquisition method : " + acquisitionMethod);
-                //logger.debug("Port Number : " + portNumber);
-                logger.debug(vnName);
-            }
 
             String localruntimeURL = null;
             try {
@@ -775,28 +743,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 e.printStackTrace();
             }
 
-            //            String localruntimeURL = null;
-            //
-            //            if (portNumber != null) {
-            //                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
-            //                            portNumber));
-            //            } else {
-            //                localruntimeURL = proActiveRuntimeImpl.getURL();
-            //            }
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
-            jvmProcess.setJvmOptions("-Dproactive.jobid="+this.jobID);
+            jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
-                acquisitionMethod + ":" + " " + nodeNumber + " " + protocolId +
-                " " + vm.getName());
-
-            //            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
-            //                localruntimeURL + " " + acquisitionMethod + ":" + " " +
-            //                nodeNumber + " " + portNumber);
-            //            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
-            //                localruntimeURL + " " + acquisitionMethod + ":" + " " +
-            //                nodeNumber + " " + portNumber);
+                nodeNumber + " " + protocolId + " " + vm.getName());
         }
     }
 
@@ -872,8 +824,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
     private void performOperations(ProActiveRuntime part, String url,
         String protocol) {
-	
-        createdNodes.add(new NodeImpl(part, url, checkProtocol(protocol),this.jobID));
+        createdNodes.add(new NodeImpl(part, url, checkProtocol(protocol),
+                this.jobID));
         logger.info("**** Mapping VirtualNode " + this.name + " with Node: " +
             url + " done");
         nodeCreated = true;
@@ -916,8 +868,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     // SECURITY
 
     /* (non-Javadoc)
-      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
-      */
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getCreatorCertificate()
+     */
     public X509Certificate getCreatorCertificate() {
         return creatorCertificate;
     }
@@ -930,8 +882,8 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     }
 
     /**
-              * @param server
-              */
+     * @param server
+     */
     public void setPolicyServer(PolicyServer server) {
         // logger.debug("Setting PolicyServer " + server + " to VN " +name);
         policyServer = server;

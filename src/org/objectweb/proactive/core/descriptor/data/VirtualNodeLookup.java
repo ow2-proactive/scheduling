@@ -91,7 +91,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         return virtualNode.getProperty();
     }
 
-    public void setTimeout(String timeout) {
+    public void setTimeout(String timeout, boolean waitForTimeout) {
         logger.warn(message);
     }
 

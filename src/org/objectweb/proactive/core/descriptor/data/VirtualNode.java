@@ -64,7 +64,7 @@ public interface VirtualNode extends java.io.Serializable, Job {
      * Calling this method will force this VirtualNode to wait until the timeout expires
      * before giving access to its nodes.
      */
-    public void setTimeout(String timeout);
+    public void setTimeout(String timeout, boolean waitForTimeout);
 
     /**
      * Returns the value of property attribute.
