@@ -49,6 +49,8 @@ public class Test extends ProActiveFunctionalTest {
     private static String FS = System.getProperty("file.separator");
     private static String XML_LOCATION = Test.class.getResource(
             "/nonregressiontest/descriptor/Penguin.xml").getPath();
+            
+    ProActiveDescriptor proActiveDescriptor;
     VirtualNode vn;
 
     public Test() {
@@ -60,7 +62,7 @@ public class Test extends ProActiveFunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        ProActiveDescriptor proActiveDescriptor = ProActive.getProactiveDescriptor(
+       	proActiveDescriptor = ProActive.getProactiveDescriptor(
                 "file:" + XML_LOCATION);
         proActiveDescriptor.activateMappings();
         vn = proActiveDescriptor.getVirtualNode("penguinNode");
@@ -76,6 +78,7 @@ public class Test extends ProActiveFunctionalTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
+    	proActiveDescriptor.killall();
     }
 
     public boolean postConditions() throws Exception {

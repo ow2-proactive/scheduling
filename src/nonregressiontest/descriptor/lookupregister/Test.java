@@ -46,6 +46,8 @@ import testsuite.test.ProActiveFunctionalTest;
  * Window>Preferences>Java>Code Generation.
  */
 public class Test extends ProActiveFunctionalTest {
+	
+		ProActiveDescriptor proActiveDescriptorAgent;
     private static String FS = System.getProperty("file.separator");
     private static String AGENT_XML_LOCATION_UNIX = Test.class.getResource(
             "/nonregressiontest/descriptor/lookupregister/Agent.xml").getPath();
@@ -60,7 +62,7 @@ public class Test extends ProActiveFunctionalTest {
     * @see testsuite.test.FunctionalTest#action()
     */
     public void action() throws Exception {
-        ProActiveDescriptor proActiveDescriptorAgent = ProActive.getProactiveDescriptor(
+        proActiveDescriptorAgent = ProActive.getProactiveDescriptor(
                 "file:" + AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
@@ -70,6 +72,7 @@ public class Test extends ProActiveFunctionalTest {
         VirtualNode vnLookup = ProActive.lookupVirtualNode("//localhost/Agent",
                 "rmi:");
         a = (A) vnLookup.getUniqueAO();
+        
     }
 
     /**
@@ -82,6 +85,7 @@ public class Test extends ProActiveFunctionalTest {
     * @see testsuite.test.AbstractTest#endTest()
     */
     public void endTest() throws Exception {
+    	proActiveDescriptorAgent.killall();
     }
 
     public boolean postConditions() throws Exception {
