@@ -12,54 +12,56 @@
 			<unitTest class="nonregressiontest.runtime.defaultruntime.Test" />
 			<unitTest class="nonregressiontest.node.nodefactory.Test" /> 
 			<!-- the next test create 3 nodes, accessible by 3 static methods -->
-			<unitTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
-			<unitTest class="nonregressiontest.stub.stubgeneration.Test" />
-			<unitTest class="nonregressiontest.stub.stubinterface.Test" />
-			<unitTest class="nonregressiontest.activeobject.creation.local.newactive.Test" />
-			<unitTest class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
-			<unitTest class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
-			<unitTest class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
-			<unitTest class="nonregressiontest.activeobject.request.Test" />
-			<unitTest class="nonregressiontest.activeobject.request.immediateservice.Test" />
-			<unitTest class="nonregressiontest.activeobject.request.terminate.Test" />
-			<unitTest class="nonregressiontest.activeobject.lookupactive.Test" />
-			<unitTest class="nonregressiontest.activeobject.node.getactiveobject.Test" />
-			<unitTest class="nonregressiontest.activeobject.migration.simplemigration.Test" />
-			<unitTest class="nonregressiontest.activeobject.migration.multiplemigration.Test" />
-			<unitTest class="nonregressiontest.activeobject.migration.loopmigration.Test" />
-			<unitTest class="nonregressiontest.activeobject.migration.strategy.Test" />
-			<unitTest class="nonregressiontest.activeobject.locationserver.Test" />
-			<unitTest class="nonregressiontest.activeobject.loopmixedlocation.Test" />
-			<unitTest class="nonregressiontest.activeobject.acontinuation.Test" /> 
-			<unitTest class="nonregressiontest.descriptor.lookupregister.Test" />
-			<unitTest class="nonregressiontest.descriptor.services.rmilookup.Test" />
-			<unitTest class="nonregressiontest.descriptor.services.p2p.Test" />
-    		<unitTest class="nonregressiontest.runtime.classloader.Test" />
-			<unitTest class="nonregressiontest.group.creation.Test" />
-			<unitTest class="nonregressiontest.group.onewaycall.Test" />
-			<unitTest class="nonregressiontest.group.asynchronouscall.Test" />
-			<unitTest class="nonregressiontest.group.result.Test" />
-			<unitTest class="nonregressiontest.group.scatter.Test" />
-			<unitTest class="nonregressiontest.group.oneserialization.Test" />
-			<unitTest class="nonregressiontest.group.exception.Test" />
-			<unitTest class="nonregressiontest.group.dynamicthreadpool.Test" />
-			<unitTest class="nonregressiontest.group.javaobject.Test" />
-			<unitTest class="nonregressiontest.group.barrier.Test" />
-			<unitTest class="nonregressiontest.group.accessbyname.Test" />
-			<unitTest class="nonregressiontest.activeobject.equality.Test" />
-			<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
-			<unitTest class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
-			<unitTest class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
-			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.Test"/>
-			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
-			<unitTest class="nonregressiontest.component.binding.local.collective.Test"/>
-			<unitTest class="nonregressiontest.component.binding.remote.collective.Test"/>
-			<unitTest class="nonregressiontest.component.binding.local.Test"/>
-			<unitTest class="nonregressiontest.component.descriptor.fractaladl.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.descriptor.defaultnodes.TestNodes" />
+			<unitTest exclude="no" class="nonregressiontest.stub.stubgeneration.Test" />
+			<unitTest exclude="no" class="nonregressiontest.stub.stubinterface.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.newactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.local.turnactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.newactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.creation.remote.turnactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.request.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.request.immediateservice.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.request.terminate.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.lookupactive.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.node.getactiveobject.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.simplemigration.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.multiplemigration.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.loopmigration.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.migration.strategy.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.locationserver.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
+			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.services.rmilookup.Test" />
+			<unitTest exclude="no" class="nonregressiontest.descriptor.services.p2p.Test" />
+    			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.creation.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.onewaycall.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.asynchronouscall.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.result.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.scatter.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.oneserialization.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.exception.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.dynamicthreadpool.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.javaobject.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.barrier.Test" />
+			<unitTest exclude="no" class="nonregressiontest.group.accessbyname.Test" />
+			<unitTest exclude="no" class="nonregressiontest.activeobject.equality.Test" />
+			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.parallel.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.local.collective.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.remote.collective.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.binding.local.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.nfe.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.nfe.servicecrash.Test"/>
 	</packageGroup>
 	
     <interLinkedGroup name="composite components interlinked tests" description="creation, assembly, binding, local and remote of composite components">
-    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+    		<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
 		<idTest class="nonregressiontest.component.creation.local.newactive.composite.Test" id="1" />
 		<idTest class="nonregressiontest.component.assembly.local.composite.Test" id="2" />
 		<idTest class="nonregressiontest.component.binding.local.composite.Test" id="3" /> 
@@ -90,7 +92,7 @@
 	</interLinkedGroup> 
 	
     <interLinkedGroup name="parallel components interlinked tests" description="creation, assembly, binding, local and remote of parallel components ">
-    	<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
+    		<idTest class="nonregressiontest.descriptor.defaultnodes.TestNodes" id="0" />
 		<idTest class="nonregressiontest.component.creation.local.newactive.parallel.Test" id="7" />
 		<idTest class="nonregressiontest.component.assembly.local.parallel.Test" id="8" />
 		<idTest class="nonregressiontest.component.binding.local.parallel.Test" id="9" />
