@@ -18,7 +18,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator
 {
 	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
   
-  private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home")+FILE_SEPARATOR+"ProActive"+FILE_SEPARATOR+"scripts"+FILE_SEPARATOR+"unix"+FILE_SEPARATOR+"gridexperiment"+FILE_SEPARATOR+"oasis-exp.sh";
+  private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home")+FILE_SEPARATOR+"ProActive"+FILE_SEPARATOR+"scripts"+FILE_SEPARATOR+"unix"+FILE_SEPARATOR+"gridexperiment"+FILE_SEPARATOR+"oasis-exp";
   protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
   
 	private String parallelize = null;
@@ -107,7 +107,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator
 		String targetCommand = targetProcess.getCommand();
 		
 		newScriptText.append(scriptText);
-		newScriptText.append("\n"+targetCommand+" ) >> /tmp/oasisgrid/log 2>&1 &");
+		newScriptText.append("\ntime "+targetCommand+" ) &");
 		return newScriptText.toString();
 	}
 
