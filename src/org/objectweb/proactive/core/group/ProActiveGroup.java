@@ -312,10 +312,9 @@ public class ProActiveGroup {
      */
     public static boolean isScatterGroupOn (Object ogroup) {
  		Proxy proxytmp = findProxyForGroup(ogroup);
-	//	if (proxytmp != null)
-	//		return ((ProxyForGroup)proxytmp).isDispatchingOn();
-	//	else return false;
-	return false;
+		if (proxytmp != null)
+			return ((ProxyForGroup)proxytmp).isDispatchingOn();
+		else return false;
    }
 
     /**

@@ -75,6 +75,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	}
 
 
+protected boolean isDispatchingOn() {
+return dispatching;	
+ 
+}
+
 	/* ------------------------ THE PROXY'S METHOD ------------------------ */
 
 	/** The proxy's method, implements the semantic of communication */
