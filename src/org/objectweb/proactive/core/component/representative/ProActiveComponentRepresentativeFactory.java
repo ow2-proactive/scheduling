@@ -30,20 +30,27 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import org.apache.log4j.Logger;
-
 import org.objectweb.fractal.api.type.ComponentType;
 
 import org.objectweb.proactive.core.mop.Proxy;
 
 
+/**
+ * This is a factory for component representatives.
+ * 
+ * @author Matthieu Morel
+ *
+ */
 public class ProActiveComponentRepresentativeFactory {
-    protected static Logger logger = Logger.getLogger(ProActiveComponentRepresentativeFactory.class.getName());
     private static ProActiveComponentRepresentativeFactory INSTANCE = null;
 
     private ProActiveComponentRepresentativeFactory() {
     }
 
+    /**
+     * returns the unique instance in the jvm
+     * @return the unique instance in the jvm
+     */
     public static ProActiveComponentRepresentativeFactory instance() {
         if (INSTANCE == null) {
             return (INSTANCE = new ProActiveComponentRepresentativeFactory());
@@ -52,6 +59,14 @@ public class ProActiveComponentRepresentativeFactory {
         }
     }
 
+    /**
+     * Creates a component representative according to the type of the component 
+     * (it also generates the required functional interfaces), and connects the representative to
+     * the given proxy 
+     * @param componentType the type of the component
+     * @param proxy the proxy to the active object
+     * @return a corresponding component representative
+     */
     public ProActiveComponentRepresentative createComponentRepresentative(
         ComponentType componentType, Proxy proxy) {
         ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType);
