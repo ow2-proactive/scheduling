@@ -30,15 +30,14 @@
  */
 package org.objectweb.proactive.core.component.adl.implementations;
 
-import org.apache.log4j.Logger;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.adl.ADLException;
-import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.RegistryManager;
@@ -47,8 +46,6 @@ import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualN
 import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.ProActiveLogger;
-
-import java.util.Map;
 
 
 /**
