@@ -145,7 +145,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     public static UniversalBody lookup(String urn) throws java.io.IOException {
         try {
             String url;
-            int port = ClassServer.DEFAULT_SERVER_BASE_PORT;
+            int port = Integer.parseInt(System.getProperty("proactive.http.port"));
             url = urn;
 
             if (urn.lastIndexOf(":") > 4) {
