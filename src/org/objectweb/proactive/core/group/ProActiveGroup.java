@@ -89,9 +89,9 @@ public class ProActiveGroup {
 
 
     /**
-     * Returns a Group corresponding to the Object o representing a group. Return null if o does not representing a group.
-     * @param <code>o</code> - the object representing a group (a typed group).
-     * @return the Group corresponding to <code>o</code>.
+     * Returns the <code>Group</code> for typed group <code>o</code>. Returns null if <code>o</code> is not a typed group.
+     * @param <code>o</code> - the typed group.
+     * @return the <code>Group</code> corresponding to <code>o</code>. <code>null</code> if <code>o</code> is not a typed group.
      */
     public static Group getGroup(Object o) {
 		return ProActiveGroup.findProxyForGroup(o);
@@ -165,7 +165,6 @@ public class ProActiveGroup {
 	
 	return ProActiveGroup.newGroup(className, params, nodeList);
 	}
-
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates all members with params on the node.

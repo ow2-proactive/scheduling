@@ -32,8 +32,10 @@ package org.objectweb.proactive.core.group;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -63,8 +65,11 @@ public class ProxyForGroup extends AbstractProxy
     /** The name of the Class : all members of the group are "className" assignable */
     protected String className;
 
-    /** The list of member : it contains exclusively StubObjects connected to Proxies */
-    protected Vector memberList;
+	/** The list of member : it contains exclusively, StubObjects connected to Proxies, or Java Objects */
+	protected Vector memberList;
+
+	/** The hashmap : to associate a name to the members */
+	protected HashMap hashList;
 
     /** Unique identificator for body (avoid infinite loop in some hierarchicals groups) */
 
@@ -1000,5 +1005,86 @@ public class ProxyForGroup extends AbstractProxy
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
     }
+
+
+	//Map class style method
+	/**
+	 * Returns <code>true</code> if this Group contains a mapping for the specified key.
+	 * More formally, returns <code>true</code> if and only if this Group contains at
+	 * a mapping for a key <code>k</code> such that <code>(key==null ? k==null : key.equals(k))</code>.
+	 * (There can be at most one such mapping.)
+	 * @param key - key whose presence in this Group is to be tested.
+	 * @return <code>true</code> if this Group contains a mapping for the specified key.
+	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
+	 * @throws NullPointerException - if the key is null and this Group does not not permit null keys (optional).
+	 */
+	public boolean containsKey(String key) {
+		return this.hashList.containsKey(key);
+	}
+
+	/**
+	 * Returns <code>true</code> if this Group maps one or more keys to the specified value.
+	 * More formally, returns <code>true</code> if and only if this Group contains at least
+	 * one mapping to a value <code>v</code> such that <code>(value==null ? v==null : value.equals(v))</code>.
+	 * @param value - value whose presence in this map is to be tested.
+	 * @return <code>true</code> if this Group maps one or more keys to the specified value.
+	 * @throws ClassCastException - if the value is of an inappropriate type for this Collection (optional).
+	 * @throws NullPointerException - if the value is null and this Group does not not permit null values (optional).  
+	 */
+	public boolean containsValue(Object value) {
+		return this.memberList.contains(value);
+	}
+
+
+	/**
+ 	 * Returns the Object to which this Group maps the specified key.
+ 	 * Returns <code>null</code> if the Collection contains no mapping for this key.
+ 	 * A return value of <code>null</code> does not necessarily indicate that the Collection
+ 	 * contains no mapping for the key; it's also possible that the Group explicitly maps the key to null.
+ 	 * The containsKey operation may be used to distinguish these two cases.
+ 	 * More formally, if this Group contains a mapping from a key <code>k</code> to a value
+ 	 * <code>v</code> such that <code>(key==null ? k==null : key.equals(k))</code>,
+ 	 * then this method returns <code>v</code>; otherwise it returns <code>null</code>.
+ 	 * (There can be at most one such mapping.)
+ 	 * @param key - key whose associated value is to be returned.
+ 	 * @return the value to which this map maps the specified key, or <code>null</code> if the map contains no mapping for this key.
+ 	 * @throws ClassCastException - if the key is of an inappropriate type for this Group (optional).
+ 	 * @throws NullPointerException - key is <code>null</code> and this Group does not not permit null keys (optional).
+	 */
+	public Object get(String key) {
+		return this.hashList.get(key);
+	}
+
+	/**
+	 * Associates the specified value with the specified key in this Group (optional operation).
+	 * If the Group previously contained a mapping for this key, the old value is replaced by
+	 * the specified value. (A map <code>m</code> is said to contain a mapping for a key
+	 * <code>k</code> if and only if <code>m.containsKey(k)</code> would return <code>true</code>.))
+	 * @param key - key with which the specified value is to be associated.
+	 * @param value - value to be associated with the specified key.
+	 * @throws UnsupportedOperationException - if the put operation is not supported by this Group.
+	 * @throws ClassCastException - if the class of the specified key or value prevents it from being stored in this Group.
+	 * @throws IllegalArgumentException - if some aspect of this key or value prevents it from being stored in this Group.
+	 * @throws NullPointerException - this map does not permit null keys or values, and the specified key or value is <code>null</code>.
+	 */
+	public synchronized void put(String key, Object value) {
+		this.add(value);
+		this.hashList.put(key,new Integer(this.size()-1));
+	}
+
+
+	/**
+	 *	Returns a set view of the keys contained in this Group.
+	 * The set is backed by the Group, so changes to the Group are reflected in the set,
+	 * and vice-versa. If the Group is modified while an iteration over the set is in progress,
+	 * the results of the iteration are undefined. The set supports element removal,
+	 * which removes the corresponding mapping from the Group, via the Iterator.remove,
+	 * Set.remove, removeAll retainAll, and clear operations.
+	 * It does not support the add or addAll operations.
+	 * @return a set view of the keys contained in this Group.
+	 */
+	public Set keySet() {
+		return this.hashList.keySet();
+	}
 
 }
