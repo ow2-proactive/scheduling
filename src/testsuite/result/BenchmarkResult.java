@@ -40,7 +40,8 @@ public class BenchmarkResult extends TestResult {
         if ((getType() == AbstractResult.RESULT) ||
                 (getType() == AbstractResult.GLOBAL_RESULT)) {
             Element result = document.createElement("Benchmark");
-            result.setAttribute("time", timeResult + "");
+            Node resultText = document.createTextNode(timeResult + "");
+            result.appendChild(resultText);
             root.appendChild(result);
         }
 

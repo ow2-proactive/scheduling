@@ -4,6 +4,25 @@
  */
 package testsuite.manager;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.WriterAppender;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import testsuite.bean.Beanable;
+
+import testsuite.group.Group;
+
+import testsuite.result.ResultsCollections;
+import testsuite.result.ResultsExporter;
+
+import testsuite.test.AbstractTest;
+
+import testsuite.xslt.TransformerXSLT;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,8 +31,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -23,25 +44,7 @@ import java.util.Properties;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.WriterAppender;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-
-import testsuite.bean.Beanable;
-import testsuite.group.Group;
-import testsuite.result.ResultsCollections;
-import testsuite.result.ResultsExporter;
-import testsuite.test.AbstractTest;
 
 
 /**
@@ -227,19 +230,10 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      */
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
-        TransformerFactory tFactory = TransformerFactory.newInstance();
         String xslPath = "/" +
             AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
                 "/xslt/manager.xsl");
-        InputStream stylesheet = getClass().getResourceAsStream(xslPath);
-        FileOutputStream os = new FileOutputStream(location);
-        Transformer transformer = tFactory.newTransformer(new StreamSource(
-                    stylesheet));
-        DOMSource xml = new DOMSource(toXML());
-
-        transformer.transform(xml, new StreamResult(os));
-        os.close();
-        stylesheet.close();
+        TransformerXSLT.transformerTo(toXML(), location, xslPath);
 
         // copy css
         String cssPath = "/" +

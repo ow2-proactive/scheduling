@@ -4,13 +4,26 @@
  */
 package testsuite.manager;
 
-import java.io.IOException;
-import java.util.Iterator;
-
 import testsuite.group.Group;
+
 import testsuite.result.AbstractResult;
 import testsuite.result.ResultsCollections;
+
 import testsuite.test.Benchmark;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
+import java.util.Iterator;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 
 /**
@@ -137,5 +150,33 @@ public abstract class BenchmarkManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
+    }
+
+    /**
+     * @see testsuite.result.ResultsExporter#toHTML(java.io.File)
+     */
+    public void toHTML(File location)
+        throws ParserConfigurationException, TransformerException, IOException {
+        createSVG(location.getParentFile());
+        super.toHTML(location);
+    }
+
+    private void createSVG(File location)
+        throws ParserConfigurationException, TransformerException, IOException {
+        TransformerFactory tFactory = TransformerFactory.newInstance();
+        String xslPath = "/" +
+            AbstractManager.class.getName().replace('.', '/').replaceAll("manager.*",
+                "/xslt/svgExporter.xsl");
+        InputStream stylesheet = getClass().getResourceAsStream(xslPath);
+        Transformer transformer = tFactory.newTransformer(new StreamSource(
+                    stylesheet));
+        DOMSource xml = new DOMSource(toXML());
+
+        transformer.setParameter("dest", location.getPath());
+        File tmp = File.createTempFile("bench", ".tmp");
+        tmp.deleteOnExit();
+        StreamResult os = new StreamResult(tmp);
+        transformer.transform(xml, os);
+        stylesheet.close();
     }
 }

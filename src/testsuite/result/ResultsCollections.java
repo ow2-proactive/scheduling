@@ -4,29 +4,25 @@
  */
 package testsuite.result;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import testsuite.exception.BadTypeException;
+
+import testsuite.xslt.TransformerXSLT;
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import testsuite.exception.BadTypeException;
 
 
 /**
@@ -120,19 +116,10 @@ public class ResultsCollections implements ResultsExporter {
 
     public void toHTML(File location)
         throws ParserConfigurationException, TransformerException, IOException {
-        TransformerFactory tFactory = TransformerFactory.newInstance();
         String xslPath = "/" +
             ResultsCollections.class.getName().replace('.', '/').replaceAll("result.*",
                 "/xslt/results.xsl");
-        InputStream stylesheet = getClass().getResourceAsStream(xslPath);
-        FileOutputStream os = new FileOutputStream(location);
-        Transformer transformer = tFactory.newTransformer(new StreamSource(
-                    stylesheet));
-        DOMSource xml = new DOMSource(toXML());
-
-        transformer.transform(xml, new StreamResult(os));
-        os.close();
-        stylesheet.close();
+        TransformerXSLT.transformerTo(toXML(), location, xslPath);
     }
 
     public Document toXML() throws ParserConfigurationException {

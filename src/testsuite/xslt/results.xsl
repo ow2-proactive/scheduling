@@ -6,7 +6,6 @@
 	<xsl:template match="/">
 		<html>
 			<head>
-  				<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1" />
   				<title>Results</title>
   			</head>
 			<body>
@@ -38,8 +37,8 @@
 				<xsl:if test="@failed = 'true'"><b><span style="color: rgb(255, 0, 0);"> [FAILED] </span></b></xsl:if>
 				<xsl:if test="@failed = 'false'"><b><span style="color: rgb(0, 255, 0);"> [SUCCESS] </span></b></xsl:if>
 			</xsl:if>
-			<xsl:if test="Benchmark/@time">
-				--> <i>Runs in </i><b><xsl:value-of select ="Benchmark/@time" /></b><i>ms</i>
+			<xsl:if test="Benchmark">
+				--> <i>Runs in </i><b><xsl:value-of select ="Benchmark" /></b><i>ms</i>
 			</xsl:if>
 			<xsl:if test="Exception">
 				<p class="error">Stack Trace :<br />
