@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.xml.sax.SAXException;
+import sun.security.krb5.internal.ccache.ao;
 
 /**
  * <p>
@@ -266,6 +268,33 @@ public class ProActive {
       throw new ActiveObjectCreationException(t);
     }
   }
+  
+	/**
+	 * Creates a new ActiveObject based on classname attached to the given virtualnode.
+	 * @param classname classname the name of the class to instanciate as active
+	 * @param constructorParameters constructorParameters the parameters of the constructor.
+	 * @param virtualnode The virtualnode where to create active objects. Active objects will be created 
+	 * on each node mapped to the given virtualnode in XML deployment descriptor.
+	 * @return Object[] an array of references (possibly remote) on  Stub of newly created active objects
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws NodeException if the virtualnode was null
+	 */
+  public static Object[] newActive(String classname, Object[] constructorParameters, VirtualNode virtualnode) throws ActiveObjectCreationException, NodeException{
+  	if (virtualnode != null){
+  		Node[] nodeTab = virtualnode.getNodes();
+  		Object[] aoTab = new Object[nodeTab.length];
+  		for (int i = 0; i < nodeTab.length; i++)
+			{
+			 Object tmp = newActive(classname,constructorParameters,(Node)nodeTab[i]);
+			 aoTab[i] = tmp;
+			}
+			return aoTab;
+  	}else{
+  		throw new NodeException("VirtualNode is null, unable to active the object");
+  	}
+  	
+  }
+  
 
   /**
    * Turns the target object into an ActiveObject attached to a default node in the local JVM.
@@ -394,7 +423,38 @@ public class ProActive {
       throw new ActiveObjectCreationException(t);
     }
   }
-
+  
+  
+  /**
+   * Turns a Java object into an Active Object and send it to remote Nodes mapped to the given virtualnode in
+   * the XML deployment descriptor.
+   * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+   * @param target The object to turn active
+   * @param nameOfTargetType the fully qualified name of the type the stub class should
+   * inherit from. That type can be less specific than the type of the target object.
+   * @param virtualnode The VirtualNode where the target object will be turn into an Active Object
+   * Target object will be turned into an Active Object on each node mapped to the given virtualnode in XML deployment descriptor.
+   * @return an array of references (possibly remote) on a Stub of the target object
+   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+   * @exception NodeException if the node was null and that the DefaultNode cannot be created
+   */
+  public static Object[] turnActive(Object target, String nameOfTargetType, VirtualNode virtualnode)
+    throws ActiveObjectCreationException, NodeException {
+    	if (virtualnode != null){
+  		Node[] nodeTab = virtualnode.getNodes();
+  		Object[] aoTab = new Object[nodeTab.length];
+  		for (int i = 0; i < nodeTab.length; i++)
+			{
+        Object tmp = turnActive(target, nameOfTargetType, (Node)nodeTab[i], null, null);
+        aoTab[i] = tmp;
+      }
+			return aoTab;
+  	}else{
+  		throw new NodeException("VirtualNode is null, unable to active the object");
+  	}
+  }
+  
+  
   /**
    * Registers an active object into a RMI registry. In fact it is the
    * remote version of the body of the active object that is registered into the 
