@@ -84,6 +84,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   protected String processor = DEFAULT_PROCESSOR_NUMBER;
   
+  protected String interactive = "false";
+  
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -195,6 +197,24 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   
 	/**
+	 * Returns true if this BsubProcess is lauched with -I option false otherwise
+	 * @return boolean
+	 */
+  public String isInteractive(){
+  	return interactive;
+  }
+  
+  
+	/**
+	 * Allows to launch this BsubProcess with -I (interactive option)
+	 * @param interactive true for -I option false otherwise
+	 */
+  public void setInteractive(String interactive){
+  	this.interactive = interactive;
+  }
+  
+  
+	/**
 	 * Sets the number of processor requested when running the job
 	 * @param processor
 	 */
@@ -213,6 +233,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   public String getProcessorNumber(){
   	return processor;
   }
+  
+  
   
   public void setScriptLocation(String location){
   	checkStarted();
@@ -237,7 +259,9 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   
   protected String buildBSubCommand() {
   	StringBuffer bSubCommand = new StringBuffer();
-  	bSubCommand.append(DEFAULT_BSUBPATH+" -n "+processor+" -q "+queueName+" ");
+  	bSubCommand.append(DEFAULT_BSUBPATH);
+  	if(interactive.equals("true")) bSubCommand.append(" -I");
+  	bSubCommand.append(" -n "+processor+" -q "+queueName+" ");
   	if(hostList != null){
   		bSubCommand.append("-m "+hostList+" ");
   	}
@@ -245,7 +269,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   	bSubCommand.append("-R span[ptile=2] "+scriptLocation+" "+getTargetProcess().getCommand());
   	}
   	
-  	System.out.println("bsub command is "+bSubCommand.toString());
+  	logger.info("bsub command is "+bSubCommand.toString());
     return bSubCommand.toString();
   }
   
@@ -262,7 +286,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    *    Job <...>
    */
   protected int parseJobID(String message) {
-    System.out.println("parseJobID analyzing "+message);
+    logger.info("parseJobID analyzing "+message);
     String beginJobIDMarkup = "Job <";
     String endJobIDMarkup = ">";
     int n1 = message.indexOf(beginJobIDMarkup);
@@ -270,7 +294,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     int n2 = message.indexOf(endJobIDMarkup, n1+beginJobIDMarkup.length());
     if (n2 == -1) return 0;
     String id = message.substring(n1+beginJobIDMarkup.length(), n2);
-    System.out.println("!!!!!!!!!!!!!! JOBID = "+id);
+   logger.info("!!!!!!!!!!!!!! JOBID = "+id);
     try {
       return Integer.parseInt(id);
     } catch (NumberFormatException e) {
@@ -294,7 +318,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
    * hostname if it is found.
    */
   protected String parseHostname(String message) {
-    System.out.println("parseHostname analyzing "+message);
+    logger.info("parseHostname analyzing "+message);
     java.util.StringTokenizer st = new java.util.StringTokenizer(message);
     if (st.countTokens() < 6) return null; // we expect at least 6 tokens
     try {
@@ -311,8 +335,8 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     st.nextToken(); // ignore queue
     st.nextToken(); // ignore fromHost
     String hostname = st.nextToken();
-    System.out.println("!!!!!!!!!!!!!! hostname = "+hostname);
-    System.out.println("token "+st.countTokens());
+    logger.info("!!!!!!!!!!!!!! hostname = "+hostname);
+    logger.info("token "+st.countTokens());
     return hostname;
   }
   
