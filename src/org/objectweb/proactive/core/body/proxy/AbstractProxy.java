@@ -91,29 +91,16 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
     }
 
     /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @param handler A class of handler associated with a class of non functional exception.
      */
-    public void setExceptionHandler(Class exception, Class handler)
+    public void setExceptionHandler(Handler handler, Class exception)
         throws ProActiveException {
         // add handler to proxy level
         if (proxyLevel == null) {
             proxyLevel = new HashMap();
         }
-        try {
-            proxyLevel.put(exception, handler.newInstance());
-        } catch (InstantiationException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "[NFE_SET_PROXY_ERROR] : Cannot instantiate handler of class" +
-                    handler.getName());
-            }
-        } catch (IllegalAccessException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_SET_PROXY_ERROR] : Cannot acces class" +
-                    handler.getName());
-            }
-        }
+        proxyLevel.put(exception, handler);
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -128,7 +115,8 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
             return handler;
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_REMOVE_PROXY_WARNING] : handler for exception " +
+                logger.debug(
+                    "[NFE_REMOVE_PROXY_WARNING] : handler for exception " +
                     exception.getName() + "did not exist in PROXY level");
             }
             return null;

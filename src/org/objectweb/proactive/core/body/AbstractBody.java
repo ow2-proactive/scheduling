@@ -857,29 +857,16 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @param handler A class of handler associated with a class of non functional exception.
      */
-    public void setExceptionHandler(Class exception, Class handler)
+    public void setExceptionHandler(Handler handler, Class exception)
         throws ProActiveException {
         // add handler to body level
         if (bodyLevel == null) {
             bodyLevel = new HashMap();
         }
-        try {
-            bodyLevel.put(exception, handler.newInstance());
-        } catch (InstantiationException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "[NFE_SET_BODY_ERROR] : Cannot instantiate handler of class" +
-                    handler.getName());
-            }
-        } catch (IllegalAccessException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_SET_BODY_ERROR] : Cannot acces class" +
-                    handler.getName());
-            }
-        }
+		bodyLevel.put(exception, handler);
     }
 
     /** Remove a handler from the table of the Handlerizable Object

@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.exceptions.handler;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
 
+import java.util.HashMap;
+
 
 /**
  * Handle all communication exceptions
@@ -43,6 +45,11 @@ import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicat
  *
  */
 public class HandlerCommunicationException extends HandlerNonFunctionalException {
+
+    /**
+     *  This list keeps a trace of the different distant machines used by the application
+     */
+    static public HashMap machineList;
 
     /**
      * Is the exception reliable for the handler ?
@@ -57,7 +64,7 @@ public class HandlerCommunicationException extends HandlerNonFunctionalException
      * @param e The exception to be handled
      */
     public void handle(NonFunctionalException e, Object info) {
-    	// System.out.println("PROBLEM ON " + ((String) info));
+        // System.out.println("PROBLEM ON " + ((String) info));
         super.handle(e, info);
     }
 

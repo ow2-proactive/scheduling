@@ -167,10 +167,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A class of handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param handler A class of handler associated with a class of non functional exception.
      */
-    public void setExceptionHandler(Class handler, Class exception)
+    public void setExceptionHandler(Handler handler, Class exception)
         throws ProActiveException {
         this.wrappedBody.setExceptionHandler(handler, exception);
     }

@@ -1355,29 +1355,17 @@ public class ProActive {
     /**
      * Add one handler of Non Functional Exception (nfe) to a specific level.
      * Similar handlers are overwritten except those at default level.
-     * @param handler A class of handler associated with a class of non functional exception.
+     * @param h An instantiated handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @param levelID An identificator for the level where the handler is added.
      * @param target An object which contains its own level. It is null if  <code>levelID</code> is default or VM level.
      */
-    public static void setExceptionHandler(Class handler, Class exception,
+    public static void setExceptionHandler(Handler h, Class exception,
         int levelID, Object target) {
         // Logging info
         if (logger.isDebugEnabled()) {
-            logger.debug("[NFE_INFO] Setting " + handler.getName() + " for " +
+            logger.debug("[NFE_INFO] Setting " + h.toString() + " for " +
                 exception.getName() + " in level " + levelID);
-        }
-
-        // Handler instantiation
-        Handler h = null;
-        try {
-            h = (Handler) handler.newInstance();
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "[NFE_SET_ERROR] Problem during instantiation of class " +
-                    handler.getName());
-            }
         }
 
         // To minimize overall cost, level are created during the association of the first handler
@@ -1403,26 +1391,23 @@ public class ProActive {
                         // Local body
                         if (logger.isDebugEnabled()) {
                             logger.debug("[NFE_INFO] Setting handler " +
-                                handler.getName() +
-                                " in local body of object " +
+                                h.toString() + " in local body of object " +
                                 target.getClass().getName());
                         }
-                        body.setExceptionHandler(exception, handler);
+                        body.setExceptionHandler(h, exception);
                     } else if (body instanceof RemoteBodyAdapter) {
                         // Remote body
                         if (logger.isDebugEnabled()) {
                             logger.debug("[NFE_INFO] Setting handler " +
-                                handler.getName() +
-                                " in remote body of object " +
+                                h.toString() + " in remote body of object " +
                                 target.getClass().getName());
                         }
-                        body.getRemoteAdapter().setExceptionHandler(exception,
-                            handler);
+                        body.getRemoteAdapter().setExceptionHandler(h, exception);
                     }
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("[NFE_ERROR] Setting handler " +
-                            handler.getName() + " in body level failed");
+                            h.toString() + " in body level failed");
                     }
                 }
             } else {
@@ -1436,12 +1421,11 @@ public class ProActive {
             // The target object must be a proxy
             if (((target != null) && target instanceof AbstractProxy)) {
                 try {
-                    ((AbstractProxy) target).setExceptionHandler(exception,
-                        handler);
+                    ((AbstractProxy) target).setExceptionHandler(h, exception);
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("[NFE_ERROR] Setting handler " +
-                            handler.getName() + " in proxy level failed");
+                            h.toString() + " in proxy level failed");
                     }
                 }
             } else {
@@ -1456,8 +1440,7 @@ public class ProActive {
         case (Handler.ID_Code):
             if (target != null) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("[NFE_INFO] Setting handler " +
-                        handler.getName() +
+                    logger.debug("[NFE_INFO] Setting handler " + h.toString() +
                         " in code level specific to object " +
                         target.getClass().getName());
                 }
@@ -1468,7 +1451,7 @@ public class ProActive {
                 // Try to get the hashmap associated to this object
                 if (codeLevel.containsKey(new Integer(target.hashCode()))) {
                     ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
-                        handler);
+                        h);
                 } else {
                     codeLevel.put(new Integer(target.hashCode()), new HashMap());
                     ((HashMap) codeLevel.get(new Integer(target.hashCode()))).put(exception,
@@ -1485,6 +1468,31 @@ public class ProActive {
     }
 
     /**
+     * Add one handler of Non Functional Exception (nfe) to a specific level.
+     * Similar handlers are overwritten except those at default level.
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @param levelID An identificator for the level where the handler is added.
+     * @param target An object which contains its own level. It is null if  <code>levelID</code> is default or VM level.
+     */
+    public static void setExceptionHandler(Class handler, Class exception,
+        int levelID, Object target) {
+        // Handler instantiation
+        Handler h = null;
+        try {
+            h = (Handler) handler.newInstance();
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "[NFE_SET_ERROR] Problem during instantiation of class " +
+                    handler.getName());
+            }
+        }
+
+        setExceptionHandler(h, exception, levelID, target);
+    }
+
+    /**
      * Remove a handler associated to a class of non functional exceptions.
      * @param exception A class of non functional exception which does not require the given handler anymore.
      * @param levelID An identificator for the level where the handler is removed.
@@ -1492,7 +1500,6 @@ public class ProActive {
      */
     public static Handler unsetExceptionHandler(Class exception, int levelID,
         Object target) {
-        	
         // Logging info
         if (logger.isDebugEnabled()) {
             logger.debug("[NFE_INFO] Removing handler for " +
@@ -1500,14 +1507,15 @@ public class ProActive {
         }
 
         // We keep a trace of the removed handler
-        Handler handler= null;
+        Handler handler = null;
 
         // The correct level is identified
         switch (levelID) {
         // Default level must not be modified !
         case (Handler.ID_Default):
             if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_WARNING] Removing handler from default level is forbidden");
+                logger.debug(
+                    "[NFE_WARNING] Removing handler from default level is forbidden");
             }
             return null;
         case (Handler.ID_VM):
@@ -1524,12 +1532,13 @@ public class ProActive {
                     if (body instanceof ActiveBody) {
                         handler = body.unsetExceptionHandler(exception);
                     } else if (body instanceof RemoteBodyAdapter) {
-						handler = body.getRemoteAdapter().unsetExceptionHandler(exception);
+                        handler = body.getRemoteAdapter().unsetExceptionHandler(exception);
                     }
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
-						logger.debug("[NFE_ERROR] Removing handler " +
-							handler.getClass().getName() + " from body level failed");
+                        logger.debug("[NFE_ERROR] Removing handler " +
+                            handler.getClass().getName() +
+                            " from body level failed");
                     }
                 }
             }
@@ -1543,8 +1552,9 @@ public class ProActive {
                     return handler;
                 } catch (ProActiveException e) {
                     if (logger.isDebugEnabled()) {
-						logger.debug("[NFE_ERROR] Removing handler " +
-							handler.getClass().getName() + " from proxy level failed");
+                        logger.debug("[NFE_ERROR] Removing handler " +
+                            handler.getClass().getName() +
+                            " from proxy level failed");
                     }
                 }
             }
@@ -1560,7 +1570,7 @@ public class ProActive {
             }
             break;
         }
-        
+
         return handler;
     }
 

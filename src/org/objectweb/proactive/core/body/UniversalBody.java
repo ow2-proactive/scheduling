@@ -139,10 +139,10 @@ public interface UniversalBody {
     public HashMap getHandlersLevel() throws ProActiveException;
 
     /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @param handler A class of handler associated with a class of non functional exception.
      */
-    public void setExceptionHandler(Class exception, Class handler)
+    public void setExceptionHandler(Handler handler, Class exception)
         throws ProActiveException;
 
     /** Remove a handler from the table of the Handlerizable Object
