@@ -1,33 +1,33 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -45,502 +45,400 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
 import org.xml.sax.SAXException;
 
-public class ProcessDefinitionHandler
 
+public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
+    implements ProActiveDescriptorConstants {
+    protected String id;
+    protected ProActiveDescriptor proActiveDescriptor;
+    protected ExternalProcess targetProcess;
 
-	extends AbstractUnmarshallerDecorator
-	implements ProActiveDescriptorConstants
-{
-	
-	protected String id;
-	protected ProActiveDescriptor proActiveDescriptor;
-	protected ExternalProcess targetProcess;
+    public ProcessDefinitionHandler(ProActiveDescriptor proActiveDescriptor) {
+        super(false);
+        this.proActiveDescriptor = proActiveDescriptor;
+        this.addHandler(JVM_PROCESS_TAG,
+            new JVMProcessHandler(proActiveDescriptor));
+        this.addHandler(RSH_PROCESS_TAG,
+            new RSHProcessHandler(proActiveDescriptor));
+        this.addHandler(MAPRSH_PROCESS_TAG,
+            new MapRshProcessHandler(proActiveDescriptor));
+        this.addHandler(SSH_PROCESS_TAG,
+            new SSHProcessHandler(proActiveDescriptor));
+        this.addHandler(RLOGIN_PROCESS_TAG,
+            new RLoginProcessHandler(proActiveDescriptor));
+        this.addHandler(BSUB_PROCESS_TAG,
+            new BSubProcessHandler(proActiveDescriptor));
+        this.addHandler(GLOBUS_PROCESS_TAG,
+            new GlobusProcessHandler(proActiveDescriptor));
+    }
 
-	public ProcessDefinitionHandler(ProActiveDescriptor proActiveDescriptor)
-	{
-		super(false);
-		this.proActiveDescriptor = proActiveDescriptor;
-		this.addHandler(JVM_PROCESS_TAG,new JVMProcessHandler(proActiveDescriptor));
-		this.addHandler(RSH_PROCESS_TAG, new RSHProcessHandler(proActiveDescriptor));
-		this.addHandler(MAPRSH_PROCESS_TAG, new MapRshProcessHandler(proActiveDescriptor));
-		this.addHandler(SSH_PROCESS_TAG, new SSHProcessHandler(proActiveDescriptor));
-		this.addHandler(RLOGIN_PROCESS_TAG, new RLoginProcessHandler(proActiveDescriptor));
-		this.addHandler(BSUB_PROCESS_TAG, new BSubProcessHandler(proActiveDescriptor));
-		this.addHandler(GLOBUS_PROCESS_TAG, new GlobusProcessHandler(proActiveDescriptor));
-		
-		
+    /**
+     * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(String, UnmarshallerHandler)
+     */
+    protected void notifyEndActiveHandler(String name,
+        UnmarshallerHandler activeHandler) throws SAXException {
+    }
 
-	}
+    /**
+     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
+     */
+    public Object getResultObject() throws SAXException {
+        ExternalProcess result = targetProcess;
+        targetProcess = null;
+        return result;
+    }
 
-	/**
-	 * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(String, UnmarshallerHandler)
-	 */
-	protected void notifyEndActiveHandler(
-		String name,
-		UnmarshallerHandler activeHandler)
-		throws SAXException
-	{
+    /**
+     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(String, Attributes)
+     */
+    public void startContextElement(String name, Attributes attributes)
+        throws SAXException {
+        id = attributes.getValue("id");
+    }
 
-	}
+    public class ProcessHandler extends AbstractUnmarshallerDecorator
+        implements ProActiveDescriptorConstants {
+        protected ProActiveDescriptor proActiveDescriptor;
+        protected boolean isRef;
 
-	/**
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
-	 */
-	public Object getResultObject() throws SAXException
-	{
-		ExternalProcess result = targetProcess;
-		targetProcess = null;
-		return result;
-	}
+        public ProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super();
+            this.proActiveDescriptor = proActiveDescriptor;
+            addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
+            addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
+        }
 
-	/**
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(String, Attributes)
-	 */
-	public void startContextElement(String name, Attributes attributes)
-		throws SAXException
-	{
-		id = attributes.getValue("id");
-	}
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            String className = attributes.getValue("class");
+            if (!checkNonEmpty(className)) {
+                throw new org.xml.sax.SAXException(
+                    "Process defined without specifying the class");
+            }
+            try {
+                targetProcess = proActiveDescriptor.createProcess(id, className);
+            } catch (ProActiveException e) {
+                //e.printStackTrace();
+                throw new org.xml.sax.SAXException(e.getMessage());
+            }
+            String hostname = attributes.getValue("hostname");
+            if (checkNonEmpty(hostname)) {
+                targetProcess.setHostname(hostname);
+            }
+            String username = attributes.getValue("username");
+            if (checkNonEmpty(username)) {
+                targetProcess.setUsername("username");
+            }
+        }
 
+        //
+        // -- implements UnmarshallerHandler ------------------------------------------------------
+        //
+        public Object getResultObject() throws org.xml.sax.SAXException {
+            return null;
+        }
 
-	public class ProcessHandler
+        //
+        // -- PROTECTED METHODS ------------------------------------------------------
+        //
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            if (name.equals(ENVIRONMENT_TAG)) {
+                targetProcess.setEnvironment((String[]) activeHandler.getResultObject());
+            } else if (name.equals(PROCESS_REFERENCE_TAG)) {
+                if (!(targetProcess instanceof ExternalProcessDecorator)) {
+                    throw new org.xml.sax.SAXException(
+                        "found a Process defined inside a non composite process");
+                }
+                ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
+                Object result = activeHandler.getResultObject();
+                proActiveDescriptor.registerProcess(cep, (String) result);
+            }
+        }
 
-		extends AbstractUnmarshallerDecorator
-		implements ProActiveDescriptorConstants
-	{
+        //
+        // -- INNER CLASSES ------------------------------------------------------
+        //
 
-		protected ProActiveDescriptor proActiveDescriptor;
-		protected boolean isRef;
+        /**
+         * This class receives environment events
+         */
+        protected class EnvironmentHandler extends BasicUnmarshaller {
+            private java.util.ArrayList variables;
 
-		public ProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super();
-			this.proActiveDescriptor = proActiveDescriptor;
-			addHandler(ENVIRONMENT_TAG, new EnvironmentHandler());
-			addHandler(PROCESS_REFERENCE_TAG, new ProcessReferenceHandler());
-		}
+            public EnvironmentHandler() {
+            }
 
-		public void startContextElement(String name, Attributes attributes)
-			throws org.xml.sax.SAXException
-		{
-			String className = attributes.getValue("class");
-			if (!checkNonEmpty(className))
-				throw new org.xml.sax.SAXException(
-					"Process defined without specifying the class");
-			try
-			{
-				targetProcess = proActiveDescriptor.createProcess(id, className);
-			}
-			catch (ProActiveException e)
-			{
-				//e.printStackTrace();
-				throw new org.xml.sax.SAXException(e.getMessage());
-			}
-			String hostname = attributes.getValue("hostname");
-			if (checkNonEmpty(hostname))
-				targetProcess.setHostname(hostname);
-			String username = attributes.getValue("username");
-			if (checkNonEmpty(username))
-				targetProcess.setUsername("username");
-		}
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                variables = new java.util.ArrayList();
+            }
 
-		//
-		// -- implements UnmarshallerHandler ------------------------------------------------------
-		//
+            public Object getResultObject() throws org.xml.sax.SAXException {
+                if (variables == null) {
+                    isResultValid = false;
+                } else {
+                    int n = variables.size();
+                    String[] result = new String[n];
+                    if (n > 0) {
+                        variables.toArray(result);
+                    }
+                    setResultObject(result);
+                    variables.clear();
+                    variables = null;
+                }
+                return super.getResultObject();
+            }
 
-		public Object getResultObject() throws org.xml.sax.SAXException
-		{
-			return null;
-		}
+            public void startElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+                if (name.equals(VARIABLE_TAG)) {
+                    String vName = attributes.getValue("name");
+                    String vValue = attributes.getValue("value");
+                    if (checkNonEmpty(vName) && (vValue != null)) {
+                        logger.info("Found environment variable name=" + vName +
+                            " value=" + vValue);
+                        variables.add(vName + "=" + vValue);
+                    }
+                }
+            }
+        }
+         // end inner class EnvironmentHandler
+    }
+     //end of inner class ProcessHandler
 
-		//
-		// -- PROTECTED METHODS ------------------------------------------------------
-		//
+    protected class JVMProcessHandler extends ProcessHandler {
+        public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            UnmarshallerHandler pathHandler = new PathHandler();
+            {
+                CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+                cu.addHandler(ABS_PATH_TAG, pathHandler);
+                cu.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(CLASSPATH_TAG, cu);
+            }
+            BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+            bch.addHandler(ABS_PATH_TAG, pathHandler);
+            bch.addHandler(REL_PATH_TAG, pathHandler);
+            this.addHandler(JAVA_PATH_TAG, bch);
+            this.addHandler(POLICY_FILE_TAG, bch);
+            this.addHandler(LOG4J_FILE_TAG, bch);
+            this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
+            this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
+            this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
+        }
 
-		protected void notifyEndActiveHandler(
-			String name,
-			UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException
-		{
-			if (name.equals(ENVIRONMENT_TAG))
-			{
-				targetProcess.setEnvironment(
-					(String[]) activeHandler.getResultObject());
-			}
-			else if (name.equals(PROCESS_REFERENCE_TAG))
-			{
-				if (!(targetProcess instanceof ExternalProcessDecorator))
-				{
-					throw new org.xml.sax.SAXException(
-						"found a Process defined inside a non composite process");
-				}
-				ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
-				Object result = activeHandler.getResultObject();
-				proActiveDescriptor.registerProcess(cep, (String) result);
-			}
-		}
+        //
+        //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
+        //
+        //
+        //  ----- PROTECTED METHODS -----------------------------------------------------------------------------------
+        //
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            // the fact targetProcess is a JVMProcess is checked in startContextElement
+            //super.notifyEndActiveHandler(name,activeHandler);
+            JVMProcess jvmProcess = (JVMProcess) targetProcess;
 
-		//
-		// -- INNER CLASSES ------------------------------------------------------
-		//
+            if (name.equals(CLASSPATH_TAG)) {
+                String[] paths = (String[]) activeHandler.getResultObject();
+                if (paths.length > 0) {
+                    StringBuffer sb = new StringBuffer();
+                    String pathSeparator = System.getProperty("path.separator");
+                    sb.append(paths[0]);
+                    for (int i = 1; i < paths.length; i++) {
+                        sb.append(pathSeparator);
+                        sb.append(paths[i]);
+                    }
+                    jvmProcess.setClasspath(sb.toString());
+                }
+            } else if (name.equals(JAVA_PATH_TAG)) {
+                String jp = (String) activeHandler.getResultObject();
+                jvmProcess.setJavaPath(jp);
+            } else if (name.equals(POLICY_FILE_TAG)) {
+                jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
+            } else if (name.equals(LOG4J_FILE_TAG)) {
+                jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
+            } else if (name.equals(CLASSNAME_TAG)) {
+                jvmProcess.setClassname((String) activeHandler.getResultObject());
+            } else if (name.equals(PARAMETERS_TAG)) {
+                jvmProcess.setParameters((String) activeHandler.getResultObject());
+            } else if (name.equals(JVMPARAMETERS_TAG)) {
+                jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
+            } else {
+                super.notifyEndActiveHandler(name, activeHandler);
+            }
+        }
+    }
+     // end of inner class JVMProcessHandler 
 
-		/**
-		 * This class receives environment events
-		 */
-		protected class EnvironmentHandler extends BasicUnmarshaller
-		{
+    protected class RSHProcessHandler extends ProcessHandler {
+        public RSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+        }
+    }
+     //end of inner class RSHProcessHandler
 
-			private java.util.ArrayList variables;
+    protected class MapRshProcessHandler extends ProcessHandler {
+        public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            UnmarshallerHandler pathHandler = new PathHandler();
+            BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+            bch.addHandler(ABS_PATH_TAG, pathHandler);
+            bch.addHandler(REL_PATH_TAG, pathHandler);
+            this.addHandler(SCRIPT_PATH_TAG, bch);
+        }
 
-			public EnvironmentHandler()
-			{
-			}
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            // we know that it is a maprsh process since we are
+            // in map rsh handler!!!
+            //MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+            super.startContextElement(name, attributes);
+            String parallelize = attributes.getValue("parallelize");
+            if (checkNonEmpty(parallelize)) {
+                ((MapRshProcess) targetProcess).setParallelization(
+                    "parallelize");
+            }
+        }
 
-			public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException
-			{
-				variables = new java.util.ArrayList();
-			}
+        protected void notifyEndActiveHandler(String name,
+            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+            //MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+            if (name.equals(SCRIPT_PATH_TAG)) {
+                ((MapRshProcess) targetProcess).setScriptLocation((String) activeHandler.getResultObject());
+            } else {
+                super.notifyEndActiveHandler(name, activeHandler);
+            }
+        }
+    }
+     //end of inner class MapRshProcessHandler
 
-			public Object getResultObject() throws org.xml.sax.SAXException
-			{
-				if (variables == null)
-				{
-					isResultValid = false;
-				}
-				else
-				{
-					int n = variables.size();
-					String[] result = new String[n];
-					if (n > 0)
-					{
-						variables.toArray(result);
-					}
-					setResultObject(result);
-					variables.clear();
-					variables = null;
-				}
-				return super.getResultObject();
-			}
+    protected class SSHProcessHandler extends ProcessHandler {
+        public SSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+        }
+    }
+     //end of inner class SSHProcessHandler
 
-			public void startElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException
-			{
-				if (name.equals(VARIABLE_TAG))
-				{
-					String vName = attributes.getValue("name");
-					String vValue = attributes.getValue("value");
-					if (checkNonEmpty(vName) && vValue != null)
-					{
-						logger.info("Found environment variable name=" + vName + " value=" + vValue);
-						variables.add(vName + "=" + vValue);
-					}
-				}
-			}
-		} // end inner class EnvironmentHandler
-	} //end of inner class ProcessHandler
+    protected class RLoginProcessHandler extends ProcessHandler {
+        public RLoginProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+        }
+    }
+     //end of inner class RLoginProcessHandler
 
-	protected class JVMProcessHandler extends ProcessHandler
-	{
+    protected class BSubProcessHandler extends ProcessHandler {
+        public BSubProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(BSUB_OPTIONS_TAG, new BsubOptionHandler());
+        }
 
-		public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-			UnmarshallerHandler pathHandler = new PathHandler();
-			{
-				CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-				cu.addHandler(ABS_PATH_TAG, pathHandler);
-				cu.addHandler(REL_PATH_TAG, pathHandler);
-				this.addHandler(CLASSPATH_TAG, cu);
-			}
-			BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-			bch.addHandler(ABS_PATH_TAG, pathHandler);
-			bch.addHandler(REL_PATH_TAG, pathHandler);
-			this.addHandler(JAVA_PATH_TAG, bch);
-			this.addHandler(POLICY_FILE_TAG, bch);
-			this.addHandler(LOG4J_FILE_TAG, bch);
-			this.addHandler(CLASSNAME_TAG, new SingleValueUnmarshaller());
-			this.addHandler(PARAMETERS_TAG, new SingleValueUnmarshaller());
-			this.addHandler(JVMPARAMETERS_TAG, new SingleValueUnmarshaller());
-		}
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            // we know that it is a maprsh process since we are
+            // in map rsh handler!!!
+            //MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
+            super.startContextElement(name, attributes);
+            String interactive = (attributes.getValue("interactive"));
+            if (checkNonEmpty(interactive)) {
+                ((LSFBSubProcess) targetProcess).setInteractive(interactive);
+            }
+            String queueName = (attributes.getValue("queue"));
+            if (checkNonEmpty(queueName)) {
+                ((LSFBSubProcess) targetProcess).setQueueName(queueName);
+            }
+        }
 
-		//
-		//  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
-		//
+        protected class BsubOptionHandler extends PassiveCompositeUnmarshaller {
+            //  	private static final String HOSTLIST_ATTRIBUTE = "hostlist";
+            //  	private static final String PROCESSOR_ATRIBUTE = "processor";
+            //private LSFBSubProcess bSubProcess;
+            public BsubOptionHandler() {
+                //this.bSubProcess = (LSFBSubProcess)targetProcess;
+                UnmarshallerHandler pathHandler = new PathHandler();
+                this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(SCRIPT_PATH_TAG, bch);
+            }
 
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
 
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                // we know that it is a bsub process since we are
+                // in bsub option!!!
+                LSFBSubProcess bSubProcess = (LSFBSubProcess) targetProcess;
+                if (name.equals(HOST_LIST_TAG)) {
+                    bSubProcess.setHostList((String) activeHandler.getResultObject());
+                } else if (name.equals(PROCESSOR_TAG)) {
+                    bSubProcess.setProcessorNumber((String) activeHandler.getResultObject());
+                } else if (name.equals(SCRIPT_PATH_TAG)) {
+                    bSubProcess.setScriptLocation((String) activeHandler.getResultObject());
+                } else {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            }
+        }
+         // end inner class OptionHandler
+    }
+     // end of inner class BSubProcessHandler
 
-		//
-		//  ----- PROTECTED METHODS -----------------------------------------------------------------------------------
-		//
+    protected class GlobusProcessHandler extends ProcessHandler {
+        public GlobusProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(GLOBUS_OPTIONS_TAG, new GlobusOptionHandler());
+        }
 
-		protected void notifyEndActiveHandler(
-			String name,
-			UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException
-		{
-			// the fact targetProcess is a JVMProcess is checked in startContextElement
-			//super.notifyEndActiveHandler(name,activeHandler);
-			JVMProcess jvmProcess = (JVMProcess) targetProcess;
-			
-			if (name.equals(CLASSPATH_TAG))
-			{
-				String[] paths = (String[]) activeHandler.getResultObject();
-				if (paths.length > 0)
-				{
-					StringBuffer sb = new StringBuffer();
-					String pathSeparator = System.getProperty("path.separator");
-					sb.append(paths[0]);
-					for (int i = 1; i < paths.length; i++)
-					{
-						sb.append(pathSeparator);
-						sb.append(paths[i]);
-					}
-					jvmProcess.setClasspath(sb.toString());
-				}
-			}
-			else if (name.equals(JAVA_PATH_TAG))
-			{
-				String jp = (String) activeHandler.getResultObject();
-				jvmProcess.setJavaPath(jp);
-			}
-			else if (name.equals(POLICY_FILE_TAG))
-			{
-				jvmProcess.setPolicyFile((String) activeHandler.getResultObject());
-			}
-			else if (name.equals(LOG4J_FILE_TAG))
-			{
-				jvmProcess.setLog4jFile((String) activeHandler.getResultObject());
-			}
-			else if (name.equals(CLASSNAME_TAG))
-			{
-				jvmProcess.setClassname((String) activeHandler.getResultObject());
-			}
-			else if (name.equals(PARAMETERS_TAG))
-			{
-				jvmProcess.setParameters((String) activeHandler.getResultObject());
-			}
-			else if (name.equals(JVMPARAMETERS_TAG))
-			{
-				jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
-			}
-			else
-			{
-				super.notifyEndActiveHandler(name, activeHandler);
-			}
-			
-		}
+        protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller {
+            public GlobusOptionHandler() {
+                this.addHandler(GRAM_PORT_TAG, new SingleValueUnmarshaller());
+                this.addHandler(GIS_PORT_TAG, new SingleValueUnmarshaller());
+                CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+                cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
+                this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
+            }
 
-	} // end of inner class JVMProcessHandler 
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
 
-	protected class RSHProcessHandler extends ProcessHandler
-	{
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                // we know that it is a globus process since we are
+                // in globus option!!!
+                GlobusProcess globusProcess = (GlobusProcess) targetProcess;
+                if (name.equals(GRAM_PORT_TAG)) {
+                    globusProcess.setGramPort((String) activeHandler.getResultObject());
+                } else if (name.equals(GIS_PORT_TAG)) {
+                    globusProcess.setGISPort((String) activeHandler.getResultObject());
+                } else if (name.equals(GLOBUS_HOST_LIST_TAG)) {
+                    String[] globusHostList = (String[]) activeHandler.getResultObject();
+                    for (int i = 0; i < globusHostList.length; i++) {
+                        globusProcess.addGlobusHost(globusHostList[i]);
+                    }
+                } else {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            }
+        }
+         //end of inner class GlobusOptionHandler
+    }
+     //end of inner class GlobusProcessHandler
 
-		public RSHProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-		}
-
-	} //end of inner class RSHProcessHandler
-	
-	protected class MapRshProcessHandler extends ProcessHandler
-	{
-		
-
-		public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-			UnmarshallerHandler pathHandler = new PathHandler();
-			BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-			bch.addHandler(ABS_PATH_TAG, pathHandler);
-			bch.addHandler(REL_PATH_TAG, pathHandler);
-			this.addHandler(SCRIPT_PATH_TAG, bch);
-		}
-		
-		public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException
-			{
-				// we know that it is a maprsh process since we are
-  		// in map rsh handler!!!
-  			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
-				super.startContextElement(name,attributes);
-				String parallelize = attributes.getValue("parallelize"); 
-				if (checkNonEmpty(parallelize))
-				((MapRshProcess)targetProcess).setParallelization("parallelize");
-			}
-			
-		protected void notifyEndActiveHandler(String name,UnmarshallerHandler activeHandler)
-			throws org.xml.sax.SAXException
-		{
-			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
-			if (name.equals(SCRIPT_PATH_TAG))
-				{
-
-					((MapRshProcess)targetProcess).setScriptLocation(
-						(String) activeHandler.getResultObject());
-						
-				}
-				else
-				{
-				super.notifyEndActiveHandler(name, activeHandler);
-				}
-		}
-
-	} //end of inner class MapRshProcessHandler
-
-	protected class SSHProcessHandler extends ProcessHandler
-	{
-
-		public SSHProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-		}
-
-	} //end of inner class SSHProcessHandler
-
-	protected class RLoginProcessHandler extends ProcessHandler
-	{
-
-		public RLoginProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-		}
-
-	} //end of inner class RLoginProcessHandler
-
-	protected class BSubProcessHandler extends ProcessHandler
-	{
-
-		public BSubProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-			this.addHandler(BSUB_OPTIONS_TAG, new BsubOptionHandler());
-		}
-		
-		public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException
-			{
-				// we know that it is a maprsh process since we are
-  		// in map rsh handler!!!
-  			//MapRshProcess mapRshProcess = (MapRshProcess)targetProcess;
-				super.startContextElement(name,attributes);
-				String interactive = (attributes.getValue("interactive"));
-				if (checkNonEmpty(interactive))
-				((LSFBSubProcess) targetProcess).setInteractive(interactive);
-				String queueName = (attributes.getValue("queue"));
-				if (checkNonEmpty(queueName)){
-					((LSFBSubProcess) targetProcess).setQueueName(queueName);
-				}
-			}
-			
-			
-		protected class BsubOptionHandler extends PassiveCompositeUnmarshaller
-		{
-
-			//  	private static final String HOSTLIST_ATTRIBUTE = "hostlist";
-			//  	private static final String PROCESSOR_ATRIBUTE = "processor";
-			//private LSFBSubProcess bSubProcess;
-
-			public BsubOptionHandler()
-			{
-
-				//this.bSubProcess = (LSFBSubProcess)targetProcess;
-				UnmarshallerHandler pathHandler = new PathHandler();
-				this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
-				this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
-				BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
-				bch.addHandler(ABS_PATH_TAG, pathHandler);
-				bch.addHandler(REL_PATH_TAG, pathHandler);
-				this.addHandler(SCRIPT_PATH_TAG, bch);
-			}
-
-			public void startContextElement(String name, Attributes attributes)
-				throws org.xml.sax.SAXException
-			{
-			}
-
-			protected void notifyEndActiveHandler(
-				String name,
-				UnmarshallerHandler activeHandler)
-				throws org.xml.sax.SAXException
-			{
-				// we know that it is a bsub process since we are
-				// in bsub option!!!
-				LSFBSubProcess bSubProcess = (LSFBSubProcess) targetProcess;
-				if (name.equals(HOST_LIST_TAG))
-				{
-					bSubProcess.setHostList((String) activeHandler.getResultObject());
-				}
-				else if (name.equals(PROCESSOR_TAG))
-				{
-					bSubProcess.setProcessorNumber(
-						(String) activeHandler.getResultObject());
-				}
-				else if (name.equals(SCRIPT_PATH_TAG))
-				{
-					bSubProcess.setScriptLocation(
-						(String) activeHandler.getResultObject());
-				}
-				else
-				{
-				super.notifyEndActiveHandler(name, activeHandler);
-				}
-			}
-		} // end inner class OptionHandler
-	} // end of inner class BSubProcessHandler
-	
-	protected class GlobusProcessHandler extends ProcessHandler{
-		
-		public GlobusProcessHandler(ProActiveDescriptor proActiveDescriptor)
-		{
-			super(proActiveDescriptor);
-			this.addHandler(GLOBUS_OPTIONS_TAG, new GlobusOptionHandler());
-		}
-		
-		protected class GlobusOptionHandler extends PassiveCompositeUnmarshaller{
-  	
-  	public GlobusOptionHandler(){
-  		this.addHandler(GRAM_PORT_TAG,new SingleValueUnmarshaller());
-  		this.addHandler(GIS_PORT_TAG,new SingleValueUnmarshaller());
-  		CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-   		cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
-    	this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
-  	}
-  	
-  	public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
-  	}
-  	
-  	protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
-  		// we know that it is a globus process since we are
-  		// in globus option!!!
-  		GlobusProcess globusProcess = (GlobusProcess)targetProcess;
-  		if(name.equals(GRAM_PORT_TAG)){
-  			globusProcess.setGramPort((String)activeHandler.getResultObject());
-  		}else if (name.equals(GIS_PORT_TAG)){
-  			globusProcess.setGISPort((String)activeHandler.getResultObject());
-  		}else if (name.equals(GLOBUS_HOST_LIST_TAG)){
-  			String[] globusHostList = (String[])activeHandler.getResultObject();
-  			for (int i = 0; i < globusHostList.length; i++)
-				{
-					globusProcess.addGlobusHost(globusHostList[i]);
-				}
-  		}
-  		else
-			{
-				super.notifyEndActiveHandler(name, activeHandler);
-			}
-  	}
-  		
-  }//end of inner class GlobusOptionHandler
-	}//end of inner class GlobusProcessHandler
-
-	private class SingleValueUnmarshaller extends BasicUnmarshaller
-	{
-		public void readValue(String value) throws org.xml.sax.SAXException
-		{
-			setResultObject(value);
-		}
-	} //end of inner class SingleValueUnmarshaller
+    private class SingleValueUnmarshaller extends BasicUnmarshaller {
+        public void readValue(String value) throws org.xml.sax.SAXException {
+            setResultObject(value);
+        }
+    }
+     //end of inner class SingleValueUnmarshaller
 }

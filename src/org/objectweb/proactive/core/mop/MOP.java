@@ -420,7 +420,7 @@ public abstract class MOP {
      * <LI>There is no noargs constructor
      * </UL>
      *
-     * @author Julien Vayssière, INRIA
+     * @author Julien Vayssi?re, INRIA
      * @param cl Class to be checked
      * @return <code>true</code> is the class exists and can be reified,
      *  <code>false</code> otherwise.
@@ -612,7 +612,7 @@ public abstract class MOP {
         Class targetClass)
         throws ClassNotFoundException, ReifiedCastException, 
             ClassNotReifiableException {
-//System.out.println("StubClass is " + nameOfBaseClass);
+        //System.out.println("StubClass is " + nameOfBaseClass);
         // BUG ID: #327
         //this has been added to deal with downloaded classes
         //if we cannot load the stub class using its name

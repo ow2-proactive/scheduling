@@ -56,7 +56,7 @@ import testsuite.test.FunctionalTest;
  */
 public class ProActiveFuncTestManager extends FunctionalTestManager
     implements InterfaceProActiveManager {
-    private ProActiveDescriptor pad = null;
+	private ProActiveDescriptor pad = null;
     private VirtualNode[] virtualNodes = null;
     private String xmlFileLocation = ProActiveFuncTestManager.class.getResource(
             "/" + ProActiveFuncTestManager.class.getName().replace('.', '/') +
@@ -65,8 +65,9 @@ public class ProActiveFuncTestManager extends FunctionalTestManager
     private Node localVMNode = null;
     private Node remoteVMNode = null;
     private String remoteHostname = "localhost";
-    //private RSHJVMProcess rshJVM = null;
+    private RSHJVMProcess rshJVM = null;
  
+
     /**
      *
      */

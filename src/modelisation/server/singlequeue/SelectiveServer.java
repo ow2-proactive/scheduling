@@ -7,6 +7,7 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestQueue;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 import util.timer.MicroTimer;
@@ -128,11 +129,13 @@ public class SelectiveServer extends SimpleLocationServer implements org.objectw
         }
     }
 
-    public static void main(String args[]) {
+    public static void main(String args[]) {   	
         if (args.length < 1) {
             System.out.println("usage: modelisation.SelectiveServer <server url> [node]");
             System.exit(-1);
         }
+		ProActiveConfiguration.load();
+        
         Object arg[] = new Object[1];
         arg[0] = args[0];
         SelectiveServer server = null;

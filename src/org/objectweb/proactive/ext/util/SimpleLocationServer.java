@@ -91,6 +91,9 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         if (url.startsWith("rmi:")) {
             tmp = url.substring(4);
         }
+		if (url.startsWith("ibis:")) {
+				   tmp = url.substring(5);
+			   }
 
         if (!tmp.startsWith("//")) {
             tmp = "//" + tmp;

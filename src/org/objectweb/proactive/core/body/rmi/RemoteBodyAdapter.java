@@ -37,7 +37,6 @@ package org.objectweb.proactive.core.body.rmi;
  *   to another remote objects library.
  */
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -65,9 +64,11 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     }
 
     public RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
+    //	Thread.dumpStack();
+    //	ProActiveConfiguration.getConfiguration().dumpLoadedProperties();
         this.proxiedRemoteBody = remoteBody;
         if (logger.isDebugEnabled()) {
-            //  logger.debug(proxiedRemoteBody.getClass());
+             logger.debug(proxiedRemoteBody.getClass());
         }
         try {
             this.bodyID = remoteBody.getID();
@@ -78,7 +79,7 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
 
     public RemoteBodyAdapter(UniversalBody body) throws ProActiveException {
         if (logger.isDebugEnabled()) {
-            //logger.debug(proxiedRemoteBody.getClass());
+            logger.debug(proxiedRemoteBody.getClass());
         }
         try {
             this.proxiedRemoteBody = new RemoteBodyImpl(body);

@@ -94,6 +94,7 @@ public abstract class BenchmarkManager extends AbstractManager {
     }
 
     /**
+
     * @see testsuite.manager.AbstractManager#execute()
     */
     public void execute(boolean useAttributesFile) {

@@ -1,25 +1,21 @@
 package modelisation.mixed;
 
-import modelisation.statistics.ExponentialLaw;
+import modelisation.ModelisationBench;
 
-import modelisation.util.NodeControler;
+import modelisation.statistics.ExponentialLaw;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 
-import java.util.Vector;
-
-
-public class Bench implements org.objectweb.proactive.RunActive {
-    protected static NodeControler auto;
-
+public class Bench extends ModelisationBench
+    implements org.objectweb.proactive.RunActive {
     public Bench() {
         super();
     }
@@ -42,47 +38,22 @@ public class Bench implements org.objectweb.proactive.RunActive {
         return agent;
     }
 
-    public static void initialise(NodeControler a) {
-        Bench.auto = a;
-    }
-
-    public static void stop() {
-        System.out.println("Bench: stoping......");
-        Bench.auto.killAllProcess();
-    }
-
-    public static Node[] readDestinationFile(String fileName) {
-        FileReader f_in = null;
-        Vector v = new Vector();
-        String s;
+    public static AgentWithExponentialMigrationMixed startExponentialAgent(
+        double d, Node[] nodes, long lifeTime) {
+        AgentWithExponentialMigrationMixed agent = null;
+        Object[] args = new Object[3];
+        args[0] = new Double(d);
+        args[1] = nodes;
+        args[2] = new Long(lifeTime);
+        System.out.println("NODES SIZE = " + nodes.length);
         try {
-            f_in = new FileReader(fileName);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not Found");
-        }
-
-        // on ouvre un "lecteur" sur ce fichier
-        BufferedReader _in = new BufferedReader(f_in);
-
-        // on lit a partir de ce fichier
-        // NB : a priori on ne sait pas combien de lignes on va lire !!
-        try {
-            // tant qu'il y a quelque chose a lire
-            while (_in.ready()) {
-                // on le lit
-                s = _in.readLine();
-                //   StringTokenizer tokens = new StringTokenizer(s, " ");
-                System.out.println("Adding " + s + " to destinationFile");
-                v.addElement(NodeFactory.getNode(s));
-                //   this.add(new NodeDestination(new String (tokens.nextToken()),tokens.nextToken()));
-            }
+            agent = (AgentWithExponentialMigrationMixed) ProActive.newActive(AgentWithExponentialMigrationMixed.class.getName(),
+                    args, Bench.StartNode, null,
+                    TimedMixedMetaObjectFactory.newInstance());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        Node[] result = new Node[v.size()];
-        v.copyInto(result);
-        return result;
+        return agent;
     }
 
     //******** ACTIVE PART OF THE TEST -  UGLY BUT NECESSARY BECAUSE OF HALF-BODIES*** //
@@ -141,35 +112,24 @@ public class Bench implements org.objectweb.proactive.RunActive {
             System.exit(-1);
         }
 
-        //try {
-        //	NodeFactory.getNode(args[0]);
-        //} catch (NodeException e) {
-        //	e.printStackTrace();
-        //}
-        //  
-        //        
-        //        if (true) {
-        //        System.exit(0);	
-        //        }
-        ExponentialLaw expo = new ExponentialLaw(Double.parseDouble(args[0]));
+        ProActiveConfiguration.load();
+
+        RandomNumberGenerator expo = RandomNumberFactory.getGenerator("lambda");
+        expo.initialize(Double.parseDouble(args[0]));
+
         LocationServer s = null;
-        NodeControler auto = new NodeControler();
         System.out.println("Test: looking up for the server");
         System.out.println("Test: using lambda = " + args[0] + " nu = " +
             args[1]);
-        if (!auto.startAllNodes(auto.readDestinationFile(args[4]), "")) {
-            auto.killAllProcess();
-            System.err.println("Error creating nodes, aborting");
-            System.exit(-1);
-        }
-        Bench.initialise(auto);
 
-        //Reading the destination file
-        Node[] nodes = Bench.readDestinationFile(args[4]);
+        //        Node[] nodes = Bench.readDestinationFile(args[4],"" + args[0] + "_" + args[1]);
+        Node[] nodes = Bench.readMapingFile(args[4]);
+
         System.out.println("NODES IN MAIN = " + nodes.length);
 
         AgentWithExponentialMigrationMixed agent = Bench.startExponentialAgent(Double.parseDouble(
-                    args[1]), nodes, args[5], Long.parseLong(args[6]));
+                    args[1]), nodes, Long.parseLong(args[6]));
+
         try {
             Thread.sleep(2000);
         } catch (Exception e) {

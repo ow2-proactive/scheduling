@@ -30,13 +30,17 @@
 */
 package org.objectweb.proactive.ext.mixedlocation;
 
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.body.RemoteBodyFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
@@ -52,8 +56,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class MixedLocationMetaObjectFactory
-    extends ProActiveRmiMetaObjectFactory {
+public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -64,8 +67,8 @@ public class MixedLocationMetaObjectFactory
     //
 
     /**
-* Constructor for LocationServerMetaObjectFactory.
-*/
+     * Constructor for LocationServerMetaObjectFactory.
+     */
     protected MixedLocationMetaObjectFactory() {
         super();
     }
@@ -112,4 +115,46 @@ public class MixedLocationMetaObjectFactory
             return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());
         }
     }
+
+ 
+    protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Factory is ibis");
+            }
+            return new RemoteIbisBodyFactoryImpl();
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Factory is rmi");
+            }
+            return new RemoteRmiBodyFactoryImpl();
+        }
+    }
+
+    protected static class RemoteIbisBodyFactoryImpl
+        implements RemoteBodyFactory, java.io.Serializable {
+        public UniversalBody newRemoteBody(UniversalBody body) {
+            try {
+                // 	System.out.println("Creating ibis remote body adapter");
+                return new IbisRemoteBodyAdapter(body);
+            } catch (ProActiveException e) {
+                throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
+                    e);
+            }
+        }
+    }
+     // end
+
+    protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory,
+        java.io.Serializable {
+        public UniversalBody newRemoteBody(UniversalBody body) {
+            try {
+                return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+            } catch (ProActiveException e) {
+                throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
+                    e);
+            }
+        }
+    }
+     // end inner class RemoteBodyFactoryImpl
 }

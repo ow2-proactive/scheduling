@@ -2,11 +2,11 @@ package modelisation.simulator.mixed.mixedwithcalendar;
 
 import modelisation.simulator.common.Averagator;
 import modelisation.simulator.common.SimulatorElement;
+
 import org.apache.log4j.Logger;
 
 
 public class Agent extends SimulatorElement {
-
     static Logger logger = Logger.getLogger(Agent.class.getName());
     public final static int WAITING = 0;
     public final static int MIGRATING = 1;
@@ -16,17 +16,15 @@ public class Agent extends SimulatorElement {
     public final static int BLOCKED = 7;
     public static final boolean NO = false;
     public static final boolean YES = true;
-    
-    
-	static {
-		   Agent.callServer = !"NO".equals(System.getProperties().getProperty("agent.performcallserver"));
-		   if (logger.isInfoEnabled()) {
-			   logger.info("--- Agent will perform call to server " +
-				   Agent.callServer);
-		   }
-	   }
 
-    
+    static {
+        Agent.callServer = !"NO".equals(System.getProperties().getProperty("agent.performcallserver"));
+        if (logger.isInfoEnabled()) {
+            logger.info("--- Agent will perform call to server " +
+                Agent.callServer);
+        }
+    }
+
     protected static boolean callServer;
     protected Event currentEvent;
     protected TtlGenerator ttlGenerator;
@@ -41,14 +39,13 @@ public class Agent extends SimulatorElement {
     protected Averagator averagatorDelta;
     protected Averagator averagatorNu;
     protected Averagator averagatorGamma2;
- 
     protected double delta;
     protected double nu;
     protected double initialTtl;
     protected double currentTtl;
-//    private RandomNumberGenerator expoDelta;
- //   private RandomNumberGenerator expoNu;
 
+    //    private RandomNumberGenerator expoDelta;
+    //   private RandomNumberGenerator expoNu;
     public Agent() {
     }
 
@@ -83,7 +80,6 @@ public class Agent extends SimulatorElement {
         this.initialTtl = ttl;
         this.currentTtl = ttl;
         this.ttlGenerator = new TtlGenerator(this.initialTtl);
-  
     }
 
     public void notifyEvent(String description) {
@@ -181,10 +177,10 @@ public class Agent extends SimulatorElement {
     protected void _endOfMigration(double endTime) {
         this.migrationCounter++;
         this.state = WAITING;
-   //     this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
-     //           this.server, this.simulator, this.id), this.simulator.generateForwarderLifeTime());
-	 this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
-		            this.server, this.simulator, this.id), this.currentTtl);
+        //     this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
+        //           this.server, this.simulator, this.id), this.simulator.generateForwarderLifeTime());
+        this.forwarderChain.add(new Forwarder(this.migrationCounter - 1,
+                this.server, this.simulator, this.id), this.currentTtl);
         this.remainingTime = this.waitTime();
         this.notifyEvent("Wait");
         if (logger.isDebugEnabled()) {
@@ -226,7 +222,6 @@ public class Agent extends SimulatorElement {
      * Called by the ForwarderChain when a tensioning is initiated
      */
     public void startTensioning(double length) {
-
         //the agent can only be waiting when a tensioning is initiated
         if (logger.isDebugEnabled()) {
             logger.debug("Tensioning requested length " + length +
@@ -255,7 +250,6 @@ public class Agent extends SimulatorElement {
     }
 
     public void end() {
-        ;
         if (logger.isInfoEnabled()) {
             logger.info("########## Agent ##################");
             logger.info("* nu = " + (1000 / this.averagatorNu.average()));
@@ -296,7 +290,6 @@ public class Agent extends SimulatorElement {
     }
 
     public String toString() {
-
         StringBuffer tmp = new StringBuffer("Agent: ");
         switch (this.state) {
         case WAITING:
@@ -330,12 +323,11 @@ public class Agent extends SimulatorElement {
     }
 
     public void previousCommunicationTime(double d, int tries) {
-    	
-    	if (this.ttlGenerator.newCommunicationTime(d)) { 	
-    		this.currentTtl = this.ttlGenerator.getNewTtl();
-			System.out.println("Getting new value for ttl = " + this.currentTtl);
-		
-    	}
+        //    	if (this.ttlGenerator.newCommunicationTime(d)) { 	
+        //    		this.currentTtl = this.ttlGenerator.getNewTtl();
+        //			System.out.println("Getting new value for ttl = " + this.currentTtl);
+        //		
+        //    	}
         //System.out.println("Agent: previous communication time " + d);
     }
 }

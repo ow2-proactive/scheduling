@@ -39,16 +39,15 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public RemoteProActiveRuntimeImpl()
-        throws RemoteException  , AlreadyBoundException {
-        
+        throws RemoteException, AlreadyBoundException {
         //System.out.println("toto");
         this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
 
         //this.urlBuilder = new UrlBuilder();
         try {
             this.proActiveRuntimeURL = buildRuntimeURL();
-        Naming.bind(proActiveRuntimeURL, this);
-        
+            Naming.bind(proActiveRuntimeURL, this);
+
             //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("Cannot bind in registry at " +
@@ -60,8 +59,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding)
-        throws RemoteException, NodeException {
+        boolean replacePreviousBinding) throws RemoteException, NodeException {
         String nodeURL = null;
 
         //Node node;
@@ -90,8 +88,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             throw new RemoteException("Node " + nodeURL +
                 " already bound in registry", e);
         } catch (java.net.MalformedURLException e) {
-            throw new RemoteException("cannot bind in registry at " +
-                nodeURL, e);
+            throw new RemoteException("cannot bind in registry at " + nodeURL, e);
         } catch (java.net.UnknownHostException e) {
             throw new RemoteException("Host unknown in " + nodeURL, e);
         }
@@ -156,7 +153,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void killRT(){
+    public void killRT() {
         proActiveRuntime.killRT();
     }
 
@@ -202,8 +199,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             throw new RemoteException("cannot bind in registry at " +
                 virtualNodeURL, e);
         } catch (java.net.UnknownHostException e) {
-            throw new RemoteException("Host unknown in " +
-                virtualNodeURL, e);
+            throw new RemoteException("Host unknown in " + virtualNodeURL, e);
         }
     }
 
@@ -224,8 +220,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             throw new RemoteException(virtualNodeURL +
                 "is not bound in the registry", e);
         } catch (java.net.UnknownHostException e) {
-            throw new RemoteException("Host unknown in " +
-                virtualNodeURL, e);
+            throw new RemoteException("Host unknown in " + virtualNodeURL, e);
         }
     }
 

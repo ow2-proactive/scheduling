@@ -73,7 +73,7 @@ public class StreamReader implements XMLReader {
         parser = new SAXParser();
         //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
         parser.setContentHandler(adaptor);
-        if (ProActiveProperties.getSchemaValidationState().equals("enable")) {
+        if ("enable".equals(ProActiveProperties.getSchemaValidationState())) {
             try {
                 parser.setErrorHandler(new SAXParserErrorHandler());
                 parser.setFeature("http://xml.org/sax/features/validation", true);

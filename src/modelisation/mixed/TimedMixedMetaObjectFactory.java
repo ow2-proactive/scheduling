@@ -1,6 +1,7 @@
 package modelisation.mixed;
 
 import modelisation.server.TimedRequestWithLocationServer;
+
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
@@ -13,9 +14,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 import org.objectweb.proactive.ext.mixedlocation.MixedLocationMetaObjectFactory;
 
 
-public class TimedMixedMetaObjectFactory
-    extends MixedLocationMetaObjectFactory {
-
+public class TimedMixedMetaObjectFactory extends MixedLocationMetaObjectFactory {
     private static MetaObjectFactory instance;
 
     public TimedMixedMetaObjectFactory() {
@@ -44,37 +43,33 @@ public class TimedMixedMetaObjectFactory
     // -- INNER CLASSES -----------------------------------------------
     //
     protected class TimedRequestWithLocationServerFactory
-        implements RequestFactory,
-                   java.io.Serializable {
-
+        implements RequestFactory, java.io.Serializable {
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
-        public Request newRequest(MethodCall methodCall, 
-                                  UniversalBody sourceBody, boolean isOneWay, 
-                                  long sequenceID) {
-            return new TimedRequestWithLocationServer(methodCall, sourceBody, 
-                                                      isOneWay, sequenceID, 
-                                                      server);
+        public Request newRequest(MethodCall methodCall,
+            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+            return new TimedRequestWithLocationServer(methodCall, sourceBody,
+                isOneWay, sequenceID, server);
         }
-    } // end inner class TimedRequestWithLocationServerFactory
+    }
+     // end inner class TimedRequestWithLocationServerFactory
 
     protected static class TimedMigrationManagerFactoryImpl
-        implements MigrationManagerFactory,
-                   java.io.Serializable {
+        implements MigrationManagerFactory, java.io.Serializable {
         public TimedMigrationManagerFactoryImpl() {
             System.out.println("TimedMigrationManagerFactoryImpl");
         }
 
         public MigrationManager newMigrationManager() {
             System.out.println(
-                    "TimedMixedMetaObjectFactory creating migrationManager");
+                "TimedMixedMetaObjectFactory creating migrationManager");
             System.out.println(System.getProperty("modelisation.ttl"));
             System.out.println(System.getProperty("modelisation.maxMigrations"));
-            return new TimedMigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer(), 
-                                                              Double.parseDouble(System.getProperty(
-                                                                                         "modelisation.ttl")), 
-                                                              Integer.parseInt(System.getProperty(
-                                                                                       "modelisation.maxMigrations")));
+            return new TimedMigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer(),
+                Double.parseDouble(System.getProperty("modelisation.ttl")),
+                Integer.parseInt(System.getProperty(
+                        "modelisation.maxMigrations")));
         }
-    } // end inner class MigrationManagerFactoryImpl
+    }
+     // end inner class MigrationManagerFactoryImpl
 }

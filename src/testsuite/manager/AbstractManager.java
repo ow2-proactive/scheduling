@@ -88,7 +88,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String name = "AbstractManager with no name";
     private String description = "AbstractManager with no description.";
     private ArrayList groups = new ArrayList();
-    protected static Logger logger = null;
+    protected static Logger logger = Logger.getLogger(AbstractManager.class);
     private int nbRuns = 1;
     private ResultsCollections results = new ResultsCollections();
     private Properties properties = null;
@@ -97,7 +97,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String outputPath = null;
 
     public AbstractManager() {
-        logger = Logger.getLogger(getClass().getName());
+      //  logger = Logger.getLogger(getClass().getName());
         testAppender();
     }
 
@@ -110,7 +110,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     }
 
     public AbstractManager(File xmlDescriptor) throws IOException, SAXException {
-        logger = Logger.getLogger(getClass().getName());
+    //    logger = Logger.getLogger(getClass().getName());
         testAppender();
         ManagerDescriptorHandler.createManagerDescriptor(xmlDescriptor.getPath(),
             this);

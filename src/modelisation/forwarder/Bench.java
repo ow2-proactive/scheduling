@@ -1,41 +1,45 @@
 package modelisation.forwarder;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.util.Date;
-import java.util.Vector;
+import modelisation.ModelisationBench;
 
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
+
 import modelisation.util.NodeControler;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
+import java.util.Date;
 
-public class Bench implements org.objectweb.proactive.RunActive {
+
+public class Bench extends ModelisationBench
+    implements org.objectweb.proactive.RunActive {
     protected static NodeControler auto;
+    protected static final int MAX = 5;
 
-    public static Agent startAgent(
-        double d, Node[] nodes, String nodeName, long lifeTime) {
+    public static Agent startAgent(double d, Node[] nodes, String nodeName,
+        long lifeTime) {
         Agent agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
         args[1] = nodes;
         args[2] = new Long(lifeTime);
         try {
-			if ("ibis".equals(System.getProperty("proactive.rmi"))) {
-				System.out.println(" USING IBIS");
-				agent = (Agent) ProActive.newActive(Agent.class.getName(),
-						args, NodeFactory.getNode(nodeName), null,
-						new ForwarderIbisMetaObjectFactory());
-			} else {
-				System.out.println(" USING RMI");
-				agent = (Agent) ProActive.newActive(Agent.class.getName(),
-						args, NodeFactory.getNode(nodeName), null, new ForwarderMetaObjectFactory());
-			}
+            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+                System.out.println(" USING IBIS");
+                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+                        args, NodeFactory.getNode(nodeName), null,
+                        new ForwarderIbisMetaObjectFactory());
+            } else {
+                System.out.println(" USING RMI");
+                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+                        args, NodeFactory.getNode(nodeName), null,
+                        new ForwarderMetaObjectFactory());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,47 +49,29 @@ public class Bench implements org.objectweb.proactive.RunActive {
         return agent;
     }
 
-    public static void initialise(NodeControler a) {
-        Bench.auto = a;
-    }
-
-    public static void stop() {
-        System.out.println("Bench: stoping......");
-        Bench.auto.killAllProcess();
-    }
-
-    public static Node[] readDestinationFile(String fileName) {
-        FileReader f_in = null;
-        Vector v = new Vector();
-        String s;
+    public static Agent startAgent(double d, Node[] nodes, long lifeTime) {
+        Agent agent = null;
+        Object[] args = new Object[3];
+        args[0] = new Double(d);
+        args[1] = nodes;
+        args[2] = new Long(lifeTime);
+        System.out.println("NODES SIZE = " + nodes.length);
         try {
-            f_in = new FileReader(fileName);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not Found");
-        }
-
-        // on ouvre un "lecteur" sur ce fichier
-        BufferedReader _in = new BufferedReader(f_in);
-
-        // on lit a partir de ce fichier
-        // NB : a priori on ne sait pas combien de lignes on va lire !!
-        try {
-            // tant qu'il y a quelque chose a lire
-            while (_in.ready()) {
-                // on le lit
-                s = _in.readLine();
-                //   StringTokenizer tokens = new StringTokenizer(s, " ");
-                System.out.println("Adding " + s + " to destinationFile");
-                v.addElement(NodeFactory.getNode(s));
-                //   this.add(new NodeDestination(new String (tokens.nextToken()),tokens.nextToken()));
+            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+                System.out.println(" USING IBIS");
+                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+                        args, Bench.StartNode, null,
+                        new ForwarderIbisMetaObjectFactory());
+            } else {
+                System.out.println(" USING RMI");
+                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+                        args, Bench.StartNode, null,
+                        new ForwarderMetaObjectFactory());
             }
-        } catch (Exception e) { //} catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        Node[] result = new Node[v.size()];
-        v.copyInto(result);
-        return result;
+        return agent;
     }
 
     //******** ACTIVE PART OF THE TEST -  UGLY BUT NECESSARY BECAUSE OF HALF-BODIES*** //
@@ -95,15 +81,14 @@ public class Bench implements org.objectweb.proactive.RunActive {
     public Bench() {
     }
 
-    public Bench(Agent a,
-        RandomNumberGenerator e) {
+    public Bench(Agent a, RandomNumberGenerator e) {
         this.agent = a;
         this.expo = e;
     }
 
     public void runActivity(Body b) {
         int waittime;
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < Bench.MAX; i++) {
             waittime = (int) (expo.next() * 1000);
             System.out.println(System.currentTimeMillis() + " Bench: waiting " +
                 waittime + " ms before calling the agent");
@@ -134,29 +119,24 @@ public class Bench implements org.objectweb.proactive.RunActive {
     // *************************************//
     public static void main(String[] args) {
         if (args.length < 5) {
-            System.out.println(
+            System.err.println(
                 "Usage: java modelisation.Bench  <lambda> <nu> <destinationFile> <creationNode> <benchLength>");
+            System.err.println(
+                "-Dnodecontroler.startnode=false to use already created nodes");
             System.exit(-1);
         }
+
+        ProActiveConfiguration.load();
 
         //ExponentialLaw expo = new ExponentialLaw(Double.parseDouble(args[0]));
         RandomNumberGenerator expo = RandomNumberFactory.getGenerator("lambda");
         expo.initialize(Double.parseDouble(args[0]));
 
-        NodeControler auto = new NodeControler();
-        if (!auto.startAllNodes(auto.readDestinationFile(args[2]),
-                    "" + args[0] + "_" + args[1])) {
-            auto.killAllProcess();
-            System.err.println("Error creating nodes, aborting");
-            System.exit(-1);
-        }
-        Bench.initialise(auto);
+        //    Node[] nodes = Bench.readDestinationFile(args[2], "" + args[0] + "_" + args[1]);
+        Node[] nodes = Bench.readMapingFile(args[2]);
 
-        //Reading the destination file
-        Node[] nodes = Bench.readDestinationFile(args[2]);
-
-        Agent agent = Bench.startAgent(Double.parseDouble(
-                    args[1]), nodes, args[3], Long.parseLong(args[4]));
+        Agent agent = Bench.startAgent(Double.parseDouble(args[1]), nodes,
+                Long.parseLong(args[4]));
         try {
             Thread.sleep(2000);
         } catch (Exception e) {

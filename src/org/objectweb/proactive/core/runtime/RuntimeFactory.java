@@ -72,7 +72,6 @@ public abstract class RuntimeFactory {
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
 		
 		
-		
     /** the table where associations Protocol - Factory are kept */
     private static java.util.HashMap protocolFactoryMapping = new java.util.HashMap();
     private static java.util.HashMap instanceFactoryMapping = new java.util.HashMap();
@@ -140,8 +139,8 @@ public abstract class RuntimeFactory {
         throws ProActiveException {
         ProActiveRuntime defaultRuntime = null;
         try {
-            defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-            //defaultRuntime = createRuntime();
+            //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+			defaultRuntime = getProtocolSpecificRuntime(System.getProperty("proactive.rmi") +":");
             if (logger.isDebugEnabled()) {
                 logger.debug("default runtime = " + defaultRuntime);
             }

@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.util.MessageLogger;
 /**
  * <p>
  * The LSFBSubProcess class is able to start any class, of the ProActive library, 
- * on a cluster managed by LSF prtocol. An istance of this class can be coupled for instance with
+ * on a cluster managed by LSF prtocol. An instance of this class can be coupled for instance with
  * RlLoginProcess or SSHProcess classes in order to log into the cluster's front end with rlogin or
  * ssh and then to run a job with LSFBSubProcess.
  * </p>

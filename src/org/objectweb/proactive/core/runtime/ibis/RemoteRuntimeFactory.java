@@ -57,7 +57,8 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
     // -- CONSTRUCTORS -----------------------------------------------
     //
     public RemoteRuntimeFactory() throws java.io.IOException {
-        if (System.getSecurityManager() == null) {
+        if ((System.getSecurityManager() == null) &&
+                !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
@@ -109,7 +110,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         try {
             RemoteProActiveRuntime remoteProActiveRuntime = (RemoteProActiveRuntime) ibis.rmi.Naming.lookup(s);
             if (logger.isDebugEnabled()) {
-                //logger.debug(remoteProActiveRuntime.getClass().getName());
+                logger.debug(remoteProActiveRuntime.getClass().getName());
             }
             return createRuntimeAdapter(remoteProActiveRuntime);
         } catch (ibis.rmi.RemoteException e) {

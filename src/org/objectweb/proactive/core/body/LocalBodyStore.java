@@ -83,7 +83,7 @@ public class LocalBodyStore {
      */
     private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
     private ThreadLocal bodyPerThread = new ThreadLocal();
-    private MetaObjectFactory halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
+    private MetaObjectFactory halfBodyMetaObjectFactory = null ;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -106,11 +106,15 @@ public class LocalBodyStore {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public MetaObjectFactory getHalfBodyMetaObjectFactory() {
+    public  synchronized MetaObjectFactory getHalfBodyMetaObjectFactory() {
+    	
+    	if (this.halfBodyMetaObjectFactory == null) {
+			halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
+    	}
         return halfBodyMetaObjectFactory;
     }
 
-    public void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
+    public synchronized void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
         halfBodyMetaObjectFactory = factory;
     }
 
@@ -126,7 +130,7 @@ public class LocalBodyStore {
             // If we cannot find the body from the current thread we assume that the current thread
             // is not the one from an active object. Therefore in this case we create an HalfBody
             // that handle the futures
-            body = HalfBody.getHalfBody(halfBodyMetaObjectFactory);
+            body = HalfBody.getHalfBody(this.getHalfBodyMetaObjectFactory());
             bodyPerThread.set(body);
             registerHalfBody(body);
         }

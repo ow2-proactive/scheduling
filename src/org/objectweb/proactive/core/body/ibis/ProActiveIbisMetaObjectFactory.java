@@ -73,6 +73,10 @@ import org.objectweb.proactive.core.body.UniversalBody;
  */
 public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory implements java.io.Serializable {
 
+
+//static {
+	//IbisProperties.load();
+//}
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
   //

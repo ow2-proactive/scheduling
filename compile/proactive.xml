@@ -253,7 +253,7 @@
 		<mkdir dir="${src.dir}/util/timer/linux"/>
 		<mkdir dir="${src.dir}/util/timer/solaris"/>
 		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/local/bin/gcc" os="Linux" output="output.txt">
-			<arg line=" -shared -I/usr/local/jdk1.3/include/ -I/usr/local/jdk1.3/include/linux -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc"/>
+			<arg line=" -shared -I/usr/local/sun-java/jdk1.4/include/ -I/usr/local/sun-java/jdk1.4/include/linux -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc"/>
 		</exec>
 		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/bin/ld" os="Linux" output="output2.txt">
 			<arg line="  -G Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so"/>

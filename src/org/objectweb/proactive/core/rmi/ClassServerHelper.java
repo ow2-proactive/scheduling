@@ -27,68 +27,72 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.rmi;
 
 public class ClassServerHelper {
 
- /**
-  * settings of the ClassServer
-  */
-  protected ClassServer currentClassServer;
-  protected String classpath;
-  protected boolean shouldCreateClassServer = true;
+    /**
+ * settings of the ClassServer
+ */
+    protected ClassServer currentClassServer;
+    protected String classpath;
+    protected boolean shouldCreateClassServer = true;
 
-
-  //
-  // -- Constructors -----------------------------------------------
-  //
-  
-  public ClassServerHelper() {
-    if (System.getSecurityManager() == null) {
-      System.setSecurityManager(new java.rmi.RMISecurityManager());
+    //
+    // -- Constructors -----------------------------------------------
+    //
+    public ClassServerHelper() {
+        if ((System.getSecurityManager() == null) &&
+                !("false".equals(System.getProperty("proactive.securitymanager")))) {
+            System.setSecurityManager(new java.rmi.RMISecurityManager());
+        }
     }
-  }
-  
-  
-  //
-  // -- PUBLIC METHODS -----------------------------------------------
-  //
-  
-  public String getClasspath() {
-    return classpath;
-  }
 
-  public void setClasspath(String v) {
-    classpath = v;
-  }
-  
-  public int getClassServerPortNumber() {
-    if (currentClassServer == null) return -1;
-    return currentClassServer.getServerSocketPort();
-  }
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    public String getClasspath() {
+        return classpath;
+    }
 
-  public boolean shouldCreateClassServer() {
-    return shouldCreateClassServer;
-  }
+    public void setClasspath(String v) {
+        classpath = v;
+    }
 
-  public void setShouldCreateClassServer(boolean v) {
-    shouldCreateClassServer = v;
-  }
-  
-  public synchronized void initializeClassServer() throws java.io.IOException {
-    if (! shouldCreateClassServer) return;  // don't bother
-    if (currentClassServer != null) return; // already created for this VM
-    if (classpath == null)
-      currentClassServer = new ClassFileServer();
-    else currentClassServer = new ClassFileServer(classpath);
-    System.setProperty("java.rmi.server.codebase","http://"+currentClassServer.getHostname()+":"+currentClassServer.getServerSocketPort()+"/");
-  }
+    public int getClassServerPortNumber() {
+        if (currentClassServer == null) {
+            return -1;
+        }
+        return currentClassServer.getServerSocketPort();
+    }
 
-  
-  
-  //
-  // -- PRIVATE METHODS -----------------------------------------------
-  // 
+    public boolean shouldCreateClassServer() {
+        return shouldCreateClassServer;
+    }
 
+    public void setShouldCreateClassServer(boolean v) {
+        shouldCreateClassServer = v;
+    }
+
+    public synchronized void initializeClassServer() throws java.io.IOException {
+        if (!shouldCreateClassServer) {
+            return; // don't bother
+        }
+        if (currentClassServer != null) {
+            return; // already created for this VM
+        }
+        if (classpath == null) {
+            currentClassServer = new ClassFileServer();
+        } else {
+            currentClassServer = new ClassFileServer(classpath);
+        }
+        System.setProperty("java.rmi.server.codebase",
+            "http://" + currentClassServer.getHostname() + ":" +
+            currentClassServer.getServerSocketPort() + "/");
+    }
+
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    // 
 }

@@ -1,9 +1,13 @@
 package modelisation.util;
 
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -18,7 +22,7 @@ public class NodeControler {
     protected static final String JAVA_BIN = "/usr/local/jdk1.4.0/bin/java ";
     protected static final String OPTIONS =
         "-Djava.library.path=/net/home/fhuet/workProActive/ProActive/classes/  " +
- //       "-Dproactive.rmi=ibis " +
+        //       "-Dproactive.rmi=ibis " +
         "-Dibis.serialization=sun " +
         "-Dproactive.migrationmanager=modelisation.TimedMigrationManager" +
         "-Dmodelisation.maxMigrations=5 -Dproactive.locationserver.rmi=//satura.inria.fr:35690/LocationServer " +
@@ -63,47 +67,48 @@ public class NodeControler {
     }
 
     protected String getHostNameFromNodeName(String nodeName) {
-      //  StringTokenizer t = new StringTokenizer(nodeName, "/");
-//..	  System.out.println("XXXXXXXXXXXXnodeName is ");
-//System.out.println("XXXXXXXXXXXXnodeName is " + nodeName);
-	Pattern p = Pattern.compile("(.*:)?(//)?(.*)/(.*)");
-//	Matcher m = p.matcher(nodeName);
-	Matcher m = p.matcher(nodeName);
-	boolean matchFound = m.find();
-    
-//	  if (matchFound) {
-//		  // Get all groups for this match
-//		  for (int i=1; i<=m.groupCount(); i++) {
-//			  String groupStr = m.group(i);
-//			  System.out.println("XXXX" +groupStr);
-//		  }
-//	  }
-//if (nodeName.indexOf('/') != 0) {
-//	//oups, we have 
-//}
-//        //since the nodeName looks like //name:port/node1
+        //  StringTokenizer t = new StringTokenizer(nodeName, "/");
+        //..	  System.out.println("XXXXXXXXXXXXnodeName is ");
+        //System.out.println("XXXXXXXXXXXXnodeName is " + nodeName);
+        Pattern p = Pattern.compile("(.*:)?(//)?(.*)/(.*)");
+
+        //	Matcher m = p.matcher(nodeName);
+        Matcher m = p.matcher(nodeName);
+        boolean matchFound = m.find();
+
+        //	  if (matchFound) {
+        //		  // Get all groups for this match
+        //		  for (int i=1; i<=m.groupCount(); i++) {
+        //			  String groupStr = m.group(i);
+        //			  System.out.println("XXXX" +groupStr);
+        //		  }
+        //	  }
+        //if (nodeName.indexOf('/') != 0) {
+        //	//oups, we have 
+        //}
+        //        //since the nodeName looks like //name:port/node1
         //we are only interested in the first token
-       // String tmp = t.nextToken();
-       // System.out.println("tmp = " + tmp);
+        // String tmp = t.nextToken();
+        // System.out.println("tmp = " + tmp);
         //t = new StringTokenizer(tmp, ":");
         //return t.nextToken();
         return m.group(3);
     }
-
 
     public boolean startNode(String name, String redirect) {
         int currentTry = 1;
         boolean result;
         RSHNodeProcessImpl p = null;
 
-       String hostName = getHostNameFromNodeName(name);
-//      String hostName = null;
-//	try {
-//		hostName = new URL(name).getHost();
-//	} catch (MalformedURLException e1) {
-//		
-//		e1.printStackTrace();
-//	}
+        String hostName = getHostNameFromNodeName(name);
+
+        //      String hostName = null;
+        //	try {
+        //		hostName = new URL(name).getHost();
+        //	} catch (MalformedURLException e1) {
+        //		
+        //		e1.printStackTrace();
+        //	}
         System.out.println("Hostname is " + hostName);
         p = new RSHNodeProcessImpl();
         p.setJavaPath(JAVA);
@@ -146,7 +151,8 @@ public class NodeControler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-         // end of try-catch
+
+        // end of try-catch
         result = !p.isFinished();
         if (result) {
             //	p.initialise();
@@ -173,6 +179,30 @@ public class NodeControler {
             ok = ok && startNode(st.nextToken() + " -noClassServer", redirect);
         }
         return ok;
+    }
+
+    public boolean getNode(String name) {
+        boolean ok = true;
+
+        try {
+            NodeFactory.getNode(name);
+        } catch (NodeException e) {
+            ok = false;
+            e.printStackTrace();
+        }
+
+        return ok;
+    }
+
+    public boolean getAllNodes(String names) {
+        System.out.println("NodeControler: getAllNodes() " + names);
+        StringTokenizer st = null;
+        String tmp;
+        boolean ok = true;
+        for (st = new StringTokenizer(names); st.hasMoreTokens();) {
+            ok = ok && getNode(st.nextToken());
+        }
+        return true;
     }
 
     public String readDestinationFile(String fileName) {
