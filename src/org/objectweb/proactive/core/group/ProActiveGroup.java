@@ -286,7 +286,7 @@ public class ProActiveGroup {
 	Group g = ProActiveGroup.getGroup(result);
 
 	if (params != null) {
-		for (int i=0 ; i < params.length ; i++) {
+		for (int i=0 ; i < nodeList.length ; i++) {
 			g.add(ProActive.newActive(className, params, nodeList[i % nodeList.length]));
 		}
 	}
