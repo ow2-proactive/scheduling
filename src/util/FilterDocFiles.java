@@ -23,7 +23,9 @@ public class FilterDocFiles {
       System.out.println("Missing target directory");
       System.exit(-1);
     }
-    if (System.getProperty("changeImages").equals("false")) changeImagePath=false;
+    if (System.getProperty("changeImages") != null){
+    	if (System.getProperty("changeImages").equals("false")) changeImagePath=false;
+    }
     java.io.File sourceDir = new java.io.File(args[0]);
     filter(sourceDir);
   }
