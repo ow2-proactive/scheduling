@@ -106,6 +106,7 @@ public class MainManager extends ProActiveFuncTestManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("You can see result : "+RESULT_LOCATION);
         System.exit(0);
     }
 }
