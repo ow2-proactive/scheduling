@@ -43,14 +43,14 @@
 			<jvm name="Jvm3-AC">
 				<acquisition method="rmi"/>
 				<creation>
-					<processReference refid="rshProcess-AC"/>
+					<processReference refid="linuxJVM-AC"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4-AC">
 				<acquisition method="rmi"/>
 				<creation>
 					<!--<processReference refid="rshProcess-AC"/>-->
-					<processReference refid="rshProcess-AC"/>
+					<processReference refid="linuxJVM-AC"/>
 				</creation>
 			</jvm>
 		</jvms>
@@ -66,16 +66,6 @@
 						<parameter value="-Dproactive.future.ac=enable"/>
 					</jvmParameters>
 				</jvmProcess>
-			</processDefinition>
-			<processDefinition id="rshProcess">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
-					<processReference refid="linuxJVM"/>
-				</rshProcess>
-				</processDefinition>
-				<processDefinition id="rshProcess-AC">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
-					<processReference refid="linuxJVM-AC"/>
-				</rshProcess>
 			</processDefinition>
 		</processes>
 	</infrastructure>
