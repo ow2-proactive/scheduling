@@ -52,8 +52,8 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
             new BindingsHandler(componentsCache));
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
+    /**
+     * see {@link org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)}
      */
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
@@ -66,33 +66,35 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
                 // then instantiate the component and add a stub on it to the cache
                 try {
                     if (virtualNode.equals(ComponentsDescriptorConstants.NULL)) {
-                        //					componentsCache.addComponent(componentParameters.getName(),
-                        //					//PrimitiveComponentB.class.getName(),
                         composite = cf.newFcInstance(componentType,
                                 new ControllerDescription(controllerDescription.getName(),
-						controllerDescription.getHierarchicalType()),
+                                    controllerDescription.getHierarchicalType()),
                                 new ContentDescription(Composite.class.getName(),
                                     new Object[] {  }));
                         componentsCache.addComponent(controllerDescription.getName(),
                             composite);
-                        //PrimitiveComponentB.class.getName(),
                     } else {
                         VirtualNode vn = deploymentDescriptor.getVirtualNode(virtualNode);
+                        vn.activate();
                         if (vn.getNodeCount() == 0) {
                             throw new NodeException(
-                                "no node defined for the virtual node " + vn.getName());
+                                "no node defined for the virtual node " +
+                                vn.getName());
                         }
                         if (logger.isDebugEnabled()) {
-							if (vn.getNodeCount() > 1) {
-								logger.debug("creating a composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");							
-							}
-						}
+                            if (vn.getNodeCount() > 1) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug(
+                                        "creating a composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");
+                                }
+                            }
+                        }
 
                         // get corresponding node (1st node retreived if the vn is multiple)
                         Node targeted_node = vn.getNode();
                         composite = cf.newFcInstance(componentType,
                                 new ControllerDescription(controllerDescription.getName(),
-						controllerDescription.getHierarchicalType()),
+                                    controllerDescription.getHierarchicalType()),
                                 new ContentDescription(Composite.class.getName(),
                                     new Object[] {  }, targeted_node));
                         componentsCache.addComponent(controllerDescription.getName(),
@@ -133,20 +135,20 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
                     throw new SAXException(ice);
                 }
                 logger.debug("created composite component : " +
-				controllerDescription.getName());
+                    controllerDescription.getName());
             }
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
+    /**
+     * see {@link org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()}
      */
     public Object getResultObject() throws SAXException {
         return new ComponentResultObject(controllerDescription.getName());
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
+    /**
+     * see {@link org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)}
      */
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
