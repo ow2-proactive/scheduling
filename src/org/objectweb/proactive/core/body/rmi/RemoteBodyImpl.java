@@ -169,7 +169,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     public void setExceptionHandler(Class handler, Class exception)
         throws java.io.IOException {
         try {
-            //System.out.println("TAAAAAAAAAA");
             body.setExceptionHandler(handler, exception);
         } catch (ProActiveException e) {
             throw new java.io.IOException(

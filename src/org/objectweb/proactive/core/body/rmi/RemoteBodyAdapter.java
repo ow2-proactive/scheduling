@@ -30,13 +30,8 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -53,6 +48,14 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
@@ -142,6 +145,7 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     public static UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
+
         // Try if URL is the address of a RemoteBody
         try {
             o = java.rmi.Naming.lookup(url);
@@ -178,7 +182,8 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException {
+    public void receiveRequest(Request r)
+        throws java.io.IOException, RenegotiateSessionException {
         proxiedRemoteBody.receiveRequest(r);
     }
 
@@ -220,145 +225,148 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
         proxiedRemoteBody.setImmediateService(methodName);
     }
 
-	// SECURITY
-	public void initiateSession(int type,UniversalBody body)
-		throws IOException, CommunicationForbiddenException, 
-			AuthenticationException, RenegotiateSessionException, 
-			SecurityNotAvailableException {
-		proxiedRemoteBody.initiateSession(type,body);
-	}
+    // SECURITY
+    public void initiateSession(int type, UniversalBody body)
+        throws IOException, CommunicationForbiddenException, 
+            AuthenticationException, RenegotiateSessionException, 
+            SecurityNotAvailableException {
+        proxiedRemoteBody.initiateSession(type, body);
+    }
 
-	public void terminateSession(long sessionID)
-		throws java.io.IOException, SecurityNotAvailableException {
-		proxiedRemoteBody.terminateSession(sessionID);
-	}
+    public void terminateSession(long sessionID)
+        throws java.io.IOException, SecurityNotAvailableException {
+        proxiedRemoteBody.terminateSession(sessionID);
+    }
 
-	public X509Certificate getCertificate()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getCertificate();
-	}
+    public X509Certificate getCertificate()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getCertificate();
+    }
 
-	public ProActiveSecurityManager getProActiveSecurityManager()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getProActiveSecurityManager();
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getProActiveSecurityManager();
+    }
 
-	public Policy getPolicyFrom(X509Certificate certificate)
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getPolicyFrom(certificate);
-	}
+    public Policy getPolicyFrom(X509Certificate certificate)
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getPolicyFrom(certificate);
+    }
 
-	public long startNewSession(Communication policy)
-		throws IOException, RenegotiateSessionException, 
-			SecurityNotAvailableException {
-		return proxiedRemoteBody.startNewSession(policy);
-	}
+    public long startNewSession(Communication policy)
+        throws IOException, RenegotiateSessionException, 
+            SecurityNotAvailableException {
+        return proxiedRemoteBody.startNewSession(policy);
+    }
 
-	public ConfidentialityTicket negociateKeyReceiverSide(
-		ConfidentialityTicket confidentialityTicket, long sessionID)
-		throws java.io.IOException, KeyExchangeException, 
-			SecurityNotAvailableException {
-		return proxiedRemoteBody.negociateKeyReceiverSide(confidentialityTicket,
-			sessionID);
-	}
+    public ConfidentialityTicket negociateKeyReceiverSide(
+        ConfidentialityTicket confidentialityTicket, long sessionID)
+        throws java.io.IOException, KeyExchangeException, 
+            SecurityNotAvailableException {
+        return proxiedRemoteBody.negociateKeyReceiverSide(confidentialityTicket,
+            sessionID);
+    }
 
-	public PublicKey getPublicKey()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getPublicKey();
-	}
+    public PublicKey getPublicKey()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getPublicKey();
+    }
 
-	public byte[] randomValue(long sessionID, byte[] cl_rand)
-		throws Exception, SecurityNotAvailableException {
-		return proxiedRemoteBody.randomValue(sessionID, cl_rand);
-	}
+    public byte[] randomValue(long sessionID, byte[] cl_rand)
+        throws Exception, SecurityNotAvailableException {
+        return proxiedRemoteBody.randomValue(sessionID, cl_rand);
+    }
 
-	public byte[][] publicKeyExchange(long sessionID,
-		UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-		byte[] sig_code) throws Exception, SecurityNotAvailableException {
-		return proxiedRemoteBody.publicKeyExchange(sessionID, distantBody,
-			my_pub, my_cert, sig_code);
-	}
+    public byte[][] publicKeyExchange(long sessionID,
+        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
+        byte[] sig_code) throws Exception, SecurityNotAvailableException {
+        return proxiedRemoteBody.publicKeyExchange(sessionID, distantBody,
+            my_pub, my_cert, sig_code);
+    }
 
-	public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-		byte[] tmp2, byte[] tmp3, byte[] tmp4)
-		throws Exception, SecurityNotAvailableException {
-		return proxiedRemoteBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
-			tmp3, tmp4);
-	}
+    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
+        byte[] tmp2, byte[] tmp3, byte[] tmp4)
+        throws Exception, SecurityNotAvailableException {
+        return proxiedRemoteBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
+            tmp3, tmp4);
+    }
 
-	public Communication getPolicyTo(String type, String from, String to)
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getPolicyTo(type, from, to);
-	}
+    public Communication getPolicyTo(String type, String from, String to)
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getPolicyTo(type, from, to);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
-	 */
-	public String getVNName()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getVNName();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
+     */
+    public String getVNName()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getVNName();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
-	 */
-	public byte[] getCertificateEncoded()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return proxiedRemoteBody.getCertificateEncoded();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+     */
+    public byte[] getCertificateEncoded()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return proxiedRemoteBody.getCertificateEncoded();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-	 */
-	public SecurityContext getPolicy(SecurityContext securityContext)
-		throws SecurityNotAvailableException, IOException {
-		return proxiedRemoteBody.getPolicy(securityContext);
-	}
-    
-	public ArrayList getEntities() throws SecurityNotAvailableException, IOException {
-			return proxiedRemoteBody.getEntities();
-		}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, IOException {
+        return proxiedRemoteBody.getPolicy(securityContext);
+    }
 
-	// Implements Handlerizable
-	/** Give a reference to a local map of handlers
-	 * @return A reference to a map of handlers
-	 */
-	public HashMap getHandlersLevel() throws ProActiveException {
-		try {
-			HashMap map = proxiedRemoteBody.getHandlersLevel();
-			return map;
-		} catch (java.io.IOException e) {
-			throw new ProActiveException(e.getMessage(), e);
-		}	
-	}
-  
-	/** Set a new handler within the table of the Handlerizable Object
-	 * @param handler A class of handler associated with a class of non functional exception.
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 */
-	public void setExceptionHandler(Class handler, Class exception) throws ProActiveException {
-		try {
-			//System.out.println("TOOOOOOOOOOOOOOOOO");
-			proxiedRemoteBody.setExceptionHandler(handler, exception);
-		} catch (java.io.IOException e) {
-			System.out.println("ERROR : " + e.getMessage());
-			throw new ProActiveException(e.getMessage(), e);
-		}
-	}
-	
-	/** Remove a handler from the table of the Handlerizable Object
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 * @return The removed handler or null
-	 */
-	public Handler unsetExceptionHandler(Class exception) throws ProActiveException { 
-		try {
-			Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
-			return handler;
-		} catch (java.io.IOException e) {
-			throw new ProActiveException(e.getMessage(), e);
-		}
-	}
-	
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, IOException {
+        return proxiedRemoteBody.getEntities();
+    }
+
+    // Implements Handlerizable
+
+    /** Give a reference to a local map of handlers
+     * @return A reference to a map of handlers
+     */
+    public HashMap getHandlersLevel() throws ProActiveException {
+        try {
+            HashMap map = proxiedRemoteBody.getHandlersLevel();
+            return map;
+        } catch (java.io.IOException e) {
+            throw new ProActiveException(e.getMessage(), e);
+        }
+    }
+
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     */
+    public void setExceptionHandler(Class handler, Class exception)
+        throws ProActiveException {
+        try {
+            proxiedRemoteBody.setExceptionHandler(handler, exception);
+        } catch (java.io.IOException e) {
+            System.out.println("ERROR : " + e.getMessage());
+            throw new ProActiveException(e.getMessage(), e);
+        }
+    }
+
+    /** Remove a handler from the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
+    public Handler unsetExceptionHandler(Class exception)
+        throws ProActiveException {
+        try {
+            Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
+            return handler;
+        } catch (java.io.IOException e) {
+            throw new ProActiveException(e.getMessage(), e);
+        }
+    }
+
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

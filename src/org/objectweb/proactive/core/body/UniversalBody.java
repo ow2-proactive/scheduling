@@ -30,12 +30,6 @@
 */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -51,6 +45,14 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -73,7 +75,8 @@ public interface UniversalBody {
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    public void receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException ;
+    public void receiveRequest(Request request)
+        throws java.io.IOException, RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
@@ -130,85 +133,87 @@ public interface UniversalBody {
     public void setImmediateService(String methodName)
         throws IOException;
 
-	/** Give a reference to a local map of handlers
-	 * @return A reference to a map of handlers
-	 */
-	public HashMap getHandlersLevel() throws ProActiveException;
-	 
-	/** Set a new handler within the table of the Handlerizable Object
-	 * @param handler A class of handler associated with a class of non functional exception.
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 */
-	public void setExceptionHandler(Class handler, Class exception) throws ProActiveException;
-	
-	/** Remove a handler from the table of the Handlerizable Object
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 * @return The removed handler or null
-	 */
-	public Handler unsetExceptionHandler(Class exception) throws ProActiveException;
-	
+    /** Give a reference to a local map of handlers
+     * @return A reference to a map of handlers
+     */
+    public HashMap getHandlersLevel() throws ProActiveException;
+
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     */
+    public void setExceptionHandler(Class handler, Class exception)
+        throws ProActiveException;
+
+    /** Remove a handler from the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
+    public Handler unsetExceptionHandler(Class exception)
+        throws ProActiveException;
+
     // SECURITY
-	public void initiateSession(int type,UniversalBody body)
-		 throws java.io.IOException, CommunicationForbiddenException, 
-			 AuthenticationException, RenegotiateSessionException, 
-			 SecurityNotAvailableException;
+    public void initiateSession(int type, UniversalBody body)
+        throws java.io.IOException, CommunicationForbiddenException, 
+            AuthenticationException, RenegotiateSessionException, 
+            SecurityNotAvailableException;
 
-	 public void terminateSession(long sessionID)
-		 throws java.io.IOException, SecurityNotAvailableException;
+    public void terminateSession(long sessionID)
+        throws java.io.IOException, SecurityNotAvailableException;
 
-	 public X509Certificate getCertificate()
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public X509Certificate getCertificate()
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 public ProActiveSecurityManager getProActiveSecurityManager()
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public ProActiveSecurityManager getProActiveSecurityManager()
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 public Policy getPolicyFrom(X509Certificate certificate)
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public Policy getPolicyFrom(X509Certificate certificate)
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 public long startNewSession(Communication policy)
-		 throws SecurityNotAvailableException, java.io.IOException, 
-			 RenegotiateSessionException;
+    public long startNewSession(Communication policy)
+        throws SecurityNotAvailableException, java.io.IOException, 
+            RenegotiateSessionException;
 
-	 public ConfidentialityTicket negociateKeyReceiverSide(
-		 ConfidentialityTicket confidentialityTicket, long sessionID)
-		 throws SecurityNotAvailableException, KeyExchangeException, 
-			 java.io.IOException;
+    public ConfidentialityTicket negociateKeyReceiverSide(
+        ConfidentialityTicket confidentialityTicket, long sessionID)
+        throws SecurityNotAvailableException, KeyExchangeException, 
+            java.io.IOException;
 
-	 public PublicKey getPublicKey()
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public PublicKey getPublicKey()
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 public byte[] randomValue(long sessionID, byte[] cl_rand)
-		 throws SecurityNotAvailableException, Exception;
+    public byte[] randomValue(long sessionID, byte[] cl_rand)
+        throws SecurityNotAvailableException, Exception;
 
-	 public byte[][] publicKeyExchange(long sessionID,
-		 UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-		 byte[] sig_code)
-		 throws SecurityNotAvailableException, Exception, 
-			 RenegotiateSessionException;
+    public byte[][] publicKeyExchange(long sessionID,
+        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
+        byte[] sig_code)
+        throws SecurityNotAvailableException, Exception, 
+            RenegotiateSessionException;
 
-	 byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-		 byte[] tmp2, byte[] tmp3, byte[] tmp4)
-		 throws SecurityNotAvailableException, Exception, 
-			 RenegotiateSessionException;
+    byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
+        byte[] tmp2, byte[] tmp3, byte[] tmp4)
+        throws SecurityNotAvailableException, Exception, 
+            RenegotiateSessionException;
 
-	 public Communication getPolicyTo(String type, String from, String to)
-		 throws SecurityNotAvailableException, java.io.IOException;
-    
-    
-	 public SecurityContext getPolicy(SecurityContext securityContext)
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public Communication getPolicyTo(String type, String from, String to)
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 /**
-	  * @return name of the virtual node where the object has been created
-	  */
-	 public String getVNName()
-		 throws SecurityNotAvailableException, java.io.IOException;
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, java.io.IOException;
 
-	 /**
-	  * @return object's X509Certificate as byte array
-	  */
-	 public byte[] getCertificateEncoded()
-		 throws SecurityNotAvailableException, IOException;
-        
-		public ArrayList getEntities()    throws SecurityNotAvailableException, IOException;
+    /**
+     * @return name of the virtual node where the object has been created
+     */
+    public String getVNName()
+        throws SecurityNotAvailableException, java.io.IOException;
+
+    /**
+     * @return object's X509Certificate as byte array
+     */
+    public byte[] getCertificateEncoded()
+        throws SecurityNotAvailableException, IOException;
+
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, IOException;
 }

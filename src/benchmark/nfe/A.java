@@ -30,16 +30,17 @@
 */
 package benchmark.nfe;
 
-import java.io.Serializable;
-import java.util.HashMap;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.node.Node;
 
-//import benchmark.util.ReifiableObject;
+import java.io.Serializable;
 
+import java.util.HashMap;
+
+
+//import benchmark.util.ReifiableObject;
 
 /**
  * @author agenoud
@@ -50,7 +51,6 @@ import org.objectweb.proactive.core.node.Node;
  * Window>Preferences>Java>Code Generation.
  */
 public class A /*extends ReifiableObject*/ implements Serializable {
-	
     String name;
 
     public A() {
@@ -67,47 +67,48 @@ public class A /*extends ReifiableObject*/ implements Serializable {
     public String getNodeUrl() {
         return ProActive.getBodyOnThis().getNodeURL();
     }
-    
+
     public boolean protectedFrom(NonFunctionalException nfe) {
-    	try {
-    		if (ProActive.getBodyOnThis().getHandlersLevel() == null) {
-    			return false;
-    		} else if  (!ProActive.getBodyOnThis().getHandlersLevel().isEmpty()) {
-				return (ProActive.searchExceptionHandler(nfe, ProActive.getBodyOnThis()) != null);
-    		} else {
-				return false;
-    		}
-    	} catch (ProActiveException e) {
-    		return false;
-    	}
+        try {
+            if (ProActive.getBodyOnThis().getHandlersLevel() == null) {
+                return false;
+            } else if (!ProActive.getBodyOnThis().getHandlersLevel().isEmpty()) {
+                return (ProActive.searchExceptionHandler(nfe,
+                    ProActive.getBodyOnThis()) != null);
+            } else {
+                return false;
+            }
+        } catch (ProActiveException e) {
+            return false;
+        }
     }
- 
-	public int getHandlerNumber() throws ProActiveException {
-		HashMap table = ProActive.getBodyOnThis().getHandlersLevel();		
-		if (table == null) {
-			return -1;
-		} else if (table.isEmpty()) {
-			return 0;
-		} else {
-			return table.size();
-		}
-	} 
- 
- 	public HashMap getTableOfHandler()  {
- 		HashMap handlers;
- 		try {
- 			handlers = ProActive.getBodyOnThis().getHandlersLevel(); 
- 		} catch (ProActiveException e) {
- 			return null;
- 		}
- 		return handlers; 
- 	}
- 	
-	public void moveTo(Node node) throws ProActiveException {
-		try {
-			ProActive.migrateTo(node);
-   		} catch (Exception e) {
-	 		System.out.println("ERROR " + e.getMessage());
-		}
-	}
+
+    public int getHandlerNumber() throws ProActiveException {
+        HashMap table = ProActive.getBodyOnThis().getHandlersLevel();
+        if (table == null) {
+            return -1;
+        } else if (table.isEmpty()) {
+            return 0;
+        } else {
+            return table.size();
+        }
+    }
+
+    public HashMap getTableOfHandler() {
+        HashMap handlers;
+        try {
+            handlers = ProActive.getBodyOnThis().getHandlersLevel();
+        } catch (ProActiveException e) {
+            return null;
+        }
+        return handlers;
+    }
+
+    public void moveTo(Node node) throws ProActiveException {
+        try {
+            ProActive.migrateTo(node);
+        } catch (Exception e) {
+            System.out.println("ERROR " + e.getMessage());
+        }
+    }
 }

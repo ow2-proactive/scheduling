@@ -30,7 +30,6 @@
 */
 package benchmark.nfe;
 
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -47,10 +46,9 @@ import testsuite.test.ProActiveBenchmark;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public class BenchSettingNFE extends ProActiveBenchmark {
+    private int set_iter = 0;
+    private A a = null;
 
-	private int set_iter = 0;
-	private A a = null;
-	
     /**
      *
      */
@@ -63,27 +61,29 @@ public class BenchSettingNFE extends ProActiveBenchmark {
      * @param node
      */
     public BenchSettingNFE(Node node, int set_iter) {
-		super(node, "NFE Mechanism Configuration",
-			"Bench time to attach handlers to active object.");
-		this.set_iter =set_iter;
-     }
+        super(node, "NFE Mechanism Configuration",
+            "Bench time to attach handlers to active object.");
+        this.set_iter = set_iter;
+    }
 
     /**
      * @see testsuite.test.Benchmark#action()
      */
     public long action() throws Exception {
-		// System.out.println("NFE Bench on " + getNode() + " with " + set_iter + " iterations");
-		int iter_tmp = set_iter;
-    	this.timer.start();
-		//UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) a).getProxy()).getBody();
-    	while (iter_tmp != 0) {
-			//System.out.print("Active objects protected from ProActiveCommunicationException is " + a.protectedFrom(new ProActiveCommunicationException()));
-			ProActive.setExceptionHandler(HandlerCommunicationException.class, ProActiveCommunicationException.class, Handler.ID_Body, a);
-			//System.out.print(" - " + a.protectedFrom(new ProActiveCommunicationException()));
-			ProActive.unsetExceptionHandler(ProActiveCommunicationException.class, Handler.ID_Body, a);
-			//System.out.println(" - " + a.protectedFrom(new ProActiveCommunicationException()));
-			iter_tmp = iter_tmp - 1;
-    	}
+        // System.out.println("NFE Bench on " + getNode() + " with " + set_iter + " iterations");
+        int iter_tmp = set_iter;
+        this.timer.start();
+        //UniversalBody body = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) a).getProxy()).getBody();
+        while (iter_tmp != 0) {
+            //System.out.print("Active objects protected from ProActiveCommunicationException is " + a.protectedFrom(new ProActiveCommunicationException()));
+            ProActive.setExceptionHandler(HandlerCommunicationException.class,
+                ProActiveCommunicationException.class, Handler.ID_Body, a);
+            //System.out.print(" - " + a.protectedFrom(new ProActiveCommunicationException()));
+            ProActive.unsetExceptionHandler(ProActiveCommunicationException.class,
+                Handler.ID_Body, a);
+            //System.out.println(" - " + a.protectedFrom(new ProActiveCommunicationException()));
+            iter_tmp = iter_tmp - 1;
+        }
         this.timer.stop();
         return this.timer.getCumulatedTime();
     }
@@ -92,9 +92,10 @@ public class BenchSettingNFE extends ProActiveBenchmark {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
-		// Create an active object on the given node and get the body
-		Node node = getNode();
-		a = (A) org.objectweb.proactive.ProActive.newActive(A.class.getName(), null, node);
+        // Create an active object on the given node and get the body
+        Node node = getNode();
+        a = (A) org.objectweb.proactive.ProActive.newActive(A.class.getName(),
+                null, node);
     }
 
     /**
@@ -110,8 +111,8 @@ public class BenchSettingNFE extends ProActiveBenchmark {
     public boolean preConditions() throws Exception {
         return (getNode() != null);
     }
-    
-	public boolean postConditions() throws Exception {
-		return true;
-	}
+
+    public boolean postConditions() throws Exception {
+        return true;
+    }
 }

@@ -8,12 +8,6 @@
  */
 package org.objectweb.proactive.ext.mixedlocation;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -30,6 +24,14 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
@@ -56,7 +58,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //   t.start();
     }
 
-    public void receiveRequest(Request request) throws IOException, RenegotiateSessionException {
+    public void receiveRequest(Request request)
+        throws IOException, RenegotiateSessionException {
         //       System.out.println("UniversalBodyWrapper.receiveRequest");
         if (this.wrappedBody == null) {
             throw new IOException();
@@ -155,128 +158,128 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody = null;
         System.gc();
     }
-    
-	/** Give a reference to a local map of handlers
-	 * @return A reference to a map of handlers
-	 */
-	public HashMap getHandlersLevel() throws ProActiveException {
-		return this.wrappedBody.getHandlersLevel();
-	}
-  
-	/** Set a new handler within the table of the Handlerizable Object
-	 * @param handler A class of handler associated with a class of non functional exception.
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 */
-	public void setExceptionHandler(Class handler, Class exception) throws ProActiveException {
-		this.wrappedBody.setExceptionHandler(handler,exception);
-	}
-	
-	/** Remove a handler from the table of the Handlerizable Object
-	 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-	 * @return The removed handler or null
-	 */
-	public Handler unsetExceptionHandler(Class exception) throws ProActiveException { 
-		return this.wrappedBody.unsetExceptionHandler(exception);
-	}
-	
+
+    /** Give a reference to a local map of handlers
+     * @return A reference to a map of handlers
+     */
+    public HashMap getHandlersLevel() throws ProActiveException {
+        return this.wrappedBody.getHandlersLevel();
+    }
+
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     */
+    public void setExceptionHandler(Class handler, Class exception)
+        throws ProActiveException {
+        this.wrappedBody.setExceptionHandler(handler, exception);
+    }
+
+    /** Remove a handler from the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
+    public Handler unsetExceptionHandler(Class exception)
+        throws ProActiveException {
+        return this.wrappedBody.unsetExceptionHandler(exception);
+    }
+
     // SECURITY
-	public void initiateSession(int type,UniversalBody body)
-		throws java.io.IOException, CommunicationForbiddenException, 
-			AuthenticationException, RenegotiateSessionException, 
-			SecurityNotAvailableException {
-		wrappedBody.initiateSession(type,body);
-	}
+    public void initiateSession(int type, UniversalBody body)
+        throws java.io.IOException, CommunicationForbiddenException, 
+            AuthenticationException, RenegotiateSessionException, 
+            SecurityNotAvailableException {
+        wrappedBody.initiateSession(type, body);
+    }
 
-	public void terminateSession(long sessionID)
-		throws java.io.IOException, SecurityNotAvailableException {
-		wrappedBody.terminateSession(sessionID);
-	}
+    public void terminateSession(long sessionID)
+        throws java.io.IOException, SecurityNotAvailableException {
+        wrappedBody.terminateSession(sessionID);
+    }
 
-	public X509Certificate getCertificate()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return wrappedBody.getCertificate();
-	}
+    public X509Certificate getCertificate()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return wrappedBody.getCertificate();
+    }
 
-	public ProActiveSecurityManager getProActiveSecurityManager()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return wrappedBody.getProActiveSecurityManager();
-	}
+    public ProActiveSecurityManager getProActiveSecurityManager()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return wrappedBody.getProActiveSecurityManager();
+    }
 
-	public Policy getPolicyFrom(X509Certificate certificate)
-		throws java.io.IOException, SecurityNotAvailableException {
-		return wrappedBody.getPolicyFrom(certificate);
-	}
+    public Policy getPolicyFrom(X509Certificate certificate)
+        throws java.io.IOException, SecurityNotAvailableException {
+        return wrappedBody.getPolicyFrom(certificate);
+    }
 
-	public long startNewSession(Communication policy)
-		throws java.io.IOException, RenegotiateSessionException, 
-			SecurityNotAvailableException {
-		return wrappedBody.startNewSession(policy);
-	}
+    public long startNewSession(Communication policy)
+        throws java.io.IOException, RenegotiateSessionException, 
+            SecurityNotAvailableException {
+        return wrappedBody.startNewSession(policy);
+    }
 
-	public ConfidentialityTicket negociateKeyReceiverSide(
-		ConfidentialityTicket confidentialityTicket, long sessionID)
-		throws java.io.IOException, KeyExchangeException, 
-			SecurityNotAvailableException {
-		return wrappedBody.negociateKeyReceiverSide(confidentialityTicket,
-			sessionID);
-	}
+    public ConfidentialityTicket negociateKeyReceiverSide(
+        ConfidentialityTicket confidentialityTicket, long sessionID)
+        throws java.io.IOException, KeyExchangeException, 
+            SecurityNotAvailableException {
+        return wrappedBody.negociateKeyReceiverSide(confidentialityTicket,
+            sessionID);
+    }
 
-	public PublicKey getPublicKey()
-		throws java.io.IOException, SecurityNotAvailableException {
-		return wrappedBody.getPublicKey();
-	}
+    public PublicKey getPublicKey()
+        throws java.io.IOException, SecurityNotAvailableException {
+        return wrappedBody.getPublicKey();
+    }
 
-	public byte[] randomValue(long sessionID, byte[] cl_rand)
-		throws Exception, SecurityNotAvailableException {
-		return wrappedBody.randomValue(sessionID, cl_rand);
-	}
+    public byte[] randomValue(long sessionID, byte[] cl_rand)
+        throws Exception, SecurityNotAvailableException {
+        return wrappedBody.randomValue(sessionID, cl_rand);
+    }
 
-	public byte[][] publicKeyExchange(long sessionID,
-		UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
-		byte[] sig_code) throws Exception, SecurityNotAvailableException {
-		return wrappedBody.publicKeyExchange(sessionID, distantBody, my_pub,
-			my_cert, sig_code);
-	}
+    public byte[][] publicKeyExchange(long sessionID,
+        UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
+        byte[] sig_code) throws Exception, SecurityNotAvailableException {
+        return wrappedBody.publicKeyExchange(sessionID, distantBody, my_pub,
+            my_cert, sig_code);
+    }
 
-	public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-		byte[] tmp2, byte[] tmp3, byte[] tmp4)
-		throws Exception, SecurityNotAvailableException {
-		return wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
-			tmp4);
-	}
+    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
+        byte[] tmp2, byte[] tmp3, byte[] tmp4)
+        throws Exception, SecurityNotAvailableException {
+        return wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3,
+            tmp4);
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
-	 */
-	public String getVNName() throws IOException, SecurityNotAvailableException {
-		return wrappedBody.getVNName();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
+     */
+    public String getVNName() throws IOException, SecurityNotAvailableException {
+        return wrappedBody.getVNName();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
-	 */
-	public byte[] getCertificateEncoded()
-		throws IOException, SecurityNotAvailableException {
-		return wrappedBody.getCertificateEncoded();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+     */
+    public byte[] getCertificateEncoded()
+        throws IOException, SecurityNotAvailableException {
+        return wrappedBody.getCertificateEncoded();
+    }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-	 */
-	public SecurityContext getPolicy(SecurityContext securityContext)
-		throws SecurityNotAvailableException, IOException {
-		return wrappedBody.getPolicy(securityContext);
-	}
-    
-	public ArrayList getEntities() throws SecurityNotAvailableException, IOException {
-			return wrappedBody.getEntities();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
+    public SecurityContext getPolicy(SecurityContext securityContext)
+        throws SecurityNotAvailableException, IOException {
+        return wrappedBody.getPolicy(securityContext);
+    }
 
-	public Communication getPolicyTo(String vn, String from, String to)
-		throws java.io.IOException, SecurityNotAvailableException {
-		return this.wrappedBody.getPolicyTo(vn, from, to);
-	}
+    public ArrayList getEntities()
+        throws SecurityNotAvailableException, IOException {
+        return wrappedBody.getEntities();
+    }
 
-	
-
+    public Communication getPolicyTo(String vn, String from, String to)
+        throws java.io.IOException, SecurityNotAvailableException {
+        return this.wrappedBody.getPolicyTo(vn, from, to);
+    }
 }

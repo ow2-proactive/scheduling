@@ -30,12 +30,6 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -51,6 +45,14 @@ import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -127,23 +129,25 @@ public interface RemoteBody extends java.rmi.Remote {
     public void setImmediateService(String methodName)
         throws java.io.IOException;
 
-	/** Give a reference to a local map of handlers
-		 * @return A reference to a map of handlers
-		 */
-		public HashMap getHandlersLevel() throws java.io.IOException;
-	 
-		/** Set a new handler within the table of the Handlerizable Object
-		 * @param handler A class of handler associated with a class of non functional exception.
-		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		 */
-		public void setExceptionHandler(Class handler, Class exception) throws java.io.IOException;
-	
-		/** Remove a handler from the table of the Handlerizable Object
-		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		 * @return The removed handler or null
-		 */
-		public Handler unsetExceptionHandler(Class exception) throws java.io.IOException;
-		
+    /** Give a reference to a local map of handlers
+             * @return A reference to a map of handlers
+             */
+    public HashMap getHandlersLevel() throws java.io.IOException;
+
+    /** Set a new handler within the table of the Handlerizable Object
+     * @param handler A class of handler associated with a class of non functional exception.
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     */
+    public void setExceptionHandler(Class handler, Class exception)
+        throws java.io.IOException;
+
+    /** Remove a handler from the table of the Handlerizable Object
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
+    public Handler unsetExceptionHandler(Class exception)
+        throws java.io.IOException;
+
     // SECURITY
     public void initiateSession(int type, UniversalBody body)
         throws java.io.IOException, CommunicationForbiddenException, 
