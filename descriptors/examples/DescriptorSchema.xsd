@@ -160,6 +160,14 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:pattern value="((\s)*[\[](\s)*[0-9]+(\s)*[\-](\s)*([0-9])+(\s)*([\]](\s)*|[;](\s)*[0-9](\s)*[\]](\s)*))((\s)*|(\s)*[\^](\s)*[\[](\s)*([0-9]+(\s)*[,]*(\s)*)+[\]](\s)*)"/>
 		</xs:restriction>
 	</xs:simpleType>
+	<!--closeStreamType is defined as a global element, hence it can be referenced in all processes.-->
+	<xs:simpleType name="CloseStreamType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="yes"/>
+					<xs:enumeration value="no"/>
+				</xs:restriction>
+		</xs:simpleType>
+	
 	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
@@ -470,6 +478,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="jvmParameters" type="JvmParameterType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 	</xs:complexType>
 	<!--classpath element has two child: absolutePath and relativePath.  One of the child must appear once or more. Both element can be present in the classpath definition. For instance an absolutePath element followed by a relativePath element-->
 	<xs:complexType name="ClasspathType">
@@ -527,6 +536,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -547,6 +557,7 @@ by fixedName that is the fixed part of hostnames, list that represents the seque
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="fixedName" type="xs:string" use="required"/>
 		<xs:attribute name="list" type="PatternType" use="required"/>
 		<xs:attribute name="padding" type="xs:positiveInteger" use="optional"/>
@@ -570,6 +581,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="hostlist" type="ListType" use="required"/>
 		<xs:attribute name="domain" type="xs:string" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
@@ -588,6 +600,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="parallelize" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="hostname" type="ListType" use="required"/>
 	</xs:complexType>
@@ -606,10 +619,10 @@ by hostlist which is a list of hostname and domain if all the host specified are
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">
 		<xs:sequence>
@@ -618,7 +631,8 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess"/>
-		<xs:attribute name="hostname" type="xs:string" use="required" />
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">
@@ -628,6 +642,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" use="optional">
 			<xs:simpleType>
@@ -663,6 +678,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="pbsOption" type="PbsOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
@@ -684,6 +700,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="prunOption" type="prunOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--prunOption element has three childs:hostlist which represents the -m option of bsub command, processor which indicate the number of processor requested, scriptPath element which represents the location of the startRuntime.sh script to run jobs on LSF cluster.These three elements may not appear -->
@@ -704,6 +721,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="oarOption" type="OarOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.oar.OARSubProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
@@ -730,6 +748,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="gridEngineOption" type="OarOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
@@ -746,6 +765,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="globusOption" type="GlobusOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--globusOption element has one child count element-->

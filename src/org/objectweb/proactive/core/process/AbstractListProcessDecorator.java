@@ -138,7 +138,14 @@ public abstract class AbstractListProcessDecorator
             ((ExternalProcessDecorator) processes.get(i)).setCompositionType(compositionType);
         }
     }
-
+    /**
+     * @see org.objectweb.proactive.core.process.ExternalProcess#closeStream()
+     */
+    public void closeStream(){
+        for (int i = 0; i < processes.size(); i++) {
+            ((ExternalProcessDecorator) processes.get(i)).closeStream();
+        }
+    }
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#getInputMessageLogger()
      */

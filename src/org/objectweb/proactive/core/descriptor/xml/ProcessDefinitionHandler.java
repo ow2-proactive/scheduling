@@ -140,6 +140,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 //e.printStackTrace();
                 throw new org.xml.sax.SAXException(e.getMessage());
             }
+            String closeStream = attributes.getValue("closeStream");
+            if (checkNonEmpty(closeStream) && closeStream.equals("yes")) {
+                targetProcess.closeStream();
+            }
             String hostname = attributes.getValue("hostname");
             if (checkNonEmpty(hostname)) {
                 targetProcess.setHostname(hostname);
@@ -264,6 +268,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 //e.printStackTrace();
                 throw new org.xml.sax.SAXException(e.getMessage());
             }
+            String closeStream = attributes.getValue("closeStream");
+            
             String fixedName = attributes.getValue("fixedName");
             String list = attributes.getValue("list");
             String domain = attributes.getValue("domain");
@@ -279,6 +285,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
             if (checkNonEmpty(hostlist)) {
                 ((AbstractListProcessDecorator) targetProcess).setHostList(hostlist,domain);                                                                
+            }
+            if (checkNonEmpty(closeStream) && closeStream.equals("yes")) {
+                targetProcess.closeStream();
             }
             String username = attributes.getValue("username");
             if (checkNonEmpty(username)) {

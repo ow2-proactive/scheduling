@@ -31,7 +31,10 @@
 package org.objectweb.proactive.core.process;
 
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.util.MessageLogger;
+
+import java.io.IOException;
 
 
 public abstract class AbstractExternalProcess extends AbstractUniversalProcess
@@ -41,6 +44,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             "os.name").toLowerCase().startsWith("win");
     protected Process externalProcess;
     private boolean shouldRun;
+    protected boolean closeStream = false;
     protected MessageLogger inputMessageLogger;
     protected MessageLogger errorMessageLogger;
     protected MessageSink outputMessageSink;
@@ -75,6 +79,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     //
     // -- implements ExternalProcess -----------------------------------------------
     //
+    public void closeStream() {
+        this.closeStream = true;
+    }
+
     public MessageLogger getInputMessageLogger() {
         return inputMessageLogger;
     }
@@ -141,9 +149,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
         return sb.toString();
     }
-    
+
     protected void internalStartProcess(String commandToExecute)
-    throws java.io.IOException {
+        throws java.io.IOException {
         try {
             externalProcess = Runtime.getRuntime().exec(commandToExecute);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
@@ -160,7 +168,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected void internalStopProcess() {
-          if (externalProcess != null) {
+        if (externalProcess != null) {
             externalProcess.destroy();
         }
         if (outputMessageSink != null) {
@@ -174,9 +182,27 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
     protected void handleProcess(java.io.BufferedReader in,
         java.io.BufferedWriter out, java.io.BufferedReader err) {
-        handleInput(in);
-        handleOutput(out);
-        handleError(err);
+        if (closeStream) {
+            try {
+                
+                //the sleep might be needed for processes that fail if
+                // we close the in/err too early
+                Thread.sleep(200);
+                out.close();
+                err.close();
+                in.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } else {
+            handleInput(in);
+            handleOutput(out);
+            handleError(err);
+        }
     }
 
     protected void handleInput(java.io.BufferedReader in) {
@@ -265,7 +291,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             t.printStackTrace();
         }
     }
-    
+
     // end inner class StandardOutputMessageLogger
 
     /**
@@ -358,7 +384,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
 
         public void run() {
             if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-				AbstractExternalProcess.clogger.debug("Process started Thread=" +
+                AbstractExternalProcess.clogger.debug("Process started Thread=" +
                     Thread.currentThread().getName());
             }
 
@@ -366,15 +392,14 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             try {
                 while (true) {
                     //threadMonitor.setActive(false);
-//                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-//						AbstractExternalProcess.clogger.debug(
-//                            "ProcessInputHandler before readLine()");
-//                    }
-
+                    //                    if (AbstractExternalProcess.clogger.isDebugEnabled()) {
+                    //						AbstractExternalProcess.clogger.debug(
+                    //                            "ProcessInputHandler before readLine()");
+                    //                    }
                     String s = in.readLine();
                     if (AbstractExternalProcess.clogger.isDebugEnabled()) {
-//                        AbstractExternalProcess.clogger.debug(
-//                            "ProcessInputHandler after readLine() s=" + s);
+                        //                        AbstractExternalProcess.clogger.debug(
+                        //                            "ProcessInputHandler after readLine() s=" + s);
                         AbstractExternalProcess.clogger.debug(s);
                     }
 
