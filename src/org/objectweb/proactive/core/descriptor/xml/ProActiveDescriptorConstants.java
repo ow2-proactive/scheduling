@@ -43,14 +43,17 @@ public interface ProActiveDescriptorConstants  {
   public static final String PROACTIVE_DESCRIPTOR_TAG = "ProActiveDescriptor"; 
   public static final String DEPLOYMENT_TAG = "deployment"; 
   public static final String INFRASTRUCTURE_TAG = "infrastructure"; 
-  
-  public static final String VIRTUAL_NODES_TAG = "virtualNodes"; 
+  public static final String COMPONENT_DEFINITION_TAG = "componentDefinition"; 
+  public static final String VIRTUAL_NODES_DEFINITION_TAG = "virtualNodesDefinition"; 
+  public static final String VIRTUAL_NODES_ACQUISITION_TAG = "virtualNodesAcquisition"; 
   public static final String VIRTUAL_NODE_TAG = "virtualNode"; 
+  public static final String REGISTER_TAG = "register"; 
   public static final String MAPPING_TAG = "mapping"; 
   public static final String MAP_TAG = "map"; 
   public static final String JVMSET_TAG = "jvmSet";
   public static final String VMNAME_TAG = "vmName";
   public static final String CURRENTJVM_TAG = "currentJVM";
+  public static final String LOOKUP_TAG = "lookup"; 
   public static final String JVMS_TAG = "jvms"; 
   public static final String JVM_TAG = "jvm"; 
   public static final String ACQUISITION_TAG = "acquisition"; 
@@ -86,6 +89,7 @@ public interface ProActiveDescriptorConstants  {
   
   public static final String ABS_PATH_TAG = "absolutePath";
   public static final String REL_PATH_TAG = "relativePath";  
+  
   
   
 }

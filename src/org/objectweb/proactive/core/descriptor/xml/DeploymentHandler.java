@@ -33,6 +33,9 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNodeLookup;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
@@ -60,7 +63,8 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
 
   public DeploymentHandler(ProActiveDescriptor proActiveDescriptor) {
     this.proActiveDescriptor = proActiveDescriptor;
-
+		this.addHandler(REGISTER_TAG,new RegisterHandler());
+		this.addHandler(LOOKUP_TAG, new LookupHandler());
     {
     PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
     ch.addHandler(MAP_TAG, new MapHandler());
@@ -92,8 +96,44 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
   //  ----- INNER CLASSES -----------------------------------------------------------------------------------
   //
 
-
-
+	private class RegisterHandler extends BasicUnmarshaller {
+		
+		private RegisterHandler(){
+		}
+			public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+				String vn = attributes.getValue("virtualNode");
+				if (! checkNonEmpty(vn)) throw new org.xml.sax.SAXException("register Tag without any virtualnode defined");
+				String protocol = attributes.getValue("protocol");
+    	if (! checkNonEmpty(protocol)) throw new org.xml.sax.SAXException("lookup Tag without any protocol defined");
+    	protocol = UrlBuilder.checkProtocol(protocol);
+			VirtualNodeImpl vnImpl = (VirtualNodeImpl)proActiveDescriptor.createVirtualNode(vn,false);
+			//VirtualNodeImpl vnImpl= (VirtualNodeImpl)vnStrat.getVirtualNode();
+			//vnImpl.setRegistrationValue(true);
+			vnImpl.setRegistrationProtocol(protocol);
+				
+			}
+		
+		
+	}
+	
+	private class LookupHandler extends BasicUnmarshaller {
+		
+		private LookupHandler(){
+		}
+		
+		public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+			String vnLookup = attributes.getValue("virtualNode");
+    	if (! checkNonEmpty(vnLookup)) throw new org.xml.sax.SAXException("lookup Tag without any virtualnode defined");
+    	String protocol = attributes.getValue("protocol");
+    	if (! checkNonEmpty(protocol)) throw new org.xml.sax.SAXException("lookup Tag without any protocol defined");
+    	String host = attributes.getValue("host");
+    	if (! checkNonEmpty(host) && protocol.equals("rmi")) throw new org.xml.sax.SAXException("within a lookup tag attribute host must be defined for rmi protocol");		
+    	protocol = UrlBuilder.checkProtocol(protocol);
+    	String url = UrlBuilder.buildUrl(host,vnLookup,protocol);
+    	VirtualNodeLookup vn  = (VirtualNodeLookup)proActiveDescriptor.createVirtualNode(vnLookup,true);
+    	vn.setLookupInformations(url,protocol);
+    	}
+	}
   /**
    * This class receives map events
    */
@@ -113,23 +153,25 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
       // create and register a VirtualNode
       String vnName = attributes.getValue("virtualNode");
       if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("mapping defined without specifying virtual node");
-      vn = proActiveDescriptor.createVirtualNode(vnName);
+      vn = proActiveDescriptor.createVirtualNode(vnName,false);
       
     }
     
     protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
     	if(name.equals(JVMSET_TAG)){
     		String[] vmNames = (String[]) activeHandler.getResultObject();
-    		if(vmNames.length > 1 && vn.getProperty()!=null && vn.getProperty().equals("unique")) throw new org.xml.sax.SAXException("a set of virtual machine is defined for a virtualNode that is unique");
+    		//throws an exception if vn has property unique or unique_singleAO and more than one vm are defined
+    		if(vmNames.length > 1 && vn.getProperty()!=null && (vn.getProperty().equals("unique")||vn.getProperty().equals("unique_singleAO"))) throw new org.xml.sax.SAXException("a set of virtual machine is defined for a virtualNode that is unique");
     		if (vmNames.length > 0) {
     			for (int i=0; i<vmNames.length; i++) {
     				VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmNames[i]);
-    				vn.addVirtualMachine(vm);
+    				
     				if (vm.getCreatorId() == null)
       			{
       				vm.setCreatorId(vn.getName());
       		
       			}
+      			vn.addVirtualMachine(vm);
     			}
     			
     		}

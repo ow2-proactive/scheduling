@@ -61,9 +61,14 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
     addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
     addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
     {
-    PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
-    ch.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler());
-    this.addHandler(VIRTUAL_NODES_TAG, ch);
+    PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
+    PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
+    PassiveCompositeUnmarshaller vNodesAcqHandler = new PassiveCompositeUnmarshaller();
+    vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler());
+    vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeLookupHandler());
+    compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG, vNodesDefHandler);
+    compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG, vNodesAcqHandler);
+    this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
     }
   }
 
@@ -164,7 +169,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
       // create and register a VirtualNode
       String vnName = attributes.getValue("name");
       if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
-      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName);
+      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName,false);
       // property
       String property = attributes.getValue("property");
       if (checkNonEmpty(property)) {
@@ -173,5 +178,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
     }
   } // end inner class VirtualNodeHandler
+	
+	/**
+   * This class receives virtualNode events
+   */
+  private class VirtualNodeLookupHandler extends BasicUnmarshaller {
+    private VirtualNodeLookupHandler() {
+    }
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+      // create and register a VirtualNode
+      String vnName = attributes.getValue("name");
+      if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
+      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName,true);
+    }
+  } // end inner class VirtualNodeLookupHandler
 
 }
