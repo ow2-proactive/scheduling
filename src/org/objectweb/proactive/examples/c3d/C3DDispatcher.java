@@ -188,7 +188,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	private String[] rendererNodes;
 
 	/**
-	 * The no-argument Constructor as commanded by Java//; otherwise unused
+	 * The no-argument Constructor as commanded by ProActive;
+	 * otherwise unused
 	 */
 	public C3DDispatcher()
 	{
@@ -650,7 +651,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	}
 
 	/** 
-	 * Java// object life routine
+	 * ProActive object life routine
 	 * To be remdelled..
 	 */
 	public void runActivity(org.objectweb.proactive.Body body)

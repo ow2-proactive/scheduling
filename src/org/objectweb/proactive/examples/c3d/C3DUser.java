@@ -132,7 +132,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   /**
    * <code>C3DDispatcher</code>, decouples the m user frames and the 
    * n rendering engines. There is always exactly one C3DDispatcher object 
-   * in the Java// rendering system.
+   * in the ProActive rendering system.
    */
   C3DDispatcher c3ddispatcher;
   /**
@@ -700,7 +700,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       gridbag.setConstraints(l1, c);
       add(l1);
 
-      Label l2 = new Label("a Java// test application", Label.CENTER);
+      Label l2 = new Label("a ProActive test application", Label.CENTER);
       c.insets = new Insets(0, 5, 0, 5);
       gridbag.setConstraints(l2, c);
       add(l2);
