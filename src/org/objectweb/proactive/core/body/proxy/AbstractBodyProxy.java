@@ -166,7 +166,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsOneWay while sending request for methodcall =" +
                     methodCall.getName(), e),
-                ProActive.getBodyOnThis().getNodeURL());
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
     }
 
@@ -191,7 +191,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
                     methodCall.getName(), e),
-                ProActive.getBodyOnThis().getNodeURL());
+			ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         } catch (ClassNotFoundException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(
@@ -204,7 +204,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
                     methodCall.getName(), e),
-                ProActive.getBodyOnThis().getNodeURL());
+			ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // Set the id of the body creator in the created future
@@ -228,7 +228,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while sending request for methodcall =" +
                     methodCall.getName(), e),
-                ProActive.getBodyOnThis().getNodeURL());
+                ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // And return the future object
@@ -259,7 +259,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
                 new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsSynchronous while sending request for methodcall =" +
                     methodCall.getName(), e),
-                ProActive.getBodyOnThis().getNodeURL());
+			ProActive.getBodyOnThis().getRemoteAdapter().getNodeURL());
         }
 
         // Returns the result
