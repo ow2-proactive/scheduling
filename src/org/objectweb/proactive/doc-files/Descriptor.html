@@ -558,6 +558,7 @@ Even if not shown in this example, a specific tag is provided for XbootClasspath
 		
 		<b>ProActive</b> provides <code><a href="../core/process/ssh/SSHProcess.html">org.objectweb.proactive.core.process.ssh.SSHProcess</a></code> to create <b>ssh</b> process. <br>
 		In order to use ssh to log on a remote host, you must perform some actions. First you need to copy your public key (located in identity.pub under ~/.ssh on your local machine) in the authorized_keys(located under ~/.ssh) file of the remote host. Then to avoid interactivity, you will have to launch on the local host the ssh-agent command: <b>ssh-agent $SHELL</b>, this command can be put in your .xsession file, in order to run it automatically when logging on your station. Then launching <b>ssh-add</b> command to add your identity. Running this command will ask you to enter your <b>passphrase</b>, it is the one you provided when asking for an ssh key pair.<br></br>
+Note also that if the generated key pair is not encrypted (no passphrase), you do not need to run neither the ssh-agent, nor the ssh-add command. Indeed it is sufficient when using non encrypted private key, to only copy the public key on the remote host (as mentionned above) in order to get logged automatically on the remote host.<br></br>
 These steps must be performed <b>before </b>running any ProActive application using <b>ssh </b>protocol. If you are not familiar with ssh, see <a href="http://www.openssh.org">openSSH</a>
 <br></br>
 		<li class="textNormal">LSF<br></br>
