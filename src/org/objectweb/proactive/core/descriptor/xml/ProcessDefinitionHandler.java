@@ -432,9 +432,9 @@ public class ProcessDefinitionHandler
   	public GlobusOptionHandler(){
   		this.addHandler(GRAM_PORT_TAG,new SingleValueUnmarshaller());
   		this.addHandler(GIS_PORT_TAG,new SingleValueUnmarshaller());
-//  		CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-//   		cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
-//    	this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
+  		CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+   		cu.addHandler(GLOBUS_HOST_TAG, new SingleValueUnmarshaller());
+    	this.addHandler(GLOBUS_HOST_LIST_TAG, cu);
   	}
   	
   	public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
