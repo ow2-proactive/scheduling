@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/ProActive/DescriptorSchema.xsd">
 	<virtualNodes>
-		<virtualNode name="Dispatcher"/>
-		<virtualNode name="Renderer" cyclic="true"/>
+		<virtualNode name="Dispatcher" property="unique"/>
+		<virtualNode name="Renderer" property="multiple"/>
 	</virtualNodes>
 	<deployment>
 		<mapping>
-			<map virtualNode="Dispatcher" jvm="currentJvm"/>
+			<map virtualNode="Dispatcher">
+				<jvmSet>
+					<vmName value="currentJvm"/>
+				</jvmSet>
+			</map>
 			<map virtualNode="Renderer">
 				<jvmSet>
-					<vmName>Jvm1</vmName>
-					<vmName>Jvm2</vmName>
-					<vmName>Jvm3</vmName>
-					<vmName>Jvm4</vmName>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
 				</jvmSet>
 			</map>
 		</mapping>
@@ -20,38 +23,34 @@
 			<jvm name="currentJvm">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm1">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3">
 				<acquisition method="rmi"/>
 				<creation>
-					<process refid="linuxJVM"/>
-				</creation>
-			</jvm>
-			<jvm name="Jvm4">
-				<acquisition method="rmi"/>
-				<creation>
-					<process refid="linuxJVM"/>
+					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			<processDefinition id="linuxJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>

@@ -1,44 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor>
-	<virtualNodes>
-		<virtualNode name="globusNode"/>
-	</virtualNodes>
-	<deployment>
-		<mapping>
-			<map virtualNode="globusNode" jvm="currentJVM"/>
-		</mapping>
-		<jvms>
-			<jvm name="currentJVM">
-				<acquisition method="rmi"/>
-				<creation>
-					<process refid="rLoginProcess"/>
-				</creation>
-			</jvm>
-		</jvms>
-	</deployment>
 	<infrastructure>
 		<processes>
-			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMNodeProcess">
-				<classpath>
-					<path type="relative" origin="userHome" value="/ProActive/classes"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/cog.jar"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/cryptix.jar"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/iaik_jce_full.jar"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/iaik_ssl.jar"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/javaxCrypto.jar"/>
-					<path type="relative" origin="userHome" value="/ProActive/lib/log4j-core.jar"/>
-				</classpath>
-				<javaPath>
-					<path type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
-				</javaPath>
-				<policyFile>
-					<path type="relative" origin="userHome" value="/ProActive/scripts/unix/proactive.java.policy"/>
-				</policyFile>
-				<classname>org.objectweb.proactive.core.process.globus.StartGlobus</classname>
-			</jvmProcess>
-			<process id="rLoginProcess" class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="globus1.inria.fr">
-				<process refid="linuxJVM"/>
-			</process>
+			<processDefinition id="globusJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<relativePath type="relative" origin="userHome" value="/ProActive/classes"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/cog.jar"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/cryptix.jar"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/iaik_jce_full.jar"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/iaik_ssl.jar"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/javaxCrypto.jar"/>
+						<relativePath type="relative" origin="userHome" value="/ProActive/lib/log4j-core.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<relativePath type="relative" origin="userHome" value="/ProActive/scripts/unix/proactive.java.policy"/>
+					</policyFile>
+					<classname>org.objectweb.proactive.core.process.globus.StartGlobus</classname>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="rLoginProcess">
+				<rloginProcess class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="globus1.inria.fr">
+					<processReference refid="globusJVM"/>
+				</rloginProcess>
+			</processDefinition>
 		</processes>
 	</infrastructure>
 </ProActiveDescriptor>
