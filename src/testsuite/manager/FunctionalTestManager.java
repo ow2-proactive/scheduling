@@ -133,17 +133,17 @@ public abstract class FunctionalTestManager extends AbstractManager {
                     AbstractResult result = test.runTest();
                     if (result != null) {
                         resultsGroup.add(result);
-                    }
-                    if (test.isFailed()) {
-                        logger.warn("Test " + test.getName() + " [FAILED]");
-                        errors++;
-                    } else {
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Test " + test.getName() +
-                                " runs with [SUCCESS]");
-                        }
-                        runs++;
-                    }
+			if (test.isFailed()) {
+			    logger.warn("Test " + test.getName() + " [FAILED]");
+			    errors++;
+			} else {
+			    if (logger.isInfoEnabled()) {
+				logger.info("Test " + test.getName() +
+					    " runs with [SUCCESS]");
+			    }
+			    runs++;
+			}
+		    }
                 }
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
@@ -161,6 +161,62 @@ public abstract class FunctionalTestManager extends AbstractManager {
             results.addAll(resultsGroup);
         }
 
+	if (this.interLinkedGroups != null) {
+	    // runs interlinked test
+	    Iterator itInterGroup = this.interLinkedGroups.iterator();
+	    while (itInterGroup.hasNext()) {
+		Group group = (Group) itInterGroup.next();
+
+		ResultsCollections resultsGroup = group.getResults();
+
+		try {
+		    group.initGroup();
+		} catch (Exception e) {
+		    logger.warn("Can't init group : " + group.getName(), e);
+		    resultsGroup.add(AbstractResult.ERROR,
+				     "Can't init group : " + group.getName(), e);
+		    continue;
+		}
+		
+		int runs = 0;
+		int errors = 0;
+		for (int i = 0; i < getNbRuns(); i++) {
+		    Iterator itTest = group.iterator();
+		    while (itTest.hasNext()) {
+			FunctionalTest test = (FunctionalTest) itTest.next();
+			AbstractResult result = test.runTestCascading();
+			resultsGroup.add(result);
+			if (test.isFailed()) {
+			    logger.warn("Test " + test.getName() + " [FAILED]");
+			    errors++;
+			} else {
+			    if (logger.isInfoEnabled()) {
+				logger.info("Test " + test.getName() +
+					    " runs with [SUCCESS]");
+			    }
+			    runs++;
+			}
+		    }
+		}
+		resultsGroup.add(AbstractResult.GLOBAL_RESULT,
+				 "Group : " + group.getName() + " Runs : " + runs +
+				 " Errors : " + errors);
+		
+		try {
+		    group.endGroup();
+		} catch (Exception e) {
+		    logger.warn("Can't ending group : " + group.getName(), e);
+		    resultsGroup.add(AbstractResult.ERROR,
+				     "Can't ending group : " + group.getName(), e);
+		    continue;
+		}
+		results.addAll(resultsGroup);
+		this.add(group);
+	    }
+	}
+
+	// end Manager
+	
         try {
             endManager();
         } catch (Exception e) {
@@ -174,7 +230,8 @@ public abstract class FunctionalTestManager extends AbstractManager {
             logger.info("... Finish");
         }
 
-        this.showResult();
+	// Show Results
+	this.showResult();
     }
 
     private int runs = 0;
@@ -196,6 +253,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
             }
             runs++;
         }
+	
     }
 
     public void execute(Group group, FunctionalTest lastestTest,
@@ -270,8 +328,6 @@ public abstract class FunctionalTestManager extends AbstractManager {
         if (logger.isInfoEnabled()) {
             logger.info("... Finish");
         }
-
-        this.showResult();
     }
 
     public void executeInterLinkedTest() {
@@ -382,8 +438,5 @@ public abstract class FunctionalTestManager extends AbstractManager {
      */
     public void execute() {
         super.execute();
-        if (this.interLinkedGroups != null) {
-            this.executeInterLinkedTest();
-        }
     }
 }
