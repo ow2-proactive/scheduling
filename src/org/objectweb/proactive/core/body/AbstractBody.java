@@ -121,9 +121,6 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
   /** The URL of the node this body is attached to */
   protected String nodeURL;
 
-  //Here we have a problem. If this.remoteBody serialized, RMI fails and we get a ClassCastException :-(
-  //Since we don't really need it (we can get it again on arrival)
-  //After a migration, we need to rebuild a new one
   /** A remote version of this body that is used to send to remote peer */
   protected transient UniversalBody remoteBody;
 

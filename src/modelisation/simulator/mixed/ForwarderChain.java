@@ -1,15 +1,6 @@
-/*
- * Created by IntelliJ IDEA.
- * User: fhuet
- * Date: Apr 30, 2002
- * Time: 10:45:07 AM
- * To change template for new class use
- * Code Style | Class Templates options (Tools | IDE Options).
- */
 package modelisation.simulator.mixed;
 
 import modelisation.simulator.common.SimulatorElement;
-
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -54,8 +45,8 @@ public class ForwarderChain extends SimulatorElement {
 
     public void add(Forwarder f) {
         f.setLifeTime(this.simulator.getForwarderLifeTime());
-   //     System.out.println("ForwarderChain.add with lifetime "
-     //                      + f.getRemainingTime());
+        System.out.println("ForwarderChain.add with lifetime "
+                           + f.getRemainingTime());
 //        f.setLifeTime(10);
         this.list.add(f);
     }
@@ -295,7 +286,7 @@ public class ForwarderChain extends SimulatorElement {
     }
 
     public void updateForwarders(double time) {
-//        System.out.println("ForwarderChain.updateForwarders");
+       System.out.println("ForwarderChain.updateForwarders " + this.list.size() );
         ListIterator li = this.list.listIterator(0);
         while (li.hasNext()) {
             ((Forwarder) li.next()).update(time);

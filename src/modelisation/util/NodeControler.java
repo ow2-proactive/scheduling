@@ -11,7 +11,7 @@ import java.util.Vector;
 public class NodeControler {
     private static final int MAXTRY = 3;
 
-    protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Xmx256m -Djava.compiler=NONE ";
+    protected static final String JAVA = "/usr/local/jdk1.2/bin/java  -Xmx256m -Djava.compiler=NONE  -Dproactive.locationserver=modelisation.server.singlequeue.SelectiveServer -Dproactive.locationserver.rmi=//tuba/LocationServer ";
     // protected static final String JAVA = "/usr/local/jdk1.3.1/bin/java  -Xmx256m  -Djava.compiler=NONE ";
     private static final String NODECLASS = " org.objectweb.proactive.StartNode ";
     private static String CLASSPATH = "/u/tuba/0/oasis/fhuet/workProActive/ProActive/classes:/u/tuba/0/oasis/fhuet/workProActive/ProActive/lib/bcel.jar:.";

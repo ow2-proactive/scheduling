@@ -8,7 +8,6 @@
  */
 package modelisation.simulator.mixed;
 
-
 public class Forwarder extends Agent {
 
     public static final int DEAD = 0;

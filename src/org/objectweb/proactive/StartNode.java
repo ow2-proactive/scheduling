@@ -300,8 +300,6 @@ public class StartNode {
     System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node3");
     System.out.println("                java "+StartNode.class.getName()+" "+Constants.JINI_PROTOCOL_IDENTIFIER+"://"+localhost+"/node4 "+MULTICAST_LOCATOR_NAME);
   }
-  
-  
 } // end class
 
 

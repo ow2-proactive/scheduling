@@ -76,6 +76,7 @@ public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFac
 
   protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
     public MigrationManager newMigrationManager() {
+    	System.out.println("MigrationManagerFactoryImpl: Creating TimedMigrationManagerWithServer");
         return new TimedMigrationManagerWithServer(LocationServerFactory.getLocationServer());
     }
   } // end inner class MigrationManagerFactoryImpl

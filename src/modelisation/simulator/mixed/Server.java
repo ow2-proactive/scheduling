@@ -58,7 +58,6 @@ public class Server extends SimulatorElement {
         }
     }
 
-
     protected void receiveRequest() {
 //        System.out.println("Server.receiveRequest");
         if (this.state == IDLE) {
@@ -99,7 +98,13 @@ public class Server extends SimulatorElement {
     public void endOfService(double endTime) {
 //        System.out.println("Server.endOfService");
         if (this.state == SERVING_AGENT) {
-            this.currentLocation=this.currentRequest.getNumber();
+        	if (this.currentLocation<this.currentRequest.getNumber()) {
+               this.currentLocation=this.currentRequest.getNumber();
+        	} else {
+        	  System.out.println("Server: ignoring request from agent");
+        	  System.out.println("CurrentLocation " + currentLocation + " new " 
+        	  + this.currentRequest.getNumber());
+        	}
             this.stateAfterService();
         } else {
             if (this.requestQueue.hasRequestFromAgent()) {

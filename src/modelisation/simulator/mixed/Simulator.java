@@ -216,7 +216,6 @@ public class Simulator {
         return minTime;
     }
 
-
     public static void main(String args[]) {
         if (args.length < 10) {
             System.err.println("Usage: java " + Simulator.class.getName()
