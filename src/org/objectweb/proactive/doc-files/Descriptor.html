@@ -170,7 +170,7 @@ or a set of Nodes after activation</p>
   <ul class="listWithSpace">  
   <li class="textNormal"><b>Typical example of a program code: </b></li>
 <code class="alignleftsnippet"><br>
-ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String xmlFile);<br></code>
+ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFile);<br></code>
 //--------- Returns a ProActiveDescriptor object from the xml file<br>
 <code class="alignleftsnippet">VirtualNode dispatcher = pad.getVirtualNode("Dispatcher");<br></code>
 //-------- Returns the VirtualNode Dispatcher described in the xml file as a java object<br>
@@ -427,7 +427,7 @@ descriptor with "*" for the host attribute</p>
 in class org.objectweb.proactive.core.descriptor.data.VirtualNode to
 update the value and to perform the lookup. Typical example of code:</p>
     
-    <code class="alignleftsnippet">ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String xmlFileLocation);</code><br>
+    <code class="alignleftsnippet">ProActiveDescriptor pad = ProActive.getProactiveDescriptor(String xmlFileLocation);</code><br>
 //----------- Returns a ProActiveDescriptor object from the xml file<br>
     <code class="alignleftsnippet">pad.activateMappings;</code><br>
 // -------------------activate all VirtualNodes(definition and
@@ -554,7 +554,7 @@ examples.</p>
 <code class="alignleftsnippet">&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Location_of_DescriptorSchema.xsd"&gt;	</code>
 <p>Note that this schema is available in the ProActive distribution
 package under ProActive\descriptor directory. Using descriptors related
-methods (Proactive.getProActiveDescriptor(file)) triggers automatic and
+methods (Proactive.getProactiveDescriptor(file)) triggers automatic and
 transparent validation of the file using <a
  href="http://xml.apache.org/xerces2-j/index.html">Xerces2_4_0</a>
 if the ProActive property <b>schema.validation</b>
@@ -1670,7 +1670,7 @@ XML descriptor with the method: killall(boolean softly) in class <a
  href="../core/descriptor/data/ProActiveDescriptor.html">ProActiveDescriptor</a>:</p>
 <br>
 <code class="alignleftsnippet">ProActiveDescriptor pad =
-ProActive.getProActiveDescriptor(String xmlFileLocation);</code><br>
+ProActive.getProactiveDescriptor(String xmlFileLocation);</code><br>
 //----------- Returns a ProActiveDescriptor object from the xml file<br>
 <code class="alignleftsnippet">pad.activateMappings();</code><br>
 <code class="alignleftsnippet">--------------------------------------------</code><br>
