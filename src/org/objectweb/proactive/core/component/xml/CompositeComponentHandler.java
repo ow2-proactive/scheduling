@@ -78,12 +78,17 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
                         //PrimitiveComponentB.class.getName(),
                     } else {
                         VirtualNode vn = deploymentDescriptor.getVirtualNode(virtualNode);
-                        if (vn.getNodeCount() != 1) {
+                        if (vn.getNodeCount() == 0) {
                             throw new NodeException(
-                                "can only create a composite on a single node (currently)");
+                                "no node defined for the virtual node " + vn.getName());
                         }
+                        if (logger.isDebugEnabled()) {
+							if (vn.getNodeCount() > 1) {
+								logger.debug("creating a composite component on a virtual node mapped onto several nodes will actually create the component on the first retreived node");							
+							}
+						}
 
-                        // get corresponding node
+                        // get corresponding node (1st node retreived if the vn is multiple)
                         Node targeted_node = vn.getNode();
                         composite = cf.newFcInstance(componentType,
                                 new ControllerDescription(controllerDescription.getName(),
