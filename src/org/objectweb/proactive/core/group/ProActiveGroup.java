@@ -271,7 +271,7 @@ public class ProActiveGroup {
     /**
      * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
      * @param className the name of the (upper) class of the group's members.
-     * @param the parameters used to build all the group's members.
+     * @param params the parameters used to build all the group's members.
      * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -297,7 +297,7 @@ public class ProActiveGroup {
     /**
      * Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
      * @param className the name of the (upper) class of the group's members.
-     * @param the parameters used to build all the group's members.
+     * @param params the parameters used to build all the group's members.
      * @param virtualNode the virtual node where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -313,7 +313,7 @@ public class ProActiveGroup {
 	/**
 	 * Creates an object representing a group (a typed group) and creates all members with the same params on the node.
 	 * @param className the name of the (upper) class of the group's members.
-	 * @param the parameters used to build all the group's members.
+	 * @param params the parameters used to build all the group's members.
 	 * @param node the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -331,7 +331,7 @@ public class ProActiveGroup {
 	/**
 	 * Creates an object representing a group (a typed group) and creates all members with the same params on the node.
 	 * @param className the name of the (upper) class of the group's members.
-	 * @param the parameters used to build all the group's members.
+	 * @param params the parameters used to build all the group's members.
 	 * @param nodeName the name of the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -502,7 +502,7 @@ public class ProActiveGroup {
 		* Creates an object representing a group (a typed group) and creates members with the same params cycling on nodeList.
 	    * Threads are used to build the group's members. This methods returns when all members were created.
 		* @param className the name of the (upper) class of the group's members.
-		* @param the parameters used to build all the group's members.
+		* @param params the parameters used to build all the group's members.
 		* If <code>params</code> is <code>null</code>, builds an empty group.
 		* @param nodeList the names of the nodes where the members are created.
 		* @return a typed group with its members.
