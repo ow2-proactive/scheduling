@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  
 public class GlobusProcessControlPanel extends javax.swing.JPanel {
 
+private int MAX_RETRY=50;
   private static final java.awt.Color FINISHED_PROCESS_COLOR = new java.awt.Color(211,32,47);
   
   private ProcessesListModel processesListModel;
@@ -170,8 +171,8 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
       GlobusProcess gp = (GlobusProcess) globusProcesses.get(idToRemove);
       gp.stopProcess();
       System.out.println("***Process have been stop***");
-      globusProcesses.remove(idToRemove);
       fireIntervalRemoved(this, index, index);
+      globusProcesses.remove(idToRemove);
     }
 
   } // end inner class ProcessListModel
@@ -186,7 +187,7 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
     public java.awt.Component getListCellRendererComponent(javax.swing.JList list, Object o, int index, boolean isSelected, boolean cellHasFocus) {
       java.awt.Component c = super.getListCellRendererComponent(list, o, index, isSelected, cellHasFocus);
       
-        c.setForeground(FINISHED_PROCESS_COLOR);
+      //c.setForeground(FINISHED_PROCESS_COLOR);
       
       return c;
     }
@@ -215,12 +216,12 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
               if (e.getValueIsAdjusting()) return;
 	      stopProcessButton.setEnabled(true);
               // We update the output frame
-	      if(getCurrentProcess()==null){
-                processOutputPanel.processChanged(globusCopyProcess);
-	      }
-	      else {
+	      //if(getCurrentProcess()==null){
                 processOutputPanel.processChanged(getCurrentProcess());
-              }
+		//}
+		//else {
+                //processOutputPanel.processChanged(getCurrentProcess());
+		//}
             }
           }
         );
@@ -340,10 +341,21 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
 	      globusCopyProcess.startNodeWithGlobus(nodeURL);
 	      //globusProcess = new GlobusProcess();
 	      //globusProcess.startNodeWithGlobus(protocol+"://"+hostname+"/"+nodeName); 
-	      processesListModel.addProcess(globusCopyProcess);
+	      
 	      // Attendre que la sortie soit prete pour mettre a jour la fenetre d'output
 	      // ... a faire
 	      // while (!gp.isReady() ... and i<MAX_RETRY...
+	      for(int i=0; (!globusCopyProcess.isReady() && i<MAX_RETRY) ; i++){
+		  try{
+		      Thread.sleep(750);
+		  }
+		  catch(java.lang.InterruptedException ie){
+		      System.out.println("exception in GlobusProcessControlPanel");
+		  }
+		  System.out.println("attente GlobusProcessControlPanel:"+i);
+	      }
+	      processesListModel.addProcess(globusCopyProcess);
+
           }
       });
       b.setToolTipText("Start a process based on the above specs");
