@@ -35,10 +35,11 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
     public final static int MAX_HISTO_SIZE=100;
     
     // fonctional
+    private String [] bodyname;
+    private int counter = 0; 
     int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
     ArrayList names;
     int nbBodies;
-    int iter;
     CircularPostionList[] historics;
     boolean showTrace = false;
     int histoSize = MAX_HISTO_SIZE;
@@ -60,11 +61,12 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
      * @param title
      * @throws java.awt.HeadlessException
      */
-    public NBodyFrame(String title, int nb) throws HeadlessException {
+    public NBodyFrame(String title, int nb, boolean displayft) throws HeadlessException {
         super(title);
         setSize(SIZE+11, SIZE+90);
         setLocation(10, 10);
         bodies = new int[nb][6];
+        bodyname = new String[nb];
         historics = new CircularPostionList[nb];
         for (int i=0;i<nb;i++){
             historics[i]=new CircularPostionList(MAX_HISTO_SIZE);
@@ -75,7 +77,9 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         }
         
         this.nbBodies = nb;
-        final Image fond = getToolkit().getImage("org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
+        ClassLoader cl = this.getClass().getClassLoader();
+        java.net.URL u = cl.getResource("org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
+        final Image fond = getToolkit().getImage(u);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         // panels
@@ -113,7 +117,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
                     g.fillOval(zoomedX,zoomedY,diameter,diameter);
                     g.setColor(Color.WHITE);
                     g.drawOval(zoomedX,zoomedY,diameter,diameter);
-                    g.drawString((String)names.get(i),zoomedX+diameter,zoomedY); 
+                    g.drawString(bodyname[i],zoomedX+diameter,zoomedY); 
                     
                     //update histo
                     if (iter%8==0){
@@ -160,7 +164,8 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         drawPanel.add(this.queue);
         drawPanel.setBorder(BorderFactory.createTitledBorder("Draw control"));
         
-        this.gui.add(killingPanel);
+        if (displayft)
+            this.gui.add(killingPanel);
         this.gui.add(drawPanel);
         //this.gui.setBorder(BorderFactory.createTitledBorder("Controls"));
         
@@ -242,10 +247,15 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
         this.bodies[id][3]=d;
         this.bodies[id][4]=vx;
         this.bodies[id][5]=vy;
-        if (!names.contains(name)){
-            this.names.remove(id);
-            this.names.add(id,name);
-            this.listVMs.addItem(name);
+        
+        counter ++;  
+        if (counter < nbBodies * 2  ) { // Only do this operation at the begining
+            bodyname[id]=name;
+            if (!names.contains(name)){
+                this.names.remove(id);
+                this.names.add(id,name);
+                	this.listVMs.addItem(name);
+            }
         }
         repaint();
     }
