@@ -22,7 +22,7 @@ public class B {
     }
 
     public void createActiveObjectC() throws Exception {
-        ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(getClass().getResource("/nonregressiontest/runtime/classloader/deployment.xml").getPath());
+        ProActiveDescriptor descriptor = ProActive.getProactiveDescriptor(System.getProperty("user.home") + "/ProActive/src/nonregressiontest/runtime/classloader/deployment.xml");
         descriptor.activateMappings();
         Object ao = ProActive.newActive("nonregressiontest.runtime.classloader.C", new Object[]{"sdfasdf"}, descriptor.getVirtualNode("VN1").getNode());
         descriptor.killall(false);
