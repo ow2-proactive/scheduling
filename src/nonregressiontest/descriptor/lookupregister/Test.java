@@ -33,6 +33,7 @@ package nonregressiontest.descriptor.lookupregister;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import testsuite.test.FunctionalTest;
 
@@ -69,7 +70,7 @@ public class Test extends FunctionalTest {
         A b = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "local" }, vnAgent.getNode());
 				Thread.sleep(3000);
-        VirtualNode vnLookup = ProActive.lookupVirtualNode("//localhost/Agent",
+        VirtualNode vnLookup = ProActive.lookupVirtualNode(UrlBuilder.buildUrlFromProperties("localhost","Agent","rmi:"),
                 "rmi:");
         a = (A) vnLookup.getUniqueAO();
         

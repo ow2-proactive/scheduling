@@ -32,6 +32,7 @@ package nonregressiontest.node.nodefactory;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import testsuite.test.FunctionalTest;
 
@@ -47,7 +48,7 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     Node rmiNode;
     Node jiniNode;
-    private String rmiURL = "//localhost/RMINode" + System.currentTimeMillis();
+    private String rmiURL;
     private String jiniURL = "jini://localhost/JININode" + System.currentTimeMillis();
 
     //Node ibisNode;
@@ -73,12 +74,17 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.AbstractTest#initTest()
      */
     public void initTest() throws Exception {
+    	String port = System.getProperty("proactive.rmi.port");
+    	if (port != null) rmiURL = UrlBuilder.buildUrl("localhost","RMINode", "rmi:", new Integer(port).intValue());
+    	else rmiURL = UrlBuilder.buildUrl("localhost","RMINode", "rmi:");
     }
 
     /**
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
+    	NodeFactory.killNode(rmiURL);
+		NodeFactory.killNode(jiniURL);
     }
 
     public boolean postConditions() throws Exception {
