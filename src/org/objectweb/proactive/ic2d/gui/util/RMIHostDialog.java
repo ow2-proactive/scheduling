@@ -39,9 +39,9 @@ public class RMIHostDialog extends javax.swing.JDialog {
        jPanel4 = new javax.swing.JPanel();
        jPanel5 = new javax.swing.JPanel();
 
-       jTextFieldHostIp = new javax.swing.JTextField();
+       jTextFieldHostIp = new javax.swing.JTextField(30);
        jLabelHostIp = new javax.swing.JLabel();
-       jTextFielddepth = new javax.swing.JTextField();
+       jTextFielddepth = new javax.swing.JTextField(2);
        jLabel2 = new javax.swing.JLabel();
        jButtonOK = new javax.swing.JButton();
        jButtonCancel = new javax.swing.JButton();
