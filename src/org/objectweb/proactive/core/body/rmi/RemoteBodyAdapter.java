@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -50,6 +51,8 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 import java.io.IOException;
+
+import java.rmi.ConnectException;
 
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -133,7 +136,18 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     public static void register(RemoteBodyAdapter bodyAdapter, String url)
         throws java.io.IOException {
+        try {
         java.rmi.Naming.rebind(url, bodyAdapter.proxiedRemoteBody);
+        } catch (ConnectException e) {
+            //failed to unbind at port 1099 
+            // try at proactive.rmi.port
+            String url2 = UrlBuilder.getProtocol(url) + "//" +
+                UrlBuilder.getHostNameFromUrl(url) + ":" +
+                System.getProperty("proactive.rmi.port") + "/" +
+                UrlBuilder.getNameFromUrl(url);
+
+            java.rmi.Naming.rebind(url2, bodyAdapter.proxiedRemoteBody);
+        }
     }
 
     /**
@@ -143,7 +157,18 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     public static void unregister(String url) throws java.io.IOException {
         try {
-            java.rmi.Naming.unbind(url);
+            try {
+                java.rmi.Naming.unbind(url);
+            } catch (ConnectException e) {
+                //failed to unbind at port 1099 
+                // try at proactive.rmi.port
+                String url2 = UrlBuilder.getProtocol(url) + "//" +
+                    UrlBuilder.getHostNameFromUrl(url) + ":" +
+                    System.getProperty("proactive.rmi.port") + "/" +
+                    UrlBuilder.getNameFromUrl(url);
+
+                java.rmi.Naming.unbind(url2);
+            }
         } catch (java.rmi.NotBoundException e) {
             throw new java.io.IOException(
                 "No object is bound to the given url : " + url);
@@ -164,7 +189,17 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
 
         // Try if URL is the address of a RemoteBody
         try {
-            o = java.rmi.Naming.lookup(url);
+            try {
+                o = java.rmi.Naming.lookup(url);
+            } catch (ConnectException e) {
+                // connection failed, try to find a rmiregistry at proactive.rmi.port port
+                String url2 = UrlBuilder.getProtocol(url) + "//" +
+                    UrlBuilder.getHostNameFromUrl(url) + ":" +
+                    System.getProperty("proactive.rmi.port") + "/" +
+                    UrlBuilder.getNameFromUrl(url);
+
+                o = java.rmi.Naming.lookup(url2);
+            }
         } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
