@@ -10,14 +10,12 @@
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
 	<property name="debug" value="on"/>
-	
 	<!-- define the classpath -->
 	<path id="project.classpath">
-		<pathelement path="${classpath}"/>
+		<pathelement location="${base}/classes"/>
 		<fileset dir="${base}/lib">
 			<include name="*.jar"/>
 		</fileset>
-		<pathelement location="${base}/classes"/>
 	</path>
 	<path id="test.classpath">
 		<path refid="project.classpath"/>
@@ -372,7 +370,7 @@
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
-			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>			
+			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
 		</javadoc>
@@ -480,7 +478,7 @@
 			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro"/>
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
-			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro" />
+			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro"/>
 		</java>
 	</target>
 </project>
