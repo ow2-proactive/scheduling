@@ -341,7 +341,7 @@ public class CircularArrayList extends java.util.AbstractList
         }
     }
 
-    public Iterator iterator() {
+    public Iterator fastIterator() {
         return new CircularArrayListIterator(this);
     }
 
