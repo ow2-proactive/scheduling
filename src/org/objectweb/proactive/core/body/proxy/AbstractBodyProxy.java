@@ -46,6 +46,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
+import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
@@ -105,15 +106,16 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     * </UL>
     */
     public Object reify(MethodCall methodCall) throws Throwable {
-        if (methodCall.getName().equals("equals")) {
-            //there is only one argument to this method
+        if (methodCall.getName().equals("equals") && (methodCall.getNumberOfParameter() == 1)) {
             Object arg = methodCall.getParameter(0);
             if (MOP.isReifiedObject(arg)) {
-                AbstractBodyProxy bodyProxy = (AbstractBodyProxy) ((StubObject) arg).getProxy();
-                return new Boolean(bodyID.equals(bodyProxy.bodyID));
-            } else {
-                return new Boolean(false);
+                    Proxy proxy = ((StubObject)arg).getProxy();
+                    if (proxy instanceof AbstractBodyProxy) {
+                        return new Boolean(bodyID.equals(((AbstractBodyProxy)proxy).bodyID));
+                    }
             }
+            return new Boolean(false);
+            
         }
 
         // Now gives the MethodCall object to the body
