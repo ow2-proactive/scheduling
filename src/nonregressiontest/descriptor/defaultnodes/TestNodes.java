@@ -44,6 +44,8 @@ import testsuite.test.FunctionalTest;
  *
  */
 public class TestNodes extends FunctionalTest {
+
+     private static String XML_LOCATION;
 	
 	
 	private static String XML_LOCATION;
