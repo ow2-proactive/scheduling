@@ -185,7 +185,7 @@ public class ProxyForGroup extends AbstractProxy
      * typed group</b>.
      * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
      */
-    public Object reify(MethodCall mc) throws InvocationTargetException {
+    public  synchronized Object reify(MethodCall mc) throws InvocationTargetException {
 
 		//System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
 
@@ -223,7 +223,9 @@ public class ProxyForGroup extends AbstractProxy
         }
 
         /* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
-        	this.threadpool.complete();
+      
+      	this.threadpool.complete();
+      
 
         return result;
     }
@@ -235,7 +237,7 @@ public class ProxyForGroup extends AbstractProxy
      * @param mc the MethodCall to be applied on each member of the Group.
      * @return the result of the call.
      */
-    protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
+    protected  Object asynchronousCallOnGroup(MethodCall mc) {
         Object result;
         Body body = ProActive.getBodyOnThis();
         if (Profiling.GROUP) {
@@ -304,7 +306,7 @@ public class ProxyForGroup extends AbstractProxy
      * @param result the result of a call on member of a Group.
      * @param index the rank of the result.
      */
-    protected synchronized void addToListOfResult(
+    protected  void addToListOfResult(
         Vector memberListOfResultGroup, Object result, int index) {
         memberListOfResultGroup.set(index, result);
     }
@@ -315,7 +317,7 @@ public class ProxyForGroup extends AbstractProxy
      * Launchs the threads for OneWay call of each member of the Group.
      * @param mc the MethodCall to be applied on each member of the Group.
      */
-    protected synchronized void oneWayCallOnGroup(MethodCall mc) {
+    protected void oneWayCallOnGroup(MethodCall mc) {
         Body body = ProActive.getBodyOnThis();
         ExceptionList exceptionList = new ExceptionList();
         if (Profiling.GROUP) {
