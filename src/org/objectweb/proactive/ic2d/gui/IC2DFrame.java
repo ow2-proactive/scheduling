@@ -346,7 +346,17 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
                 });
             monitoringMenu.add(b);
         }
-
+        {
+            javax.swing.JMenuItem b = new javax.swing.JMenuItem(
+                    "Monitor a new HTTP Host");
+            b.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent e) {
+                        DialogUtils.openNewHTTPHostDialog(IC2DFrame.this,
+                            ic2dObject.getWorldObject(), logger);
+                    }
+                });
+            monitoringMenu.add(b);
+        }
         monitoringMenu.addSeparator();
         // Add new GLOBUS host 
         //deprecated
