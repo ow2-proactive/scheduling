@@ -145,7 +145,6 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
   protected void setFontSize(java.awt.Font font) {
     super.setFontSize(font);
     createBorder(name);
-  //  selectRightFontRb(popup.fontSizeMenu.getGroup());
   }
 
 
