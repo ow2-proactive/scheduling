@@ -8,7 +8,6 @@ workingDir=`dirname $0`
 
 $JAVACMD org.objectweb.proactive.examples.c3d.C3DUser
 
-killall java
 
 echo
 echo ---------------------------------------------------------
