@@ -288,7 +288,7 @@ public class SubMatrix {
 		Group allSubMatrix = ProActiveGroup.getGroup(this.matrix);
 		Plan topology = null;
 		try {
-			topology = new Plan(allSubMatrix,Jacobi.WIDTH,Jacobi.HEIGHT); }
+			topology = new Plan(allSubMatrix,Jacobi.HEIGHT,Jacobi.WIDTH); }
 		catch (ConstructionOfReifiedObjectFailedException e) {
 			System.err.println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
 			e.printStackTrace();
