@@ -28,7 +28,7 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.core.node;
+package org.objectweb.proactive.core.node;      
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
