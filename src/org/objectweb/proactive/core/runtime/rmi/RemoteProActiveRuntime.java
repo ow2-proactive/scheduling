@@ -74,7 +74,7 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote {
     public VMInformation getVMInformation() throws java.rmi.RemoteException;
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol)
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName)
         throws java.rmi.RemoteException;
 
     public ProActiveRuntime[] getProActiveRuntimes()

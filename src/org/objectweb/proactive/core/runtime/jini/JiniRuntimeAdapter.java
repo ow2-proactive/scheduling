@@ -216,11 +216,11 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 
 	
-	public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName, String creatorID, String creationProtocol)
+	public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName)
 	{
 		try{
 			//System.out.println("register in adapter"+remoteProActiveRuntime.getURL());
-		jiniRuntime.register(proActiveRuntimeDist,proActiveRuntimeName,creatorID,creationProtocol);
+		jiniRuntime.register(proActiveRuntimeDist,proActiveRuntimeName,creatorID,creationProtocol,vmName);
 		}catch(java.rmi.RemoteException re){
 			re.printStackTrace();
 			// behavior to be defined

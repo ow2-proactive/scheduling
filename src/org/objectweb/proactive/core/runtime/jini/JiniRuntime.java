@@ -96,7 +96,7 @@ public interface JiniRuntime extends java.rmi.Remote
   
   
   
-  public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName, String creatorID, String creationProtocol) throws java.rmi.RemoteException;
+  public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName, String creatorID, String creationProtocol, String vmName) throws java.rmi.RemoteException;
   
   
   

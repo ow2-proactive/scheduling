@@ -24,7 +24,8 @@ public class RuntimeRegistrationEvent extends ProActiveEvent
 	
 	protected String protocol;
 	
-  
+    protected String vmName;
+    
   /**
    * Creates a new <code>RuntimeRegistrationEvent</code>
    * @param <code>proActiveRuntime</code> the local runtime on which the registration occurs
@@ -33,12 +34,13 @@ public class RuntimeRegistrationEvent extends ProActiveEvent
    * @param <code>creatorID</code> The name of the creator of the registered ProActiveRuntime 
    * @param <code>protocol</code> The protocol used to register the registered ProActiveRuntime when created
    */
-	public RuntimeRegistrationEvent(ProActiveRuntime ProActiveRuntime, int messagetype, String registeredRuntimeName, String creatorID ,String protocol)
+	public RuntimeRegistrationEvent(ProActiveRuntime ProActiveRuntime, int messagetype, String registeredRuntimeName, String creatorID ,String protocol, String vmName)
 	{
 		super(ProActiveRuntime, messagetype);
 		this.creatorID = creatorID;
 		this.registeredRuntimeName = registeredRuntimeName;
 		this.protocol = protocol;
+		this.vmName =vmName;
 	}
 	
 	
@@ -54,6 +56,13 @@ public class RuntimeRegistrationEvent extends ProActiveEvent
 	
 	public String getProtocol(){
 		return protocol;
+	}
+
+	/**
+	 * @return
+	 */
+	public String getVmName() {
+		return vmName;
 	}
 
 }

@@ -471,9 +471,16 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         String protocol;
         String url;
         int port = 0;
+		VirtualMachine virtualMachine = null;
+
+        for ( int i = 0; i < virtualMachines.size(); i++) {
+        	if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
+        		virtualMachine = (VirtualMachine) virtualMachines.get(i);
+        	}
+        }
 
         //Check if it this virtualNode that originates the process
-        if (event.getCreatorID().equals(this.name)) {
+        if ((event.getCreatorID().equals(this.name)) && (virtualMachine != null)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("runtime " + event.getCreatorID() +
                     " registered on virtualnode " + this.name);
@@ -481,32 +488,50 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             protocol = event.getProtocol();
             //gets the registered runtime
             proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+
+
+			// get the host of nodes
+			nodeHost = proActiveRuntimeRegistered.getVMInformation()
+												 .getInetAddress().getHostName();
+
             try {
                 //get the node on the registered runtime
-                nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
+                // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
+				int nodeNumber = (new Integer((String) virtualMachine.getNodeNumber())).intValue();
+						  for (int i = 1; i <= nodeNumber; i++) {
+								  nodeName = this.name +
+									  Integer.toString(new java.util.Random(
+											  System.currentTimeMillis()).nextInt());
+								  url = buildURL(nodeHost, nodeName, protocol, port);
+								  // nodes are created from the registered runtime, since this virtualNode is
+								  // waiting for runtime registration to perform co-allocation in the jvm.
+								  proActiveRuntimeRegistered.createLocalNode(url, false);
+								  performOperations(proActiveRuntimeRegistered, url, protocol);
+						  }
             } catch (ProActiveException e) {
                 e.printStackTrace();
             }
 
-            // get the host of nodes
-            nodeHost = proActiveRuntimeRegistered.getVMInformation()
-                                                 .getInetAddress().getHostName();
+
             try {
                 port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
             } catch (ProActiveException e) {
                 logger.warn("port unknown: " + port);
             }
-
+/*
             for (int i = 0; i < nodeNames.length; i++) {
                 nodeName = nodeNames[i];
                 url = buildURL(nodeHost, nodeName, protocol, port);
                 performOperations(proActiveRuntimeRegistered, url, protocol);
             }
+            */
         }
 
         //Check if the virtualNode that originates the process is among awaited VirtualNodes
         if (awaitedVirtualNodes.containsKey(event.getCreatorID())) {
             //gets the registered runtime
+            
+            System.out.println("Virtual Node ready to create node");
             proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
             // get the host for the node to be created
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
@@ -534,7 +559,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 } catch (ProActiveException e) {
                     e.printStackTrace();
                 }
-            }
+           }
         }
     }
 
@@ -744,10 +769,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
-
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
-                acquisitionMethod + ":" + " " + nodeNumber+" "+protocolId);
-
+                acquisitionMethod + ":" + " " + nodeNumber+" "+protocolId + " " + vm.getName());
+      
 //            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
 //                localruntimeURL + " " + acquisitionMethod + ":" + " " +
 //                nodeNumber + " " + portNumber);

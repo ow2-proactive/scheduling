@@ -168,7 +168,7 @@ public interface ProActiveRuntime {
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol);
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName);
 
     /**
      * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM

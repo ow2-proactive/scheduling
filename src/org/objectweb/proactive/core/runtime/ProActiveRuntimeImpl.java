@@ -236,13 +236,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String)
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
         //System.out.println("register in Impl");
         //System.out.println("thread"+Thread.currentThread().getName());
         //System.out.println(vmInformation.getVMID().toString());
         proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
         notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
-            proActiveRuntimeName, creatorID, creationProtocol);
+            proActiveRuntimeName, creatorID, creationProtocol,vmName);
     }
 
     /**

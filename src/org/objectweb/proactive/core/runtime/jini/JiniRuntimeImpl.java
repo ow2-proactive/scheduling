@@ -193,9 +193,9 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
         proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeName,
-            creatorID, creationProtocol);
+            creatorID, creationProtocol,vmName);
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() {

@@ -209,11 +209,11 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol) {
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName) {
         try {
             //System.out.println("register in adapter"+remoteProActiveRuntime.getURL());
             remoteProActiveRuntime.register(proActiveRuntimeDist,
-                proActiveRuntimeName, creatorID, creationProtocol);
+                proActiveRuntimeName, creatorID, creationProtocol,vmName);
         } catch (RemoteException re) {
             re.printStackTrace();
             // behavior to be defined

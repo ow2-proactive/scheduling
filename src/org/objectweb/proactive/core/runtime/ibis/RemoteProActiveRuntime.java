@@ -75,7 +75,7 @@ public interface RemoteProActiveRuntime extends Remote {
     public VMInformation getVMInformation() throws RemoteException;
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol)
+        String proActiveRuntimeName, String creatorID, String creationProtocol,String vmName)
         throws RemoteException;
 
     public ProActiveRuntime[] getProActiveRuntimes() throws RemoteException;

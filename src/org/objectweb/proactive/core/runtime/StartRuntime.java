@@ -61,6 +61,7 @@ public class StartRuntime {
     protected ProActiveRuntime proActiveRuntime;
     protected String acquisitionMethod;
     protected String nodeNumber;
+    protected String vmName;
     protected int nodenumber; //it is only the int value of nodeNumber
 
 	protected String protocolId;
@@ -79,6 +80,7 @@ public class StartRuntime {
      //   this.portNumber = Integer.parseInt(args[4]);
         this.nodenumber = (new Integer(nodeNumber)).intValue();
 		this.protocolId = args[4];
+		this.vmName = args[5];
     }
 
     public static void main(String[] args) {
@@ -118,7 +120,7 @@ public class StartRuntime {
             //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
 			proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty("proactive.rmi")+":");
 			proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
-
+/*
             for (int i = 1; i <= nodenumber; i++) {
                 proActiveRuntime.createLocalNode(nodeURL +
                     Integer.toString(
@@ -129,6 +131,7 @@ public class StartRuntime {
 
             //System.out.println("creation OK");
             //System.out.println(DefaultRuntimeURL);
+*/
             register(DefaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -159,7 +162,7 @@ public class StartRuntime {
             //System.out.println(proActiveRuntime.getURL());
             //PART.killRT();
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                creatorID, System.getProperty("proactive.rmi")+":");
+                creatorID, System.getProperty("proactive.rmi")+":",vmName);
             //System.out.println("coucou");
             //System.out.println("register ok");
             //System.out.println(PART.getProActiveRuntime("renderer").getURL());
