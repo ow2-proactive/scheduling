@@ -220,7 +220,13 @@ The following element ProActiveDescriptor defines the root of the schema
 					 one attribute: virtualNode that must appear once and only once, it may have have any value of type string-->
 	<xs:complexType name="MapType">
 		<xs:sequence>
-			<xs:element name="jvmSet" type="JvmSetType"/>
+			<xs:element name="jvmSet" type="JvmSetType">
+				<xs:unique name="vmname">
+				<xs:selector xpath="vmName"/>
+				<xs:field xpath="@value"/>
+			<!--Uniqueness of the value attribute for vmName element inside a jvmSet collection-->
+		</xs:unique>
+			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="virtualNode" type="xs:string" use="required"/>
 	</xs:complexType>
