@@ -89,8 +89,8 @@ public class RepresentativeInterfaceClassGenerator
     }
 
     public ProActiveInterface generateInterface(final String fcInterfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal,
-        boolean isPrimitive) throws Exception {
+        Component owner, InterfaceType interfaceType, boolean isInternal)
+        throws Exception {
         this.fcInterfaceName = fcInterfaceName;
 
         //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
