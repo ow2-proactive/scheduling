@@ -101,13 +101,6 @@ public class StartRuntime {
     private void run() {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
-            System.out.println("YYYYYYYYYY StartRunTime.run() acquisition " +
-                acquisitionMethod);
-            System.out.println(
-                "YYYYYYYYYY StartRunTime.run() proactiveRunTime " +
-                proActiveRuntime);
-            System.out.println("YYYYYYYYYY StartRunTime.run() nodeURL " +
-                nodeURL);
             for (int i = 1; i <= nodenumber; i++) {
                 proActiveRuntime.createLocalNode(nodeURL +
                     Integer.toString(

@@ -235,17 +235,17 @@ public class HostObject extends AbstractDataObject {
     public void run() {
       Node[] nodes;
       try {
-        nodes = nodeFinder.findNodes(hostname);
+        hosts = nodeFinder.findNodes(hostname);
       //  System.out.println("XXXXXXX");
       } catch (java.io.IOException e) {
         controller.log("There is no RMI Registry on host "+hostname, e);
         return;
       }
-      if (nodes.length == 0) {
+      if (hosts.length == 0) {
         controller.warn("A RMIRegistry has been found on host "+hostname+" but no Node object are bound !");
       }
-      for (int i = 0; i < nodes.length; i++) {
-        Node node = nodes[i];
+      for (int i = 0; i < hosts.length; i++) {
+        Node node = hosts[i];
         //System.out.println("nodeURL "+node.getNodeInformation().getURL());
         String nodeName = node.getNodeInformation().getName();
         if ((targetNodeName == null) || targetNodeName.equals(nodeName)) {

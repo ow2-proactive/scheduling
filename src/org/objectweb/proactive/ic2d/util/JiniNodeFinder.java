@@ -79,11 +79,11 @@ public class JiniNodeFinder implements AllNodeFinder {
     }
     java.util.ArrayList nodes = nodelist.getNodes();
     //System.out.println("JiniNodeFinder: on  recupere "+nodes.size()+" noeuds");
-    Node[] nodeArray = new Node[nodes.size()];
-    if (nodes.size() > 0) {
+    Node[] nodeArray = new Node[hosts.size()];
+    if (hosts.size() > 0) {
       //System.out.println("JiniNodeFinder: copie du tableau");
-      for (int i=0; i<nodes.size();i++){
-	Node node = (Node)  nodes.get(i);
+      for (int i=0; i<hosts.size();i++){
+	Node node = (Node)  hosts.get(i);
 	nodeArray[i] = node;
       }
     }

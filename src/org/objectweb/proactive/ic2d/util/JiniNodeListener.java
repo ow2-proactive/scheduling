@@ -117,7 +117,7 @@ public class JiniNodeListener implements DiscoveryListener {
                                                         java.net.InetAddress.getByName(
                                                             host))) {
                                                 //System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
-                                                nodes.add(new NodeImpl(
+                                                hosts.add(new NodeImpl(
                                                         new JiniRuntimeAdapter(
                                                             runtime), name,
                                                         "jini"));
@@ -213,7 +213,7 @@ public class JiniNodeListener implements DiscoveryListener {
                                                                 java.net.InetAddress.getByName(
                                                                     host))) {
                                                         //System.out.println("JiniNodeListener: ajout du noeud pour le host "+host);
-                                                        nodes.add(new NodeImpl(
+                                                        hosts.add(new NodeImpl(
                                                                 new JiniRuntimeAdapter(
                                                                     runtime),
                                                                 name, "jini"));
@@ -225,7 +225,7 @@ public class JiniNodeListener implements DiscoveryListener {
                                             } else {
                                                 //System.out.println("host null: ");
                                                 //System.out.println("JiniNodeListener: ajout du noeud");
-                                                nodes.add(new NodeImpl(
+                                                hosts.add(new NodeImpl(
                                                         new JiniRuntimeAdapter(
                                                             runtime), name,
                                                         "jini"));
@@ -261,7 +261,7 @@ public class JiniNodeListener implements DiscoveryListener {
     }
 
     public java.util.ArrayList getNodes() {
-        return nodes;
+        return hosts;
     }
 
     public static void main(String[] args) {

@@ -259,7 +259,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
       String nodeNumber = attributes.getValue("nodeNumber");
       try{
       	if (checkNonEmpty(nodeNumber)) {
-        	currentVM.setNodeNumber(nodeNumber);
+        	currentVM.setHostsNumber(nodeNumber);
       	}
       }catch(java.io.IOException e){
       	throw new org.xml.sax.SAXException(e);

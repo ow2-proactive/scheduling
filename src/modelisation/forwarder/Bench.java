@@ -26,7 +26,7 @@ public class Bench extends ModelisationBench
         Agent agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = nodes;
+        args[1] = hosts;
         args[2] = new Long(lifeTime);
         try {
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
@@ -53,9 +53,9 @@ public class Bench extends ModelisationBench
         Agent agent = null;
         Object[] args = new Object[3];
         args[0] = new Double(d);
-        args[1] = nodes;
+        args[1] = hosts;
         args[2] = new Long(lifeTime);
-        System.out.println("NODES SIZE = " + nodes.length);
+        System.out.println("NODES SIZE = " + hosts.length);
         try {
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
                 System.out.println(" USING IBIS");
@@ -135,7 +135,7 @@ public class Bench extends ModelisationBench
         //    Node[] nodes = Bench.readDestinationFile(args[2], "" + args[0] + "_" + args[1]);
         Node[] nodes = Bench.readMapingFile(args[2]);
 
-        Agent agent = Bench.startAgent(Double.parseDouble(args[1]), nodes,
+        Agent agent = Bench.startAgent(Double.parseDouble(args[1]), hosts,
                 Long.parseLong(args[4]));
         try {
             Thread.sleep(2000);

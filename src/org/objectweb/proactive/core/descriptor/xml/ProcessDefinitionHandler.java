@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
@@ -45,7 +46,6 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
 
 
@@ -72,6 +72,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new BSubProcessHandler(proActiveDescriptor));
         this.addHandler(GLOBUS_PROCESS_TAG,
             new GlobusProcessHandler(proActiveDescriptor));
+        this.addHandler(PRUN_PROCESS_TAG,
+            new PrunProcessHandler(proActiveDescriptor));
     }
 
     /**
@@ -205,10 +207,66 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 }
             }
         }
-         // end inner class EnvironmentHandler
+
+        // end inner class EnvironmentHandler
     }
      //end of inner class ProcessHandler
 
+    protected class PrunProcessHandler extends ProcessHandler {
+        public PrunProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+			this.addHandler(PRUN_OPTIONS_TAG, new PrunOptionHandler());
+		//	System.out.println("ProcessDefinitionHandler.PrunProcessHandler()");
+        }
+
+        protected class PrunOptionHandler extends PassiveCompositeUnmarshaller {
+            //  	private static final String HOSTLIST_ATTRIBUTE = "hostlist";
+            //  	private static final String PROCESSOR_ATRIBUTE = "processor";
+            //private LSFBSubProcess bSubProcess;
+            public PrunOptionHandler() {
+                //this.bSubProcess = (LSFBSubProcess)targetProcess;
+          //      System.out.println("ProcessDefinitionHandler.PrunOptionHandler()");
+                UnmarshallerHandler pathHandler = new PathHandler();
+                this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
+				this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
+				this.addHandler(BOOKING_DURATION_TAG, new SingleValueUnmarshaller());
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+            //    this.addHandler(SCRIPT_PATH_TAG, bch);
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                // we know that it is a prun process since we are
+                // in prun option!!!
+                PrunSubProcess prunSubProcess = (PrunSubProcess) targetProcess;
+            //    System.out.println("+++++ notifyEndActiveHandler " + name);
+                if (name.equals(HOST_LIST_TAG)) {
+                    prunSubProcess.setHostList((String) activeHandler.getResultObject());
+                } else if (name.equals(HOSTS_NUMBER_TAG)) {
+                    prunSubProcess.setHostsNumber((String) activeHandler.getResultObject());
+                } else if (name.equals(PROCESSOR_PER_NODE_TAG)) {
+				     prunSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
+//                } else if (name.equals(SCRIPT_PATH_TAG)) {
+//                    prunSubProcess.setScriptLocation((String) activeHandler.getResultObject());
+//                }
+                } else  if (name.equals(BOOKING_DURATION_TAG)) {
+                	prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
+                } else  {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            }
+        }
+    }
+
+    //end of inner class PrunProcessHandler
     protected class JVMProcessHandler extends ProcessHandler {
         public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
@@ -272,15 +330,15 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
         }
     }
-     // end of inner class JVMProcessHandler 
 
+    // end of inner class JVMProcessHandler 
     protected class RSHProcessHandler extends ProcessHandler {
         public RSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
-     //end of inner class RSHProcessHandler
 
+    //end of inner class RSHProcessHandler
     protected class MapRshProcessHandler extends ProcessHandler {
         public MapRshProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
@@ -314,22 +372,22 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
         }
     }
-     //end of inner class MapRshProcessHandler
 
+    //end of inner class MapRshProcessHandler
     protected class SSHProcessHandler extends ProcessHandler {
         public SSHProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
-     //end of inner class SSHProcessHandler
 
+    //end of inner class SSHProcessHandler
     protected class RLoginProcessHandler extends ProcessHandler {
         public RLoginProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
         }
     }
-     //end of inner class RLoginProcessHandler
 
+    //end of inner class RLoginProcessHandler
     protected class BSubProcessHandler extends ProcessHandler {
         public BSubProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
@@ -388,10 +446,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 }
             }
         }
-         // end inner class OptionHandler
-    }
-     // end of inner class BSubProcessHandler
 
+        // end inner class OptionHandler
+    }
+
+    // end of inner class BSubProcessHandler
     protected class GlobusProcessHandler extends ProcessHandler {
         public GlobusProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
@@ -431,14 +490,16 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 }
             }
         }
-         //end of inner class GlobusOptionHandler
-    }
-     //end of inner class GlobusProcessHandler
 
+        //end of inner class GlobusOptionHandler
+    }
+
+    //end of inner class GlobusProcessHandler
     private class SingleValueUnmarshaller extends BasicUnmarshaller {
         public void readValue(String value) throws org.xml.sax.SAXException {
             setResultObject(value);
         }
     }
-     //end of inner class SingleValueUnmarshaller
+
+    //end of inner class SingleValueUnmarshaller
 }

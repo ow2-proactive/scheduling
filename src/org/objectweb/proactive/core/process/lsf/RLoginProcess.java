@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  * For instance:
  * </p><pre>
  * ...............
- * LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * PrunSubProcess lsf = new PrunSubProcess(new SimpleExternalProcess("ls -lsa"));
  * RLoginProcess p = new RLoginProcess(lsf, false);
  * p.setHostname("cluster_front_end_name");
  * p.startProcess();

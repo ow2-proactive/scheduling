@@ -124,7 +124,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
    		VirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
     	//Thread.sleep(15000);
 			String[] nodes = vn1.getNodesURL();
-			new PenguinControler(nodes);
+			new PenguinControler(hosts);
     }catch(Exception e){
     e.printStackTrace();
     }

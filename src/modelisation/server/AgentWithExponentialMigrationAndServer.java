@@ -25,7 +25,7 @@ public class AgentWithExponentialMigrationAndServer
         Long lifeTime) throws IllegalArgumentException {
         this.expo = RandomNumberFactory.getGenerator("nu");
         this.expo.initialize(nu.doubleValue());
-        nodes = array;
+        hosts = array;
         System.out.println(
             "AgentWithExponentialMigrationAndServer: array contains " +
             array.length + " destinations");
@@ -63,7 +63,7 @@ public class AgentWithExponentialMigrationAndServer
             while (!start) {
                 body.serve(body.getRequestQueue().blockingRemoveOldest());
             }
-            if (++index > nodes.length) {
+            if (++index > hosts.length) {
                 index = 1;
             }
 
@@ -86,9 +86,9 @@ public class AgentWithExponentialMigrationAndServer
                 // 	      {
                 System.out.println(System.currentTimeMillis() +
                     " AgentWithExponentialMigrationAndServer: migrating to " +
-                    nodes[index - 1].getNodeInformation());
+                    hosts[index - 1].getNodeInformation());
                 //		  this.migratedOnce=true;
-                ProActive.migrateTo(nodes[index - 1]);
+                ProActive.migrateTo(hosts[index - 1]);
                 //	      }
             } catch (Exception e) {
                 e.printStackTrace();

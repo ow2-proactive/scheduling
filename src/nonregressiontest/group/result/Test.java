@@ -38,7 +38,7 @@ public class Test extends ProActiveFunctionalTest {
 	public void initTest() throws Exception {
 		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
 		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
-		A typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
+		A typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, hosts);
 		this.resultTypedGroup = typedGroup.asynchronousCall();
 	}
 

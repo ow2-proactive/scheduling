@@ -75,13 +75,14 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     //
     //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
     //
-    public void setNodeNumber(String nodeNumber) throws java.io.IOException {
+    public void setHostsNumber(String nodeNumber) throws java.io.IOException {
         if (new Integer(nodeNumber).intValue() < 1) {
             throw new java.io.IOException(
                 "Cannot define nodeNumber with a value < 1");
         }
         this.nodeNumber = nodeNumber;
     }
+    
 
     public String getNodeNumber() {
         return this.nodeNumber;

@@ -67,6 +67,8 @@ public interface ProActiveDescriptorConstants  {
   public static final String RLOGIN_PROCESS_TAG = "rloginProcess";
   public static final String BSUB_PROCESS_TAG = "bsubProcess";
   public static final String GLOBUS_PROCESS_TAG = "globusProcess";    
+  public static final String PRUN_PROCESS_TAG = "prunProcess";  
+  
   
   public static final String PROCESSES_TAG = "processes"; 
   public static final String PROCESS_REFERENCE_TAG = "processReference";
@@ -79,7 +81,11 @@ public interface ProActiveDescriptorConstants  {
   public static final String GLOBUS_HOST_LIST_TAG = "globusHostList";
   public static final String GRAM_PORT_TAG = "GramPort";
   public static final String GIS_PORT_TAG = "GISPort";
+  public static final String PRUN_OPTIONS_TAG = "prunOption";
   public static final String PROCESSOR_TAG = "processor";
+  public static final String HOSTS_NUMBER_TAG = "hostsNumber";
+  public static final String PROCESSOR_PER_NODE_TAG = "processorPerNode";
+  public static final String BOOKING_DURATION_TAG = "bookingDuration";
   public static final String VARIABLE_TAG = "variable"; 
   public static final String CLASSPATH_TAG = "classpath"; 
   public static final String JAVA_PATH_TAG = "javaPath"; 

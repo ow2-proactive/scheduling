@@ -50,7 +50,7 @@ public interface VirtualMachine {
 	 * @param nodeNumber
 	 * @throws IOException
 	 */
-  public void setNodeNumber(String nodeNumber) throws java.io.IOException;
+  public void setHostsNumber(String nodeNumber) throws java.io.IOException;
   
   
 	/**

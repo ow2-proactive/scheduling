@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.ProActive;
@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -188,8 +189,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             VirtualMachine vm = getVirtualMachine();
             boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
             ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
-//            System.out.println("<<< VirtualNodeImpl.activate() process " +
-//                process);
 
             // Test if that is this virtual Node that originates the creation of the vm
             // else the vm was already created by another virtualNode, in that case, nothing is
@@ -456,9 +455,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
     }
 
     /**
-           * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
-           * At the moment no property can be set at runtime on a VirtualNodeImpl.
-           */
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setRuntimeInformations(String,String)
+     * At the moment no property can be set at runtime on a VirtualNodeImpl.
+     */
     public void setRuntimeInformations(String information, String value)
         throws ProActiveException {
         try {
@@ -573,7 +572,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         ExternalProcessDecorator processImplDecorator;
         JVMProcess jvmProcess;
         LSFBSubProcess bsub = null;
-
+        PrunSubProcess prun = null;
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
             logger.debug("nodeNumber " + nodeNumber);
@@ -585,8 +584,22 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 bsub = (LSFBSubProcess) processImpl;
                 increaseNodeCount((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
             }
+            if (processImpl instanceof PrunSubProcess) {
+                //if the process is prun we have to increase the node count by the number of processors            
+                prun = (PrunSubProcess) processImpl;
+                System.out.println("VirtualNodeImpl getHostsNumber() " +
+                    prun.getHostsNumber());
+                System.out.println("VirtualNodeImpl getnodeNumber() " +
+                    prun.getProcessorPerNodeNumber());
+				System.out.println("VM " +
+									vm);
+                increaseNodeCount((new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
+            }
+
             processImplDecorator = (ExternalProcessDecorator) processImpl;
             processImpl = processImplDecorator.getTargetProcess();
+            System.out.println("processImplDecorator " +
+                processImplDecorator.getClass().getName());
         }
 
         //When the virtualNode will be activated, it has to launch the process
@@ -595,7 +608,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if (bsub == null) {
+            if ((bsub == null)  && (prun==null)) {
                 //if bsub is null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
@@ -611,8 +624,9 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
-            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" + localruntimeURL + " " +
-                acquisitionMethod + ":" + " " + nodeNumber);
+            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
+                localruntimeURL + " " + acquisitionMethod + ":" + " " +
+                nodeNumber);
         }
     }
 

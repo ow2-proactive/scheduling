@@ -22,7 +22,7 @@ public class AgentWithExponentialMigrationMixed
         this.expo = RandomNumberFactory.getGenerator("nu");
         this.expo.initialize(nu.doubleValue());
 
-        nodes = array;
+        hosts = array;
         System.out.println(
             "AgentWithExponentialMigrationMixed: array contains " +
             array.length + " destinations");

@@ -35,7 +35,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
         //  this.expo = new ExponentialLaw(nu.doubleValue());
         //    this.expo = RandomNumberFactory.getGenerator("nu");
         //     this.expo.initialize(nu.doubleValue());
-        nodes = array;
+        hosts = array;
 
         index = 0;
         this.lifeTime = lifeTime.longValue();
@@ -89,7 +89,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
 
     protected void runNormal(Body body) {
         while (body.isActive()) {
-            if (++index > nodes.length) {
+            if (++index > hosts.length) {
                 index = 1;
             }
 
@@ -107,13 +107,13 @@ public class Agent implements org.objectweb.proactive.RunActive,
                 //	this.checkTerminate(body);
                 System.out.println(System.currentTimeMillis() +
                     " AgentWithExponentialMigrationAndForwarder: migrating to " +
-                    nodes[index - 1].getNodeInformation());
+                    hosts[index - 1].getNodeInformation());
                 if (count >= Bench.MAX) {
                     //	System.exit(0);
                     System.out.println(">>>>> Agent should stop ");
                 }
 
-                ProActive.migrateTo(nodes[index - 1]);
+                ProActive.migrateTo(hosts[index - 1]);
                 //System.out.println("Migration done");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,7 +124,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
 
     protected void runSimple(Body body) {
         while (body.isActive()) {
-            if (++index > nodes.length) {
+            if (++index > hosts.length) {
                 index = 1;
             }
 
@@ -145,13 +145,13 @@ public class Agent implements org.objectweb.proactive.RunActive,
                 body.getRequestQueue().clear();
                 System.out.println(System.currentTimeMillis() +
                     " AgentWithExponentialMigrationAndForwarder: migrating to " +
-                    nodes[index - 1].getNodeInformation());
+                    hosts[index - 1].getNodeInformation());
 
                 if (this.migrationCounter++ > SIMPLE_BENCH_MAX_MIGRATIONS) {
                     System.out.println("Bench successfully completed, exiting");
                     System.exit(0);
                 }
-                ProActive.migrateTo(nodes[index - 1]);
+                ProActive.migrateTo(hosts[index - 1]);
                 //System.out.println("Migration done");
             } catch (Exception e) {
                 e.printStackTrace();
@@ -177,12 +177,12 @@ public class Agent implements org.objectweb.proactive.RunActive,
         Node[] nodes = null;
         if (arguments.length == 1) {
             //we assume we have a descriptor file
-            nodes = ModelisationBench.readMapingFile(arguments[0]);
+            hosts = ModelisationBench.readMapingFile(arguments[0]);
         } else {
-            nodes = new Node[arguments.length]; //Bench.readDestinationFile(args[2]);
+            hosts = new Node[arguments.length]; //Bench.readDestinationFile(args[2]);
             for (int i = 0; i < arguments.length; i++) {
                 try {
-                    nodes[i] = NodeFactory.getNode(arguments[i]);
+                    hosts[i] = NodeFactory.getNode(arguments[i]);
                 } catch (NodeException e1) {
                     e1.printStackTrace();
                 }
@@ -191,7 +191,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
 
         Object[] args = new Object[3];
         args[0] = new Double(1);
-        args[1] = nodes;
+        args[1] = hosts;
         args[2] = new Long(50000);
 
         try {

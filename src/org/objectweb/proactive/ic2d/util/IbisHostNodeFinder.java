@@ -134,16 +134,16 @@ static {
         log("  -> Found remote node " + list[i]);
         //Node realNode = NodeFactory.getNode(fullName);
         try {
-          nodes.add(new NodeImpl(new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj),"//"+host+"/"+list[i],"rmi"));
+          hosts.add(new NodeImpl(new RemoteProActiveRuntimeAdapter((RemoteProActiveRuntime)obj),"//"+host+"/"+list[i],"rmi"));
         } catch (ProActiveException e) {
           log("Error while trying to create a RuntimeAdapter for "+list[i]+", check the version of ProActive or jdk");
         }
       }
      }
     }
-    Node[] nodeArray = new Node[nodes.size()];
-    if (nodes.size() > 0) {
-      nodeArray = (Node[]) nodes.toArray(nodeArray);
+    Node[] nodeArray = new Node[hosts.size()];
+    if (hosts.size() > 0) {
+      nodeArray = (Node[]) hosts.toArray(nodeArray);
     }
     return nodeArray;
   }
