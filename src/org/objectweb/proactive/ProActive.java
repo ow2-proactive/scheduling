@@ -32,6 +32,12 @@ package org.objectweb.proactive;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.factory.GenericFactory;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -47,6 +53,9 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
+import org.objectweb.proactive.core.component.ComponentParameters;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -312,8 +321,8 @@ public class ProActive {
                     "Cannot create group of active objects" + e);
             }
             for (int i = 0; i < nodeTab.length; i++) {
-            	Object tmp = newActive(classname, constructorParameters,
-				(Node) nodeTab[i], activity, factory);
+                Object tmp = newActive(classname, constructorParameters,
+                        (Node) nodeTab[i], activity, factory);
                 aoGroup.add(tmp);
             }
 
@@ -322,6 +331,103 @@ public class ProActive {
             throw new NodeException(
                 "VirtualNode is null, unable to activate the object");
         }
+    }
+
+    /**
+      * Creates a new ProActive component over the specified base class, according to the
+      * given component parameters, and returns a reference on the component of type Component.
+      * A reference on the active object base class can be retreived through the component parameters controller's
+      * method "getStubOnReifiedObject".
+      *
+      * @param classname the name of the base class. "Composite" if the component is a composite,
+      * "ParallelComposite" if the component is a parallel composite component
+      * @param constructorParameters the parameters of the constructor of the object
+      *    to instantiate as active. If some parameters are primitive types, the wrapper
+      *    class types should be given here. null can be used to specify that no parameter
+      *    are passed to the constructor.
+      * @param node the possibly null node where to create the active object. If null, the active object
+      *       is created localy on a default node
+      * @param activity the possibly null activity object defining the different step in the activity of the object.
+      *               see the definition of the activity in the javadoc of this classe for more information.
+      * @param factory should be null for components (automatically created)
+      * @param componentParameters the parameters of the component
+      * @return a component representative of type Component
+      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
+      * @exception NodeException if the node was null and that the DefaultNode cannot be created
+      */
+    public static Component newActiveComponent(String classname,
+        Object[] constructorParameters, Node node, Active activity,
+        MetaObjectFactory factory, ComponentParameters componentParameters)
+        throws ActiveObjectCreationException, NodeException {
+        // COMPONENTS
+        try {
+            Component boot = Fractal.getBootstrapComponent();
+            GenericFactory cf = Fractal.getGenericFactory(boot);
+            return cf.newFcInstance(componentParameters.getComponentType(),
+                new ControllerDescription(componentParameters.getName(),
+                    componentParameters.getHierarchicalType()),
+                new ContentDescription(classname, constructorParameters, node,
+                    activity, factory));
+        } catch (NoSuchInterfaceException e) {
+            throw new ActiveObjectCreationException(e);
+        } catch (InstantiationException e) {
+            if (e.getCause() instanceof NodeException) {
+                throw new NodeException(e);
+            } else {
+                throw new ActiveObjectCreationException(e);
+            }
+        }
+    }
+
+    /**
+     * Creates a new ProActive component over the specified base class, according to the
+     * given component parameters, and returns a reference on the component of type Component.
+     *
+     * This method allows automatic of primitive components on Virtual Nodes. In that case, the appendix
+     * -cyclicInstanceNumber-<b><i>number</i></b> is added to the name of each of these components.
+     * If the component is not a primitive, only one instance of the component is created, on the first node
+     * retreived from the specified virtual node.
+     *
+     * A reference on the active object base class can be retreived through the component parameters controller's
+     * method "getStubOnReifiedObject".
+     *
+     * @param classname the name of the base class. "Composite" if the component is a composite,
+     * "ParallelComposite" if the component is a parallel composite component
+     * @param constructorParameters the parameters of the constructor of the object
+     *    to instantiate as active. If some parameters are primitive types, the wrapper
+     *    class types should be given here. null can be used to specify that no parameter
+     *    are passed to the constructor.
+     * @param node the possibly null node where to create the active object. If null, the active object
+     *       is created localy on a default node
+     * @param activity the possibly null activity object defining the different step in the activity of the object.
+     *               see the definition of the activity in the javadoc of this class for more information.
+     * @param factory should be null for components (automatically created)
+     * @param componentParameters the parameters of the component
+     * @return a typed group of component representative elements, of type Component
+     * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
+     * @exception NodeException if the node was null and that the DefaultNode cannot be created
+     */
+    public static Component newActiveComponent(String className,
+        Object[] constructorParameters, VirtualNode vn,
+        ComponentParameters componentParameters)
+        throws ActiveObjectCreationException, NodeException {
+			// COMPONENTS
+			try {
+				Component boot = Fractal.getBootstrapComponent();
+				GenericFactory cf = Fractal.getGenericFactory(boot);
+				return cf.newFcInstance(componentParameters.getComponentType(),
+					new ControllerDescription(componentParameters.getName(),
+						componentParameters.getHierarchicalType()),
+					new ContentDescription(classname, constructorParameters, vn));
+			} catch (NoSuchInterfaceException e) {
+				throw new ActiveObjectCreationException(e);
+			} catch (InstantiationException e) {
+				if (e.getCause() instanceof NodeException) {
+					throw new NodeException(e);
+				} else {
+					throw new ActiveObjectCreationException(e);
+				}
+			}
     }
 
     /**
@@ -480,17 +586,17 @@ public class ProActive {
         throws ActiveObjectCreationException, NodeException {
         if (virtualnode != null) {
             Node[] nodeTab = virtualnode.getNodes();
-			Group aoGroup = null;
-			try {
-				aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
-							target.getClass().getName()));
-			} catch (ClassNotFoundException e) {
-				throw new ActiveObjectCreationException(
-					"Cannot create group of active objects" + e);
-			} catch (ClassNotReifiableException e) {
-				throw new ActiveObjectCreationException(
-					"Cannot create group of active objects" + e);
-			}
+            Group aoGroup = null;
+            try {
+                aoGroup = ProActiveGroup.getGroup(ProActiveGroup.newGroup(
+                            target.getClass().getName()));
+            } catch (ClassNotFoundException e) {
+                throw new ActiveObjectCreationException(
+                    "Cannot create group of active objects" + e);
+            } catch (ClassNotReifiableException e) {
+                throw new ActiveObjectCreationException(
+                    "Cannot create group of active objects" + e);
+            }
 
             for (int i = 0; i < nodeTab.length; i++) {
                 Object tmp = turnActive(target, nameOfTargetType,
