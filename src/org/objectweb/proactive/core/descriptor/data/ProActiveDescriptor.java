@@ -188,11 +188,17 @@ public class ProActiveDescriptor {
   
   private void addPendingProcess(String processID, VirtualMachine virtualMachine) {
     ProcessUpdater updater = new VirtualMachineProcessUpdater(virtualMachine);
+    //adding the following line to know that the virtualMachine references a process
+    //and has to be updated when this process will be defined
+    pendingProcessMapping.put(processID,updater);
   }
   
   
   private void addPendingProcess(String processID, ExternalProcessDecorator compositeProcess) {
     ProcessUpdater updater = new CompositeExternalProcessUpdater(compositeProcess);
+    //adding the following line to know that the process referebces another process
+    //and has to be updated when this other process will be defined
+    pendingProcessMapping.put(processID,updater);
   }
   
   
