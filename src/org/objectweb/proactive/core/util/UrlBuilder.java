@@ -72,6 +72,7 @@ public class UrlBuilder {
     //	
     public static String buildUrl(String host, String name, String protocol,
         int port) {
+        protocol = checkProtocol(protocol);
         String noProtocolUrl = buildUrl(host, name, port);
         if (protocol.equals(Constants.DEFAULT_PROTOCOL_IDENTIFIER)) {
             return noProtocolUrl;
@@ -89,9 +90,15 @@ public class UrlBuilder {
      * @param protocol
      * @return an Url built from properties
      */
-    public static String buildUrlFromProperties(String host, String name,
-        String protocol) {
-        String port = System.getProperty("proactive.rmi.port");
+    public static String buildUrlFromProperties(String host, String name) {
+        String port = null;
+        String protocol = System.getProperty("proactive.communication.protocol");
+        if(protocol.equals("rmi") || protocol.equals("ibis")){
+            port = System.getProperty("proactive.rmi.port");
+        }
+        if(protocol.equals("http")){
+            port = System.getProperty("proactive.http.port");
+        }
         if (checkProtocol(protocol).equals("jini:") || (port == null)) {
             return buildUrl(host, name, protocol);
         } else {
@@ -244,9 +251,17 @@ public class UrlBuilder {
     //	}
     private static String buildUrl(String host, String name, int port) {
         if (port == DEFAULT_REGISTRY_PORT) {
-            return "//" + host + "/" + name;
+            if (name.equals("")) {
+                return "//" + host;
+            } else {
+                return "//" + host + "/" + name;
+            }
         } else {
-            return "//" + host + ":" + port + "/" + name;
+            if (name.equals("")) {
+                return "//" + host + ":" + port;
+            } else {
+                return "//" + host + ":" + port + "/" + name;
+            }
         }
     }
 
@@ -316,6 +331,7 @@ public class UrlBuilder {
      */
     private static String buildHostUrl(String urlToRead, String protocol)
         throws UnknownHostException {
+        protocol = checkProtocol(protocol);
         String urlTemp;
         String hostname = getHostFromUrl(urlToRead.substring(2,
                     urlToRead.length()));
