@@ -297,6 +297,8 @@ public class NodeExploration implements JobMonitorConstants {
         Iterator iter = asso.getJVM().iterator();
         while (iter.hasNext()) {
             MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
+            if (jvmObject.isDeleted())
+            	continue;
             ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());
             if (pr != null) {
                 handleProActiveRuntime(pr, jvmObject.getDepth());
