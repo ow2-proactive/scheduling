@@ -34,7 +34,7 @@ public class Forwarder extends Agent {
 	public Forwarder(double lifeTime, int n) {
 		this.remainingTime = lifeTime;
 		this.number = n;
-		this.state = ACTIF;
+		this.state = DEAD;
 	}
 
 	public void endLife() {
@@ -43,6 +43,7 @@ public class Forwarder extends Agent {
 
 	public void setLifeTime(double l) {
 		this.remainingTime = l;
+//		this.simulator.log("Forwarder: setLifeTime " + l);
 	}
 
 	//    public void decreaseLifeTime(double l) {
@@ -67,8 +68,8 @@ public class Forwarder extends Agent {
 		this.state = DEAD;
 		this.remainingTime = 50000000;
 		//we send the number of the next forwarder
-		System.out.println(
-			"Forwarder: calling server, next number is " + (this.number + 1));
+//		System.out.println(
+//			"Forwarder: calling server, next number is " + (this.number + 1));
 		this.server.receiveRequestFromForwarder(this.number + 1);
 	}
 
@@ -92,6 +93,9 @@ public class Forwarder extends Agent {
 				case UPDATING_SERVER :
 					//                    this.state = DEAD;
 					this.endCommunicationServer();
+					break;
+					case DEAD: 
+					this.setRemainingTime(50000000);
 					break;
 			}
 		}

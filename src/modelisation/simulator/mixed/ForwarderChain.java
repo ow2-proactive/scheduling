@@ -44,7 +44,7 @@ public class ForwarderChain extends SimulatorElement {
 
 	public void add(Forwarder f) {
 		f.setLifeTime(this.simulator.getForwarderLifeTime());
-		System.out.println(
+		this.simulator.log(
 			"ForwarderChain.add with lifetime " + f.getRemainingTime());
 		//        f.setLifeTime(10);
 		this.list.add(f);
@@ -85,8 +85,8 @@ public class ForwarderChain extends SimulatorElement {
 			//the element we are looking for in not in the
 			//forwarder chain, we check to see if it is the agent
 			if (this.agent.getNumber() == objectNumber) {
-				//                System.out.println("ForwarderChain.reachElement agent reached");
-				//                System.out.println("ForwarderChain.reachElement hasBeenForwarded "
+				//                this.simulator.log("ForwarderChain.reachElement agent reached");
+				//                this.simulator.log("ForwarderChain.reachElement hasBeenForwarded "
 				//                                   + this.hasBeenForwarded);
 				this.reachElementAgent(agent);
 			} else {
@@ -125,7 +125,7 @@ public class ForwarderChain extends SimulatorElement {
 				//this.position++;
 				this.state = WAITING_AGENT;
 				this.setRemainingTime(a.getRemainingTime());
-				System.out.println(
+				this.simulator.log(
 					" Source: waiting for the agent will last "
 						+ this.remainingTime);
 				break;
@@ -133,10 +133,12 @@ public class ForwarderChain extends SimulatorElement {
 	}
 
 	protected void reachElementForwarder(Forwarder f) {
-		//        System.out.println("ForwarderChain.reachElementForwarder");
+		//        this.simulator.log("ForwarderChain.reachElementForwarder");
 		int returnValue = f.receiveMessage();
 		switch (returnValue) {
 			case Forwarder.ACTIF :
+			this.simulator.log("XXXXXXXXXXX" );
+			this.simulator.log(this.toString());
 				this.hasBeenForwarded = true;
 				this.objectNumber++;
 				this.setRemainingTime(this.communicationLength());
@@ -155,16 +157,16 @@ public class ForwarderChain extends SimulatorElement {
 		this.objectNumber = forwarderNumber;
 		this.hasBeenForwarded = false;
 		this.forwarderCount = 0;
-		//        System.out.println("ForwarderChain.startCommunication");
+		//        this.simulator.log("ForwarderChain.startCommunication");
 		this.setRemainingTime(this.communicationLength());
-		//        System.out.println("ForwarderChain.startCommunication will last " +
+		//        this.simulator.log("ForwarderChain.startCommunication will last " +
 		//                           this.remainingTime);
-		//        System.out.println("ForwarderChain.startCommunication length of the chain is " +
+		//        this.simulator.log("ForwarderChain.startCommunication length of the chain is " +
 		//                           this.list.size());
-		//        System.out.println("ForwarderChain.startCommunication looking for object " +
+		//        this.simulator.log("ForwarderChain.startCommunication looking for object " +
 		//                           forwarderNumber);
 		this.position = this.getPositionFromNumber(forwarderNumber);
-		//        System.out.println("ForwarderChain.startCommunication position "
+		//        this.simulator.log("ForwarderChain.startCommunication position "
 		//                           + this.position);
 		this.state = COMMUNICATING;
 	}
@@ -177,7 +179,7 @@ public class ForwarderChain extends SimulatorElement {
 		this.setRemainingTime(50000);
 		this.source.communicationFailed();
 		this.state = IDLE;
-		System.out.println(
+		this.simulator.log(
 			"Communication failed after "
 				+ this.forwarderCount
 				+ " forwarders");
@@ -190,7 +192,7 @@ public class ForwarderChain extends SimulatorElement {
 		//from 0 to position-1
 		this.list.clear();
 		this.source.agentReached(this.agent.getNumber());
-		System.out.println(
+		this.simulator.log(
 			"Communication succeeded after "
 				+ this.forwarderCount
 				+ " forwarders");
@@ -201,11 +203,10 @@ public class ForwarderChain extends SimulatorElement {
 	 * after having been through forwarders
 	 */
 	public void startTensioning() {
-		//        System.out.println("ForwarderChain.startTensioning");
+		//        this.simulator.log("ForwarderChain.startTensioning");
 		this.state = TENSIONING;
 		this.setRemainingTime(simulator.getCommunicationTimeForwarder());
 		this.agent.startTensioning(this.remainingTime);
-
 	}
 
 	public double getRemainingTime() {
@@ -215,11 +216,12 @@ public class ForwarderChain extends SimulatorElement {
 			minTime =
 				Math.min(((Forwarder) li.next()).getRemainingTime(), minTime);
 		}
+		this.simulator.log("ForwarderChain: remainingTime = " + this.remainingTime);
 		return minTime;
 	}
 
 	public void update(double time) {
-//		System.out.println(this);
+//		this.simulator.log(this);
 		this.updateForwarders(time);
 		if (this.remainingTime == 0) {
 			switch (this.state) {
@@ -228,7 +230,7 @@ public class ForwarderChain extends SimulatorElement {
 					break;
 				case WAITING_AGENT :
 					if (this.agent.getState() == Agent.CALLING_SERVER) {
-						//	System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+						//	this.simulator.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 						//			oooopsss, we have to be carreful here, the agent is actually calling the server
 						//         so its migration is not over yet			
 						 this.setRemainingTime(this.agent.getRemainingTime());
@@ -257,14 +259,14 @@ public class ForwarderChain extends SimulatorElement {
 	}
 
 	public void setRemainingTimoe(double time) {
-//		System.out.println(
+//		this.simulator.log(
 //			"setRemainingTime: old = " + this.remainingTime + " new = " + time);
 		this.remainingTime = time;
 
 	}
 
 	public void updateForwarders(double time) {
-		System.out.println(
+		this.simulator.log(
 		"ForwarderChain.updateForwarders "
 				+ this.list.size()
 				+ " elements");

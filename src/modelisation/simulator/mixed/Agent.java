@@ -99,8 +99,8 @@ public class Agent extends SimulatorElement {
 //        this.migrationCounter++;
 //        this.migrationCounter++;
         this.remainingTime = this.waitTime();
-//        System.out.println("Agent.endOfCallServer total time " +
-//                           (time - startTime));
+       System.out.println("Agent.endOfCallServer total time " +
+                           (endTime - startTime));
         System.out.println(" AgentWithExponentialMigrationAndServer: waited " +
                            this.remainingTime + " before migration");
    
@@ -124,8 +124,8 @@ public class Agent extends SimulatorElement {
     public void startTensioning(double time) {
     //the agent can only be waiting when a tensioning is initiated
         if (this.remainingTime < time) {
-//            System.out.println("Tensioning initiated, adjusting waiting time "
-//            + " from " + this.remainingTime + " to " + time);
+              System.out.println("Simulator: agent wait end of tensioning "
+                                   + (time-this.remainingTime));
             this.remainingTime=time;
         }
     }

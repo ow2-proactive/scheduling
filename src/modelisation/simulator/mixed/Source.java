@@ -45,7 +45,7 @@ public class Source extends SimulatorElement {
 
 	public void waitBeforeCommunication() {
 		this.remainingTime = simulator.getSourceWaitingTime();
-		System.out.println(" Source: calling the agent after " + this.remainingTime);
+		this.simulator.log(" Source: calling the agent after " + this.remainingTime);
 	}
 
 	public void communicationFailed() {
@@ -68,7 +68,7 @@ public class Source extends SimulatorElement {
 				case COMMUNICATION :
 					break;
 				case COMMUNICATION_FAILED :
-					System.out.println("Communication failed after " + (time - startTime));
+					this.simulator.log("Communication failed after " + (time - startTime));
 					this.communicationServerStartTime = time;
 					this.callServer();
 					break;
@@ -84,9 +84,9 @@ public class Source extends SimulatorElement {
 				case WAITING_SERVER :
 					this.state = COMMUNICATION;
 					this.remainingTime = 5000000;
-					System.out.println(
+					this.simulator.log(
 						"Source: reply from server total " + (time - communicationServerStartTime));
-					System.out.println(
+					this.simulator.log(
 						"Source: processing for server total " + (time - processingServerStartTime));
 					this.tries++;
 					this.forwarderChain.startCommunication(currentLocation);
@@ -98,13 +98,13 @@ public class Source extends SimulatorElement {
 	public void callServer() {
 		this.remainingTime = simulator.getCommunicationTimeServer();
 		//        this.server.receiveRequestFromSource();
-		System.out.println(
+		this.simulator.log(
 			"Source: communication with server started will last  " + this.remainingTime);
 		this.state = CALLING_SERVER;
 	}
 
 	public void receiveReplyFromServer(int location) {
-		      System.out.println("Source.receiveReplyFromServer currentLocation "
+		      this.simulator.log("Source.receiveReplyFromServer currentLocation "
 		                           + location);
 		this.currentLocation = location;
 		this.remainingTime = 0;
@@ -116,7 +116,7 @@ public class Source extends SimulatorElement {
 		this.forwarderChain.startCommunication(currentLocation);
 		this.startTime = startTime;
 		this.tries=1;
-		System.out.println(">>>>> Source: communication started at time " + startTime);
+		this.simulator.log(">>>>> Source: communication started at time " + startTime);
 	}
 
 	public void endCommunication(double endTime) {
@@ -124,11 +124,11 @@ public class Source extends SimulatorElement {
 		this.state = WAITING;
 		this.endTime = endTime;
 		//        this.remainingTime = simulator.getSourceWaitingTime();
-		//        System.out.println("<<<<< Source: communication finished at time " + endTime);
-		System.out.println(
+		//        this.simulator.log("<<<<< Source: communication finished at time " + endTime);
+		this.simulator.log(
 			"TimedProxyWithLocationServer:  .............. done after "
 				+ (endTime - startTime));
-		System.out.println("Number of tries= " + tries);
+		this.simulator.log("Number of tries= " + tries);
 		this.waitBeforeCommunication();
 	}
 
