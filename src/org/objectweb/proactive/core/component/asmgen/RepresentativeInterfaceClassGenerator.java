@@ -1,21 +1,26 @@
 package org.objectweb.proactive.core.component.asmgen;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.Hashtable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Type;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
+
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 
+import java.io.Serializable;
 
-/** 
+import java.lang.reflect.Method;
+
+import java.util.Hashtable;
+import java.util.Vector;
+
+
+/**
  * Generates Interface implementations for the functional interfaces of the
  * component representative.
  *
@@ -28,10 +33,11 @@ import org.objectweb.proactive.core.mop.Utils;
  * Method calls are reified as MethodCall objects, that contain :
  * - a tag signaling component requests
  * - the name given to the component functional interface.
- * 
+ *
  * @author Matthieu Morel
  */
-public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
+public class RepresentativeInterfaceClassGenerator
+    extends AbstractInterfaceClassGenerator {
     protected static Logger logger = Logger.getLogger(RepresentativeInterfaceClassGenerator.class.getName());
 
     // A few constants that come in handy when using ASM in our case
@@ -52,7 +58,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         // a wrapper class for. This call may fail with a ClassNotFoundException
         // if the class corresponding to this type cannot be found.
         this.cl = ProActiveInterface.class;
-
 
         // Keep this info at hand for performance purpose
         this.className = cl.getName();
@@ -83,36 +88,33 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         return generatedClassesCache;
     }
 
-    public ProActiveInterface generateInterface(final String fcInterfaceName, Component owner, 
-                                                         InterfaceType interfaceType, boolean isInternal, boolean isPrimitive)
-                                                  throws Exception {
+    public ProActiveInterface generateInterface(final String fcInterfaceName,
+        Component owner, InterfaceType interfaceType, boolean isInternal,
+        boolean isPrimitive) throws Exception {
         this.fcInterfaceName = fcInterfaceName;
 
         //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
-         //                                                    .equals(ComponentParameters.PRIMITIVE);
+        //                                                    .equals(ComponentParameters.PRIMITIVE);
         interfacesToImplement = new Vector();
 
-
         // add functional interface
-        interfacesToImplement.add(Class.forName(interfaceType.getFcItfSignature()));
-
+        interfacesToImplement.add(Class.forName(
+                interfaceType.getFcItfSignature()));
 
         // add Serializable interface
         interfacesToImplement.addElement(Serializable.class);
-
 
         // add StubObject, so we can set the proxy
         interfacesToImplement.addElement(StubObject.class);
 
         //  	String generated_class_name = getGeneratedClassName(fcInterfaceName, interfaceType.getFcItfSignature());
-//        if (!isPrimitive) {
-//            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectCompositeComponentRepresentativeClassName(
-//                                             fcInterfaceName, interfaceType.getFcItfSignature());
-//        } else {
-            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(
-                                             fcInterfaceName, interfaceType.getFcItfSignature());
+        //        if (!isPrimitive) {
+        //            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectCompositeComponentRepresentativeClassName(
+        //                                             fcInterfaceName, interfaceType.getFcItfSignature());
+        //        } else {
+        this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
+                interfaceType.getFcItfSignature());
         //}
-
         Class generated_class;
 
         // check whether class has already been generated
@@ -122,32 +124,32 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             byte[] bytes;
             setInfos();
             bytes = create();
-            RepresentativeInterfaceClassGenerator.generatedClassesCache.put(stubClassFullName, bytes);
+            RepresentativeInterfaceClassGenerator.generatedClassesCache.put(stubClassFullName,
+                bytes);
             if (logger.isDebugEnabled()) {
                 logger.debug("added " + stubClassFullName + " to cache");
             }
             if (logger.isDebugEnabled()) {
-                logger.debug("generated classes cache is : " + generatedClassesCache.toString());
+                logger.debug("generated classes cache is : " +
+                    generatedClassesCache.toString());
             }
 
             // Next few lines for debugging only
-//            try {
-//                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
-//                                                     stubClassFullName + ".class");
-//
-//                if (logger.isDebugEnabled()) {
-//                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-//                }
-//
-//                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-//                fos.write(bytes);
-//                fos.close();
-//			} catch (FileNotFoundException fnfe) {
-//				// e.printStackTrace();
-//				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-//			}
-
-
+            //            try {
+            //                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
+            //                                                     stubClassFullName + ".class");
+            //
+            //                if (logger.isDebugEnabled()) {
+            //                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
+            //                }
+            //
+            //                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+            //                fos.write(bytes);
+            //                fos.close();
+            //			} catch (FileNotFoundException fnfe) {
+            //				// e.printStackTrace();
+            //				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+            //			}
             // convert the bytes into a Class
             generated_class = defineClass(stubClassFullName, bytes);
         }
@@ -164,24 +166,22 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
     protected CodeVisitor createMethod(int methodIndex, Method m) {
         CodeVisitor cv = createMethodGenerator(m);
 
-
         // Pushes on the stack the reference to the proxy object
         cv.visitVarInsn(ALOAD, 0);
-        cv.visitFieldInsn(GETFIELD, this.stubClassFullName.replace('.', '/'), PROXY_FIELD_NAME, PROXY_TYPE);
-
+        cv.visitFieldInsn(GETFIELD, this.stubClassFullName.replace('.', '/'),
+            PROXY_FIELD_NAME, PROXY_TYPE);
 
         // Pushes on the stack the Method object that represents the current method
-        cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'), "methods", METHOD_ARRAY_TYPE);
+        cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
+            "methods", METHOD_ARRAY_TYPE);
         pushInt(cv, methodIndex);
         cv.visitInsn(AALOAD);
 
         Class[] paramTypes = m.getParameterTypes();
 
-
         // Create an array of type Object[] for holding all the parameters
         // Push on the stack the size of the array
         pushInt(cv, paramTypes.length);
-
 
         // Creates an array of class objects of that size
         cv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
@@ -192,7 +192,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             // First, duplicate the reference to the array of type Object[]
             // That currently sits on top of the stack
             cv.visitInsn(DUP);
-
 
             // Load the array index for storing the result
             pushInt(cv, i);
@@ -229,39 +228,41 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 } else if (param == Character.TYPE) {
                     type = "java/lang/Character";
                     desc = "C";
-                } else/*if (param == Short.TYPE)*/
-                {
+                } else /*if (param == Short.TYPE)*/
+                 {
                     type = "java/lang/Short";
                     desc = "S";
                 }
                 cv.visitTypeInsn(NEW, type);
                 cv.visitInsn(DUP);
                 cv.visitVarInsn(opcode, indexInParameterArray);
-                cv.visitMethodInsn(INVOKESPECIAL, type, "<init>", "(" + desc + ")V");
+                cv.visitMethodInsn(INVOKESPECIAL, type, "<init>",
+                    "(" + desc + ")V");
             } else {
                 cv.visitVarInsn(ALOAD, indexInParameterArray);
             }
-            indexInParameterArray += (((param == Double.TYPE) || (param == Long.TYPE)) ? 2 : 1);
-
+            indexInParameterArray += (((param == Double.TYPE) ||
+            (param == Long.TYPE)) ? 2 : 1);
 
             // Stores the object in the array
             cv.visitInsn(AASTORE);
         }
 
         // So now we have the Method object and the array of objects on the stack,
-           // Pushes on the stack the reference to the functional interface name
-            cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'), FUNCTIONAL_INTERFACE_NAME_FIELD_NAME, 
-                              FUNCTIONAL_INTERFACE_NAME_TYPE);
+        // Pushes on the stack the reference to the functional interface name
+        cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
+            FUNCTIONAL_INTERFACE_NAME_FIELD_NAME, FUNCTIONAL_INTERFACE_NAME_TYPE);
 
-            cv.visitMethodInsn(INVOKESTATIC, "org/objectweb/proactive/core/mop/MethodCall", "getComponentMethodCall", 
-                               "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE + FUNCTIONAL_INTERFACE_NAME_TYPE + ")" + 
-                               METHODCALL_TYPE);
-//        }
-
-
+        cv.visitMethodInsn(INVOKESTATIC,
+            "org/objectweb/proactive/core/mop/MethodCall",
+            "getComponentMethodCall",
+            "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE +
+            FUNCTIONAL_INTERFACE_NAME_TYPE + ")" + METHODCALL_TYPE);
+        //        }
         // Now, call 'reify' on the proxy object
-        cv.visitMethodInsn(INVOKEINTERFACE, "org/objectweb/proactive/core/mop/Proxy", "reify", 
-                           "(" + METHODCALL_TYPE + ")" + OBJECT_TYPE);
+        cv.visitMethodInsn(INVOKEINTERFACE,
+            "org/objectweb/proactive/core/mop/Proxy", "reify",
+            "(" + METHODCALL_TYPE + ")" + OBJECT_TYPE);
 
         // If the return type of the method is a primitive type,
         // we want to unwrap it first
@@ -280,46 +281,44 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
     protected void createFields() {
         // Creates the field that points to the active object
-        this.classGenerator.visitField(ACC_PROTECTED, PROXY_FIELD_NAME, PROXY_TYPE, null);
+        this.classGenerator.visitField(ACC_PROTECTED, PROXY_FIELD_NAME,
+            PROXY_TYPE, null);
     }
 
     protected void createStaticVariables() {
         // Creates fields that contains the array of Method objects
         // that represent the reified methods of this class
-        this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods", METHOD_ARRAY_TYPE, null);
-
+        this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods",
+            METHOD_ARRAY_TYPE, null);
 
         // creates and set the field that points to the functional interface name
-        this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, FUNCTIONAL_INTERFACE_NAME_FIELD_NAME, 
-                                       FUNCTIONAL_INTERFACE_NAME_TYPE, fcInterfaceName);
+        this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
+            FUNCTIONAL_INTERFACE_NAME_FIELD_NAME,
+            FUNCTIONAL_INTERFACE_NAME_TYPE, fcInterfaceName);
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {
         // Creates the class initializer method itself
-        CodeVisitor cv = this.classGenerator.visitMethod(ACC_STATIC, "<clinit>", "()V", null);
-
+        CodeVisitor cv = this.classGenerator.visitMethod(ACC_STATIC,
+                "<clinit>", "()V", null);
 
         // Creates an array of Method objects that we will store into the static
         // variable 'methods' of type 'Method[]'
         // Pushes the size of the array on to the stack
         pushInt(cv, this.methods.length);
 
-
         // Creates an array of Method objects of that size
         cv.visitTypeInsn(ANEWARRAY, "java/lang/reflect/Method");
 
-
         // Stores the reference to this newly-created array into the static variable 'methods'
-        cv.visitFieldInsn(PUTSTATIC, this.stubClassFullName.replace('.', '/'), "methods", METHOD_ARRAY_TYPE);
-
+        cv.visitFieldInsn(PUTSTATIC, this.stubClassFullName.replace('.', '/'),
+            "methods", METHOD_ARRAY_TYPE);
 
         // Pushes on the stack the size of the array
         pushInt(cv, interfacesToImplement.size());
 
-
         // Creates an array of class objects of that size
         cv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
-
 
         // Stores the reference to this newly-created array as the local variable with index '1'
         cv.visitVarInsn(ASTORE, 1);
@@ -329,7 +328,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             // Load onto the stack a pointer to the array
             cv.visitVarInsn(ALOAD, 1);
 
-
             // Load the index in the array where we want to store the result
             pushInt(cv, i);
 
@@ -337,10 +335,9 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             String s = ((Class) interfacesToImplement.elementAt(i)).getName();
             cv.visitLdcInsn(s);
 
-
             // Performs the call to Class.forName
-            cv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
-
+            cv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName",
+                "(Ljava/lang/String;)Ljava/lang/Class;");
 
             // Stores the result of the invocation of forName into the array
             // The index into which to store as well as the reference to the array
@@ -351,7 +348,9 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         // Now, lookup each of the Method objects and store it into the 'method' array
         for (int i = 0; i < this.methods.length; i++) {
             // Stacks up the reference to the array of methods and the index in the array
-            cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'), "methods", METHOD_ARRAY_TYPE);
+            cv.visitFieldInsn(GETSTATIC,
+                this.stubClassFullName.replace('.', '/'), "methods",
+                METHOD_ARRAY_TYPE);
             pushInt(cv, i);
 
             // Now, we load onto the stack a pointer to the class that contains the method
@@ -359,20 +358,16 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             if (indexInClassArray == -1) {
             }
 
-
             // Load a pointer to the Class array (local variable number 1)
             cv.visitVarInsn(ALOAD, 1);
-
 
             // Access element number 'indexInClassArray'
             pushInt(cv, indexInClassArray);
             cv.visitInsn(AALOAD);
 
-
             // Now, perform a call to 'getDeclaredMethod'
             // First, stack up the simple generatedClassName of the method to solve
             cv.visitLdcInsn(this.methods[i].getName());
-
 
             // Now, we want to create an array of type Class[] for representing
             // the parameters to this method. We choose to store this array into the
@@ -380,22 +375,19 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             // Pushes the size of the array
             pushInt(cv, this.methods[i].getParameterTypes().length);
 
-
             // Creates an array of class objects of that size
             cv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
-
 
             // Stores the reference to this newly-created array as the local variable with index '2'
             cv.visitVarInsn(ASTORE, 2);
 
             // Stack up the class objects that represent the types of all the arguments to this method
-            for (int j = 0; j < this.methods[i].getParameterTypes().length; j++) {
+            for (int j = 0; j < this.methods[i].getParameterTypes().length;
+                    j++) {
                 Class currentParameter = this.methods[i].getParameterTypes()[j];
-
 
                 // Load onto the stack a pointer to the array of Class objects (for parameters)
                 cv.visitVarInsn(ALOAD, 2);
-
 
                 // Load the index in the array where we want to store the result
                 pushInt(cv, j);
@@ -404,41 +396,36 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 // constants (like java.lang.Integer.TYPE) instead of calling Class.forName
                 if (currentParameter.isPrimitive()) {
                     // Loads that static variable
-                    cv.visitFieldInsn(GETSTATIC, Type.getInternalName(Utils.getWrapperClass(currentParameter)), "TYPE", 
-                                      "Ljava/lang/Class;");
+                    cv.visitFieldInsn(GETSTATIC,
+                        Type.getInternalName(Utils.getWrapperClass(
+                                currentParameter)), "TYPE", "Ljava/lang/Class;");
                 } else {
                     // Load the generatedClassName of the parameter class onto the stack
                     cv.visitLdcInsn(currentParameter.getName());
 
-
                     // Performs a call to Class.forName
-                    cv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", 
-                                       "(Ljava/lang/String;)Ljava/lang/Class;");
+                    cv.visitMethodInsn(INVOKESTATIC, "java/lang/Class",
+                        "forName", "(Ljava/lang/String;)Ljava/lang/Class;");
                 }
-
 
                 // Stores the result in the array
                 cv.visitInsn(AASTORE);
             }
 
-
             // Loads the array
             cv.visitVarInsn(ALOAD, 2);
 
-
             // Perform the actual call to 'getDeclaredMethod'
-            cv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredMethod", 
-                               "(Ljava/lang/String;[Ljava/lang/Class;)" + METHOD_TYPE);
-
+            cv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class",
+                "getDeclaredMethod",
+                "(Ljava/lang/String;[Ljava/lang/Class;)" + METHOD_TYPE);
 
             // Now that we have the result, let's store it into the array
             cv.visitInsn(AASTORE);
         }
 
-
         // And returns
         cv.visitInsn(RETURN);
-
 
         // Needed stack size
         // Needed locals
@@ -449,30 +436,29 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
     protected void createGetAndSetProxyMethods() {
         // Do the getProxy method first
-        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC, "getProxy", "()" + PROXY_TYPE, null);
-
+        CodeVisitor cv = this.classGenerator.visitMethod(ACC_PUBLIC,
+                "getProxy", "()" + PROXY_TYPE, null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);
-        cv.visitFieldInsn(GETFIELD, this.stubClassFullName.replace('.', '/'), PROXY_FIELD_NAME, PROXY_TYPE);
+        cv.visitFieldInsn(GETFIELD, this.stubClassFullName.replace('.', '/'),
+            PROXY_FIELD_NAME, PROXY_TYPE);
         cv.visitInsn(ARETURN);
-
 
         // Needed stack size
         // Needed locals
         cv.visitMaxs(0, 0);
 
-
         // Now, do the setProxy method
-        cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setProxy", "(" + PROXY_TYPE + ")V", null);
-
+        cv = this.classGenerator.visitMethod(ACC_PUBLIC, "setProxy",
+                "(" + PROXY_TYPE + ")V", null);
 
         // Now, fills in the instruction list
         cv.visitVarInsn(ALOAD, 0);
         cv.visitVarInsn(ALOAD, 1);
-        cv.visitFieldInsn(PUTFIELD, this.stubClassFullName.replace('.', '/'), PROXY_FIELD_NAME, PROXY_TYPE);
+        cv.visitFieldInsn(PUTFIELD, this.stubClassFullName.replace('.', '/'),
+            PROXY_FIELD_NAME, PROXY_TYPE);
         cv.visitInsn(RETURN);
-
 
         // Needed stack size
         // Needed locals
