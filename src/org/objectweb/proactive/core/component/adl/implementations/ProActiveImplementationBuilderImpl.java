@@ -30,14 +30,14 @@
  */
 package org.objectweb.proactive.core.component.adl.implementations;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.adl.RegistryManager;
@@ -47,18 +47,18 @@ import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNod
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.ProActiveLogger;
 
+import java.util.Map;
+
 
 /**
  * @author Matthieu Morel
  */
-public class ProActiveImplementationBuilderImpl implements ProActiveImplementationBuilder,
-    BindingController {
-
+public class ProActiveImplementationBuilderImpl
+    implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";
     public RegistryManager registry;
     private static Logger logger = ProActiveLogger.getLogger("components.adl");
 
-    
     // --------------------------------------------------------------------------
     // Implementation of the BindingController interface
     // --------------------------------------------------------------------------
@@ -85,13 +85,11 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
         }
     }
 
-    
     //  --------------------------------------------------------------------------
     // Implementation of the Implementation Builder and ProActiveImplementationBuilder interfaces
     // --------------------------------------------------------------------------
-    
     public Object createComponent(Object arg0, String arg1, String arg2,
-            Object arg3, Object arg4, Object arg5) throws Exception {
+        Object arg3, Object arg4, Object arg5) throws Exception {
         return null;
     }
 
@@ -117,6 +115,11 @@ public class ProActiveImplementationBuilderImpl implements ProActiveImplementati
                     ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
             } else {
                 // 	TODO add self exported virtual node ?
+                // for the moment, just add a leaf to the linked vns
+                ExportedVirtualNodesList.instance().addLeafVirtualNode(name,
+                    adlVN.getName(),
+                    exported.isMultiple() ? VirtualNode.MULTIPLE
+                                          : VirtualNode.SINGLE);
             }
             if (context.get("deployment-descriptor") != null) {
                 org.objectweb.proactive.core.descriptor.data.VirtualNode proactive_vn =
