@@ -124,9 +124,7 @@ public abstract class FunctionalTest extends AbstractTest
         // postconditions
         try {
             if (!postConditions()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Postconditions are not verified");
-                }
+                logger.warn("Postconditions are not verified");
                 failed = true;
             }
         } catch (Exception e1) {
@@ -211,9 +209,7 @@ public abstract class FunctionalTest extends AbstractTest
         // postconditions
         try {
             if (!postConditions()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Postconditions are not verified");
-                }
+                logger.warn("Postconditions are not verified");
                 failed = true;
             }
         } catch (Exception e1) {
