@@ -533,7 +533,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
 
   void exit() {
     try {
-      c3ddispatcher.unregisterConsumer(i_user);
+    	if( c3ddispatcher != null )
+    		c3ddispatcher.unregisterConsumer(i_user);
       userframe.setVisible(false);
       userframe.dispose();
       userframe = null;
@@ -542,8 +543,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     } catch (NullPointerException ex) {
     	ex.printStackTrace();
     }
-//    if (!b_isApplet) {
-//    	
+//    if (!b_isApplet) {    	
 //      System.exit(0);
 //    }
   }
