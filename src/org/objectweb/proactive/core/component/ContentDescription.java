@@ -50,6 +50,7 @@ public class ContentDescription {
     private MetaObjectFactory factory;
     private VirtualNode virtualNode = null;
     private Node node = null;
+    private boolean uniqueInstance = false;
 
     /**
      * constructor
@@ -211,10 +212,20 @@ public class ContentDescription {
         virtualNode = null;
     }
 
+    public void forceSingleInstance() {
+        uniqueInstance = true;
+    }
+    
+    public boolean uniqueInstance() {
+        return uniqueInstance;
+    }
+    
+
     /**
      * setter (visibility is reduced)
      */
     void setFactory(MetaObjectFactory factory) {
         this.factory = factory;
     }
+    
 }
