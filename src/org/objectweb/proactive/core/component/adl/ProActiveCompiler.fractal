@@ -2,50 +2,18 @@
 <!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/basic.dtd">
 
 <definition name="org.objectweb.proactive.core.component.adl.ProActiveCompiler" extends="org.objectweb.fractal.adl.BasicCompiler">
-  <interface name="type-builder" role="client" signature="org.objectweb.fractal.adl.types.TypeBuilder"/>
-  <interface name="implementation-builder" role="client" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder"/>
-  <interface name="component-builder" role="client" signature="org.objectweb.fractal.adl.components.ComponentBuilder"/>
-  <interface name="binding-builder" role="client" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"/>
-  <interface name="attribute-builder" role="client" signature="org.objectweb.fractal.adl.attributes.AttributeBuilder"/>
-  <interface name="virtualNode-builder" role="client" signature="org.objectweb.proactive.core.component.adl.nodes.VirtualNodeBuilder"/>
-  
-  <component name="main-compiler" definition="org.objectweb.fractal.adl.components.ComponentCompiler"/>
-  <component name="type-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.types.TypeBuilder"/>
-    <content class="org.objectweb.fractal.adl.types.TypeCompiler"/>
-  </component>
+  <interface signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder" role="client" name="exportedVirtualNode-builder"/>
+
   <component name="implementation-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
     <interface name="builder" role="client" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder"/>
-    <content class="org.objectweb.proactive.core.component.adl.nodes.ProActiveVirtualNodeImplementationCompiler"/>
+    <content class="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationCompiler"/>
   </component>
-  <component name="component-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.components.ComponentBuilder"/>
-    <content class="org.objectweb.fractal.adl.components.PrimitiveComponentCompiler"/>
-  </component>
-  <component name="binding-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.bindings.BindingBuilder"/>
-    <content class="org.objectweb.fractal.adl.bindings.BindingCompiler"/>
-  </component>
-  <component name="attribute-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.fractal.adl.attributes.AttributeBuilder"/>
-    <content class="org.objectweb.fractal.adl.attributes.AttributeCompiler"/>
-  </component>
-  <component name="virtualNode-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
-    <interface name="builder" role="client" signature="org.objectweb.proactive.core.component.adl.nodes.VirtualNodeBuilder"/>
-    <content class="org.objectweb.proactive.core.component.adl.nodes.ProActiveVirtualNodeImplementationCompiler"/>
+  <component name="exportedVirtualNodes-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
+    <interface name="builder" role="client" signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder"/>
+    <content class="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesCompiler"/>
   </component>
   
-  <binding client="this.compiler" server="main-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers0" server="type-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers1" server="implementation-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers2" server="component-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers3" server="binding-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers4" server="attribute-compiler.compiler"/>
-  <binding client="main-compiler.primitive-compilers5" server="virtualNode-compiler.compiler"/>
-  <binding client="type-compiler.builder" server="this.type-builder"/>
-  <binding client="implementation-compiler.builder" server="this.implementation-builder"/>
-  <binding client="component-compiler.builder" server="this.component-builder"/>
-  <binding client="binding-compiler.builder" server="this.binding-builder"/>
-  <binding client="attribute-compiler.builder" server="this.attribute-builder"/>
-  <binding client="virtualNode-compiler.builder" server="this.virtualNode-builder"/>
+  <binding client="main-compiler.primitive-compilers5" server="exportedVirtualNodes-compiler.compiler"/>
+  <binding client="exportedVirtualNodes-compiler.builder" server="this.exportedVirtualNode-builder"/>
+  
 </definition>

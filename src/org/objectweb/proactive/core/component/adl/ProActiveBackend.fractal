@@ -1,42 +1,47 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/standard.dtd">
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
-<definition name="org.objectweb.proactive.core.component.adl.ProActiveBackend" extends="org.objectweb.proactive.core.component.adl.ProActiveBackendType">
+<definition extends="org.objectweb.proactive.core.component.adl.ProActiveBackendType" name="org.objectweb.proactive.core.component.adl.ProActiveBackend">
   <component name="type-builder">
-    <interface name="type-builder" signature="org.objectweb.fractal.adl.types.TypeBuilder" role="server"/>
+    <interface signature="org.objectweb.fractal.adl.types.TypeBuilder" role="server" name="type-builder"/>
     <content class="org.objectweb.fractal.adl.types.FractalTypeBuilder"/>
     <controller desc="primitive"/>
   </component>
   <component name="implementation-builder">
-    <interface name="implementation-builder" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder" role="server"/>
+    <interface signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder" role="server" name="implementation-builder"/>
     <component name="builder">
-      <interface name="implementation-builder" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder" role="server"/>
-      <interface name="registry" signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="client"/>
+      <interface signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder" role="server" name="implementation-builder"/>
+      <interface signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="client" name="registry"/>
       <content class="org.objectweb.proactive.core.component.adl.implementations.ProActiveImplementationBuilder"/>
       <controller desc="primitive"/>
     </component>
     <component name="registry">
-	    <interface name="registry" signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="server"/>
+      <interface signature="org.objectweb.proactive.core.component.adl.RegistryManager" role="server" name="registry"/>
       <content class="org.objectweb.proactive.core.component.adl.RegistryManagerImpl"/>
       <controller desc="primitive"/>
-      </component>
+    </component>
     <binding client="this.implementation-builder" server="builder.implementation-builder"/>
     <binding client="builder.registry" server="registry.registry"/>
     <controller desc="composite"/>
   </component>
   <component name="component-builder">
-    <interface name="component-builder" signature="org.objectweb.fractal.adl.components.ComponentBuilder" role="server"/>
+    <interface signature="org.objectweb.fractal.adl.components.ComponentBuilder" role="server" name="component-builder"/>
     <content class="org.objectweb.proactive.core.component.adl.components.ProActiveComponentBuilder"/>
     <controller desc="primitive"/>
   </component>
   <component name="binding-builder">
-    <interface name="binding-builder" signature="org.objectweb.fractal.adl.bindings.BindingBuilder" role="server"/>
+    <interface signature="org.objectweb.fractal.adl.bindings.BindingBuilder" role="server" name="binding-builder"/>
     <content class="org.objectweb.fractal.adl.bindings.FractalBindingBuilder"/>
     <controller desc="primitive"/>
   </component>
   <component name="attribute-builder">
-    <interface name="attribute-builder" signature="org.objectweb.fractal.adl.attributes.AttributeBuilder" role="server"/>
+    <interface signature="org.objectweb.fractal.adl.attributes.AttributeBuilder" role="server" name="attribute-builder"/>
     <content class="org.objectweb.fractal.adl.attributes.FractalAttributeBuilder"/>
+    <controller desc="primitive"/>
+  </component>
+  <component name="exportedVirtualNode-builder">
+    <interface signature="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilder" role="server" name="exportedVirtualNode-builder"/>
+    <content class="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesBuilderImpl"/>
     <controller desc="primitive"/>
   </component>
   <binding client="this.type-builder" server="type-builder.type-builder"/>
@@ -44,13 +49,6 @@
   <binding client="this.component-builder" server="component-builder.component-builder"/>
   <binding client="this.binding-builder" server="binding-builder.binding-builder"/>
   <binding client="this.attribute-builder" server="attribute-builder.attribute-builder"/>
+  <binding client="this.exportedVirtualNode-builder" server="exportedVirtualNode-builder.exportedVirtualNode-builder"/>
   <controller desc="composite"/>
-  <coordinates name="type-builder" x1="0.6670094710703848" y1="0.5032407407407413" x0="0.4557540598149735" y0="0.26157407407407496" color="-73"/>
-  <coordinates name="implementation-builder" x1="0.6621933621933623" y1="0.9250000000000002" x0="0.31818181818181823" y0="0.6683333333333334" color="-73">
-    <coordinates name="builder" x1="0.4802783833640786" y1="0.6508164757494517" x0="0.1314606741573034" y0="0.15361930294906168" color="-73"/>
-    <coordinates name="registry" x1="1.0" y1="0.7670241286863271" x0="0.651310861423221" y0="0.26300268096514745" color="-73"/>
-  </coordinates>
-  <coordinates name="component-builder" x1="0.5344618141989446" y1="0.21615789473684208" x0="0.27422085034352295" y0="0.0073157894736842755" color="-73"/>
-  <coordinates name="binding-builder" x1="0.262115127175368" y1="0.35314035087719303" x0="0.060776439089691825" y0="0.17124561403508773" color="-73"/>
-  <coordinates name="attribute-builder" x1="0.32020434138396603" y1="0.5480672268907563" x0="0.05425259875662021" y0="0.3968067226890756" color="-73"/>
 </definition>
