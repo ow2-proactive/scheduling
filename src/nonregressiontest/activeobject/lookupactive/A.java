@@ -34,6 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import java.io.IOException;
 
@@ -62,7 +63,7 @@ public class A implements RunActive {
 
     public void runActivity(Body body) {
         try {
-            ProActive.register((A) ProActive.getStubOnThis(), "//localhost/A");
+            ProActive.register((A) ProActive.getStubOnThis(), UrlBuilder.buildUrlFromProperties("localhost","A", "rmi:"));
         } catch (IOException e) {
             e.printStackTrace();
         }

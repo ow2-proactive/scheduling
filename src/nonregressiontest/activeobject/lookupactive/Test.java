@@ -31,6 +31,7 @@
 package nonregressiontest.activeobject.lookupactive;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 import testsuite.test.FunctionalTest;
 
@@ -69,7 +70,8 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        A a = (A) ProActive.lookupActive(A.class.getName(), "//localhost/A");
+    	String url = UrlBuilder.buildUrlFromProperties("localhost","A", "rmi:");
+        A a = (A) ProActive.lookupActive(A.class.getName(), url);
         return ((a != null) && (a.getName().equals("toto")));
     }
 }
