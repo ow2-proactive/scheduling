@@ -885,7 +885,7 @@ public class ProActiveGroup {
      * @return the <code>ProxyForGroup</code> of the typed group <code>ogroup</code>.
      * <code>null</code> if <code>ogroup</code> does not represent a Group.
      */
-    private static ProxyForGroup findProxyForGroup(Object ogroup) {
+    static ProxyForGroup findProxyForGroup(Object ogroup) {
 		if (!(MOP.isReifiedObject(ogroup)))
 	    	return null;
 		else {
