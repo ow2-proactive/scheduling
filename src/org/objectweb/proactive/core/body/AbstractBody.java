@@ -137,8 +137,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   //
   
   public void receiveRequest(Request request) throws java.io.IOException {
-    //if (reifiedObject != null)
-    //  System.out.println("  --> "+reifiedObject.getClass().getName()+".receiveRequest m="+request.getMethodName());
+    //System.out.println("  --> receiveRequest m="+request.getMethodName());
     if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
     internalReceiveRequest(request);
@@ -146,8 +145,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   }
 
   public void receiveReply(Reply reply) throws java.io.IOException {
-    //if (reifiedObject != null)
-    //  System.out.println("  --> "+reifiedObject.getClass().getName()+".receiveReply m="+reply.getMethodName());
+    //System.out.println("  --> receiveReply m="+reply.getMethodName());
     if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
     internalReceiveReply(reply);

@@ -27,7 +27,7 @@ public class AgentClient {
       hostName=myServer.getName();
       System.out.println("The name is : " + hostName+" " + nodeName);
       }
-      //myServer.endBodyActivity();
+      myServer.endBodyActivity();
     } catch (Exception e) {
       System.err.println("Could not reach/create server object");
       e.printStackTrace();

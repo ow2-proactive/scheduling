@@ -144,7 +144,7 @@ public class ActiveBody extends MigratableBody implements Runnable, java.io.Seri
     try {
       runActive.runActivity(this);
       // the body terminate its activity
-      if (isAlive()) {
+      if (isActive()) {
         // serve remaining requests if non dead
         while (!(localBodyStrategy.getRequestQueue().isEmpty())) {
           serve(localBodyStrategy.getRequestQueue().removeOldest());

@@ -153,9 +153,9 @@ public class MigratableBody extends BodyImpl implements Migratable, java.io.Seri
 
   protected void changeBodyAfterMigration(UniversalBody migratedBody) {
     // cleanup after migration
-    activityStopped();
     requestReceiver = migrationManager.createRequestReceiver(migratedBody, requestReceiver);
     replyReceiver = migrationManager.createReplyReceiver(migratedBody, replyReceiver);
+    activityStopped();
     migrationManager = null;
     // signal that this body (remaining after migration) has just migrated
     hasJustMigrated = true;
