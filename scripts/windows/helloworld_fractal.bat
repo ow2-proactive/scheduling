@@ -1,7 +1,7 @@
 @echo off
 echo. 
 echo --- Fractal HelloWorld example ----------------------------------------
-if "%1" == "" goto usage
+if "%1" == "help" goto usage
 
 goto doit
 
