@@ -9,8 +9,6 @@ package test.guidedtour;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.ext.migration.MigrationStrategyManager;

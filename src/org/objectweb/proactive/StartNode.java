@@ -31,7 +31,6 @@
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;

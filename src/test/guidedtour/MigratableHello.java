@@ -1,14 +1,11 @@
 package test.guidedtour;
 
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.NodeException;
-import sun.security.action.GetLongAction;
 /** This class adds non functionnal behavior to Hello, so that we can
 * manipulate it as a ProActive active object.
 * @author mmorel

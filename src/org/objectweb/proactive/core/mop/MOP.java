@@ -38,7 +38,7 @@ import java.lang.reflect.Modifier;
  * A place where static methods go
  */
 public abstract class MOP {
-
+	
   /**
    * The name of the interface that caracterizes all stub classes
    */

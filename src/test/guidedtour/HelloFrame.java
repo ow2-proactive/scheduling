@@ -6,8 +6,6 @@
 
 package test.guidedtour;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * This class allows the creation of a graphical window 

@@ -8,9 +8,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 
 
-import org.objectweb.proactive.core.mop.StubObject;
-
-
 public class Go {
 
     public static void main (String args[]) {

@@ -2,7 +2,6 @@ package modelisation.statistics;
 
 import java.util.Random;
 
-
 public class UniformLaw implements RandomNumberGenerator {
 
     protected double parameter;

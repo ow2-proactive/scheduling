@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 
-
 /**
  * This class provides static methods to manage object representing a Group.
  *
@@ -313,16 +312,17 @@ public class ProActiveGroup {
      */
     public static boolean isScatterGroupOn (Object ogroup) {
  		Proxy proxytmp = findProxyForGroup(ogroup);
-		if (proxytmp != null)
-			return ((ProxyForGroup)proxytmp).isDispatchingOn();
-		else return false;
+	//	if (proxytmp != null)
+	//		return ((ProxyForGroup)proxytmp).isDispatchingOn();
+	//	else return false;
+	return false;
    }
 
     /**
      * Returns the ProxyForGroup of the object <code>obj</code>.
      * Returns <code>null</code> if <code>obj</code> does not represent a Group.
      */
-    private static ProxyForGroup findProxyForGroup(Object obj) {
+    protected static ProxyForGroup findProxyForGroup(Object obj) {
 	if (!(MOP.isReifiedObject(obj)))
 	    return null;
 	else {

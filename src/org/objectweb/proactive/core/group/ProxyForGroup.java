@@ -109,7 +109,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 	}
 
-	private synchronized void decrementWaitedAndNotifyAll() {
+	protected synchronized void decrementWaitedAndNotifyAll() {
 		waited--;
 		notifyAll();
 	}
@@ -166,7 +166,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		this.waited++;
 	}
 
-	private synchronized void addToListOfResult(Vector memberListOfResultGroup, Object o, int index) {
+	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object o, int index) {
 		memberListOfResultGroup.set(index, o);
 		decrementWaitedAndNotifyAll();
 	}

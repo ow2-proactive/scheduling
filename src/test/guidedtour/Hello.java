@@ -2,8 +2,6 @@ package test.guidedtour;
 
 
 
-import java.io.IOException;
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 /** This class represents an object, with its functionnal properties and
