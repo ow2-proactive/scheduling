@@ -26,9 +26,7 @@ public class Request {
         this.remainingTime = this.expoGamma.next() * 1000;
         this.state = RUNNING;
         System.out.println("Request: the communication will last " + this.remainingTime);
-
     }
-
 
     public double getRemainingTime() {
         return this.remainingTime;
