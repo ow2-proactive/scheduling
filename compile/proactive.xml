@@ -10,6 +10,7 @@
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
 	<property name="debug" value="on"/>
+	
 	<!-- define the classpath -->
 	<path id="project.classpath">
 		<pathelement path="${classpath}"/>
@@ -292,7 +293,7 @@
       ==
       ================================================================
 	-->
-	<target name="dist" depends="all">
+	<target name="dist" depends="all, docs">
 		<!-- Create the distribution directory -->
 		<delete dir="${dist.dir}"/>
 		<mkdir dir="${dist.dir}"/>
@@ -365,15 +366,17 @@
 		<mkdir dir="${docs.dir}"/>
 		<mkdir dir="${docs.dir}/api"/>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 1.0.3&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 1.0.3&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS">
 			<classpath refid="project.classpath"/>
+			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
+			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>			
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 1.0.3 - IC2D" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 1.0.3 - IC2D" bottom="&lt;i>Copyright &#169; October 2003 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
 			<classpath refid="project.classpath"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
