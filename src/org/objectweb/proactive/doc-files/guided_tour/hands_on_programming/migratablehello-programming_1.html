@@ -68,8 +68,8 @@ public class MigratableHello extends InitializedHello implements Serializable {
 	public static MigratableHello createMigratableHello(String name) {
 		try {
 			return (MigratableHello) ProActive.newActive(
-											MigratableHello.class.getName(), 
-											new Object[] { name });
+			                                      MigratableHello.class.getName(), 
+			                                      new Object[] { name });
 		} catch (ActiveObjectCreationException aoce) {
 			System.out.println("creation of the active object failed");
 			aoce.printStackTrace();
