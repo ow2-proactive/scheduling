@@ -170,7 +170,6 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
         LinkHandler(Hashtable table) {
             super();
             this.table = table;
-            this.parents = new ArrayList();
             addHandler(PARENT_TAG, new ParentHandler(this.table));
         }
 
@@ -182,6 +181,7 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
 
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
+				this.parents = new ArrayList();
             String id = attributes.getValue("id");
             this.test = (FunctionalTest) this.table.get(id);
         }
