@@ -2,7 +2,7 @@
 
 workingDir=`dirname $0`
 
-cd $PWD/../../../scripts/unix
+cd $PWD/..
 . env.sh
 cd $workingDir
 

@@ -1,5 +1,5 @@
 SETLOCAL enabledelayedexpansion
-call ..\..\..\scripts\windows\init.bat
+call ..\init.bat
 
 echo.
 echo --- StartP2PService -------------------------------------

@@ -18,14 +18,14 @@ void p2p_daemon(int argc, TCHAR * argv[]);
 
 #define LOG_INFO 0
 #define LOG_NOTICE 1
-#define DEFAULT_PRG TEXT("..\scripts\windows\daemon.bat")
+#define DEFAULT_PRG TEXT("..\..\scripts\windows\p2p\daemon.bat")
 #define DAEMON_DIR TEXT("daemon.txt")
 
 void Error(void);
 
 #else
 
-#define DEFAULT_PRG "../scripts/unix/daemon.sh"
+#define DEFAULT_PRG "../../scripts/unix/p2p/daemon.sh"
 #define DAEMON_DIR  "daemon"
 
 #endif
