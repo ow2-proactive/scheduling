@@ -142,13 +142,11 @@ public class MOPClassLoader extends URLClassLoader {
 				//ASM is now the default bytecode manipulator
 				byte[] data = null;
 				if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
-					System.out.println("using ASM as the default bytecode manipulator");
 					ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
 					long start_time = System.currentTimeMillis();
 					data = bsb.create();
 					MOPClassLoader.classDataCache.put(name, data);
 				} else if (BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-					System.out.println("using BCEL as the bytecode manipulator");
 					BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
 					long start_time = System.currentTimeMillis();
 					data = bsb.create();

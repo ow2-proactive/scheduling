@@ -27,12 +27,10 @@ public class StubGenerator {
 			//ASM is now the default bytecode manipulator
 			byte[] data;
 			if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-				System.out.println("using ASM");
 				ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(className);
 				data = bsb.create();
 				stubClassName = bsb.getStubClassFullName();
 			} else if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-				System.out.println("using BCEL");
 				BytecodeStubBuilder bsb = new BytecodeStubBuilder(className);
 				data = bsb.create();
 				stubClassName = bsb.getStubClassFullName();
