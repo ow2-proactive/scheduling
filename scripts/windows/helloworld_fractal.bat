@@ -1,13 +1,13 @@
 @echo off
 echo. 
 echo --- Fractal HelloWorld example ----------------------------------------
-if "%1" == "help" goto usage
+rem if "%1" == "help" goto usage
 
 goto doit
 
 :usage
 echo. 
-echo helloworld-fractal.sh <parameters>
+echo helloworld-fractal.sh <optional parameters>
 echo		
 echo		parameters are :
 echo			- parser
@@ -19,6 +19,7 @@ goto doit
 :doit
 SETLOCAL
 call init.bat
+set JAVA_CMD=%JAVA_CMD% -Dfractal.provider=org.objectweb.proactive.core.component.Fractive
 %JAVA_CMD%  org.objectweb.proactive.examples.components.helloworld.HelloWorld %1 %2 %3 
 ENDLOCAL
 
