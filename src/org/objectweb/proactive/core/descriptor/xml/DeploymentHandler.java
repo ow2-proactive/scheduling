@@ -103,9 +103,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
   	
   	
     private MapHandler() {
-    	CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
-   		cu.addHandler(VMNAME_TAG, new VmNameHandler());
-    	this.addHandler(JVMSET_TAG, cu);
+//    	CollectionUnmarshaller cu = new CollectionUnmarshaller(String.class);
+//   		cu.addHandler(VMNAME_TAG, new VmNameHandler());
+//    	this.addHandler(JVMSET_TAG, cu);
+			this.addHandler(JVMSET_TAG, new JvmSetHandler());
     }
     
     public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
@@ -147,6 +148,26 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
     	} 	
   	} //end of inner class SingleValueUnmarshaller
   	
+  	private class JvmSetHandler extends CollectionUnmarshaller{
+  		
+  		protected JvmSetHandler(){
+  			super(String.class);
+  			this.addHandler(VMNAME_TAG, new VmNameHandler());	
+  			this.addHandler(CURRENTJVM_TAG, new CurrentJvmHandler());
+  		}
+  		
+  		protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+  			if(name.equals(CURRENTJVM_TAG)){
+  				String protocol = (String)activeHandler.getResultObject();
+  				vn.createNodeOnCurrentJvm(protocol);
+  			}
+  			else{
+  				super.notifyEndActiveHandler(name,activeHandler);
+  			}
+  		}
+  		
+  	}//end of inner class JvmSetHandler
+  	
   	private class VmNameHandler extends BasicUnmarshaller{
 			
 			private VmNameHandler(){
@@ -159,6 +180,16 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
    			}else throw new org.xml.sax.SAXException("The name of the Jvm cannot be set to an empty string");
   		}
 		}	//end of inner class VmNameHandler
+		
+		
+		private class CurrentJvmHandler extends BasicUnmarshaller{
+			private CurrentJvmHandler(){
+			}
+			public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+				String protocol = attributes.getValue("protocol");
+				setResultObject(protocol);
+			}
+		}// end of inner class CurrentJvmHandler
   } // end inner class MapHandler
 		
 		
