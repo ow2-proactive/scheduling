@@ -97,10 +97,10 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
   	        new Object [] { ProActive.getStubOnThis(), outputListener, 
   	        	new Integer(containerSize), new Long(n), previous }, node);
   	        	
-  	    try {
-  	    	Thread.sleep(20);     	// Workaround for a little bug in ProActive (Exception in receiveRequest)
-  	    						// may be removed as the bug is fixed
-  	    } catch (InterruptedException ex) {}
+        // Workaround for a little bug in ProActive (Exception in receiveRequest)
+  	    // may be removed as the bug is fixed
+  	    // This call makes us wait while the newly created object is not yet in his runActivity() method
+  	    long v = result.getValue();
   	    
 	    return result;
   	} catch (ProActiveException e) {
