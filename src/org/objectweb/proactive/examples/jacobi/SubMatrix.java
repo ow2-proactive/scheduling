@@ -75,7 +75,7 @@ public class SubMatrix {
 	private SubMatrix east; 
 
 	/** A ProActive reference to this */
-	private SubMatrix me;
+	private SubMatrix asyncRefToMe;
 
 	/** The neighbors submatix */
 	private SubMatrix neighbors;
@@ -296,11 +296,11 @@ public class SubMatrix {
 			e.printStackTrace();
 		}
 		
-		this.me = (SubMatrix) ProActive.getStubOnThis();
-		this.north = (SubMatrix) topology.up(me);
-		this.south = (SubMatrix) topology.down(me);
-		this.west = (SubMatrix) topology.left(me);
-		this.east = (SubMatrix) topology.right(me);
+		this.asyncRefToMe = (SubMatrix) ProActive.getStubOnThis();
+		this.north = (SubMatrix) topology.up(this.asyncRefToMe);
+		this.south = (SubMatrix) topology.down(this.asyncRefToMe);
+		this.west = (SubMatrix) topology.left(this.asyncRefToMe);
+		this.east = (SubMatrix) topology.right(this.asyncRefToMe);
 		
 		try {
 			this.neighbors = (SubMatrix) ProActiveGroup.newGroup(SubMatrix.class.getName()); }
@@ -341,7 +341,7 @@ public class SubMatrix {
 			neighborsGroup.add(this.east);
 			this.east.setWestBorder(this.buildEastBorder());
 		}
-		neighborsGroup.add(this.me);
+		neighborsGroup.add(this.asyncRefToMe);
 	}
 
 	/**
@@ -467,7 +467,7 @@ public class SubMatrix {
 	public void compute () {
 		this.buildNeighborhood();
 		ProSPMD.barrier("InitDone");
-		this.me.loop();
+		this.asyncRefToMe.loop();
 	}
 
 	/**
@@ -488,7 +488,7 @@ public class SubMatrix {
 		// continue or stop ?
 		if ((this.iterationsToStop > 0) && (this.minDiff > Jacobi.MINDIFF)) {
 			this.exchange();
-			this.me.loop();
+			this.asyncRefToMe.loop();
 		}
 		else {
 			System.out.println("[" + this.name + "] Computation over :\n      " +
