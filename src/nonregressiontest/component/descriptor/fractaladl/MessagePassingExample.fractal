@@ -1,55 +1,44 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
-<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/fractal/adl/xml/standard.dtd">
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 
 <definition name="nonregressiontest.component.descriptor.fractaladl.MessagePassingExample" extends="nonregressiontest.component.descriptor.fractaladl.MessagePassingExampleType">
-  <component name="b2">
-    <interface name="i1" signature="nonregressiontest.component.I2" role="server"/>
-    <content class="nonregressiontest.component.PrimitiveComponentB"/>
-    <controller desc="primitive"/>
-  </component>
+	
+   <exportedVirtualNodes>
+    	<exportedVirtualNode name="VN3">
+    		<composedFrom>
+    			<!--these were defined as "multiple" -->
+		   		<composingVirtualNode component="a2-3" name="VNA"/>
+		   		<composingVirtualNode component="a2-2" name="VNA"/>
+		   		<composingVirtualNode component="a2-1" name="VNA"/>
+		   		<!-- these were defined as single (see their definition)
+		   		 : there will be only 1 instance of each component -->
+		   		<composingVirtualNode component="b2" name="VNB"/>
+		   		<composingVirtualNode component="b1" name="VNB"/>
+    		</composedFrom>
+    	</exportedVirtualNode>
+    </exportedVirtualNodes>
+
+  <component name="b2" definition="nonregressiontest.component.descriptor.fractaladl.b"/>
   <component name="parallel">
     <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
     <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-    <component name="a1">
-      <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
-      <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-      <content class="nonregressiontest.component.PrimitiveComponentA"/>
-      <controller desc="primitive"/>
+    <component name="a1" definition="nonregressiontest.component.descriptor.fractaladl.a">
+    	<virtual-node name="VN3" cardinality="single"/> <!-- this one is not exported -->
     </component>
     <component name="parallel-2">
       <interface cardinality="collection" name="i1" signature="nonregressiontest.component.I1" role="server"/>
       <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-      <interface name="i3" signature="nonregressiontest.component.I2" role="client"/>
-      <component name="a2-1">
-        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
-        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-        <content class="nonregressiontest.component.PrimitiveComponentA"/>
-        <controller desc="primitive"/>
+      <component name="a2-1" definition="nonregressiontest.component.descriptor.fractaladl.a">
+	  </component>
+      <component name="a2-2" definition="nonregressiontest.component.descriptor.fractaladl.a">
       </component>
-      <component name="a2-3">
-        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
-        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-        <content class="nonregressiontest.component.PrimitiveComponentA"/>
-        <controller desc="primitive"/>
-      </component>
-      <component name="a2-2">
-        <interface name="i1" signature="nonregressiontest.component.I1" role="server"/>
-        <interface name="i2" signature="nonregressiontest.component.I2" role="client"/>
-        <content class="nonregressiontest.component.PrimitiveComponentA"/>
-        <controller desc="primitive"/>
-      </component>
-      <component name="b1">
-        <interface name="i1" signature="nonregressiontest.component.I2" role="server"/>
-        <content class="nonregressiontest.component.PrimitiveComponentB"/>
-        <controller desc="primitive"/>
-        <virtual-node name=""/>
-      </component>
+      <component name="a2-3" definition="nonregressiontest.component.descriptor.fractaladl.a"/>
+      <component name="b1" definition="nonregressiontest.component.descriptor.fractaladl.b"/>
       <binding client="this.i100" server="a2-2.i1"/>
       <binding client="this.i101" server="a2-3.i1"/>
       <binding client="a2-3.i2" server="b1.i1"/>
       <binding client="a2-2.i2" server="this.i2"/>
       <controller desc="parallel"/>
-      <virtual-node name="VN3"/>
     </component>
     <binding client="this.i100" server="parallel-2.i100"/>
     <binding client="this.i101" server="a1.i1"/>
@@ -59,14 +48,15 @@
   </component>
   <binding client="parallel.i2" server="b2.i1"/>
   <controller desc="composite"/>
-  <coordinates name="b2" x1="1.0" y1="0.28306233663450664" x0="0.8974567650050865" y0="0.17054301669633043" color="-73"/>
-  <coordinates name="parallel" x1="0.842952072509999" y1="0.9741552156098688" x0="0.1340396978880492" y0="0.1844521492125818" color="-73">
-    <coordinates name="a1" x1="0.6812215532788868" y1="0.9760617150412144" x0="0.4582307089248683" y0="0.798009164809375" color="-73"/>
-    <coordinates name="parallel-2" x1="0.8963034331704434" y1="0.5172075367781521" x0="0.301176477960417" y0="0.039265306122448884" color="-73">
-      <coordinates name="a2-1" x1="0.5563780918487553" y1="0.7615970547001393" x0="0.33338724749473675" y0="0.5835445044682999" color="-73"/>
-      <coordinates name="a2-3" x1="0.5493594431051975" y1="0.48962158150747304" x0="0.3263685987511791" y0="0.3115690312756337" color="-73"/>
-      <coordinates name="a2-2" x1="0.5516118758764503" y1="0.24165083472117974" x0="0.3286210315224318" y0="0.06359828448934032" color="-73"/>
-      <coordinates name="b1" x1="0.9977707992392411" y1="0.45695583108441545" x0="0.7146623026228495" y0="0.26516153573525175" color="-73"/>
+  <coordinates color="-73" y0="0.30321505065328447" x1="1.0" y1="0.4157343705914607" name="b2" x0="0.8974567650050864"/>
+  <coordinates color="-73" y0="0.1" x1="0.7337430167597766" y1="0.99856" name="parallel" x0="0.1">
+    <coordinates color="-73" y0="0.05239498894620483" x1="0.5845592925091543" y1="0.1309874723655121" name="a1" x0="0.301225018141059"/>
+    <coordinates color="-73" y0="0.31080696594166857" x1="0.8199187201241778" y1="0.8996126294339153" name="parallel-2" x0="0.1453607323655478">
+      <coordinates color="-73" y0="0.1" x1="0.4181073703366698" y1="0.24400514304082288" name="a2-1" x0="0.1"/>
+      <coordinates color="-73" y0="0.7300546448087432" x1="0.4574929971988796" y1="0.8703096539162113" name="a2-2" x0="0.173109243697479"/>
+      <coordinates color="-73" y0="0.3175506268081003" x1="0.469047619047619" y1="0.4718418514946962" name="a2-3" x0="0.12847619047619047"/>
+      <coordinates color="-73" y0="0.2608750604066759" x1="0.9536366601435096" y1="0.4143266049589231" name="b1" x0="0.6225212002609264"/>
     </coordinates>
   </coordinates>
+
 </definition>
