@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.Hashtable;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
@@ -46,14 +46,16 @@ import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
 /**
- * @author rquilici
+ * A <code>VirtualNode</code> represents a conceptual entity. After activation
+ * a <code>VirtualNode</code> represents one or several nodes.
  *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
  */
+
 public class VirtualNodeImpl implements VirtualNode,Serializable
 {
 //
@@ -61,6 +63,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   //
   /** Reference on the local runtime*/
   private ProActiveRuntimeImpl proActiveRuntimeImpl;
+  
   /** the name of this VirtualNode */
   private String name;
 
@@ -75,8 +78,10 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   
   /** index of the last associated jvm used */
   private int lastVirtualMachineIndex;
+  
   /** the list of nodes linked to this VirtualNode that have been created*/
   private java.util.ArrayList createdNodes;
+  
   /** index of the last node used */
   private int lastNodeIndex;
 
@@ -85,10 +90,16 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   
   /** Number of Nodes mapped to this VitualNode in the XML Descriptor that are actually created */
   private int nodeCountCreated;
+  
   /** true if the node has been created*/
   private boolean nodeCreated = false;
   
+  /** the list of VitualNodes Id that this VirualNode is waiting for in order to create Nodes on a JVM 
+   * already assigned in the XML descriptor */
+  private Hashtable awaitedVirtualNodes;
+  
 	protected static final int MAX_RETRY = 70;
+	
   //
   //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
   //
@@ -99,6 +110,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   VirtualNodeImpl() {
     virtualMachines = new java.util.ArrayList(5);
     createdNodes = new java.util.ArrayList();
+    awaitedVirtualNodes = new Hashtable();
     proActiveRuntimeImpl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
    // System.out.println("vn "+this.name+" registered on "+proActiveRuntimeImpl.getVMInformation().getVMID().toString());
     proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
@@ -153,35 +165,39 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
    */
   public void activate(){
   	
-    //VirtualMachine vm = getVirtualMachine();
-    //JVMProcessImpl process =(JVMProcessImpl)vm.getProcess();
     for (int i = 0; i < virtualMachines.size(); i++)
 		{
-			ExternalProcess process = getProcess();
-			setParameters(process);
-			try{
-    		if (process.getHostname() == null){
-    		// it is a local process:JVMProcess
-    			proActiveRuntimeImpl.createLocalVM((JVMProcess)process);
-    		}else{
-    		// it is a remote process
-    			proActiveRuntimeImpl.createRemoteVM(process);
+			VirtualMachine vm = getVirtualMachine();
+			boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
+			ExternalProcess process = getProcess(vm,vmAlreadyAssigned);
+			setParameters(process,vm,vmAlreadyAssigned);
+			// Test if that is this virtual Node that originates the creation of the vm
+			// else the vm was already created by another virtualNode, in that case, nothing is
+			// done at this point, nodes creation will occur when the runtime associated with the jvm
+			// will register.
+				if(!vmAlreadyAssigned){
+					// It is this virtual Node that originates the creation of the vm
+				try{
+    			proActiveRuntimeImpl.createVM(process);	
+    		}catch(java.io.IOException e){
+    			e.printStackTrace();
+    			System.out.println("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
     		}
-    		increaseIndex();
-    	}catch(java.io.IOException e){
-    		e.printStackTrace();
-    		System.out.println("cannot activate virtualNode "+this.name+" with the process "+process.getCommand());
-    	}
+			}else{
+				// add in the hashtable the vm's creator id, and the number of nodes that should be created
+				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
+			}
+			increaseIndex();	
 		}
     
   }
   
   
-  /**
-   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
-   */
-  public void desactivate(){
-  }
+//  /**
+//   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
+//   */
+//  public void desactivate(){
+//  }
   
   
   /**
@@ -197,14 +213,14 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
    * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
    * @return int
    */
-  public int CreatedNodeCount(){
+  public int createdNodeCount(){
     return nodeCountCreated;
   }
   
   
   /**
-   * Returns the first Node available among Nodes mapped to this VirtualNode in the XML Descriptor 
-   * Another call to this method will return the following available node if any.
+   * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor 
+   * Another call to this method will return the following created node if any.
    * @return Node
    */
   public Node getNode() throws NodeException{
@@ -213,20 +229,11 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	waitForNodeCreation();
   	if (!createdNodes.isEmpty()) {
     node = (Node) createdNodes.get(lastNodeIndex);
+    increaseNodeIndex();
     return node;
   	}else {
   		throw new NodeException("Cannot get the node "+this.name);
-  	}
-//  	// if we cannot find the node then create a name and get the Node from the RMIregistry 
-//    String nodeName = buildNodeName();
-//    node = getNode(nodeName);
-//    if (node != null){
-//    	return node;
-//    	}
-//    	else{
-//    	throw new NodeException("Cannot get the node of the name"+nodeName);
-//    	}
-			
+  	}		
   }
   
   /**
@@ -242,7 +249,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   public String[] getNodesURL() throws NodeException{
   	String [] nodeNames ;
   	try{
-  	WaitForAllNodesCreation();
+  	waitForAllNodesCreation();
   	}catch(NodeException e){
   		System.out.println(e.getMessage());
   	}
@@ -260,10 +267,11 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	return nodeNames;
   }
   
+  
   public Node[] getNodes()throws NodeException{
   	Node [] nodeTab;
   	try{
-  	WaitForAllNodesCreation();
+  	waitForAllNodesCreation();
   	}catch(NodeException e){
   		System.out.println(e.getMessage());
   	}
@@ -281,23 +289,29 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	return nodeTab;
   }
   
-//  /**
-//   * Returns the Node mapped to this VirtualNode in the XML Descriptor with the specified name
-//   * @param name
-//   * @return Node
-//   */
-//  public Node getNode(String name) throws NodeException{
-//    Node node = null;
-//    try{
-//    node = NodeFactory.getNode(name);
-//    }catch (Exception ne){
-//    ne.printStackTrace();
-//    throw new NodeException("Cannot get the node of the name"+name);
-//    } 
-//    createdNodes.add(node);
-//    return node;
-//		return null;
- // }
+
+  public Node getNode(String url) throws NodeException{
+    Node node = null;
+    try{
+    waitForAllNodesCreation();
+    }catch(NodeException e){
+  		System.out.println(e.getMessage());
+  	}
+    if (!createdNodes.isEmpty()){
+    	synchronized(createdNodes){
+    		for (int i = 0; i < createdNodes.size(); i++)
+				{
+					if (((Node)createdNodes.get(i)).getNodeInformation().getURL().equals(url)){
+						 node = (Node)createdNodes.get(i);
+						 break;
+						 }
+				}
+				return node;
+    	}
+    }else{
+  		throw new NodeException("Cannot return nodes, no nodes hava been created");
+  	}
+  }
   
   
   //
@@ -308,32 +322,62 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	//System.out.println("receive event");
   	String nodeName;
   	String [] nodeNames = null;
+  	ProActiveRuntime proActiveRuntimeRegistered;
+  	String nodeHost;
+  	String protocol;
+  	String url;
   	//Check if it this virtualNode that originates the process
   	if(event.getCreatorID().equals(this.name)){
   		//System.out.println("runtime "+event.getCreatorID()+" registered on virtualnode "+this.name);
-  		String protocol = event.getProtocol();
+  	  protocol = event.getProtocol();
   		//gets the registered runtime
-  		ProActiveRuntime proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+  	  proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
   		try{
-  		//get the node on the registered runtime
-  		nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
+  			//get the node on the registered runtime
+  			nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
   		}catch(ProActiveException e){
   			e.printStackTrace();
   		}
   		// get the host of nodes
-  		String nodeHost = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
+  		nodeHost = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
   		for (int i = 0; i < nodeNames.length; i++){
   			//System.out.println(buildURL(nodeHost,nodeNames[i]));
 				nodeName = nodeNames[i];
-				String url = buildURL(nodeHost,nodeName,protocol);
+			  url = buildURL(nodeHost,nodeName,protocol);
 				createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
 				System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");
+				//System.out.println("nodecount "+nodeCountCreated);
+			  nodeCreated = true;
 				nodeCountCreated++;
 			}
-			//System.out.println("nodecount "+nodeCountCreated);
-			nodeCreated = true;
 			
   	}
+  	//Check if the virtualNode that originates the process is among awaited VirtualNodes
+  	if(awaitedVirtualNodes.containsKey(event.getCreatorID())){
+  		//gets the registered runtime
+  		proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+  		// get the host for the node to be created
+  		nodeHost = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getHostName();
+  		protocol = event.getProtocol();
+  		int nodeNumber = (new Integer((String)awaitedVirtualNodes.get(event.getCreatorID()))).intValue();
+  		//System.out.println("NodeNumber "+nodeNumber);
+  		for (int i = 1; i <= nodeNumber; i++)
+				{
+					try{
+						nodeName = this.name+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt());
+						url = buildURL(nodeHost,nodeName,protocol);
+						// nodes are created from the registered runtime, since this virtualNode is
+						// waiting for runtime registration to perform co-allocation in the jvm.
+					  proActiveRuntimeRegistered.createLocalNode(url,false);
+						createdNodes.add(new NodeImpl(proActiveRuntimeRegistered,url,protocol));
+						System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+						nodeCreated = true;
+						nodeCountCreated++;
+					}catch(ProActiveException e){
+						e.printStackTrace();
+					}
+			}
+  	} 
   }
   
   
@@ -366,7 +410,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   /**
    * Waits until all Nodes mapped to this VirtualNode in the XML Descriptor are created
    */
-  private void WaitForAllNodesCreation() throws NodeException{
+  private void waitForAllNodesCreation() throws NodeException{
   	int count = 0;
   	while(nodeCountCreated != nodeCount){
   		if(count<MAX_RETRY){
@@ -382,36 +426,47 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	return;
   }
   
+  
 	/**
- 	* Returns the process mapped to the virtual machine mapped to this virtual node
+ 	* Returns the process mapped to the given virtual machine mapped to this virtual node
+ 	* @param VirtualMachine
  	* @return ExternalProcess
  	*/
-  private ExternalProcess getProcess(){
+  private ExternalProcess getProcess(VirtualMachine vm, boolean vmAlreadyAssigned){
   ExternalProcess copyProcess;
-	VirtualMachine vm = getVirtualMachine();
+	//VirtualMachine vm = getVirtualMachine();
 	ExternalProcess process = vm.getProcess();
 	// we need to do a deep copy of the process otherwise,
 	//modifications will be applied on one object that might 
 	// be referenced by other virtualNodes .i.e check started
-	copyProcess = makeDeepCopy(process);
-	vm.setProcess(copyProcess);
-	return copyProcess;
-  }
+	if(!vmAlreadyAssigned){
+		copyProcess = makeDeepCopy(process);
+		vm.setProcess(copyProcess);
+		return copyProcess;
+	}else{
+		return process;
+	}
+ }
+  
   
 	/**
 	 * Sets parameters to the JVMProcess linked to the ExternalProcess
 	 * @param process
 	 */
-  private void setParameters(ExternalProcess process){
+  private void setParameters(ExternalProcess process, VirtualMachine vm, boolean vmAlreadyAssigned){
   	ExternalProcess processImpl = process;
   	ExternalProcessDecorator processImplDecorator;
   	JVMProcess jvmProcess;
   	LSFBSubProcess bsub = null;
+  	
+  	int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
+  	//System.out.println("nodeNumber "+nodeNumber);
+  	
   	while(ExternalProcessDecorator.class.isInstance(processImpl)){
   		if(processImpl instanceof LSFBSubProcess){
   			//if the process is bsub we have to increase the node count by the number of processors
   			bsub = (LSFBSubProcess)processImpl;
-  			increaseNodeCount((new Integer(bsub.getProcessorNumber()).intValue()));
+  			increaseNodeCount((new Integer(bsub.getProcessorNumber()).intValue())*nodeNumber);
   		}
   		processImplDecorator = (ExternalProcessDecorator)processImpl;
   		processImpl = processImplDecorator.getTargetProcess();
@@ -421,24 +476,21 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	jvmProcess = (JVMProcess)processImpl;
   	//if the target class is StartRuntime, then give parameters otherwise keep parameters
   	if(jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")){
-  		VirtualMachine vm = getVirtualMachine();
-  		String vnName = this.name;
-  		String acquisitionMethod = vm.getAcquisitionMethod();
-  		String nodeNumber = vm.getNodeNumber();
   		
   		//we increment the index of nodecount
   		if(bsub == null){
   			//if bsub is null we can increase the nodeCount
-  		increaseNodeCount((new Integer(nodeNumber)).intValue());
+  			increaseNodeCount(nodeNumber);
   		}
-  		
-  		//System.out.println("Aquisition method :"+acquisitionMethod);
-  		//System.out.println(vnName);
-  		String localruntimeURL = proActiveRuntimeImpl.getURL();
-  		//System.out.println(localruntimeURL);
-  	
-  	
-  		jvmProcess.setParameters(vnName+" "+localruntimeURL+" "+acquisitionMethod+":"+" "+nodeNumber);
+  		if(!vmAlreadyAssigned){
+  			String vnName = this.name;
+  			String acquisitionMethod = vm.getAcquisitionMethod();
+  			//System.out.println("Aquisition method :"+acquisitionMethod);
+  			//System.out.println(vnName);
+  			String localruntimeURL = proActiveRuntimeImpl.getURL();
+  			//System.out.println(localruntimeURL);
+  			jvmProcess.setParameters(vnName+" "+localruntimeURL+" "+acquisitionMethod+":"+" "+nodeNumber);
+  		}
   	}
   }
   
@@ -481,6 +533,13 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   	nodeCount = nodeCount + n;
   	//System.out.println("NodeCount: "+nodeCount);
   }
+  
+  private void increaseNodeIndex(){
+  	if (createdNodes.size() > 1){	
+  			lastNodeIndex = (lastNodeIndex + 1) % createdNodes.size();
+  	}
+  }
+  
 
   
 

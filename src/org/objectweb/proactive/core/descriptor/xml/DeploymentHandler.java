@@ -43,8 +43,9 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 /**
  * This class receives deployment events
  *
- * @author       Lionel Mestre
- * @version      1.0
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
  */
 class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
 
@@ -146,6 +147,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
       if (checkNonEmpty(vmName) && !vn.getCyclic()){
       	VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmName);
       	vn.addVirtualMachine(vm);
+      	if (vm.getCreatorId() == null)
+      	{
+      		vm.setCreatorId(vn.getName());
+      	}
       }
 			
     }
@@ -158,6 +163,10 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller implements ProActiv
     			for (int i=0; i<vmNames.length; i++) {
     				VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmNames[i]);
     				vn.addVirtualMachine(vm);
+    				if (vm.getCreatorId() == null)
+      			{
+      				vm.setCreatorId(vn.getName());
+      			}
     			}
     		}
     	}

@@ -35,39 +35,73 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 /**
- * A <code>VirtualNode</code> represents a conceptual entity. After activation
+ * A <code>VirtualNode</code> is a conceptual entity that represents one or several nodes. After activation
  * a <code>VirtualNode</code> represents one or several nodes.
  *
  * @author  ProActive Team
- * @version 1.0,  2002/06/20
+ * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
+ * @see ProActiveDescriptor
+ * @see VirtualMachine
  */
 public interface VirtualNode extends RuntimeRegistrationEventListener
 {
 
  
-
- 
+	/**
+	 * Method setCyclic.
+	 * @param b the value of cyclic attribute, the default value is false
+	 */
   public void setCyclic(boolean b);
   
   
+	/**
+	 * Returns the value of cyclic attribute.
+	 * @return boolean
+	 */
   public boolean getCyclic();
 
 
+	/**
+	 * Method setLocalBackup.
+	 * @param b the value of localbackup attribute, the default value is false
+	 */
   public void setLocalBackup(boolean b);
   
+  
+	/**
+	 * Returns the value of localbackup attribute.
+	 * @return boolean
+	 */
   public boolean getLocalBackup();
 
 
+	/**
+	 * Method setName.
+	 * @param s
+	 */
   public void setName(String s);
   
   
+	/**
+	 * Returns the name of this VirtualNode
+	 * @return String
+	 */
   public String getName();
   
   
+	/**
+	 * Adds a VirtualMachine entity to this VirtualNode
+	 * @param virtualMachine
+	 */
   public void addVirtualMachine(VirtualMachine virtualMachine);
   
   
+	/**
+	 * Returns the virtualMachine entity linked to this VirtualNode or if cyclic, returns
+	 * one of the VirtualMachines linked to this VirtualNode with a cyclic manner(internal count incremented each time this method is called). 
+	 * @return VirtualMachine
+	 */
   public VirtualMachine getVirtualMachine() ;
   
   
@@ -77,10 +111,10 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
   public void activate();
   
   
-  /**
-   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
-   */
-  public void desactivate();
+//  /**
+//   * Desactivate all the Nodes mapped to This VirtualNode in the XML Descriptor
+//   */
+//  public void desactivate();
   
   
   /**
@@ -94,17 +128,14 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
    * Returns the number of Nodes already created among the Nodes mapped to this VirtualNode in the XML Descriptor
    * @return int
    */
-  public int CreatedNodeCount();
+  public int createdNodeCount();
   
-  
-//  /**
-//   * Waits until at least one Node mapped to this VirtualNode in the XML Descriptor is created
-//   */
-//  public void waitForNodeCreation() throws NodeException;
   
   
   /**
-   * Returns the first Node available among Nodes mapped to this VirtualNode in the XML Descriptor 
+   * Returns the first Node created among Nodes mapped to this VirtualNode in the XML Descriptor 
+   * Another call to this method will return the following created node if any. Note that the order
+   * in which Nodes are created has nothing to do with the order defined in the XML descriptor.
    * @return Node
    */
   public Node getNode() throws NodeException;
@@ -112,16 +143,17 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
   
   
   /**
-   * Returns the Node mapped to this VirtualNode with the specified index(in the XML Descriptor
+   * Returns the Node mapped to this VirtualNode with the specified index. There is no relationship between,
+   * the order in the xml descriptor and the order in the array.
    * @param index
-   * @return Node
+   * @return Node the node at the specified index in the array of nodes mapped to this VirtualNode
    */
   public Node getNode(int index);
   
   
 	/**
-	 * Returns all nodes name mapped to this VirualNode
-	 * @return String[]. An array of string containing the name of all nodes mapped to
+	 * Returns all nodes url mapped to this VirualNode
+	 * @return String[]. An array of string containing the url of all nodes mapped to
 	 * this VirtualNode in the XML descriptor.
 	 */
   public String[] getNodesURL() throws NodeException;
@@ -135,23 +167,15 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
   public Node[] getNodes() throws NodeException;
   
   
-//  /**
-//   * Returns the Node mapped to this VirtualNode in the XML Descriptor with the specified name
-//   * @param name
-//   * @return Node
-//   */
-//  public Node getNode(String name) throws NodeException{
-//    Node node = null;
-//    try{
-//    node = NodeFactory.getNode(name);
-//    }catch (Exception ne){
-//    ne.printStackTrace();
-//    throw new NodeException("Cannot get the node of the name"+name);
-//    } 
-//    createdNodes.add(node);
-//    return node;
-//		return null;
- // }
+	/**
+	 * Returns the node of the given url among nodes mapped to this VirtualNode in the xml
+	 * descriptor or null if such node does not exist.
+	 * @param name
+	 * @return Node the node of the given url or null if such node does not exist
+	 */
+  public Node getNode(String url) throws NodeException;
+  	
+  
   
   
   
