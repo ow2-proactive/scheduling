@@ -140,7 +140,7 @@ public class LocalBodyStore {
 
     /**
      * Associates the body with the thread calling the method.
-     * @param the body to associate to the active thread that calls this method.
+     * @param body the body to associate to the active thread that calls this method.
      */
     public void setCurrentThreadBody(Body body) {
         bodyPerThread.set(body);

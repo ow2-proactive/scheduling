@@ -77,8 +77,6 @@ public class FutureMap extends Object implements java.io.Serializable {
 	/**
 	 * Add a future (id, creatorID) in the map. The entry for this key could already
 	 * exists, because a body can have copies of a future.
-	 * @param id sequence id of the future 
-	 * @param creatorID UniqueID of the creator body of the future
 	 * @param futureObject future to register
 	 */
 	public synchronized void receiveFuture(Future futureObject) {
@@ -150,7 +148,7 @@ public class FutureMap extends Object implements java.io.Serializable {
 	/**
 	 * Return the list of ACs to (ie bodies destination) corresponding to (id,bodyID) if any, null otherwise.
 	 * @param id sequence id of the future 	
-	 * @param creatorID UniqueID of the creator body of the future
+	 * @param bodyID UniqueID of the creator body of the future
 	 */
 	public synchronized java.util.ArrayList getAutomaticContinuation(long id, UniqueID bodyID) {
 		java.util.ArrayList resultat = null;

@@ -235,8 +235,6 @@ public class FuturePool extends Object implements java.io.Serializable {
 
 	/**
 	 * To put a future in the FutureMap
-	 * @param id sequence id of the future
-	 * @param creatorID UniqueID of the body which creates futureObject
 	 * @param futureObject future to register
 	 */
 	public synchronized void receiveFuture(Future futureObject) {

@@ -107,7 +107,7 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
      * Registers an active object into a RMI registry. In fact it is the
      * jini version of the body of the active object that is registered into the
      * RMI Registry under the given URL.
-     * @param obj the active object to register.
+     * @param bodyAdapter the bodyadapter of the active object to register.
      * @param url the url under which the jini body is registered.
      * @exception java.io.IOException if the jini body cannot be registered
      */

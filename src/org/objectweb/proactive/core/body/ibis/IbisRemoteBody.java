@@ -67,14 +67,14 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
     /**
      * Receives a request for later processing. The call to this method is non blocking
      * unless the body cannot temporary receive the request.
-     * @param request the request to process
+     * @param r the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
     public void receiveRequest(Request r) throws java.io.IOException,RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
-     * @param reply the reply received
+     * @param r the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
     public void receiveReply(Reply r) throws java.io.IOException;

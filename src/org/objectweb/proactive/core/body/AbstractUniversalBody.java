@@ -84,9 +84,8 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
 
   /**
    * Creates a new AbstractBody for an active object attached to a given node.
-   * @param reifiedObject the active object that body is for
    * @param nodeURL the URL of the node that body is attached to
-   * @param factory the factory able to construct new factories for each type of meta objects 
+   * @param remoteBodyFactory the factory able to construct new factories for each type of meta objects 
    *                needed by this body
    */
   public AbstractUniversalBody(String nodeURL, RemoteBodyFactory remoteBodyFactory) {

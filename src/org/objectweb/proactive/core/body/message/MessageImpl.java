@@ -68,10 +68,10 @@ public class MessageImpl implements Message, java.io.Serializable {
 
   /**
    * Creates a new Message based on the given information.
-   * @param <code>sourceID</code> the id of the sender of this message
-   * @param <code>destinationID</code> the id of the receiver of this message
-   * @param <code>sequenceNumber</code> the unique sequence number of this message
-   * @param <code>methodName</code> the method name of the method call
+   * @param sourceID the id of the sender of this message
+   * @param destinationID the id of the receiver of this message
+   * @param sequenceNumber the unique sequence number of this message
+   * @param methodName the method name of the method call
    */  
   public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName) {
     this.sourceID = sourceID;

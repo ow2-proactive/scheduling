@@ -47,7 +47,7 @@ public interface RequestQueueFactory {
 
   /**
    * Creates or reuses a RequestQueue object 
-   * @param the unique id of the object that request queue is owned by
+   * @param ownerID the unique id of the object that request queue is owned by
    * @return the newly created or already existing RequestQueue object.
    */
   public BlockingRequestQueue newRequestQueue(UniqueID ownerID);

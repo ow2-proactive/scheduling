@@ -117,7 +117,7 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
      * Registers an active object into a RMI registry. In fact it is the
      * remote version of the body of the active object that is registered into the
      * RMI Registry under the given URL.
-     * @param obj the active object to register.
+     * @param bodyAdapter the bodyadapter of the active object to register.
      * @param url the url under which the remote body is registered.
      * @exception java.io.IOException if the remote body cannot be registered
      */

@@ -80,7 +80,7 @@ public interface UniversalBody {
 
     /**
      * Receives a reply in response to a former request.
-     * @param reply the reply received
+     * @param r the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
     public void receiveReply(Reply r) throws java.io.IOException;
