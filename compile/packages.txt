@@ -1,23 +1,23 @@
 org.objectweb.proactive
 org.objectweb.proactive.core
-org.objectweb.proactive.core.body
+#org.objectweb.proactive.core.body
 org.objectweb.proactive.core.body.future
 org.objectweb.proactive.core.body.jini
 org.objectweb.proactive.core.body.message
 org.objectweb.proactive.core.body.migration
-org.objectweb.proactive.core.body.proxy
+#org.objectweb.proactive.core.body.proxy
 org.objectweb.proactive.core.body.reply
 org.objectweb.proactive.core.body.request
 org.objectweb.proactive.core.body.rmi
 org.objectweb.proactive.core.descriptor.data
 org.objectweb.proactive.core.descriptor.xml
 org.objectweb.proactive.core.event
-org.objectweb.proactive.core.group
+#org.objectweb.proactive.core.group
 org.objectweb.proactive.core.jini
 org.objectweb.proactive.core.mop
 org.objectweb.proactive.core.node
-org.objectweb.proactive.core.node.jini
-org.objectweb.proactive.core.node.rmi
+#org.objectweb.proactive.core.node.jini
+#org.objectweb.proactive.core.node.rmi
 org.objectweb.proactive.core.process
 org.objectweb.proactive.core.process.globus
 org.objectweb.proactive.core.process.lsf
@@ -33,7 +33,3 @@ org.objectweb.proactive.ext.locationserver
 org.objectweb.proactive.ext.migration
 org.objectweb.proactive.ext.mixedlocation
 org.objectweb.proactive.ext.util
-# org.objectweb.proactive.core.body.proxy
-# org.objectweb.proactive.core.group
-# org.objectweb.proactive.core.node.jini
-# org.objectweb.proactive.core.node.rmi
