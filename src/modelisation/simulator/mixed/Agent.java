@@ -30,7 +30,6 @@ public class Agent extends SimulatorElement {
         this.maxMigrations = mm;
         System.out.println(" AgentWithExponentialMigrationAndServer: waited " +
                            this.remainingTime + " before migration");
-
     }
 
     public void setForwarderChain(ForwarderChain fc) {
@@ -104,7 +103,9 @@ public class Agent extends SimulatorElement {
 //                           (time - startTime));
         System.out.println(" AgentWithExponentialMigrationAndServer: waited " +
                            this.remainingTime + " before migration");
+   
     }
+
 
     public void callServer(double time) {
         System.out.println("Agent.callServer");

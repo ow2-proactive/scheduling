@@ -72,7 +72,7 @@ public class Source extends SimulatorElement {
                 case COMMUNICATION_FAILED:
                     System.out.println("Communication failed after " +
                                        (time - startTime));
-                    this.communicationServerStartTime =  time;
+                    this.communicationServerStartTime = time;
                     this.callServer();
                     break;
                 case WAITING_FOR_AGENT:
@@ -88,9 +88,9 @@ public class Source extends SimulatorElement {
                     this.state = COMMUNICATION;
                     this.remainingTime = 5000000;
                     System.out.println("Source: reply from server total " +
-                    (time-communicationServerStartTime));
-                      System.out.println("Source: processing for server total " +
-                    (time-processingServerStartTime));
+                                       (time - communicationServerStartTime));
+                    System.out.println("Source: processing for server total " +
+                                       (time - processingServerStartTime));
                     this.forwarderChain.startCommunication(currentLocation);
                     break;
             }
@@ -111,18 +111,14 @@ public class Source extends SimulatorElement {
 //                           + location);
         this.currentLocation = location;
         this.remainingTime = 0;
-//        this.state=COMMUNICATION;
     }
 
     public void startCommunication(double startTime) {
         this.remainingTime = 5000000;
-//        this.start = true;
         this.state = COMMUNICATION;
         this.forwarderChain.startCommunication(currentLocation);
-//        this.remainingTime = length;
         this.startTime = startTime;
         System.out.println(">>>>> Source: communication started at time " + startTime);
-//        System.out.println("Source: communication started will last   " + remainingTime);
     }
 
 
@@ -136,14 +132,6 @@ public class Source extends SimulatorElement {
                            + (endTime - startTime));
         this.waitBeforeCommunication();
     }
-
-//    public void startCommunicationServer(double length) {
-//        this.start = false;
-//        System.out.println("Source: communication with server started will last   " + length);
-//        this.state = CALLING_SERVER;
-//        this.remainingTime = length;
-//    }
-
 
     /**
      * Get the value of lambda.
@@ -169,32 +157,22 @@ public class Source extends SimulatorElement {
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
             case WAITING:
-                {
-                    tmp.append("WAITING");
-                    break;
-                }
+                tmp.append("WAITING");
+                break;
             case COMMUNICATION:
-                {
-                    tmp.append("COMMUNICATION");
-                    break;
-                }
+                tmp.append("COMMUNICATION");
+                break;
             case WAITING_FOR_AGENT:
-                {
-                    tmp.append("WAITING_AGENT");
-
-                    break;
-                }
+                tmp.append("WAITING_AGENT");
+                break;
             case CALLING_SERVER:
-                {
-                    tmp.append("CALLING_SERVER");
-                    break;
-                }
+                tmp.append("CALLING_SERVER");
+                break;
             case WAITING_SERVER:
                 tmp.append("WAITING_SERVER");
                 break;
         }
         tmp.append(" remainingTime = ").append(remainingTime);
-
         return tmp.toString();
     }
 }

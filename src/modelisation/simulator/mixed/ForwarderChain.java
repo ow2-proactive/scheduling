@@ -54,8 +54,8 @@ public class ForwarderChain extends SimulatorElement {
 
     public void add(Forwarder f) {
         f.setLifeTime(this.simulator.getForwarderLifeTime());
-//        System.out.println("ForwarderChain.add with lifetime "
-//                           + f.getRemainingTime());
+   //     System.out.println("ForwarderChain.add with lifetime "
+     //                      + f.getRemainingTime());
 //        f.setLifeTime(10);
         this.list.add(f);
     }
