@@ -393,7 +393,6 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="rshProcess" type="RshProcessType"/>
 			<xs:element name="maprshProcess" type="MapRshProcessType"/>
 			<xs:element name="sshProcess" type="SshProcessType"/>
-			<xs:element name="piseProcess" type="PiseProcessType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
