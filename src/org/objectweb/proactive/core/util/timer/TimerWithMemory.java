@@ -14,12 +14,12 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
     protected long[] memory;
     protected int position;
 
-    protected TimerWithMemory() {
+    public TimerWithMemory() {
         this.memory = new long[10];
         this.position = 0;
     }
 
-    protected TimerWithMemory(String name) {
+    public TimerWithMemory(String name) {
         this();
         this.name = name;
     }
