@@ -27,7 +27,6 @@ IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\
 IF EXIST %PROACTIVE%\lib\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\reggie.jar
 
 IF EXIST %PROACTIVE%\lib\cog.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cog.jar
-IF EXIST %PROACTIVE%\lib\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\cryptix.jar
 IF EXIST %PROACTIVE%\lib\iaik_jce_full.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_jce_full.jar
 IF EXIST %PROACTIVE%\lib\iaik_ssl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\iaik_ssl.jar
 IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log4j-core.jar

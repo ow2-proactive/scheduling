@@ -64,10 +64,6 @@ if [ -f $PROACTIVE/lib/cog.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog.jar
 fi
-if [ -f $PROACTIVE/lib/cryptix.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix.jar
-fi
 if [ -f $PROACTIVE/lib/iaik_jce_full.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/iaik_jce_full.jar
