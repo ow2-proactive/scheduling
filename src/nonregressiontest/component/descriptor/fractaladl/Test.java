@@ -82,10 +82,10 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        //		System.out.println("\nMESSAGE IS : ");
-        //		System.out.println("-------------------------------------------------");
-        //		message.printToStream(System.out);
-        //		System.out.println("-------------------------------------------------");
+//        		System.out.println("\nMESSAGE IS : ");
+//        		System.out.println("-------------------------------------------------");
+//        		message.printToStream(System.out);
+//        		System.out.println("-------------------------------------------------");
         StringBuffer resulting_msg = new StringBuffer();
         int nb_messages = append(resulting_msg, message);
 
@@ -98,9 +98,9 @@ public class Test extends ComponentTest {
             PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
             Test.MESSAGE;
 
-        // there should be 5 messages with the current configuration
+        // there should be 6 messages with the current configuration
         return resulting_msg.toString().equals(single_message + single_message +
-            single_message + single_message + single_message);
+            single_message + single_message + single_message + single_message);
     }
 
     private int append(StringBuffer buffer, Message message) {
