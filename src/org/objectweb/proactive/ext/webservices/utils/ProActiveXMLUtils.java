@@ -297,6 +297,10 @@ public class ProActiveXMLUtils {
             body = LocalBodyStore.getInstance().getLocalHalfBody(id);
         }
 
+        if (body == null) {
+            body = LocalBodyStore.getInstance().getForwarder(id);
+        }
+        
         return body;
     }
 }

@@ -78,6 +78,16 @@ public class LocalBodyStore {
     private BodyMap localHalfBodyMap = new BodyMap();
 
     /**
+     * This table maps all known Forwarder's in this JVM with their UniqueID
+     * From one UniqueID it is possible to get the corresponding forwarder if
+     * it belongs to this JVM. Used by the HTTP ProActive protocol, so that
+     * when a Body migrates, it is still possible to talk to the object using
+     * its BodyID, that here now points to the Forwarder instead of the original
+     * Body.
+     */
+    private BodyMap localForwarderMap = new BodyMap();
+    
+    /**
      * Static object that manages the registration of listeners and the sending of
      * events
      */
@@ -167,6 +177,16 @@ public class LocalBodyStore {
     }
 
     /**
+     * Returns the forwarder belonging to this JVM whose ID is the one specified.
+     * Returns null if a forwarder with such an id is not found in this jvm
+     * @param bodyID the ID to look for
+     * @return the halfbody with matching id or null
+     */
+    public Body getForwarder(UniqueID bodyID) {
+        return (Body) localForwarderMap.getBody(bodyID);
+    }
+    
+    /**
      * Returns all local Bodies in a new BodyMap
      * @return all local Bodies in a new BodyMap
      */
@@ -225,5 +245,19 @@ public class LocalBodyStore {
     void unregisterHalfBody(AbstractBody body) {
         localHalfBodyMap.removeBody(body.bodyID);
         //bodyEventProducer.fireBodyRemoved(body);
+    }
+
+
+    public void registerForwarder(AbstractBody body) {
+    	if (localForwarderMap.getBody(body.bodyID) != null) {
+            logger.debug("DEBUUUUUUUUUUUUG1 Forwarder already registered in the body map");
+            System.err.println("DEBUUUUUUUUUUUUG2 Forwarder already registered in the body map");
+            localForwarderMap.removeBody(body.bodyID);
+        }
+        localForwarderMap.putBody(body.bodyID, body);
+    }
+
+    public void unregisterForwarder(AbstractBody body) {
+        localForwarderMap.removeBody(body.bodyID);
     }
 }

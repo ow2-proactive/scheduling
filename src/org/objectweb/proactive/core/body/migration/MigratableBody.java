@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
@@ -262,6 +263,7 @@ public class MigratableBody extends ComponentBodyImpl implements Migratable,
 
         // signal that this body (remaining after migration) has just migrated
         hasJustMigrated = true;
+        LocalBodyStore.getInstance().registerForwarder(this);
     }
 
     //
