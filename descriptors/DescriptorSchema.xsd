@@ -233,7 +233,6 @@ The following element ProActiveDescriptor defines the root of the schema
 					<xs:enumeration value="rmi"/>
 					<xs:enumeration value="http"/>
 					<xs:enumeration value="jini"/>
-					<xs:enumeration value="http"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -357,7 +356,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element name="peerSet" type="peerSetType"/>
 		</xs:sequence>
-		<xs:attribute name="nodeNumber"  use="required">
+		<xs:attribute name="nodeNumber" use="required">
 			<xs:simpleType>
 				<xs:union memberTypes="xs:positiveInteger MaxType"/>
 			</xs:simpleType>
@@ -372,10 +371,9 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">
-		<xs:enumeration value="MAX"/>
+			<xs:enumeration value="MAX"/>
 		</xs:restriction>
 	</xs:simpleType>
-	
 	<!-- peerSet element has one child peer that can occurs once or more-->
 	<xs:complexType name="peerSetType">
 		<xs:sequence>
@@ -395,6 +393,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="rshProcess" type="RshProcessType"/>
 			<xs:element name="maprshProcess" type="MapRshProcessType"/>
 			<xs:element name="sshProcess" type="SshProcessType"/>
+			<xs:element name="piseProcess" type="PiseProcessType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
@@ -505,6 +504,20 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:attribute>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!--PiseProcess-->
+	<xs:complexType name="PiseProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+		</xs:sequence>
+		<xs:attribute name="class" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.pise.PiseProcess"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="hostname" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by r (in) -->
+<xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- 
 The following element ProActiveDescriptor defines the root of the schema
 -->
@@ -11,6 +12,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="infrastructure/processes/processDefinition"/>
 			<xs:field xpath="@id"/>
 			<!--Uniqueness of the id attribute for infrastructure/processes/processDefinition element-->
+		</xs:unique>
+		<xs:unique name="serviceDefid">
+			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
+			<xs:field xpath="@id"/>
+			<!--Uniqueness of the id attribute for infrastructure/services/serviceDefinition element-->
 		</xs:unique>
 		<xs:keyref name="VirtNodeName" refer="vnName">
 			<xs:selector xpath="componentDefinition/virtualNodesDefinition/virtualNode"/>
@@ -40,6 +46,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:selector xpath="deployment/jvms/jvm/creation/processReference"/>
 			<xs:field xpath="@refid"/>
 			<!-- This section references the processid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="serviceReferenceid" refer="serviceid">
+			<xs:selector xpath="deployment/jvms/jvm/acquisition/serviceReference"/>
+			<xs:field xpath="@refid"/>
+			<!-- This section references the serviceid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id-->
 		</xs:keyref>
 		<xs:keyref name="rshprocessReferenceid" refer="processid">
 			<xs:selector xpath="infrastructure/processes/processDefinition/rshProcess/processReference"/>
@@ -101,6 +112,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@id"/>
 			<!-- Key definition for the attribute id located at  infrastructure/processes/processDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/creation/ has a correponding value in infrastructure/processes/processDefinition@id and also that the refid attribute defined in infrastructure/processDefinition/rshProcess-sshProcess-rloginProcess-bsubProcess-globusProcess/processReference@refid has a correponding value in infrastructure/processes/processDefinition@id -->
 		</xs:key>
+		<xs:key name="serviceid">
+			<xs:selector xpath="infrastructure/services/serviceDefinition"/>
+			<xs:field xpath="@id"/>
+			<!-- Key definition for the attribute id located at  infrastructure/services/serviceDefinition. This key will be used to ensure either that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id -->
+		</xs:key>
 	</xs:element>
 	<!--processReference element is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: refid that must occur once and only once. This element must reference a process defined elsewhere in the infrastructure section. Hence in the infrastructure section there must be an element ProcessDefinition with the corresponding value for id attribute   -->
 	<xs:element name="processReference" type="ProcessReferenceType"/>
@@ -122,6 +138,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
+			<xs:element name="security" type="SecurityType" minOccurs="0"/>
 			<xs:element name="componentDefinition" type="ComponentDefinitionType">
 				<xs:unique name="idName">
 					<xs:selector xpath=".//*"/>
@@ -134,9 +151,8 @@ The following element ProActiveDescriptor defines the root of the schema
 				<!--This section references the vnName key defined above to ensure that the value of attribute name in virtualNodeDefinition/virtualNode element will have the corresponding definition in deployment/mapping/map@virtualNode -->
 				<!-- </xs:keyref>-->
 			</xs:element>
-			<xs:element name="security" type="SecurityType" minOccurs="0"/>
 			<xs:element name="deployment" type="DeploymentType"/>
-			<xs:element name="infrastructure" type="InfrastructureType"/>
+			<xs:element name="infrastructure" type="InfrastructureType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--component definition element has one child, that is a group of element, one element(or many) of the group has to appear at least once or more -->
@@ -146,14 +162,22 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--VirtualNodesGroup is composed of two elements VirtualNodesDefinition where are defined virtualNodes that will be built from the descriptor and VirtualNodesAcquisition where are defined virtualNodes created by performing a lookup with a given protocol(rmi or jini). Both element can appear 0 or more-->
 	<xs:group name="VirtualNodesGroup">
 		<xs:sequence>
-			<xs:element name="virtualNodesDefinition" type="VirtualNodesDefintionType" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="virtualNodesAcquisition" type="virtualNodesAcquisitionType" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="virtualNodesDefinition" type="VirtualNodesDefintionType" minOccurs="0"/>
+			<xs:element name="virtualNodesAcquisition" type="virtualNodesAcquisitionType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:group>
 	<!--virtualnodesDefinition element has one child: virtualNode element that must appear once or more-->
 	<xs:complexType name="VirtualNodesDefintionType">
 		<xs:sequence>
-			<xs:element name="virtualNode" type="VirtualNodeExtType" maxOccurs="unbounded"/>
+			<xs:element name="virtualNode" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="VirtualNodeExtType">
+							<xs:attribute name="minNodeNumber" type="xs:positiveInteger" use="optional"/>
+						</xs:extension>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 	<!-- virtualNodesAcquisition element has only one child: virtualNode element that must appear once or more-->
@@ -207,6 +231,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
+					<xs:enumeration value="http"/>
 					<xs:enumeration value="jini"/>
 				</xs:restriction>
 			</xs:simpleType>
@@ -252,6 +277,7 @@ The following element ProActiveDescriptor defines the root of the schema
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
 					<xs:enumeration value="jini"/>
+					<xs:enumeration value="http"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
@@ -278,35 +304,80 @@ The following element ProActiveDescriptor defines the root of the schema
 				two attributes: name that must appear once and only once. It represents the name of the virtualmachine to be created
 							    nodeNumber which is optionnal and represents the number of nodes that will be created on the enclosing jvm. Default is one-->
 	<xs:complexType name="JvmType">
-		<xs:sequence>
+		<xs:choice>
 			<xs:element name="creation" type="CreationType"/>
-			<!--<xs:element name="acquisition" type="AcquisitionType"/>-->
-		</xs:sequence>
+			<xs:element name="acquisition" type="AcquisitionType"/>
+		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required"/>
 		<xs:attribute name="nodeNumber" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
-	<!--acquisition element has one attribute: method that must appear once and only one. It can takes three value: rmi, jini or ibis. It represents the protocol to use to acquire the  ProActiveRuntime on the jvm to be created. -->
-	<!--<xs:complexType name="AcquisitionType">
-		<xs:attribute name="method" use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="rmi"/>
-					<xs:enumeration value="jini"/>
-					<xs:enumeration value="ibis"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-	</xs:complexType>-->
+	<!--acquisition element has one element: serviceReference that identifies uniquely the service to use in order to acquire the jvm. -->
+	<xs:complexType name="AcquisitionType">
+		<xs:sequence>
+			<xs:element name="serviceReference" type="ServiceReferenceType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceReferenceType">
+		<xs:attribute name="refid" use="required"/>
+	</xs:complexType>
 	<!--creation element has one child: processReference element defined as global element. This element must occur once and only once. The reference is used to map the jvm with a process defined in infrastructure section. This process will originate jvm's creation. Hence such process must exist in the infrastructure section. -->
 	<xs:complexType name="CreationType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
 		</xs:sequence>
 	</xs:complexType>
-	<!--infrastructure element has one child: processes element that must appear once and only once -->
+	<!--infrastructure element has two childs: processes and services element that can appear zero or  once -->
 	<xs:complexType name="InfrastructureType">
 		<xs:sequence>
-			<xs:element name="processes" type="ProcessesType"/>
+			<xs:element name="processes" type="ProcessesType" minOccurs="0"/>
+			<xs:element name="services" type="ServicesType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!--services element has one child: serviceDefinition element that must appear once or more -->
+	<xs:complexType name="ServicesType">
+		<xs:sequence>
+			<xs:element name="serviceDefinition" type="ServiceDefinitionType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ServiceDefinition has two childs: RMIRegistryLookup, P2PLookup but only one can be present in the parent element. This element contains also an attribute: id which must appear once and only once and represents the id of the service in order for  jvms(serviceReference element in deployment/jvms/jvm/creation/processReference)  to reference other services-->
+	<xs:complexType name="ServiceDefinitionType">
+		<xs:choice>
+			<xs:element name="RMIRegistryLookup" type="RMIRegistryLookupType"/>
+			<xs:element name="P2PLookup" type="P2PLookupType"/>
+		</xs:choice>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!-- RMIRegistryLookup has one attribute: the url to looup-->
+	<xs:complexType name="RMIRegistryLookupType">
+		<xs:attribute name="url" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!-- P2PLookup has one child peerSet that represents a set of peer's url. It has also 4 attributes: nodeNumber that represents the number of nodes requested, timeout: the timeout of the P2P service, lookupFrequence, TTL.-->
+	<xs:complexType name="P2PLookupType">
+		<xs:sequence>
+			<xs:element name="peerSet" type="peerSetType"/>
+		</xs:sequence>
+		<xs:attribute name="nodeNumber" use="required">
+			<xs:simpleType>
+				<xs:union memberTypes="xs:positiveInteger MaxType"/>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="timeout" use="optional">
+			<xs:simpleType>
+				<xs:union memberTypes="xs:positiveInteger MaxType"/>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="lookupFrequence" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="TTL" type="xs:positiveInteger" use="optional"/>
+	</xs:complexType>
+	<xs:simpleType name="MaxType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MAX"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- peerSet element has one child peer that can occurs once or more-->
+	<xs:complexType name="peerSetType">
+		<xs:sequence>
+			<xs:element name="peer" type="xs:string" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<!--processes element has one child: processDefinition element that must appear once or more -->
@@ -322,6 +393,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="rshProcess" type="RshProcessType"/>
 			<xs:element name="maprshProcess" type="MapRshProcessType"/>
 			<xs:element name="sshProcess" type="SshProcessType"/>
+			<xs:element name="piseProcess" type="PiseProcessType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
@@ -432,6 +504,20 @@ The following element ProActiveDescriptor defines the root of the schema
 		</xs:attribute>
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
+	</xs:complexType>
+	<!--PiseProcess-->
+	<xs:complexType name="PiseProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+		</xs:sequence>
+		<xs:attribute name="class" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.pise.PiseProcess"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="hostname" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">
