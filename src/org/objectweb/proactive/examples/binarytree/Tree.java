@@ -27,128 +27,174 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.examples.binarytree;
 
 public class Tree {
 
-  private String key;
-  private String value;
-  private Tree left;
-  private Tree right;
-  private TreeDisplay display;
+    private String key;
+    private String value;
+    private Tree left;
+    private Tree right;
+    private TreeDisplay display;
+    private Integer graphicDepth;
 
-
-  public Tree() {
-  }
-
-
-  public Tree(String key, String value, TreeDisplay display) {
-    this.left = null;
-    this.right = null;
-    this.key = key;
-    this.value = value;
-    this.display = display;
-    display.displayMessage("[" + key + "] Createdwith value " + value);
-  }
-
-
-  public void insert(String key, String value) {
-    int res = key.compareTo(this.key);
-    if (res == 0) {
-      // Same key --> Modify the current calue
-      display.displayMessage("[" + key + "] Replacing " + this.value + " with " + value);
-      this.value = value;
-    } else if (res < 0) {
-      display.displayMessage("[" + key + "] trying left");
-      // key < this.key --> store left
-      if (left != null) {
-        left.insert(key, value);
-      } else {
-        display.displayMessage("[" + key + "] CREATE left");
-        // Create the new node
-        try {
-          left = (Tree)org.objectweb.proactive.ProActive.newActive(this.getClass().getName(), new Object[]{key,value,display});
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    } else {
-      display.displayMessage("[" + key + "] trying right");
-      if (right != null) {
-        right.insert(key, value);
-      } else {
-        display.displayMessage("[" + key + "] Creating right");
-        try {
-          right = (Tree)org.objectweb.proactive.ProActive.newActive(this.getClass().getName(), new Object[]{key,value,display});
-        } catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
+    public Tree() {
     }
-  }
 
-
-  public String search(String key) {
-    display.displayMessage("[" + this.key + "] Searching for " + key);
-    if (key == null)
-      return null;
-
-    int res = key.compareTo(this.key);
-    if (res == 0) {
-      display.displayMessage("[" + this.key + "] Found " + key);
-      return value;
+    public Tree(String key, String value, TreeDisplay display) {
+	this.left = null;
+	this.right = null;
+	this.key = key;
+	this.value = value;
+	this.display = display;
+	display.displayMessage("[" + key + "] Created with value " 
+			       + value, java.awt.Color.blue);
     }
-    if (res < 0)
-      return (left != null)?left.search(key):null;
-    else
-      return (right != null)?right.search(key):null;
-  }
 
-
-  public String getKey() {
-    return key;
-  }
-
-
-  public String getValue() {
-    return value;
-  }
-
-
-  public Tree getLeft() {
-    return left;
-  }
-
-
-  public Tree getRight() {
-    return right;
-  }
-
-
-  public StringBuffer dump(int level, boolean draw) {
-    StringBuffer str = new StringBuffer();
-    str.append("[").append(key).append("] --> ").append(value).append("\n");
-    
-    String spaces = "";
-    if (right != null || left != null) {
-      StringBuffer indent = new StringBuffer();
-      for (int i = 0; i < level; i++) 
-        indent.append("  ");
-      if (draw) indent.setCharAt(indent.length() - 1, '|');
-      spaces = indent.toString();
+    public void insert(String key, String value, boolean AC) {
+	int res = key.compareTo(this.key);
+	if (res == 0) {
+	    // Same key --> Modify the current value
+	    display.displayMessage("[" + key + "] Replacing " 
+				   + this.value + " with " + value);
+	    this.value = value;
+	} else if (res < 0) {
+	    display.displayMessage("[" + key + "] trying left");
+	    // key < this.key --> store left
+	    if (left != null) {
+		left.insert(key, value, AC);
+	    } else {
+		display.displayMessage("[" + key + "] Creating left");
+		// Create the new node
+		try {
+		    left =
+			(Tree) org.objectweb.proactive.ProActive.newActive(this.getClass().getName(), new Object[] { key, value, display });
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		// Enabled Automatic Continuations
+		if (AC) {
+		    try {
+			org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+		    } catch (java.io.IOException e) {
+			display.displayMessage("Automatic Continuations error!!!",
+					       java.awt.Color.red);
+		    }
+		}
+	    }
+	} else {
+	    display.displayMessage("[" + key + "] trying right");
+	    if (right != null) {
+		right.insert(key, value, AC);
+	    } else {
+		display.displayMessage("[" + key + "] Creating right");
+		try {
+		    right =
+			(Tree) org.objectweb.proactive.ProActive.newActive(this.getClass().getName(), new Object[] { key, value, display });
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
+		// Enabled Automatic Continuations
+		if (AC) {
+		    try {
+			org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+		    } catch (java.io.IOException e) {
+			display.displayMessage("Automatic Continuations error!!!",
+					       java.awt.Color.red);
+		    }
+		}
+	    }
+	}
     }
-    
-    if (left != null) {
-      str.append(spaces).append(" |\n");
-      str.append(spaces).append(" +->");
-      str.append(left.dump(level + 1, (right != null)).toString());
+
+    public ObjectWrapper search(String key) {
+	display.displayMessage("[" + this.key + "] Searching for " + key);
+	if (key == null)
+	    return new ObjectWrapper("null");;
+
+	int res = key.compareTo(this.key);
+	if (res == 0) {
+	    display.displayMessage("[" + this.key + "] Found " + key);
+	    return new ObjectWrapper(value);
+	}
+	if (res < 0)
+	    return (left != null) ? left.search(key) : new ObjectWrapper("null");
+	else
+	    return (right != null) ? right.search(key) : new ObjectWrapper("null");
     }
-    if (right != null) {
-      str.append(spaces).append(" |\n");
-      str.append(spaces).append(" +->");
-      str.append(right.dump(level + 1, false).toString());
+
+    public void delete() {
+	if (right != null)
+	    right.delete();
+	if (left != null)
+	    left.delete();
+	(org.objectweb.proactive.ProActive.getBodyOnThis()).terminate();
     }
-    return str;
-  }
+
+
+    public String getKey() {
+	return key;
+    }
+
+    public java.util.ArrayList getKeys() {
+	java.util.ArrayList keys = new java.util.ArrayList();
+	if (key != null)
+	    keys.add(key);
+	if (right != null)
+	    keys.addAll(right.getKeys());
+	if (left != null)
+	    keys.addAll(left.getKeys());
+	return keys;
+    }
+
+    public String getValue() {
+	return value;
+    }
+
+    public Tree getLeft() {
+	return left;
+    }
+
+    public Tree getRight() {
+	return right;
+    }
+
+    public int depth() {
+	int rightDepth = 0, leftDepth = 0;
+	if (right != null)
+	    rightDepth = right.depth();
+	if (left != null)
+	    leftDepth = left.depth();
+	if (leftDepth < rightDepth)
+	    return ++rightDepth;
+	return ++leftDepth;
+    }
+
+    // Change Automatic Continuations state
+    public void enableAC() {
+	try {
+	    org.objectweb.proactive.ProActive.enableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+	    if (right != null)
+		right.enableAC();
+	    if (left != null)
+		left.enableAC();
+	} catch (java.io.IOException e) {
+	    display.displayMessage("Automatic Continuations error!!!",
+				   java.awt.Color.red);
+	}
+    }
+
+    public void disableAC() {
+	try {
+	    org.objectweb.proactive.ProActive.disableAC(org.objectweb.proactive.ProActive.getStubOnThis());
+	    if (right != null)
+		right.disableAC();
+	    if (left != null)
+		left.disableAC();
+	} catch (java.io.IOException e) {
+	    display.displayMessage("Automatic Continuations error!!!", 
+				   java.awt.Color.red);
+	}
+    }
 }

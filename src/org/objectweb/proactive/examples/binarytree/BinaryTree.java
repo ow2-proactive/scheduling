@@ -87,7 +87,7 @@ public class BinaryTree {
     }
     if (key == this.key) {
       // We have found the node that contains the value we're looking for
-      return new ObjectWrapper(this.value);
+      return new ObjectWrapper(this.value);	
     }
     if (key < this.key) {
       // The current key is greater than the search key, let's continue on the left
