@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.core.node;
 
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -41,6 +42,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 
 
 public class NodeImpl implements Node, Serializable
@@ -110,23 +112,23 @@ public class NodeImpl implements Node, Serializable
 	/**
 	 * @see org.objectweb.proactive.core.node.Node#getActiveObject(String)
 	 */
-	public Object[] getActiveObject(String objectName) throws NodeException,ActiveObjectCreationException
+	public Object[] getActiveObjects(String className) throws NodeException,ActiveObjectCreationException
 	{
 		ArrayList bodyArray;
 		try{
-			bodyArray = this.proActiveRuntime.getActiveObject(this.nodeInformation.getName(),objectName);
+			bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName(),className);
 		}catch(ProActiveException e){
-			throw new NodeException("Cannot get Active Objects of type "+objectName+" registered on this node: "+this.nodeInformation.getURL(),e);
+			throw new NodeException("Cannot get Active Objects of type "+className+" registered on this node: "+this.nodeInformation.getURL(),e);
 		}
 		if(bodyArray.size() == 0){
-			throw new NodeException("no ActiveObjects of type "+objectName+" are registered for this node: "+ this.nodeInformation.getURL());
+			throw new NodeException("no ActiveObjects of type "+className+" are registered for this node: "+ this.nodeInformation.getURL());
 		}else{
 			Object[] stubOnAO = new Object[bodyArray.size()];
 			for (int i = 0; i < bodyArray.size(); i++)
 			{
 				UniversalBody body = (UniversalBody)bodyArray.get(i);
 				try{
-				stubOnAO[i] = createStubObject(objectName,body);
+				stubOnAO[i] = createStubObject(className,body);
 				}catch(MOPException e){
 					throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy",e);
 				}
@@ -136,6 +138,14 @@ public class NodeImpl implements Node, Serializable
 		
 	}
 
+
+	private void readObject(ObjectInputStream in)throws java.io.IOException, ClassNotFoundException, ProActiveException{
+		in.defaultReadObject();
+		if(NodeFactory.isNodeLocal(this)){
+			this.proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(nodeInformation.getProtocol());	
+		}
+
+	}
 	
 	// -------------------------------------------------------------------------------------------
   // 
