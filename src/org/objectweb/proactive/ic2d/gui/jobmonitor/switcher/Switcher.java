@@ -46,11 +46,11 @@ public class Switcher extends JPanel implements SwitchListener
 						}
 					});
 					
-					popupmenu.add (new AbstractAction ("Hilight '" + l.getText() + "'")
+					popupmenu.add (new AbstractAction ("Highlight '" + l.getText() + "'")
 					{
 						public void actionPerformed (ActionEvent e)
 						{
-							System.out.println ("hilight: " + e.getActionCommand());
+							System.out.println ("highlight: " + e.getActionCommand());
 						}
 					});
 					

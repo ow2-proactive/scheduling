@@ -148,6 +148,10 @@
 		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/images" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/images"/>
 		</copy>
+		<!-- JobMonitor images -->
+		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images" includeEmptyDirs="no">
+			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images"/>
+		</copy>
 	</target>
 	<!--
 	   ================================================================

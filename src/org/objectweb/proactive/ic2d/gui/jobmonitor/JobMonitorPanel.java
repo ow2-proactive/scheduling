@@ -25,6 +25,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 {
+	private static final String PA_JVM = "PA_JVM";
 	private static final String VN_VIEW_LABEL = "Job view / Virtual Nodes";
 	private static final String JOB_VIEW_LABEL = "Job view / Hosts";
 	private static final String HOST_VIEW_LABEL = "Host view";
@@ -225,7 +226,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 			for (int idx = 0; idx < list.length; ++idx)
 			{
 				String id = list [idx];
-				if (id.indexOf ("PA_RT") != -1)
+				if (id.indexOf (PA_JVM) != -1)
 				{
 					RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup (id);
 					System.out.println("Found runtime id: " + id);
