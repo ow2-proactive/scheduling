@@ -143,6 +143,11 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             if (checkNonEmpty(xml_path)) {
                 p2pDescriptorService.setXmlPath(xml_path);
             }
+            
+            String booking_nodes = attributes.getValue("booking_nodes");
+            if (checkNonEmpty(booking_nodes)) {
+                p2pDescriptorService.setBookingNodes(booking_nodes);
+            }
         }
 
         protected void notifyEndActiveHandler(String name,

@@ -32,6 +32,7 @@ package org.objectweb.proactive.p2p.service.node;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
@@ -41,6 +42,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -48,6 +50,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PAcquaintanceManager;
 import org.objectweb.proactive.p2p.service.P2PService;
+import org.objectweb.proactive.p2p.service.util.Dummy;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.io.Serializable;
@@ -213,6 +216,54 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         }
     }
 
+    /**
+     * <p>Returns whether the node accessor is active or not.
+     * The nodes accessor is active as long as it has an associated thread running
+     * to serve the requests by calling methods on the active object and looking for
+     * asked nodes.</p>
+     * <p>If the nodes accessor is not active, looking for nodes is stopped.</p>
+     * @return whether the nodes accessor is active or not.
+     */
+    public boolean isActive() {
+        return ProActive.getBodyOnThis().isActive();
+    }
+
+    /**
+     * @return all available and node and remove them from the lookup.
+     */
+    public Vector getAndRemoveNodes() {
+        Vector v = new Vector();
+        while (this.waitingNodesList.size() != 0) {
+            Object elem = this.waitingNodesList.get(0);
+            v.add(elem);
+            this.waitingNodesList.remove(elem);
+            this.nodesToKillList.add(((Node) elem).getNodeInformation().getURL());
+        }
+        return v;
+    }
+
+    /**
+     * <p>Reserve nodes for a later use.</p>
+     * <p>This method creates dummy active objects in the nodes.</p>
+     * @param nodesToBook nodes to book.
+     */
+    public void reservingNodes(Vector nodesToBook) {
+        for (int i = 0; i < nodesToBook.size(); i++) {
+            Node currentNode = (Node) nodesToBook.get(i);
+            try {
+                ProActive.newActive(Dummy.class.getName(), null, currentNode);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Node at " +
+                        currentNode.getNodeInformation().getURL() + " booked");
+                }
+            } catch (ActiveObjectCreationException e) {
+                logger.warn("Couldn't actived a Dummy class to book a node", e);
+            } catch (NodeException e) {
+                logger.warn("Problem with remote node to book", e);
+            }
+        }
+    }
+
     // -------------------------------------------------------------------------
     // ProActive methods
     // -------------------------------------------------------------------------
@@ -271,31 +322,5 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             }
         }
         logger.info("This P2P nodes lookup is no more active, bye..");
-    }
-
-    /**
-     * <p>Returns whether the node accessor is active or not.
-     * The nodes accessor is active as long as it has an associated thread running
-     * to serve the requests by calling methods on the active object and looking for
-     * asked nodes.</p>
-     * <p>If the nodes accessor is not active, looking for nodes is stopped.</p>
-     * @return whether the nodes accessor is active or not.
-     */
-    public boolean isActive() {
-        return ProActive.getBodyOnThis().isActive();
-    }
-
-    /**
-     * @return all available and node and remove them from the lookup.
-     */
-    public Vector getAndRemoveNodes() {
-        Vector v = new Vector();
-        while (this.waitingNodesList.size() != 0) {
-            Object elem = this.waitingNodesList.get(0);
-            v.add(elem);
-            this.waitingNodesList.remove(elem);
-            this.nodesToKillList.add(((Node) elem).getNodeInformation().getURL());
-        }
-        return v;
     }
 }

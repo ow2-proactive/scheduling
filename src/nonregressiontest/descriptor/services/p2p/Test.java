@@ -34,8 +34,11 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import testsuite.test.FunctionalTest;
 
@@ -98,7 +101,12 @@ public class Test extends FunctionalTest {
         boolean resultTest = (nodeTab.length == 3);
         this.process.stopProcess();
         this.process1.stopProcess();
-        this.pad.killall(false); 
+        this.pad.killall(false);
+        Node p2pNode = NodeFactory.getNode("//localhost/" +
+                P2PConstants.P2P_NODE_NAME);
+        p2pNode.killAllActiveObjects();
+        ProActiveRuntime part = p2pNode.getProActiveRuntime();
+        part.killNode(p2pNode.getNodeInformation().getURL());
         return resultTest;
     }
 
