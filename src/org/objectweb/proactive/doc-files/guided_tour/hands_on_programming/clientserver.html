@@ -186,7 +186,8 @@ and finally display that message. <br>
 			} else {
 				// Lookups the server object
 				System.out.println("Using server located on " + args[0]);
-				myServer = (Hello) org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), args[0]);
+				myServer = (Hello) org.objectweb.proactive.ProActive.lookupActive(
+								     Hello.class.getName(), args[0]);
 			}
 			// Invokes a remote method on this object to get the message
 			myServer.sayHello();

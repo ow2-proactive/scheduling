@@ -102,7 +102,9 @@ public class HelloFrameController extends MigratableHello {
 		try {
 			// creates (and initialize) the active object
 			HelloFrameController obj =
-				(HelloFrameController) ProActive.newActive(HelloFrameController.class.getName(), new Object[] { name });
+				(HelloFrameController) ProActive.newActive(
+												HelloFrameController.class.getName(), 
+												new Object[] { name });
 			return obj;
 		} catch (ActiveObjectCreationException aoce) {
 			System.out.println("creation of the active object failed");
