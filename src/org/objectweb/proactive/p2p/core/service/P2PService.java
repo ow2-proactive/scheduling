@@ -36,11 +36,12 @@ import org.objectweb.proactive.p2p.core.load.Load;
 
 import java.util.Collection;
 
+
 /**
  * Interface to specify a ProActive Peer-to-Peer Service.
- * 
+ *
  * @author Alexandre di Costanzo
- *  
+ *
  */
 public interface P2PService extends Load {
 
@@ -56,25 +57,25 @@ public interface P2PService extends Load {
     public static final String P2P_NODE_NAME = "P2PNode";
 
     /**
-     * <code>TTU</code>: Time To Update the know JVM table.
+     * <code>TTU</code>: Time To Update the known JVM table.
      */
-    public static final long TTU = 600000; // TTU in milliseconds. By default
-    									   // 10minuts
-
-    //  public static final long TTU = 10000;
+    public static final long TTU = 600000; // TTU in milliseconds. By default 10 minuts
 
     /**
      * <p>
-     * <code>FRIENDS</code>: minimal number of known peers.
+     * <code>NOA</code>: minimal number of known peers.
      * </p>
      * <p>
      * Only if it's possible, enougth peers in the networks.
      * </p>
+     * <p>
+     * For a single server use, change it in 0 Friends.
+     * </p>
      */
-    public static final int FRIENDS = 10;
+    public static final int NOA = 0;
 
-    //   public static final int FRIENDS = 5;
-
+    public static final int MAX_LOAD = 1;
+    
     /**
      * <p>
      * Allows this P2P Service on this VM to register in a list of other P2P
@@ -83,7 +84,7 @@ public interface P2PService extends Load {
      * <p>
      * Also, register other Services in this one.
      * </p>
-     * 
+     *
      * @param servers
      *            List of P2P Services.
      */
@@ -91,7 +92,7 @@ public interface P2PService extends Load {
 
     /**
      * Allow in this current P2P Service a remote P2P Service with its url.
-     * 
+     *
      * @param url
      *            like //hostname.domain.com
      */
@@ -104,7 +105,7 @@ public interface P2PService extends Load {
      * <p>
      * Also, register the other Service in this one.
      * </p>
-     * 
+     *
      * @param serviceName
      * @param service
      *            A remote P2P Service.
@@ -114,11 +115,11 @@ public interface P2PService extends Load {
      *            the remote Service.
      */
     public abstract void registerP2PService(String serviceName,
-            P2PService service, int serviceLoad, boolean remoteRecord);
+        P2PService service, int serviceLoad, boolean remoteRecord);
 
     /**
      * Unregister a remote P2P Service form this local Service.
-     * 
+     *
      * @param url
      *            like //hostname.domain.com
      */
@@ -126,7 +127,7 @@ public interface P2PService extends Load {
 
     /**
      * Unregister a remote P2P Service form this local Service.
-     * 
+     *
      * @param service
      *            the remote P2P Service.
      */
@@ -140,7 +141,7 @@ public interface P2PService extends Load {
      * <p>
      * This method returns n >= ProActive JVMs (this one is exclude).
      * </p>
-     * 
+     *
      * @param n
      *            number of ProActive JVMs asked.
      * @param TTL
@@ -151,11 +152,11 @@ public interface P2PService extends Load {
      *             ProActiveRuntime.
      */
     public abstract ProActiveRuntime[] getProActiveJVMs(int n, int TTL)
-            throws ProActiveException;
+        throws ProActiveException;
 
     /**
      * For internal use only.
-     * 
+     *
      * @param n
      * @param TTL
      * @param parent
@@ -163,13 +164,13 @@ public interface P2PService extends Load {
      *         ProActiveException
      */
     public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, String parent)
-            throws ProActiveException;
+        throws ProActiveException;
 
     /**
      * <p>
      * Wiht default value of TTL at 10.
      * </p>
-     * 
+     *
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getProActiveJVMs(int,
      *      int)
      * @param n
@@ -180,7 +181,7 @@ public interface P2PService extends Load {
      *             ProActiveRuntime.
      */
     public abstract ProActiveRuntime[] getProActiveJVMs(int n)
-            throws ProActiveException;
+        throws ProActiveException;
 
     /**
      * @return All JVMS who are registered in this Service.
@@ -189,18 +190,18 @@ public interface P2PService extends Load {
      *             ProActiveRuntime.
      */
     public abstract ProActiveRuntime[] getProActiveJVMs()
-            throws ProActiveException;
+        throws ProActiveException;
 
     /**
      * Get the name of this P2P Service.
-     * 
+     *
      * @return the name of this P2P Service.
      */
     public abstract String getServiceName();
 
     /**
      * Get the ProActive Runtime include in this P2P Service.
-     * 
+     *
      * @return
      */
     public abstract ProActiveRuntime getProActiveRuntime();

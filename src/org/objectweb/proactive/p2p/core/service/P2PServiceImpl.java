@@ -30,8 +30,17 @@
  */
 package org.objectweb.proactive.p2p.core.service;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -43,18 +52,6 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.p2p.core.service.KnownTable.KnownTableElement;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * Implemantation of P2P Service.
@@ -182,11 +179,17 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                 .get(serviceName);
         if (exist != null) {
             exist.setLastUpdate(System.currentTimeMillis());
+            if (logger.isInfoEnabled()) {
+                logger.info("Update ProActive JVM: " + serviceName);
+            }
         } else {
-            KnownTableElement element = knownProActiveJVM.new KnownTableElement(
+            KnownTableElement element = this.knownProActiveJVM.new KnownTableElement(
                     serviceName, service, serviceLoad, System
                             .currentTimeMillis());
             knownProActiveJVM.put(serviceName, element);
+            if (logger.isInfoEnabled()) {
+                logger.info("Add ProActive JVM: " + serviceName);
+            }
         }
 
         if (remoteRecord) {
@@ -230,6 +233,9 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public void unregisterP2PService(String service) {
         this.knownProActiveJVM.remove(service);
+        if (logger.isInfoEnabled()) {
+            logger.info("Remove ProActive JVM: " + service);
+        }
     }
 
     /**
@@ -261,6 +267,11 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, String parent)
             throws ProActiveException {
+        return this.getProActiveJVMs(n, TTL, parent, false);
+    }
+    
+    public ProActiveRuntime[] getProActiveJVMs(int n, int TTL, String parent,
+            boolean internalUSe) throws ProActiveException {
         Hashtable allServices = new Hashtable();
         Hashtable res = new Hashtable();
 
@@ -270,11 +281,16 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             if (((String) element.getKey()).compareTo(parent) != 0) {
                 allServices.put(element.getKey(), element.getP2PService());
                 if (element.getLoad() == 0) {
-                    res.put(this.getRemoteProActiveRuntime(
-                            (String) element.getKey()).getVMInformation()
-                            .getName(), this
-                            .getRemoteProActiveRuntime((String) element
-                                    .getKey()));
+                    try {
+                        res.put(this.getRemoteProActiveRuntime(
+                                (String) element.getKey()).getVMInformation()
+                                .getName(), this
+                                .getRemoteProActiveRuntime((String) element
+                                        .getKey()));
+                    } catch (ProActiveException e) {
+                        allServices.remove(element.getKey());
+                        continue;
+                    }
                 }
             }
         }
@@ -292,9 +308,16 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         while ((res.size() != n) && (enum.hasMoreElements())) {
             P2PService current = (P2PService) enum.nextElement();
 
-            ProActiveRuntime[] currentRes = current.getProActiveJVMs(n
-                    - res.size(), TTL - 1, this.runtimeName);
-
+            ProActiveRuntime[] currentRes;
+            try {
+                currentRes = current.getProActiveJVMs(n - res.size(), TTL - 1,
+                        this.runtimeName);
+            } catch (Exception e) {
+                if (logger.isDebugEnabled()) {
+                        logger.debug("Could't get JVMS", e);
+                }
+                continue;
+            }
             if (currentRes != null) {
                 for (int i = 0; i < currentRes.length; i++) {
                     res.put(currentRes[i].getVMInformation().getName(),
@@ -314,7 +337,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                     .toArray(new ProActiveRuntime[resFinal.size()]);
         }
     }
-
+    
     /**
      * @see org.objectweb.proactive.p2p.core.service.P2PService#getProActiveJVMs()
      */
@@ -385,7 +408,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      * @see org.objectweb.proactive.p2p.core.load.Load#getLoad()
      */
     public int getLoad() {
-        return this.load;
+        return P2PService.MAX_LOAD - this.load;
     }
 
     // -------------------------------------------------------------------------
@@ -404,7 +427,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             ProActive.enableAC(this.knownProActiveJVM);
             // Launch a thread to update the known table.
             Object[] params = { this.knownProActiveJVM,
-                    ProActive.getStubOnThis() };
+                    ProActive.getStubOnThis(), this.runtimeName };
             ProActive.newActive(Updater.class.getName(), params, P2PServiceImpl
                     .urlAdderP2PNodeName(this.url));
         } catch (ActiveObjectCreationException e) {
