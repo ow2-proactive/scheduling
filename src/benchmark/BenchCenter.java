@@ -38,8 +38,6 @@ import org.xml.sax.SAXException;
 
 import testsuite.group.Group;
 import testsuite.manager.ProActiveBenchManager;
-import benchmark.nfe.BenchMigrationHandlerizable;
-import benchmark.nfe.BenchSettingNFE;
 import benchmark.objectcreation.newactive.BenchNewActive;
 import benchmark.objectcreation.turnactive.BenchTurnActive;
 
@@ -261,7 +259,7 @@ public class BenchCenter extends ProActiveBenchManager {
 		  Group nfe = new Group("NFE", "Non Functional Exception Mechanism");
         
 		  // Test handler setting
-		  BenchSettingNFE benchNFEsameVM;
+		/*  BenchSettingNFE benchNFEsameVM;
 		  benchNFEsameVM = new BenchSettingNFE(getSameVMNode(), 0);
 		  benchNFEsameVM.setName(benchNFEsameVM.getName() + " on same VM with 0 handler");
 		  nfe.add(benchNFEsameVM);
@@ -333,7 +331,7 @@ public class BenchCenter extends ProActiveBenchManager {
 					  nfe.add(benchMigNFE);
 		  }
 		
-		  add(nfe); 
+		  add(nfe);*/ 
     }
 
     public static void main(String[] args) {
