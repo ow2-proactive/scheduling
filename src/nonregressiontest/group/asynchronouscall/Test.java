@@ -24,11 +24,6 @@ public class Test extends ProActiveFunctionalTest {
 	 */
 	public Test() {
 		super("asynchronous (and synchronous) call on group", "do an (a)synchronous call on a previously created group");
-		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
-		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
-		try {
-			this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
-		} catch (Exception e) { e.printStackTrace(); }
 	}
 
 	public void action() throws Exception {
@@ -40,7 +35,9 @@ public class Test extends ProActiveFunctionalTest {
 	}
 
 	public void initTest() throws Exception {
-		// nothing to do
+		Object[][] params = {{"Agent0"}, {"Agent1"}, {"Agent2"}};
+		Node[] nodes = {this.getSameVMNode(), this.getLocalVMNode(), this.getRemoteVMNode()};
+		this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(), params, nodes);
 	}
 
 	public boolean postConditions() throws Exception {
