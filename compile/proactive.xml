@@ -6,6 +6,7 @@
 	<property name="proactive.core.dir" value="${proactive.dir}/core"/>
 	<property name="proactive.ext.dir" value="${proactive.dir}/ext"/>
 	<property name="classes.dir" value="${base}/classes"/>
+	<property name="classlibs.dir" value="${base}/classlibs"/>
 	<property name="dist.dir" value="${base}/dist"/>
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
@@ -58,6 +59,7 @@
 		<echo message="  util"/>
 		<echo message="  alljunk  : means all of the above"/>
 		<echo message="  ibis     : everything related to proactive ibis"/>
+		<echo message="  rewrite  : rewrite classes to enhance performance with ibis"/>
 		<echo message="  runTests	: Run all non regression tests"/>
 		<echo message="  runBench	: Run benchmarks"/>
 		<echo message=""/>
@@ -287,6 +289,7 @@
 		<delete dir="${classes.dir}"/>
 		<delete dir="${dist.dir}"/>
 		<delete dir="${docs.dir}"/>
+		<delete dir="${classlibs.dir}"/>
 	</target>
 	<!--
 	   ================================================================
@@ -408,6 +411,39 @@
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
+	
+	
+	<!--
+	   ================================================================
+	   ==
+      ==  Call the IOGenerator to speed-up serialization
+      ==
+      ================================================================
+	-->
+	
+	 <target name="rewrite">
+	 <mkdir dir="${classlibs.dir}"/>
+	 <copy todir="${classlibs.dir}">
+		<fileset dir="${classes.dir}" includes="**/*.class"/>
+	</copy> 
+       <!--
+         then we call the iogenerator
+       -->
+       	<java   classname="ibis.frontend.io.IOGenerator"
+		taskname="IOGenerator"
+		dir="${classlibs.dir}"
+		failonerror="true"
+		maxmemory="256m"
+		fork="true">
+	    <arg line="-dir ."/>
+	    <classpath>
+	       <pathelement path="${classlibs.dir}"/>
+	       <path refid="project.classpath"/>
+	    </classpath>
+	</java>
+	
+    </target>
+	
 	<!--
 	   ================================================================
 	   ==
@@ -444,6 +480,22 @@
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocal.xml"/>
 		</java>
 	</target>
+
+	<target name="runTestsLocalIbis" depends="testsuite, nonregressiontest">
+		<java classname="nonregressiontest.MainManager" fork="true">
+			<classpath refid="test.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+			<jvmarg value="-Dproactive.rmi=ibis"/>
+			<jvmarg value="-Dibis.serialization=sun"/>
+			<jvmarg value="-Dibis.name_server.host=localhost"/>
+			<jvmarg value="-Dibis.name_server.pool=rutget"/>
+			<jvmarg value="-Dibis.pool_host_number=1"/>
+			<jvmarg value="-Dibis.name_server.key=12"/>
+			 <jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties"/>
+			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml"/>
+		</java>
+	</target>
+	
 	<!--
 	   ================================================================
 	   ==
