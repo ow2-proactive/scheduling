@@ -162,7 +162,7 @@ public void activeObjectAdded(ActiveObject activeObject) {
 	String host;
 	
 		protocol = event.getProtocol();
-		proActiveRuntimeRegistered = proActiveRuntimeImpl.getProActiveRuntime(event.getRegisteredRuntimeName());
+		proActiveRuntimeRegistered = event.getRegisteredRuntime();
 		host = proActiveRuntimeRegistered.getVMInformation().getInetAddress().getCanonicalHostName();
 		try {
 			ic2dObject.getWorldObject().addHostObject(host,protocol);
