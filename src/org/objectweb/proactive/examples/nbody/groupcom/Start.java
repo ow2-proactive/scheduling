@@ -1,6 +1,5 @@
 package org.objectweb.proactive.examples.nbody.groupcom;
 
-
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
@@ -13,14 +12,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-
-/*
- * Created on Jan 7, 2005
- */
-
-/**
- * @author irosenbe
- **/
 
 
 public class Start {
@@ -95,7 +86,8 @@ public class Start {
 		
 			Maestro maestro = null;
 			try {
- 		       maestro = (Maestro) ProActive.newActive(Maestro.class.getName(), new Object[] {domainGroup});
+ 		       maestro = (Maestro) ProActive.newActive(
+ 		               Maestro.class.getName(), new Object[] {domainGroup, new Integer(maxIter)});
 			    } 
  		    catch (ActiveObjectCreationException e) { e.printStackTrace();   }
 			catch(NodeException ex){  	ex.printStackTrace();    }
@@ -108,8 +100,8 @@ public class Start {
 		        domainGroup.init(domainGroup,maestro);
         
 		    // launch computation
-		    // domainGroup.sendValueToNeighbours();
-		    maestro.start(maxIter);
+		    domainGroup.sendValueToNeighbours();
+		    
         }
 			
         catch (NodeException e) { e.printStackTrace(); } 

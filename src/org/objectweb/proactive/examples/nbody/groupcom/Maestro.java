@@ -1,15 +1,9 @@
-/*
- * Created on Jan 12, 2005
- */
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 import java.io.Serializable;
 
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
-/**
- * @author irosenbe
- */
 public class Maestro implements Serializable {
 
     private Domain domainGroup;
@@ -22,18 +16,10 @@ public class Maestro implements Serializable {
      * Create a new master for the simulation, which pilots all the domains given in parameter.
      * @param domainG the group of Domains which are to be controled by this Maestro.
      */
-    public Maestro (Domain domainG) {
+    public Maestro (Domain domainG, Integer max) {
+        maxIter = max.intValue(); 
         domainGroup = domainG;
         size = ProActiveGroup.getGroup(domainGroup).size();
-    }
-    
-    /**
-     * Start the whole simulation, for a given number of iterations. 
-     * @param max The number of iterations which should be computed before the end of the program. 
-     */
-    public void start(int max) {
-        maxIter = max; 
-        domainGroup.sendValueToNeighbours();
     }
     
     /**
@@ -46,10 +32,8 @@ public class Maestro implements Serializable {
             iter ++;
             if (iter == maxIter)  Start.quit ();
             nbFinished = 0 ;
-            //System.out.println("Synchro " + iter );
             domainGroup.sendValueToNeighbours();
         }
     }
-    
     
 }

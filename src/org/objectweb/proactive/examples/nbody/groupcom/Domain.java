@@ -1,6 +1,3 @@
-/*
- * Created on Jan 7, 2005
- */
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 
@@ -12,9 +9,6 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
-/**
- * @author irosenbe
- */
 public class Domain implements Serializable{
 
     private int identification;
@@ -26,7 +20,7 @@ public class Domain implements Serializable{
     Planet info;
     Rectangle limits;
     private Planet [] values; // list of all the bodies within all the other domains
-    private int nbvalues;
+    private int nbvalues, nbReceived=0;
     
     
     public Domain (){}
@@ -34,6 +28,7 @@ public class Domain implements Serializable{
     public Domain (Integer i, Rectangle r) {
         identification = i.intValue();
         limits = r;
+        info = new Planet(r);
     }
 
     public void init(Domain domainG, Displayer dp, Maestro master) {
@@ -44,19 +39,14 @@ public class Domain implements Serializable{
     public void init(Domain domainGroup, Maestro master) {
         maestro = master;
         neighbours = domainGroup;
-        Group gr = ProActiveGroup.getGroup(neighbours);
-        gr.remove(ProActive.getStubOnThis ()); // domainGroup now contains all domains, excluding self
-        
-        values = new Planet[gr.size() +1]; // must add one slot for self, which stays null all the time
-        clearValues();
-        
-        info = new Planet (limits);
+        Group g = ProActiveGroup.getGroup(neighbours);
+        g.remove(ProActive.getStubOnThis()); // no need to send information to self
+        nbvalues = g.size();
+        values = new Planet [nbvalues + 1] ; // leave empty slot for self
     }
 
     public void clearValues(){
-        for (int i = 0 ; i < values.length;  i++) 
-            values[i] = null;
-        nbvalues=0;
+        nbReceived = 0 ;
     } 
     
     public void computeNewValue() {
@@ -68,7 +58,6 @@ public class Domain implements Serializable{
         info.moveWithForce(force);
       
         clearValues();
-        maestro.notifyFinished();
     }
 
     public Planet getValue() {
@@ -76,12 +65,14 @@ public class Domain implements Serializable{
     }
 
     public void setValue(Planet inf, int id) {
-        //System.out.println(identification + " received value from " + id);
-        values[id] = inf;
-        nbvalues++;
-        
-        if (nbvalues == values.length - 1)
+        values [id] = inf;
+        nbReceived ++ ;
+        if (nbReceived > nbvalues)  // This is a bad sign!
+            System.err.println("Domain " + identification + " received too many answers");
+        if (nbReceived == nbvalues) {
+            maestro.notifyFinished();
             computeNewValue();
+            }
     }
 
     public void sendValueToNeighbours() {

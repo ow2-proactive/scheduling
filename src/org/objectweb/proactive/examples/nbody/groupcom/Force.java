@@ -1,13 +1,7 @@
-/*
- * Created on Jan 22, 1005
- */
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 import java.io.Serializable;
 
-/**
- * @author irosenbe
- */
 public class Force implements Serializable {
 
     double x=0,y=0;    
@@ -30,8 +24,8 @@ public class Force implements Serializable {
             double cube = length*length; // *length; 
             double coeff = G * p2.mass / cube ; // * p1.mass removed, because division removed as well
             // Watch out : no minus sign : we want to have force of 2 on 1!
-            x += coeff * (p2.x - p1.x);
-            y += coeff * (p2.y - p1.y);
+            x += coeff * a;
+            y += coeff * b;
         }
     }
     

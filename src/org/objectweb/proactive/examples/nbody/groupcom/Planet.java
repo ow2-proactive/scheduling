@@ -1,18 +1,12 @@
-/*
- * Created on Jan 11, 2005
- */
 package org.objectweb.proactive.examples.nbody.groupcom;
 
-import org.objectweb.proactive.examples.nbody.common.Rectangle;
 import java.io.Serializable;
 
-/**
- * @author irosenbe
- */
+import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Planet implements Serializable{
 
-    final double dt = 0.002;
+    final double dt = 0.0002;
     double mass;
     double x,y;
     double vx,vy;
@@ -42,13 +36,12 @@ public class Planet implements Serializable{
      */
     public void moveWithForce(Force force) {
         // Using f(t+dt) ~= f(t) + dt * f'(t)
-        x += vx * dt;
-        y += vy * dt;
-        
+        x += dt * vx ;
+        y += dt * vy ;
         // sum F  = mass * acc;
-        // a = sum F / mass:
+        // v' = a = sum F / mass:
         vx += dt * force.x ;  // removed /mass because * p1.mass removed as well  
         vy += dt * force.y ; 
-        
+
     }
 }
