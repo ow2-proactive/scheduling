@@ -97,6 +97,27 @@ public class UrlBuilder
 	}
 	
 	
+	public static String buildVirtualNodeUrl(String url) throws java.net.UnknownHostException{
+		String vnName = getNameFromUrl(url);
+		vnName = vnName.concat("_VN");
+		String host = getHostNameFromUrl(url);
+		String protocol = getProtocol(url);
+		return buildUrl(host,vnName,protocol);
+	}
+	
+	public static String appendVnSuffix(String name){
+		return name.concat("_VN");
+	}
+	
+	
+	public static String removeVnSuffix(String url){
+//		System.out.println("########vn url "+url);
+		int index = url.lastIndexOf("_VN");
+		if(index == -1) return url;
+		return url.substring(0,index);
+	}
+	
+	
 	public static String getNameFromUrl(String url){
 		int n = url.lastIndexOf("/");
     	String name = url.substring(n+1);
@@ -128,6 +149,11 @@ public class UrlBuilder
   	int n = validUrl.indexOf("//");
   	int m = validUrl.lastIndexOf("/"); // looking for the end of the host
   	return validUrl.substring(n+2,m);
+  }
+  
+  public static String checkProtocol(String protocol){
+  	if(protocol.indexOf(":") == -1) return protocol.concat(":");
+  	return protocol;
   }
   
 
