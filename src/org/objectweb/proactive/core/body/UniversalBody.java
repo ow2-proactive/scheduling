@@ -30,11 +30,13 @@
 */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+
+import java.io.IOException;
+
 
 /**
  * An object implementing this interface provides the minimum service a body offers
@@ -50,65 +52,73 @@ import org.objectweb.proactive.core.body.request.Request;
  */
 public interface UniversalBody {
 
-	/**
-	 * Receives a request for later processing. The call to this method is non blocking
-	 * unless the body cannot temporary receive the request.
-	 * @param request the request to process
-	 * @exception java.io.IOException if the request cannot be accepted
-	 */
-	public void receiveRequest(Request request) throws java.io.IOException;
+    /**
+     * Receives a request for later processing. The call to this method is non blocking
+     * unless the body cannot temporary receive the request.
+     * @param request the request to process
+     * @exception java.io.IOException if the request cannot be accepted
+     */
+    public void receiveRequest(Request request) throws java.io.IOException;
 
-	/**
-	 * Receives a reply in response to a former request.
-	 * @param reply the reply received
-	 * @exception java.io.IOException if the reply cannot be accepted
-	 */
-	public void receiveReply(Reply r) throws java.io.IOException;
+    /**
+     * Receives a reply in response to a former request.
+     * @param reply the reply received
+     * @exception java.io.IOException if the reply cannot be accepted
+     */
+    public void receiveReply(Reply r) throws java.io.IOException;
 
-	/**
-	 * Returns the url of the node this body is associated to
-	 * The url of the node can change if the active object migrates
-	 * @return the url of the node this body is associated to
-	 */
-	public String getNodeURL();
+    /**
+     * Returns the url of the node this body is associated to
+     * The url of the node can change if the active object migrates
+     * @return the url of the node this body is associated to
+     */
+    public String getNodeURL();
 
-	/**
-	 * Returns the UniqueID of this body
-	 * This identifier is unique accross all JVMs
-	 * @return the UniqueID of this body
-	 */
-	public UniqueID getID();
+    /**
+     * Returns the UniqueID of this body
+     * This identifier is unique accross all JVMs
+     * @return the UniqueID of this body
+     */
+    public UniqueID getID();
 
-	/**
-	 * Signals to this body that the body identified by id is now to a new
-	 * remote location. The body given in parameter is a new stub pointing
-	 * to this new location. This call is a way for a body to signal to his
-	 * peer that it has migrated to a new location
-	 * @param id the id of the body
-	 * @param body the stub to the new location
-	 */
-	public void updateLocation(UniqueID id, UniversalBody body) throws java.io.IOException;
+    /**
+     * Signals to this body that the body identified by id is now to a new
+     * remote location. The body given in parameter is a new stub pointing
+     * to this new location. This call is a way for a body to signal to his
+     * peer that it has migrated to a new location
+     * @param id the id of the body
+     * @param body the stub to the new location
+     */
+    public void updateLocation(UniqueID id, UniversalBody body)
+        throws java.io.IOException;
 
-	/**
-	 * Returns the remote friendly version of this body
-	 * @return the remote friendly version of this body
-	 */
-	public UniversalBody getRemoteAdapter();
+    /**
+     * Returns the remote friendly version of this body
+     * @return the remote friendly version of this body
+     */
+    public UniversalBody getRemoteAdapter();
 
-	/**
-	 * Enables automatic continuation mechanism for this body
-	 */
-	public void enableAC() throws java.io.IOException;
+    /**
+     * Enables automatic continuation mechanism for this body
+     */
+    public void enableAC() throws java.io.IOException;
 
-	/**
-	 * Disables automatic continuation mechanism for this body
-	 */
-	public void disableAC() throws java.io.IOException;
+    /**
+     * Disables automatic continuation mechanism for this body
+     */
+    public void disableAC() throws java.io.IOException;
 
-	/**
-	 * For setting an immediate service for this body.
-	 * An immediate service is a method that will bw excecuted by the calling thread.
-	 */
-	public void setImmediateService(String methodName) throws IOException;
+    /**
+     * For setting an immediate service for this body.
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     */
+    public void setImmediateService(String methodName)
+        throws IOException;
 
+    /**
+     * Returns a reference on the component metaobject
+     */
+
+    // COMPONENTS
+    public ProActiveComponent getProActiveComponent() throws IOException;
 }
