@@ -35,6 +35,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import org.objectweb.proactive.ic2d.gui.util.MessagePanel;
 import org.objectweb.proactive.core.util.MessageLogger;
+import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.globus.*;
 import java.awt.GridLayout;
 import java.awt.BorderLayout.*;
@@ -50,6 +51,8 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
   private ProcessOutputPanel processOutputPanel;
   private javax.swing.JSplitPane mainSplitPanel;
   private GlobusProcess globusProcess;
+  // we need a deep copy of the process to be able to run multiple process from the same window
+  private GlobusProcess globusCopyProcess;
   private Dictionary globusProcesses=new Hashtable();
 
   //
@@ -213,7 +216,7 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
 	      stopProcessButton.setEnabled(true);
               // We update the output frame
 	      if(getCurrentProcess()==null){
-                processOutputPanel.processChanged(globusProcess);
+                processOutputPanel.processChanged(globusCopyProcess);
 	      }
 	      else {
                 processOutputPanel.processChanged(getCurrentProcess());
@@ -329,12 +332,15 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
 	      String nodeName = filterEmptyString(nodeNameField.getText());
 	      String nodeURL = UrlBuilder.buildUrl(hostname, nodeName,protocol+":");
 	      System.out.println("Node URL:"+nodeURL);
+	      
+	      //Make the deep copy of the process to be able to run multiple globus process
+	      globusCopyProcess = (GlobusProcess)makeDeepCopy(globusProcess);
 
 	      // CREATE THE GLOBUS PROCESS
-	      globusProcess.startNodeWithGlobus(nodeURL);
+	      globusCopyProcess.startNodeWithGlobus(nodeURL);
 	      //globusProcess = new GlobusProcess();
 	      //globusProcess.startNodeWithGlobus(protocol+"://"+hostname+"/"+nodeName); 
-	      processesListModel.addProcess(globusProcess);
+	      processesListModel.addProcess(globusCopyProcess);
 	      // Attendre que la sortie soit prete pour mettre a jour la fenetre d'output
 	      // ... a faire
 	      // while (!gp.isReady() ... and i<MAX_RETRY...
@@ -390,6 +396,29 @@ public class GlobusProcessControlPanel extends javax.swing.JPanel {
       areaScrollPane.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.black));
       return areaScrollPane;
     }
+    
+    /**
+	 * Returns a deepcopy of the process
+	 * @param process the process to copy
+	 * @return ExternalProcess, the copy version of the process
+	 */
+  private ExternalProcess makeDeepCopy(ExternalProcess process){
+  	ExternalProcess result = null;
+  	try{
+  	java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+    java.io.ObjectOutputStream oos = new java.io.ObjectOutputStream(baos);
+    oos.writeObject(process);
+    oos.flush();
+    oos.close();
+    java.io.ByteArrayInputStream bais = new java.io.ByteArrayInputStream(baos.toByteArray());
+    java.io.ObjectInputStream ois = new java.io.ObjectInputStream(bais);
+    result = (ExternalProcess)ois.readObject();
+    ois.close();
+  	}catch(Exception e){
+  		e.printStackTrace();
+  	}
+    return result; 
+  }
 
   } // end inner class ProcessDefinitionPanel
 
