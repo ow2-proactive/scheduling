@@ -92,7 +92,16 @@
       ==
       ================================================================
 	-->
-	<target name="core" depends="init">
+	<target name="configurationCopy">
+		<copy toDir="${classes.dir}">
+			<fileset dir="${src.dir}">			
+				<include name="**/*.xml"/>		
+			</fileset>
+		</copy>
+	</target>
+	
+	
+	<target name="core" depends="init, configurationCopy">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="*.java"/>
