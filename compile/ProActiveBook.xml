@@ -82,6 +82,12 @@
 			<SectionFile>..\src\org\objectweb\proactive\doc-files\_Migration.html</SectionFile>
 		</Chapter>
 		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_Descriptor.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_TypedGroupCommunication.html</SectionFile>
+		</Chapter>
+		<Chapter>
 			<SectionFile>..\src\org\objectweb\proactive\doc-files\_MOP.html</SectionFile>
 		</Chapter>
 		<Chapter>
