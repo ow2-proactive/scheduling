@@ -66,10 +66,6 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.examples.c3d.C3DRenderingEngine;
-import org.objectweb.proactive.examples.c3d.C3DUser;
-import org.objectweb.proactive.examples.c3d.Interval;
-import org.objectweb.proactive.examples.c3d.Scene;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
 import org.objectweb.proactive.examples.c3d.prim.Sphere;
@@ -697,6 +693,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	{
 		/* Register this C3DDispatcher, this will serve as entry point to the
 		 * raytracing system for the user frames */
+		 
 		try
 		{
 			org.objectweb.proactive.core.node.Node node =
@@ -710,6 +707,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 				org.objectweb.proactive.ProActive.getStubOnThis(),
 				s_access_url);
 			log("Successfully registered at " + s_access_url + " and ready.");
+			
 		}
 		catch (org.objectweb.proactive.core.node.NodeException e)
 		{
@@ -1244,6 +1242,31 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			c3duser.setPixels(pixels, inter);
 		}
 		return i_lastuser++;
+	}
+	
+	public void registerMigratedUser(int userNumber){
+		
+
+		User user = (User)h_users.get(new Integer(userNumber));
+		log("User " + user.getName() + "(" + userNumber + ") has migrated ");
+		
+		for (Enumeration e = h_users.keys(); e.hasMoreElements();)
+		{
+			int i = ((Integer) e.nextElement()).intValue();
+			User oldUser = ((User) h_users.get(new Integer(i)));
+			if (i != userNumber)
+			{
+				// Inform the migrated user
+				user.getObject().informNewUser(i, oldUser.getName());
+			}
+		}
+		
+		
+		/* Initializes the image of the migrated consumer */
+		Interval inter = new Interval(0, width, height, 0, height, 1);
+		user.getObject().setPixels(pixels, inter);
+		
+		
 	}
 
 	/** 
