@@ -32,6 +32,17 @@ package org.objectweb.proactive.core.event;
 
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 
+/**
+ * <p>
+ * A class implementating this interface is able to generate RuntimeRegistrationEvent
+ * </p>
+ * 
+ * @see RuntimeRegistrationEvent
+ * @author  ProActive Team
+ * @version 1.0,  2003/03/23
+ * @since   ProActive 1.0.1
+ *
+ */
 
 public interface RuntimeRegistrationEventProducer
 {
