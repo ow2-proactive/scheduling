@@ -24,7 +24,7 @@ public class ProcessForGroupCreation implements Runnable {
 
 	public void run() {
 		try {
-			this.proxyGroup.add(this.index,ProActive.newActive(className, param, node));
+			this.proxyGroup.set(this.index,ProActive.newActive(className, param, node));
 			this.proxyGroup.decrementWaitedAndNotifyAll();
 		} catch (Exception e) {
 			e.printStackTrace();
