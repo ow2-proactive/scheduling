@@ -45,10 +45,11 @@ import testsuite.test.FunctionalTest;
  */
 public class TestNodes extends FunctionalTest {
 
-     private static String XML_LOCATION;
+     
 	
 	
 	private static String XML_LOCATION;
+	
 	static {
 		String value = System.getProperty("nonregressiontest.descriptor.defaultnodes.file");
 		if (value != null) {
