@@ -18,7 +18,7 @@ import org.xml.sax.SAXException;
 /**
  * @author Matthieu Morel
  */
-public class ComponentsHandler extends AbstractUnmarshallerDecorator {
+public class ComponentsHandler extends AbstractUnmarshallerDecorator implements ContainerHandlerMarker {
 
 	public static Logger logger = Logger.getLogger(ComponentsHandler.class.getName());
 
@@ -26,27 +26,56 @@ public class ComponentsHandler extends AbstractUnmarshallerDecorator {
 	private ComponentsCache componentsCache;
 	private HashMap componentTypes;
 	private List subComponents;
+	private boolean enabled;
+	private ContainerElementHierarchy containersHierarchy;
 
-	public ComponentsHandler(ProActiveDescriptor deploymentDescriptor, ComponentsCache componentsCache, HashMap componentTypes) {
+	public ComponentsHandler(
+		ProActiveDescriptor deploymentDescriptor,
+		ComponentsCache componentsCache,
+		HashMap componentTypes,
+		AbstractContainerComponentHandler fatherHandler) {
+		enable();
+		containersHierarchy = new ContainerElementHierarchy();
+		containersHierarchy.addFatherHandler(fatherHandler);
 		this.deploymentDescriptor = deploymentDescriptor;
 		this.componentsCache = componentsCache;
 		this.componentTypes = componentTypes;
 		// handlers for the different types of components are added when components are effectively encountered
-		// this avoids infinite handlers due to the recursive structure of components 
-		addHandler(ComponentsDescriptorConstants.BINDINGS_TAG, new BindingsHandler(componentsCache));
+		// this avoids infinite handlers due to the recursive structure of components
+		BindingsHandler bindings_handler = new BindingsHandler(componentsCache);
+		addHandler(ComponentsDescriptorConstants.BINDINGS_TAG, bindings_handler);
 		subComponents = new ArrayList();
+		getContainerElementHierarchy().disableGrandFatherHandler();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
 	 */
 	protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
-		if (name.equals(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG)
-			|| name.equals(ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG)
-			|| name.equals(ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG)) {
-			// add the name of this sub component to the list
-			logger.debug("adding component's name : " + (String)activeHandler.getResultObject());
-			subComponents.add((String)activeHandler.getResultObject());
+		if (isEnabled() || getContainerElementHierarchy().containsChild(activeHandler)) {
+			enable(); // just to make sure
+			if (name.equals(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG)
+				|| name.equals(ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG)
+				|| name.equals(ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG)) {
+				// add the name of this sub component to the list
+				ComponentResultObject result = (ComponentResultObject) activeHandler.getResultObject();
+				if (result.componentsAreParallelized()) {
+					String[] component_names = result.getNames();
+					for (int i = 0; i < component_names.length; i++) {
+						subComponents.add(component_names[i]);
+						if (logger.isDebugEnabled()) {
+							logger.debug("adding component's name : " + component_names[i]);
+						}
+					}
+				} else {
+					subComponents.add(result.getName());
+					if (logger.isDebugEnabled()) {
+						logger.debug(
+							"adding component's name : "
+								+ ((ComponentResultObject) activeHandler.getResultObject()).getName());
+					}
+				}
+			}
 		}
 	}
 
@@ -57,11 +86,8 @@ public class ComponentsHandler extends AbstractUnmarshallerDecorator {
 		return subComponents;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
-	 */
-	public void startContextElement(String name, Attributes attributes) throws SAXException {
-	}
+
+	
 
 	/* (non-Javadoc)
 	 * @see org.objectweb.proactive.core.xml.io.XMLHandler#readValue(java.lang.String)
@@ -74,22 +100,53 @@ public class ComponentsHandler extends AbstractUnmarshallerDecorator {
 	 * @see org.objectweb.proactive.core.xml.io.XMLHandler#startElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
 	 */
 	public void startElement(String name, Attributes attributes) throws SAXException {
-		if (name.equals(ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG)) {
-			addHandler(
-				ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG,
-				new CompositeComponentHandler(deploymentDescriptor, componentsCache, componentTypes));
+		if (isEnabled()) {
+			if (name.equals(ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG)) {
+				CompositeComponentHandler handler =
+					new CompositeComponentHandler(deploymentDescriptor, componentsCache, componentTypes, this);
+				getContainerElementHierarchy().addChildContainerHandler(handler);
+				addHandler(ComponentsDescriptorConstants.COMPOSITE_COMPONENT_TAG, handler);
+			}
+			if (name.equals(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG)) {
+				addHandler(
+					ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG,
+					new PrimitiveComponentHandler(deploymentDescriptor, componentsCache, componentTypes));
+			}
+			if (name.equals(ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG)) {
+				ParallelCompositeComponentHandler handler =
+					new ParallelCompositeComponentHandler(deploymentDescriptor, componentsCache, componentTypes, this);
+				addHandler(ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG, handler);
+				getContainerElementHierarchy().addChildContainerHandler(handler);
+			}
 		}
-		if (name.equals(ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG)) {
-			addHandler(
-				ComponentsDescriptorConstants.PRIMITIVE_COMPONENT_TAG,
-				new PrimitiveComponentHandler(deploymentDescriptor, componentsCache, componentTypes));
-		}
-		if (name.equals(ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG)) {
-			addHandler(
-				ComponentsDescriptorConstants.PARALLEL_COMPOSITE_COMPONENT_TAG,
-				new PrimitiveComponentHandler(deploymentDescriptor, componentsCache, componentTypes));
-		}
-		super.startElement(name, attributes);
+			super.startElement(name, attributes);
+	}
+
+	public void enable() {
+		enabled = true;
+	}
+
+	public void disable() {
+		enabled = false;
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.component.xml.ContainerHandlerMarker#getContainerElementHierarchy()
+	 */
+	public ContainerElementHierarchy getContainerElementHierarchy() {
+		return containersHierarchy;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
+	 */
+	public void startContextElement(String name, Attributes attributes) throws SAXException {
+		// Auto-generated method stub
+
 	}
 
 }
