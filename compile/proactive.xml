@@ -402,7 +402,7 @@
       ================================================================
 	-->
 	<target name="nonregressiontest" depends="testsuite">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" debug="${debug}" >
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
@@ -416,6 +416,7 @@
 	<target name="runTests" depends="testsuite, nonregressiontest">
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="project.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
 		</java>
 	</target>
 </project>
