@@ -84,6 +84,7 @@ custom activity of an active object ?</a></li>
  <li class="textNormal"><a href="#liveAndActive">What did happen to the former
     <b>live()</b> method and <b>Active</b> interface ?</a></li>
      <li class="textNormal"><a href="#asynch">Are the call to an Active Object always asynchronous ?</a></li>
+     <li class="textNormal"><a href="#future">Why should I avoid to return null in methods body ?</a></li>
  <li class="textNormal"><a href="#JiniUse">How can I use <b>Jini </b> in ProActive ?</a></li>
 <li class="textNormal"><a href="#JiniPb">Why do I get an exception when using <b>Jini </b>?</a></li>
 <li class="textNormal"><a href="#config">What is the difference between passing parameters in Deployment Descriptor and setting properties in ProActive Configuration  file?</a></li>
@@ -802,6 +803,40 @@ suppose that one of your object  has a method</p><pre><b> int</b> getNumber()</p
 [<a href="#answers">Answers</a>]</tt></p>
 
 
+<li class="textNormal"><a
+ name="future">
+<h3>Why should I avoid to return null in methods body ?</h3>
+</a>
+<p class="textNormal">On the <b>caller</b> side the test <b>if(result_from_method == null)</b> has no sense. Indeed result_from_method is a couple Stub-FutureProxy as explained above, so even if the method returns null, result_from_method cannot be null:
+<pre>public class MyObject{
+
+ public MyObject(){
+ //empty constructor with no-args
+ }
+ 
+ public Object getObject{
+ if(.....) {
+ return new Object();
+ }
+ else {
+   return null; --> to avoid in ProActive
+  }
+ }
+ 
+}</pre>
+
+On the caller side:
+<pre>
+MyObject o = new MyObject();
+Object result_from_method = o.getObject();
+if(result_from_method == null){
+......
+}
+</pre>
+ This test is never true, indeed, result_from_method is <b>Stub-->Proxy-->null</b> if the future is not yet available or the method returns null or <b>Stub-->Proxy-->Object</b> if the future is available, but result_from_method is <b>never null</b>. see <a href="FutureObjectCreation.html#commonerror">Future documentation</a>  for more documentation about common errors to avoid </p>
+<!-- separation link --> 
+  <p align="center"><tt>[<a href="#top">Top</a>] [<a href="#list">Questions</a>]
+[<a href="#answers">Answers</a>]</tt></p>
 <li class="textNormal"><a
  name="JiniUse">
 <h3>How can I use <b>Jini </b> in ProActive ?</h3>

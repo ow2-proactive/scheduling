@@ -280,7 +280,63 @@ future object (see figure below).
 <br><b class="legend">
 Sequence Diagram
 </b><br></div>
+<h2>Important Notes: Errors to avoid</h2>
+<a
+ name="commonerror"></a>
+ there are few things to remember with asynchronous method call and futures, in order to avoid annoying debugs:<br></br>
+ <ul>
+		<li><b>Constructor with no-args:</b> this constructor will be used either for  the Active Objects creation(if not present, an exception might be thrown) or Future creation for a method call (if not present, the method call is synchronous). Avoid to put initialization stuff in this constructor, as it might lead to unexpected behavior. Indeed this constructor is called for the stub creation.</li><br></br>
+		<li>Make your classes implement <b>Serializable </b>interface since ProActive deals with objects that cross the network<br></br></li>
+		<li>Think to use <b>wrappers </b>instead of primitive types or final classes for methods result type otherwise you will loose the asynchronism capabilities. For instance if one of your object has a method<pre><b> int</b> giveSolution(parameter)</pre> calling this method with ProActive is sychronous. So to keep the asynchronism it is advised  to use<pre><b>MyInteger </b>giveSolution(parameter)</pre>In that case call to this method is asynchronous. 
+<pre>public class MyInteger{
 
+protected int i;
+
+ public MyInteger(){
+ //empty constructor with no-args
+ }
+ 
+ public MyInteger(int i){
+ this.i = i;
+ }
+ 
+ public int get{
+  return i;
+ }
+ 
+}</pre>
+<p class="textNormal">Only the methods  return type are concerned not the parameters.</p>
+
+<br></li>
+<li>
+<b>Avoid</b> to return null in Active Object methods: on the <b>caller</b> side the test <b>if(result_from_method == null)</b> has no sense. Indeed result_from_method is a couple Stub-FutureProxy as explained above, so even if the method returns null, result_from_method cannot be null:
+<pre>public class MyObject{
+
+ public MyObject(){
+ //empty constructor with no-args
+ }
+ 
+ public Object getObject{
+ if(.....) {
+ return new Object();
+ }
+ else {
+   return null; --> to avoid in ProActive
+  }
+ }
+ 
+}</pre>
+
+On the caller side:
+<pre>
+MyObject o = new MyObject();
+Object result_from_method = o.getObject();
+if(result_from_method == null){
+......
+}
+</pre>
+ This test is never true, indeed, result_from_method is <b>Stub-->Proxy-->null</b> if the future is not yet available or the method returns null or <b>Stub-->Proxy-->Object</b> if the future is available, but result_from_method is <b>never null</b>
+</li>
 <!--
  Footer : start 
 ~~~ -->
