@@ -35,7 +35,7 @@ public class Test
 		Thread.sleep(5000);
 		node1.getActiveObjects();
 		//call getActiveObject method
-		Agent agent2 = (Agent)((node2.getActiveObject("test.getactiveobjects.Agent"))[0]);
+		Agent agent2 = (Agent)((node2.getActiveObjects("test.getactiveobjects.Agent"))[0]);
 		System.out.println("hostname: "+ agent2.getName());
 		System.out.println("nodename: "+ agent2.getNodeName());
 		System.out.println("myname: "+ agent2.getMyName());
