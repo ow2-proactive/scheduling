@@ -357,31 +357,6 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         return body;
     }
 
-    /**
-     * Components are equal if they have the same UniqueID. However, it is only
-     * possible to compare the current component with a reference on another
-     * component, in other words with a ProActiveComponentRepresentative object.
-     *
-     * see {@link ProActiveComponent#equals(Object)}
-     */
-    public boolean equals(Object component) {
-        if (component instanceof ProActiveComponentRepresentative) {
-            return getBody().getID().equals(((ProActiveComponentRepresentative) component).getID());
-        } else {
-            logger.error(
-                "can only compare the current component with component representatives");
-            return false;
-        }
-    }
-
-    /**
-     * hashCode override
-     *
-     * @return a hashCode for this object
-     */
-    public int hashCode() {
-        return getBody().hashCode();
-    }
 
     /**
      * see
