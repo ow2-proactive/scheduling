@@ -3,28 +3,23 @@ package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitchEvent;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitchListener;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
-public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstants, SwitchListener
+public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstants
 {
 	private DataAssociation asso;
 	private DataModelTraversal traversal;
 	private SwitcherModel smodel;
-	private NodeHelper helper;
 	private boolean[] highlighted;
 	
-	public DataTreeModel (DataAssociation _asso, SwitcherModel _smodel, DataModelTraversal _traversal, NodeHelper _helper)
+	public DataTreeModel (DataAssociation _asso, SwitcherModel _smodel, DataModelTraversal _traversal)
 	{
 		super(new DataTreeNode(_traversal));
 		asso = _asso;
 		traversal = _traversal;
 		smodel = _smodel;
-		helper = _helper;
 		highlighted = new boolean[NB_KEYS];
 		
-		smodel.addSwitchListener (this);
 		smodel.setTreeModel(this);
 	}
 	
@@ -48,12 +43,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	public DataAssociation getAssociations() {
 		return asso;
 	}
-	
-	public void switchPerformed (SwitchEvent e)
-	{
-		nodeStructureChanged (root);
-	}
-	
+		
 	public SwitcherModel getSwitcherModel ()
 	{
 		return smodel;
@@ -71,9 +61,9 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 		return false;
 	}
 	
-	public void toggleHidden(int key) {
+	public void setHidden(int key, boolean hide) {
 		if (key != NO_KEY) {
-			traversal.toggleHidden(key);
+			traversal.setHidden(key, hide);
 			rebuild();
 		}
 	}

@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-public class Switcher extends JPanel implements SwitchListener
+public class Switcher extends JPanel
 {
 	private SwitcherModel model;
 	private JLabel [] labels;
@@ -21,9 +21,6 @@ public class Switcher extends JPanel implements SwitchListener
 		model = _model;
 		
 		final JPopupMenu popupmenu = new JPopupMenu ();
-		
-		model.addSwitchListener (this);
-		
 		int size = model.size();
 		labels = new JLabel [size];
 		
@@ -44,8 +41,9 @@ public class Switcher extends JPanel implements SwitchListener
 					hide.addActionListener(new ActionListener () {
 						public void actionPerformed (ActionEvent e)
 						{
-							model.toggleHidden(l.getText());
-							hide.setSelected(model.isHidden(l.getText()));
+							boolean wantToHide = !model.isHidden(l.getText());
+							performSwitch(l, !wantToHide);
+							hide.setSelected(wantToHide);
 							jtree.repaint();
 						}
 					});
@@ -106,26 +104,6 @@ public class Switcher extends JPanel implements SwitchListener
 	{
 		label.setFont (isNewStateON ? ON_Font() : OFF_Font());
 		label.setBackground (isNewStateON ? ON : OFF);
-	}
-
-	public SwitcherModel getModel()
-	{
-		return model;
-	}
-
-	private void updateModel (String label)
-	{
-		model.switchStateLabel (label);
-	}
-	
-	public void switchPerformed (SwitchEvent e)
-	{
-//		System.out.println("JLabel: " + e.getLabel() + " is now '" + (e.getType() == SwitchEvent.ON ? "on" : "off") +"'");
-		for (int i = 0; i < labels.length; i++)
-		{
-			JLabel l = labels[i];
-			if (l.getText().equals (e.getLabel()))
-				performSwitch (l, e.getType() == SwitchEvent.ON);
-		}
+		model.setHidden(label.getText(), !isNewStateON);
 	}
 }

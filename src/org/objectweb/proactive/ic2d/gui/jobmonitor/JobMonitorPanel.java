@@ -37,7 +37,6 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.NodeHelper;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.SwitcherModel;
 
@@ -628,10 +627,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private JPanel createJobView ()
 	{
 		SwitcherModel jobSwitchModel = new SwitcherModel (JOB_VIEW_KEYS);
-		NodeHelper helper = new NodeHelper (jobSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (JOB_VIEW_KEYS);
-		jobViewModel = new DataTreeModel (asso, jobSwitchModel, traversal, helper);
+		jobViewModel = new DataTreeModel (asso, jobSwitchModel, traversal);
 		
 		return createPanel (jobViewModel);
 	}
@@ -639,10 +637,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private JPanel createHostView ()
 	{
 		SwitcherModel hostSwitchModel = new SwitcherModel (HOST_VIEW_KEYS);
-		NodeHelper helper = new NodeHelper (hostSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (HOST_VIEW_KEYS);
-		hostViewModel = new DataTreeModel (asso, hostSwitchModel, traversal, helper);
+		hostViewModel = new DataTreeModel (asso, hostSwitchModel, traversal);
 		
 		return createPanel (hostViewModel);
 	}
@@ -650,10 +647,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants
 	private JPanel createVNView ()
 	{
 		SwitcherModel vnSwitchModel = new SwitcherModel (VN_VIEW_KEYS);
-		NodeHelper helper = new NodeHelper (vnSwitchModel);
 		
 		DataModelTraversal traversal = new DataModelTraversal (VN_VIEW_KEYS);
-		vnViewModel = new DataTreeModel (asso, vnSwitchModel,  traversal, helper);
+		vnViewModel = new DataTreeModel (asso, vnSwitchModel,  traversal);
 		
 		return createPanel (vnViewModel);
 	}	
