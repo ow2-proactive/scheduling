@@ -144,8 +144,8 @@ The <code>Fractive</code> class acts as :
 <pre class="snippet">i= (I) Fractal.createCollectiveClientInterface("i",I.class.getName());</pre>
 <p class="textNormal">Then the binding method (implementation of the BindingController interface) would be :</p>
 <pre class="snippet">public void bindFc(String clientItfName, Object serverItf) {
-        if (clientItfName.equals(I2_ITF_NAME)) {
-            ProActiveGroup.getGroup(i2).add(serverItf);
+        if (clientItfName.equals("i")) {
+            ProActiveGroup.getGroup(i).add(serverItf);
         }
 }</pre>
 <p class="textNormal">You will be able to see the collective interface as an object of type I, and therefore invoke methods defined by I. But you will also be able to see the collective interface as a <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/Collection.html"/>collection</a>, as a group can also be manipulated as a collection : <br>
@@ -458,6 +458,7 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <p class="textSmall"><i>
 History :<BR>
 March 2004 : 1st version
+June 2004 : typo fix (bindFc method in "conformance ... / collective bindings" references i, not i2)
 </i></p>
 
 <!--
