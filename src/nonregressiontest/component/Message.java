@@ -4,6 +4,8 @@
   */
 package nonregressiontest.component;
 
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.io.Serializable;
 
 
@@ -13,6 +15,7 @@ import java.io.Serializable;
 public class Message implements Serializable {
 
 	String message;
+	boolean valid = true;
 
 	public Message() {
 	}
@@ -27,12 +30,32 @@ public class Message implements Serializable {
 	}
 
 	public Message append(Message message) {
-		this.message = message + message.toString();
+		if (isValid()) {
+			this.message = message + message.toString();
+		}
 		return this;
 	}
 
 	public String toString() {
 		return message;
 	}
+	
+	public void setInvalid() {
+		message = null;
+		valid = false;
+	}
+	
+	public boolean isValid() {
+		return valid;
+	}
+	
+	public void printToStream(PrintStream out) {
+		out.println(message);
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	 
 
 }

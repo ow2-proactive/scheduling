@@ -12,6 +12,7 @@ import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
 import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 
 
@@ -28,6 +29,8 @@ public class PrimitiveComponentD implements I1, BindingController {
     // typed collective interface
     I2 i2 = (I2) Fractive.createCollectiveClientInterface(I2_ITF_NAME,
             I2.class.getName());
+    // ref on the Group
+    Group i2Group = ProActiveGroup.getGroup(i2);
 
     /**
      *
@@ -40,7 +43,7 @@ public class PrimitiveComponentD implements I1, BindingController {
      */
     public void bindFc(String clientItfName, Object serverItf) {
         if (clientItfName.equals(I2_ITF_NAME)) {
-            ProActiveGroup.getGroup(i2).add(serverItf);
+            i2Group.add(serverItf);
         } else {
             logger.error("Binding impossible : wrong client interface name");
         }
@@ -59,7 +62,8 @@ public class PrimitiveComponentD implements I1, BindingController {
             //return msg;
         } else {
             logger.error("cannot forward message (binding missing)");
-            return null;
+            message.setInvalid();
+            return message;
         }
     }
 
@@ -91,7 +95,7 @@ public class PrimitiveComponentD implements I1, BindingController {
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
         if (clientItf.equals(I2_ITF_NAME)) {
-            ProActiveGroup.getGroup(i2).clear();
+            i2Group.clear();
             if (logger.isDebugEnabled()) {
                 logger.debug(I2_ITF_NAME + " interface unbound");
             }

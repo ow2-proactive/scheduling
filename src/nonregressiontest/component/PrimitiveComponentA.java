@@ -72,7 +72,8 @@ public class PrimitiveComponentA implements I1, BindingController {
 			return (i2.processOutputMessage(message.append(MESSAGE))).append(MESSAGE);
 		} else {
 			logger.error("cannot forward message (binding missing)");
-			return null;
+			message.setInvalid();
+			return message;
 		}
 	}
 
