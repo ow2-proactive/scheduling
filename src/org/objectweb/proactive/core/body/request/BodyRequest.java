@@ -123,6 +123,7 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
     } catch (MethodCallExecutionFailedException e) {
       throw new ServeException("serve method " + methodCall.getName() + " failed", e);
     } catch (java.lang.reflect.InvocationTargetException e) {
+    	e.printStackTrace();
     }
   }
 
