@@ -964,7 +964,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Builds the members using the threads (of the threadpool).
      * @param className - the name of the Class of the members.
-     * @param params - an array that contains the parameters for the constructor of member.
+     * @param params - an array that contains the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
     protected void createMemberWithMultithread(String className,
@@ -976,6 +976,25 @@ public class ProxyForGroup extends AbstractProxy
         for (int i = 0; i < params.length; i++) {
             this.threadpool.addAJob(new ProcessForGroupCreation(this,
                     className, params[i], nodeList[i % nodeList.length], i));
+        }
+        this.threadpool.complete();
+    }
+
+    /**
+     * Builds the members using the threads (of the threadpool).
+     * @param className - the name of the Class of the members.
+     * @param params - the parameters for the constructor of members.
+     * @param nodeList - the nodes where the member will be created.
+     */
+    protected void createMemberWithMultithread(String className,
+        Object[] params, String[] nodeList) {
+        // Initializes the Group to the correct size
+        for (int i = 0; i < params.length; i++) {
+            this.memberList.add(null);
+        }
+        for (int i = 0; i < params.length; i++) {
+            this.threadpool.addAJob(new ProcessForGroupCreation(this,
+                    className, params, nodeList[i % nodeList.length], i));
         }
         this.threadpool.complete();
     }
