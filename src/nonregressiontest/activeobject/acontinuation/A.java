@@ -34,7 +34,7 @@ import org.objectweb.proactive.ProActive;
 
 
 public class A implements java.io.Serializable {
-    boolean isFuture;
+    boolean isFuture=true;
     private A deleguate;
     Id id;
     Id idSent;
@@ -77,7 +77,7 @@ public class A implements java.io.Serializable {
 
     public Id getIdforFuture() {
         try {
-            Thread.sleep(4000);
+            Thread.sleep(6000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -88,6 +88,7 @@ public class A implements java.io.Serializable {
         if (deleguate != null) {
             deleguate.forwardID(id);
         }
+        
         isFuture = ProActive.isAwaited(id);
         idSent = id;
     }

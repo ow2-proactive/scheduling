@@ -61,9 +61,37 @@ public class Test extends ProActiveFunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        System.setProperty("proactive.future.ac", "enable");
+       	//System.out.println( "Property "+System.getProperty("proactive.future.ac"));
+				System.setProperty("proactive.future.ac","enable");
+				ACThread acthread = new ACThread();
+				acthread.start();
+				acthread.join();
+        System.setProperty("proactive.future.ac","disable");
+    }
 
-        a = (A) ProActive.newActive(A.class.getName(),
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
+
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    	
+    }
+
+    public boolean postConditions() throws Exception {
+        return (futureByResult && a.isSuccessful() &&
+        a.getFinalResult().equals("dummy"));
+    }
+    
+    private class ACThread extends Thread {
+    	
+    	public void run() {
+    		try{
+    		a = (A) ProActive.newActive(A.class.getName(),
                 new Object[] { "principal" });
         a.initFirstDeleguate();
         idDeleguate = a.getId("deleguate2");
@@ -79,22 +107,10 @@ public class Test extends ProActiveFunctionalTest {
         b = (A) ProActive.newActive(A.class.getName(), new Object[] { "dummy" });
         idPrincipal = b.getIdforFuture();
         a.forwardID(idPrincipal);
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#initTest()
-     */
-    public void initTest() throws Exception {
-    }
-
-    /**
-     * @see testsuite.test.AbstractTest#endTest()
-     */
-    public void endTest() throws Exception {
-    }
-
-    public boolean postConditions() throws Exception {
-        return (futureByResult && a.isSuccessful() &&
-        a.getFinalResult().equals("dummy"));
+    		}catch (Exception e){
+    			e.printStackTrace();
+    		}
+    		
+    	}
     }
 }
