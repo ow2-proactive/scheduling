@@ -1269,7 +1269,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			User oldUser = ((User) h_users.get(new Integer(i)));
 			if (i != userNumber)
 			{
-				// Inform the migrated user
+				// Inform users
 				user.getObject().informNewUser(i, oldUser.getName());
 			}
 		}
@@ -1320,13 +1320,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 				user.getObject().informUserLeft(nameOfUser(number));
 			}
 		}
-//		for (Enumeration e = h_users.elements(); e.hasMoreElements();)
-//		{
-//			User user = (User) e.nextElement();
-//			if(
-//			user.getObject().informUserLeft(
-//				nameOfUser(number));
-//		}
+
 
 		try
 		{
