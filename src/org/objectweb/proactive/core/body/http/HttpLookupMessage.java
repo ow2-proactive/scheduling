@@ -64,7 +64,6 @@ public class HttpLookupMessage implements HttpMessage {
 				try {
 					this.returnedObject = org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter.lookup(urn);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				if (this.returnedObject == null) // urn body is no found

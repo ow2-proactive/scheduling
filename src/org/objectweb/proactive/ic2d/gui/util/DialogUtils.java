@@ -122,7 +122,6 @@ public class DialogUtils {
         try {
             worldObject.addHostObject(host, "http");
         } catch (RemoteException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }

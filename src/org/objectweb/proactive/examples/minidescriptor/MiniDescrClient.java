@@ -57,11 +57,9 @@ public class MiniDescrClient {
                 try {
                     bombs[j].join();
                 } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -124,10 +122,8 @@ public class MiniDescrClient {
                     logger.info(buf.toString());
                 }
             } catch (ActiveObjectCreationException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (NodeException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (Exception e) {
                 System.err.println("Error during remote call: ");

@@ -95,7 +95,6 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         try {
             tmp =  UrlBuilder.checkUrl(url);
         } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return tmp;

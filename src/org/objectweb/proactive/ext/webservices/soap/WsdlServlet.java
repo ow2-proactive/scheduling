@@ -77,7 +77,6 @@ public class WsdlServlet extends HttpServlet {
 				
 		
 			} catch (SOAPException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
 	}

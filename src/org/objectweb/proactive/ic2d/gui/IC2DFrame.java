@@ -163,7 +163,6 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         try {
             ic2dObject.getWorldObject().addHostObject(host, protocol);
         } catch (RemoteException e) {
-            // TODO Auto-generated catch block
             logger.log("Cannot create the RMI Host " + host, e);
         }
     }

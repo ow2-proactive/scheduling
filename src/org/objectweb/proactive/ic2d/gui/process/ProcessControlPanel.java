@@ -398,7 +398,6 @@ public class ProcessControlPanel extends javax.swing.JPanel {
                         hostname, username);
                 }
             } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 //e.printStackTrace();
                 messagePanel.getMessageLogger().log("Unknown Host", e);
             }
