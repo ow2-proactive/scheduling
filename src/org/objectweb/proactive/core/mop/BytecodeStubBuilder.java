@@ -72,8 +72,6 @@ public class BytecodeStubBuilder {
     
 
     public BytecodeStubBuilder(String classname) throws ClassNotFoundException {
-//      System.out.println ("Creating builder for class "+classname);
-
         // Obtains the object that represents the type we want to create
         // a wrapper class for. This call may fail with a ClassNotFoundException
         // if the class corresponding to this type cannot be found.
@@ -107,8 +105,6 @@ public class BytecodeStubBuilder {
     }
 
     public byte[] create() {
-//    System.out.println ("Creating stub class for class "+this.className);
-
         // Creates the class generator
         this.classGenerator = this.createClassGenerator();
 
@@ -144,7 +140,7 @@ public class BytecodeStubBuilder {
           theClass.dump (theClass.getClassName()+".class");
         } catch (java.io.IOException e) {
           e.printStackTrace();
-        }*/
+	  }*/
         return theClass.getBytes();
     }
 
@@ -244,7 +240,6 @@ public class BytecodeStubBuilder {
         // Load 'this' onto the stack
         instructionList.append(factory.createThis());
 
-        // System.out.println ("BOO m="+m);
         // Gets the value of the field 'outsideConstructor'
         instructionList.append(factory.createGetField(this.stubClassFullName, "outsideConstructor", Type.BOOLEAN));
 
@@ -266,8 +261,10 @@ public class BytecodeStubBuilder {
         instructionList.append(new PUSH(this.classGenerator.getConstantPool(), paramTypes.length));
         // Creates an array of class objects of that size
         instructionList.append((Instruction) factory.createNewArray(OBJECT_TYPE, (byte) 1));
-        // Fill in the array with the parameters
-        for (int i = 0; i < paramTypes.length; i++) {
+        
+	// Fill in the array with the parameters
+	int indexInParameterArray = 1; // Necessary because sometimes we need to jump 2 slots ahead
+        for (int i = 0; i < paramTypes.length; i++) {   
             // First, duplicate the reference to the array of type Object[]
             // That currently sits on top of the stack
             instructionList.append(factory.createDup(1));
@@ -285,18 +282,21 @@ public class BytecodeStubBuilder {
                 instructionList.append(factory.createNew(nameOfWrapper));
                 instructionList.append(factory.createDup(1));
                 // Load the primitive value on to the stack
-                instructionList.append(factory.createLoad(theType, i + 1));
+                instructionList.append(factory.createLoad(theType, indexInParameterArray));
+		// Handles the fact that some primitive types need 2 slots
+		indexInParameterArray = indexInParameterArray + lengthOfType (paramTypes[i]);
 
                 // Now, we call the constructor of the wrapper
                 Type[] argtypes = new Type[] { convertClassToType(paramTypes[i]) };
                 instructionList.append(factory.createInvoke(nameOfWrapper, "<init>", Type.VOID, argtypes, Constants.INVOKESPECIAL));
             } else {
                 // Simply pushes the argument on to the stack
-                instructionList.append(factory.createLoad(theType, i + 1));
+                instructionList.append(factory.createLoad(theType, indexInParameterArray));
+		indexInParameterArray++; // Non-primitive types only use one slot
             }
 
             // Stores the object in the array
-            instructionList.append(factory.createArrayStore(OBJECT_TYPE));
+            instructionList.append(factory.createArrayStore(OBJECT_TYPE));  
         }
 
         // So now we have the Method object and the array of objects on the stack,
@@ -335,10 +335,14 @@ public class BytecodeStubBuilder {
         // control flows move to the previous instruction
         instructionList.insert(outsideConstructorHandle, factory.createBranchInstruction(Constants.IFEQ, inConstructorHandle));
 
+	// This is for browsing the parameter array, not forgetting that some parameters
+	// require two slots (longs and doubles)
+	indexInParameterArray = 1;
         for (int i = 0; i < paramTypes.length; i++) {
             Type theType = convertClassToType(paramTypes[i]);
-            LocalVariableInstruction lvi = factory.createLoad(theType, i + 1);
+            LocalVariableInstruction lvi = factory.createLoad(theType, indexInParameterArray);
             instructionList.append(lvi);
+	    indexInParameterArray = indexInParameterArray + lengthOfType (paramTypes[i]);
         }
 
         // And perform the call
@@ -539,8 +543,7 @@ public class BytecodeStubBuilder {
 
             // Now, we load onto the stack a pointer to the class that contains the method
             int indexInClassArray = vectorOfSuperClasses.indexOf(this.methods[i].getDeclaringClass());
-            if (indexInClassArray == -1) {
-                System.err.println("Problem : cannot find index for class " + this.methods[i].getDeclaringClass());
+            if (indexInClassArray == -1) {       
             }
             // Load a pointer to the Class array (local variable number 1)
             instructionList.append(factory.createLoad(Type.OBJECT, 1));
@@ -690,7 +693,7 @@ public class BytecodeStubBuilder {
         } catch (ClassNotFoundException e) {
             return null;
         }
-    }
+    } 
 
     /**
      * Converts a java.lang.Class object to its org.apache.bcel.generic.Type equivalent
@@ -726,6 +729,27 @@ public class BytecodeStubBuilder {
                 return new ObjectType(cl.getName());
             }
         }                                
+    }
+
+    protected static int lengthOfType (Class cl)
+    {
+	int result;
+	if (cl.isPrimitive())
+	    {	       
+		if ((cl.equals(Long.TYPE)) || (cl.equals(Double.TYPE)))
+		    {
+			result =  2;
+		    }
+		else
+		    {
+			result =  1;
+		    }
+	    }
+	else
+	    {
+		result =  1;
+	    }                 
+	return result;
     }
 
     protected static Type[] convertClassArrayToTypeArray(Class[] cl) {
