@@ -84,6 +84,11 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
                     vmObject.destroyObject();
                 }
             });
+        popup.add(new javax.swing.AbstractAction("Kill this VM", null) {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                vmObject.killVM();
+            }
+        });
 
         addMouseListener(popup.getMenuMouseListener());
     }

@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
 import org.objectweb.proactive.ic2d.event.SpyEventListener;
@@ -81,6 +82,8 @@ public class VMObject extends AbstractDataObject {
     protected java.util.HashMap objectNodeMap;
     protected SpyListenerImpl activeSpyListener;
     protected VMObjectListener listener;
+    //this node will be used to kill the vm
+    protected Node baseNode;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -95,6 +98,7 @@ public class VMObject extends AbstractDataObject {
         this.vmid = vmid;
         this.protocolId = protocolId;
         this.objectNodeMap = new java.util.HashMap();
+        this.baseNode = node;
         SpyListenerImpl spyListener = new SpyListenerImpl(new MySpyEventListener());
         if (log4jlogger.isDebugEnabled()) {
             log4jlogger.debug("VMObject.<init> creating activeSpyListener");
@@ -235,6 +239,21 @@ public class VMObject extends AbstractDataObject {
     }
 
     public void destroyObject() {
+        getTypedParent().removeVMObject(vmid);
+    }
+    
+    public void killVM(){
+        ProActiveRuntime part = null;
+        try {
+            part = baseNode.getProActiveRuntime();
+            part.killRT(false);
+        } catch (Exception e) {
+            controller.log(" Virtual Machine " +
+                    part.getVMInformation().getVMID() + " on host " +
+                    UrlBuilder.getHostNameorIP(
+                        part.getVMInformation().getInetAddress()) +
+                    " terminated!!!");
+        }
         getTypedParent().removeVMObject(vmid);
     }
 
