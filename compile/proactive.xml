@@ -11,6 +11,7 @@
 	<property name="docs.dir" value="${base}/docs"/>
 	<property name="name" value="ProActive"/>
 	<property name="debug" value="on"/>
+        <property name="source" value="1.4"/>
 	<!-- define the classpath -->
 	<path id="project.classpath">
 		<pathelement location="${base}/classes"/>
@@ -103,7 +104,7 @@
 		</copy>
 	</target>
 	<target name="core" depends="init, configurationCopy">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="*.java"/>
 			<include name="${proactive.dir}/*.java"/>
@@ -132,7 +133,7 @@
       ================================================================
 	-->
 	<target name="ext" depends="core">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 			<include name="${proactive.ext.dir}/**/*.java"/>
 		</javac>
@@ -145,7 +146,7 @@
       ================================================================
 	-->
 	<target name="ic2d" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/ic2d/**/*.java" deprecation="on"  source="${source}" debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/images" includeEmptyDirs="no">
@@ -164,7 +165,7 @@
       ================================================================
 	-->
 	<target name="p2p" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
@@ -176,7 +177,7 @@
       ================================================================
 	-->
 	<target name="examples" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/examples/**/*.java" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/${proactive.dir}/examples" includeEmptyDirs="no">
@@ -204,7 +205,7 @@
 		</copy>
 	</target>
 	<target name="testsuite" depends="ext, copyDivers">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="testsuite/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
@@ -216,7 +217,7 @@
       ================================================================
 	-->
 	<target name="essai" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="project.classpath"/>
 		</javac>
 		<copy todir="${classes.dir}/essai" includeEmptyDirs="no">
@@ -233,7 +234,7 @@
       ================================================================
 	-->
 	<target name="migration" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="migration/**" deprecation="on"  source="${source}"  debug="${debug}"/>
 	</target>
 	<!--
 	   ================================================================
@@ -243,7 +244,7 @@
       ================================================================
 	-->
 	<target name="modelisation" depends="ext, util">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="modelisation/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="modelisation/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath>
 				<path refid="project.classpath"/>
 				<pathelement location="${base}/dev/lib/Jama-1.0.1.jar"/>
@@ -258,7 +259,7 @@
       ================================================================
 	-->
 	<target name="util" depends="">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="util/**" deprecation="on"  source="${source}"  debug="${debug}"/>
 	</target>
 	<!--
 	   ================================================================
@@ -379,6 +380,29 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Generate ProActive stubs for all classes in class
+      ==
+      ================================================================
+	-->	
+	<target name="stub">
+	<echo message="${classes.dir}"/>
+	<path id="test">
+	    	<fileset dir="${classes.dir}" >
+                  <include name="**/TimedMigrationManager.class"/>
+               </fileset>
+	    </path>  
+	     <pathconvert pathsep=" " property="test-files" refid="test">
+	    <!-- <map from="/home1/fabrice/workProActive/ProActive/classes/" to=""/>-->
+	      <map from="${classes.dir}${file.separator}" to=""/>
+	     </pathconvert>
+	<java classname="org.objectweb.proactive.ext.util.StubGenerator" fork="true" dir="${classes.dir}">
+	      <classpath refid="project.classpath"/>
+	       <arg line="${test-files}"/>
+	 </java> 
+	</target>
+	<!--
+	   ================================================================
+	   ==
       ==  Ibisc to generate stubs/skels
       ==
       ================================================================
@@ -396,7 +420,7 @@
 			<classpath refid="project.classpath"/>
 			<arg value="org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntimeImpl"/>
 		</java>
-		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on" debug="${debug}">
+		<javac srcdir="${classes.dir}" destdir="${classes.dir}" deprecation="on"  source="${source}"  debug="${debug}">
 			<include name="**/*.java"/>
 			<classpath refid="project.classpath"/>
 		</javac>
@@ -406,7 +430,7 @@
 	<!--
 	   ================================================================
 	   ==
-      ==  Call the IOGenerator to speed-up serialization
+      ==  Call the IOGenerator to speed-up serialization with Ibis
       ==
       ================================================================
 	-->
@@ -450,7 +474,7 @@
       ================================================================
 	-->
 	<target name="nonregressiontest" depends="testsuite">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
@@ -517,7 +541,7 @@
 		</copy> -->
 	</target>
 	<target name="benchmark" depends="testsuite, microTimer">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
 	</target>
