@@ -236,6 +236,12 @@ public class ProxyForGroup extends AbstractProxy
         return result;
     }
 
+    /** Explicit destructor : Interrupts the threads in the threadpool */ 
+    public void finalize () {
+    	this.threadpool.clean();
+    }
+    
+    
     /* ------------ FOR ASYNCHRONOUS CALL ------------ */
 
     /**

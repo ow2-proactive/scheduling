@@ -94,9 +94,9 @@ public class ThreadPool {
      * @param members - the number of members in the group
      */
     public void checkNumberOfThreads(int members) {
-    	//System.out.println("ThreadPool there are " + members + " members in the pool");
+    	// System.out.println("ThreadPool there are " + members + " members in the pool");
 		int i, f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) + this.additionalThreads;
-	//	System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
+	    // System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
 		if (this.threads.length < f) {
 			Thread[] tmp = new Thread[f];
 			for (i = 0 ; i < this.threads.length ; i++) {
@@ -113,6 +113,7 @@ public class ThreadPool {
 				tmp[i] = this.threads[i];
 			}
 			for (; i < this.threads.length; i++) {
+				this.threads[i].interrupt();
 				this.threads[i] = null;
 			}
 			this.threads = tmp;
@@ -168,14 +169,22 @@ public class ThreadPool {
         this.controler.waitDone();
     }
 
-    /** Cleanly destroys a ThreadPool object */
-    public void finalize() {
-        this.controler.reset();
-        for (int i = 0; i < threads.length; i++) {
+//    /** Cleanly destroys a ThreadPool object */
+//    public void finalize() {
+//        this.controler.reset();
+//        for (int i = 0; i < threads.length; i++) {
+//            this.threads[i].interrupt();
+//            this.controler.jobStart();
+//            // this.threads[i].destroy();   // deprecated
+//        }
+//        this.controler.waitDone();
+//    }
+
+    /** Interrupts the thread in the pool */
+	public void clean() {
+	     for (int i = 0; i < threads.length; i++) {
             this.threads[i].interrupt();
-            this.controler.jobStart();
-            // this.threads[i].destroy();   // deprecated
         }
-        this.controler.waitDone();
-    }
+	}
+
 }
