@@ -54,6 +54,14 @@ public interface ProActiveComponent extends Component {
      */    
     public Object getReferenceOnBaseObject();
 
+	/**
+	 * provides a reference to the current component
+	 * @return a component representative on the current component
+	 * - If called from the representative, it returns this representative 
+	 * - if called from the meta-object, it returns a representative on itself
+	 */    
+	public Component getRepresentativeOnThis();
+
     /**
      * This method's implementation is only valid in the component meta-objects.
      * @return a reference to the queue of request of this active object
