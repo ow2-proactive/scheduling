@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
+import org.objectweb.proactive.core.group.ProActiveGroupManagerFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
@@ -103,6 +104,13 @@ public interface MetaObjectFactory {
      */
     public ThreadStoreFactory newThreadStoreFactory();
 
+	// GROUP
+	/**
+	 * Creates or reuses a ProActiveGroupManagerFactory
+	 * @return a new ProActiveGroupManagerFactory
+	 */
+	public ProActiveGroupManagerFactory newProActiveGroupManagerFactory();
+
     /**
      * creates a ProActiveComponentFactory
      * @return a new ProActiveComponentFactory
@@ -127,5 +135,6 @@ public interface MetaObjectFactory {
 	 */
 	public ProActiveSecurityManager getProActiveSecurityManager();
 
-	public void setProActiveSecurityManager(ProActiveSecurityManager psm);    
+	public void setProActiveSecurityManager(ProActiveSecurityManager psm);
+	
 }

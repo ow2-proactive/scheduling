@@ -57,7 +57,7 @@ public class ThreadPool {
      * By default, the number of thread in the pool is 10.
      */
     public ThreadPool() {
-        this(1);
+        this(0);
     }
 
     /** Builds a ThreadPool, specifying the number of thread to create.

@@ -91,6 +91,8 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
+import org.objectweb.proactive.core.group.ProActiveGroupManager;
+import org.objectweb.proactive.core.group.ProActiveGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
@@ -119,6 +121,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected MigrationManagerFactory migrationManagerFactoryInstance;
     protected RemoteBodyFactory remoteBodyFactoryInstance;
     protected ThreadStoreFactory threadStoreFactoryInstance;
+	protected ProActiveGroupManagerFactory proActiveGroupManagerFactoryInstance;
     protected ProActiveComponentFactory componentFactoryInstance;
 	protected ProActiveSecurityManager proActiveSecurityManager;
 
@@ -133,6 +136,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
         remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
         threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+		proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
     }
 
     /**
@@ -152,6 +156,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
             remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
             threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+			proActiveGroupManagerFactoryInstance = newProActiveGroupManagerFactorySingleton();
         }
     }
 
@@ -205,6 +210,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return threadStoreFactoryInstance;
     }
 
+	public ProActiveGroupManagerFactory newProActiveGroupManagerFactory() {
+		return proActiveGroupManagerFactoryInstance;
+	}    
+
     public ProActiveComponentFactory newComponentFactory() {
         return componentFactoryInstance;
     }
@@ -240,6 +249,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         return new ThreadStoreFactoryImpl();
     }
 
+	protected ProActiveGroupManagerFactory newProActiveGroupManagerFactorySingleton() {
+		return new ProActiveGroupManagerFactoryImpl();
+	}    
+
     protected ProActiveComponentFactory newComponentFactorySingleton(
         ComponentParameters initialComponentParameters) {
         return new ProActiveComponentFactoryImpl(initialComponentParameters);
@@ -262,24 +275,24 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             //}
         }
     }
-
     // end inner class RequestFactoryImpl
+
     protected static class ReplyReceiverFactoryImpl
         implements ReplyReceiverFactory, java.io.Serializable {
         public ReplyReceiver newReplyReceiver() {
             return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
         }
     }
-
     // end inner class ReplyReceiverFactoryImpl
+
     protected static class RequestReceiverFactoryImpl
         implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
         }
     }
-
     // end inner class RequestReceiverFactoryImpl
+
     protected class RequestQueueFactoryImpl implements RequestQueueFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
@@ -292,8 +305,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             }
         }
     }
-
     // end inner class RequestQueueFactoryImpl
+
     protected static class MigrationManagerFactoryImpl
         implements MigrationManagerFactory, java.io.Serializable {
         public MigrationManager newMigrationManager() {
@@ -305,8 +318,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             //}
         }
     }
-
     // end inner class MigrationManagerFactoryImpl
+
     protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory,
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
@@ -328,16 +341,24 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
             }
         }
     }
-
     // end inner class RemoteBodyFactoryImpl
+
     protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory,
         java.io.Serializable {
         public ThreadStore newThreadStore() {
             return new org.objectweb.proactive.core.util.ThreadStoreImpl();
         }
     }
-
     // end inner class ThreadStoreFactoryImpl
+
+	protected static class ProActiveGroupManagerFactoryImpl implements ProActiveGroupManagerFactory,
+		java.io.Serializable {
+			public ProActiveGroupManager newProActiveGroupManager() {
+				return new ProActiveGroupManager();
+		}
+	}
+	// end inner class ProActiveGroupManagerFactoryImpl
+
     protected class ProActiveComponentFactoryImpl
         implements ProActiveComponentFactory, java.io.Serializable {
         // COMPONENTS
@@ -355,10 +376,11 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     
     // SECURITY
 	public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
-		proActiveSecurityManager = psm;
+		this.proActiveSecurityManager = psm;
 	}
 
 	public ProActiveSecurityManager getProActiveSecurityManager() {
 		return proActiveSecurityManager;
-	}    
+	}
+
 }

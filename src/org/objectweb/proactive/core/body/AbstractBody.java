@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.group.ProActiveGroupManager;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.ext.security.Communication;
@@ -112,6 +113,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   protected Hashtable openedSessions;
   protected static Logger logger = Logger.getLogger(AbstractBody.class.getName());
 
+  // GROUP
+  protected ProActiveGroupManager pgm;
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
@@ -146,6 +149,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     super(nodeURL, factory.newRemoteBodyFactory());
     this.threadStore = factory.newThreadStoreFactory().newThreadStore();
     
+	// GROUP
+	this.pgm = factory.newProActiveGroupManagerFactory().newProActiveGroupManager();
+
     // SECURITY
 	this.psm = factory.getProActiveSecurityManager();
 	   if (psm != null) {
@@ -154,7 +160,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 		   logger.debug("Security is on " + isSecurityOn);
 		   psm.setBody(this);
 		   internalBodySecurity = new InternalBodySecurity(null);
-	   }    
+	   } 
   }
 
 
@@ -178,14 +184,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   public void receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
     //System.out.println("  --> receiveRequest m="+request.getMethodName());
 	try {
-		enterInThreadStore();
-		if (isDead) {
+		this.enterInThreadStore();
+		if (this.isDead) {
 			throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
 		}
-		if (isSecurityOn) {
+		if (this.isSecurityOn) {
 			try {
-				renegociateSessionIfNeeded(request.getSessionId());
-				if ((internalBodySecurity.isLocalBody()) &&
+				this.renegociateSessionIfNeeded(request.getSessionId());
+				if ((this.internalBodySecurity.isLocalBody()) &&
 						request.isCiphered()) {
 					request.decrypt(psm);
 				}
@@ -194,9 +200,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 			}
 		}
 		this.registerIncomingFutures();
-		internalReceiveRequest(request);
+		this.internalReceiveRequest(request);
 	} finally {
-		exitFromThreadStore();
+		this.exitFromThreadStore();
 	}
   }
 
