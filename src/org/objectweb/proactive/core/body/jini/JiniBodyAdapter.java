@@ -73,7 +73,7 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
   }
   
   
-  public JiniBodyAdapter(Body body) throws ProActiveException {
+  public JiniBodyAdapter(UniversalBody body) throws ProActiveException {
     try {
       this.proxiedJiniBody = new JiniBodyImpl(body);
     } catch (java.rmi.RemoteException e) {
