@@ -85,7 +85,7 @@ public abstract class ClassServer implements Runnable {
       this.port = port;
       server = new java.net.ServerSocket(port);
     }
-    hostname = java.net.InetAddress.getLocalHost().getHostName();
+    hostname = java.net.InetAddress.getLocalHost().getHostAddress();
     newListener();
   }
 
@@ -135,7 +135,7 @@ public abstract class ClassServer implements Runnable {
           out.writeBytes("Content-Type: application/java\r\n\r\n");
           out.write(bytecodes);
           out.flush();
-          System.out.println("ClassServer loaded class " + info.path+" successfully.");
+          System.out.println("ClassServer sent class " + info.path+" successfully");
         } catch (java.io.IOException ie) {
           return;
         }
