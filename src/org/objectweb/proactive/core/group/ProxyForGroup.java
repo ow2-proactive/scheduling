@@ -1139,5 +1139,4 @@ public class ProxyForGroup extends AbstractProxy
 		return removed;
 	}
 
-
 }
