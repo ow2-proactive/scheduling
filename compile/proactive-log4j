@@ -5,6 +5,9 @@
 # The root logger logs in the test.log file
 log4j.rootLogger=INFO, A1
 
+# NFE Logger
+log4j.logger.NFE = FATAL
+
 # Appender A1 writes to the file "tests.log".
 log4j.appender.A1=org.apache.log4j.FileAppender
 log4j.appender.A1.File=tests.log
