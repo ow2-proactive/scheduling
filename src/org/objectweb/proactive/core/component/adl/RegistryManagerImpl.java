@@ -35,16 +35,13 @@ import org.objectweb.fractal.api.Component;
 
 
 /**
- * The implementation of a primitive component proposing the server interface "RegistryManager".
+ * The implementation of a primitive component proposing the server interface {@link org.objectweb.proactive.core.component.adl.RegistryManager}.
  * It offers facilities for accessing a shared static registry for storing component instances according to
  * their name.
- *
  *
  * 
  * @author Matthieu Morel
  */
-//  TODO : change the design? (component refers to a static resource)?
-// use a shared component?
 public class RegistryManagerImpl implements RegistryManager {
     Registry registry;
 
