@@ -54,7 +54,9 @@ import org.objectweb.proactive.core.node.NodeException;
  * 
  * A group  =  (A) ProSPMD.newSPMDGroup("A", params, nodes);
  * </pre>
- *
+ * 
+ * @version 1.0,  2003/10/09
+ * @since   ProActive 1.0.3
  * @author Laurent Baduel
  */
 

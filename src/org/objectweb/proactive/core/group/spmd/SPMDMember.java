@@ -57,7 +57,9 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
  * <pre>
  * obj.getMyGroup().sendMessageTo(obj);
  * </pre>
- *  
+ * 
+ * @version 1.0,  2003/10/09
+ * @since   ProActive 1.0.3
  * @author Laurent Baduel
  */
 public class SPMDMember extends GroupMember {
