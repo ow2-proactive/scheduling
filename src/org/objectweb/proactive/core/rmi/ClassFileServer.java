@@ -48,7 +48,6 @@ public class ClassFileServer extends ClassServer {
 
     /**
      * Constructs a ClassFileServer.
-     * @param classpath the classpath where the server locates classes
      */
     public ClassFileServer() throws java.io.IOException {
         this(0, null);
@@ -56,7 +55,7 @@ public class ClassFileServer extends ClassServer {
 
     /**
      * Constructs a ClassFileServer.
-     * @param classpath the classpath where the server locates classes
+     * @param port the port to bound the server to
      */
     public ClassFileServer(int port) throws java.io.IOException {
         this(port, null);
@@ -64,7 +63,7 @@ public class ClassFileServer extends ClassServer {
 
     /**
      * Constructs a ClassFileServer.
-     * @param classpath the classpath where the server locates classes
+     * @param paths the classpath where the server locates classes
      */
     public ClassFileServer(String paths) throws java.io.IOException {
         this(0, paths);
@@ -73,7 +72,7 @@ public class ClassFileServer extends ClassServer {
     /**
      * Constructs a ClassFileServer.
      * @param port the port to bound the server to
-     * @param classpath the classpath where the server locates classes
+     * @param paths the classpath where the server locates classes
      */
     public ClassFileServer(int port, String paths) throws java.io.IOException {
         super(port);
