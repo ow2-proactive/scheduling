@@ -13,7 +13,7 @@ public interface ComponentMetaObjectFactory extends MetaObjectFactory {
     /**
     * Creates or reuses a ProActiveComponentFactory
     * @return a new or existing ProActiveComponentFactory
-    * @see ProActiveComponentFactory
+    * see {@link ProActiveComponentFactory}
     */
     public ProActiveComponentFactory newComponentIdentityFactory();
 }
