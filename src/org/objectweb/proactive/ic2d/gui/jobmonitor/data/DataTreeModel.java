@@ -1,5 +1,7 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.util.HashMap;
+
 import javax.swing.tree.DefaultTreeModel;
 
 import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
@@ -26,7 +28,7 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	
 	public void rebuild(DataTreeNode node) {
 		node.setAllStates(DataTreeNode.STATE_REMOVED);
-		node.rebuild(this, NO_KEY, null);
+		node.rebuild(this, NO_KEY, null, new HashMap(NB_KEYS));
 	}
 
 	public DataModelTraversal getTraversal() {

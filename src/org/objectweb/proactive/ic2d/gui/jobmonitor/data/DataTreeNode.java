@@ -1,6 +1,7 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,8 +21,8 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 		key = traversal.getFollowingKey(NO_KEY);
 	}
 	
-	public DataTreeNode(DataTreeModel model, int key, String name) {
-		rebuild(model, key, name);
+	public DataTreeNode(DataTreeModel model, int key, String name, Map constraints) {
+		rebuild(model, key, name, constraints);
 	}
 	
 	public int getState() {
@@ -66,7 +67,7 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 	}
 	
 	/* key : la cle de cette branche, les fils sont donc des traversal.getFollowingKey(key) */
-	public void rebuild(DataTreeModel model, int key, String name) {
+	public void rebuild(DataTreeModel model, int key, String name, Map constraints) {
 		this.key = key;
 		this.name = name;
 		DataModelTraversal traversal = model.getTraversal();
@@ -80,18 +81,23 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 			this.key = nextKey;
 		
 		DataAssociation asso = model.getAssociations();
-		Set children = asso.getValues(key, name, nextKey);
+		Set children = asso.getValues(key, name, nextKey, constraints);
 		Iterator iter = children.iterator();
 		while (iter.hasNext()) {
 			String childName = (String) iter.next();
 			DataTreeNode child = getChildByName(childName);
+			Integer constraintKey = key == NO_KEY ? null : new Integer(key);
+			if (constraintKey != null)
+				constraints.put(constraintKey, name);
 			if (child != null) {
 				child.state = STATE_KEPT;
-				child.rebuild(model, nextKey, childName);
+				child.rebuild(model, nextKey, childName, constraints);
 			} else {
-				DataTreeNode newChild = new DataTreeNode(model, nextKey, childName);
+				DataTreeNode newChild = new DataTreeNode(model, nextKey, childName, constraints);
 				model.insertNodeInto(newChild, this, getChildCount());
 			}
+			if (constraintKey != null)
+				constraints.remove(constraintKey);
 		}
 		
 		handleRemovedChildren(model);
