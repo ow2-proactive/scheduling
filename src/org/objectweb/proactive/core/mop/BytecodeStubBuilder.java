@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.mop;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.bcel.Constants;
@@ -519,10 +520,10 @@ public class BytecodeStubBuilder {
 
     // Creates an array of Class objects that represent all the superclasses of
     // the stub class.
-    Vector vectorOfSuperClasses = new Vector();
+    List vectorOfSuperClasses = new Vector();
     Class currentClass = cl;
     while (currentClass != null) {
-      vectorOfSuperClasses.addElement(currentClass);
+      vectorOfSuperClasses.add(currentClass);
       currentClass = currentClass.getSuperclass();
     }
     
@@ -543,7 +544,7 @@ public class BytecodeStubBuilder {
       // Load the index in the array where we want to store the result
       instructionList.append(new PUSH(this.classGenerator.getConstantPool(), i));
       // Loads the name of the class onto the stack
-      String s = ((Class) vectorOfSuperClasses.elementAt(i)).getName();
+      String s = ((Class) vectorOfSuperClasses.get(i)).getName();
       instructionList.append(new PUSH(this.classGenerator.getConstantPool(), s));
       // Performs the call to Class.forName
       Type[] argstypes = new Type[1];
