@@ -111,8 +111,10 @@ The feature is specially useful in a SPMD programming style. A barrier
 stops the activity of the active object that invokes it until a special
 condition is satisfied. Notice that, as the opposite of MPI or such
 libraries, the ProActive barriers do not stop the current activity
-immediately (when the <b>barrier</b> method is encountered). The
-activity "waits" for the end of the current method to stop.
+immediately (when the <b>barrier</b> method is encountered).
+The current method actually keeps on executing until the end. The barrier
+will be activated at the end of the service: no other service will be
+started until all the AOs involved in the barrier are at that same point.
 <br><br>
 
 The three barriers are named:</p>
