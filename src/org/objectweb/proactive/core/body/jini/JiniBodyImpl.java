@@ -30,14 +30,14 @@
 */ 
 package org.objectweb.proactive.core.body.jini;
 
-import org.objectweb.proactive.Body;
+import java.rmi.RemoteException;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
-
-import java.rmi.RemoteException;
 
 /**
  *   An adapter for a LocalBody to be able to receive jini calls. This helps isolate JINI-specific
@@ -46,7 +46,9 @@ import java.rmi.RemoteException;
  */
 public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements JiniBody, java.rmi.server.Unreferenced {
 
-
+		
+		static Logger logger = Logger.getLogger(JiniBodyImpl.class.getName());
+		
     /**
      * A custom socket Factory
      */
@@ -56,7 +58,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
      * The encapsulated local body
      * transient to deal with custom serialization of requests.
      */
-    protected transient Body body;
+    protected transient UniversalBody body;
   
 
     //
@@ -66,7 +68,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
     public JiniBodyImpl() throws RemoteException {
     }
 
-  public JiniBodyImpl(Body body) throws RemoteException {
+  public JiniBodyImpl(UniversalBody body) throws RemoteException {
       // super(0, factory, factory);
     this.body = body;
   }
@@ -84,7 +86,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
 
   public void receiveRequest(Request r) throws java.io.IOException {
     //System.out.println("JiniBodyImpl: receiveRequest() for " + this.localBody);
-    System.out.println("JiniBodyImpl: receiveRequest() request is " + r.getMethodName());
+    //System.out.println("JiniBodyImpl: receiveRequest() request is " + r.getMethodName());
     body.receiveRequest(r);
   }
 
@@ -118,7 +120,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
  	}
 
   public void unreferenced() {
-    System.out.println("JiniBodyImpl: unreferenced()");      
+    logger.info("JiniBodyImpl: unreferenced()");      
     System.gc();
   }
 
