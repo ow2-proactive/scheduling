@@ -27,7 +27,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
 						<parameter value="-Dproactive.runtime.name=PA_JVM1" />  
-						<parameter value="-Dproactive.rmi.port=2006" />  
+						<parameter value="-Dproactive.rmi.port=2020" />  
 					</jvmParameters> 
 				 </jvmProcess>
 			</processDefinition>

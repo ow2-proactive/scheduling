@@ -66,12 +66,12 @@ public class Test extends FunctionalTest {
         process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
         process1.setClassname(
             "org.objectweb.proactive.p2p.core.service.StartP2PService");
-        process1.setParameters("rmi 2600");
+        process1.setParameters("rmi 2900");
 
         process = new JVMProcessImpl(new StandardOutputMessageLogger());
         process.setClassname(
             "org.objectweb.proactive.p2p.core.service.StartP2PService");
-        process.setParameters("rmi -s //localhost:2600");
+        process.setParameters("rmi 3000 -s //localhost:2900");
 
         process1.startProcess();
         Thread.sleep(5000);

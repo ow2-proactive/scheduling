@@ -38,7 +38,7 @@
 			<serviceDefinition id="p2plookup">
 				<P2PLookup nodeNumber="2" timeout="70000" lookupFrequence="5000">
 					<peerSet>
-						<peer>localhost</peer>
+						<peer>rmi://localhost:3000</peer>
 					</peerSet>
 				</P2PLookup>
 			</serviceDefinition>

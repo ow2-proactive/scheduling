@@ -24,7 +24,7 @@
 	<infrastructure>
 		<services>
 			<serviceDefinition id="lookup">
-				<RMIRegistryLookup url="//localhost:2006/PA_JVM1"></RMIRegistryLookup>
+				<RMIRegistryLookup url="//localhost:2020/PA_JVM1"></RMIRegistryLookup>
 			</serviceDefinition>
 		</services>
 	</infrastructure>

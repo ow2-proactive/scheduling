@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         pad = ProActive.getProactiveDescriptor(ONEVM_XML_LOCATION_UNIX);
         pad.activateMappings();
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         pad1 = ProActive.getProactiveDescriptor(LOOK_XML_LOCATION_UNIX);
         pad1.activateMappings();
         VirtualNode vn = pad1.getVirtualNode("VnTest");
@@ -88,5 +88,18 @@ public class Test extends FunctionalTest {
 
     public boolean postConditions() throws Exception {
         return node.getProActiveRuntime().getVMInformation().getName().equals("PA_JVM1");
+    }
+    
+    public static void main(String[] args) {
+        Test test = new Test();
+
+        try {
+            test.action();
+            System.out.println(test.postConditions());
+            test.endTest();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
