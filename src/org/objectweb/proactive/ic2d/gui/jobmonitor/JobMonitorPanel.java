@@ -7,6 +7,8 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
@@ -79,8 +81,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         monitoredHosts = new DefaultListModel();
         skippedObjects = new DefaultListModel();
-        skippedObjects.addElement(BasicMonitoredObject.create(JOB,
-                ProActive.getJobId()));
+        skippedObjects.addElement(new MonitoredJob(ProActive.getJobId()));
 
         tabs = new JTabbedPane();
         frames = new Vector();
@@ -188,7 +189,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public void addMonitoredHost(String host) {
-        BasicMonitoredObject hostObject = BasicMonitoredObject.create(HOST, host);
+        MonitoredHost hostObject = new MonitoredHost(host);
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
@@ -232,6 +233,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private void handleHosts() {
         synchronized (monitoredHosts) {
             asso.clear();
+            explorator.startExploration();
 
             for (int i = 0, size = monitoredHosts.size(); i < size; ++i) {
                 BasicMonitoredObject hostObject = (BasicMonitoredObject) monitoredHosts.get(i);
@@ -241,6 +243,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 handleHost(host);
             }
 
+            explorator.exploreKnownJVM();
+            explorator.endExploration();
+
             rebuildAll();
         }
     }
@@ -249,7 +254,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         new Thread(new Runnable() {
                 public void run() {
                     asso.deleteItem(hostObject);
+                    explorator.startExploration();
                     handleHost(hostObject.getFullName());
+                    explorator.endExploration();
                 }
             }).start();
     }

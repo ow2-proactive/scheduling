@@ -4,11 +4,17 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredAO;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJVM;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredVN;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -117,8 +123,9 @@ public class NodeExploration implements JobMonitorConstants {
     public void exploreHost(String hostname, int port) {
         Registry registry;
         String[] list;
+        MonitoredHost hostObject = new MonitoredHost(hostname);
 
-        if (isSkipped(HOST, hostname)) {
+        if (skippedObjects.contains(hostObject)) {
             return;
         }
 
@@ -130,7 +137,6 @@ public class NodeExploration implements JobMonitorConstants {
             return;
         }
 
-        visitedVM = new TreeSet();
         for (int idx = 0; idx < list.length; ++idx) {
             String id = list[idx];
             if (id.indexOf(PA_JVM) != -1) {
@@ -146,21 +152,6 @@ public class NodeExploration implements JobMonitorConstants {
                 }
             }
         }
-        visitedVM = null;
-    }
-
-    private boolean isSkipped(int key, String fullname) {
-        BasicMonitoredObject object = BasicMonitoredObject.create(key, fullname);
-        return skippedObjects.contains(object);
-    }
-
-    private void addChild(int fromKey, String fromName, int toKey, String toName) {
-        BasicMonitoredObject fromObject = BasicMonitoredObject.create(fromKey,
-                fromName);
-        BasicMonitoredObject toObject = BasicMonitoredObject.create(toKey,
-                toName);
-
-        asso.addChild(fromObject, toObject);
     }
 
     private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
@@ -174,39 +165,45 @@ public class NodeExploration implements JobMonitorConstants {
             }
         }
 
-        String vmName = pr.getVMInformation().getName();
+        VMInformation infos = pr.getVMInformation();
+        String vmName = infos.getName();
 
-        if (visitedVM.contains(vmName) || isSkipped(JVM, vmName)) {
+        MonitoredJVM jvmObject = new MonitoredJVM(infos.getInetAddress()
+                                                       .getCanonicalHostName(),
+                vmName, depth);
+
+        if (visitedVM.contains(vmName) || skippedObjects.contains(jvmObject)) {
             return;
         }
 
         String jobID = pr.getJobID();
-        if (isSkipped(JOB, jobID)) {
+        MonitoredJob jobObject = new MonitoredJob(jobID);
+        if (skippedObjects.contains(jobObject)) {
             return;
         }
 
         String hostname = pr.getVMInformation().getInetAddress()
                             .getCanonicalHostName();
-        if (isSkipped(HOST, hostname)) {
+        MonitoredHost hostObject = new MonitoredHost(hostname);
+        if (skippedObjects.contains(hostObject)) {
             return;
         }
 
         visitedVM.add(vmName);
 
-        addChild(HOST, hostname, JVM, vmName);
-        addChild(JOB, jobID, JVM, vmName);
-
         try {
             String[] nodes = pr.getLocalNodeNames();
             for (int i = 0; i < nodes.length; ++i) {
                 String nodeName = nodes[i];
-                if (!isSkipped(NODE, nodeName)) {
-                    handleNode(pr, vmName, nodeName);
-                }
+                handleNode(pr, jvmObject, vmName, nodeName);
             }
         } catch (ProActiveException e) {
             log(e);
+            return;
         }
+
+        asso.addChild(hostObject, jvmObject);
+        asso.addChild(jobObject, jvmObject);
 
         if (depth < maxDepth) {
             List known = getKnownRuntimes(pr);
@@ -217,45 +214,54 @@ public class NodeExploration implements JobMonitorConstants {
         }
     }
 
-    private void handleNode(ProActiveRuntime pr, String vmName, String nodeName) {
+    private void handleNode(ProActiveRuntime pr, MonitoredJVM jvmObject,
+        String vmName, String nodeName) {
         try {
+            MonitoredNode nodeObject = new MonitoredNode(nodeName);
+            if (skippedObjects.contains(nodeObject)) {
+                return;
+            }
+
             String jobID = pr.getJobID(pr.getURL() + "/" + nodeName);
-            if (isSkipped(JOB, jobID)) {
+            MonitoredJob jobObject = new MonitoredJob(jobID);
+            if (skippedObjects.contains(jobObject)) {
                 return;
             }
 
             String vnName = pr.getVNName(nodeName);
-            String vnJobID = null;
+            MonitoredJob vnJobIDObject = null;
             if (vnName != null) {
-                if (isSkipped(VN, vnName)) {
+                MonitoredVN vnObject = new MonitoredVN(vnName);
+                if (skippedObjects.contains(vnObject)) {
                     return;
                 }
 
                 VirtualNode vn = pr.getVirtualNode(vnName);
                 if (vn != null) {
-                    vnJobID = vn.getJobID();
-                    if (isSkipped(JOB, vnJobID)) {
+                    vnJobIDObject = new MonitoredJob(vn.getJobID());
+                    if (skippedObjects.contains(vnJobIDObject)) {
                         return;
                     }
 
-                    addChild(JOB, vnJobID, VN, vnName);
+                    asso.addChild(vnJobIDObject, vnObject);
                 }
 
-                addChild(VN, vnName, NODE, nodeName);
+                asso.addChild(vnObject, nodeObject);
             }
 
-            addChild(JVM, vmName, NODE, nodeName);
-            addChild(JOB, jobID, NODE, nodeName);
-
             ArrayList activeObjects = pr.getActiveObjects(nodeName);
-            handleActiveObjects(nodeName, activeObjects);
+            handleActiveObjects(nodeObject, activeObjects);
+
+            asso.addChild(jvmObject, nodeObject);
+            asso.addChild(jobObject, nodeObject);
         } catch (ProActiveException e) {
             log(e);
             return;
         }
     }
 
-    private void handleActiveObjects(String nodeName, ArrayList activeObjects) {
+    private void handleActiveObjects(MonitoredNode nodeObject,
+        ArrayList activeObjects) {
         for (int i = 0, size = activeObjects.size(); i < size; ++i) {
             ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
             RemoteBodyAdapter rba = (RemoteBodyAdapter) aoWrapper.get(0);
@@ -267,7 +273,8 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             String jobID = rba.getJobID();
-            if (isSkipped(JOB, jobID)) {
+            MonitoredJob jobObject = new MonitoredJob(jobID);
+            if (skippedObjects.contains(jobObject)) {
                 continue;
             }
 
@@ -278,10 +285,30 @@ public class NodeExploration implements JobMonitorConstants {
                 aos.put(rba.getID(), aoName);
             }
 
-            if (!isSkipped(AO, aoName)) {
-                addChild(NODE, nodeName, AO, aoName);
-                addChild(JOB, rba.getJobID(), AO, aoName);
+            MonitoredAO aoObject = new MonitoredAO(aoName);
+            if (skippedObjects.contains(aoObject)) {
+                asso.addChild(nodeObject, aoObject);
+                asso.addChild(jobObject, aoObject);
             }
         }
+    }
+
+    public void exploreKnownJVM() {
+        Iterator iter = asso.getJVM().iterator();
+        while (iter.hasNext()) {
+            MonitoredJVM jvmObject = (MonitoredJVM) iter.next();
+            ProActiveRuntime pr = urlToRuntime(jvmObject.getFullName());
+            if (pr != null) {
+                handleProActiveRuntime(pr, jvmObject.getDepth());
+            }
+        }
+    }
+    
+    public void startExploration() {
+    	visitedVM = new TreeSet();
+    }
+    
+    public void endExploration() {
+    	visitedVM = null;
     }
 }

@@ -1,12 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
-
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
 
 
 public class DataTreeNode extends DefaultMutableTreeNode
@@ -19,7 +19,7 @@ public class DataTreeNode extends DefaultMutableTreeNode
 
     public DataTreeNode(DataModelTraversal traversal) {
         int key = traversal.getFollowingKey(NO_KEY);
-        object = BasicMonitoredObject.create(key, null);
+        object = BasicMonitoredObject.createRoot(key);
     }
 
     public DataTreeNode(DataTreeModel model, BasicMonitoredObject value,
@@ -78,8 +78,8 @@ public class DataTreeNode extends DefaultMutableTreeNode
         }
 
         if (value.isRoot()) {
-            object = BasicMonitoredObject.create(traversal.getFollowingKey(
-                        NO_KEY), null);
+            object = BasicMonitoredObject.createRoot(traversal.getFollowingKey(
+                        NO_KEY));
             nextKey = NO_KEY;
         } else {
             object = value;

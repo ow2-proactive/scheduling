@@ -246,7 +246,11 @@ public class DataAssociation implements JobMonitorConstants {
         res = filter(res, constraints);
         return res;
     }
-
+    
+    public MonitoredObjectSet getJVM() {
+    	return list(JVM, null);
+    }
+    
     public void clear() {
         for (int j = 0; j < sets.length; j++)
             if (sets[j] != null) {

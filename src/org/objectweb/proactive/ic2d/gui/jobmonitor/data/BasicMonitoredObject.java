@@ -6,7 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 
 
-public abstract class BasicMonitoredObject implements JobMonitorConstants,
+public class BasicMonitoredObject implements JobMonitorConstants,
     Comparable {
     protected int key;
     protected String prettyName;
@@ -27,23 +27,12 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants,
         o.deletedSince = deletedSince;
     }
 
-    public static BasicMonitoredObject create(int key, String fullname) {
-        switch (key) {
-        case JOB:
-            return new MonitoredJob(fullname);
-        case VN:
-            return new MonitoredVN(fullname);
-        case HOST:
-            return new MonitoredHost(fullname);
-        case JVM:
-            return new MonitoredJVM(fullname);
-        case NODE:
-            return new MonitoredNode(fullname);
-        case AO:
-            return new MonitoredAO(fullname);
-        default:
-            return null;
-        }
+    private BasicMonitoredObject(int key) {
+    	this(key, null);
+    }
+    
+    public static BasicMonitoredObject createRoot(int key) {
+    	return new BasicMonitoredObject(key);
     }
 
     public boolean equals(Object value) {
@@ -96,113 +85,5 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants,
 
     public boolean isRoot() {
         return fullname == null;
-    }
-}
-
-
-class MonitoredJob extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredJob(String fullname) {
-        super(JOB, fullname);
-    }
-}
-
-
-class MonitoredVN extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredVN(String fullname) {
-        super(VN, fullname);
-    }
-}
-
-
-class MonitoredHost extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredHost(String fullname) {
-        super(HOST, fullname);
-    }
-}
-
-
-class MonitoredJVM extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredJVM(String fullname) {
-        super(JVM, fullname);
-    }
-}
-
-
-class MonitoredNode extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredNode(String fullname) {
-        super(NODE, fullname);
-    }
-}
-
-
-class MonitoredAO extends BasicMonitoredObject {
-    static protected int lastID = 0;
-    static protected Map prettyNames;
-
-    protected int incLastID() {
-        return ++lastID;
-    }
-
-    protected Map getPrettyNames() {
-        return prettyNames;
-    }
-
-    public MonitoredAO(String fullname) {
-        super(AO, fullname);
     }
 }
