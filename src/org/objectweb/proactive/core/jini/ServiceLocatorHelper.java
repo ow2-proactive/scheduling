@@ -44,8 +44,11 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   protected static int MAX_RETRY = 8;
   protected static long MAX_WAIT = 10000L;
   
+  private static String policy = System.getProperty("user.home") + System.getProperty("file.separator") + "proactive.java.policy";
+  
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
   private static String DEFAULT_RMID_LOCATION = System.getProperty("java.home")+FILE_SEPARATOR+"bin"+FILE_SEPARATOR+"rmid";
+  private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy="+policy;
 
   protected static LookupLocator lookup = null;
   protected static ServiceRegistrar registrar = null;
@@ -57,7 +60,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   protected boolean locatorChecked;
   protected static boolean multicastLocator = false;
 
-  private static String policy = System.getProperty("user.home") + System.getProperty("file.separator") + ".java.policy";
+  
 
   private static String host = null;
 
@@ -120,6 +123,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         if(jiniLockFile.exists()) jiniLockFile.delete();
       }
     } catch(java.io.IOException e) {
+    	if(jiniLockFile != null){
+        if(jiniLockFile.exists()) jiniLockFile.delete();
+      }
       e.printStackTrace();
       System.exit(1);
     }
@@ -260,12 +266,18 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         System.out.println("Lookup.getRegistrar() on " + host);
         this.registrar = lookup.getRegistrar();
       } catch (java.net.MalformedURLException e) {
-        throw new java.io.IOException("Lookup failed: " + e.getMessage());
+        throw new java.io.IOException("Lookup failed: " + e.getMessage() );
       } catch (java.io.IOException e) {
-        System.err.println("Registrar search failed: " + e.getMessage());
+        System.err.println("Registrar search failed: " + e.getMessage() );
         if (MAX_RETRY-- > 0) {
         	//-----------wont work everywhere---------------------------
-        	Runtime.getRuntime().exec(DEFAULT_RMID_LOCATION);
+        	
+        	String[] env = new String[2];
+        	
+        	env[0]=DEFAULT_RMID_LOCATION;
+        	env[1]=DEFAULT_RMID_PARAMS;
+        	Runtime.getRuntime().exec(env);
+        	
           createServiceLocator();
           getOrCreateServiceLocator();
         } else {
@@ -274,6 +286,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
           throw new java.io.IOException("\nCannot run a ServiceLocator : Have you launched the rmid deamon on " + host);
         }
       } catch (java.lang.ClassNotFoundException e) {
+      	if(jiniLockFile.exists()) jiniLockFile.delete();
         throw new java.io.IOException("Registrar search failed: " + e.toString());
       }
       System.out.println("Registrar found on " + host);
@@ -310,6 +323,15 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     System.out.println("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
 
     //String[] args = { httpserver , policy , reggieTmpDir,};
+//    String classpath = System.getProperty("java.class.path");
+//    try{
+//    java.io.File canonicalFile = new java.io.File(classpath);
+//	    classpath = canonicalFile.getCanonicalPath();
+//    }catch (Exception e){
+//    	e.printStackTrace();
+//    	
+//    }
+//	    System.out.println(classpath);
     String[] args = { "", policy, reggieTmpDir, };
     com.sun.jini.start.ServiceStarter.create(args, "com.sun.jini.reggie.CreateLookup", "com.sun.jini.reggie.RegistrarImpl", "lookup");
   }
