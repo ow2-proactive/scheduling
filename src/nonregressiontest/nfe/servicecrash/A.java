@@ -59,7 +59,6 @@ public class A implements Serializable {
         try {
                 inet = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
         }
         System.out.println("Object A sur //" + inet.getCanonicalHostName() );

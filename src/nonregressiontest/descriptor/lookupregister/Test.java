@@ -98,7 +98,6 @@ public class Test extends FunctionalTest {
             test.action();
             test.postConditions();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         

@@ -40,7 +40,7 @@ import testsuite.test.FunctionalTest;
 
 /**
  * @author ProActiveTeam
- * @version 1.0 6 août 2004
+ * @version 1.0 6 aoï¿½t 2004
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
@@ -98,7 +98,6 @@ public class Test extends FunctionalTest {
             System.out.println(test.postConditions());
             test.endTest();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
