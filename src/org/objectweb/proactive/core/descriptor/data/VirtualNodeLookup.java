@@ -123,8 +123,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             try {
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
-                this.virtualNode = ProActive.lookupVirtualNode(urlForLookup,
-                        lookupProtocol);
+                this.virtualNode = ProActive.lookupVirtualNode(urlForLookup);
                 isActivated = true;
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -229,6 +228,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         return isActivated;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isLookup()
+     */
     public boolean isLookup() {
         return true;
     }
@@ -236,6 +238,10 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //
     //-------------------IMPLEMENTS Job-----------------------------------
     //
+
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
     public String getJobID() {
         return virtualNode.getJobID();
     }
@@ -297,10 +303,10 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     /**
-     * see {@link VirtualNode#isMultiple()}
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
      */
     public boolean isMultiple() {
-    	return virtualNode.isMultiple();
+        return virtualNode.isMultiple();
     }
 
     //
@@ -329,6 +335,4 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
             throw new ProActiveException(exceptionMessage);
         }
     }
-    
-	
 }

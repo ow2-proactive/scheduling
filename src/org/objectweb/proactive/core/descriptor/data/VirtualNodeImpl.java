@@ -198,8 +198,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /**
      * Sets the timeout variable to the given value.
-     * Calling this method will force this VirtualNode to wait until the timeout expires
-     * before giving access to its nodes.
+     * Using waitForTimeout = true will force this VirtualNode to wait until the timeout expires
+     * before giving access to its nodes, waitForTimeout = false allows this VirtualNode to give 
+     * access to its node when number of nodes expected are really created or the timeout 
+     * has expired
+     * @param timeout the timeout to set in ms
+     * @param waitForTimeout to force or not this VirtualNode to wait untile timeout's expiration
      */
     public void setTimeout(long timeout, boolean waitForTimeout) {
         this.timeout = timeout;
@@ -208,7 +212,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     /**
      * Sets the name of this VirtualNode
-     * @param s
+     * @param s the name of this Virtual Node
      */
     public void setName(String s) {
         this.name = s;
@@ -475,6 +479,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     public void createNodeOnCurrentJvm(String protocol) {
+        if (protocol == null) {
+            protocol = System.getProperty("proactive.communication.protocol");
+        }
         localVirtualMachines.add(protocol);
     }
 
@@ -510,6 +517,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         return isActivated;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isLookup()
+     */
     public boolean isLookup() {
         return false;
     }
@@ -517,6 +527,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     //
     //-------------------IMPLEMENTS Job-----------------------------------
     //
+
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
     public String getJobID() {
         return this.jobID;
     }
@@ -664,7 +678,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * Sets the minimal number of nodes this VirtualNode needs to be suitable for the application.
      * It means that if in the Deployment file, this VirtualNode is mapped onto n nodes, and the
-     * minimum number of nodes is set to m, with of course m<n, calling method getNodes will return
+     * minimum number of nodes is set to m, with of course m &lt; n, calling method getNodes will return
      * when at least m nodes are created
      * @param min the minimum number of nodes
      */
@@ -711,7 +725,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     }
 
     /**
-     * see {@link VirtualNode#isMultiple()}
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
      */
     public boolean isMultiple() {
         return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
@@ -937,9 +951,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 globus = (GlobusProcess) processImpl;
                 increaseNodeCount((new Integer(globus.getCount()).intValue()) * nodeNumber);
             }
-            
-            if (processImpl instanceof GridEngineSubProcess){
-                sge = (GridEngineSubProcess)processImpl;
+
+            if (processImpl instanceof GridEngineSubProcess) {
+                sge = (GridEngineSubProcess) processImpl;
                 increaseNodeCount((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
             }
 
