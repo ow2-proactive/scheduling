@@ -118,7 +118,7 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
   
   protected String buildUnixSSHCommand() {
     StringBuffer command = new StringBuffer();
-    command.append("ssh");
+    command.append(command_path);
     // append username
     if (username != null) {
       command.append(" -l ");
