@@ -29,6 +29,18 @@ public class ProActiveComponentType implements ComponentType, Serializable {
 	public ProActiveComponentType(final InterfaceType[] interfaceTypes) {
 		this.interfaceTypes = interfaceTypes; //rem : julia uses a clone method		
 	}
+	
+	/**
+	 * copy constructor
+	 */
+	public ProActiveComponentType(final ComponentType componentType) {
+		InterfaceType[] tempItfTypes = componentType.getFcInterfaceTypes();
+		this.interfaceTypes = new InterfaceType[tempItfTypes.length];
+		for (int i=0; i<interfaceTypes.length; i++) {
+			// deep copy
+			interfaceTypes[i] = new ProActiveInterfaceType(tempItfTypes[i]);
+		}
+	}
 
 	/**
 	 * @see org.objectweb.fractal.api.type.ComponentType#getFcInterfaceTypes()

@@ -38,7 +38,22 @@ public class ProActiveInterfaceType implements InterfaceType, Serializable {
     public ProActiveInterfaceType() {
         super();
     }
-
+    
+    /**
+     * copy constructor
+     * @param name
+     * @param signature
+     * @param isClient
+     * @param isOptional
+     * @param isCollection
+     */
+	public ProActiveInterfaceType(final InterfaceType itfType) {
+		this.name = new String(itfType.getFcItfName());
+		this.signature = new String(itfType.getFcItfSignature());
+		this.isClient = itfType.isFcClientItf();
+		this.isOptional = itfType.isFcOptionalItf();
+		this.isCollection = itfType.isFcCollectionItf();
+	}
     /**
      * Constructor for ProActiveInterfaceType.
      */
