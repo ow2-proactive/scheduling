@@ -6,67 +6,7 @@
   <link rel="stylesheet" href="ProActive.css">
   <meta content="Arnaud Contes" name="author">
   <meta content="ProActive Security Mechanism" name="description">
-  <style type="text/css"><!--
-.syntax0 {
-color: #000000;
-}
-.syntax1 {
-color: #006666;
-font-style: italic;
-}
-.syntax2 {
-color: #990033;
-font-style: italic;
-}
-.syntax3 {
-color: #404040;
-}
-.syntax4 {
-color: #404040;
-}
-.syntax5 {
-color: #990033;
-font-weight: bold;
-font-style: italic;
-}
-.syntax6 {
-color: #000000;
-font-weight: bold;
-}
-.syntax7 {
-color: #000000;
-font-weight: bold;
-}
-.syntax8 {
-color: #000000;
-font-weight: bold;
-}
-.syntax9 {
-color: #000066;
-}
-.syntax10 {
-color: #000000;
-font-weight: bold;
-}
-.syntax11 {
-color: #000000;
-font-weight: bold;
-}
-.syntax12 {
-color: #666600;
-}
-.syntax13 {
-color: #ff0000;
-}
-.gutter {
-background: #ffffff;
-color: #000000;
-}
-.gutterH {
-background: #ffffff;
-color: #666699;
-}
--->
+  <style type="text/css">
   </style>
 </head>
 <body style="background-color: white;">
@@ -122,15 +62,16 @@ expressed inside an <a href="#descriptors">XML descriptor</a>. <br>
 <br>
 <h2>Security Architecture</h2>
 <h3>Base model</h3>
-A distributed or concurrent application built using <i>ProActive</i>&nbsp;is
+<p>A distributed or concurrent application built using <i>ProActive</i>&nbsp;is
 composed of a number of medium-grained entities called
 <i>active objects</i>. Each active object has one distinguished
 element, the <i>root</i>, which is the only entry point to the
 active object; all other objects inside the active object are called
 <i>passive objects</i> and cannot be referenced directly from objects
 which are outside this active object (see Figure <a
- href="../../../../../../../work/esorics2004/esorics2004/node15.html#graphe">8</a>);
+ href="security_images/node15.html#graphe">8</a>);
 the absence of sharing is important with respect to security.
+</p>
 <div align="center"><a name="graphe"></a><a name="419"></a>
 <table>
   <caption align="bottom"><strong>Figure 8:</strong>
@@ -147,15 +88,16 @@ A typical object graph with active objects </caption> <tbody>
 </div>
 <br>
 <br>
-The security is based on Public Key Infrastructure. Each entity owns a
+<p>The security is based on Public Key Infrastructure. Each entity owns
+a
 certificate and an private key generated from the certificate of a
-user. <br>
-Certificates are&nbsp; generated automatically by the security
+user. </p>
+<p>Certificates are&nbsp; generated automatically by the security
 mechanism. The validity of a certificate is checked by validating its
 certificate chain. As shown in figure 2, before validating the
 certificate of an active object, application certificate and user
 certificate will be checked. If a valid path is found so object
-certificate is validated.<br>
+certificate is validated.</p>
 <br>
 <table style="width: 100%; text-align: left;" border="0" cellpadding="2"
  cellspacing="2">
@@ -201,9 +143,10 @@ through an XML descriptor.<br>
 </table>
 <br>
 </div>
-When an interaction is happening, all participating entities' security
+<p>When an interaction is happening, all participating entities'
+security
 policy are verified and combined to find the policy to enforce to the
-interaction.<br>
+interaction.</p>
 <h3>
 </h3>
 <br>
@@ -232,7 +175,8 @@ Nodes, the mapping, is done at application starting time.
 </p>
 <br>
 <h3><a name="SECTION00033000000000000000">Hierarchical Security Entities</a></h3>
-Grid programming is about deploying processes (activities) on various
+<p>Grid programming is about deploying processes (activities) on
+various
 machines.
 In the end, the security policy that must be ensured for those
 processes
@@ -240,6 +184,7 @@ depends upon many factors:
 first of all, the application policy that is needed, but also the
 machine locations, the security policies of their administrative
 domain, and the network being used to reach those machines.
+</p>
 <p>Previous section defined the notions of <i>Virtual Nodes</i>, and <i>Nodes</i>.
 Virtual Nodes are application abstractions, and nodes are only a
 run-time entity
@@ -283,10 +228,11 @@ security policies, </li>
   <li>allowing application security to be specifically adapted to a
 given deployment environment. </li>
 </ol>
-Domains are a standard way to structure (virtual) organizations
+<p>Domains are a standard way to structure (virtual) organizations
 involved in a Grid infrastructure; they are organized in a hierarchical
 manner. They are the logical concept
 allowing to express security policies in a hierarchical way.
+</p>
 <p><br>
 <img src="security_images/img4.png"
  alt="\begin{definition}{Declarative Domain Security}\\
@@ -317,8 +263,7 @@ additional security based on the domains being deployed onto.
 deployment descriptor for the domains he deploys onto.
 Note that those domains are actually dynamic as they can be obtained
 through external allocators, or even Web Services in an OGSA
-infrastructure [<a
- href="../../../../../../../work/esorics2004/esorics2004/node18.html#foster98security">5</a>].
+infrastructure [<a href="security_images/node18.html#foster98security">5</a>].
 Joker rules might be important in that case to cover all cases, and to
 provide a conservative security strategy for un-forecasted deployments.
 </p>
@@ -378,7 +323,7 @@ Syntax and attributes for policy rules</caption> <tbody align="center">
 <br>
 <h3><a name="SECTION00034000000000000000">Resource provider security
 features</a></h3>
-Prior to start application on a Grid, a user needs to acquire some
+<p>Prior to start application on a Grid, a user needs to acquire some
 resources (CPU time, disk storage, bandwidth) from the Grid.
 A <i>Resource provider</i> is an individual, a research institute, an
 organization who wants to offer some resources under a certain
@@ -386,11 +331,11 @@ security policy to a restricted set of peoples. According to our
 definition, resource provider will set up one or more runtime where
 clients will be able do perform computation. Each runtime is set with
 its
-own policy. Theses runtimes could be worldwide distributed. <br>
+own policy. Theses runtimes could be worldwide distributed. </p>
 <br>
 <h3><a name="SECTION00034000000000000000">Resource provider security
 features</a></h3>
-Prior to start application on a Grid, a user needs to acquire some
+<p>Prior to start application on a Grid, a user needs to acquire some
 resources (CPU time, disk storage, bandwidth) from the Grid.
 A <i>Resource provider</i> is an individual, a research institute, an
 organization who wants to offer some resources under a certain
@@ -398,17 +343,17 @@ security policy to a restricted set of peoples. According to our
 definition, resource provider will set up one or more runtime where
 clients will be able do perform computation. Each runtime is set with
 its
-own policy. Theses runtimes could be worldwide distributed. <br>
+own policy. Theses runtimes could be worldwide distributed. </p>
 <br>
 <h3><a name="SECTION00037000000000000000">Interactions, Security
 Attributes</a></h3>
-Security policies are able to control all the
+<p>Security policies are able to control all the
 <i>interactions</i> that can occur when deploying and
 executing a multi-principals Grid application. With this goal in mind,
 interactions span over the creation of processes,
 to the monitoring of activities (Objects) within processes, including
 of course the communications.
-Here is a brief description of those interactions: <br>
+Here is a brief description of those interactions: </p>
 <ul>
   <li>RuntimeCreation (RC): creation of a new Runtime process </li>
   <li>NodeCreation (NC): creation of a new Node within a Runtime (as
@@ -447,7 +392,8 @@ The next two sections present that aspect.
 </p>
 <br>
 <h3><a name="SECTION00038000000000000000">Combining Policies</a></h3>
-As the proposed infrastructure takes into account different actors of
+<p>As the proposed infrastructure takes into account different actors
+of
 the Grid (domain administrator, Grid user), even for a single-principal
 single-domain application, there are potentially several security
 policies activated. This section deals with the
@@ -455,18 +401,17 @@ combination of those policies to obtain the final security tuples of a
 single entity.
 An important principle being that a sub-domain cannot weaken a
 super-domain's rule.
+</p>
 <p>During execution, each activity (Active Object) is always included
 in a <i>Node</i> (due to the Virtual Node mapping) and at least in one
 <i>Domain</i>, the one used to launch a JVM (<img
- src="../../../../../../../work/esorics2004/esorics2004/img9.png"
- alt="$D_0$" align="middle" border="0" height="30" width="24">).
-Figure <a
- href="../../../../../../../work/esorics2004/esorics2004/node11.html#hierarchicalsecurityrule">6</a>
+ src="security_images/img9.png" alt="$D_0$" align="middle" border="0"
+ height="30" width="24">).
+Figure <a href="security_images/node11.html#hierarchicalsecurityrule">6</a>
 hierarchically represents the security rules that can be activated at
 execution: from the top, hierarchical domains (<img
- src="../../../../../../../work/esorics2004/esorics2004/img10.png"
- alt="$D_n$" align="middle" border="0" height="30" width="26"> to <img
- src="../../../../../../../work/esorics2004/esorics2004/img9.png"
+ src="security_images/img10.png" alt="$D_n$" align="middle" border="0"
+ height="30" width="26"> to <img src="security_images/img9.png"
  alt="$D_0$" align="middle" border="0" height="30" width="24">), the
 virtual node policy (VN), and the Object
 (O) policy. Of course, such policies can be inconsistent, and there
@@ -495,13 +440,17 @@ weakening of authorizations), (3) the security attributes retained are
 the most constrained
 based on a partial order (absence of weakening of security).
 </p>
-<pre> <br>Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C] <br>Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C]<br></pre>
-within the CardPlus domain, the second rule will be chosen (integrity
+<pre> <br></pre>
+<p>Domain[*] -&gt; Domain[*] : Q,P : [+A,+I,+C] </p>
+<p>Domain[CardPlus] -&gt; Domain[CardPlus] : Q,P : [+A,?I,?C]</p>
+<p>within the CardPlus domain, the second rule will be chosen
+(integrity
 and confidentiality will be optional).
 Of course, comparison of rules is
 only a partial order, and several incompatible most specific rules can
 exist within a single level (e.g. both ACCEPT and DENY most specific
 rules for the same interaction, or both +A and -A).
+</p>
 <p>Between levels, an incompatibility can also occur, especially if a
 sub-level attempts to weaken the policy on a given interaction
 (e.g. a domain prohibits confidentiality [-C] while a sub-domain or the
@@ -519,8 +468,7 @@ migration, ...), will want to apply a security policy based on the
 resolution presented in the previous section.
 Before starting an interaction,
 a <i>negotiation</i> occurs between the two entities involved.
-Figure <a
- href="../../../../../../../work/esorics2004/esorics2004/node12.html#sac">7</a>
+Figure <a href="security_images/node12.html#sac">7</a>
 shows the result of such negotiation. For example, if for a given
 interaction, entity A's policy is
 [+A,?I,?C], and B's policy is [+A,?I,-C], the negotiated policy will be
@@ -555,12 +503,13 @@ Result of security negotiations</caption> <tbody>
 <br>
 <h3>Migration and Negotiation
 </h3>
-In large scale Grid applications, migration of activities is an
+<p>In large scale Grid applications, migration of activities is an
 important issue. The migration of Active Objects must not weaken the
 security policy being applied.
-<br>
-When an active object migrates to a new location,
+</p>
+<p>When an active object migrates to a new location,
 three cases may happen :
+</p>
 <ul>
   <li>the object migrates to a node belonging to the same virtual node
 and included inside the same domain. In this case, all already
@@ -622,10 +571,10 @@ policy for all Nodes and active that will be created.<br>
  style="color: rgb(51, 51, 255); font-weight: bold;">&lt;parameter value="-Dproactive.runtime.security=/.../descriptors/jvm1-sec.xml" /&gt;</span><span
  class="gutter"></span><span class="syntax10"></span><br>  82:     &lt;/jvmParameters&gt;<br>  83:    &lt;/jvmProcess&gt;<br>  84: &lt;/processDefinition&gt;<span
  class="syntax10"><br>       ....<br></span><span class="syntax10"></span></pre>
-<p class="textNormal">Inside the policy file, you can express policy
+<p>Inside the policy file, you can express policy
 between entities (domain, runtime, node, active object).<br>
 The entity tag can be used to :<br>
-</p>
+
 <ul>
   <li>express policies on entities described inside the descriptor
 (lines 13, 15)<br>
@@ -634,24 +583,35 @@ The entity tag can be used to :<br>
 certificates (line 32). <br>
   </li>
 </ul>
+</p>
 <h3>Construction of an XML policy :</h3>
-A policy file must begin with : <br>
-<pre>  1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>  2:&lt;Policy&gt;</pre>
-next, application specific informations are given.<br>
-<pre><br>   3: &lt;ApplicationName&gt;<span style="font-weight: bold;">Garden</span>&lt;/ApplicationName&gt;<br><br>&lt;ApplicationName&gt; sets the application name.  This allows to identify easily which application an entity belongs to.<br><br>   4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;<br>   5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;<br><br>&lt;Certificate&gt; is the X509 certificate of the application, generated from a user certificate, and <br>&lt;PrivateKey&gt; the private key associated to the certificate.<br><br>  &nbsp;6: &lt;CertificationAuthority&gt;<br>   7:  &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;<br>   8: &lt;/CertificationAuthority&gt;<br><br>&lt;CertificationAuthority&gt; contains all trusted certificate authority. Each &lt;Certificate&gt; contains a certification authority certificate. <br></pre>
-&nbsp;&nbsp;&nbsp; 10: &lt;Rules&gt;<br>
-Then we can define policy rules. All rules are located within
-the &lt;Rules&gt;<br>
-<br>
-A &lt;Rule&gt; is constructed according the following syntax : <br>
+<p>A policy file must begin with : </p>
+<pre>   1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>   2:&lt;Policy&gt;</pre>
+<p>next, application specific informations are given.
+</p>
+<pre>   3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;</pre>
+<p>&lt;ApplicationName&gt; sets the application name. This allows to
+identify easily which application an entity belongs to.</p>
+<pre>   4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;<br>   5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;</pre>
+<p>&lt;Certificate&gt; is the X509 certificate of the application,
+generated from a user certificate, and</p>
+<p>&lt;PrivateKey&gt; the private key associated to the certificate.</p>
+<pre>&nbsp;  6: &lt;CertificationAuthority&gt;<br>   7: &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;<br>   8: &lt;/CertificationAuthority&gt;<br>
+</pre>
+<p>&lt;CertificationAuthority&gt; contains all trusted certificate
+authority. Each &lt;Certificate&gt; contains a certification authority
+certificate.</p>
+<pre>&nbsp;&nbsp;10: &lt;Rules&gt;</pre>
+<p>Then we can define policy rules. All rules are located within
+the &lt;Rules&gt;</p>
+<p>A &lt;Rule&gt; is constructed according the following syntax :</p>
 <pre>  11: &lt;Rule&gt;</pre>
-<br>
-&lt;From&gt; tag contains all entities from which the interaction is
+<p>&lt;From&gt; tag contains all entities from which the interaction is
 made. It is possible to specify many entities in order to match a
-specific fine-grained policy.<br>
+specific fine-grained policy.</p>
 <pre>  12: &lt;From&gt;<br>  13:  &lt;Entity type="VN" name="vm2"/&gt;<br>  14: &lt;/From&gt;</pre>
-&lt;Entity&gt; is used to define an entity. the "type" parameter can be
-"VN", "certificate". <br>
+<p>&lt;Entity&gt; is used to define an entity. the "type" parameter can be
+"VN", "certificate".
 <ul>
   <li>"VN" (Virtual Node) referrers to virtual nodes defined inside the
 deployment descriptor.</li>
@@ -661,44 +621,32 @@ default policy.<br>
   <li>"certificate" supposes that a path to a file is set inside the
 "name" parameters.</li>
 </ul>
-<br>
 &lt;To&gt; tag contains all entities onto the interaction is made. As
-&lt;From&gt; tag, many entities can be specified.<br>
+&lt;From&gt; tag, many entities can be specified.</p>
 <pre>  15: &lt;To&gt;<br>  16:  &lt;Entity type="VN" name="Locale"/&gt;<br>  17: &lt;/To&gt;</pre>
-<br>
-The &lt;Communication&gt; tag defines security policies to apply to
-requests and replies. <br>
+<p>The &lt;Communication&gt; tag defines security policies to apply to
+requests and replies. </p>
 <pre>  18: &lt;Communication&gt;</pre>
-&lt;Request&gt; sets the policy associated a request. the "value"
-parameter can be : <br>
+<p>&lt;Request&gt; sets the policy associated a request. the "value"
+parameter can be :
 <ul>
   <li>"authorized" means a request is authorized.</li>
   <li>"denied" means a request is denied.</li>
 </ul>
-<pre><br></pre>
-Each &lt;Attribute&gt; (authentication,integrity, confidentiality) can
-be
-required, optional or denied. <br>
-<br>
-&nbsp;&nbsp;&nbsp; 19: &lt;Request value="authorized"&gt;<br>
-&nbsp;&nbsp;&nbsp; 20: &nbsp; &lt;Attributes authentication="required"
-integrity="optional" confidentiality="optional"/&gt;&nbsp;&nbsp;&nbsp; <br>
-&nbsp;&nbsp;&nbsp; 21: &lt;/Request&gt;
-<br>
-<br>
-&lt;Reply&gt; tag has the same parameters that &lt;Request&gt;<br>
-<pre>  22:&lt;Reply value="authorized"&gt;<br>  23: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  24:&lt;/Reply&gt;</pre>
-<pre>  25:&lt;/Communication&gt;</pre>
-<br>
-&lt;Migration&gt; allows or not migration from &lt;from&gt; entities to
-&lt;To&gt; entities. Values can be "denied" or "authorized".<br>
+Each &lt;Attribute&gt; (authentication,integrity, confidentiality) can be required, optional or denied. </p>
+<pre>
+&nbsp;&nbsp;19: &lt;Request value="authorized"&gt;<br>&nbsp;&nbsp;20: &nbsp; &lt;Attributes authentication="required" integrity="optional" confidentiality="optional"/&gt; <br>&nbsp;&nbsp;21: &lt;/Request&gt;</pre>
+<p>&lt;Reply&gt; tag has the same parameters that &lt;Request&gt;</p>
+<pre>  22:&lt;Reply value="authorized"&gt;<br>  23: &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  24:&lt;/Reply&gt;<br>  25:&lt;/Communication&gt;</pre>
+<p>&lt;Migration&gt; allows or not migration from &lt;from&gt; entities to
+&lt;To&gt; entities. Values can be "denied" or "authorized".</p>
 <pre>  26: &lt;Migration&gt;denied&lt;/Migration&gt;</pre>
-&lt;OACreation&gt; allows or not creation of active objects by
+<p>&lt;OACreation&gt; allows or not creation of active objects by
 &lt;From&gt; entities onto &lt;To&gt; entities.<br>
-Values can be "denied" or "authorized".<br>
-<span ="">
-<pre>27: &lt;OACreation&gt;denied&lt;/OACreation&gt;</pre>
-<br>
+Values can be "denied" or "authorized".</p>
+
+<pre>  27: &lt;OACreation&gt;denied&lt;/OACreation&gt;</pre>
+
 <pre>   1:&lt;?xml version="1.0" encoding="UTF-8"?&gt;<br>   2:&lt;Policy&gt;<br>   3: &lt;ApplicationName&gt;Garden&lt;/ApplicationName&gt;<br>   4: &lt;Certificate&gt;/net/home/acontes/certif/appli.cert&lt;/Certificate&gt;<br>   5: &lt;PrivateKey&gt;/net/home/acontes/certif/appli.key&lt;/PrivateKey&gt;<br>   6: &lt;CertificationAuthority&gt;<br>   7:  &lt;Certificate&gt;&lt;/Certificate&gt;<br>   8: &lt;/CertificationAuthority&gt;<br>  <br>  10: &lt;Rules&gt;<br>  11:  &lt;Rule&gt;<br>  12:    &lt;From&gt;<br>  13:      &lt;Entity type="VN" name="vm2"/&gt;<br>  14:    &lt;/From&gt;<br>  15:    &lt;To&gt;<br>  16:      &lt;Entity type="VN" name="Locale"/&gt;<br>  17:    &lt;/To&gt;<br>  18:    &lt;Communication&gt;<br>  19:     &lt;Request value="authorized"&gt;<br>  20:      &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  21:     &lt;/Request&gt;<br>  22:     &lt;Reply value="authorized"&gt;<br>  23:      &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  24:     &lt;/Reply&gt;<br>  25:    &lt;/Communication&gt;<br>  26:    &lt;Migration&gt;denied&lt;/Migration&gt;<br>  27:    &lt;OACreation&gt;denied&lt;/OACreation&gt;<br>  28:<br>  29:  &lt;/Rule&gt;<br>  30:  &lt;Rule&gt;<br>  31:   &lt;From&gt;<br>  32:    &lt;Entity type="certificate" name="certificateRuntime1.cert"/&gt;<br>  33:   &lt;/From&gt;<br>  34:   &lt;To&gt;<br>  35:    &lt;Entity type="VN" name="Locale"/&gt;<br>  36:   &lt;/To&gt;<br>  37:   &lt;Communication&gt;<br>  38:    &lt;Request value="authorized"&gt;<br>  39:     &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  40:    &lt;/Request&gt;<br>  41:    &lt;Reply value="authorized"&gt;<br>  42:     &lt;Attributes authentication="required" integrity="required" confidentiality="required"/&gt;<br>  43:    &lt;/Reply&gt;<br>  44:   &lt;/Communication&gt;<br>  45:   &lt;Migration&gt;denied&lt;/Migration&gt;<br>  46:   &lt;OACreation&gt;denied&lt;/OACreation&gt;<br>  47:<br>  48:  &lt;/Rule&gt;<br>                        ...<br>  90:  &lt;Rule&gt;<br>  91:   &lt;From&gt;<br>  92:    &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br>  93:   &lt;/From&gt;<br>  94:   &lt;To&gt;<br>  95:    &lt;Entity type="DefaultVirtualNode" name="*"/&gt;<br>  96:   &lt;/To&gt;<br>  97:   &lt;Communication&gt;<br>  98:    &lt;Request value="denied"&gt;<br>  99:     &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 100:    &lt;/Request&gt;<br> 101:    &lt;Reply value="denied"&gt;<br> 102:     &lt;Attributes authentication="optional" integrity="optional" confidentiality="optional"/&gt;<br> 103:<br>&nbsp;104:    &lt;/Reply&gt;<br> 105:   &lt;/Communication&gt;<br> 106:   &lt;Migration&gt;denied&lt;/Migration&gt;<br> 107:   &lt;OACreation&gt;authorized&lt;/OACreation&gt;<br> 108:<br> 109:   &lt;/Rule&gt;<br> 110:<br> 111: &lt;/Rules&gt;<br> 112:&lt;/Policy&gt;<br></pre>
 Note that the JVM that reads the deployment descriptor should be
 started with security policy. In order to start a secure JVM, you need
