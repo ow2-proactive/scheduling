@@ -149,7 +149,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     *
     */
     protected void reifyAsOneWay(MethodCall methodCall)
-        throws MethodCallExecutionFailedException, RenegotiateSessionException {
+        throws Exception, RenegotiateSessionException {
         try {
             sendRequest(methodCall, null);
         } catch (java.io.IOException e) {
@@ -162,17 +162,19 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe);
+            handler.handle(nfe,
+                new MethodCallExecutionFailedException(
+                    "Exception occured in reifyAsOneWay while sending request for methodcall =" +
+                    methodCall.getName(), e));
         }
     }
 
     protected Object reifyAsAsynchronous(MethodCall methodCall)
-        throws MethodCallExecutionFailedException, RenegotiateSessionException {
+        throws Exception, RenegotiateSessionException {
         StubObject futureobject = null;
 
         // Creates a stub + FutureProxy for representing the result
         try {
-            //futureobject = (StubObject)MOP.newInstance(methodCall.getReifiedMethod().getReturnType().getName(), null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
             futureobject = (StubObject) MOP.newInstance(methodCall.getReifiedMethod()
                                                                   .getReturnType(),
                     null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
@@ -184,14 +186,10 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe);
-
-            // Check if problem is resolved
-            if (futureobject == null) {
-                throw new MethodCallExecutionFailedException(
+            handler.handle(nfe,
+                new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
-                    methodCall.getName(), e);
-            }
+                    methodCall.getName(), e));
         } catch (ClassNotFoundException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(
@@ -200,14 +198,10 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe);
-
-            // Check if problem is resolved
-            if (futureobject == null) {
-                throw new MethodCallExecutionFailedException(
+            handler.handle(nfe,
+                new MethodCallExecutionFailedException(
                     "Exception occured in reifyAsAsynchronous while creating future for methodcall =" +
-                    methodCall.getName(), e);
-            }
+                    methodCall.getName(), e));
         }
 
         // Set the id of the body creator in the created future
@@ -227,7 +221,10 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe);
+            handler.handle(nfe,
+                new MethodCallExecutionFailedException(
+                    "Exception occured in reifyAsAsynchronous while sending request for methodcall =" +
+                    methodCall.getName(), e));
         }
 
         // And return the future object
@@ -235,8 +232,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     }
 
     protected Object reifyAsSynchronous(MethodCall methodCall)
-        throws Throwable, MethodCallExecutionFailedException, 
-            RenegotiateSessionException {
+        throws Throwable, Exception, RenegotiateSessionException {
         // Setting methodCall.res to null means that we do not use the future mechanism
         Future f = FutureProxy.getFutureProxy();
         f.setCreatorID(bodyID);
@@ -255,7 +251,10 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             // Retrieve the right handler for the given exception
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe);
+            handler.handle(nfe,
+                new MethodCallExecutionFailedException(
+                    "Exception occured in reifyAsSynchronous while sending request for methodcall =" +
+                    methodCall.getName(), e));
         }
 
         // Returns the result
