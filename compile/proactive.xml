@@ -525,11 +525,11 @@
       ================================================================
 	-->
 	<target name="microTimer">
-		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/local/bin/g++" os="Linux" output="output.txt">
-			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o Testsuite_timer_micro_MicroTimer.o  testsuite_timer_micro_MicroTimer.cc"/>
+	        <exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/local/bin/g++" os="Linux" >
+			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o MicroTimer.o  MicroTimer.cc"/>
 		</exec>
-		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/bin/ld" os="Linux" output="output2.txt">
-			<arg line="  -G Testsuite_timer_micro_MicroTimer.o -o  libTestsuite_timer_micro_MicroTimer.so"/>
+		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/ld" os="Linux">
+			<arg line="  -G MicroTimer.o -o  libMicroTimer.so"/>
 		</exec>
 		<copy toDir="${classes.dir}">
 			<fileset dir="${src.dir}">
