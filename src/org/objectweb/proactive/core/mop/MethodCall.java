@@ -30,16 +30,15 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.apache.log4j.Logger;
 
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 
 /**
@@ -49,7 +48,7 @@ import java.lang.reflect.Method;
  *
  * @author Julien Vayssi&egrave;re
  */
-public final class MethodCall implements java.io.Serializable {
+public class MethodCall implements java.io.Serializable {
     // COMPONENTS added a tag for identification of component requests
     private String tag;
 
@@ -60,7 +59,15 @@ public final class MethodCall implements java.io.Serializable {
     //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
     //
-    public static Logger logger = Logger.getLogger(MethodCall.class.getName());
+    
+	/**
+	 * The hashtable that caches Method/isAsynchronousCall
+	 * This dramatically improves performances, since we do not have to call
+	 * isAsynchronousCall for every call, but only once for a given method
+	 */
+	private static transient java.util.Hashtable ASYNORNOT = new java.util.Hashtable();
+
+    private static Logger logger = Logger.getLogger(MethodCall.class.getName());
 
     /**
      *        The size of the pool we use for recycling MethodCall objects.
@@ -280,6 +287,7 @@ public final class MethodCall implements java.io.Serializable {
      * Fields of the object are also copied.
      * Please, consider use the factory method  <code>getMethodCall</code>
      * instead of build a new MethodCall object.
+     * @param mc - the MethodCall object to copy 
      */
     public MethodCall(MethodCall mc) {
         try {
@@ -308,6 +316,15 @@ public final class MethodCall implements java.io.Serializable {
             e.printStackTrace();
         }
     }
+
+	/**
+	 * Builds a new MethodCall object.
+	 */
+	protected MethodCall() {
+//		this.reifiedMethod = null;
+//		this.effectiveArguments = null;
+	}
+
 
     /**
      *        Executes the instance method call represented by this object.
@@ -370,6 +387,10 @@ public final class MethodCall implements java.io.Serializable {
         return reifiedMethod;
     }
 
+	/**
+	 * Returns the name of the method
+	 * @return the name of the method
+	 */
     public String getName() {
         return reifiedMethod.getName();
     }
@@ -507,6 +528,66 @@ public final class MethodCall implements java.io.Serializable {
             serializedEffectiveArguments = null;
         }
     }
+
+
+	/**
+	 * Returns a boolean saying whether the method is one-way or not.
+	 * Being one-way method is equivalent to <UL>
+	 * <LI>having <code>void</code> as return type
+	 * <LI>and not throwing any checked exceptions</UL>
+	 * @return true if and only if the method call is one way
+	 */
+	public boolean isOneWayCall() {
+		return (this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE)) && (this.getReifiedMethod().getExceptionTypes().length == 0);
+	}
+
+
+	/**
+	 * Checks if the <code>Call</code> object can be
+	 * processed with a future semantics, i-e if its returned object
+	 * can be a future object.
+	 *
+	 * Two conditions must be met : <UL>
+	 * <LI> The returned object is reifiable
+	 * <LI> The invoked method does not throw any exceptions
+	 * </UL>
+	 * @return true if and only if the method call is asynchronous
+	 */
+	public boolean isAsynchronousWayCall() {
+		Method m = this.getReifiedMethod();
+		// Is the result cached ?
+		Boolean b = (Boolean)MethodCall.ASYNORNOT.get(m);
+		if (b != null) {
+		  return b.booleanValue();
+		} else // Computes the result
+		{
+		  boolean result;
+		  // A Method that returns void is the only case where a method that returns
+		  // a non-reifiable type is asynchronous
+		  if (this.isOneWayCall()) {
+			result = true;
+		  } else {
+			try {
+			  MOP.checkClassIsReifiable(m.getReturnType());
+			  // If the method can throw exceptions, then the result if false
+			  if (m.getExceptionTypes().length > 0) {
+				//System.out.println(" ------ isAsynchronousCall() The method can throw exceptions ");
+				result = false;
+			  } else {
+				result = true;
+			  }
+			} catch (ClassNotReifiableException e) {
+			  //System.out.println(" ------ isAsynchronousCall() The class " + m.getReturnType() + " is not reifiable ");
+			  result = false;
+			}
+			// Now that we have computed the result, let's cache it
+			//System.out.println(" ------ isAsynchronousCall() method " + m + " ===> "+result);
+			MethodCall.ASYNORNOT.put(m, new Boolean(result));
+		  }
+		  return result;
+		}
+
+	}
 
     //
     // --- INNER CLASSES -----------------------------------------------------------------------

@@ -183,6 +183,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   
   public void receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
     //System.out.println("  --> receiveRequest m="+request.getMethodName());
+
+	MethodCall mc = request.getMethodCall();
+	if ("GroupControlCall".equals(mc.getName())) {
+		System.out.println("XXX recieve a barrier call");
+	}
+
 	try {
 		this.enterInThreadStore();
 		if (this.isDead) {

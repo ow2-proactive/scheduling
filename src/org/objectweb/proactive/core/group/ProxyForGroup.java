@@ -791,6 +791,19 @@ public class ProxyForGroup extends AbstractProxy
 		}
 	}
 
+//	/**
+//	 * Strongly synchronizes all the members of the group
+//	 */
+//	public void barrier () {
+//		try {
+//			this.reify(new MethodCallControlForGroup()); }
+//		catch (InvocationTargetException e) {
+//			logger.info("Unable to invoke the \"barrier\" method");
+//			e.printStackTrace();
+//		}
+//	}
+
+
     /**
      * To debug, display the size of the Group and all its members with there position
      */

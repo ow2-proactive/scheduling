@@ -192,4 +192,9 @@ public interface Group extends java.util.Collection {
      * @return a group that contain the members of the group from <code>begin</code> to <code>end</code>. <code>null</code> if <code>begin > end</code>.
      */
     public Group range(int begin, int end);
+    
+//	/**
+//	 * Strongly synchronizes all the members of the group
+//	 */
+//    public void barrier ();
 }
