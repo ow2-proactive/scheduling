@@ -80,6 +80,8 @@ A specific tag: <b>&lt;ProActiveUserPropertiesFile&gt;</b> is provided in <a hre
 		<ul class="listWithSpace">
 			<li class="textNormal"><b>proactive.rmi.port</b> represents the port number on which to start the RMIRegistry. Default is 1099. If  an RMIRegistry is already running  on the given port, jms  use the existing registry</li>
 			<li class="textNormal"><b>proactive.http.port</b> represents the port number on which to start the HTTP server. Default is 2010. If this port is occupied by another application, the http server starts on the first free port(given port is incremented transparently)</li>
+			<li class="textNormal"><b>proactive.useIPaddress</b> if set to <b>true</b>, IP adresses will be used instead of machines names. This property is particularly usefull to deal with sites that do not host a DNS</li>
+			<li class="textNormal"><b>proactive.hostname</b> when this property is set, the host name on which the jvm is started is given by the value of the property.  This property is particularly usefull to deal with machines with two network interfaces</li>
 			<li class="textNormal"><b>proactive.locationserver</b> represents the location server class to instantiate when using Active Objects with Location Server</li>
 			<li class="textNormal"><b>proactive.locationserver.rmi</b> represents the url under which the Location Server is registered in the RMIRegistry</li>
 			<li class="textNormal"><b>fractal.provider</b> This property defines the bootstrap component for the Fractal component model</li>
