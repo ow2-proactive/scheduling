@@ -324,8 +324,12 @@ public class CircularArrayList extends java.util.AbstractList
     }
 
     public boolean addAll(int index, java.util.Collection c) {
-        throw new UnsupportedOperationException(
-            "This method left as an exercise to the reader ;-)");
+    	boolean result = true;
+        Iterator it = c.iterator();
+        while (it.hasNext()) {
+        	result &= this.add(it.next());
+        }
+        return result;
     }
 
     // The convert() method takes a logical index (as if head was
@@ -369,6 +373,13 @@ public class CircularArrayList extends java.util.AbstractList
             array[i] = s.readObject();
     }
 
+    
+    /**
+     * This class implements an iterator for the CircularArrayList.
+     * It is more efficient than the default implementation of the 
+     * AbstractList Iterator.
+     * @author Laurent Baduel
+     */
     private class CircularArrayListIterator implements Iterator {
         private CircularArrayList clist;
         private int pos;
