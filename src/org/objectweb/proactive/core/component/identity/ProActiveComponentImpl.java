@@ -27,15 +27,16 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -49,7 +50,6 @@ import org.objectweb.proactive.core.component.controller.ProActiveComponentParam
 import org.objectweb.proactive.core.component.controller.ProActiveContentController;
 import org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController;
 import org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
@@ -60,10 +60,6 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ProActiveLogger;
-
-import java.io.Serializable;
-
-import java.util.ArrayList;
 
 
 /**

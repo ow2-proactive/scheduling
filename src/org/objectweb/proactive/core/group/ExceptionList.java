@@ -70,6 +70,7 @@ public class ExceptionList extends RuntimeException {
 	
 	/**
 	 * Returns an iterator over the exceptions in this list in proper sequence.
+	 * @return an iterator over the exceptions in this list in proper sequence.
 	 */
 	public Iterator iterator () {
 		return this.list.iterator();
@@ -82,5 +83,12 @@ public class ExceptionList extends RuntimeException {
 	public int size () {
 		return this.list.size();
 	}
-
+	
+	/**
+	 * Tests if this ExceptionList has no ExceptionInGroup.
+	 * @return <code>true</code> if and only if this list has no components, that is, its size is zero; <code>false otherwise.
+	 */
+	public boolean isEmpty() {
+		return this.list.isEmpty();
+	}
 }

@@ -1,17 +1,5 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,12 +12,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
 import java.rmi.registry.Registry;
-
 import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -46,6 +30,18 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredJob;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {

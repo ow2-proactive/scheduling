@@ -31,8 +31,6 @@
 package org.objectweb.proactive.core.runtime.rmi;
 
 import java.rmi.RemoteException;
-import java.rmi.registry.Registry;
-import java.rmi.registry.LocateRegistry;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;

@@ -1,19 +1,21 @@
 package org.objectweb.proactive.core.ssh.httpssh;
 
 import java.io.IOException;
-import java.net.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.ProtocolException;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.Permission;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.SshTunnelFactory;
-import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.TryCache;
-import org.apache.log4j.Logger;
 
 /**
  * @author mlacage

@@ -6,15 +6,12 @@ package org.objectweb.proactive.examples.components.helloworld;
  * Author: Eric Bruneton
  * Modified by: Matthieu Morel
  */
-import nonregressiontest.component.descriptor.fractaladl.Test;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
