@@ -184,7 +184,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	/**
 	 * ProactiveDescriptor object for the dispatcher 
 	 */
-	//private ProActiveDescriptor proActiveDescriptor;
+	private ProActiveDescriptor proActiveDescriptor;
 	private String[] rendererNodes;
 
 	/**
@@ -206,11 +206,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	/**
 	 * Constructor to call when using XML Descriptor
 	 */
-	public C3DDispatcher(String [] rendererNodes,VirtualNode vn)
+	public C3DDispatcher(String [] rendererNodes,VirtualNode vn, ProActiveDescriptor pad)
 	{
 		new C3DDispatcherFrame();
 		this.rendererNodes=rendererNodes;
 		this.vn = vn;
+		this.proActiveDescriptor = pad;
 	}
 	/**
 	 * Continues the initialization; called when the first user registers.
@@ -1111,7 +1112,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 			
 			VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer");
 		String[] rendererNodes = renderer.getNodesURL();
-		Object param[] = new Object[]{rendererNodes,dispatcher};
+		Object param[] = new Object[]{rendererNodes,dispatcher, proActiveDescriptor};
 		//System.out.println("in main"+dispatcher.getVirtualMachine().getProcess().getCommand());	
 		//VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer1");
 		//System.out.println(renderer.getName());
@@ -1644,12 +1645,15 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 		{
 			try
 			{
-				org.objectweb.proactive.ProActive.unregisterVirtualNode(
-					vn);
+//				org.objectweb.proactive.ProActive.unregisterVirtualNode(
+//					vn);
+					proActiveDescriptor.killall(false);
+				
 			}
 			catch (Exception e)
 			{
-				trace("Error: Could not unregister from the RMI Registry!");
+				trace("WARNING occurs when killing the application!");
+				//e.printStackTrace();
 			}
 			try
 			{
