@@ -69,7 +69,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
- * @see Body
+ * @see org.objectweb.proactive.Body
  * @see UniqueID
  *
  */
