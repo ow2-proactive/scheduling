@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
 //import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 
+
 /**
  * <p>
  * This class overrides the default Factory to provide Request and MigrationManager
@@ -50,64 +51,63 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class LocationServerMetaObjectFactory extends ProActiveRmiMetaObjectFactory {
+public class LocationServerMetaObjectFactory
+    extends ProActiveRmiMetaObjectFactory {
+    //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
+    private static MetaObjectFactory instance = null;
 
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-  private static MetaObjectFactory instance = null;
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-
-  /**
-   * Constructor for LocationServerMetaObjectFactory.
-   */
-  protected LocationServerMetaObjectFactory() {
-    super();
-  }
-
-  //
-  // -- PUBLICS METHODS -----------------------------------------------
-  //
-
-  public static synchronized MetaObjectFactory newInstance() {
-  	if (instance == null) {
-  		instance = new LocationServerMetaObjectFactory();
-  	}
-    return instance;
-  }
-
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-
-  protected RequestFactory newRequestFactorySingleton() {
-    return new RequestWithLocationServerFactory();
-  }
-
-  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
-    return new MigrationManagerFactoryImpl();
-  }
-
-  //
-  // -- INNER CLASSES -----------------------------------------------
-  //
-
-  protected class RequestWithLocationServerFactory implements RequestFactory, java.io.Serializable {
-    transient private LocationServer server = LocationServerFactory.getLocationServer();
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-      return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server);
+    /**
+     * Constructor for LocationServerMetaObjectFactory.
+     */
+    protected LocationServerMetaObjectFactory() {
+        super();
     }
-  } // end inner class RequestWithLocationServerFactory
 
-
-
-  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
-    public MigrationManager newMigrationManager() {
-        return new MigrationManagerWithLocationServer(LocationServerFactory.getLocationServer());
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public static synchronized MetaObjectFactory newInstance() {
+        if (instance == null) {
+            instance = new LocationServerMetaObjectFactory();
+        }
+        return instance;
     }
-  } // end inner class MigrationManagerFactoryImpl
 
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+    protected RequestFactory newRequestFactorySingleton() {
+        return new RequestWithLocationServerFactory();
+    }
+
+    protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
+        return new MigrationManagerFactoryImpl();
+    }
+
+    //
+    // -- INNER CLASSES -----------------------------------------------
+    //
+    protected class RequestWithLocationServerFactory implements RequestFactory,
+        java.io.Serializable {
+        transient private LocationServer server = LocationServerFactory.getLocationServer();
+
+        public Request newRequest(MethodCall methodCall,
+            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+            return new RequestWithLocationServer(methodCall, sourceBody,
+                isOneWay, sequenceID, server);
+        }
+    }
+
+    protected static class MigrationManagerFactoryImpl
+        implements MigrationManagerFactory, java.io.Serializable {
+        public MigrationManager newMigrationManager() {
+            return new MigrationManagerWithLocationServer(LocationServerFactory.getLocationServer());
+        }
+    }
 }
