@@ -113,7 +113,7 @@ public class NodeFactory {
                         Integer.toString(
                             new java.util.Random(System.currentTimeMillis()).nextInt()),
                         false,defaultRuntime.getPolicyServer(), 
-						 "currentJVM",jobID );
+						 "DefaultVN",jobID );
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             }
