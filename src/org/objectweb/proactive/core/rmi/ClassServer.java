@@ -37,7 +37,7 @@ import java.net.UnknownHostException;
 
 public class ClassServer implements Runnable {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
-    public static final int DEFAULT_SERVER_BASE_PORT = 2222;
+    public static final int DEFAULT_SERVER_BASE_PORT = 2010;
     protected static int DEFAULT_SERVER_PORT_INCREMENT = 20;
     protected static int MAX_RETRY = 50;
     private static java.util.Random random = new java.util.Random();
