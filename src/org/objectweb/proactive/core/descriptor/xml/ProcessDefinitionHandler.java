@@ -318,7 +318,7 @@ public class ProcessDefinitionHandler
 			}
 			else if (name.equals(JVMPARAMETERS_TAG))
 			{
-				jvmProcess.setJvmParameters((String) activeHandler.getResultObject());
+				jvmProcess.setJvmOptions((String) activeHandler.getResultObject());
 			}
 			else
 			{

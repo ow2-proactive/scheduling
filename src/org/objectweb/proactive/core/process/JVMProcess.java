@@ -116,9 +116,15 @@ public interface JVMProcess extends ExternalProcess {
   public void setParameters(String parameters);
 
 
-     /**
-      * Sets the parameters of the jvm to start
-      * @param parameters Paramaters to be given in order to start the jvm 
-      */
-  public void setJvmParameters(String parameters);
+  /**
+   * Sets the options of the jvm to start
+   * <p>
+ 	 * For instance:
+ 	 * </p>
+ 	 * <pre>
+ 	 * jvmProcess.set JvmOptions("-verbose -Xms300M -Xmx300m");
+ 	 * </pre>
+   * @param options Options to be given in order to start the jvm 
+   */
+  public void setJvmOptions(String options);
 }

@@ -214,8 +214,8 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
 	   * Sets the parameters of the jvm to start with the given parameters for the target JVMProcess
 	   * @param parameters Paramaters to be given in order to start the jvm 
 	   */
-   public void setJvmParameters(String parameters) {
-	 jvmProcess.setJvmParameters(parameters);
+   public void setJvmOptions(String parameters) {
+	 jvmProcess.setJvmOptions(parameters);
    }
   //
   // -- PROTECTED METHODS -----------------------------------------------

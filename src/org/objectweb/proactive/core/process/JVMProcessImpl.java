@@ -179,7 +179,7 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
     this.parameters = parameters;
   }
   
-  public void setJvmParameters(String string) {
+  public void setJvmOptions(String string) {
 	  jvmParameters = string;
   }
 
