@@ -198,6 +198,10 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   public String getGISPort(){
   	return this.gisPort;
   }
+  
+  public GlobusHostAdviser getGlobusHostAdviser(){
+  	return this.globusHostAdviser;
+  }
   //===========================================================
   // Seteur
   //===========================================================
