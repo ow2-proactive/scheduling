@@ -47,7 +47,12 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * Objects of this class will be created when in an XML descriptor a VirtualNode is declared 
  * in the virtualNodesAcquisition tag and defined with
  * <pre>
- * lookup virtualNode="Dispatcher" host="hostname" protocol="rmi or jini"
+ * virtualNodesAcquisition
+ * 		virtualNode name="vn_name"
+ * virtualNodesAcquisition
+ * 	..........................
+ * ...........................
+ * lookup virtualNode="vn_name" host="hostname" protocol="rmi or jini"
  * </pre>
  * @author  ProActive Team
  * @version 1.0,  2003/04/01

@@ -173,7 +173,7 @@ public interface VirtualNode extends java.io.Serializable
   
 	/**
 	 * Returns the unique active object created on the unique node mapped to this VirtualNode.
-	 * This method should be called on a virtualNode, with unique_singleAO property defined in theXML descriptor. If more than one active object are found, a 
+	 * This method should be called on a virtualNode, with unique_singleAO property defined in the XML descriptor. If more than one active object are found, a 
 	 * warning is generated, and the first active object found is returned
 	 * @return Object the unique active object created on the unique node mapped to this VirtualNode. If many active objects are found, the first one is returned
 	 * @throws ProActiveException if no active objects are created on this VirtualNode.
