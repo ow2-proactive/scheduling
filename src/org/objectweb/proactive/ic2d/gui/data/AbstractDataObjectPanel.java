@@ -373,6 +373,10 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
             titleItem = add(name + " Menu");
             titleItem.setEnabled(false);
             addSeparator();
+        }
+
+        // generic menu built
+        public void addGenericMenu() {
             add(fontSizeMenu);
             monitoringMenu = new MessageMonitoringMenu("Monitor events",
                     getAbstractDataObject());
@@ -434,23 +438,23 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel
             public FontSizeMenu() {
                 super("Change font size");
                 HashMenuFontSize.put(SMALL_FONT, new String("Small font size"));
+                add(createItem(SMALL_FONT, false));
                 HashMenuFontSize.put(VERY_SMALL_FONT,
                     new String("Very small font size"));
-                HashMenuFontSize.put(VERY_BIG_FONT,
-                    new String("Very large font size"));
-                HashMenuFontSize.put(BIG_FONT, new String("Large font size"));
+                add(createItem(VERY_SMALL_FONT, false));
                 HashMenuFontSize.put(REGULAR_FONT,
                     new String("Regular font size"));
-                java.util.Iterator iter = HashMenuFontSize.entrySet().iterator();
-                while (iter.hasNext()) {
-                    java.util.Map.Entry keyval = (java.util.Map.Entry) iter.next();
-                    add(createItem((String) keyval.getValue(),
-                            (java.awt.Font) keyval.getKey(), false));
-                }
+                add(createItem(REGULAR_FONT, false));
+                HashMenuFontSize.put(VERY_BIG_FONT,
+                    new String("Very large font size"));
+                add(createItem(VERY_BIG_FONT, false));
+                HashMenuFontSize.put(BIG_FONT, new String("Large font size"));
+                add(createItem(BIG_FONT, false));
             }
 
-            private javax.swing.JMenuItem createItem(String text,
-                final java.awt.Font font, final boolean stat) {
+            private javax.swing.JMenuItem createItem(final java.awt.Font font,
+                final boolean stat) {
+                String text = (String) HashMenuFontSize.get(font);
                 javax.swing.JRadioButtonMenuItem menuItem = new javax.swing.JRadioButtonMenuItem(text,
                         stat);
                 menuItem.addActionListener(new java.awt.event.ActionListener() {
