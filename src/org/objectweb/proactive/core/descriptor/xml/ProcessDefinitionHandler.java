@@ -141,7 +141,7 @@ public class ProcessDefinitionHandler
 				targetProcess.setHostname(hostname);
 			String username = attributes.getValue("username");
 			if (checkNonEmpty(username))
-				targetProcess.setHostname(username);
+				targetProcess.setUsername("username");
 		}
 
 		//
