@@ -216,35 +216,85 @@ else
 <p class="textNormal">
 This is the easiest solution when you do control the class that you make active. Depending on which phase in the life of the active object you want to customize, you implement the corresponding interface (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>. Here an example that has a custom initialization and activity.
 </p>
+<p class="textNormal"><b>Example1: </b>
 <pre>
   import org.objectweb.proactive.*;
 
   public class A implements InitActive, RunActive {
-    private String myName;
+    	private String myName;
 
-    public String getName() {
-      return myName;
-    }
+   	 public String getName() {
+     	 return myName;
+    	}
 
-    // -- implements InitActive
-    public void initActivity(Body body) {
-      myName = body.getName();
-    }
+    	// -- implements InitActive
+    	public void initActivity(Body body) {
+      	myName = body.getName();
+    	}
 
-    // -- implements RunActive for serving request in a LIFO fashion
-    public void runActivity(Body body) {
-      Service service = new Service(Body);
-      while (body.isActive()) {
-        service.blockingServeYoungest();
-      }
-    }
+    	// -- implements RunActive for serving request in a LIFO fashion
+   	 public void runActivity(Body body) {
+      	Service service = new Service(Body);
+      	while (body.isActive()) {
+       	 service.blockingServeYoungest();
+      	}
+    	}
 
-    public static void main(String[] args) throws Exception {
-      A a = (A) ProActive.newActive("A",null);
-      System.out.println("Name = "+a.getName());
-    }
+    	public static void main(String[] args) throws Exception {
+      	A a = (A) ProActive.newActive("A",null);
+      	System.out.println("Name = "+a.getName());
+    	}
   }
 </pre>
+<p class="textNormal"><b>Example2: </b> <b>start, stop, suspend, restart</b> a simulation algorithm in runActivity method
+<pre>
+import org.objectweb.proactive.*;
+
+public class Simulation implements RunActive {
+
+      private boolean stoppedSimulation=false;
+	private boolean startedSimulation=false
+	private boolean suspendedSimulation=false;
+	private boolean notStarted = true;
+
+	public void startSimulation(){
+	//<b>Simulation starts</b>
+	notStarted = false;
+	startedSimulation=true;
+	}
+	public void restartSimulation(){
+	//<b>Simulation is restarted</b>
+	startedSimulation=true;
+	suspendedSimulation=false;
+	}
+
+	public void suspendSimulation(){
+	//<b>Simulation is suspended</b>
+	suspendedSimulation=true;
+	startedSimulation = false;
+	}
+
+	public void stoppedSimulation(){
+	//<b>Simulation is stopped</b>
+	stoppedSimulation=true;
+	}
+
+	public void runActivity(Body body) {
+     	 Service service = new Service(Body);
+      	while (body.isActive()) {
+      	//If the simulation is not yet started wait until startSimulation method
+   	<b>if(notStarted) service.blockingServeOldest(startSimulation());</b>
+       // If the simulation is started serve request with FIFO
+     	<b> if(startedSimulation) service.blockingServeOldest();</b>
+      	// If simulation is suspended wait until restartSimulation method
+      <b>	if(suspendedSimulation) service.blockingServeOldest(restartSimulation());</b>
+      	// If simulation is stopped, exit
+      <b>	if(stoppedSimulation) exit();</b>
+	}
+}
+</pre>
+
+</p>
 <h3>Passing an object implementing the interfaces when creating the active object</h3>
 <p class="textNormal">
 This is the solution to use when you do not control the class that you make active or when you want to write generic activities policy and reused them with several active objects. Depending on which phase in the life of the active object you want to customize, you implement the corresponding interface (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>. Here an example that has a custom activity.
