@@ -123,6 +123,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="ProcessReferenceType">
 		<xs:attribute name="refid" type="xs:string" use="required"/>
 	</xs:complexType>
+	<!--commandPath element is defined as a global element, hence it can be referenced in many part of the document. It has one attribute: value that must occur once and only once. This element represents the path of the command to be executed   -->
+	<xs:element name="commandPath" type="CommandPathType"/>
+	<xs:complexType name="CommandPathType">
+		<xs:attribute name="value" type="xs:string" use="required"/>
+	</xs:complexType>
 	<!--environment element is defined as global element, hence it can be referenced in many part of the document. It has one child: variable element that must occur once and only once. This element is used to defined environment variables for some processes. -->
 	<xs:element name="environment" type="EnvironmentType"/>
 	<xs:complexType name="EnvironmentType">
@@ -462,6 +467,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
@@ -478,6 +484,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="MapRshProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
@@ -495,6 +502,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
@@ -512,6 +520,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.RLoginProcess"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
@@ -520,6 +529,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="BsubProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="bsubOption" type="BsubOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.LSFBSubProcess"/>
@@ -554,6 +564,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="PbsProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="pbsOption" type="PbsOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.pbs.PBSSubProcess"/>
@@ -564,9 +575,9 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="PbsOptionType">
 		<xs:complexContent>
 			<xs:extension base="prunOptionType">
-			<xs:sequence>
-			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-			</xs:sequence>
+				<xs:sequence>
+					<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -574,6 +585,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<xs:complexType name="prunProcessType">
 		<xs:sequence>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="prunOption" type="prunOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.prun.PrunSubProcess"/>
@@ -598,6 +610,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
 			<xs:element name="globusOption" type="GlobusOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
