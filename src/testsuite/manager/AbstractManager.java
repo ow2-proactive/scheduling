@@ -369,9 +369,8 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
      * @see testsuite.bean.Beanable#loadAttributes()
      */
     public void loadAttributes() throws IOException {
-        String filename = getClass().getResource(getClass().getName() +
-                ".class").getPath();
-        filename = filename.replaceAll(".class", ".prop");
+        String filename = getClass().getResource("/"+getClass().getName().replace('.','/') + ".class").getPath();
+        filename = filename.replaceAll("\\.class", ".prop");
         loadAttributes(new File(filename.replaceAll("%20", " ")));
     }
 
