@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -38,9 +38,10 @@ import org.objectweb.proactive.core.component.controller.ComponentParametersCont
 
 import java.io.Serializable;
 
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -53,17 +54,19 @@ import java.util.Vector;
  *         the inner components)
  *
  *
- *
  * @author Matthieu Morel
  */
 public class Bindings implements Serializable {
-    private Hashtable clientInterfaceBindings;
-    private Hashtable parallelInternalClientInterfaceBindings;
+    //	 In case of collective bindings, the interfaces of the collection can be : 
+    //	  1. named (as in Fractal 2.0 spec) : they are mapped in clientInterfaceBindings according to their name
+    //	  2. anonymous : they are put in a list which is mapped in clientInterfaceBindings with the type name of the collective interface 
+    private HashMap clientInterfaceBindings;
+    private HashMap parallelInternalClientInterfaceBindings;
 
     // key = interfaceName ; value = binding
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)
     public Bindings() {
-        clientInterfaceBindings = new Hashtable();
+        clientInterfaceBindings = new HashMap();
     }
 
     /**
@@ -89,8 +92,8 @@ public class Bindings implements Serializable {
         }
     }
 
-    // returns either a Binding or a Vector of Binding objects (collection interface case)
-    
+    // returns either a Binding or a List of Binding objects (collection interface case)
+
     /**
      * removes the binding on the given client interface
      */
@@ -102,11 +105,11 @@ public class Bindings implements Serializable {
         return clientInterfaceBindings.get(clientItfName);
     }
 
-	/**
-	 * tests if binding exists on the given interface
-	 * @param clientItfName the client inteface to check
-	 * @return true if binding exists
-	 */
+    /**
+     * tests if binding exists on the given interface
+     * @param clientItfName the client inteface to check
+     * @return true if binding exists
+     */
     public boolean containsBindingOn(String clientItfName) {
         return clientInterfaceBindings.containsKey(clientItfName);
     }
@@ -146,14 +149,18 @@ public class Bindings implements Serializable {
     }
 
     private void addCollectiveBinding(Map bindingsTable, Binding binding) {
-        String clientItfName = binding.getClientInterface().getFcItfName();
-        if (bindingsTable.containsKey(clientItfName)) {
-            // there should be a Vector for containing the bindings associated
-            ((Vector) bindingsTable.get(clientItfName)).add(binding);
-        } else { // we create a Vector for keeping the bindings
-            Vector bindings_collection = new Vector();
-            bindings_collection.add(binding);
-            bindingsTable.put(clientItfName, bindings_collection);
+        String client_itf_name = binding.getClientInterfaceName();
+        if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {
+            if (bindingsTable.containsKey(client_itf_name)) {
+                // there should be a List for containing the bindings associated
+                ((List) bindingsTable.get(client_itf_name)).add(binding);
+            } else { // we create a List for keeping the bindings
+                ArrayList bindings_collection = new ArrayList();
+                bindings_collection.add(binding);
+                bindingsTable.put(client_itf_name, bindings_collection);
+            }
+        } else {
+            bindingsTable.put(client_itf_name, binding);
         }
     }
 
@@ -163,7 +170,7 @@ public class Bindings implements Serializable {
 
     private void addCollectiveBindingOnInternalClientItf(Binding binding) {
         if (parallelInternalClientInterfaceBindings == null) {
-            parallelInternalClientInterfaceBindings = new Hashtable();
+            parallelInternalClientInterfaceBindings = new HashMap();
         }
         addCollectiveBinding(parallelInternalClientInterfaceBindings, binding);
     }
