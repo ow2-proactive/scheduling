@@ -84,7 +84,7 @@
 					<bsubOption>
 						<hostlist>pf10.inria.fr</hostlist>
 						<processor>2</processor>
-						<resourceRequirement value="span[ptile=2"/>
+						<resourceRequirement value="span[ptile=2]"/>
 						<scriptPath>
 							<absolutePath value="/net/home/rquilici/ProActive/scripts/unix/cluster/startRuntime.sh"/>
 						</scriptPath>
