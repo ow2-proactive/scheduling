@@ -323,7 +323,7 @@
 			<group title="ProActive Extensions : Security (*under development*)" packages="org.objectweb.proactive.ext.security*"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 0.91 - IC2D" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 0.9.1 - IC2D" bottom="&lt;i>Copyright &#169; April 2002 INRIA All Rights Reserved.&lt;/i>">
 			<classpath refid="project.classpath"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
