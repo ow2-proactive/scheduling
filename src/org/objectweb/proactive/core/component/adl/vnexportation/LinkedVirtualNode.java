@@ -84,7 +84,7 @@ public class LinkedVirtualNode {
      * @return true if the virtual node was added, false if it was already present as a composing virtual node
      */
     public boolean addComposingVirtualNode(LinkedVirtualNode vn) {
-        System.out.println("ADDING " + vn.toString() + " \nTO : " + toString());
+//        System.out.println("ADDING " + vn.toString() + " \nTO : " + toString());
         setMultiple(vn.isMultiple());
         if (!composingVirtualNodes.contains(vn)) {
             composingVirtualNodes.add(vn);
