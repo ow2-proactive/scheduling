@@ -29,24 +29,24 @@ IF EXIST %PROACTIVE%\lib\bcel.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bcel
 rem -------------------------------------------------
 rem jars for Jini
 rem -------------------------------------------------
-IF EXIST %PROACTIVE%\lib\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-core.jar
-IF EXIST %PROACTIVE%\lib\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-ext.jar
-IF EXIST %PROACTIVE%\lib\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\reggie.jar
+IF EXIST %PROACTIVE%\lib\jini\jini-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-core.jar
+IF EXIST %PROACTIVE%\lib\jini\jini-ext.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\jini-ext.jar
+IF EXIST %PROACTIVE%\lib\jini\reggie.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jini\reggie.jar
 
 rem -------------------------------------------------
 rem jars for Globus
 rem -------------------------------------------------
-IF EXIST %PROACTIVE%\lib\cog-jglobus.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cog-jglobus.jar
-IF EXIST %PROACTIVE%\lib\cog-ogce.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cog-ogce.jar
-IF EXIST %PROACTIVE%\lib\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix.jar
-IF EXIST %PROACTIVE%\lib\cryptix32.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix32.jar
-IF EXIST %PROACTIVE%\lib\cryptix-asn1.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix-asn1.jar
-IF EXIST %PROACTIVE%\lib\puretls.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\puretls.jar
+IF EXIST %PROACTIVE%\lib\globus\cog-jglobus.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cog-jglobus.jar
+IF EXIST %PROACTIVE%\lib\globus\cog-ogce.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cog-ogce.jar
+IF EXIST %PROACTIVE%\lib\globus\cryptix.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix.jar
+IF EXIST %PROACTIVE%\lib\globus\cryptix32.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix32.jar
+IF EXIST %PROACTIVE%\lib\globus\cryptix-asn1.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\cryptix-asn1.jar
+IF EXIST %PROACTIVE%\lib\globus\puretls.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\globus\puretls.jar
 
 rem -------------------------------------------------
 rem jars for Ibis
 rem -------------------------------------------------
-IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis\ibis.jar
+IF EXIST %PROACTIVE%\lib\ibis\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis\ibis.jar
 
 rem -------------------------------------------------
 rem jars for Fractal GUI
@@ -64,19 +64,19 @@ IF EXIST %PROACTIVE%\lib\components\SVGGraphics.jar set CLASSPATH=%CLASSPATH%;%P
 rem -------------------------------------------------
 rem jars for Web Services
 rem -------------------------------------------------
-IF EXIST %PROACTIVE%\lib\soap.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\soap.jar
-IF EXIST %PROACTIVE%\lib\wsdl4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\wsdl4j.jar
-IF EXIST %PROACTIVE%\lib\axis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\axis.jar
-IF EXIST %PROACTIVE%\lib\jaxrpc.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\jaxrpc.jar
-IF EXIST %PROACTIVE%\lib\activation.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\activation.jar
-IF EXIST %PROACTIVE%\lib\saaj-api.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\saaj-api.jar
-IF EXIST %PROACTIVE%\lib\commons-logging.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-logging.jar
-IF EXIST %PROACTIVE%\lib\commons-discovery.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-discovery.jar
-IF EXIST %PROACTIVE%\lib\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\mail.jar
-IF EXIST %PROACTIVE%\lib\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\xml-apis.jar
+IF EXIST %PROACTIVE%\lib\ws\soap.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\soap.jar
+IF EXIST %PROACTIVE%\lib\ws\wsdl4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\wsdl4j.jar
+IF EXIST %PROACTIVE%\lib\ws\axis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\axis.jar
+IF EXIST %PROACTIVE%\lib\ws\jaxrpc.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\jaxrpc.jar
+IF EXIST %PROACTIVE%\lib\ws\activation.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\activation.jar
+IF EXIST %PROACTIVE%\lib\ws\saaj-api.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\saaj-api.jar
+IF EXIST %PROACTIVE%\lib\ws\commons-logging.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-logging.jar
+IF EXIST %PROACTIVE%\lib\ws\commons-discovery.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\commons-discovery.jar
+IF EXIST %PROACTIVE%\lib\ws\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\mail.jar
+IF EXIST %PROACTIVE%\lib\ws\xml-apis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ws\xml-apis.jar
 
 
-echo CLASSPATH=%CLASSPATH%
+rem echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy=%PROACTIVE%\scripts\proactive.java.policy -Dlog4j.configuration=file:%PROACTIVE%\scripts\proactive-log4j
 set PATH=%JAVA_HOME%\bin;%PATH%
