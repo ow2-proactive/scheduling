@@ -412,6 +412,34 @@ A ga2 = (A) ag.getGroupByType();
 			</td>
 	</tbody>
 </table><br></br>
+
+
+<table width="100%" border="1">
+	<tbody>
+		<tr>
+			<th>OO SPMD:</th>
+		</tr>
+		<tr>
+			<td><pre>
+A spmdGroup  =  (A) ProSPMD.newSPMDGroup("A", params, nodes);
+<FONT ID="SingleLineComment">   // Creates an SPMD group and creates all members with params on the nodes.</FONT>
+<FONT ID="SingleLineComment">   // An SPMD group is a typed group in which every member has a reference to</FONT>
+<FONT ID="SingleLineComment">   // the others (the SPMD group itself).</FONT>
+A mySpmdGroup = (A) ProSPMD.getSPMDGroup();
+<FONT ID="SingleLineComment">   // Returns the SPMD group of the activity.</FONT>
+int rank = ProSPMD.getMyRank();
+<FONT ID="SingleLineComment">   // Returns the rank of the activity in its SPMD group.</FONT>
+ProSPMD.barrier("barrierID");
+<FONT ID="SingleLineComment">   // Blocks the activity (after the end of the current service) until all</FONT>
+<FONT ID="SingleLineComment">   // other members of the SPMD group invoke the same barrier. </FONT>
+<FONT ID="SingleLineComment">   // Three barriers are available : total barrier, neighbors based barrier</FONT>
+<FONT ID="SingleLineComment">   // and method based barrier. </FONT>
+</pre>
+			</td>
+	</tbody>
+</table><br></br>
+
+
 <table width="100%" border="1">
 	<tbody>
 		<tr>
