@@ -372,7 +372,7 @@
 		<mkdir dir="${docs.dir}"/>
 		<mkdir dir="${docs.dir}/api"/>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 2.0&lt;br>&lt;a href=&quot;org/objectweb/proactive/doc-files/index.html&quot;>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2004 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" use="true" windowtitle="ProActive API" doctitle="ProActive 2.0&lt;br>&lt;a href='org/objectweb/proactive/doc-files/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2004 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
 			<classpath refid="project.classpath"/>
 			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
