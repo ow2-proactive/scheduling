@@ -6,14 +6,16 @@ BODY {
 /* P  { margin-left:  8px; padding-left: 8px; } */
 th { background-color: #00257E; color: white; font-weight: bold; }
 H1 { font-weight: bold; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 18pt;}
-H2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
+h2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
 H3 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold;}
 H4 { margin-left: 15px; padding-left: 5px; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
 B  { color: #00257E; }
 b.java { color: #0000FF ; font-weight: bold }
 P{ margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 LI{margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
+table.xml{ background-color: #C0C0C0; border: double #FFFFFF}
 
+.xml{font-family: Courier; font-size: 10pt;}
 .regularLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .regularLink2 { background-color: white; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .smallLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 8pt; font-weight: bold; }
@@ -24,7 +26,10 @@ LI{margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial,
 .textNormal { margin-left:  5px; padding-left: 5px; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; }
 .textSmall {  font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 8pt; }
 .listWithSpace { line-height: 1.5;}
-.snippet{ color: #00257E; font-size:0.75em; border:1;padding-top: 0em;padding-left: 6.0em;padding-right: 1.0em; /*font-family:monospace;*/  background-color:white; border-color:#00257E font-weight:bolder;font-family: Lucida Console, Courier;}
+.snippet{ color: #00257E; font-size:0.75em; border:1;padding-top: 0em;padding-left: 6.0em;padding-right: 1.0em; /*font-family:monospace;*/  background-color:white; border-color:#00257E font-weight:bolder;font-family: Lucida Console, Courier; font-size: 10pt; }
+.alignleftsnippet{ color: #00257E; font-size:0.75em; border:1;padding-top: 0em;padding-right: 1.0em; /*font-family:monospace;*/  background-color:white; border-color:#00257E font-weight:bolder;font-family: Lucida Console, Courier; font-size: 10pt; }
+.print {  page-break-after: always}
+
 
 /* Token Colours */
 #CharacerLiteral	{ color: #FF00FF; }
