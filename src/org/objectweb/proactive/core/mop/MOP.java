@@ -66,7 +66,7 @@ public abstract class MOP {
     /**
      * Empty object array
      */
-    protected static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+    public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     /**
      * Class array representing (Constructor Call, Object[])
@@ -668,7 +668,7 @@ public abstract class MOP {
     }
 
     // Instanciates the proxy object
-    private static Proxy createProxyObject(String nameOfProxy,
+    public static Proxy createProxyObject(String nameOfProxy,
         Object[] proxyParameters, ConstructorCall reifiedCall)
         throws ConstructionOfProxyObjectFailedException, ClassNotFoundException, 
             InvalidProxyClassException {
@@ -697,7 +697,7 @@ public abstract class MOP {
         }
     }
 
-    private static ConstructorCall buildTargetObjectConstructorCall(
+    public static ConstructorCall buildTargetObjectConstructorCall(
         Class targetClass, Object[] constructorParameters)
         throws ConstructionOfReifiedObjectFailedException {
         // First, build the ConstructorCall object to pass to the constructor
@@ -902,7 +902,7 @@ public abstract class MOP {
      * @return The resulting object
      * @throws ReifiedCastException if the class cast is invalid
      */
-    private static Object castInto(Object sourceObject, Class targetType)
+   private static Object castInto(Object sourceObject, Class targetType)
         throws ReifiedCastException {
         // First, check if sourceObject is a reified object
         if (!(isReifiedObject(sourceObject))) {
