@@ -315,7 +315,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
      */
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.wrappedBody.receiveFTMessage(ev);
