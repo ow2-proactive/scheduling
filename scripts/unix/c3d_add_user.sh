@@ -6,7 +6,9 @@ echo --- C3D ---------------------------------------------
 workingDir=`dirname $0`
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.examples.c3d.C3DUser
+export XMLDESCRIPTOR=$workingDir/../../descriptors/C3D_User.xml
+$JAVACMD org.objectweb.proactive.examples.c3d.C3DUser $XMLDESCRIPTOR
+
 
 
 echo
