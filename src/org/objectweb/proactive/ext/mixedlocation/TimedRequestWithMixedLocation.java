@@ -1,6 +1,6 @@
 package org.objectweb.proactive.ext.mixedlocation;
 
-import modelisation.server.TimedRequestWithLocationServer;
+import org.objectweb.proactive.ext.locationserver.TimedRequestWithLocationServer;
 
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureProxy;
