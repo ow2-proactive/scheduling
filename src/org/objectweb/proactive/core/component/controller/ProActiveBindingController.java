@@ -162,7 +162,7 @@ public class ProActiveBindingController extends ProActiveController
 
     /**
      *
-     * @param the name of the client interface
+     * @param clientItfName the name of the client interface
      * @return a Binding object if single binding, List of Binding objects otherwise
      */
     public Object removeBinding(String clientItfName) {
@@ -171,7 +171,7 @@ public class ProActiveBindingController extends ProActiveController
 
     /**
      *
-     * @param the name of the client interface
+     * @param clientItfName the name of the client interface
      * @return a Binding object if single binding, List of Binding objects otherwise
      */
     public Object getBinding(String clientItfName) {
@@ -179,7 +179,7 @@ public class ProActiveBindingController extends ProActiveController
     }
 
     /**
-     * see {@link org.objectweb.fractal.api.control.BindingController#lookupFc(String)}
+     * see @link org.objectweb.fractal.api.control.BindingController#lookupFc(String)
      */
     public Object lookupFc(String clientItfName)
         throws NoSuchInterfaceException {
@@ -437,7 +437,7 @@ public class ProActiveBindingController extends ProActiveController
     }
 
     /**
-     * @return
+     * 
      */
     public List getSingleInterfacesNames() {
         if (singleInterfacesNames == null) {

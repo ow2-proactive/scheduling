@@ -364,7 +364,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
 
     /**
      * see
-     * {@org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
+     * {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
     public Component getRepresentativeOnThis() {
         try {

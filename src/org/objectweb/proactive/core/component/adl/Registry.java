@@ -71,7 +71,7 @@ public class Registry {
     }
 
     /**
-     * see {@link org.objectweb.fractal.adl.RegistryManager#addComponent(org.objectweb.fractal.api.Component)}
+     * see @link org.objectweb.fractal.adl.RegistryManager#addComponent(org.objectweb.fractal.api.Component)
      */
     public void addComponent(Component component) throws ADLException {
         if (ProActiveGroup.isGroup(component)) {
@@ -100,7 +100,7 @@ public class Registry {
     }
 
     /**
-     * see {@link org.objectweb.fractal.adl.RegistryManager#getComponent(java.lang.String)}
+     * see @link org.objectweb.fractal.adl.RegistryManager#getComponent(java.lang.String)
      */
     public Component getComponent(String name) {
         return (Component) table.get(name);

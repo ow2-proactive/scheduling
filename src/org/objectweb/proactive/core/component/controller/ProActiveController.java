@@ -58,7 +58,6 @@ public abstract class ProActiveController implements Interface, Serializable {
     /**
      * Constructor for ProActiveController.
      * @param owner the component that wants this controller
-     * @param controllerName the name of the controller (the list of controller names
      * is in the {@link Constants} class.
      */
     public ProActiveController(Component owner) {

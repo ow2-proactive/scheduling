@@ -88,7 +88,7 @@ public class ProActiveComponentParametersController extends ProActiveController
     }
     
     /**
-     * see {@link ComponentParametersController#setComponentName(String)}
+     * see @link ComponentParametersController#setComponentName(String)
      */
     public void setFcName(String componentName) {
     	componentParameters.setName(componentName);
