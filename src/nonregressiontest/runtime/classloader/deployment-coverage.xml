@@ -27,17 +27,17 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-					 <relativePath origin="user.home" value="/ProActive/dist/ProActive/ProActive.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/asm.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/log4j.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/xercesImpl.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/reggie.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/bouncycastle.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/lib/components/fractal.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/dev/lib/clover.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/dev/lib/cenquatasks.jar"/>
-				     <relativePath origin="user.home" value="/ProActive/classes/nonregressiontest/runtime/classloader/"/>
+                                        <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
+                                     <absolutePath value="proactive.home/lib/bcel.jar"/>
+                                     <absolutePath value="proactive.home/lib/asm.jar"/>
+                                     <absolutePath value="proactive.home/lib/log4j.jar"/>
+                                     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
+                                     <absolutePath value="proactive.home/lib/reggie.jar"/>
+                                     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
+                                     <absolutePath value="proactive.home/lib/components/fractal.jar"/>
+                                     <absolutePath value="proactive.home/classes/nonregressiontest/runtime/classloader/"/>
+                                     <absolutePath value="proactive.home/dev/lib/clover.jar"/>
+                                     <absolutePath value="proactive.home/dev/lib/cenquatasks.jar"/>
 					</classpath>
 				</jvmProcess>
 			</processDefinition>
