@@ -47,10 +47,11 @@ import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 
+
 /**
  * @author fhuet
  *
- * 
+ *
  *
  */
 /**
@@ -80,287 +81,289 @@ import org.objectweb.proactive.core.mop.MethodCall;
  */
 public abstract class BodyImpl extends AbstractBody
     implements java.io.Serializable {
-    
     //  
-	// -- STATIC MEMBERS -----------------------------------------------
-	//
+    // -- STATIC MEMBERS -----------------------------------------------
+    //
+    private static final String INACTIVE_BODY_EXCEPTION_MESSAGE = "Cannot perform this call because this body is inactive";
 
-	private static final String INACTIVE_BODY_EXCEPTION_MESSAGE = 
-		"Cannot perform this call because this body is inactive";
+    //
+    // -- PROTECTED MEMBERS -----------------------------------------------
+    //
 
-	//
-	// -- PROTECTED MEMBERS -----------------------------------------------
-	//
+    /** The component in charge of receiving reply */
+    protected ReplyReceiver replyReceiver;
 
-	/** The component in charge of receiving reply */
-	protected ReplyReceiver replyReceiver;
+    /** The component in charge of receiving request */
+    protected RequestReceiver requestReceiver;
+    protected MessageEventProducerImpl messageEventProducer;
 
-	/** The component in charge of receiving request */
-	protected RequestReceiver requestReceiver;
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-	protected MessageEventProducerImpl messageEventProducer;
+    /**
+     * Creates a new AbstractBody.
+     * Used for serialization.
+     */
+    public BodyImpl() {
+    }
 
-	//
-	// -- CONSTRUCTORS -----------------------------------------------
-	//
+    /**
+     * Creates a new AbstractBody for an active object attached to a given node.
+     * @param reifiedObject the active object that body is for
+     * @param nodeURL the URL of the node that body is attached to
+     * @param factory the factory able to construct new factories for each type of meta objects
+     *                needed by this body
+     */
+    public BodyImpl(Object reifiedObject, String nodeURL,
+        MetaObjectFactory factory) {
+        super(reifiedObject, nodeURL, factory);
+        this.requestReceiver = factory.newRequestReceiverFactory()
+                                      .newRequestReceiver();
+        this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
+        this.messageEventProducer = new MessageEventProducerImpl();
+        setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject,
+                factory.newRequestQueueFactory().newRequestQueue(bodyID),
+                factory.newRequestFactory()));
+        this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+    }
 
-	/**
-	 * Creates a new AbstractBody.
-	 * Used for serialization.
-	 */
-	public BodyImpl() {
-	}
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    //
+    // -- implements MessageEventProducer -----------------------------------------------
+    //
+    public void addMessageEventListener(MessageEventListener listener) {
+        if (messageEventProducer != null) {
+            messageEventProducer.addMessageEventListener(listener);
+        }
+    }
 
-	/**
-	 * Creates a new AbstractBody for an active object attached to a given node.
-	 * @param reifiedObject the active object that body is for
-	 * @param nodeURL the URL of the node that body is attached to
-	 * @param factory the factory able to construct new factories for each type of meta objects 
-	 *                needed by this body
-	 */
-	public BodyImpl(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
-		super(reifiedObject, nodeURL, factory);
-		this.requestReceiver = factory.newRequestReceiverFactory().newRequestReceiver();
-		this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
-		this.messageEventProducer = new MessageEventProducerImpl();
-		setLocalBodyImpl(
-			new ActiveLocalBodyStrategy(
-				reifiedObject,
-				factory.newRequestQueueFactory().newRequestQueue(bodyID),
-				factory.newRequestFactory()));
-		this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
-	}
+    public void removeMessageEventListener(MessageEventListener listener) {
+        if (messageEventProducer != null) {
+            messageEventProducer.removeMessageEventListener(listener);
+        }
+    }
 
-	//
-	// -- PUBLIC METHODS -----------------------------------------------
-	//
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
 
-	//
-	// -- implements MessageEventProducer -----------------------------------------------
-	//
+    /**
+     * Receives a request for later processing. The call to this method is non blocking
+     * unless the body cannot temporary receive the request.
+     * @param request the request to process
+     * @exception java.io.IOException if the request cannot be accepted
+     */
+    protected void internalReceiveRequest(Request request)
+        throws java.io.IOException {
+        if (messageEventProducer != null) {
+            messageEventProducer.notifyListeners(request,
+                MessageEvent.REQUEST_RECEIVED, bodyID,
+                getRequestQueue().size() + 1);
+        }
 
-	public void addMessageEventListener(MessageEventListener listener) {
-		if (messageEventProducer != null)
-			messageEventProducer.addMessageEventListener(listener);
-	}
+        // request queue length = number of requests in queue
+        //							+ the one to add now 
+        requestReceiver.receiveRequest(request, this);
+    }
 
-	public void removeMessageEventListener(MessageEventListener listener) {
-		if (messageEventProducer != null)
-			messageEventProducer.removeMessageEventListener(listener);
-	}
+    /**
+     * Receives a reply in response to a former request.
+     * @param reply the reply received
+     * @exception java.io.IOException if the reply cannot be accepted
+     */
+    protected void internalReceiveReply(Reply reply) throws java.io.IOException {
+        if (messageEventProducer != null) {
+            messageEventProducer.notifyListeners(reply,
+                MessageEvent.REPLY_RECEIVED, bodyID);
+        }
+        replyReceiver.receiveReply(reply, this, getFuturePool());
+    }
 
-	//
-	// -- PROTECTED METHODS -----------------------------------------------
-	//
+    /**
+     * Signals that the activity of this body, managed by the active thread has just stopped.
+     */
+    protected void activityStopped() {
+        super.activityStopped();
+        messageEventProducer = null;
+        setLocalBodyImpl(new InactiveLocalBodyStrategy());
+    }
 
-	/**
-	 * Receives a request for later processing. The call to this method is non blocking
-	 * unless the body cannot temporary receive the request.
-	 * @param request the request to process
-	 * @exception java.io.IOException if the request cannot be accepted
-	 */
-	protected void internalReceiveRequest(Request request) throws java.io.IOException {
-		if (messageEventProducer != null)
-			messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_RECEIVED, bodyID,
-			getRequestQueue().size() + 1);
-			// request queue length = number of requests in queue
-			//							+ the one to add now 
-		requestReceiver.receiveRequest(request, this);
-	}
+    //protected void activityStopped2() {
+    //	super.activityStopped2();
+    //	
+    //}
+    public void setImmediateService(String methodName)
+        throws java.io.IOException {
+        this.requestReceiver.setImmediateService(methodName);
+    }
 
-	/**
-	 * Receives a reply in response to a former request.
-	 * @param reply the reply received
-	 * @exception java.io.IOException if the reply cannot be accepted
-	 */
-	protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-		if (messageEventProducer != null)
-			messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_RECEIVED, bodyID);
-		replyReceiver.receiveReply(reply, this, getFuturePool());
-	}
+    //
+    // -- PRIVATE METHODS -----------------------------------------------
+    //
+    //
+    // -- inner classes -----------------------------------------------
+    //
+    private class ActiveLocalBodyStrategy implements LocalBodyStrategy,
+        java.io.Serializable {
 
-	/**
-	 * Signals that the activity of this body, managed by the active thread has just stopped.
-	 */
-	protected void activityStopped() {
-		super.activityStopped();
-		messageEventProducer = null;
-		setLocalBodyImpl(new InactiveLocalBodyStrategy());
-	}
+        /** A pool future that contains the pending future objects */
+        protected FuturePool futures;
 
-//protected void activityStopped2() {
-//	super.activityStopped2();
-//	
-//}
+        /** The reified object target of the request processed by this body */
+        protected Object reifiedObject;
+        protected BlockingRequestQueue requestQueue;
+        protected RequestFactory internalRequestFactory;
+        private long absoluteSequenceID;
 
-	public void setImmediateService(String methodName) throws java.io.IOException {
-		this.requestReceiver.setImmediateService(methodName);
-	}
+        //
+        // -- CONSTRUCTORS -----------------------------------------------
+        //
+        public ActiveLocalBodyStrategy(Object reifiedObject,
+            BlockingRequestQueue requestQueue, RequestFactory requestFactory) {
+            this.reifiedObject = reifiedObject;
+            this.futures = new FuturePool();
+            this.requestQueue = requestQueue;
+            this.internalRequestFactory = requestFactory;
+        }
 
-	//
-	// -- PRIVATE METHODS -----------------------------------------------
-	//
+        //
+        // -- PUBLIC METHODS -----------------------------------------------
+        //
+        //
+        // -- implements LocalBody -----------------------------------------------
+        //
+        public FuturePool getFuturePool() {
+            return futures;
+        }
 
-	//
-	// -- inner classes -----------------------------------------------
-	//
+        public BlockingRequestQueue getRequestQueue() {
+            return requestQueue;
+        }
 
-	private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
+        public Object getReifiedObject() {
+            return reifiedObject;
+        }
 
-		/** A pool future that contains the pending future objects */
-		protected FuturePool futures;
+        public String getName() {
+            return reifiedObject.getClass().getName();
+        }
 
-		/** The reified object target of the request processed by this body */
-		protected Object reifiedObject;
+        /** Serves the request. The request should be removed from the request queue
+         * before serving, which is correctly done by all methods of the Service class.
+         * However, this condition is not ensured for custom calls on serve. */
+        public void serve(Request request) {
+            if (request == null) {
+                return;
+            }
+            try {
+                messageEventProducer.notifyListeners(request,
+                    MessageEvent.SERVING_STARTED, bodyID,
+                    getRequestQueue().size());
+                Reply reply = request.serve(BodyImpl.this);
+                if (reply == null) {
+                    if (!isActive()) {
+                        return; //test if active in case of terminate() method otherwise eventProducer would be null
+                    }
+                    messageEventProducer.notifyListeners(request,
+                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                        getRequestQueue().size());
+                    return;
+                }
+                UniqueID destinationBodyId = request.getSourceBodyID();
+                System.out.println("destinationBodyID " + destinationBodyId);
+                if (destinationBodyId != null) {
+                    messageEventProducer.notifyListeners(reply,
+                        MessageEvent.REPLY_SENT, destinationBodyId,
+                        getRequestQueue().size());
+                }
+                this.getFuturePool().registerDestination(request.getSender());
+                reply.send(request.getSender());
+                this.getFuturePool().removeDestination();
+            } catch (ServeException e) {
+                // handle error here
+                throw new ProActiveRuntimeException("Exception in serve (Still not handled) : throws killer RuntimeException",
+                    e);
+            } catch (java.io.IOException e) {
+                // handle error here
+                throw new ProActiveRuntimeException("Exception in sending reply (Still not handled) : throws killer RuntimeException",
+                    e);
+            }
+        }
 
-		protected BlockingRequestQueue requestQueue;
-		
-		protected RequestFactory internalRequestFactory;
+        public void sendRequest(MethodCall methodCall, Future future,
+            UniversalBody destinationBody) throws java.io.IOException {
+            long sequenceID = getNextSequenceID();
+            Request request = internalRequestFactory.newRequest(methodCall,
+                    BodyImpl.this, future == null, sequenceID);
+            if (future != null) {
+                future.setID(sequenceID);
+                futures.receiveFuture(future);
+            }
+            messageEventProducer.notifyListeners(request,
+                MessageEvent.REQUEST_SENT, destinationBody.getID());
+            request.send(destinationBody);
+        }
 
-		private long absoluteSequenceID;
+        //
+        // -- PROTECTED METHODS -----------------------------------------------
+        //
 
-		//
-		// -- CONSTRUCTORS -----------------------------------------------
-		//
+        /**
+        * Returns a unique identifier that can be used to tag a future, a request
+        * @return a unique identifier that can be used to tag a future, a request.
+        */
+        private synchronized long getNextSequenceID() {
+            return ++absoluteSequenceID;
+        }
+    }
+     // end inner class LocalBodyImpl
 
-		public ActiveLocalBodyStrategy(Object reifiedObject, BlockingRequestQueue requestQueue, RequestFactory requestFactory) {
-			this.reifiedObject = reifiedObject;
-			this.futures = new FuturePool();
-			this.requestQueue = requestQueue;
-			this.internalRequestFactory = requestFactory;
-		}
+    private class InactiveLocalBodyStrategy implements LocalBodyStrategy,
+        java.io.Serializable {
+        //
+        // -- CONSTRUCTORS -----------------------------------------------
+        //
+        public InactiveLocalBodyStrategy() {
+        }
 
-		//
-		// -- PUBLIC METHODS -----------------------------------------------
-		//
+        //
+        // -- PUBLIC METHODS -----------------------------------------------
+        //
+        //
+        // -- implements LocalBody -----------------------------------------------
+        //
+        public FuturePool getFuturePool() {
+            //throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+            return null;
+        }
 
-		//
-		// -- implements LocalBody -----------------------------------------------
-		//
+        public BlockingRequestQueue getRequestQueue() {
+            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+        }
 
-		public FuturePool getFuturePool() {
-			return futures;
-		}
+        public RequestQueue getHighPriorityRequestQueue() {
+            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+        }
 
-		public BlockingRequestQueue getRequestQueue() {
-			return requestQueue;
-		}
+        public Object getReifiedObject() {
+            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+        }
 
-		public Object getReifiedObject() {
-			return reifiedObject;
-		}
+        public String getName() {
+            return "inactive body";
+        }
 
-		public String getName() {
-			return reifiedObject.getClass().getName();
-		}
+        public void serve(Request request) {
+            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+        }
 
-		/** Serves the request. The request should be removed from the request queue
-		 * before serving, which is correctly done by all methods of the Service class.
-		 * However, this condition is not ensured for custom calls on serve. */
-		public void serve(Request request) {
-			if (request == null)
-				return;
-			try {
-				messageEventProducer.notifyListeners(request, MessageEvent.SERVING_STARTED, 
-							bodyID, getRequestQueue().size());		
-				Reply reply = request.serve(BodyImpl.this);
-				if (reply == null) {
-					if(!isActive()) return;//test if active in case of terminate() method otherwise eventProducer would be null
-					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, 
-							bodyID, getRequestQueue().size());
-					return;
-				}
- 				UniqueID destinationBodyId = request.getSourceBodyID();
-				if (destinationBodyId != null)
-					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId,
-  						getRequestQueue().size());
-				this.getFuturePool().registerDestination(request.getSender());
-				reply.send(request.getSender());		
-				this.getFuturePool().removeDestination();
-			} catch (ServeException e) {
-				// handle error here
-				throw new ProActiveRuntimeException("Exception in serve (Still not handled) : throws killer RuntimeException", e);
-			} catch (java.io.IOException e) {
-				// handle error here
-				throw new ProActiveRuntimeException("Exception in sending reply (Still not handled) : throws killer RuntimeException", e);
-			}
-		}
-
-
-		
-
-
-		public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException {
-			long sequenceID = getNextSequenceID();
-			Request request = internalRequestFactory.newRequest(methodCall, BodyImpl.this, future == null, sequenceID);
-			if (future != null) {
-				future.setID(sequenceID);
-				futures.receiveFuture(future);
-			}
-			messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_SENT, destinationBody.getID());
-			request.send(destinationBody);
-		}
-
-		//
-		// -- PROTECTED METHODS -----------------------------------------------
-		//
-
-		/**
-		* Returns a unique identifier that can be used to tag a future, a request
-		* @return a unique identifier that can be used to tag a future, a request.
-		*/
-		private synchronized long getNextSequenceID() {
-			return ++absoluteSequenceID;
-		}
-
-	} // end inner class LocalBodyImpl
-
-	private class InactiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
-
-		//
-		// -- CONSTRUCTORS -----------------------------------------------
-		//
-
-		public InactiveLocalBodyStrategy() {
-		}
-
-		//
-		// -- PUBLIC METHODS -----------------------------------------------
-		//
-
-		//
-		// -- implements LocalBody -----------------------------------------------
-		//
-
-		public FuturePool getFuturePool() {
-			//throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-			return null;
-		}
-
-		public BlockingRequestQueue getRequestQueue() {
-			throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-		}
-		
-		public RequestQueue getHighPriorityRequestQueue() {
-			throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-		}
-
-		public Object getReifiedObject() {
-			throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-		}
-
-		public String getName() {
-			return "inactive body";
-		}
-
-		public void serve(Request request) {
-			throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-		}
-
-		public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException {
-			throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
-		}
-
-	} // end inner class LocalInactiveBody
+        public void sendRequest(MethodCall methodCall, Future future,
+            UniversalBody destinationBody) throws java.io.IOException {
+            throw new ProActiveRuntimeException(INACTIVE_BODY_EXCEPTION_MESSAGE);
+        }
+    }
+     // end inner class LocalInactiveBody
 }
-

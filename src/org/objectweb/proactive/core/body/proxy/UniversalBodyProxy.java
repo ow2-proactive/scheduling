@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.body.proxy;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
@@ -52,13 +54,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 
-import org.apache.log4j.Logger;
-
-public class UniversalBodyProxy extends AbstractBodyProxy  implements java.io.Serializable {
-
-protected static Logger logger = Logger.getLogger(UniversalBodyProxy.class.getName());
-
-   
+public class UniversalBodyProxy extends AbstractBodyProxy
+    implements java.io.Serializable {
+    protected static Logger logger = Logger.getLogger(UniversalBodyProxy.class.getName());
 
     // note that we do not want to serialize this member but rather handle
     // the serialization by ourselve
@@ -88,7 +86,6 @@ protected static Logger logger = Logger.getLogger(UniversalBodyProxy.class.getNa
      */
     public UniversalBodyProxy(ConstructorCall constructorCall,
         Object[] parameters) throws ProActiveException {
-
         Object p0 = parameters[0];
 
         // Determines whether the body is local or remote
@@ -97,11 +94,10 @@ protected static Logger logger = Logger.getLogger(UniversalBodyProxy.class.getNa
             this.universalBody = (UniversalBody) p0;
             this.bodyID = universalBody.getID();
             isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
-if (logger.isDebugEnabled()) {
-            //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
-}
+            if (logger.isDebugEnabled()) {
+                //logger.debug("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
+            }
         } else {
-
             // instantiate the body locally or remotely
             Class bodyClass = Constants.DEFAULT_BODY_CLASS;
             Node node = (Node) p0;
@@ -141,9 +137,9 @@ if (logger.isDebugEnabled()) {
                 isLocal = false;
             }
             this.bodyID = universalBody.getID();
-if (logger.isDebugEnabled()) {
-            //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
-}
+            if (logger.isDebugEnabled()) {
+                //logger.debug("UniversalBodyProxy created from constructorCall bodyID="+bodyID+" isLocal="+isLocal);
+            }
         }
     }
 
@@ -186,14 +182,12 @@ if (logger.isDebugEnabled()) {
 
             //return (UniversalBody) bodyConstructorCall.execute();
             //---------------------added lines--------------------------
-//			if (logger.isDebugEnabled()) {
-//						logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
-//			}
-            
+            //			if (logger.isDebugEnabled()) {
+            //						logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
+            //			}
             return part.createBody(node.getNodeInformation().getName(),
                 bodyConstructorCall, true);
             //---------------------added lines------------------------------
-
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
@@ -208,21 +202,20 @@ if (logger.isDebugEnabled()) {
         ConstructorCall bodyConstructorCall, Node node)
         throws ProActiveException {
         try {
-
             ProActiveRuntime part = node.getProActiveRuntime();
 
-//if (logger.isDebugEnabled()) {
-//            //logger.debug("UniversalBodyProxy.createRemoteBody bodyClass="+bodyClass+"  node="+node);
-//}
+            //if (logger.isDebugEnabled()) {
+            //            //logger.debug("UniversalBodyProxy.createRemoteBody bodyClass="+bodyClass+"  node="+node);
+            //}
             //return node.createBody(bodyConstructorCall);
             //--------------added lines
-			if (logger.isDebugEnabled()) {
-						logger.debug("RemoteBodyProxy created bodyID=" + bodyID + " from ConstructorCall");
-			}
+            if (logger.isDebugEnabled()) {
+                logger.debug("RemoteBodyProxy created bodyID=" + bodyID +
+                    " from ConstructorCall");
+            }
             return part.createBody(node.getNodeInformation().getName(),
                 bodyConstructorCall, false);
             //--------------added lines
-
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
         } catch (java.lang.reflect.InvocationTargetException e) {
@@ -247,7 +240,6 @@ if (logger.isDebugEnabled()) {
 
     protected void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody) throws java.io.IOException {
-
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
         UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
@@ -279,7 +271,6 @@ if (logger.isDebugEnabled()) {
         // Determines the constructor of the body object: it is the constructor that
         // has only one argument, this argument being of type ConstructorCall
         try {
-
             Constructor cstr = bodyClass.getConstructor(argsClass);
 
             // A word of explanation: here we have two nested ConstructorCall objects:
@@ -303,16 +294,16 @@ if (logger.isDebugEnabled()) {
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
-
         Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
-if (logger.isDebugEnabled()) {
-        logger.debug(" XXXXX  UniversalProxyBody XXXXX ");
-}
-       // Thread.dumpStack();
-if (logger.isDebugEnabled()) {
-        logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-        logger.debug("Local body is " + localBody);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug(" XXXXX  UniversalProxyBody XXXXX ");
+        }
+
+        // Thread.dumpStack();
+        if (logger.isDebugEnabled()) {
+            logger.debug("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+            logger.debug("Local body is " + localBody);
+        }
         if (localBody != null) {
             // the body is local
             universalBody = localBody;
@@ -322,8 +313,8 @@ if (logger.isDebugEnabled()) {
             universalBody = (UniversalBody) in.readObject();
             isLocal = false;
         }
-if (logger.isDebugEnabled()) {
-		logger.debug("universalBody is " + universalBody);
-}
+        if (logger.isDebugEnabled()) {
+            logger.debug("universalBody is " + universalBody);
+        }
     }
 }
