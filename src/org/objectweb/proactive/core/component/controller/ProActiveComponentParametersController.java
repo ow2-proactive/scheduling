@@ -24,24 +24,31 @@ public class ProActiveComponentParametersController extends ProActiveController
 
 	/**
 	 * Constructor
-	 * @param owner
+	 * @param owner the super controller
 	 */
     public  ProActiveComponentParametersController(Component owner) {
         super(owner, Constants.COMPONENT_PARAMETERS_CONTROLLER);
     }
 
-    /**
-     * see {@link org.objectweb.fractal.proactive.control.ComponentParametersController#getFcComponentParameters()}
-     */
+	/**
+	 * see {@link ComponentParametersController#getComponentParameters()}
+	 */
     public ComponentParameters getComponentParameters() {
         return componentParameters;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.proactive.control.ComponentParametersController#setFcComponentParameters(ComponentParameters)}
-     */
+	/**
+	 * see {@link ComponentParametersController#setComponentParameters(ComponentParameters)}
+	 */
     public void setComponentParameters(ComponentParameters componentParameters) {
         this.componentParameters = componentParameters;
+    }
+    
+    /**
+     * see {@link ComponentParametersController#setComponentName(String)}
+     */
+    public void setComponentName(String componentName) {
+    	componentParameters.setName(componentName);
     }
     
 }
