@@ -96,10 +96,6 @@ if [ -f $PROACTIVE/lib/fractal.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal.jar
 fi
-if [ -f $PROACTIVE/lib/jce-jdk13-117.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jce-jdk13-117.jar
-fi
 if [ -f $PROACTIVE/lib/cryptix-asn1.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix-asn1.jar
