@@ -1248,8 +1248,11 @@ public class ProActive {
 					logger.debug("*** SEARCH HANDLER IN PROXY");
 				}
                 try {
-					AbstractProxy proxy = (AbstractProxy) ((org.objectweb.proactive.core.mop.StubObject) target).getProxy();
+                	System.out.println("*** SEARCH HANDLER IN PROXY : GET PROXY");
+					org.objectweb.proactive.core.mop.Proxy  proxy = ((org.objectweb.proactive.core.mop.StubObject) target).getProxy();
+					System.out.println("*** SEARCH HANDLER IN PROXY : PROXY IS OK");
                     HashMap map = ((AbstractProxy) proxy).getHandlersLevel();
+					System.out.println("*** SEARCH HANDLER IN PROXY : GET HASHMAP");
                     if ((handler = searchExceptionHandler(ex.getClass(), map,
                                     Handler.ID_Proxy)) != null) {
                         return handler;
