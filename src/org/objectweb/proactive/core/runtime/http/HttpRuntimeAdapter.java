@@ -73,6 +73,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 
                 try {
                     nodeURL = buildNodeURL(nodeName);
+                    System.out.println(nodeURL);
                 } catch (UnknownHostException e1) {
                     e1.printStackTrace();
                 }
@@ -165,7 +166,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
 		} catch (UnknownHostException e) {
 			throw new ProActiveException(e);
 		}
-		logger.info(url + " successfully registered at " + url);
+		logger.info(virtualNodeName + " successfully registered at " + url);
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
