@@ -38,17 +38,17 @@ import java.util.ArrayList;
 
 
 public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
-    
-	private static transient Logger logger = Logger.getLogger("XML_HTTP");
+    private static transient Logger logger = Logger.getLogger("XML_HTTP");
     protected int port = ClassServer.getServerSocketPort();
     protected String url = ClassServer.getUrl();
     private transient ProActiveRuntime runtimestrategyadapter;
+    protected VMInformation vmInformation;
 
     //protected VMInformation vmInformation;
     public HttpRuntimeAdapter() {
         runtimestrategyadapter = ProActiveRuntimeImpl.getProActiveRuntime();
-
-        url = ClassServer.getUrl(); 
+        this.vmInformation = runtimestrategyadapter.getVMInformation();
+        url = ClassServer.getUrl();
         logger.debug("url de l adapter runtime = " + url);
     }
 
@@ -58,6 +58,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      */
     public HttpRuntimeAdapter(String newurl) {
         runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this, newurl);
+        this.vmInformation = runtimestrategyadapter.getVMInformation();
     }
 
     //
@@ -111,7 +112,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     public VMInformation getVMInformation() {
-        return runtimestrategyadapter.getVMInformation();
+    	return this.vmInformation;
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
@@ -157,6 +158,14 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
         boolean replacePreviousBinding) throws ProActiveException {
         runtimestrategyadapter.registerVirtualNode(virtualNodeName,
             replacePreviousBinding);
+
+        String url;
+		try {
+			url = buildNodeURL(virtualNodeName);
+		} catch (UnknownHostException e) {
+			throw new ProActiveException(e);
+		}
+		logger.info(url + " successfully registered at " + url);
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
@@ -304,7 +313,8 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this,this.url);
+        this.runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this,
+                this.url);
     }
 
     protected String buildNodeURL(String url)
@@ -343,27 +353,18 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public String getStrategyURL() {
         return url;
     }
-    
-    
-    
-    
+
     public boolean equals(Object o) {
         if (!(o instanceof HttpRuntimeAdapter)) {
             return false;
         }
+
         HttpRuntimeAdapter runtimeadapter = (HttpRuntimeAdapter) o;
+
         return runtimestrategyadapter.equals(runtimeadapter.runtimestrategyadapter);
     }
 
     public int hashCode() {
         return runtimestrategyadapter.hashCode();
     }
-    
-    
-    
-    
-    
-    
-    
-    
 }
