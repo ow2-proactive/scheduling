@@ -30,6 +30,14 @@
 */ 
 package org.objectweb.proactive.core.xml.io;
 
+import org.apache.log4j.Logger;
+import org.apache.xerces.parsers.SAXParser;
+import org.objectweb.proactive.core.util.ProActiveProperties;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
+
+import iaik.pkcs.pkcs12.SafeBag;
+
 /**
  *
  * Implement an XLMReader based on SAX reading from a stream 
@@ -39,6 +47,8 @@ package org.objectweb.proactive.core.xml.io;
  *
  */
 public class StreamReader implements XMLReader {
+	
+	static Logger logger = Logger.getLogger(StreamReader.class.getName());
   
   private org.xml.sax.XMLReader parser;
   private org.xml.sax.InputSource inputSource;
@@ -55,17 +65,28 @@ public class StreamReader implements XMLReader {
   public StreamReader(org.xml.sax.InputSource inputSource, XMLHandler xmlHandler) throws java.io.IOException {
     this.inputSource = inputSource;
     DefaultHandlerAdapter adaptor = new DefaultHandlerAdapter(xmlHandler);
-    try {
-    	javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory.newInstance();
-    	parser = factory.newSAXParser().getXMLReader();
+    
+//    	javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory.newInstance();
+//    	parser = factory.newSAXParser().getXMLReader();
+			parser = new SAXParser();
       //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
     	parser.setContentHandler(adaptor);
-    	parser.setErrorHandler(adaptor);
-    } catch (org.xml.sax.SAXException e) {
-      throw new java.io.IOException(e.toString());
-    } catch (javax.xml.parsers.ParserConfigurationException e) {
-      throw new java.io.IOException(e.toString());
-    }
+    	if (ProActiveProperties.getSchemaValidationState().equals("enable")){
+    		try {
+    			parser.setErrorHandler(new SAXParserErrorHandler());
+    			parser.setFeature("http://xml.org/sax/features/validation",true);
+					parser.setFeature("http://apache.org/xml/features/validation/schema",true);
+					
+//            parser.parse(inputSource);
+            
+    			}catch(SAXNotRecognizedException e){
+            	logger.error("unrecognised feature: ");
+            	logger.error("http://xml.org/sax/features/validation");
+					}catch(SAXNotSupportedException e){
+							logger.error("unrecognised feature: ");
+							logger.error("http://apache.org/xml/features/validation/schema");
+    			}
+    	}
   }
 
 
@@ -74,6 +95,8 @@ public class StreamReader implements XMLReader {
   
   public void read() throws java.io.IOException {
     try {
+    	//parser.setFeature("http://xml.org/sax/features/validation",true);
+    	//parser.setFeature("http://apache.org/xml/features/validation/schema",true);
       parser.parse(inputSource);
     } catch (org.xml.sax.SAXException e) {
       e.printStackTrace();

@@ -65,20 +65,20 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
   * startPrefixMapping.
   * Receives notification of the start of a Namespace mapping. 
   */
-  public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException {
-    //System.out.println("startPrefixMapping prefix="+prefix+"  uri="+uri);
-    targetHandler.startPrefixMapping(prefix, uri);
-  }
-
-
- /**
-  * endPrefixMapping.
-  * Receive notification of the start of a Namespace mapping. 
-  */
-  public void endPrefixMapping(String prefix) throws org.xml.sax.SAXException {
-    //System.out.println("endPrefixMapping prefix="+prefix);
-    targetHandler.endPrefixMapping(prefix);
-  }
+//  public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException {
+//    //System.out.println("startPrefixMapping prefix="+prefix+"  uri="+uri);
+//    targetHandler.startPrefixMapping(prefix, uri);
+//  }
+//
+//
+// /**
+//  * endPrefixMapping.
+//  * Receive notification of the start of a Namespace mapping. 
+//  */
+//  public void endPrefixMapping(String prefix) throws org.xml.sax.SAXException {
+//    //System.out.println("endPrefixMapping prefix="+prefix);
+//    targetHandler.endPrefixMapping(prefix);
+//  }
     
     
  /**
@@ -99,16 +99,16 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
   }
 
 
-  public void skippedEntity(java.lang.String name) {
-    // ignore
-    // System.out.println("skippedEntity "+name);
-  }
-  
-  
-  public void processingInstruction(java.lang.String target, java.lang.String data) {
-    // ignore
-    //System.out.println("processingInstruction target="+target+"  data="+data);
-  }
+//  public void skippedEntity(java.lang.String name) {
+//    // ignore
+//    // System.out.println("skippedEntity "+name);
+//  }
+//  
+//  
+//  public void processingInstruction(java.lang.String target, java.lang.String data) {
+//    // ignore
+//    //System.out.println("processingInstruction target="+target+"  data="+data);
+//  }
   
   
  /**
@@ -123,34 +123,34 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
   }
 
   
- /**
-  * ignorableWhitespace.
-  */
-  public void ignorableWhitespace(char[] ch, int start, int length) throws org.xml.sax.SAXException {
-    // ignore
-  }
+// /**
+//  * ignorableWhitespace.
+//  */
+//  public void ignorableWhitespace(char[] ch, int start, int length) throws org.xml.sax.SAXException {
+//    // ignore
+//  }
     
   //
   // -- ErrorHandler methods ------------------------------------------------------
   //
     
- /**
-  * Warning.
-  */
-  public void warning(org.xml.sax.SAXParseException ex) {
-    System.err.println("[Warning] : "+ex.getMessage());
-  }
-
-  /** Error. */
-  public void error(org.xml.sax.SAXParseException ex) {
-    System.err.println("[Error] : "+ex.getMessage());
-  }
-
-  /** Fatal error. */
-  public void fatalError(org.xml.sax.SAXParseException ex) throws org.xml.sax.SAXException {
-    System.err.println("[Fatal Error] : "+ex.getMessage());
-    throw ex;
-  }
+// /**
+//  * Warning.
+//  */
+//  public void warning(org.xml.sax.SAXParseException ex) {
+//    System.err.println("[Warning] : "+ex.getMessage());
+//  }
+//
+//  /** Error. */
+//  public void error(org.xml.sax.SAXParseException ex) {
+//    System.err.println("[Error] : "+ex.getMessage());
+//  }
+//
+//  /** Fatal error. */
+//  public void fatalError(org.xml.sax.SAXParseException ex) throws org.xml.sax.SAXException {
+//    System.err.println("[Fatal Error] : "+ex.getMessage());
+//    throw ex;
+//  }
 
 
   
