@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.identity;
 
 import org.objectweb.fractal.api.Component;
 
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
 
 
@@ -13,21 +14,11 @@ import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
   */
 public interface ProActiveComponent extends Component {
 	
-//    /**
-//     * @return the hierarchical type of the component (see ComponentParameters)
-//     */    
-//    public String getHierarchicalType();
 
     /**
      * @return the reified object at the base of the active object
      */    
     public Object getReifiedObject();
-
-//    /**
-//     * This method's implementation is only valid in the component meta-objects.
-//     * @return the configuration parameters of this component
-//     */    
-//    public ComponentParameters getComponentParameters();
 
     /**
      * This method's implementation is only valid in the component meta-objects.
@@ -40,5 +31,15 @@ public interface ProActiveComponent extends Component {
 	 * @param componentIdentity another component to compare to
 	 * @return true if both components are equals
 	 */
-	public boolean equals(Component componentIdentity);
+	public boolean equals(Object object);
+	
+	
+	/**
+	 * getter for a unique identifier
+	 * @return a unique identifier of the component (of the active object) accross virtual machines
+	 */
+	public UniqueID getID();
+	
+	
+
 }
