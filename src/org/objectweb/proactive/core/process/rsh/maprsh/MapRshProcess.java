@@ -97,7 +97,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
 
     /**
      * Sets the variable scriptLocation with the given location
-     * @param string
+     * @param scriptLocation
      */
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;

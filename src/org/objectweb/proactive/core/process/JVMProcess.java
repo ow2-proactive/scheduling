@@ -97,7 +97,7 @@ public interface JVMProcess extends ExternalProcess {
 
     /**
      * Sets the location of the log4j property file.
-     * @param The value of the path to the log4j property file
+     * @param log4fFilePath The value of the path to the log4j property file
      */
     public void setLog4jFile(String log4fFilePath);
 

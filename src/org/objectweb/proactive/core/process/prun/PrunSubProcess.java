@@ -228,7 +228,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     /**
      *  Set the booking duration of the cluster's nodes. The default is 00:01:00
-     * @param duration
+     * @param d duration
      */
     public void setBookingDuration(String d) {
         this.bookingDuration = d;
@@ -278,7 +278,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     /**
      * Sets the number of nodes requested when running the job
-     * @param processor
+     * @param hosts
      */
     public void setHostsNumber(String hosts) {
         checkStarted();
@@ -291,7 +291,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     /**
      * Sets the number of nodes requested when running the job
-     * @param processor
+     * @param processorPerNode processor per node
      */
     public void setProcessorPerNodeNumber(String processorPerNode) {
         checkStarted();

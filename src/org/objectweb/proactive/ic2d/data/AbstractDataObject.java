@@ -309,7 +309,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
   
   /**
    * notifies all known objects of the monitoring request
-   * @param shouldMonitor whether the monitoring is activated or not
+   * @param shouldView whether the monitoring is activated or not
    * @param iterator an iterator on the collection of object to notify
    */
   protected synchronized void viewInEventListCollection(boolean shouldView, java.util.Iterator iterator) {

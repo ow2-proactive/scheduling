@@ -58,7 +58,7 @@ public interface UniversalProcess extends java.io.Serializable {
    * Set the environment for this process. Each
    * cell of the array contains the definition of one variable in a 
    * syntax that is system dependant.
-   * @param an array of string containing all environment variables or
+   * @param environment an array of string containing all environment variables or
    * null if the environment is empty
    */
   public void setEnvironment(String[] environment);
@@ -74,7 +74,7 @@ public interface UniversalProcess extends java.io.Serializable {
   /**
    * Set the hostname target of this process. By default the target host 
    * is the localhost.
-   * @param the target hostname.
+   * @param hostname the target hostname.
    */
   public void setHostname(String hostname);
   
@@ -89,7 +89,7 @@ public interface UniversalProcess extends java.io.Serializable {
   /**
    * Set the username that will be used to run the command.
    * By default the current username owner of the JVM process is used.
-   * @param the target username or null to use the default one.
+   * @param username the target username or null to use the default one.
    */
   public void setUsername(String username);
   

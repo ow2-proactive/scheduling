@@ -170,7 +170,7 @@ public class RSHJVMProcess extends RSHProcess implements JVMProcess {
 
     /**
      * Sets the location of the policy file for the target JVMProcess
-     * @param policyFilePath The value of the path to the policy file
+     * @param policyFile The value of the path to the policy file
      */
     public void setPolicyFile(String policyFile) {
         checkStarted();

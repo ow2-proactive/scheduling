@@ -202,7 +202,7 @@ public class DialogUtils {
   
 	/**
 	 * Method openNewGlobusHostDialog.
-	 * @param component
+	 * @param parentComponent
 	 * @param worldObject
 	 * @param logger
 	 */
