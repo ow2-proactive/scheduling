@@ -11,13 +11,13 @@
 <table width="100%">
 <tr>
 <td align="left" valign="middle">
-	<table cellpadding="2" cellspacing="0" border="1">
-	<tr>
-	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
-	<td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
-	<td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">prev</a>&nbsp;&nbsp;</td>
-	</tr>
-	</table>
+    <table cellpadding="2" cellspacing="0" border="1">
+    <tr>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
+    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="MOP.html">prev</a>&nbsp;&nbsp;</td>
+    </tr>
+    </table>
 </td>
 <td  align="right" valign="top">
 <img src="ProActiveLogo200x34.gif"/>
@@ -75,19 +75,19 @@ Other targets are available if needed :
 <p class="textNormal">
 <b>General source file builds</b>
 <ul>
-	<li><code>core</code>     : ProActive core</li>
-	<li><code>ext</code>      : ProActive ext</li>
-	<li><code>ic2d</code>     : All IC2D</li>
-	<li><code>examples</code> : All examples</li>
-	<li><code>all</code>      : means all of the above</li>
+    <li><code>core</code>     : ProActive core</li>
+    <li><code>ext</code>      : ProActive ext</li>
+    <li><code>ic2d</code>     : All IC2D</li>
+    <li><code>examples</code> : All examples</li>
+    <li><code>all</code>      : means all of the above</li>
 </ul>
 </p>
 <p class="textNormal">
 <b>Utility builds</b>
 <ul>
-	<li><code>docs</code>     : creates the docs directory with javadoc + doc</li>
-	<li><code>clean</code>    : removes all build generated file</li>
-	<li><code>dist</code>     : creates the distribution directory and files</li>
+    <li><code>docs</code>     : creates the docs directory with javadoc + doc</li>
+    <li><code>clean</code>    : removes all build generated file</li>
+    <li><code>dist</code>     : creates the distribution directory and files</li>
 </ul>
 </p>
 </li>
@@ -633,16 +633,16 @@ Comparing to the solution above where interfaces are directly implemented in the
 -->
 <li class="textNormal"><a name="liveAndActive"><h3>What did happen to the former <b>live()</b> method and <b>Active</b> interface ?</h3></a>
 <p class="textNormal">
-The former <code>Active</code> interface was simply a marker interface allowing to change the body and/or the proxy of an active object. It was of no use most of the time and was made obsolete with the introduction of the <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> in the <b>0.9.2</b> release
+The former <code>Active</code> interface was simply a marker interface allowing to change the body and/or the proxy of an active object. It was of no use most of the time and was made obsolete with the introduction of the <a href="../core/body/MetaObjectFactory.html">MetaObjectFactory</a> in the <b>0.9.3</b> release
 </p>
 <p class="textNormal">
-Up to <b>ProActive 0.9.2</b> the activity of an active object was given by a method <code>live(Body)</code> called by reflection of the reified object. Doing this way wouldn't allow compile time type checking of the method, was using reflection, wouldn't allow to externalize from the reified object its activity, wouldn't allow to give a custom activity to an active object created using <code>turnReified</code>. We addressed all those issues using the new mecanism based on the three interfaces <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>.
+Up to <b>ProActive 0.9.3</b> the activity of an active object was given by a method <code>live(Body)</code> called by reflection of the reified object. Doing this way wouldn't allow compile time type checking of the method, was using reflection, wouldn't allow to externalize from the reified object its activity, wouldn't allow to give a custom activity to an active object created using <code>turnReified</code>. We addressed all those issues using the new mecanism based on the three interfaces <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>.
 </p>
 <p class="textNormal">
 In order to convert the code of an active object containing a method <code>live</code> to the new interface you just need to :
 <ul>
-	<li>implement the new interface <code><a href="../RunActive.html">RunActive</a></code> (and remove <code>Active</code> if it was implemented</li>
-	<li>changed the name of the method <code>live</code> to <code>runActivity</code></li>
+    <li>implement the new interface <code><a href="../RunActive.html">RunActive</a></code> (and remove <code>Active</code> if it was implemented</li>
+    <li>changed the name of the method <code>live</code> to <code>runActivity</code></li>
 </ul>
 </p>
 </li>
@@ -653,7 +653,7 @@ In order to convert the code of an active object containing a method <code>live<
 <!--
  Footer : start 
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; May 2002 INRIA All Rights Reserved.</p>
+<br><hr><div align="right" class="textSmall">Copyright &#169; June 2002 INRIA All Rights Reserved.</p>
 <!-- Footer : end -->
 </body>
 </html>

@@ -19,8 +19,8 @@
 		<BookTitle>"ProActive PDC"</BookTitle>
 		<BookSubTitle>"The ProActive Java Library for Parallel, Distributed, and Concurrent Computing"</BookSubTitle>
 		<BookAuthor>"ProActive Team"</BookAuthor>
-		<BookVersion>"Version 0.9.2"</BookVersion>
-		<BookCopyright>"Copyright \xa9 2002 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
+		<BookVersion>"Version 0.9.3"</BookVersion>
+		<BookCopyright>"Copyright \xa9 June 2002 INRIA Sophia Antipolis, All right reserved"</BookCopyright>
 		<BookPublisher>"INRIA Sophia Antipolis"</BookPublisher>
 		<!-- CHAPTER OPTIONS -->
 		<Author enabled="false"/>
@@ -81,6 +81,9 @@
 		</Chapter>
 		<Chapter>
 			<SectionFile>..\src\org\objectweb\proactive\doc-files\_MOP.html</SectionFile>
+		</Chapter>
+		<Chapter>
+			<SectionFile>..\src\org\objectweb\proactive\doc-files\_FAQ.html</SectionFile>
 		</Chapter>
 		<InsertAPIDoc>packages classes</InsertAPIDoc>
 		<!--
