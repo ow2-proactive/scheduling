@@ -56,6 +56,7 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 public class VirtualNodeLookup extends RuntimeDeploymentProperties implements VirtualNode
 {
+	
 	private VirtualNode virtualNode;
 	private ProActiveRuntime remoteProActiveRuntime;
 	private String name;
@@ -74,7 +75,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties implements Vi
 	 */
 	public void setProperty(String property)
 	{
-		System.out.println(message);
+
+		logger.warn(message);
 	}
 
 	/**
@@ -84,13 +86,19 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties implements Vi
 	{
 		return virtualNode.getProperty();
 	}
+	
+	public void setTimeout(String timeout){
+
+		logger.warn(message);
+
+	}
 
 	/**
 	 * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#setName(String)
 	 */
 	public void setName(String s)
 	{
-		System.out.println(message);
+		logger.warn(message);
 	}
 
 	/**
@@ -106,7 +114,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties implements Vi
 	 */
 	public void addVirtualMachine(VirtualMachine virtualMachine)
 	{
-		System.out.println(message);
+		logger.warn(message);
 	}
 
 	/**
@@ -218,7 +226,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties implements Vi
 	 */
 	public void createNodeOnCurrentJvm(String protocol)
 	{
-		System.out.println(message);
+		logger.warn(message);
 	}
 	
 	public Object getUniqueAO() throws ProActiveException {
