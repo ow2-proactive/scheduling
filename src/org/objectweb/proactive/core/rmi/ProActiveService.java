@@ -104,6 +104,7 @@ process_request:
                         bytes = fp.getBytes();
                         statusLine = "HTTP/1.1 200 OK";
                         contentType = "application/java";
+                        logger.info("ClassServer sent class " + info.getClassFileName() + " successfully");
                     }
                 } catch (ClassNotFoundException e) {
                     logger.info("ClassServer failed to load class " +
