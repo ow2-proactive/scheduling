@@ -138,8 +138,17 @@ public class HostPanel extends AbstractDataObjectPanel
             setLayout(new javax.swing.BoxLayout(HostPanel.this,
                     javax.swing.BoxLayout.Y_AXIS));
         }
+        this.setAlignLayoutChild(align); // 
         revalidate();
         repaint();
+    }
+
+    // Set child (vm) Alignement H  / V 
+    public void setAlignLayoutChild(boolean align) {
+        java.util.Iterator iterator = childsIterator();
+        while (iterator.hasNext()) {
+            ((VMPanel) iterator.next()).setAlignLayout(align);
+        }
     }
 
     //

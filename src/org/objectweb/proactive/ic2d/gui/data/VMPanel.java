@@ -38,9 +38,11 @@ import org.objectweb.proactive.ic2d.data.SpyListenerImpl;
 import org.objectweb.proactive.ic2d.data.VMObject;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
 
+
 public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener {
 
   private VMObject vmObject;
+  protected PanelPopupMenu popup;
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -57,7 +59,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     createBorder(name);
 	
     // The popup
-    PanelPopupMenu popup = new PanelPopupMenu(name);
+    popup = new PanelPopupMenu(name);
     popup.add(new javax.swing.AbstractAction("Look for new Active Objects", null) {
       public void actionPerformed(java.awt.event.ActionEvent e) {
         vmObject.sendEventsForAllActiveObjects();
@@ -99,7 +101,20 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     removeChild(nodeObject);
   }
   
-  
+  // ebe 06/2004
+  // set VM horiz or vertic layout for that VM
+  // needed if there's more than one node in one VM
+  public void setAlignLayout(boolean align) {
+      setPreferredSize(null);
+      if (align == false) {
+          
+          setLayout(new java.awt.GridLayout(1, 0, 4, 4));
+      } else {
+          this.setLayout(new java.awt.GridLayout(0, 1, 4, 4));
+      }
+      revalidate();
+      repaint();
+  }
   
   //
   // -- PROTECTED METHODS -----------------------------------------------
@@ -127,6 +142,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
   protected void setFontSize(java.awt.Font font) {
     super.setFontSize(font);
     createBorder(name);
+  //  selectRightFontRb(popup.fontSizeMenu.getGroup());
   }
 
 
