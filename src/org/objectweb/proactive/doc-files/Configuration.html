@@ -54,14 +54,23 @@ java .... -Dprop1=value1 -Dprop2=value2 .... -Dpropn=valuen can define all their
 There is a default file with default ProActive options located under ProActive/src/org/objectweb/proactive/core/config/ProActiveConfiguration.xml. This file is automatically copied with the same package structure under the classes directory when compiling source files with the ProActive/compile/build facility. Hence it is included in the jar file of the distribution under org/objectweb/proactive/core/config/ProActiveConfiguration.xml (See below for default options).<br></br>
 People can specify their own configuration file by running their application with proactive.configuration option, i.e <br>
 java ... <b>-Dproactive.configuration=pathToTheConfigFile</b>. In that case, the given xml file is loaded. Some ProActive properties(defined below) are required for applications using ProActive to work, so even if not defined in user config file, they will be loaded programatically with default values. So people can just ignore the config file if they are happy with the default configuration or create their own file if they want to change ProActive properties values or add their own properties <br></br>
-A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a> to notify remote jvms which configuration file to load once created.
+A specific tag: <b>&lt;ProActiveUserPropertiesFile&gt;</b> is provided in <a href="Descriptor.html">Deployment Descriptor</a> to notify remote jvms which configuration file to load once created:
+<pre>
+&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;
+...
+ &lt;ProActiveUserPropertiesFile&gt;
+     &lt;absolutePath value="/net/home/rquilici/config.xml"/&gt;
+ &lt;/ProActiveUserPropertiesFile&gt;
+...
+&lt;/jvmProcess&gt;
+ </pre>
 </p>
 <h2>ProActive properties</h2>
 <p>
 <ul class="listWithSpace">
 	<li class="textNormal"><b>Required</b><br></br>
 		<ul class="listWithSpace">
-			<li class="textNormal"><b>proactive.communication.protocol</b> represents the registration and lookup protocol.  At this stage two values are possible: <b>rmi, jini</b>. It means that once the JVM starts, nodes that will be created on this JVM, will register themselves in the RMIRegistry if the <b>proactive.communication.protocol</b> property is <b>rmi</b>, in the JINI Lookup Service if it is <b>jini</b>. It replaces former acquisition method defined in Deployment Descriptor. Default value is <b>rmi</b></li>
+			<li class="textNormal"><b>proactive.communication.protocol</b> represents the communication protocol i.e the protocol, objects on remote JVMS are exported with.  At this stage several protocols are supported: <b>RMI(rmi), HTTP(http), IBIS/RMI(ibis), SSH tunneling for RMI/HTTP(rmissh), JINI(jini)</b>. It means that once the JVM starts, Nodes, Active Objects that will be created on this JVM, will export themselves using the protocol specified in <b>proactive.communication.protocol</b> property. They will be reachable transparently through the given protocol.</li>
 			<li class="textNormal"><b>schema.validation</b>. Two values are possible:<b>enable, disable</b>. If enable, all xml files will be validated against provided schema. Default is <b>disable</b></li>
 			<li class="textNormal"><b>proactive.future.ac</b>. Two values are possible:<b>enable, disable</b> If enable, <a href="AC.html">automatic continuations</a> are activated. Default is <b>enable</b></li>
 		</ul><br></br>
@@ -69,13 +78,59 @@ A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a
 	</li><br></br>
 	<li class="textNormal"><b>Other properties</b><br></br>
 		<ul class="listWithSpace">
-			<li class="textNormal"><b>proactive.rmi.port</b> represents the port number on which to start the RMIRegistry. Default is 1099</li>
+			<li class="textNormal"><b>proactive.rmi.port</b> represents the port number on which to start the RMIRegistry. Default is 1099. If  an RMIRegistry is already running  on the given port, jms  use the existing registry</li>
+			<li class="textNormal"><b>proactive.http.port</b> represents the port number on which to start the HTTP server. Default is 2010. If this port is occupied by another application, the http server starts on the first free port(given port is incremented transparently)</li>
 			<li class="textNormal"><b>proactive.locationserver</b> represents the location server class to instantiate when using Active Objects with Location Server</li>
 			<li class="textNormal"><b>proactive.locationserver.rmi</b> represents the url under which the Location Server is registered in the RMIRegistry</li>
 			<li class="textNormal"><b>fractal.provider</b> This property defines the bootstrap component for the Fractal component model</li>
-		</ul><br></br>
+		
+		<p class="textNormal">Following properties are specific to the protocol <b><a href="SSHTunneling.html">rmissh</a> </b></p>
+		<li class="textNormal"><b>proactive.ssh.port</b>: the port number on which all the ssh daemons to
+    which this JVM must connect to are expected to listen. If this property 
+    is not set, the default is 22.</li>
+     <li class="textNormal"><b>proactive.ssh.username</b>: the username which will be used during
+    authentication with all the ssh daemons to which this JVM will need to
+    connect to. If this property is not set, the default is the user.name 
+    java property.</li>
+     <li class="textNormal"><b>proactive.ssh.known_hosts</b>: a filename which identifies the file
+    which contains the traditional ssh known_hosts list. This list of hosts
+    is used during authentication with each ssh daemon to which this JVM
+    will need to connect to. If the host key does not match the one stored
+    in this file, the authentication will fail. If this property is not
+    set, the default is System.getProperty ("user.home") + "/.ssh/known_hosts"</li>
+     <li class="textNormal"><b>proactive.ssh.key_directory</b>: a directory which is expected to contain
+    the pairs of public/private keys used during authentication. the private
+    keys must not be encrypted. The public keys filenames must match "*.pub".
+    Private keys are ignored if their associated public key is not present.
+    If this property is not set, the default is 
+    System.getProperty ("user.home") + "/.ssh/"</li>
+     <li class="textNormal"><b>proactive.tunneling.try_normal_first</b>: if this property is set to "yes",
+    the tunneling code always attempts to make a direct rmi connection to
+    the remote object before tunneling. If this property is not set, the 
+    default is not to make these direct-connection attempts.
+    This property is especially useful if you want to deploy a number of 
+    objects on a LAN where only one of the hosts needs to run with the rmissh
+    protocol to allow hosts outside the LAN to connect to this frontend host.
+    The other hosts located on the LAN can use the try_normal_first property
+    to avoid using tunneling to make requests to the LAN frontend.</li>
+     <li class="textNormal"><b>proactive.tunneling.connect_timeout</b>: this property specifies how long
+    the tunneling code will wait while trying to establish a connection to a
+    remote host before declaring that the connection failed. If this property
+    is not set, the default value is 2000ms.</li>
+     <li class="textNormal"><b>proactive.tunneling.use_gc</b>: if this property is set to "yes", the client
+    JVM does not destroy the ssh tunnels are soon as they are not used anymore.
+    They are queued into a list of unused tunnels which can be reused. If this
+    property is not set or is set to another value, the tunnels are destroyed
+    as soon as they are not needed anymore by the JVM.</li>
+     <li class="textNormal"><b>proactive.tunneling.gc_period</b>: this property specifies how long the
+    tunnel garbage collector will wait before destroying a unused tunnel. If
+    a tunnel is older than this value, it is automatically destroyed. If this
+    property is not set, the default value is 10000ms.</li>    
+		
+		<br></br>
 		Note that as mentionned above, user-defined properties can be added.
 	</li>
+</ul>
 </ul>
 </p>
 
@@ -85,17 +140,18 @@ Configuration file must have following structure:
 <pre>
 &lt;ProActiveUserProperties&gt;
  &lt;properties&gt;
-  &lt;prop <b>key</b>="schema.validation"<b>value</b>="enable"/&gt;
-  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="disable"/&gt;
+  &lt;prop <b>key</b>="schema.validation"<b>value</b>="disable"/&gt;
+  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="enable"/&gt;
   &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;
   &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
-  &lt;prop <b>key</b>="proactive.locationserver" <b>value</b>="org.objectweb.proactive.ext.locationserver.LocationServer"/&gt;
-  &lt;prop <b>key</b>="proactive.locationserver.rmi" <b>value</b>="//localhost/LocationServer"/&gt;
+  ....
+  &lt;prop <b>key</b>="myprop" <b>value</b>="myvalue"/&gt;
+  ....
  &lt;/properties&gt;
 &lt;/ProActiveUserProperties&gt;
 </pre></p>
 <p class="textNormal">
-Note that <b>ProActiveUserProperties</b>, <b>properties</b> tag and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
+Note that tag <b>ProActiveUserProperties</b>,  tag <b>properties</b> and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
 </p>
 <!--
  Footer : start 
