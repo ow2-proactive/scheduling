@@ -98,6 +98,7 @@
 		<copy toDir="${classes.dir}">
 			<fileset dir="${src.dir}">
 				<include name="**/*.xml"/>
+				<include name="**/*.fractal"/>
 			</fileset>
 		</copy>
 	</target>
