@@ -2,15 +2,55 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!--  The following element  defines the root of the schema -->
 
+	<xs:simpleType name="AttributesValueType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="authorized"/>
+					<xs:enumeration value="optional"/>
+					<xs:enumeration value="denied"/>
+				</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="AuthorizedDeniedType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="authorized"/>
+					<xs:enumeration value="denied"/>
+				</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="AttributesType>
+		<xs:attribute name="authentication" type="AttributesValueType"/>
+	        <xs:attribute name="integrity" type="AttributesValueType"/>
+	        <xs:attribute name="confidentiality" type="AttributesValueType"/>
+	</xs:complexType>
+	
+
+	<xs:complexType name="RequestReplyType>
+		<xs:sequence>
+			<xs:element name="Attributes" type="AttributesType"/>	
+		</xs:sequence>
+		<xs:attribute name="value" type="AuthorizedDeniedType"/>
+	</xs:complexType>
+
+	<xs:complexType name="EntityType>
+		<xs:attribute name="type" type=""xs:string"/>
+		<xs:attribute name="name" type=""xs:string"/>
+	</xs:complexType>
+
 
 	<xs:element name="Policy" type="ProActivePolicyType">
 	 <xs:complexType>
 	 </xs:complexType>
 	</xs:element>
-
-		<xs:element  name="Rule" type="PolicyRuleType">
-			 <xs:complexType>
-	 </xs:complexType>
+             
+	
+              
+		<xs:element  name="Communication">
+			<xs:complexType>
+				<xs:sequence>
+					<xs:element name="Request" type="RequestReplyType">
+					<xs:element name="Reply" type="RequestReplyType">
+				</xs:sequence>		
+			</xs:complexType>
 		</xs:element>
 
 </xs:schema>
