@@ -81,12 +81,11 @@ public class ProActiveContentController extends ProActiveController
         checkLifeCycleIsStopped();
 
         // check whether the subComponent is the component itself
-        // TODO to test
         if (getFcItfOwner().equals((ProActiveComponent) subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
                     Fractive.getComponentParametersController(getFcItfOwner())
-                           .getComponentParameters().getName() +
+                            .getComponentParameters().getName() +
                     " component into itself ");
             } catch (NoSuchInterfaceException e) {
                 logger.error(e.getMessage());
@@ -112,7 +111,7 @@ public class ProActiveContentController extends ProActiveController
         }
 
         // FIXME : component cycle checking
-        // we have a pb here : this should raise an exception if the subcomponent is primitive,
+        // this should raise an exception if the subcomponent is primitive,
         // but proactive remote calls don't relay exception ; they stay in the body and lead to its termination
         //		// check whether current component is contained in subComponent
         //		Component[] subComponent_sub_components =
@@ -150,13 +149,5 @@ public class ProActiveContentController extends ProActiveController
         if (logger.isDebugEnabled()) {
             logger.debug("TODO : check the bindings");
         }
-    }
-
-    /**
-    * NOT IMPLEMENTED YET !
-    * @see org.objectweb.fractal.api.control.ContentController#checkFc()
-    */
-    public void checkFc() {
-        throw new ProActiveRuntimeException("not yet implemented");
     }
 }

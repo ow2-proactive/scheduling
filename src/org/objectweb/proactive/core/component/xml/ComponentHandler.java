@@ -67,22 +67,22 @@ public abstract class ComponentHandler extends AbstractUnmarshallerDecorator {
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
+    /**
+     * @link {org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)}
      */
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
+    /**
+     * @link {org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()}
      */
     public Object getResultObject() throws SAXException {
         return null;
     }
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
+    /**
+     * @link {org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)}
      */
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {

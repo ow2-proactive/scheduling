@@ -136,7 +136,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
                     // no group case
                     if (!interface_types[i].isFcCollectionItf()) {
                         if (!interface_types[i].isFcClientItf()) {
-                            (itf_ref).setFcItfImpl(getReifiedObject());
+                            (itf_ref).setFcItfImpl(getReferenceOnBaseObject());
                         } else if (interface_types[i].isFcClientItf()) {
                             (itf_ref).setFcItfImpl(null);
                         }
@@ -279,28 +279,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
     }
 
     /**
-     * see {@link org.objectweb.proactive.core.body.component.ProActiveComponent#getComponentIdentity()}
-     */
-    public Component getComponentIdentity() {
-        return this;
-    }
-
-    /**
-     * see {@link org.objectweb.proactive.core.body.component.ProActiveComponent#getHierarchicalType()}
-     */
-    public String getHierarchicalType() throws NoSuchInterfaceException {
-        //return componentParameters.getHierarchicalType();
-        return ((ComponentParametersController) getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                .getHierarchicalType();
-    }
-
-    /**
-     * Returns the reifiedObject.
+     * Returns the base object.
      * If the component is a composite, a basic do-nothing instance of class Composite
      * is returned.
-     * @return the reified object underneath
+     * @return the base object underneath
      */
-    public Object getReifiedObject() {
+    public Object getReferenceOnBaseObject() {
         return getBody().getReifiedObject();
     }
 
@@ -332,7 +316,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
      * However, it is only possible to compare the current component with a reference
      * on another component, in other words with a ProActiveComponentRepresentative object.
      *
-     * see {@link org.objectweb.proactive.core.component.ProActiveComponent#equals(org.objectweb.fractal.api.Component)}
+     * see {@link ProActiveComponent#equals(Object)}
      */
     public boolean equals(Object component) {
         if (component instanceof ProActiveComponentRepresentative) {
@@ -344,6 +328,10 @@ public class ProActiveComponentImpl implements ProActiveComponent, Interface,
         }
     }
 
+	/**
+	 * hashCode override
+	 * @return a hashCode for this object
+	 */
     public int hashCode() {
         return getBody().hashCode();
     }

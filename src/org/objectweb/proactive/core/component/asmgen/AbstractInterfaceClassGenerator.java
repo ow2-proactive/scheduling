@@ -87,7 +87,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
     /** utility method
      * @param javaModifier
-     * @return
+     * @return the code identifying the java modifier with ASM
      */
     protected static int convertJavaModifierToASM(int javaModifier) {
         int result = 0;
@@ -131,7 +131,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
     /** utility method
      * @param modifiers
-     * @return
+     * @return modifiers after applying masks
      */
     protected static int removeNativeAndAbstractModifiers(int modifiers) {
         // In order to set to 0 the bit that represents 'native', we first
@@ -143,7 +143,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     }
 
     /** utility method
-     * @return
+     * @return the full class name of the stub
      */
     public String getStubClassFullName() {
         return this.stubClassFullName;
@@ -151,7 +151,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
     /** actually creates the bytecode corresponding to the generated class
      * @throws ClassNotFoundException
-     * @return
+     * @return the bytecode corresponding to the generated class
      */
     public byte[] create() throws ClassNotFoundException {
         // Creates the class generator
@@ -187,7 +187,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     }
 
     /**
-     * @return
+     * @return a visitor for writing Java classes
      */
     protected ClassWriter createClassGenerator() {
         String[] interfaces = new String[interfacesToImplement.size()];

@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 
 
@@ -83,9 +84,9 @@ public class RepresentativeInterfaceClassGenerator
 
     /**
     * Returns the generatedClassesCache.
-    * @return Hashtable
+    * @return a Map acting as a cache for generated classes  
     */
-    public static Hashtable getGeneratedClassesCache() {
+    public static Map getGeneratedClassesCache() {
         return generatedClassesCache;
     }
 
@@ -490,7 +491,7 @@ public class RepresentativeInterfaceClassGenerator
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.component.asmgen.AbstractInterfaceClassGenerator#createDefaultMethods()
+     * implementation of abstract method defined in mother class  
      */
     protected void createDefaultMethods() {
         createGetAndSetProxyMethods();
