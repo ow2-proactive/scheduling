@@ -60,7 +60,7 @@ public class VirtualMachineImpl implements VirtualMachine,java.io.Serializable
   private String acquisitionMethod;
 
   /** the process to start in order to create the JVM */
-  private ExternalProcess process;
+  private transient ExternalProcess process;
   
   /** The name of the VirtualNode that created this VirtualMachine */
   private String creatorId = null;
