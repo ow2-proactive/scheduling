@@ -24,7 +24,7 @@ public class NodeExploration implements JobMonitorConstants {
 
     public NodeExploration(DataAssociation asso, Vector filteredJobs,
         IC2DGUIController controller) {
-        this.maxDepth = 1;
+        this.maxDepth = 4;
         this.asso = asso;
         this.filteredJobs = filteredJobs;
         this.controller = controller;
