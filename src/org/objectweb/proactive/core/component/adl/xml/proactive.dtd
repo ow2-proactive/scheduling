@@ -38,9 +38,6 @@
 <?add ast="controller"     itf="org.objectweb.fractal.adl.implementations.Controller" ?>
 <?add ast="definition"     itf="org.objectweb.fractal.adl.implementations.ControllerContainer" ?>
 <?add ast="component"      itf="org.objectweb.fractal.adl.implementations.ControllerContainer" ?>
-<?add ast="templateController" itf="org.objectweb.fractal.adl.implementations.TemplateController" ?>
-<?add ast="definition"     itf="org.objectweb.fractal.adl.implementations.TemplateControllerContainer" ?>
-<?add ast="component"      itf="org.objectweb.fractal.adl.implementations.TemplateControllerContainer" ?>
 
 <!-- loggers module -->
 <?add ast="logger"     itf="org.objectweb.fractal.adl.loggers.Logger" ?>
@@ -48,14 +45,10 @@
 <?add ast="component"  itf="org.objectweb.fractal.adl.loggers.LoggerContainer" ?>
 
 <!-- nodes module -->
-<?add ast="virtualNode" itf="org.objectweb.fractal.adl.nodes.VirtualNode" ?>
+<?add ast="virtualNode" itf="org.objectweb.proactive.core.component.adl.nodes.VirtualNode" ?>
 <?add ast="definition"  itf="org.objectweb.fractal.adl.nodes.VirtualNodeContainer" ?>
 <?add ast="component"   itf="org.objectweb.fractal.adl.nodes.VirtualNodeContainer" ?>
 
-<!-- name module -->
-<?add ast="virtualNode" itf="org.objectweb.fractal.adl.name.Name" ?>
-<?add ast="definition"  itf="org.objectweb.fractal.adl.name.NameContainer" ?>
-<?add ast="component"   itf="org.objectweb.fractal.adl.name.NameContainer" ?>
 
 <!-- arguments module -->
 <?add ast="definition" itf="org.objectweb.fractal.adl.arguments.ArgumentDefinition" ?>
@@ -77,6 +70,21 @@
 <?add ast="templateController" itf="org.objectweb.fractal.adl.comments.CommentContainer" ?>
 <?add ast="implementation" itf="org.objectweb.fractal.adl.comments.CommentContainer" ?>
 
+
+<!-- exported virtual nodes module -->
+<?add ast="exportedVirtualNodes"  itf="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodes" ?>
+<?add ast="exportedVirtualNode"  itf="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNode" ?>
+<?add ast="composedFrom"  itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposedFrom" ?>
+<?add ast="composingVirtualNode"  itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposingVirtualNode" ?>
+
+<?add ast="definition" itf="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesContainer" ?>
+<?add ast="component" itf="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesContainer" ?>
+<?add ast="exportedVirtualNodes" itf="org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodeContainer" ?>
+<?add ast="exportedVirtualNode" itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposedFromContainer" ?>
+<?add ast="composedFrom" itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposingVirtualNodeContainer" ?>
+
+
+
 <!-- ********************************************************************** -->
 <!--                   Mapping from XML names to AST names                  -->
 <!-- ********************************************************************** -->
@@ -89,23 +97,20 @@
 
 <?map xml="controller.desc" ast="controller.descriptor" ?>
 
-<?map xml="template-controller"      ast="templateController" ?>
-<?map xml="template-controller.desc" ast="templateController.descriptor" ?>
-
 <?map xml="virtual-node" ast="virtualNode" ?>
 
 <!-- ********************************************************************** -->
 <!--                          XML syntax definition                         -->
 <!-- ********************************************************************** -->
 
-<!ELEMENT definition (comment*,interface*,component*,binding*,content?,attributes?,controller?,template-controller?,logger?,virtual-node?,coordinates*) >
+<!ELEMENT definition (comment*,interface*,exportedVirtualNodes?, component*,binding*,content?,attributes?,controller?,logger?,virtual-node?,coordinates*) >
 <!ATTLIST definition
   name CDATA #REQUIRED
   arguments CDATA #IMPLIED
   extends CDATA #IMPLIED
 >
 
-<!ELEMENT component (comment*,interface*,component*,binding*,content?,attributes?,controller?,template-controller?,logger?,virtual-node?,coordinates*) >
+<!ELEMENT component (comment*,interface*,exportedVirtualNodes?, component*,binding*,content?,attributes?,controller?,logger?,virtual-node?,coordinates*) >
 <!ATTLIST component
   name CDATA #REQUIRED
   definition CDATA #IMPLIED
@@ -142,11 +147,6 @@
   desc CDATA #REQUIRED
 >
 
-<!ELEMENT template-controller (comment*) >
-<!ATTLIST template-controller
-  desc CDATA #REQUIRED
->
-
 <!ELEMENT content (comment*) >
 <!ATTLIST content
   class CDATA #REQUIRED
@@ -160,6 +160,7 @@
 <!ELEMENT virtual-node EMPTY >
 <!ATTLIST virtual-node
   name CDATA #REQUIRED
+  cardinality (single | multiple) "single"
 >
 
 <!ELEMENT coordinates (coordinates*) >
@@ -177,3 +178,20 @@
   language CDATA #IMPLIED
   text CDATA #IMPLIED
 >
+
+<!ELEMENT exportedVirtualNodes (exportedVirtualNode*) >
+
+
+<!ELEMENT exportedVirtualNode (composedFrom) >
+<!ATTLIST exportedVirtualNode
+	name CDATA #REQUIRED
+>
+
+<!ELEMENT composedFrom (composingVirtualNode+) >
+
+<!ELEMENT composingVirtualNode EMPTY>
+<!ATTLIST composingVirtualNode
+	component CDATA #REQUIRED
+	name CDATA #REQUIRED
+>
+
