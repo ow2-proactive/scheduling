@@ -49,7 +49,7 @@ public interface Constants {
 	// hierarchical types of component
 	public final static String COMPOSITE = "composite";
 	public final static String PRIMITIVE = "primitive";
-	public final static String PARALLEL = "parallel-composite";
+	public final static String PARALLEL = "parallel";
 	
 
 
