@@ -110,15 +110,16 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
             // URL
             String url = InetAddress.getLocalHost().getCanonicalHostName();
             this.peerHostname = url;
-            
+
             if (url.endsWith("/")) {
                 url.replace('/', ' ');
                 url.trim();
             }
 
             url += (":" + this.portNumber);
+
             this.peerUrl = "//" + url;
-            
+
             this.runtime = RuntimeFactory.getProtocolSpecificRuntime(this.acquisitionMethod);
             this.runtimeName = this.runtime.getURL();
             this.serviceInfo = new Info(0, 0, this.getServiceName());
@@ -127,8 +128,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
         } catch (UnknownHostException e) {
             logger.error("Could't return the URL of this P2P Service ");
         } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
@@ -247,8 +247,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public void registerP2PService(String remoteUrl) {
         // 	we should find an hostname matching this kind of pattern : hostname.inria.fr:PORT
-  
-        if (this.peerHostname.compareTo(UrlBuilder.getNameFromUrlWithoutPort(remoteUrl)) != 0) {
+        if (this.peerHostname.compareTo(UrlBuilder.getNameFromUrlWithoutPort(
+                        remoteUrl)) != 0) {
             try {
                 P2PService dist;
                 Node remoteP2PNode = P2PServiceImpl.getRemoteNode(remoteUrl);
@@ -320,8 +320,8 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
     }
 
     /**
-              * returninformation available for this peer such as name, load, stub
-              */
+     * returninformation available for this peer such as name, load, stub
+     */
     public Info getInfo() {
         return this.serviceInfo;
     }
