@@ -118,7 +118,7 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
 
  
     protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+        if ("ibis".equals(System.getProperty("proactive.protocol"))) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Factory is ibis");
             }

@@ -1,7 +1,7 @@
 /*
  * Created on Dec 4, 2003
  * author : Matthieu Morel
-  */
+ */
 package org.objectweb.proactive.core.component;
 
 import org.apache.log4j.Logger;
@@ -65,12 +65,12 @@ public class Fractive implements GenericFactory, Component, Factory {
     }
 
     /**
-                     * Returns the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
-                     *
-                     * @param component a component.
-                     * @return the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
-                     * @throws NoSuchInterfaceException if there is no such interface.
-                     */
+     * Returns the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
+     *
+     * @param component a component.
+     * @return the {@link org.objectweb.fractal.api.control.ContentController} interface of the given component.
+     * @throws NoSuchInterfaceException if there is no such interface.
+     */
     public static ComponentParametersController getComponentParametersController(
         final Component component) throws NoSuchInterfaceException {
         return (ComponentParametersController) component.getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER);

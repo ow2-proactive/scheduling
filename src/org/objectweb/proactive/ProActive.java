@@ -87,8 +87,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
-import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 import java.net.UnknownHostException;
@@ -119,10 +119,8 @@ public class ProActive {
     static public HashMap codeLevel = null;
 
     static {
-        //load the properties
-        ProActiveProperties.load();
-
-        Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
+		ProActiveConfiguration.load();
+		Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
 
         // Creation of lower levels of exception handling
         defaultLevel = new HashMap();
@@ -149,7 +147,7 @@ public class ProActive {
         setExceptionHandler(IHandler.ID_defaultLevel, null,
             HandlerServiceException.class, ProActiveServiceException.class);
 
-        ProActiveConfiguration.load();
+        //ProActiveConfiguration.load();
     }
 
     //
@@ -301,6 +299,7 @@ public class ProActive {
      *
      */
     public static Object newActive(String classname,
+
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {
@@ -685,7 +684,7 @@ public class ProActive {
     public static Object lookupActive(String classname, String url)
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
-        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+        if ("ibis".equals(System.getProperty("proactive.protocol"))) {
             b = IbisRemoteBodyAdapter.lookup(url);
         } else {
             b = RemoteBodyAdapter.lookup(url);
@@ -740,7 +739,14 @@ public class ProActive {
      */
     public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
-        RuntimeFactory.getDefaultRuntime();
+       RuntimeFactory.getDefaultRuntime();
+        if (!xmlDescriptorUrl.startsWith("file:")) {
+            xmlDescriptorUrl = "file:" + xmlDescriptorUrl;
+        }
+        ProActiveRuntimeImpl part = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        if (part.getDescriptor(xmlDescriptorUrl) != null) {
+            return part.getDescriptor(xmlDescriptorUrl);
+        }
 
         try {
             if (logger.isInfoEnabled()) {
@@ -748,27 +754,18 @@ public class ProActive {
                     xmlDescriptorUrl + " ********************");
             }
             ProActiveDescriptorHandler proActiveDescriptorHandler = ProActiveDescriptorHandler.createProActiveDescriptor(xmlDescriptorUrl);
-
-            return (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
+            ProActiveDescriptor pad = (ProActiveDescriptor) proActiveDescriptorHandler.getResultObject();
+            part.registerDescriptor(xmlDescriptorUrl, pad);
+            return pad;
         } catch (org.xml.sax.SAXException e) {
             e.printStackTrace();
             logger.fatal(
                 "a problem occurs when getting the proActiveDescriptor");
-
-            //            if (logger.isInfoEnabled()) {
-            //                logger.info(
-            //                    "a problem occurs when getting the proactiveDescriptor");
-            //            }
             throw new ProActiveException(e);
         } catch (java.io.IOException e) {
             e.printStackTrace();
             logger.fatal(
                 "a problem occurs during the ProActiveDescriptor object creation");
-
-            //            if (logger.isDebugEnabled()) {
-            //                logger.debug(
-            //                    "a problem occurs during the ProactiveDescriptor object creation");
-            //            }
             throw new ProActiveException(e);
         }
     }
@@ -1221,6 +1218,7 @@ public class ProActive {
      * @param ex Exception for which we search a handler.
      * @return A reliable handler or null if no handler is available
      */
+
     public static IHandler searchExceptionHandler(NonFunctionalException ex) {
         // an handler
         IHandler handler = null;
