@@ -90,13 +90,11 @@ public interface ProActiveRuntime extends Job {
         String vnName, String jobId) throws NodeException;
 
     /**
-     * <i><font size="-1" color="#FF0000">**Under development** </font></i>
      * Kills all Nodes in this ProActiveRuntime
      */
     public void killAllNodes() throws ProActiveException;
 
     /**
-     * <i><font size="-1" color="#FF0000">**Under development** </font></i>
      * Kills the Node of the given name and all Active Objects deployed on it.
      * @param nodeName the name of the node to kill
      */

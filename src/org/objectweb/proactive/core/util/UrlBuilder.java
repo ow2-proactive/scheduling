@@ -40,7 +40,9 @@ import java.net.UnknownHostException;
  * This class is a utility class to perform modifications and operations on urls.
  */
 public class UrlBuilder {
-    private static String[] LOCAL_URLS = { "///", "//localhost.localdomain", "//localhost", "//127.0.0.1" };
+    private static String[] LOCAL_URLS = {
+            "///", "//localhost.localdomain", "//localhost", "//127.0.0.1"
+        };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
 
     //
@@ -70,7 +72,14 @@ public class UrlBuilder {
         return buildUrl(host, name, protocol, DEFAULT_REGISTRY_PORT);
     }
 
-    //	
+    /**
+     * Returns an url under the form protocol://host:port/name
+     * @param host
+     * @param name
+     * @param protocol
+     * @param port
+     * @return an url under the form protocol://host:port/name
+     */
     public static String buildUrl(String host, String name, String protocol,
         int port) {
         protocol = checkProtocol(protocol);
@@ -244,9 +253,9 @@ public class UrlBuilder {
     }
 
     public static String getHostNameorIP(InetAddress address) {
-    	if(System.getProperty("proactive.hostname")  != null ){
-    		return System.getProperty("proactive.hostname");
-    	}
+        if (System.getProperty("proactive.hostname") != null) {
+            return System.getProperty("proactive.hostname");
+        }
         if ((System.getProperty("proactive.useIPaddress") != null) &&
                 (System.getProperty("proactive.useIPaddress").equals("true"))) {
             return address.getHostAddress();
@@ -291,7 +300,6 @@ public class UrlBuilder {
                 // local url
                 String name = urlToRead.substring(LOCAL_URLS[i].length());
                 if (name.startsWith("/")) {
-                    
                     //there is no port and the name starts with /
                     return buildUrl(UrlBuilder.getHostNameorIP(hostInetAddress),
                         name.substring(1), protocol);

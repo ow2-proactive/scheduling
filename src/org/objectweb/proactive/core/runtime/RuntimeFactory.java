@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
 /**
  * <p>
  * The <code>RuntimeFactory</code> provides a generic way to create and lookup <code>ProActiveRuntime</code>
- * without protocol specific code (such as RMI or Jini).
+ * without protocol specific code (such as RMI, HTTP, IBIS, RMI/SSH, JINI).
  * </p><p>
  * <code>RuntimeFactory</code> provides a set of static methods to create and lookup <code>ProActiveRuntime</code>
  * and to associate protocol specific factory to concrete protocols. To create a proActiveRuntime it is only

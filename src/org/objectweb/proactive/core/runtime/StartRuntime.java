@@ -125,8 +125,8 @@ public class StartRuntime {
             if(comProtocol == "http");
             	comProtocol="";
             
-            logger.info("Runtime started at " + comProtocol+ ":" +
-                proActiveRuntime.getURL());
+//            logger.info("Runtime started at " + comProtocol+ ":" +
+//                proActiveRuntime.getURL());
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
 
             /*
