@@ -72,7 +72,7 @@ public class ProActiveDialogModelImpl extends BasicDialogModel implements ProAct
     	final String oldValue)
       {
     	if (component == configuration.getRootComponent()) {
-    	    System.out.println("VIRTUAL NODE CHANGED : " + oldValue + " -->" + ((ProActiveComponent)component).getVirtualNode());
+    	    //System.out.println("VIRTUAL NODE CHANGED : " + oldValue + " -->" + ((ProActiveComponent)component).getVirtualNode());
     	  virtualNodeFieldModel.componentTextChanged(
     		((ProActiveComponent)component).getVirtualNode());
     	}
