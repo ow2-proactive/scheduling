@@ -61,13 +61,24 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
+/**
+ *   An adapter for a LocalBody to be able to receive remote calls using HTTP. This helps isolate HTTP-specific
+ *   code into a small set of specific classes.
+ * @author virginie
+ */
 public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
-    private static Logger logger = Logger.getLogger("XML_HTTP");
-    UniqueID bodyID;
+  
+	private static Logger logger = Logger.getLogger("XML_HTTP");
+    
+	UniqueID bodyID;
     String url;
     int port;
 
+    /**
+     * 
+     * @param bodyID
+     * @param url
+     */
     public HttpRemoteBodyImpl(UniqueID bodyID, String url) {
         this.bodyID = bodyID;
         this.url = url;
@@ -90,6 +101,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             throw new HTTPUnexpectedException("Unexpected exception", e);
         }
     }
+
 
     public void receiveReply(Reply reply) throws IOException {
         try {

@@ -1,8 +1,32 @@
 /*
- * Created on Jul 15, 2004
+ * ################################################################
  *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package org.objectweb.proactive.core.body.http;
 
@@ -14,26 +38,30 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 /**
+ * This kind of HTTP message isusefull to receive and send replies. 
  * @author vlegrand
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * @see HttpMessage
  */
 public class HttpReply implements HttpMessage{
 	
 	  private Reply reply;
 	    private UniqueID  idBody;
 	 
-
+/**
+ *  Constructs an HTTP Message containing a ProActive Reply
+ * @param reply The ProActive Reply to encapsulate
+ * @param idBody The unique id of the targeted active object 
+ */
 	    public HttpReply(Reply reply , UniqueID idBody) {
 	        this.reply = reply;
 	        this.idBody= idBody;
 	    }
 
 
-
+	 
 	    public Object  processMessage() {
-	        try {
+	 
+	    	try {
 	        	Body body = ProActiveXMLUtils.getBody(idBody);
 	            if (this.reply != null) 
 	                body.receiveReply(this.reply);

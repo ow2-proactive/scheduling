@@ -70,6 +70,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
     * thanks to the ProActive.lookupActive method
     */
     protected static transient Hashtable urnBodys = new Hashtable();
+    
     private static Logger logger = Logger.getLogger("XML_HTTP");
 
     /**
@@ -121,11 +122,19 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
      */
     public static void register(RemoteBodyAdapter paBody, String urn)
         throws java.io.IOException {
-        urn = urn.substring(urn.lastIndexOf('/') + 1);
+	
+	
+	int port = UrlBuilder.getPortFromUrl(urn);
+	if (port != ClassServer.getServerSocketPort())
+	    throw new IOException ("Bad registering port. You have to register on the same port as the runtime");
+
+	urn = urn.substring(urn.lastIndexOf('/') + 1);
+	
         urnBodys.put(urn, paBody);
 
         if (logger.isInfoEnabled()) {
             logger.info("register object  at " + urn);
+            logger.info(urnBodys);
         }
     }
 
@@ -157,6 +166,7 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
 
             urn = urn.substring(urn.lastIndexOf('/') + 1);
 
+            
             HttpLookupMessage message = new HttpLookupMessage(urn);
             message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
                     port, message, ProActiveXMLUtils.MESSAGE);
