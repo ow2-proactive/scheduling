@@ -76,6 +76,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.MemoryImageSource;
 
+import java.io.IOException;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -541,7 +543,11 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 
     public void terminate() {
-        org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
+        try {
+            org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public class UserFrame extends Frame implements ActionListener,
@@ -633,11 +639,14 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             s_localhost = "";
             try {
                 String port = "";
-                String protocol = System.getProperty("proactive.communication.protocol");
-                if(!protocol.equals("jini") && !protocol.equals("ibis")){
-                    port=":"+System.getProperty("proactive."+protocol+".port");
+                String protocol = System.getProperty(
+                        "proactive.communication.protocol");
+                if (!protocol.equals("jini") && !protocol.equals("ibis")) {
+                    port = ":" +
+                        System.getProperty("proactive." + protocol + ".port");
                 }
-                s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost())+port;
+                s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost()) +
+                    port;
             } catch (UnknownHostException e) {
                 s_localhost = "unknown!";
             }

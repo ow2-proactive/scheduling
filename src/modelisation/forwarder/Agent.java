@@ -1,5 +1,7 @@
 package modelisation.forwarder;
 
+import java.io.IOException;
+
 import modelisation.ModelisationBench;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
@@ -73,7 +75,11 @@ public class Agent implements org.objectweb.proactive.RunActive,
         }
         System.out.println("live started");
         if (checkTerminate(body)) {
-            body.terminate();
+            try {
+                body.terminate();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if (this.simpleBench) {
             runSimple(body);

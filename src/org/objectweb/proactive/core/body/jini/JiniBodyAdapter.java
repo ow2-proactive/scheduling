@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.jini;
 
 import org.objectweb.proactive.Body;
@@ -82,7 +82,7 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
      * Cache the jobID locally for speed
      */
     protected String jobID;
-    
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -110,21 +110,19 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-
     public String getJobID() {
-    	if (jobID == null) {
-    		try {
-    			jobID = proxiedJiniBody.getJobID();
-    		} catch (java.rmi.RemoteException e) {
-    			e.printStackTrace();
-    			return "";
-    		}
-    	}
-    	
-    	return jobID;
+        if (jobID == null) {
+            try {
+                jobID = proxiedJiniBody.getJobID();
+            } catch (java.rmi.RemoteException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+
+        return jobID;
     }
 
-    
     /**
      * Registers an active object into a RMI registry. In fact it is the
      * jini version of the body of the active object that is registered into the
@@ -207,6 +205,13 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
 
     public int receiveReply(Reply r) throws java.io.IOException {
         return proxiedJiniBody.receiveReply(r);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
+     */
+    public void terminate() throws IOException {
+        proxiedJiniBody.terminate();
     }
 
     public String getNodeURL() {
@@ -342,13 +347,13 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
         return proxiedJiniBody.getEntities();
     }
 
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return "BODY of CLASS ["+ this.getClass()  +"]";
-	}
+    /**
+     * Get information about the handlerizable object
+     * @return information about the handlerizable object
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+        return "BODY of CLASS [" + this.getClass() + "]";
+    }
 
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
@@ -357,28 +362,28 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
         return null;
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-	}
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+    }
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
-    public void setExceptionHandler(Handler handler, Class exception) throws java.io.IOException {
+    public void setExceptionHandler(Handler handler, Class exception)
+        throws java.io.IOException {
     }
 
     /** Remove a handler from the table of the Handlerizable Object
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @return The removed handler or null
      */
-    public Handler unsetExceptionHandler(Class exception) throws java.io.IOException {
+    public Handler unsetExceptionHandler(Class exception)
+        throws java.io.IOException {
         return null;
     }
-
-    
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
@@ -386,19 +391,14 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedJiniBody.receiveFTMessage(ev);
     }
-    
+
     //
     // Implements Adapter
     //
-    
-    public void changeProxiedBody(Body newBody) throws java.io.IOException{
+    public void changeProxiedBody(Body newBody) throws java.io.IOException {
         this.proxiedJiniBody.changeProxiedBody(newBody);
     }
 
- 
-
-    
-    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

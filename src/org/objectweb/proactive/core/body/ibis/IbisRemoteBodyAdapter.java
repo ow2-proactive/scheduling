@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.body.ibis;
 
 import org.apache.log4j.Logger;
@@ -66,8 +66,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class IbisRemoteBodyAdapter implements BodyAdapter,
-    java.io.Serializable {
+public class IbisRemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
     protected static Logger logger = Logger.getLogger(IbisRemoteBodyAdapter.class.getName());
 
     /**
@@ -79,7 +78,7 @@ public class IbisRemoteBodyAdapter implements BodyAdapter,
      * Cache the ID of the Body locally for speed
      */
     protected UniqueID bodyID;
-    
+
     /**
      * Cache the jobID locally for speed
      */
@@ -197,19 +196,18 @@ public class IbisRemoteBodyAdapter implements BodyAdapter,
     // -- implements UniversalBody -----------------------------------------------
     //
     public String getJobID() {
-    	if (jobID == null) {
-    		try {
-    			jobID = proxiedRemoteBody.getJobID();
-    		} catch (ibis.rmi.RemoteException e) {
-    			e.printStackTrace();
-    			return "";
-    		}
-    	}
-    	
-    	return jobID;
+        if (jobID == null) {
+            try {
+                jobID = proxiedRemoteBody.getJobID();
+            } catch (ibis.rmi.RemoteException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+
+        return jobID;
     }
 
-    
     public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
         return proxiedRemoteBody.receiveRequest(r);
@@ -217,6 +215,13 @@ public class IbisRemoteBodyAdapter implements BodyAdapter,
 
     public int receiveReply(Reply r) throws java.io.IOException {
         return proxiedRemoteBody.receiveReply(r);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
+     */
+    public void terminate() throws IOException {
+        proxiedRemoteBody.terminate();
     }
 
     public String getNodeURL() {
@@ -394,13 +399,13 @@ public class IbisRemoteBodyAdapter implements BodyAdapter,
         return proxiedRemoteBody.getEntities();
     }
 
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return "BODY of CLASS ["+ this.getClass()  +"]";
-	}
+    /**
+     * Get information about the handlerizable object
+     * @return information about the handlerizable object
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+        return "BODY of CLASS [" + this.getClass() + "]";
+    }
 
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
@@ -409,49 +414,42 @@ public class IbisRemoteBodyAdapter implements BodyAdapter,
         return null;
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-	}
-	
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+    }
+
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      */
-    public void setExceptionHandler(Handler handler, Class exception) throws java.io.IOException {
+    public void setExceptionHandler(Handler handler, Class exception)
+        throws java.io.IOException {
     }
 
     /** Remove a handler from the table of the Handlerizable Object
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @return The removed handler or null
      */
-    public Handler unsetExceptionHandler(Class exception) throws java.io.IOException {
+    public Handler unsetExceptionHandler(Class exception)
+        throws java.io.IOException {
         return null;
     }
-    
-    
-    
+
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
      */
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }
-    
-    
-    
+
     //
     // Implements Adapter
     //
-    
-    public void changeProxiedBody(Body newBody){
+    public void changeProxiedBody(Body newBody) {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
     }
-
- 
-    
-    
 
     //
     // -- PRIVATE METHODS -----------------------------------------------

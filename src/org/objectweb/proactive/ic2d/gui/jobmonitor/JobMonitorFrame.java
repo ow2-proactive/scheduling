@@ -44,7 +44,7 @@ public class JobMonitorFrame extends JFrame {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
                     String initialHostValue = "localhost";
                     try {
-                        initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost());
+                        initialHostValue = UrlBuilder.getHostNameorIP(java.net.InetAddress.getLocalHost())+":"+System.getProperty("proactive.rmi.port");
                     } catch (java.net.UnknownHostException exc) {
                     }
                     Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,

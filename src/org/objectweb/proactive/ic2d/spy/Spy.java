@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
+import java.io.IOException;
+
 
 /**
  * The master Spy class
@@ -151,7 +153,11 @@ public class Spy implements org.objectweb.proactive.RunActive {
         }
         spyEventManager.removeBodyEventListener();
         spyEventManager.removeFutureEventListener();
-        body.terminate();
+        try {
+            body.terminate();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     //

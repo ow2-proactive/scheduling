@@ -30,16 +30,8 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import java.io.IOException;
-import java.rmi.RemoteException;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RMIServerSocketFactory;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -57,6 +49,18 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.rmi.RemoteException;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -89,7 +93,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public RemoteBodyImpl(UniversalBody body) throws RemoteException {
-     //      super(0, factory, factory);
+        //      super(0, factory, factory);
         this.body = body;
     }
 
@@ -105,11 +109,10 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     //
     // -- implements RemoteBody -----------------------------------------------
     //
-    
     public String getJobID() {
-    	return body.getJobID();
+        return body.getJobID();
     }
-    
+
     public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
         return body.receiveRequest(r);
@@ -117,6 +120,13 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     public int receiveReply(Reply r) throws java.io.IOException {
         return body.receiveReply(r);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.rmi.RemoteBody#terminate()
+     */
+    public void terminate() throws IOException {
+        body.terminate();
     }
 
     public String getNodeURL() {
@@ -134,7 +144,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     public void unreferenced() {
         // System.out.println("RemoteBodyImpl: unreferenced()");      
-       // System.gc();
+        // System.gc();
     }
 
     public void enableAC() throws java.io.IOException {
@@ -152,28 +162,28 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     // implements Handlerizable
 
-	/**
-	 * Get information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return "REMOTE BODY (URL=" + body.getNodeURL() + ") of CLASS ["+ this.getClass()  +"]";
-	}
-
+    /**
+     * Get information about the handlerizable object
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+        return "REMOTE BODY (URL=" + body.getNodeURL() + ") of CLASS [" +
+        this.getClass() + "]";
+    }
 
     /** Give a reference to a local map of handlers
      * @return A reference to a map of handlers
      */
     public HashMap getHandlersLevel() throws java.io.IOException {
-            HashMap map = body.getHandlersLevel();
-            return map;
+        HashMap map = body.getHandlersLevel();
+        return map;
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-			body.clearHandlersLevel();
-	}
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+        body.clearHandlersLevel();
+    }
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
@@ -181,7 +191,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
      */
     public void setExceptionHandler(Handler handler, Class exception)
         throws java.io.IOException {
-            body.setExceptionHandler(handler, exception);
+        body.setExceptionHandler(handler, exception);
     }
 
     /** Remove a handler from the table of the Handlerizable Object
@@ -190,8 +200,8 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
      */
     public Handler unsetExceptionHandler(Class exception)
         throws java.io.IOException {
-            Handler handler = body.unsetExceptionHandler(exception);
-            return handler;
+        Handler handler = body.unsetExceptionHandler(exception);
+        return handler;
     }
 
     // SECURITY
@@ -290,7 +300,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         return body.getEntities();
     }
 
-    
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.rmi.RemoteBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
      */
@@ -299,10 +308,9 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void changeProxiedBody(Body newBody) {
-      this.body = newBody;
+        this.body = newBody;
     }
-    
-    
+
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
@@ -318,8 +326,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         //long endTime=System.currentTimeMillis();
         //System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
     }
-
-
 
     //  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     //  in.defaultReadObject();

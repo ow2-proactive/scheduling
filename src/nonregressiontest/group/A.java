@@ -73,7 +73,7 @@ public class A implements InitActive, RunActive, EndActive,
         // System.out.println("migration done");
     }
 
-    public void endBodyActivity() {
+    public void endBodyActivity() throws Exception {
         ProActive.getBodyOnThis().terminate();
     }
 

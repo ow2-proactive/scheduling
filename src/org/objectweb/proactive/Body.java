@@ -68,11 +68,7 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 public interface Body extends LocalBodyStrategy, UniversalBody,
     MessageEventProducer {
 
-    /**
-     * Terminate the body. After this call the body is no more alive and no more active
-     * although the active thread is not interrupted. The body is unuseable after this call.
-     */
-    public void terminate();
+    
 
     /**
      * Returns whether the body is alive or not.

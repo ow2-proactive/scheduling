@@ -103,7 +103,16 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
         //System.out.println("JiniBodyImpl: receiveRequest() request is " + r.getMethodName());
         return body.receiveRequest(r);
     }
+    
+    
 
+    /**
+     * @see org.objectweb.proactive.core.body.jini.JiniBody#terminate()
+     */
+    public void terminate() throws IOException {
+        body.terminate();
+
+    }
     public int receiveReply(Reply r) throws java.io.IOException {
         return body.receiveReply(r);
     }

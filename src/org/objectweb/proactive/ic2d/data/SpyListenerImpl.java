@@ -38,6 +38,8 @@ import org.objectweb.proactive.ic2d.spy.BodySpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyListener;
 
+import java.io.IOException;
+
 
 public class SpyListenerImpl implements SpyListener {
     protected SpyEventListener spyEventListener;
@@ -58,7 +60,12 @@ public class SpyListenerImpl implements SpyListener {
     public void terminate() {
         Body body = ProActive.getBodyOnThis();
         if (body != null) {
-            body.terminate();
+            try {
+                body.terminate();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
     }
 

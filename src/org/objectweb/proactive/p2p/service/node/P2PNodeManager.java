@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 
@@ -134,7 +135,11 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
             Object[] activeObjects = nodeToFree.getActiveObjects();
             for (int index = 0; index < activeObjects.length; index++) {
                 BodyProxy proxy = (BodyProxy) ((StubObject) activeObjects[index]).getProxy();
-                ((Body) proxy.getBody()).terminate();
+                try {
+                    ((Body) proxy.getBody()).terminate();
+                } catch (IOException e1) {
+                    logger.error(e1);
+                }
             }
 
             // Kill the node

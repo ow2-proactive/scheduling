@@ -207,6 +207,13 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         return remoteBodyStrategy.receiveReply(reply);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
+     */
+    public void terminate() throws IOException {
+        remoteBodyStrategy.terminate();
+    }
+
     public String getURL() {
         return this.url;
     }
@@ -405,5 +412,4 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
     public void changeProxiedBody(Body newBody) {
         this.remoteBodyStrategy = newBody;
     }
-
 }

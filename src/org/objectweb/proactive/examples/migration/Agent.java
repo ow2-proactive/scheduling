@@ -39,6 +39,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import java.io.IOException;
+
 
 /**
  * This class represents a migratable Agent
@@ -91,7 +93,11 @@ public class Agent implements InitActive, RunActive, EndActive,
     }
 
     public void endBodyActivity() {
-        ProActive.getBodyOnThis().terminate();
+        try {
+            ProActive.getBodyOnThis().terminate();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void initActivity(Body body) {

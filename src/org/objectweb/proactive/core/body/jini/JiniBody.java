@@ -30,11 +30,6 @@
  */
 package org.objectweb.proactive.core.body.jini;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -51,6 +46,13 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
 
 
 /**
@@ -83,6 +85,12 @@ public interface JiniBody extends java.rmi.Remote {
     public int receiveReply(Reply r) throws java.io.IOException;
 
     /**
+     * Terminate the body. After this call the body is no more alive and no more active
+     * although the active thread is not interrupted. The body is unuseable after this call.
+     */
+    public void terminate() throws java.io.IOException;
+
+    /**
      * Returns the url of the node this body is associated to
      * The url of the node can change if the active object migrates
      * @return the url of the node this body is associated to
@@ -99,7 +107,7 @@ public interface JiniBody extends java.rmi.Remote {
     public UniqueID getID() throws java.rmi.RemoteException;
 
     public String getJobID() throws java.rmi.RemoteException;
-    
+
     /**
      * Signals to this body that the body identified by id is now to a new
      * jini location. The body given in parameter is a new stub pointing
@@ -190,19 +198,17 @@ public interface JiniBody extends java.rmi.Remote {
 
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException;
-    
-	/**
+
+    /**
      * For sending an event to the FTManager linked to this object
-     * @param ev the event 
+     * @param ev the event
      * @return still not used
-     */    
+     */
     public int receiveFTMessage(FTMessage fte) throws IOException;
-    
-    
+
     /**
      * Change the body referenced by this adapter
      * @param newBody the body referenced after the call
      */
-    public void changeProxiedBody(Body newBody) throws java.io.IOException ;
-    
+    public void changeProxiedBody(Body newBody) throws java.io.IOException;
 }

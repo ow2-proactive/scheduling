@@ -8,12 +8,6 @@
  */
 package org.objectweb.proactive.ext.mixedlocation;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -30,6 +24,14 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
@@ -87,6 +89,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.receiveReply(r);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
+     */
+    public void terminate() throws IOException {
+        this.wrappedBody.terminate();
+    }
+
     public String getNodeURL() {
         return this.wrappedBody.getNodeURL();
     }
@@ -96,12 +105,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     public String getJobID() {
-    	if (jobID == null)
-    		jobID = wrappedBody.getJobID();
-    	
-    	return jobID;
+        if (jobID == null) {
+            jobID = wrappedBody.getJobID();
+        }
+
+        return jobID;
     }
-    
+
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
         this.wrappedBody.updateLocation(id, body);
@@ -162,7 +172,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //        System.out.println("UniversalBodyWrapper.run end of life...");
         this.updateServer();
         this.wrappedBody = null;
-//        System.gc();
+        //        System.gc();
     }
 
     /**
@@ -180,13 +190,13 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.getHandlersLevel();
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-		this.wrappedBody.clearHandlersLevel();	
-	}
-	
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+        this.wrappedBody.clearHandlersLevel();
+    }
+
     /** Set a new handler within the table of the Handlerizable Object
      * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
      * @param handler A class of handler associated with a class of non functional exception.

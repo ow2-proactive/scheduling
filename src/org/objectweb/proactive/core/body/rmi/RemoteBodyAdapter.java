@@ -140,7 +140,7 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
     public static void register(RemoteBodyAdapter bodyAdapter, String url)
         throws java.io.IOException {
         try {
-        java.rmi.Naming.rebind(url, bodyAdapter.proxiedRemoteBody);
+            java.rmi.Naming.rebind(url, bodyAdapter.proxiedRemoteBody);
         } catch (ConnectException e) {
             //failed to unbind at port 1099 
             // try at proactive.rmi.port
@@ -245,6 +245,13 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
 
     public int receiveReply(Reply r) throws java.io.IOException {
         return proxiedRemoteBody.receiveReply(r);
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
+     */
+    public void terminate() throws IOException {
+        proxiedRemoteBody.terminate();
     }
 
     public String getNodeURL() {
@@ -433,23 +440,14 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.proxiedRemoteBody.receiveFTMessage(ev);
     }
-    
-    
- 
-    
-    
+
     //
     // Implements Adapter
     //
-    
-    public void changeProxiedBody(Body newBody) throws IOException{
+    public void changeProxiedBody(Body newBody) throws IOException {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
     }
 
-
-    
-    
-    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
