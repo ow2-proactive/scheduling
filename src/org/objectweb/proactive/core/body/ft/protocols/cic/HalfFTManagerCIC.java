@@ -1,0 +1,202 @@
+/*
+ * Created on Feb 2, 2005
+ *
+ * TODO To change the template for this generated file go to
+ * Window - Preferences - Java - Code Style - Code Templates
+ */
+package org.objectweb.proactive.core.body.ft.protocols.cic;
+
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.reply.Reply;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+
+import java.io.IOException;
+
+import java.rmi.RemoteException;
+
+
+/**
+ * This class implements a Communication Induced Checkpointing protocol for ProActive.
+ * This FTManager is linked non active object communicating with fault-tolerant active objects.
+ * @author cdelbe
+ * @since ProActive 2.2
+ */
+public class HalfFTManagerCIC extends FTManager {
+    // error message
+    private static final String HALF_BODY_EXCEPTION_MESSAGE = "Cannot perform this call on a FTManager of a HalfBody";
+
+    // message infos
+    private char[] forSentMessage;
+
+    /**
+     * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#init(org.objectweb.proactive.core.body.AbstractBody)
+     */
+    public int init(AbstractBody owner) throws ProActiveException {
+        super.init(owner);
+        this.forSentMessage = new char[FTManagerCIC.INFOS_SIZE];
+        this.forSentMessage[FTManagerCIC.FROM_HALF_BODY] = (char) FTManagerCIC.IS_HALF;
+        return 0;
+    }
+
+    public int onReceiveReply(Reply reply) {
+        reply.setFTManager(this);
+        return 0;
+    }
+
+    public int onDeliverReply(Reply reply) {
+        return FTManager.NON_FT;
+    }
+
+    public int onSendRequestBefore(Request request) {
+        request.setMessageInfo(this.forSentMessage);
+        return 0;
+    }
+
+    public int onSendReplyBefore(Reply reply) {
+        reply.setMessageInfo(this.forSentMessage);
+        return 0;
+    }
+
+    public int onSendRequestAfter(Request request, int rdvValue,
+        UniversalBody destination) throws RenegotiateSessionException {
+        if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
+            try {
+                System.out.println(
+                    "[CIC] Receiver is recovering : request is resent");
+                request.resetSendCounter();
+                Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
+                int rdvValueBis = sendRequest(request, destination);
+                return this.onSendRequestAfter(request, rdvValueBis, destination);
+            } catch (RenegotiateSessionException e1) {
+                // TODO Auto-generated catch block
+                throw e1;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
+        UniversalBody destination) {
+        //System.out.println("[CIC] onSendReplyAfter");
+        // if return value is RESEDN, receiver have to recover --> resend the message
+        if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
+            try {
+                System.out.println(
+                    "[CIC] Receiver is recovering : reply is resent");
+                Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
+                int rdvValueBis = sendReply(reply, destination);
+                return this.onSendReplyAfter(reply, rdvValueBis, destination);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return 0;
+    }
+
+    public int sendRequest(Request r, UniversalBody destination)
+        throws RenegotiateSessionException {
+        try {
+            this.onSendRequestBefore(r);
+            int res;
+            res = r.send(destination);
+            this.onSendRequestAfter(r, res, destination);
+            return res;
+        } catch (IOException e) {
+            System.err.println("[FAULT] " + this.owner.getID() +
+                " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REQUEST SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendRequest(r, newDestination);
+        } catch (RenegotiateSessionException e1) {
+            throw e1;
+        }
+    }
+
+    public int sendReply(Reply r, UniversalBody destination) {
+        try {
+            this.onSendReplyBefore(r);
+            int res = r.send(destination);
+            this.onSendReplyAfter(r, res, destination);
+            return res;
+        } catch (IOException e) {
+            System.err.println("[FAULT] " + this.owner.getID() +
+                " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REPLY SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(),
+                    destination, e);
+            return this.sendReply(r, newDestination);
+        }
+    }
+
+    public UniversalBody communicationFailed(UniqueID suspect,
+        UniversalBody suspectLocation, Exception e) {
+        try {
+            UniversalBody newLocation = this.location.searchObject(suspect,
+                    suspectLocation, this.owner.getID());
+            if (newLocation == null) {
+                while (newLocation == null) {
+                    try {
+                        // suspected is failed or is recovering
+                        System.out.println("[CIC] Waiting for recovery of " +
+                            suspect);
+                        Thread.sleep(FTManagerCIC.TIME_TO_RESEND); // TMP
+                    } catch (InterruptedException e2) {
+                        e2.printStackTrace();
+                    }
+                    newLocation = this.location.searchObject(suspect,
+                            suspectLocation, this.owner.getID());
+                }
+                return newLocation;
+            } else {
+                // newLocation is the new location of suspect
+                return newLocation;
+            }
+        } catch (RemoteException e1) {
+            System.err.println("[ERROR] Location server unreachable");
+            e1.printStackTrace();
+            return null;
+        }
+    }
+
+    ////////////////////////
+    // UNCALLABLE METHODS //
+    ////////////////////////
+    public int onReceiveRequest(Request request) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int onDeliverRequest(Request request) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int onServeRequestBefore(Request request) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int onServeRequestAfter(Request request) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int getIncarnation() {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
+    public int handleFTMessage(FTMessage fte) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+}

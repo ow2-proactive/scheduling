@@ -32,9 +32,12 @@ package org.objectweb.proactive.core.body.ibis;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -63,7 +66,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class IbisRemoteBodyAdapter implements UniversalBody,
+public class IbisRemoteBodyAdapter implements BodyAdapter,
     java.io.Serializable {
     protected static Logger logger = Logger.getLogger(IbisRemoteBodyAdapter.class.getName());
 
@@ -207,13 +210,13 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     }
 
     
-    public void receiveRequest(Request r)
+    public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        proxiedRemoteBody.receiveRequest(r);
+        return proxiedRemoteBody.receiveRequest(r);
     }
 
-    public void receiveReply(Reply r) throws java.io.IOException {
-        proxiedRemoteBody.receiveReply(r);
+    public int receiveReply(Reply r) throws java.io.IOException {
+        return proxiedRemoteBody.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -426,6 +429,29 @@ public class IbisRemoteBodyAdapter implements UniversalBody,
     public Handler unsetExceptionHandler(Class exception) throws java.io.IOException {
         return null;
     }
+    
+    
+    
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return this.proxiedRemoteBody.receiveFTMessage(ev);
+    }
+    
+    
+    
+    //
+    // Implements Adapter
+    //
+    
+    public void changeProxiedBody(Body newBody){
+        this.proxiedRemoteBody.changeProxiedBody(newBody);
+    }
+
+ 
+    
+    
 
     //
     // -- PRIVATE METHODS -----------------------------------------------

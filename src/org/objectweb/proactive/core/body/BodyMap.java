@@ -81,19 +81,18 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * block if it already exists until it is removed
      */
     public synchronized void putBody(UniqueID id, UniversalBody b) {
-    	while (idToBodyMap.get(id) != null) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        while (idToBodyMap.get(id) != null) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-    	idToBodyMap.put(id, b);
+        }
+        idToBodyMap.put(id, b);
 
-    	if (hasListeners()) {
-                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-            }
-    
+        if (hasListeners()) {
+            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+        }
     }
 
     /**
@@ -101,23 +100,20 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * erase any previous entry
      */
     public synchronized void updateBody(UniqueID id, UniversalBody b) {
-               idToBodyMap.put(id, b);
+        idToBodyMap.put(id, b);
 
-            if (hasListeners()) {
-                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-            }
-   
+        if (hasListeners()) {
+            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+        }
     }
 
     public synchronized void removeBody(UniqueID id) {
+        UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
+        notifyAll();
 
-            UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
-            notifyAll();
-
-            if ((b != null) && hasListeners()) {
-                notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
-            }
-
+        if ((b != null) && hasListeners()) {
+            notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
+        }
     }
 
     public synchronized int size() {
@@ -128,10 +124,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
 
     public synchronized UniversalBody getBody(UniqueID id) {
         Object o = null;
-        if(id != null)
-
-        		o = idToBodyMap.get(id);
-
+        if (id != null) {
+            o = idToBodyMap.get(id);
+        }
 
         return (UniversalBody) o;
     }
@@ -139,25 +134,24 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
     public synchronized boolean containsBody(UniqueID id) {
         return idToBodyMap.containsKey(id);
     }
- 
+
     public java.util.Iterator bodiesIterator() {
         return idToBodyMap.values().iterator();
-    }  
+    }
 
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
 
-            sb.append(" -- BodyMap ------- \n");
+        sb.append(" -- BodyMap ------- \n");
 
-            java.util.Set entrySet = idToBodyMap.entrySet();
-            java.util.Iterator iterator = entrySet.iterator();
- 
-            while (iterator.hasNext()) {
-                java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-                sb.append(entry.getKey()).append("  body = ")
-                  .append(entry.getValue()).append("\n");
-            }
-        
+        java.util.Set entrySet = idToBodyMap.entrySet();
+        java.util.Iterator iterator = entrySet.iterator();
+
+        while (iterator.hasNext()) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            sb.append(entry.getKey()).append("  body = ")
+              .append(entry.getValue()).append("\n");
+        }
 
         return sb.toString();
     }
@@ -193,14 +187,13 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void readExternal(java.io.ObjectInput in)
         throws java.io.IOException, ClassNotFoundException {
-            int size = in.readInt();
+        int size = in.readInt();
 
-            for (int i = 0; i < size; i++) {
-                UniqueID id = (UniqueID) in.readObject();
-                UniversalBody remoteBody = (UniversalBody) in.readObject();
-                idToBodyMap.put(id, remoteBody);
-            }
-
+        for (int i = 0; i < size; i++) {
+            UniqueID id = (UniqueID) in.readObject();
+            UniversalBody remoteBody = (UniversalBody) in.readObject();
+            idToBodyMap.put(id, remoteBody);
+        }
     }
 
     /**
@@ -210,25 +203,24 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      */
     public synchronized void writeExternal(java.io.ObjectOutput out)
         throws java.io.IOException {
-            int size = idToBodyMap.size();
-            out.writeInt(size);
+        int size = idToBodyMap.size();
+        out.writeInt(size);
 
-            java.util.Set entrySet = idToBodyMap.entrySet();
-            java.util.Iterator iterator = entrySet.iterator();
+        java.util.Set entrySet = idToBodyMap.entrySet();
+        java.util.Iterator iterator = entrySet.iterator();
 
-            while (iterator.hasNext()) {
-                java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-                out.writeObject(entry.getKey());
+        while (iterator.hasNext()) {
+            java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
+            out.writeObject(entry.getKey());
 
-                Object value = entry.getValue();
+            Object value = entry.getValue();
 
-                if (value instanceof Body) {
-                    out.writeObject(((Body) value).getRemoteAdapter());
-                } else {
-                    out.writeObject(value);
-                }
+            if (value instanceof Body) {
+                out.writeObject(((Body) value).getRemoteAdapter());
+            } else {
+                out.writeObject(value);
             }
-
+        }
     }
 
     //
@@ -241,12 +233,9 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
         switch (bodyEvent.getType()) {
         case BodyEvent.BODY_CREATED:
             ((BodyEventListener) listener).bodyCreated(bodyEvent);
-
             break;
-
         case BodyEvent.BODY_DESTROYED:
             ((BodyEventListener) listener).bodyDestroyed(bodyEvent);
-
             break;
         }
     }

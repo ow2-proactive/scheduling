@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.body.request;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
 import org.objectweb.proactive.core.event.*;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
@@ -67,6 +69,10 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         return requestQueue.iterator();
     }
 
+    public CircularArrayList getInternalQueue() {
+        return this.requestQueue;
+    }
+    
 
     public synchronized boolean isEmpty() {
         return requestQueue.isEmpty();
@@ -152,19 +158,36 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         return findYoungest(requestFilter, true);
     }
 
-    public synchronized void add(Request request) {
+    public synchronized int add(Request request) {
       //System.out.println("  --> RequestQueue.add m="+request.getMethodName());
+      
+      // FAULT-TOLERANCE  
+      int ftres = FTManager.NON_FT;
+      FTManagerCIC ftm = (FTManagerCIC)(request.getFTManager());
+      if (ftm!=null){
+          // null if FT is disable OR if request is an awaited request         
+          ftres = ftm.onDeliverRequest(request);
+          if (request.ignoreIt()) {
+             return ftres;
+          }
+          
+      }
+      
       requestQueue.add(request);
       if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
           notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
       }
+      
+      return ftres;
     }
 
-    public synchronized void addToFront(Request request) {
+    public synchronized int addToFront(Request request) {
+        int ftres = 0;
         requestQueue.add(0, request);
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
         }
+        return ftres;
     } 
 
     public synchronized void processRequests(RequestProcessor processor, Body body) {

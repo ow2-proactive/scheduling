@@ -84,15 +84,17 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
   // -- Implements Request -----------------------------------------------
   //
   
-  public void send(UniversalBody destinationBody) throws java.io.IOException {
+  public int send(UniversalBody destinationBody) throws java.io.IOException {
+    int ftres; 
     if (! (destinationBody instanceof Body)) {
       throw new java.io.IOException("The destination body is not a local body");
     }
     if (isPriority) {
-      ((Body)destinationBody).getRequestQueue().add(this);
+      ftres = ((Body)destinationBody).getRequestQueue().add(this);
     } else {
-      ((Body)destinationBody).getRequestQueue().addToFront(this);
+      ftres = ((Body)destinationBody).getRequestQueue().addToFront(this);
     }
+    return ftres;
   }
 
 
@@ -113,6 +115,9 @@ public class BodyRequest extends MessageImpl implements Request, java.io.Seriali
   public boolean hasBeenForwarded() {
     return false;
   }
+  
+  public void resetSendCounter(){}
+  
   
   public UniversalBody getSender() {
     return null;

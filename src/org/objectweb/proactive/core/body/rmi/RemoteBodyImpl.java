@@ -40,8 +40,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -108,13 +110,13 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     	return body.getJobID();
     }
     
-    public void receiveRequest(Request r)
+    public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        body.receiveRequest(r);
+        return body.receiveRequest(r);
     }
 
-    public void receiveReply(Reply r) throws java.io.IOException {
-        body.receiveReply(r);
+    public int receiveReply(Reply r) throws java.io.IOException {
+        return body.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -288,6 +290,19 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         return body.getEntities();
     }
 
+    
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.rmi.RemoteBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage fte) throws IOException {
+        return this.body.receiveFTMessage(fte);
+    }
+
+    public void changeProxiedBody(Body newBody) {
+      this.body = newBody;
+    }
+    
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
@@ -303,6 +318,8 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         //long endTime=System.currentTimeMillis();
         //System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
     }
+
+
 
     //  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     //  in.defaultReadObject();

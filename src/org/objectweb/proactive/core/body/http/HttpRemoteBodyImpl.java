@@ -34,6 +34,8 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -68,7 +70,7 @@ import java.util.HashMap;
  */
 public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
   
-	private static Logger logger = Logger.getLogger("XML_HTTP");
+    private static Logger logger = Logger.getLogger("XML_HTTP");
     
 	UniqueID bodyID;
 	String jobID;
@@ -76,7 +78,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     int port;
 
     /**
-     * 
+     *
      * @param bodyID
      * @param url
      */
@@ -87,7 +89,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         this.jobID = jobID;
     }
 
-    public void receiveRequest(Request request)
+    public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
         try {
             //logger.debug("Receive Request " + request.getMethodName());
@@ -102,10 +104,11 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         } catch (Exception e) {
             throw new HTTPUnexpectedException("Unexpected exception", e);
         }
+
+        return FTManager.NON_FT;
     }
 
-
-    public void receiveReply(Reply reply) throws IOException {
+    public int receiveReply(Reply reply) throws IOException {
         try {
             logger.debug("Receive Reply " + reply.getResult());
 
@@ -117,6 +120,8 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         } catch (Exception e) {
             throw new HTTPUnexpectedException("Unexpected exception", e);
         }
+
+        return FTManager.NON_FT;
     }
 
     public String getNodeURL() {
@@ -542,18 +547,24 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     }
 
     /*
-        public boolean equals(Object o) {
-                if (!(o instanceof HttpRemoteBodyImpl)) {
-                        return false;
-                }
-
-                HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
-
-                return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
-                    (remoteBodyAdapter.port == rba.getPort());
-        }
-        */
+       public boolean equals(Object o) {
+               if (!(o instanceof HttpRemoteBodyImpl)) {
+                       return false;
+               }
+               HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
+               return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
+                   (remoteBodyAdapter.port == rba.getPort());
+       }
+     */
     public UniversalBody getRemoteAdapter() {
         return this;
+    }
+
+    /*
+     * STILL NOT IMPLEMENTED
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return FTManager.NON_FT;
     }
 }

@@ -45,7 +45,6 @@ package org.objectweb.proactive.core.body;
  *
  */
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
@@ -153,8 +152,8 @@ public class ActiveBody extends MigratableBody implements Runnable,
             }
         } catch (Exception e) {
             logger.error("Exception occured in runActivity method of body " +
-                toString() + ". Now terminating the body");
-
+                    toString() + ". Now terminating the body");
+           
             e.printStackTrace();
             terminate();
         } finally {
@@ -162,7 +161,7 @@ public class ActiveBody extends MigratableBody implements Runnable,
             if ((!hasJustMigrated) && (endActive != null)) {
                 endActive.endActivity(this);
             }
-
+            
             if (isActive()) {
                 activityStopped();
             }
@@ -176,13 +175,17 @@ public class ActiveBody extends MigratableBody implements Runnable,
     /**
      * Creates the active thread and start it using this runnable body.
      */
-    protected void startBody() {
+    public void startBody() {
         if (logger.isDebugEnabled()) {
             logger.debug("Starting Body");
         }
+        // get the incarnation number if ft is enable
+        String inc = (this.ftmanager!=null)?(""+this.ftmanager):("");
         Thread t = new Thread(this,
-                shortClassName(getName()) + " on " + getNodeURL());
+                shortClassName(getName()) + " on " + getNodeURL() + inc);
         t.start();
+        // start the Automatic Continuation thread if AC is enable
+        this.getFuturePool().startACThread();
     }
 
     /**
@@ -218,7 +221,15 @@ public class ActiveBody extends MigratableBody implements Runnable,
             logger.debug("in = " + in);
         }
         in.defaultReadObject();
-        startBody();
+        // FAULT-TOLERANCE: if this is a recovering checkpoint, 
+        // activity will be started in ProActiveRuntimeImpl.receiveCheckpoint()
+        if (this.ftmanager!=null){
+            if (!this.ftmanager.isACheckpoint()){
+                startBody();
+            }
+        } else {
+            startBody();
+        }
     }
 
     //

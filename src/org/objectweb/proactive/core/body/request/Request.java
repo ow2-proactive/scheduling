@@ -63,7 +63,13 @@ public interface Request extends Message {
    */
   public boolean hasBeenForwarded();
 
+  
+  /**
+   * Set the send counter to 0.
+   */
+  public void resetSendCounter();
 
+  
   /**
    * Returns the parameter number <code>index</code> from the method call
    * embedded in the request
@@ -92,8 +98,9 @@ public interface Request extends Message {
    * Sends this request to the body destination
    * @param destinationBody the body destination of this request
    * @exception java.io.IOException if the request fails to be sent
+   * @return value for fault-tolerance protocol
    */
-  public void send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException;
+  public int send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException;
 
 
   /**
@@ -131,4 +138,7 @@ public interface Request extends Message {
    public long getSessionId() ;
   
    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException; 
+
+
+   
 }

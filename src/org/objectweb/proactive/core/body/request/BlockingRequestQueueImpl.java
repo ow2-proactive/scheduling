@@ -87,10 +87,20 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     return ! shouldWait;
   }
 
-	public synchronized void add(Request r) {
-	  super.add(r);
-	  logger.debug("Adding request " + r.getMethodName());
+	public synchronized int add(Request r) {
+	  int ftres = super.add(r);
+	  if (logger.isDebugEnabled()) {
+	      logger.debug("Adding request " + r.getMethodName());
+	  }
 
+	  // FAULT-TOLERANCE
+	  // STILL NOT OOSPMD COMPLIANT !
+	  if (r instanceof AwaitedRequest){
+	      this.notifyAll();
+	      return ftres;
+	  }
+	  
+	  
 	  // if there is a "method based barrier"
 	  if (this.methodBarriers.size() != 0) {
   		Iterator it = this.methodBarriers.iterator();
@@ -153,12 +163,16 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 	  		this.methodBarriers.add(new MethodBarrier(mcbwmn.getMethodNames()));
 			this.suspended = true;
 	  }
-	  this.notifyAll();
+	  this.notifyAll();	  
+	  return ftres;
 	}
 
-  public synchronized void addToFront(Request r) {
-    super.addToFront(r);
+	
+	
+  public synchronized int addToFront(Request r) {
+    int ftres = super.addToFront(r);
     this.notifyAll();
+    return ftres;
   }
 
   public synchronized Request blockingRemoveOldest(RequestFilter requestFilter) {
@@ -169,7 +183,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     return blockingRemove(methodName, true);  }
 
   public synchronized Request blockingRemoveOldest() {
-	if (this.body == null) {
+    //System.out.println("BlockingRequestQueueImpl.blockingRemoveOldest()");
+	if (this.body == null) {	    
 		this.body = ProActive.getBodyOnThis();
 	}
 	return this.barrierBlockingRemove();
@@ -257,13 +272,13 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
    * @return the request found in the queue.
    */
   protected Request blockingRemove(boolean oldest) {
-    while (isEmpty() && shouldWait) {
-      if (hasListeners()) {
+    while (isEmpty() && shouldWait) {        
+      if (hasListeners()) {         
         notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.WAIT_FOR_REQUEST));
       }
       try {
-        this.wait();
-      } catch (InterruptedException e) {}
+        this.wait();        
+      } catch (InterruptedException e) {e.printStackTrace();}
     }
     return oldest ? removeOldest() : removeYoungest();
   }

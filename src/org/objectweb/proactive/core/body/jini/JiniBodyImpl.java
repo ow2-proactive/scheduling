@@ -37,8 +37,10 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
@@ -96,14 +98,14 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
     	return body.getJobID();
     }
     
-    public void receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException {
+    public int receiveRequest(Request r) throws java.io.IOException, RenegotiateSessionException {
         //System.out.println("JiniBodyImpl: receiveRequest() for " + this.localBody);
         //System.out.println("JiniBodyImpl: receiveRequest() request is " + r.getMethodName());
-        body.receiveRequest(r);
+        return body.receiveRequest(r);
     }
 
-    public void receiveReply(Reply r) throws java.io.IOException {
-        body.receiveReply(r);
+    public int receiveReply(Reply r) throws java.io.IOException {
+        return body.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -228,6 +230,18 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
 			return body.getEntities();
 		}
 
+    public void changeProxiedBody(Body newBody) {
+	        this.body = newBody;
+	}
+
+    /**
+     * @see org.objectweb.proactive.core.body.jini.JiniBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage fte) throws IOException {
+        return this.body.receiveFTMessage(fte);
+    }
+	
+	
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

@@ -43,8 +43,8 @@ public class RequestReceiverForwarder implements RequestReceiver {
     }
 
 
-  public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException {
-    request.send(remoteBody);
+  public int receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException {
+    return request.send(remoteBody);
   }
 
   public void setImmediateService(String methodName) throws java.io.IOException {

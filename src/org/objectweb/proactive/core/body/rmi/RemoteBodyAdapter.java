@@ -32,9 +32,12 @@ package org.objectweb.proactive.core.body.rmi;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -61,7 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
+public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
     protected static Logger logger = Logger.getLogger(RemoteBodyAdapter.class.getName());
 
     /**
@@ -235,13 +238,13 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request r)
+    public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        proxiedRemoteBody.receiveRequest(r);
+        return proxiedRemoteBody.receiveRequest(r);
     }
 
-    public void receiveReply(Reply r) throws java.io.IOException {
-        proxiedRemoteBody.receiveReply(r);
+    public int receiveReply(Reply r) throws java.io.IOException {
+        return proxiedRemoteBody.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -424,6 +427,29 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
         return handler;
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return this.proxiedRemoteBody.receiveFTMessage(ev);
+    }
+    
+    
+ 
+    
+    
+    //
+    // Implements Adapter
+    //
+    
+    public void changeProxiedBody(Body newBody) throws IOException{
+        this.proxiedRemoteBody.changeProxiedBody(newBody);
+    }
+
+
+    
+    
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

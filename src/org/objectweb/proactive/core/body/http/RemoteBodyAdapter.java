@@ -32,9 +32,12 @@ package org.objectweb.proactive.core.body.http;
 
 import org.apache.log4j.Logger;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -64,7 +67,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 
 
-public class RemoteBodyAdapter implements UniversalBody, Serializable {
+public class RemoteBodyAdapter implements BodyAdapter, Serializable {
 
     /**
      * an Hashtable containing all the http  adapters registered. They can be retrieved
@@ -195,13 +198,13 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         //(port == rba.getPort());       
     }
 
-    public void receiveRequest(Request request)
+    public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
-        remoteBodyStrategy.receiveRequest(request);
+        return remoteBodyStrategy.receiveRequest(request);
     }
 
-    public void receiveReply(Reply reply) throws IOException {
-        remoteBodyStrategy.receiveReply(reply);
+    public int receiveReply(Reply reply) throws IOException {
+        return remoteBodyStrategy.receiveReply(reply);
     }
 
     public String getURL() {
@@ -384,4 +387,23 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
         //return bodyID.hashCode();//jobID
         return remoteBodyStrategy.hashCode();
     }
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return this.remoteBodyStrategy.receiveFTMessage(ev);
+    }
+
+    //
+    // Implements Adapter
+    //
+
+    /**
+     * This method must be called only locally.
+     */
+    public void changeProxiedBody(Body newBody) {
+        this.remoteBodyStrategy = newBody;
+    }
+
 }

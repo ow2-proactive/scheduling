@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.event.RequestQueueEventListener;
+import org.objectweb.proactive.core.util.CircularArrayList;
 
 public interface RequestQueue {
 
@@ -144,15 +145,17 @@ public interface RequestQueue {
   /**
    * Adds the given request to the end of the queue
    * @param request the request to add
+   * @return value for fault tolerance protocol
    */
-  public void add(Request request);
+  public int add(Request request);
 
   /**
    * Adds the given request to the front of the queue before all 
    * other request already in the queue
    * @param request the request to add
+   * @return value for fault tolerance protocol
    */
-  public void addToFront(Request request);
+  public int addToFront(Request request);
 
   /**
    * Processes all requests in the queue using  the given RequestProcessor.
@@ -166,4 +169,11 @@ public interface RequestQueue {
   public void addRequestQueueEventListener(RequestQueueEventListener listener);
 
   public void removeRequestQueueEventListener(RequestQueueEventListener listener);
+  
+  /**
+   * Return the internal queue as a CircularArrayList 
+   * @return the internal queue as a CircularArrayList 
+   */
+  public CircularArrayList getInternalQueue();
+  
 }

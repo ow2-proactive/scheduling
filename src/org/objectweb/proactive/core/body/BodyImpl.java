@@ -31,8 +31,10 @@
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.protocols.cic.FTManagerCIC;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.message.MessageEventProducerImpl;
@@ -46,6 +48,7 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
@@ -145,6 +148,27 @@ public abstract class BodyImpl extends AbstractBody
             timer = new CompositeAverageMicroTimer("Service");
             PAProfilerEngine.registerTimer(timer);
         }
+
+        // FAULT TOLERANCE
+        String ftstate = ProActiveConfiguration.getFTState();
+        if ("enable".equals(ftstate)) {
+            try {
+                // should use a factory ...
+                this.ftmanager = new FTManagerCIC();
+                this.ftmanager.init(this);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Init FTManager on " + this.getNodeURL());
+                }
+                logger.info("** Fault-Tolerance is enable **");
+            } catch (ProActiveException e) {
+                logger.error(
+                    "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                    e);
+                this.ftmanager = null;
+            }
+        } else {
+            this.ftmanager = null;
+        }
     }
 
     //
@@ -175,7 +199,7 @@ public abstract class BodyImpl extends AbstractBody
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    protected void internalReceiveRequest(Request request)
+    protected int internalReceiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException {
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(request,
@@ -185,7 +209,7 @@ public abstract class BodyImpl extends AbstractBody
 
         // request queue length = number of requests in queue
         //							+ the one to add now 
-        requestReceiver.receiveRequest(request, this);
+        return requestReceiver.receiveRequest(request, this);
     }
 
     /**
@@ -193,7 +217,7 @@ public abstract class BodyImpl extends AbstractBody
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
-    protected void internalReceiveReply(Reply reply) throws java.io.IOException {
+    protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         //System.out.print("Body receives Reply -> ");
         if (messageEventProducer != null) {
             messageEventProducer.notifyListeners(reply,
@@ -201,11 +225,11 @@ public abstract class BodyImpl extends AbstractBody
         }
 
         /*if (reply.getResult() != null) {
-                System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-        } else {
-                System.out.println("Reply is : " + reply);
-        }*/
-        replyReceiver.receiveReply(reply, this, getFuturePool());
+           System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
+           } else {
+                   System.out.println("Reply is : " + reply);
+           }*/
+        return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
     /**
@@ -224,6 +248,10 @@ public abstract class BodyImpl extends AbstractBody
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         this.requestReceiver.setImmediateService(methodName);
+    }
+
+    public void updateNodeURL(String newNodeURL) {
+        this.nodeURL = newNodeURL;
     }
 
     //
@@ -339,7 +367,15 @@ public abstract class BodyImpl extends AbstractBody
                             getRequestQueue().size());
                     }
                     this.getFuturePool().registerDestination(request.getSender());
-                    replyAlternate.send(request.getSender());
+
+                    // FAULT-TOLERANCE
+                    if (BodyImpl.this.ftmanager != null) {
+                        BodyImpl.this.ftmanager.sendReply(replyAlternate,
+                            request.getSender());
+                    } else {
+                        replyAlternate.send(request.getSender());
+                    }
+
                     this.getFuturePool().removeDestination();
                     return;
                 }
@@ -361,7 +397,14 @@ public abstract class BodyImpl extends AbstractBody
                         getRequestQueue().size());
                 }
                 this.getFuturePool().registerDestination(request.getSender());
-                reply.send(request.getSender());
+
+                // FAULT-TOLERANCE
+                if (BodyImpl.this.ftmanager != null) {
+                    BodyImpl.this.ftmanager.sendReply(reply, request.getSender());
+                } else {
+                    reply.send(request.getSender());
+                }
+
                 this.getFuturePool().removeDestination();
             } catch (java.io.IOException e) {
                 // Create a non functional exception encapsulating the network exception
@@ -394,7 +437,13 @@ public abstract class BodyImpl extends AbstractBody
             }
             messageEventProducer.notifyListeners(request,
                 MessageEvent.REQUEST_SENT, destinationBody.getID());
-            request.send(destinationBody);
+
+            // FAULT TOLERANCE
+            if (BodyImpl.this.ftmanager != null) {
+                BodyImpl.this.ftmanager.sendRequest(request, destinationBody);
+            } else {
+                request.send(destinationBody);
+            }
         }
 
         //

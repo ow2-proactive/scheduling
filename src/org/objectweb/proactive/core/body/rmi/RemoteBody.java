@@ -35,8 +35,10 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.Handlerizable;
@@ -70,16 +72,18 @@ public interface RemoteBody extends java.rmi.Remote, Handlerizable {
      * unless the body cannot temporary receive the request.
      * @param r the request to process
      * @exception java.io.IOException if the request cannot be accepted
+     * @return value for fault-tolerance protocol
      */
-    public void receiveRequest(Request r)
+    public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
      * @param r the reply received
      * @exception java.io.IOException if the reply cannot be accepted
+     * @return value for fault-tolerance protocol
      */
-    public void receiveReply(Reply r) throws java.io.IOException;
+    public int receiveReply(Reply r) throws java.io.IOException;
 
     /**
      * Returns the url of the node this body is associated to
@@ -189,4 +193,21 @@ public interface RemoteBody extends java.rmi.Remote, Handlerizable {
 
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException;
+
+    /**
+     * For sending an event to the FTManager linked to this object
+     * @param ev the event 
+     * @return still not used
+     */ 
+    public int receiveFTMessage(FTMessage fte) throws IOException;
+    
+
+    /**
+     * Change the body referenced by this adapter
+     * @param newBody the body referenced after the call
+     */
+    public void changeProxiedBody(Body newBody) throws java.io.IOException;
+
+
+
 }

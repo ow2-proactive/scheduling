@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.request;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
 
 public class RequestReceiverImpl implements RequestReceiver,
@@ -48,7 +49,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         this.immediateServices.add("hashCode");
     }
 
-    public void receiveRequest(Request request, Body bodyReceiver)
+    public int receiveRequest(Request request, Body bodyReceiver)
         throws java.io.IOException {
         if (immediateExecution(request.getMethodName())) {
             if (logger.isDebugEnabled()) {
@@ -58,9 +59,11 @@ public class RequestReceiverImpl implements RequestReceiver,
             if (logger.isDebugEnabled()) {
                 logger.debug("end of service for " + request.getMethodName());
             }
+            //Dummy value for immediate services...
+            return FTManager.IMMEDIATE_SERVICE;
         } else {
             request.notifyReception(bodyReceiver);
-            bodyReceiver.getRequestQueue().add(request);
+            return bodyReceiver.getRequestQueue().add(request);
         }
     }
 

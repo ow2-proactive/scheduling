@@ -30,9 +30,12 @@
 */
 package org.objectweb.proactive.core.body.jini;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -63,7 +66,7 @@ import java.util.HashMap;
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to another jini objects library.
  */
-public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
+public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
 
     /**
      * The encapsulated JiniBody
@@ -197,13 +200,13 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request r)
+    public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        proxiedJiniBody.receiveRequest(r);
+        return proxiedJiniBody.receiveRequest(r);
     }
 
-    public void receiveReply(Reply r) throws java.io.IOException {
-        proxiedJiniBody.receiveReply(r);
+    public int receiveReply(Reply r) throws java.io.IOException {
+        return proxiedJiniBody.receiveReply(r);
     }
 
     public String getNodeURL() {
@@ -375,6 +378,27 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
         return null;
     }
 
+    
+
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
+     */
+    public int receiveFTMessage(FTMessage ev) throws IOException {
+        return this.proxiedJiniBody.receiveFTMessage(ev);
+    }
+    
+    //
+    // Implements Adapter
+    //
+    
+    public void changeProxiedBody(Body newBody) throws java.io.IOException{
+        this.proxiedJiniBody.changeProxiedBody(newBody);
+    }
+
+ 
+
+    
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

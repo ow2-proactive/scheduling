@@ -35,8 +35,10 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -78,7 +80,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         }
         if (acEnabled) {
             queueAC = new ActiveACQueue();
-            queueAC.start();
+            //queueAC.start(); //-> done in StartBody()
         }
     }
 
@@ -183,13 +185,20 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param creatorID ID of the body creator of the future to update
      * @param result value to update with the futures
      */
-    public synchronized void receiveFutureValue(long id, UniqueID creatorID,
-        Object result) throws java.io.IOException {
+    public synchronized int receiveFutureValue(long id, UniqueID creatorID,
+        Object result, Reply reply) throws java.io.IOException {
         // get all aiwated futures
         java.util.ArrayList futuresToUpdate = futures.getFuturesToUpdate(id,
                 creatorID);
 
         if (futuresToUpdate != null) {
+            
+            // FAULT-TOLERANCE
+            int ftres = FTManager.NON_FT;
+            if ((reply!=null) && (reply.getFTManager()!=null)){
+                ftres = reply.getFTManager().onDeliverReply(reply);
+            }
+            
             Future future = (Future) (futuresToUpdate.get(0));
             if (future != null) {
                 future.receiveReply(result);
@@ -227,9 +236,13 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 3) Remove futures from the futureMap
             futures.removeFutures(id, creatorID);
+            
+            return ftres;
         } else {
-            // we have to store the result until future arrive
+            // we have to store the result received by AC until future arrive
             this.valuesForFutures.put("" + id + creatorID, result);
+            // OR this reply might be an orphan reply (return value is ignored if not)
+            return FTManager.ORPHAN_REPLY;
         }
     }
 
@@ -245,8 +258,9 @@ public class FuturePool extends Object implements java.io.Serializable {
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
                 this.receiveFutureValue(id, creatorID,
-                    valuesForFutures.remove("" + id + creatorID));
+                    valuesForFutures.remove("" + id + creatorID),null);
             } catch (java.io.IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -310,6 +324,16 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures.unsetMigrationTag();
     }
 
+    
+    /**
+     * Start the AC thread if Automatic continuation mechanism is enable
+     */
+    public void startACThread(){
+        if (acEnabled){
+            this.queueAC.start();
+        }
+    }
+    
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
@@ -328,8 +352,14 @@ public class FuturePool extends Object implements java.io.Serializable {
         if (acEnabled) {
             // send the queue of AC requests
             out.writeObject(queueAC.getQueue());
-            // stop the ActiveQueue thread 
-            queueAC.killMe();
+            // stop the ActiveQueue thread if this is not a checkpointing serialization
+            FTManager ftm = ((AbstractBody)(LocalBodyStore.getInstance().getLocalBody(this.ownerBody))).getFTManager();
+            if (ftm != null){
+                if (!ftm.isACheckpoint()) {
+                    queueAC.killMe();}
+            }else{
+                queueAC.killMe();
+            }
         }
     }
 
@@ -341,7 +371,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             // create a new ActiveACQueue
             java.util.ArrayList queue = (java.util.ArrayList) (in.readObject());
             queueAC = new ActiveACQueue(queue);
-            queueAC.start();
+            //queueAC.start(); <-- done in ActiveBody.start();
         }
     }
 
@@ -497,8 +527,20 @@ public class FuturePool extends Object implements java.io.Serializable {
             if (dests != null) {
                 for (int i = 0; i < dests.size(); i++) {
                     UniversalBody dest = (UniversalBody) (dests.get(i));
-                    registerDestination(dest);
-                    reply.send(dest);
+                    registerDestination(dest);                   
+                    // FAULT-TOLERANCE
+                    AbstractBody ownerBody = (AbstractBody)(LocalBodyStore.getInstance().getLocalBody(FuturePool.this.ownerBody));
+                    if (ownerBody==null){
+                        //this might be a halfbody !
+                        ownerBody = (AbstractBody)(LocalBodyStore.getInstance().getLocalHalfBody(FuturePool.this.ownerBody));
+                    }               
+                    FTManager ftm = ownerBody.getFTManager();
+                    if (ftm!=null){
+                        ftm.sendReply(reply,dest);
+                    }else{
+                        //System.out.println("ACService.doAutomaticContinuation() : sending reply");
+                        reply.send(dest);
+                    }
                     removeDestination();
                 }
             }

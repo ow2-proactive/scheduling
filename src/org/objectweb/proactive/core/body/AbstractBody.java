@@ -30,16 +30,29 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -62,20 +75,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 
 /**
@@ -128,6 +127,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     // GROUP
     protected ProActiveGroupManager pgm;
+
+    // FAULT TOLERANCE
+    protected FTManager ftmanager;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -201,21 +203,32 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @return a string representation of this object
      */
     public String toString() {
+        // get the incarnation number if ft is enable
+        String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
         return "Body for " + localBodyStrategy.getName() + " node=" + nodeURL +
-        " id=" + bodyID;
+        " id=" + bodyID + inc;
     }
 
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public void receiveRequest(Request request)
+    public int receiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException {
         //System.out.println("  --> receiveRequest m="+request.getMethodName());
+        // NON_FT is returned if this object is not fault tolerant
+        int ftres = FTManager.NON_FT;
+        if (this.ftmanager != null) {
+            ftres = this.ftmanager.onReceiveRequest(request);
+            if (request.ignoreIt()) {
+                return ftres;
+            }
+        }
         try {
             this.enterInThreadStore();
             if (this.isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
+
             if (this.isSecurityOn) {
 
                 /*
@@ -235,20 +248,31 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
             this.registerIncomingFutures();
-            this.internalReceiveRequest(request);
+            ftres = this.internalReceiveRequest(request);
         } finally {
             this.exitFromThreadStore();
         }
+        return ftres;
     }
 
-    public void receiveReply(Reply reply) throws java.io.IOException {
+    public int receiveReply(Reply reply) throws java.io.IOException {
         //System.out.println("  --> receiveReply m="+reply.getMethodName());
+        // NON_FT is returned if this object is not fault tolerant
+        int ftres = FTManager.NON_FT;
+        if (this.ftmanager != null) {
+            ftres = this.ftmanager.onReceiveReply(reply);
+            if (reply.ignoreIt()) {
+                return ftres;
+            }
+        }
+
         try {
-            //System.out.println("Body receives Reply on NODE : " + this.nodeURL); 
             enterInThreadStore();
             if (isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             }
+
+            //System.out.println("Body receives Reply on NODE : " + this.nodeURL); 
             if (isSecurityOn) {
                 try {
                     if ((internalBodySecurity.isLocalBody()) &&
@@ -260,10 +284,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
             this.registerIncomingFutures();
-            internalReceiveReply(reply);
+            ftres = internalReceiveReply(reply);
         } finally {
             exitFromThreadStore();
         }
+        return ftres;
     }
 
     /**
@@ -800,7 +825,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * before serving, which is correctly done by all methods of the Service class.
      * However, this condition is not ensured for custom calls on serve. */
     public void serve(Request request) {
-        localBodyStrategy.serve(request);
+        if (this.ftmanager != null) {
+            this.ftmanager.onServeRequestBefore(request);
+            localBodyStrategy.serve(request);
+            this.ftmanager.onServeRequestAfter(request);
+        } else {
+            localBodyStrategy.serve(request);
+        }
     }
 
     public void sendRequest(MethodCall methodCall, Future future,
@@ -904,6 +935,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
+    public int receiveFTMessage(FTMessage fte) {
+        // delegate to the FTManger
+        int res = 0;
+        if (this.ftmanager != null) {
+            res = this.ftmanager.handleFTMessage(fte);
+        }
+        return res;
+    }
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -914,7 +954,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    protected abstract void internalReceiveRequest(Request request)
+    protected abstract int internalReceiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException;
 
     /**
@@ -922,7 +962,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
-    protected abstract void internalReceiveReply(Reply reply)
+    protected abstract int internalReceiveReply(Reply reply)
         throws java.io.IOException;
 
     protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
@@ -997,6 +1037,22 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
+    /**
+     * To get the FTManager of this body
+     * @return Returns the ftm.
+     */
+    public FTManager getFTManager() {
+        return ftmanager;
+    }
+
+    /**
+     * To set the FTManager of this body
+     * @param ftm The ftm to set.
+     */
+    public void setFTManager(FTManager ftm) {
+        this.ftmanager = ftm;
+    }
+
     //
     // -- SERIALIZATION METHODS -----------------------------------------------
     //
@@ -1008,6 +1064,21 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
+
+        // FAULT TOLERANCE
+        if (this.ftmanager != null) {
+            if (this.ftmanager.isACheckpoint()) {
+                //re-use remote view of the old body if any                
+                Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
+                if (toKill != null) {
+                    //this body is still alive
+                    BodyAdapter ba = (RemoteBodyAdapter) (toKill.getRemoteAdapter());
+                    ba.changeProxiedBody(this);
+                    this.remoteBody = ba;
+                    toKill.terminate();
+                }
+            }
+        }
         logger = Logger.getLogger("AbstractBody");
     }
 }

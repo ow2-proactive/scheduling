@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.core.body;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.ft.protocols.cic.HalfFTManagerCIC;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -41,6 +43,7 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -84,24 +87,42 @@ public class HalfBody extends AbstractBody {
         //psm = new ProActiveSecurityManager();
         //isSecurityOn = true;
         //psm.setBody(this);
-        
-       
-   	 this.psm = factory.getProActiveSecurityManager();
-   	   if (psm != null) {
-   		   //  startDefaultProActiveSecurityManager();
-   		   isSecurityOn = (psm != null);
-   		   logger.debug("HalfBody Security is " + isSecurityOn);
-   		   psm.setBody(this);
-   		   internalBodySecurity = new InternalBodySecurity(null);  
+        this.psm = factory.getProActiveSecurityManager();
+        if (psm != null) {
+            //  startDefaultProActiveSecurityManager();
+            isSecurityOn = (psm != null);
+            logger.debug("HalfBody Security is " + isSecurityOn);
+            psm.setBody(this);
+            internalBodySecurity = new InternalBodySecurity(null);
+        }
 
-   	   }
-   	   
-        
-       // internalBodySecurity = new InternalBodySecurity(null);
-
+        // internalBodySecurity = new InternalBodySecurity(null);
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
         setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+        //start the ACThread if ac is enable
+        this.localBodyStrategy.getFuturePool().startACThread();
+
+        // FAULT TOLERANCE
+        String ftstate = ProActiveConfiguration.getFTState();
+        if ("enable".equals(ftstate)) {
+            try {
+                // should use a factory ...
+                this.ftmanager = new HalfFTManagerCIC();
+                this.ftmanager.init(this);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Init FTManager on " + this.getNodeURL());
+                }
+                logger.info("** Fault-Tolerance is enable **");
+            } catch (ProActiveException e) {
+                logger.error(
+                    "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                    e);
+                this.ftmanager = null;
+            }
+        } else {
+            this.ftmanager = null;
+        }
     }
 
     //
@@ -126,7 +147,7 @@ public class HalfBody extends AbstractBody {
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    protected void internalReceiveRequest(Request request)
+    protected int internalReceiveRequest(Request request)
         throws java.io.IOException {
         throw new ProActiveRuntimeException(
             "The method 'receiveRequest' is not implemented in class HalfBody.");
@@ -137,8 +158,8 @@ public class HalfBody extends AbstractBody {
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
-    protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-    	//System.out.print("Half-Body receives Reply -> ");
+    protected int internalReceiveReply(Reply reply) throws java.io.IOException {
+        //System.out.print("Half-Body receives Reply -> ");
         try {
             if (reply.isCiphered()) {
                 reply.decrypt(psm);
@@ -146,19 +167,20 @@ public class HalfBody extends AbstractBody {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         /*if (reply.getResult() != null) {
-        	System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
-        } else {
-        	System.out.println("Reply is : " + reply);
-        }*/
-        replyReceiver.receiveReply(reply, this, getFuturePool());
+           System.out.println("Result contains in Reply is : " + reply.getResult().getClass());
+           } else {
+                   System.out.println("Reply is : " + reply);
+           }*/
+        return replyReceiver.receiveReply(reply, this, getFuturePool());
     }
 
     public void setImmediateService(String methodName) {
         throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
     }
 
-     /**
+    /**
      *  @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
@@ -166,9 +188,13 @@ public class HalfBody extends AbstractBody {
     }
 
     private static String getRuntimeJobID() {
-    	return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
+        return ProActiveRuntimeImpl.getProActiveRuntime().getJobID();
     }
-    
+
+    public void updateNodeURL(String newNodeURL) {
+        throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+    }
+
     //
     // -- inner classes -----------------------------------------------
     //
@@ -262,7 +288,14 @@ public class HalfBody extends AbstractBody {
                     logger.debug("communication without security");
                     //e.printStackTrace();
                 }
-                request.send(destinationBody);
+
+                // FAULT TOLERANCE
+                // System.out.println("a half body send a request: " + request.getMethodName());
+                if (HalfBody.this.ftmanager != null) {
+                    HalfBody.this.ftmanager.sendRequest(request, destinationBody);
+                } else {
+                    request.send(destinationBody);
+                }
             } catch (RenegotiateSessionException e) {
                 //e.printStackTrace();
                 updateLocation(destinationBody.getID(), e.getUniversalBody());

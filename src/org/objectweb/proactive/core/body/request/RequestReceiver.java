@@ -35,7 +35,7 @@ import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionExcepti
 
 public interface RequestReceiver {
 
-  public void receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException;
+  public int receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException;
   
   public void setImmediateService(String methodName) throws java.io.IOException ;
 

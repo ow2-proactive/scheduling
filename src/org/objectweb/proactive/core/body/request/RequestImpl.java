@@ -90,11 +90,11 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     // -- Implements Request -----------------------------------------------
     //
-    public void send(UniversalBody destinationBody)
+    public int send(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
         sendCounter++;
-        sendRequest(destinationBody);
+        return sendRequest(destinationBody);
     }
 
     public UniversalBody getSender() {
@@ -113,7 +113,7 @@ public class RequestImpl extends MessageImpl implements Request,
                 logger.debug("result null");
             }
         }
-        if (isOneWay || (sender == null)) {
+        if (isOneWay){ // || (sender == null)) {
             return null;
         }
         return createReply(targetBody, result);
@@ -130,7 +130,7 @@ public class RequestImpl extends MessageImpl implements Request,
 				loggerNFE.debug("*** Result null");
 			}
 		}
-		if (isOneWay || (sender == null)) {
+		if (isOneWay){// || (sender == null)) {
 			return null;
 		}
 		return createReply(targetBody, nfe);
@@ -140,6 +140,10 @@ public class RequestImpl extends MessageImpl implements Request,
         return sendCounter > 1;
     }
 
+    public void resetSendCounter(){
+        this.sendCounter = 0;
+    }
+    
     public Object getParameter(int index) {
         return methodCall.getParameter(index);
     }
@@ -154,7 +158,7 @@ public class RequestImpl extends MessageImpl implements Request,
             return;
         }
 
-        // System.out.println("the request has been forwarded " + forwardCounter + " times");
+        //System.out.println("the request has been forwarded times");
         //we know c.res is a remoteBody since the call has been forwarded
         //if it is null, this is a one way call
         if (sender != null) {
@@ -202,7 +206,7 @@ public class RequestImpl extends MessageImpl implements Request,
             result, psm);
     }
 
-    protected void sendRequest(UniversalBody destinationBody)
+    protected int sendRequest(UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException {
         if (logger.isDebugEnabled()) {
             logger.debug(" sending request " + methodCall.getName());
@@ -237,11 +241,13 @@ public class RequestImpl extends MessageImpl implements Request,
             logger.debug("Request : security disabled");
         }
 
-        destinationBody.receiveRequest(this);
+        int ftres = destinationBody.receiveRequest(this);
 
         if (logger.isDebugEnabled()) {
             logger.debug(" sending request finished");
         }
+        
+        return ftres;
     }
 
     // security issue
@@ -309,16 +315,12 @@ public class RequestImpl extends MessageImpl implements Request,
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         out.defaultWriteObject();
-        if (!isOneWay) {
-            out.writeObject(sender.getRemoteAdapter());
-        }
+        out.writeObject(sender.getRemoteAdapter());
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        if (!isOneWay) {
-            sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
-        }
+        sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }
 }
