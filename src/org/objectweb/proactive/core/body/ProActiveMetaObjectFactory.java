@@ -311,7 +311,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
-                if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+                if ("ibis".equals(System.getProperty("proactive.protocol"))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is ibis");
                     }

@@ -38,10 +38,12 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.core.util.ProActiveProperties;
+
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityNotAvailableException;
+
 
 public class FuturePool extends Object implements java.io.Serializable {
 
@@ -71,7 +73,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 		futures = new FutureMap();
 		valuesForFutures = new java.util.HashMap();
 		this.newState = false;
-		if ("enable".equals(ProActiveProperties.getACState()))
+		if ("enable".equals(ProActiveConfiguration.getACState()))
 			this.acEnabled = true;
 		else
 			this.acEnabled = false;
