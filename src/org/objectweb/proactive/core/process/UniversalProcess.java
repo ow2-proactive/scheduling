@@ -110,7 +110,18 @@ public interface UniversalProcess extends java.io.Serializable {
    */
   public void stopProcess();
 
-
+	
+	/**
+	 * Causes the current thread to wait until this Process has terminated. 
+	 * This method returns immediately if the subprocess has already terminated.
+	 *  If the subprocess has not yet terminated, the calling thread will be blocked until the subprocess exits. 
+	 * @return int exit value
+	 * @exception java.lang.InterruptedException if the current thread is interrupted by another thread while it is waiting.
+	 * Then the wait is ended and an InterruptedException is thrown
+	 */
+	public int waitFor() throws InterruptedException;
+	
+	
   /**
    * Returns true if and only if this process has been started. A process that has been 
    * started can be finished or running.
