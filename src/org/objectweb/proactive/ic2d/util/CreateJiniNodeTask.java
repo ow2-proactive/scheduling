@@ -79,8 +79,10 @@ public class CreateJiniNodeTask implements Runnable {
 	vmObject.addNodeObject(node);
 	vmObject.sendEventsForAllActiveObjects();
       }
-      
+    
     }
+
+
   }
   
 }

@@ -46,6 +46,7 @@ import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.DiscoveryEvent;
 
 import java.net.InetAddress;
+import java.io.File;
 
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 
@@ -95,13 +96,28 @@ public class ServiceLocatorHelper  implements DiscoveryListener {
 
   private static String grpName = "public";
 
-  private static String tmpDir = 
-    System.getProperty("user.home") + 
-    System.getProperty("file.separator") + 
-    "proactive-jini-log" +
-    System.getProperty("file.separator") + 
-    host;   
-  
+//    private static String tmpDir = 
+//      System.getProperty("user.home") + 
+//      System.getProperty("file.separator") + 
+//      "proactive-jini-log" +
+//      System.getProperty("file.separator") + 
+//      host;   
+
+  private static String tmpDir = null;
+
+  static {
+    try {
+      File fTmp = File.createTempFile("proactive-","-"+host);
+      tmpDir =  fTmp.getAbsolutePath(); 
+      System.out.println(">> TEMP directory = "+tmpDir);
+    } catch(Exception e) {
+      System.err.println("Cannot create the TEMP directory : "+e.toString());
+      e.printStackTrace();
+      System.exit(1);
+    }
+  }
+
+
   //
   // -- Constructors -----------------------------------------------
   //

@@ -7,8 +7,8 @@ if [ $# -lt 1 ]; then
        Start a new Node
          startNode.sh <the url of the node to create>
   
-         ex : startNode.sh  rmi//$HOSTNAME/node1
-         ex : startNode.sh jini//$HOSTNAME/node2
+         ex : startNode.sh  rmi://$HOSTNAME/node1
+         ex : startNode.sh jini://$HOSTNAME/node2
  
     "
     exit 1
