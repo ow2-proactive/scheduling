@@ -17,3 +17,4 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
 ########### per-logger basis
 ########### usage is log4j.logger.className=Level, Appender
 
+

@@ -63,8 +63,8 @@ public class TimedMixedMetaObjectFactory extends MixedLocationMetaObjectFactory 
         public MigrationManager newMigrationManager() {
             System.out.println(
                 "TimedMixedMetaObjectFactory creating migrationManager");
-            System.out.println(System.getProperty("modelisation.ttl"));
-            System.out.println(System.getProperty("modelisation.maxMigrations"));
+            System.out.println("TimedMixedMetaObjectFactory ttl = " + System.getProperty("modelisation.ttl"));
+            System.out.println("TimedMixedMetaObjectFactory ttu = " + System.getProperty("modelisation.maxMigrations"));
             return new TimedMigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer(),
                 Double.parseDouble(System.getProperty("modelisation.ttl")),
                 Integer.parseInt(System.getProperty(

@@ -28,6 +28,7 @@
 *
 * ################################################################
 */
+
 package org.objectweb.proactive.core.group;
 
 import org.apache.log4j.Logger;
@@ -51,7 +52,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Vector;
-
 
 public class ProxyForGroup extends AbstractProxy
     implements org.objectweb.proactive.core.mop.Proxy, Group,

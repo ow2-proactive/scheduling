@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import org.apache.log4j.Logger;
+
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;
 
@@ -58,6 +60,7 @@ public final class MethodCall implements java.io.Serializable {
     //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
     //
+    public static Logger logger = Logger.getLogger(MethodCall.class.getName());
 
     /**
      *        The size of the pool we use for recycling MethodCall objects.
@@ -337,7 +340,15 @@ public final class MethodCall implements java.io.Serializable {
             }
             serializedEffectiveArguments = null;
         }
-
+        if (logger.isDebugEnabled()) {
+            logger.debug("MethodCall.execute() name = " + this.getName());
+            logger.debug("MethodCall.execute() reifiedMethod = " +
+                reifiedMethod);
+            logger.debug(
+                "MethodCall.execute() reifiedMethod.getDeclaringClass() = " +
+                reifiedMethod.getDeclaringClass());
+            logger.debug("MethodCall.execute() targetObject " + targetObject);
+        }
         if (reifiedMethod.getParameterTypes().length > 0) {
             reifiedMethod.setAccessible(true);
         }

@@ -147,7 +147,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     try {
       sendRequest(methodCall, null);
     } catch (java.io.IOException e) {
-      throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for m="+methodCall.getName(), e);
+      throw new MethodCallExecutionFailedException("Exception occured in reifyAsOneWay while sending request for methodcall ="+methodCall.getName(), e);
     }
   }
 
@@ -160,9 +160,9 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 	  futureobject = (StubObject)MOP.newInstance(methodCall.getReifiedMethod().getReturnType(), null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
      
     } catch (MOPException e) {
-      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for m="+methodCall.getName(), e);
+      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for methodcall ="+methodCall.getName(), e);
     } catch (ClassNotFoundException e) {
-      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for m="+methodCall.getName(), e);
+      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for methodcall ="+methodCall.getName(), e);
     }
    
     // Set the id of the body creator in the created future
@@ -173,7 +173,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     try {
       sendRequest(methodCall, (Future)futureobject.getProxy());
     } catch (java.io.IOException e) {
-      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for m="+methodCall.getName(), e);
+      throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while sending request for methodcall ="+methodCall.getName(), e);
     }
     // And return the future object
     return futureobject;
@@ -190,7 +190,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     try {
       sendRequest(methodCall, f);
     } catch (java.io.IOException e) {
-      throw new MethodCallExecutionFailedException("Exception occured in reifyAsSynchronous while sending request for m="+methodCall.getName(), e);
+      throw new MethodCallExecutionFailedException("Exception occured in reifyAsSynchronous while sending request for methodcall ="+methodCall.getName(), e);
     }
     // Returns the result
     if (f.getRaisedException() != null) {

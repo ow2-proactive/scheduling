@@ -1,13 +1,15 @@
 package modelisation.server.multiqueue;
 
+import modelisation.multiqueueserver.CompositeQueueMetaObjectFactory;
+import modelisation.server.singlequeue.SelectiveServer;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestQueue;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import modelisation.server.singlequeue.SelectiveServer;
-import modelisation.multiqueueserver.CompositeQueueMetaObjectFactory;
 
 
 public class SelectiveCompositeQueueServer extends SelectiveServer implements org.objectweb.proactive.RunActive {
@@ -64,7 +66,7 @@ public class SelectiveCompositeQueueServer extends SelectiveServer implements or
       if (args.length == 2)
         server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, NodeFactory.getNode(args[1]), null, CompositeQueueMetaObjectFactory.newInstance());
       else
-        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, null, null, CompositeQueueMetaObjectFactory.newInstance());
+        server = (SelectiveCompositeQueueServer) ProActive.newActive(SelectiveCompositeQueueServer.class.getName(), arg, (Node) null, null, CompositeQueueMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -83,7 +83,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.net.UnknownHostException;
 
 import java.util.HashMap;

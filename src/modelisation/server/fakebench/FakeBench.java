@@ -28,17 +28,19 @@
  */
 package modelisation.server.fakebench;
 
+import modelisation.server.TimedLocationServerMetaObjectFactory;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
-import modelisation.server.TimedLocationServerMetaObjectFactory;
+
 
 public class FakeBench implements org.objectweb.proactive.RunActive {
-
     protected LocationServer l;
     protected long delay;
 
@@ -82,18 +84,20 @@ public class FakeBench implements org.objectweb.proactive.RunActive {
         return b;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         if (args.length < 2) {
-            System.err.println("Usage: java -Dproactive.locationserver=classe -Dproactive.locationserver.rmi=name "
-                               + FakeBench.class + " <numberOfBench> "
-                               + "<sleepTime>");
+            System.err.println(
+                "Usage: java -Dproactive.locationserver=classe -Dproactive.locationserver.rmi=name " +
+                FakeBench.class + " <numberOfBench> " + "<sleepTime>");
             System.exit(-1);
         }
         int max = Integer.parseInt(args[0]);
-        Object[] param = new Object[]{new Long(args[1])};
+        Object[] param = new Object[] { new Long(args[1]) };
         try {
             for (int i = 0; i < max; i++) {
-                ProActive.newActive("modelisation.server.fakebench.FakeBench", param, null, null, TimedLocationServerMetaObjectFactory.newInstance());
+                ProActive.newActive("modelisation.server.fakebench.FakeBench",
+                    param, (Node) null, null,
+                    TimedLocationServerMetaObjectFactory.newInstance());
             }
         } catch (Exception e) {
             e.printStackTrace();

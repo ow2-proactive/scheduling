@@ -30,9 +30,10 @@
  */
 package org.objectweb.proactive.core.process;
 
-import org.objectweb.proactive.core.util.MessageLogger;
-
 import java.io.Serializable;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.MessageLogger;
 
 
 /**
@@ -60,6 +61,9 @@ import java.io.Serializable;
  */
 public class JVMProcessImpl extends AbstractExternalProcess
     implements JVMProcess, Serializable {
+	
+	protected static Logger logger = Logger.getLogger(JVMProcessImpl.class.getName());
+	
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
     private final static String POLICY_FILE = "proactive.java.policy";
@@ -249,7 +253,9 @@ public class JVMProcessImpl extends AbstractExternalProcess
         // append classname
         javaCommand.append(" ");
         javaCommand.append(classname);
-        System.out.println("Parameters " + parameters);
+        if (logger.isDebugEnabled()) {
+        	logger.debug("JVMProcessImpl.buildJavaCommand()  Parameters " + parameters);
+        }
         if (parameters != null) {
             javaCommand.append(" ");
             javaCommand.append(parameters);
@@ -261,7 +267,9 @@ public class JVMProcessImpl extends AbstractExternalProcess
             logger.debug(javaCommand.toString() +"\n");
 		
         }
-
+        if (logger.isDebugEnabled()) {
+             logger.debug("JVMProcessImpl.buildJavaCommand() " + javaCommand);
+        }
         return javaCommand.toString();
     }
 

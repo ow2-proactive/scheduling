@@ -1,52 +1,48 @@
 package modelisation.forwarder;
 
-import modelisation.ModelisationBench;
+import java.util.Date;
 
+import modelisation.ModelisationBench;
 import modelisation.statistics.RandomNumberFactory;
 import modelisation.statistics.RandomNumberGenerator;
-
 import modelisation.util.NodeControler;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
 
-import java.util.Date;
 
 public class Bench extends ModelisationBench
     implements org.objectweb.proactive.RunActive {
     protected static NodeControler auto;
-    protected static final int MAX = 5;
+    protected static final int MAX = 50;
 
-    public static Agent startAgent(double d, Node[] nodes, String nodeName,
-        long lifeTime) {
-        Agent agent = null;
-        Object[] args = new Object[3];
-        args[0] = new Double(d);
-        args[1] = nodes;
-        args[2] = new Long(lifeTime);
-        try {
-            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
-                System.out.println(" USING IBIS");
-                agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, NodeFactory.getNode(nodeName), null,
-                        new ForwarderIbisMetaObjectFactory());
-            } else {
-                System.out.println(" USING RMI");
-                agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, NodeFactory.getNode(nodeName), null,
-                        new ForwarderMetaObjectFactory());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        //   agent.initialize(s);
-        //   agent.start();
-        return agent;
-    }
+    // protected static final int MAX = 5;
+//    public static Agent startAgent(double d, Node[] nodes, String nodeName,
+//        long lifeTime) {
+//        Agent agent = null;
+//        Object[] args = new Object[3];
+//        args[0] = new Double(d);
+//        args[1] = nodes;
+//        args[2] = new Long(lifeTime);
+//        try {
+//            if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+//                System.out.println(" USING IBIS");
+//                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+//                        args, NodeFactory.getNode(nodeName), null,
+//                        new ForwarderIbisMetaObjectFactory());
+//            } else {
+//                System.out.println(" USING RMI");
+//                agent = (Agent) ProActive.newActive(Agent.class.getName(),
+//                        args, NodeFactory.getNode(nodeName), null,
+//                        new ForwarderMetaObjectFactory());
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return agent;
+//    }
 
     public static Agent startAgent(double d, Node[] nodes, long lifeTime) {
         Agent agent = null;
@@ -102,6 +98,7 @@ public class Bench extends ModelisationBench
                 agent.echo();
             } catch (Exception e) {
                 e.printStackTrace();
+                System.exit(0);
             }
         }
 
@@ -117,9 +114,9 @@ public class Bench extends ModelisationBench
 
     // *************************************//
     public static void main(String[] args) {
-        if (args.length < 5) {
+        if (args.length < 4) {
             System.err.println(
-                "Usage: java modelisation.Bench  <lambda> <nu> <destinationFile> <creationNode> <benchLength>");
+                "Usage: java modelisation.Bench  <lambda> <nu> <destinationFile>  <benchLength> <output>");
             System.err.println(
                 "-Dnodecontroler.startnode=false to use already created nodes");
             System.exit(-1);
@@ -135,18 +132,18 @@ public class Bench extends ModelisationBench
         Node[] nodes = Bench.readMapingFile(args[2]);
 
         Agent agent = Bench.startAgent(Double.parseDouble(args[1]), nodes,
-                Long.parseLong(args[4]));
+                Long.parseLong(args[3]));
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println("");
-        System.out.println("Bench started at " + new Date());
+        System.out.println("Bench started at " + new Date() + " with MAX  " +
+            Bench.MAX);
         System.out.println("");
         System.out.println("Calling agent.start()");
         agent.start();
-        //   long benchTime = Long.parseLong(args[4]);
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
@@ -156,17 +153,15 @@ public class Bench extends ModelisationBench
         Bench bench = null;
         Object[] param = new Object[] { agent, expo };
         try {
-            //            bench = (Bench) ProActive.newActive(Bench.class.getName(), param,
-            //                    null, null, new FowarderIbisMetaObjectFactory());
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
                 System.out.println(" USING IBIS");
                 bench = (Bench) ProActive.newActive(Bench.class.getName(),
-                        param, null, null, new ForwarderIbisMetaObjectFactory());
+                        param, (Node) null, null, new ForwarderIbisMetaObjectFactory());
                 //   ProActiveMetaObjectFactory.instance = new ProActiveIbisMetaObjectFactory();
             } else {
                 System.out.println(" USING RMI");
                 bench = (Bench) ProActive.newActive(Bench.class.getName(),
-                        param, null, null, new ForwarderMetaObjectFactory());
+                        param, (Node) null, null, new ForwarderMetaObjectFactory());
             }
         } catch (Exception e) {
             e.printStackTrace();

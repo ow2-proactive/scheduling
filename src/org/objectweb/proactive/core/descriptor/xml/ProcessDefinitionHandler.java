@@ -132,7 +132,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             }
             String username = attributes.getValue("username");
             if (checkNonEmpty(username)) {
-                targetProcess.setUsername("username");
+                targetProcess.setUsername(username);
             }
         }
 
@@ -234,6 +234,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
+                this.addHandler(QUEUE_NAME_TAG, new SingleValueUnmarshaller());
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -265,6 +266,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     prunSubProcess.setBookingDuration((String) activeHandler.getResultObject());
                 } else if (name.equals(PRUN_OUTPUT_FILE)) {
                     prunSubProcess.setOutputFile((String) activeHandler.getResultObject());
+                } else if (name.equals(QUEUE_NAME_TAG)) {
+                	prunSubProcess.setQueueName((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }

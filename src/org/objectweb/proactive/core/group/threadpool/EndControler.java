@@ -49,24 +49,29 @@ public class EndControler {
 
     /** Suspends the current thread until all the pending jobs in the ThreadPool are done. */
 	synchronized public void waitDone() {
-		try {
+		try {	
 			while (this.numberOfAwakeThreads > 0) {
 				this.wait();
-			} }
+			} 
+		}
 		catch (InterruptedException e) { System.err.println("InterruptedException"); }
     }
 
-	/** Waits for the first thread to start. */
-	synchronized public void waitBegin() {
-		try {
-			while (!this.started) {
-				this.wait();
-			} }
-		catch (InterruptedException e) { System.err.println("InterruptedException"); }
-	}
+//	/** Waits for the first thread to start. */
+//	synchronized public void waitBegin() {
+////		Thread.dumpStack();
+//		this.started=true;
+//	//	try {
+//		//	while (!this.started) {
+////				System.out.println("EndControler.waitBegin() started " + this.started);
+//			//	this.wait();
+//			//} }
+//	//	catch (InterruptedException e) { System.err.println("InterruptedException"); }
+//	}
 
 	/** A ThreadInThePool object calls this method to indicate it has started a job. */
 	synchronized public void jobStart() {
+//		Thread.dumpStack();
 		this.numberOfAwakeThreads++;
 		this.started = true;
 		this.notify();
@@ -74,6 +79,7 @@ public class EndControler {
 
 	/** A ThreadInThePool object calls this method to indicate it has finished a job. */
     synchronized public void jobFinish() {
+//    	Thread.dumpStack();
         this.numberOfAwakeThreads--;
         this.notify();
     }

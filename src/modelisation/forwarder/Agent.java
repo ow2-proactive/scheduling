@@ -1,6 +1,8 @@
 package modelisation.forwarder;
 
 import modelisation.ModelisationBench;
+import modelisation.statistics.RandomNumberFactory;
+import modelisation.statistics.RandomNumberGenerator;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
@@ -14,8 +16,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
     java.io.Serializable {
     private static final int SIMPLE_BENCH_MAX_MIGRATIONS = 200;
     protected int migrationCounter;
-
-    //  protected RandomNumberGenerator expo;
+    protected RandomNumberGenerator expo;
     protected Node[] nodes;
     protected int index;
     protected boolean start = false;
@@ -24,14 +25,16 @@ public class Agent implements org.objectweb.proactive.RunActive,
     private int count;
     protected boolean simpleBench;
 
+
+
     public Agent() {
     }
 
     public Agent(Double nu, Node[] array, Long lifeTime)
         throws IllegalArgumentException {
         //  this.expo = new ExponentialLaw(nu.doubleValue());
-        //    this.expo = RandomNumberFactory.getGenerator("nu");
-        //     this.expo.initialize(nu.doubleValue());
+        this.expo = RandomNumberFactory.getGenerator("nu");
+        this.expo.initialize(nu.doubleValue());
         nodes = array;
 
         index = 0;
@@ -57,9 +60,9 @@ public class Agent implements org.objectweb.proactive.RunActive,
     //   }
 
     /**
- * Called to indicate that this agent is on a bench
- * without forwarders
- */
+     * Called to indicate that this agent is on a bench
+     * without forwarders
+     */
     public void simpleBench() {
         this.simpleBench = true;
     }
@@ -90,7 +93,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
                 index = 1;
             }
 
-            double time = 0; //expo.next();
+            double time = expo.next();
 
             // this.checkTerminate(body);
             System.out.println(System.currentTimeMillis() +
@@ -104,7 +107,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
                 //	this.checkTerminate(body);
                 System.out.println(System.currentTimeMillis() +
                     " AgentWithExponentialMigrationAndForwarder: migrating to " +
-                    nodes[index - 1].getNodeInformation());
+                    nodes[index - 1].getNodeInformation().getName());
                 if (count >= Bench.MAX) {
                     //	System.exit(0);
                     System.out.println(">>>>> Agent should stop ");
@@ -136,8 +139,8 @@ public class Agent implements org.objectweb.proactive.RunActive,
             //      " AgentWithExponentialMigrationAndForwarder: waiting " +
             //      (time * 1000) + " before migration");
             try {
-         //       System.out.println("Agent waiting 5s before migration");
-          //      Thread.sleep(5000);
+                //       System.out.println("Agent waiting 5s before migration");
+                //      Thread.sleep(5000);
                 //we empty the requestQueue
                 body.getRequestQueue().clear();
                 System.out.println(System.currentTimeMillis() +
@@ -146,7 +149,7 @@ public class Agent implements org.objectweb.proactive.RunActive,
 
                 if (this.migrationCounter++ > SIMPLE_BENCH_MAX_MIGRATIONS) {
                     System.out.println("Bench successfully completed, exiting");
-                    System.exit(0);
+                   // System.exit(0);
                 }
                 ProActive.migrateTo(nodes[index - 1]);
                 //System.out.println("Migration done");
@@ -197,11 +200,11 @@ public class Agent implements org.objectweb.proactive.RunActive,
             if ("ibis".equals(System.getProperty("proactive.rmi"))) {
                 System.out.println(" USING IBIS");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, null, null, new NoForwarderIbisMetaObjectFactory());
+                        args, (Node) null, null, new NoForwarderIbisMetaObjectFactory());
             } else {
                 System.out.println(" USING RMI");
                 agent = (Agent) ProActive.newActive(Agent.class.getName(),
-                        args, null, null, new NoForwarderMetaObjectFactory());
+                        args, (Node) null, null, new NoForwarderMetaObjectFactory());
             }
 
             //    agent = (Agent) ProActive.newActive("modelisation.forwarder.Agent",

@@ -152,7 +152,7 @@ public class ActiveBody extends MigratableBody implements Runnable,
             }
         } catch (Exception e) {
             
-            logger.error("Exception occured in live method of body " +
+            logger.error("Exception occured in runActivity method of body " +
                     toString() + ". Now terminating the body");
            
             e.printStackTrace();

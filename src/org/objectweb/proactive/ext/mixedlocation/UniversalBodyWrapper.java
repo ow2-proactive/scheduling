@@ -24,6 +24,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     protected boolean stop;
     protected long creationTime;
 
+    //protected  Thread t ;
+
     /**
      * Create a time-limited wrapper around a UniversalBody
      * @param body the wrapped UniversalBody
@@ -33,7 +35,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody = body;
         this.time = time;
         this.creationTime = System.currentTimeMillis();
-        Thread t = new Thread(this);
+        //     t =new Thread(this);
         this.id = this.wrappedBody.getID();
 
         //   t.start();
@@ -47,9 +49,10 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
         //the forwarder should be dead
         if (System.currentTimeMillis() > (this.creationTime + this.time)) {
-            this.updateServer();
-            this.wrappedBody = null;
-            System.gc();
+            //   this.updateServer();
+            //   this.wrappedBody = null;
+            //	t.start();
+            //   System.gc();
             throw new IOException();
         } else {
             try {

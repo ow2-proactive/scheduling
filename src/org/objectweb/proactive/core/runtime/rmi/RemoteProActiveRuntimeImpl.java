@@ -33,6 +33,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     protected transient ProActiveRuntimeImpl proActiveRuntime;
     protected String proActiveRuntimeURL;
 
+    protected int portNumber=1099;
+    
     //	
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -69,7 +71,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             String name = UrlBuilder.getNameFromUrl(nodeURL);
 
             //System.out.println("name is : "+ name);
-            //System.out.println("url is : "+ nodeURL);
+//           System.out.println("url is : "+ nodeURL);
             //register it with the url
             if (replacePreviousBinding) {
                 java.rmi.Naming.rebind(nodeURL, this);
@@ -160,6 +162,14 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntimeURL;
     }
 
+    public void setPortNumber(int p) {
+    	this.portNumber = p;
+    }
+    
+    public int getPortNumber() {
+    	return this.portNumber;
+    }
+    
     public ArrayList getActiveObjects(String nodeName) {
         return proActiveRuntime.getActiveObjects(nodeName);
     }
@@ -171,7 +181,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     public VirtualNode getVirtualNode(String virtualNodeName) {
         return proActiveRuntime.getVirtualNode(virtualNodeName);
     }
-
+    
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws java.rmi.RemoteException {
 
@@ -257,7 +267,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
             //it is an url given by a descriptor
             String host = getVMInformation().getInetAddress().getHostName();
-            return UrlBuilder.buildUrl(host, url);
+            return UrlBuilder.buildUrl(host+":"+portNumber, url);
         } else {
             return UrlBuilder.checkUrl(url);
         }

@@ -301,7 +301,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         throws java.io.IOException, ClassNotFoundException {
         Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
         if (logger.isDebugEnabled()) {
-            logger.debug(" XXXXX  UniversalProxyBody XXXXX ");
+            logger.debug(" XXXXX  UniversalBodyProxy XXXXX ");
         }
 
         // Thread.dumpStack();
@@ -312,6 +312,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         if (localBody != null) {
             // the body is local
             universalBody = localBody;
+            in.readObject();
             isLocal = true;
         } else {
             // the body is not local

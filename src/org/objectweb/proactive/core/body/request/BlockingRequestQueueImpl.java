@@ -30,10 +30,13 @@
 */ 
 package org.objectweb.proactive.core.body.request;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.io.Serializable,BlockingRequestQueue {
+
+	public static Logger logger = Logger.getLogger(BlockingRequestQueueImpl.class.getName());
 
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
@@ -67,6 +70,9 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 
   public synchronized void add(Request r) {
     super.add(r);
+    if (logger.isDebugEnabled()) {
+    	logger.debug("adding request " + r.getMethodName());
+    }
     this.notifyAll();
   }
 

@@ -30,13 +30,29 @@
 */
 package org.objectweb.proactive.core.mop;
 
-import org.apache.bcel.Constants;
-import org.apache.bcel.classfile.JavaClass;
-import org.apache.bcel.generic.*;
-
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
+
+import org.apache.bcel.Constants;
+import org.apache.bcel.classfile.JavaClass;
+import org.apache.bcel.generic.ArrayType;
+import org.apache.bcel.generic.ClassGen;
+import org.apache.bcel.generic.ConstantPoolGen;
+import org.apache.bcel.generic.FieldGen;
+import org.apache.bcel.generic.GOTO;
+import org.apache.bcel.generic.ICONST;
+import org.apache.bcel.generic.Instruction;
+import org.apache.bcel.generic.InstructionConstants;
+import org.apache.bcel.generic.InstructionFactory;
+import org.apache.bcel.generic.InstructionHandle;
+import org.apache.bcel.generic.InstructionList;
+import org.apache.bcel.generic.LocalVariableInstruction;
+import org.apache.bcel.generic.MethodGen;
+import org.apache.bcel.generic.ObjectType;
+import org.apache.bcel.generic.PUSH;
+import org.apache.bcel.generic.ReferenceType;
+import org.apache.bcel.generic.Type;
 
 public class BytecodeStubBuilder {
   // Those fields contain information about the class

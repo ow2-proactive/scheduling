@@ -86,6 +86,7 @@ public interface ProActiveDescriptorConstants  {
   public static final String HOSTS_NUMBER_TAG = "hostsNumber";
   public static final String PROCESSOR_PER_NODE_TAG = "processorPerNode";
   public static final String BOOKING_DURATION_TAG = "bookingDuration";
+  public static final String QUEUE_NAME_TAG = "queueName";
   public static final String PRUN_OUTPUT_FILE = "outputFile";
   public static final String VARIABLE_TAG = "variable"; 
   public static final String CLASSPATH_TAG = "classpath"; 

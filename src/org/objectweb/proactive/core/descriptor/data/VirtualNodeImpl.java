@@ -533,7 +533,6 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 }
             }
         }
-
         return;
     }
 
@@ -587,19 +586,22 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             if (processImpl instanceof PrunSubProcess) {
                 //if the process is prun we have to increase the node count by the number of processors            
                 prun = (PrunSubProcess) processImpl;
-                System.out.println("VirtualNodeImpl getHostsNumber() " +
-                    prun.getHostsNumber());
-                System.out.println("VirtualNodeImpl getnodeNumber() " +
-                    prun.getProcessorPerNodeNumber());
-				System.out.println("VM " +
-									vm);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+                        prun.getHostsNumber());
+                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+                        prun.getProcessorPerNodeNumber());
+                    logger.debug("VM " + vm);
+                }
                 increaseNodeCount((new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
             }
 
             processImplDecorator = (ExternalProcessDecorator) processImpl;
             processImpl = processImplDecorator.getTargetProcess();
-            System.out.println("processImplDecorator " +
-                processImplDecorator.getClass().getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("processImplDecorator " +
+                    processImplDecorator.getClass().getName());
+            }
         }
 
         //When the virtualNode will be activated, it has to launch the process
@@ -608,25 +610,35 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null)  && (prun==null)) {
-                //if bsub is null we can increase the nodeCount
+            if ((bsub == null) && (prun == null)) {
+                //if bsub and prun are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
 
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
             String acquisitionMethod = vm.getAcquisitionMethod();
+            String portNumber = vm.getPortNumber();
             if (logger.isDebugEnabled()) {
-                logger.debug("Aquisition method :" + acquisitionMethod);
+                logger.debug("Aquisition method : " + acquisitionMethod);
+                logger.debug("Port Number : " + portNumber);
                 logger.debug(vnName);
             }
-            String localruntimeURL = proActiveRuntimeImpl.getURL();
+
+            String localruntimeURL = null;
+
+            if (portNumber != null) {
+                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
+                            portNumber));
+            } else {
+                localruntimeURL = proActiveRuntimeImpl.getURL();
+            }
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
             jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
                 localruntimeURL + " " + acquisitionMethod + ":" + " " +
-                nodeNumber);
+                nodeNumber + " " + portNumber);
         }
     }
 

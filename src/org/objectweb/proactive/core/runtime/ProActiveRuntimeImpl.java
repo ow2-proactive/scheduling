@@ -1,36 +1,34 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.runtime;
-
-import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -43,6 +41,9 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 
 /**
@@ -62,7 +63,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //
     //the Unique instance of ProActiveRuntime
     private static ProActiveRuntime proActiveRuntime = new ProActiveRuntimeImpl();
+    private static Random prng = null; // new Random();
 
+    private static synchronized int getNextInt() {
+    	 if (prng == null) {
+    	 	 prng = new Random();
+    	 }
+    	return prng.nextInt();
+    }
+    
     //
     // -- PRIVATE MEMBERS -----------------------------------------------------------
     //
@@ -107,10 +116,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-           * Register the given VirtualNode on this ProActiveRuntime. This method cannot be called remotely.
-           * @param vn the virtualnode to register
-           * @param vnname the name of the VirtualNode to register
-           */
+     * Register the given VirtualNode on this ProActiveRuntime. This method cannot be called remotely.
+     * @param vn the virtualnode to register
+     * @param vnname the name of the VirtualNode to register
+     */
     public void registerLocalVirtualNode(VirtualNode vn, String vnName) {
         //System.out.println("vn "+vnName+" registered");
         virtualNodesMap.put(vnName, vn);
@@ -142,15 +151,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-           * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#DeleteAllNodes()
-           */
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#DeleteAllNodes()
+     */
     public void DeleteAllNodes() {
         nodeMap.clear();
     }
 
     /**
-           * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killNode(String)
-           */
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killNode(String)
+     */
     public void killNode(String nodeName) {
         nodeMap.remove(nodeName);
     }
@@ -212,14 +221,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getVMInformation()
-           */
+     */
     public VMInformation getVMInformation() {
         return vmInformation;
     }
 
     /**
-       * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String)
-      */
+     * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime, String, String, String)
+     */
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol) {
         //System.out.println("register in Impl");
@@ -232,7 +241,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntimes()
-           */
+     */
     public ProActiveRuntime[] getProActiveRuntimes() {
         int i = 0;
         ProActiveRuntime[] runtimeArray;
@@ -249,26 +258,34 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntime(String)
-           */
+     */
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
         return (ProActiveRuntime) proActiveRuntimeMap.get(proActiveRuntimeName);
     }
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT()
-           */
+     */
     public void killRT() {
         System.exit(0);
     }
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
-           */
+     */
     public String getURL() {
         return "//" + vmInformation.getInetAddress().getHostName() + "/" +
         vmInformation.getName();
     }
 
+    /**
+     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
+     */
+    public String getURL(int port) {
+    	return "//" + vmInformation.getInetAddress().getHostName() + ":" + port + "/" +
+    	vmInformation.getName();
+    }
+    
     public ArrayList getActiveObjects(String nodeName) {
         // we have to clone the array otherwise modifications done on nodeMap
         // would be reflected on the temp variable bodyArray
@@ -351,13 +368,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /**
      *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#createBody(String, ConstructorCall, boolean)
-      */
+     */
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isLocal)
         throws ConstructorCallExecutionFailedException, 
             java.lang.reflect.InvocationTargetException {
-      //  System.out.println("XXXXXX creating body on " + this.getURL());
-     //   ProActiveConfiguration.getConfiguration().dumpAddedProperties();
+        //  System.out.println("XXXXXX creating body on " + this.getURL());
+        //   ProActiveConfiguration.getConfiguration().dumpAddedProperties();
         if (isLocal) {
             // if the body and proxy are on the same vm, returns the local view
             //System.out.println("body and proxy on the same vm");
@@ -485,10 +502,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             String hostName = hostInetAddress.getHostName();
 
             //this.name = "PA_RT"+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt())+"_"+hostName;
+//                        this.name = "PA_RT" +
+//                            Integer.toString(new java.security.SecureRandom().nextInt()) +
+//                            "_" + hostName;
+//            			this.name = "PA_RT" +
+//            							Integer.toString(new java.util.Random().nextInt()) +
+//            							"_" + hostName;
             this.name = "PA_RT" +
-                Integer.toString(new java.security.SecureRandom().nextInt()) +
-                "_" + hostName;
-            //System.out.println("name = "+ this.name+" vmid "+ this.uniqueVMID);
+                Integer.toString(ProActiveRuntimeImpl.getNextInt()) + "_" +
+                hostName;
         }
 
         //

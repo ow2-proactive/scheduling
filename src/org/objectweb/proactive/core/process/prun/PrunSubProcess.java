@@ -78,12 +78,12 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     //  public final static String DEFAULT_QJOBPATH = DEFAULT_PBSPATH +
     //       FILE_SEPARATOR + "qjobs";
-    public static final String DEFAULT_QUEUE_NAME = "normal";
+   // public static final String DEFAULT_QUEUE_NAME = "normal";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     protected int jobID;
-    protected String queueName = DEFAULT_QUEUE_NAME;
+    protected String queueName;
     protected String hostList;
 
     //  protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
@@ -358,6 +358,11 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
         if (outputFile != null) {
             prunCommand.append("-o " + outputFile + " ");
+        }
+        
+        if (queueName != null) {
+        	
+          prunCommand.append("-q " + queueName + " ") ;	
         }
 
         prunCommand.append(commandAndOptions[0] + " " + hosts + " " +

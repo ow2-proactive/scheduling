@@ -1,13 +1,11 @@
-/*
- * Created on Oct 20, 2003
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package modelisation;
 
-import modelisation.mixed.Bench;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Vector;
 
+import modelisation.mixed.Bench;
 import modelisation.util.NodeControler;
 
 import org.objectweb.proactive.ProActive;
@@ -17,19 +15,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 
-import java.util.Vector;
-
-
-/**
- * @author fabrice
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 public class ModelisationBench {
     protected static Node StartNode;
     protected static NodeControler auto;
@@ -44,7 +30,6 @@ public class ModelisationBench {
 
     public static void stop() {
         System.out.println("Bench: stoping......");
-        // Bench.auto.killAllProcess();
         ModelisationBench.killAll();
 		System.out.println("Bench: stoping...... done");
     }

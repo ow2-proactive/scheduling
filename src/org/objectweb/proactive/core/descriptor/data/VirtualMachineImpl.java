@@ -56,6 +56,9 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
     /** the acquisition method to use to find the VirtualMachine once created */
     private String acquisitionMethod;
 
+    /** the port number used during the acquisition */
+    private String portNumber;
+    
     /** the process to start in order to create the JVM */
     private transient ExternalProcess process;
 
@@ -104,6 +107,15 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
         return acquisitionMethod;
     }
 
+    
+    public void setPortNumber(String s) {
+    	portNumber = s;
+    }
+    
+    public String getPortNumber() {
+    	return portNumber;
+    }
+    
     public void setProcess(ExternalProcess p) {
         process = p;
     }

@@ -2,6 +2,7 @@ package modelisation.multiqueueserver;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.ext.util.SimpleLocationServer;
 
@@ -38,7 +39,7 @@ public class MultiQueueServer extends SimpleLocationServer implements org.object
                       CompositeQueueMetaObjectFactory.newInstance());
       else
         server = (MultiQueueServer) ProActive.newActive(MultiQueueServer.class.getName(), arg, 
-                      null, null, CompositeQueueMetaObjectFactory.newInstance());
+                     (Node)  null, null, CompositeQueueMetaObjectFactory.newInstance());
     } catch (Exception e) {
       e.printStackTrace();
     }

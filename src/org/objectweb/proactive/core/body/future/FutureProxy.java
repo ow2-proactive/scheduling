@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.event.FutureEvent;
 /**
  * This proxy class manages the semantic of future objects
  *
- * @author Julien Vayssière - INRIA
+ * @author Julien Vayssi?re - INRIA
  * @see org.objectweb.proactive.core.mop.Proxy
  *
  */
@@ -342,15 +342,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	public Object reify(MethodCall c) throws InvocationTargetException {
 		Object result = null;
 		//stem.out.println("FutureProxy: c.getName() = " +c.getName());
-		if ((c.getName()).equals("equals") || (c.getName()).equals("hashCode")) {
-			//System.out.println("FutureProxy: now executing " + c.getName());
-			try {
-				result = c.execute(this);
-			} catch (MethodCallExecutionFailedException e) {
-				throw new ProActiveRuntimeException("FutureProxy: Illegal arguments in call " + c.getName());
-			}
-			return result;
-		}
+//		if ((c.getName()).equals("equals") || (c.getName()).equals("hashCode")) {
+//			//System.out.println("FutureProxy: now executing " + c.getName());
+//			try {
+//				result = c.execute(this);
+//			} catch (MethodCallExecutionFailedException e) {
+//				throw new ProActiveRuntimeException("FutureProxy: Illegal arguments in call " + c.getName());
+//			}
+//			return result;
+//		}
 		waitFor();
 	
 		// Now that the object is available, execute the call

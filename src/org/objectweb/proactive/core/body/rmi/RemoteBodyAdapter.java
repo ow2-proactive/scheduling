@@ -134,7 +134,6 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
      */
     public static UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
-
         // Try if URL is the address of a RemoteBody
         try {
             o = java.rmi.Naming.lookup(url);

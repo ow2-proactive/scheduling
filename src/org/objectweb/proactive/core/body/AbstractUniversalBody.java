@@ -139,7 +139,7 @@ public abstract class AbstractUniversalBody implements UniversalBody, java.io.Se
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     in.defaultReadObject();
     if (bodyID == null) {
-      // it may append that the bodyID is set to null before serialization if we want to
+      // it may happen that the bodyID is set to null before serialization if we want to
       // create a copy of the Body that is distinct from the original
       bodyID = new UniqueID();
     }

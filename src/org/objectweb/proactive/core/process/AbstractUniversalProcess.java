@@ -107,6 +107,9 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
   public void startProcess() throws java.io.IOException {
     checkStarted();
     isStarted = true;
+    if (logger.isDebugEnabled()) {
+    logger.debug(getCommand());
+    }
     internalStartProcess(getCommand());
   }
 

@@ -35,6 +35,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
@@ -42,6 +43,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.Type;
 
 public class ASMBytecodeStubBuilder implements Constants {
+	
+	protected static Logger logger = Logger.getLogger(ASMBytecodeStubBuilder.class.getName());
+	
 	// Those fields contain information about the class
 	// for which we are building a wrapper
 	protected Class cl;
@@ -69,11 +73,17 @@ public class ASMBytecodeStubBuilder implements Constants {
 		// Obtains the object that represents the type we want to create
 		// a wrapper class for. This call may fail with a ClassNotFoundException
 		// if the class corresponding to this type cannot be found.
+		logger.debug("ASMBytecodeStubBuilder.init<> classname " + classname);
+		try {
 		this.cl = Class.forName(classname);
-
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		logger.debug("ASMBytecodeStubBuilder.init<> 1");
 		// Keep this info at hand for performance purpose
 		this.className = classname;
-
+		logger.debug("ASMBytecodeStubBuilder.init<> 2");
 		// Fills in all the infos about this class
 		this.setInfos();
 	}
@@ -706,6 +716,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 	 */
 
 	protected void setInfos() {
+		logger.debug("ASMByteCodeStubBuilder.setInfos()");
 		// This hashtable is used for keeping track of the method signatures
 		// we have already met while going up the inheritance branch
 		java.util.Hashtable temp = new java.util.Hashtable();
@@ -722,6 +733,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 
 		// If the target type is an interface, the only thing we have to do is to
 		// get the list of all its public methods.
+		logger.debug("ASMByteCodeStubBuilder.setInfos() 1");
 		if (this.cl.isInterface()) {
 			Method[] allPublicMethods = this.cl.getMethods();
 			for (int i = 0; i < allPublicMethods.length; i++) {
@@ -732,6 +744,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 			do // Loops from the current class up to java.lang.Object
 				{
 				// The declared methods for the current class
+				logger.debug("ASMByteCodeStubBuilder.setInfos() 2");
 				Method[] declaredMethods = currentClass.getDeclaredMethods();
 
 				// For each method declared in this class
@@ -745,7 +758,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 					for (int k = 0; k < params.length; k++) {
 						key = key + params[k].getName();
 					}
-
+					logger.debug("ASMByteCodeStubBuilder.setInfos() 3");
 					// Tests if we already have met this method in a subclass
 					exists = temp.get(key);
 					if (exists == null) {

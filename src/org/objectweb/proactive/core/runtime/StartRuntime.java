@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.runtime;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
@@ -62,6 +61,7 @@ public class StartRuntime {
     protected String acquisitionMethod;
     protected String nodeNumber;
     protected int nodenumber; //it is only the int value of nodeNumber
+ //   protected int portNumber;
 
     protected StartRuntime() {
     }
@@ -73,21 +73,28 @@ public class StartRuntime {
         this.DefaultRuntimeURL = args[1];
         this.acquisitionMethod = args[2];
         this.nodeNumber = args[3];
+     //   this.portNumber = Integer.parseInt(args[4]);
         this.nodenumber = (new Integer(nodeNumber)).intValue();
     }
 
     public static void main(String[] args) {
         if (args.length < 3) {
             logger.error(
-                "Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod>");
+                "Usage: java org.objectweb.proactive.core.runtime.StartRuntime <nodeURL> <DefaultRuntimeURL> <acquisitionMethod> <portNumber>");
             System.exit(1);
         }
         ProActiveConfiguration.load();
         System.out.println("StartRunTime.main() " + args[0] + " " + args[1] +
-            " " + args[2]);
+            " " + args[2] + " " + args[3]);
         try {
             logger.info("**** Starting jvm on " +
                 java.net.InetAddress.getLocalHost().getHostName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("**** Starting jvm with classpath " +
+                    System.getProperty("java.class.path"));
+                logger.debug("****              with bootclasspath " +
+                    System.getProperty("sun.boot.class.path"));
+            }
         } catch (java.net.UnknownHostException e) {
             e.printStackTrace();
         }
@@ -102,6 +109,7 @@ public class StartRuntime {
     private void run() {
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
+           // System.out.println(proActiveRuntime.getClass().getName());
             for (int i = 1; i <= nodenumber; i++) {
                 proActiveRuntime.createLocalNode(nodeURL +
                     Integer.toString(

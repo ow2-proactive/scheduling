@@ -1,34 +1,36 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.mop;
+
+import org.apache.log4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,13 +40,10 @@ import java.net.URLClassLoader;
 
 import java.util.Hashtable;
 
-import org.apache.log4j.Logger;
-
 
 public class MOPClassLoader extends URLClassLoader {
-	
-	static Logger logger = Logger.getLogger(MOPClassLoader.class.getName());
-	
+    static Logger logger = Logger.getLogger(MOPClassLoader.class.getName());
+
     // retreives the optionnal byteCodeManipulator JVM arg
     // ASM is used by default
     public static String BYTE_CODE_MANIPULATOR = ((System.getProperty(
@@ -64,9 +63,9 @@ public class MOPClassLoader extends URLClassLoader {
     //    }
 
     /**
-    * Return the unique MOPClassLoader for the current JVM
-    * Create it if it does not exist
-    */
+     * Return the unique MOPClassLoader for the current JVM
+     * Create it if it does not exist
+     */
     public static synchronized MOPClassLoader getMOPClassLoader() {
         if (MOPClassLoader.mopCl == null) {
             MOPClassLoader.mopCl = MOPClassLoader.createMOPClassLoader();
@@ -75,10 +74,10 @@ public class MOPClassLoader extends URLClassLoader {
     }
 
     /**
-     * Get the bytecode of a stub given its name. If the stub can not be found 
+     * Get the bytecode of a stub given its name. If the stub can not be found
      * the cache, the MOPClassLoader tries to generate it.
      * @param classname The name of the stub class
-     * @return An array representing the bytecode of the stub, null if the 
+     * @return An array representing the bytecode of the stub, null if the
      *  stub could not be found or created
      */
     public byte[] getClassData(String classname) {
@@ -94,6 +93,7 @@ public class MOPClassLoader extends URLClassLoader {
             }
             cb = (byte[]) classDataCache.get(classname);
         }
+
         //return (byte[]) classDataCache.get(classname);
         return cb;
     }
@@ -117,15 +117,15 @@ public class MOPClassLoader extends URLClassLoader {
 
             Object[] mainArgs = { newArgs };
             mainMethod.invoke(null, mainArgs);
-		} catch (ClassNotFoundException e) {
-			logger.error("Launcher: cannot find class " + args[0]);
-		} catch (NoSuchMethodException e) {
-			logger.error(
-				"Launcher: class " + args[0] + " does not contain have method void 'public void main (String[])'");
-		} catch (InvocationTargetException e) {
-			throw e.getTargetException();
-		}
-		return ;
+        } catch (ClassNotFoundException e) {
+            logger.error("Launcher: cannot find class " + args[0]);
+        } catch (NoSuchMethodException e) {
+            logger.error("Launcher: class " + args[0] +
+                " does not contain have method void 'public void main (String[])'");
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
+        }
+        return;
     }
 
     protected static MOPClassLoader createMOPClassLoader() {
@@ -139,21 +139,20 @@ public class MOPClassLoader extends URLClassLoader {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        URL[] urls = null;
 
         // Checks if the current classloader is actually an instance of
         // java.net.URLClassLoader, or of one of its subclasses.
         if (currentClassLoader instanceof java.net.URLClassLoader) {
-            //      System.out.println ("Current classloader is of type "+currentClassLoader.getClass().getName()+", compatible with URLClassLoader");
+            // Retrieves the set of URLs from the current classloader
+            urls = ((URLClassLoader) currentClassLoader).getURLs();
         } else {
-            System.out.println("Current classloader is of type " +
-                currentClassLoader.getClass().getName() +
-                ", which is not compatible with URLClassLoader. Cannot install MOPClassLoader");
-
-            return null;
+            urls = new URL[0];
+            //     System.out.println("Current classloader is of type " +
+            //      currentClassLoader.getClass().getName() +
+            //    ", which is not compatible with URLClassLoader. Cannot install MOPClassLoader");
+            //   return null;
         }
-
-        // Retrieves the set of URLs from the current classloader
-        URL[] urls = ((URLClassLoader) currentClassLoader).getURLs();
 
         // Creates a new MOPClassLoader
         return new MOPClassLoader(currentClassLoader, urls);
@@ -191,29 +190,30 @@ public class MOPClassLoader extends URLClassLoader {
         } catch (ClassNotFoundException e) {
             // Test if the name of the class is actually a request for
             // a stub class to be created
-			if (Utils.isStubClassName(name)) {
-				logger.info("Generating class: " + name);
+            if (Utils.isStubClassName(name)) {
+                logger.info("Generating class : " + name);
 
-				String classname = Utils.convertStubClassNameToClassName(name);
-				//ASM is now the default bytecode manipulator
-				byte[] data = null;
-				if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
-					ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-					long start_time = System.currentTimeMillis();
-					data = bsb.create();
-					MOPClassLoader.classDataCache.put(name, data);
-				} else if (BYTE_CODE_MANIPULATOR.equals("BCEL")) {
-					BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
-					long start_time = System.currentTimeMillis();
-					data = bsb.create();
-					MOPClassLoader.classDataCache.put(name, data);
-				} else {
-					// that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
-					logger.error(
-						"byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
-					logger.error(
-						"Any other setting will result in the use of ASM, the default bytecode manipulator framework");
-				}
+                String classname = Utils.convertStubClassNameToClassName(name);
+
+                //ASM is now the default bytecode manipulator
+                byte[] data = null;
+                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
+                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
+                    long start_time = System.currentTimeMillis();
+                    data = bsb.create();
+                    MOPClassLoader.classDataCache.put(name, data);
+                } else if (BYTE_CODE_MANIPULATOR.equals("BCEL")) {
+                    BytecodeStubBuilder bsb = new BytecodeStubBuilder(classname);
+                    long start_time = System.currentTimeMillis();
+                    data = bsb.create();
+                    MOPClassLoader.classDataCache.put(name, data);
+                } else {
+                    // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
+                    logger.error(
+                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
+                    logger.error(
+                        "Any other setting will result in the use of ASM, the default bytecode manipulator framework");
+                }
 
                 // System.out.println ("Classfile created with length "+data.length);
                 // Now, try to define the class
@@ -245,7 +245,15 @@ public class MOPClassLoader extends URLClassLoader {
                     effectiveArguments[3] = new Integer(data.length);
                     effectiveArguments[4] = this.getClass().getProtectionDomain();
 
-                    return (Class) m.invoke(this.getParent(), effectiveArguments);
+                    //   System.out.println("");
+                    if (this.getParent() == null) {
+                        return (Class) m.invoke(Thread.currentThread()
+                                                      .getContextClassLoader(),
+                            effectiveArguments);
+                    } else {
+                        return (Class) m.invoke(this.getParent(),
+                            effectiveArguments);
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     throw new ClassNotFoundException(ex.getMessage());
@@ -257,6 +265,8 @@ public class MOPClassLoader extends URLClassLoader {
         }
     }
 }
+
+
 //=======
 //	
 //	static Logger logger = Logger.getLogger(MOPClassLoader.class.getName());
