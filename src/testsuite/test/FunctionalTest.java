@@ -144,7 +144,6 @@ public abstract class FunctionalTest extends AbstractTest
             }
         } catch (AssertionFailedException e) {
         	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
         	failed=true;
         	logger.warn(this.getName() + ": [FAILED]");
         	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
@@ -168,7 +167,6 @@ public abstract class FunctionalTest extends AbstractTest
             return null;
         } catch (AssertionFailedException e) {
         	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
         	failed=true;
         	logger.warn(this.getName() + ": [FAILED]");
         	return new TestResult(this, TestResult.ERROR, "An assertion failed", e);
@@ -203,7 +201,6 @@ public abstract class FunctionalTest extends AbstractTest
 	    	}
         } catch (AssertionFailedException e) {
         	logger.error("Failed assertion" + e);
-        	e.printStackTrace();
         	failed=true;
         	logger.warn(this.getName() + ": [FAILED]");
             return new TestResult(this, TestResult.ERROR, "An assertion failed in postconditions", e);
