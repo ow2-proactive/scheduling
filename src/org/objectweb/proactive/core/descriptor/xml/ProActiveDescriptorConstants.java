@@ -63,6 +63,8 @@ public interface ProActiveDescriptorConstants {
     public static final String SERVICE_DEFINITION_TAG = "serviceDefinition";
     public static final String JVM_PROCESS_TAG = "jvmProcess";
     public static final String RSH_PROCESS_TAG = "rshProcess";
+    public static final String PROCESS_LIST_TAG = "processList";
+    public static final String PROCESS_LIST_BYHOST_TAG = "processListbyHost";
     public static final String MAPRSH_PROCESS_TAG = "maprshProcess";
     public static final String SSH_PROCESS_TAG = "sshProcess";
     public static final String RLOGIN_PROCESS_TAG = "rloginProcess";

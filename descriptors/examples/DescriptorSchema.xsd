@@ -56,6 +56,16 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:field xpath="@refid"/>
 			<!-- This section references the serviceid key reference defined above to ensure that the refid attribute defined in deployment/jvms/jvm/acquisition/ has a correponding value in infrastructure/services/serviceDefinition@id-->
 		</xs:keyref>
+		<xs:keyref name="processListReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/processList/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/processList/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
+		<xs:keyref name="processListbyHostReferenceid" refer="processid">
+			<xs:selector xpath="infrastructure/processes/processDefinition/processListbyHost/processReference"/>
+			<xs:field xpath="@refid"/>
+			<!--This section references the processid key defined above to ensure that the refid attribute defined in  processes/processDefinition/processListbyHost/processReference has a corresponding value in infrastructure/processes/processDefinition@id-->
+		</xs:keyref>
 		<xs:keyref name="rshprocessReferenceid" refer="processid">
 			<xs:selector xpath="infrastructure/processes/processDefinition/rshProcess/processReference"/>
 			<xs:field xpath="@refid"/>
@@ -147,7 +157,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--PatternType is defined as a global element, hence it can be referenced in many part of the document.-->
 	<xs:simpleType name="PatternType">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="((\s)*[\[](\s)*[0-9]+(\s)*[-](\s)*([0-9])+(\s)*([\]](\s)*|[,](\s)*[0-9](\s)*[\]](\s)*))((\s)*|(\s)*[\^](\s)*[\[](\s)*([0-9]+(\s)*[,]*(\s)*)+[\]](\s)*)"/>
+			<xs:pattern value="((\s)*[\[](\s)*[0-9]+(\s)*[\-](\s)*([0-9])+(\s)*([\]](\s)*|[;](\s)*[0-9](\s)*[\]](\s)*))((\s)*|(\s)*[\^](\s)*[\[](\s)*([0-9]+(\s)*[,]*(\s)*)+[\]](\s)*)"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
@@ -434,12 +444,11 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:choice>
 			<xs:element name="jvmProcess" type="JvmProcessType"/>
 			<xs:element name="rshProcess" type="RshProcessType"/>
-			<xs:element name="rshProcessList" type="RshProcessListType"/>
 			<xs:element name="maprshProcess" type="MapRshProcessType"/>
 			<xs:element name="sshProcess" type="SshProcessType"/>
-			<xs:element name="sshProcessList" type="SshProcessListType"/>
+			<xs:element name="processList" type="ProcessListType"/>
+			<xs:element name="processListbyHost" type="ProcessListbyHostType"/>
 			<xs:element name="rloginProcess" type="RloginProcessType"/>
-			<xs:element name="rloginProcessList" type="RloginProcessListType"/>
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="pbsProcess" type="PbsProcessType"/>
 			<xs:element name="oarProcess" type="oarProcessType"/>
@@ -521,8 +530,9 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-<!-- Same as RshProcess Type, except that no hostname is specified, instead, fixedName must be supplied followed by a list, and domain. This gives the ability to define in a single process a list of machines that starts with the same name-->	
-	<xs:complexType name="RshProcessListType">
+	<!-- The ProcessListType represents a list of ssh, rsh or rlogin processes, they are defined by the class attributes that identifies wich process is included in the list
+by fixedName that is the fixed part of hostnames, list that represents the sequence of number, padding and domain-->
+	<xs:complexType name="ProcessListType">
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
@@ -531,15 +541,38 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="class" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHJVMProcess"/>
-					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcess"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcessList"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcessList"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RLoginProcessList"/>
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
 		<xs:attribute name="fixedName" type="xs:string" use="required"/>
 		<xs:attribute name="list" type="PatternType" use="required"/>
+		<xs:attribute name="padding" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="domain" type="xs:string" use="required"/>
-		<xs:attribute name="username" type="xs:string" use="optional"/>	
+		<xs:attribute name="username" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<!-- The ProcessListbyHostType represents a list of ssh, rsh or rlogin processes, they are defined by the class attributes that identifies wich process is included in the list
+by hostlist which is a list of hostname and domain if all the host specified are in the same domain-->
+	<xs:complexType name="ProcessListbyHostType">
+		<xs:sequence>
+			<xs:element ref="environment" minOccurs="0"/>
+			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcessList"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RSHProcessList"/>
+					<xs:enumeration value="org.objectweb.proactive.core.process.rsh.RLoginProcessList"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="hostlist" type="ListType" use="required"/>
+		<xs:attribute name="domain" type="xs:string" use="optional"/>
+		<xs:attribute name="username" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--maprshProcess element has two child: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id). Most of time  the referenced process will be a jvmProcess, it means once logged on a remote hosts with rsh protocol a jvm will be created on the remote host.This element has also  a scriptPath child which represents the location of the script oasis-exp.sh and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.rsh.maprsh.MapRSHProcess,  netgroup which is required and represents  group of remote hosts to log on with rsh. and parallelize which is optional and represents the parallelization degree -->
 	<xs:complexType name="MapRshProcessType">
@@ -576,26 +609,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="username" type="xs:string" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
-<!-- Same as SshProcess Type, except that no hostname is specified, instead, fixedName must be supplied followed by a list, and domain. This gives the ability to define in a single process a list of machines that starts with the same name-->	
-	<xs:complexType name="SshProcessListType">
-		<xs:sequence>
-			<xs:element ref="environment" minOccurs="0"/>
-			<xs:element ref="processReference"/>
-			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
-		<xs:attribute name="class" use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHJVMProcess"/>
-					<xs:enumeration value="org.objectweb.proactive.core.process.ssh.SSHProcess"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
-		<xs:attribute name="fixedName" type="xs:string" use="required"/>
-		<xs:attribute name="list" type="PatternType" use="required"/>
-		<xs:attribute name="domain" type="xs:string" use="required"/>
-		<xs:attribute name="username" type="xs:string" use="optional"/>	
-	</xs:complexType>
+
 	<!--rloginProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id) and environment element that may not appear and two attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.RLoginProcess, and hostname which is required and represents the remote host to log on with rlogin-->
 	<xs:complexType name="RloginProcessType">
 		<xs:sequence>
@@ -604,20 +618,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess"/>
-		<xs:attribute name="hostname" type="xs:string" use="required"/>
-	</xs:complexType>
-<!-- Same as RloginProcess Type, except that no hostname is specified, instead, fixedName must be supplied followed by a list, and domain. This gives the ability to define in a single process a list of machines that starts with the same name-->		
-	<xs:complexType name="RloginProcessListType">
-		<xs:sequence>
-			<xs:element ref="environment" minOccurs="0"/>
-			<xs:element ref="processReference"/>
-			<xs:element ref="commandPath" minOccurs="0"/>
-		</xs:sequence>
-		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess"/>
-		<xs:attribute name="fixedName" type="xs:string" use="required"/>
-		<xs:attribute name="list" type="PatternType" use="required"/>
-		<xs:attribute name="domain" type="xs:string" use="required"/>
-		<xs:attribute name="username" type="xs:string" use="optional"/>	
+		<xs:attribute name="hostname" type="xs:string" use="required" />
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
 	<xs:complexType name="BsubProcessType">

@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.process.AbstractListProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
@@ -49,6 +50,7 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
 import org.xml.sax.SAXException;
 
 
@@ -83,6 +85,9 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new GridEngineProcessHandler(proActiveDescriptor));
         this.addHandler(OAR_PROCESS_TAG,
             new OARProcessHandler(proActiveDescriptor));
+        ProcessListHandler handler = new ProcessListHandler(proActiveDescriptor);
+        this.addHandler(PROCESS_LIST_TAG, handler);
+        this.addHandler(PROCESS_LIST_BYHOST_TAG, handler);
     }
 
     /**
@@ -91,7 +96,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
     }
-    
+
     /**
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
@@ -239,6 +244,49 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
     }
 
+    public class ProcessListHandler extends ProcessHandler
+        implements ProActiveDescriptorConstants {
+        public ProcessListHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            int padding = 0;
+            String className = attributes.getValue("class");
+            if (!checkNonEmpty(className)) {
+                throw new org.xml.sax.SAXException(
+                    "Process defined without specifying the class");
+            }
+            try {
+                targetProcess = proActiveDescriptor.createProcess(id, className);
+            } catch (ProActiveException e) {
+                //e.printStackTrace();
+                throw new org.xml.sax.SAXException(e.getMessage());
+            }
+            String fixedName = attributes.getValue("fixedName");
+            String list = attributes.getValue("list");
+            String domain = attributes.getValue("domain");
+            String spadding = attributes.getValue("padding");
+            String hostlist = attributes.getValue("hostlist");
+            if (checkNonEmpty(spadding)) {
+                padding = Integer.parseInt(spadding);
+            }
+            if (checkNonEmpty(fixedName) && checkNonEmpty(list) &&
+                    checkNonEmpty(domain)) {
+                ((AbstractListProcessDecorator) targetProcess).setHostConfig(fixedName,
+                    list, domain, padding);
+            }
+            if (checkNonEmpty(hostlist)) {
+                ((AbstractListProcessDecorator) targetProcess).setHostList(hostlist,domain);                                                                
+            }
+            String username = attributes.getValue("username");
+            if (checkNonEmpty(username)) {
+                targetProcess.setUsername(username);
+            }
+        }
+    }
+
     //end of inner class ProcessHandler
     protected class PrunProcessHandler extends ProcessHandler {
         public PrunProcessHandler(ProActiveDescriptor proActiveDescriptor) {
@@ -266,7 +314,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler pathHandler = new PathHandler();
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
                 this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
-                this.addHandler(PROCESSOR_PER_NODE_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESSOR_PER_NODE_TAG,
+                    new SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
@@ -328,7 +377,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 UnmarshallerHandler pathHandler = new PathHandler();
                 this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
                 this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
-                this.addHandler(PROCESSOR_PER_NODE_TAG, new SingleValueUnmarshaller());
+                this.addHandler(PROCESSOR_PER_NODE_TAG,
+                    new SingleValueUnmarshaller());
                 this.addHandler(BOOKING_DURATION_TAG,
                     new SingleValueUnmarshaller());
                 this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
@@ -368,7 +418,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
     protected class GridEngineProcessHandler extends ProcessHandler {
         public GridEngineProcessHandler(ProActiveDescriptor proActiveDescriptor) {
             super(proActiveDescriptor);
-            this.addHandler(GRID_ENGINE_OPTIONS_TAG, new GridEngineOptionHandler());
+            this.addHandler(GRID_ENGINE_OPTIONS_TAG,
+                new GridEngineOptionHandler());
         }
 
         public void startContextElement(String name, Attributes attributes)
