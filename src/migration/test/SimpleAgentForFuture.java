@@ -16,16 +16,17 @@ public class SimpleAgentForFuture implements org.objectweb.proactive.RunActive, 
 
 
   public void runActivity(org.objectweb.proactive.Body b) {
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
     System.out.println("SimpleAgentForFuture: Now calling custom live");
     //first we wait to allow the caller to migrate with its futures
-    b.getRequestQueue().blockingRemoveOldest("go");
+    service.blockingRemoveOldest("go");
     System.out.println("SimpleAgentForFuture: Now in service");
     try {
       Thread.sleep(2000);
     } catch (Exception e) {
       e.printStackTrace();
     }
-    b.fifoPolicy();
+    service.fifoServing();
   }
 
 

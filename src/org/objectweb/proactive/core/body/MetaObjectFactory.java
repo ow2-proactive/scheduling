@@ -31,10 +31,10 @@
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestQueueFactory;
+import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
 /**

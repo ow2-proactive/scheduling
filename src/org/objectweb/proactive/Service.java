@@ -103,6 +103,48 @@ public class Service {
   //
 
 
+  /**
+   * Serves the request given in parameter
+   * @param request the request to be served
+   */
+  public String toString() {
+    return "Service\n  Body="+body.toString()+"\n  RequestQueue="+requestQueue.toString();
+  }
+
+
+  /**
+   * Serves the request given in parameter
+   * @param request the request to be served
+   */
+  public void serve(Request request) {
+    body.serve(request);
+  }
+
+
+  /**
+   * Invoke the default FIFO policy to pick up the requests from the request queue.
+   * This does not return until the body terminate, as the active thread enters in
+   * an infinite loop for processing the request in the FIFO order.
+   */
+  public void fifoServing() {
+    while (body.isActive()) {
+      blockingServeOldest();
+    }
+  }
+
+
+  /**
+   * Invoke the LIFO  policy to pick up the requests from the request queue.
+   * This does not return until the body terminate, as the active thread enters in
+   * an infinite loop for processing the request in the LIFO order.
+   */
+  public void lifoServing() {
+    while (body.isActive()) {
+      blockingServeYoungest();
+    }
+  }
+
+
   // -- Serve Oldest ---------------------------------------------------
 
   /**
@@ -400,9 +442,10 @@ public class Service {
   }
   
 
-
+  //
   // -- getOldests ---------------------------------------------------
-
+  //
+  
   /**
    * Returns the oldest request from the queue or null if the queue is empty
    * The request queue is unchanged by this call
@@ -436,8 +479,26 @@ public class Service {
 
 
 
-  // -- getYoungests ---------------------------------------------------
+  /**
+   * Returns the oldest request from the queue
+   * If no request is available the method block until one request can be returned
+   * The request queue is unchanged by this call
+   * @return the oldest request or null
+   */
+  public Request blockingGetOldest() {
+    Request request = null;
+    while (request == null && ! requestQueue.isDestroyed()) {
+      waitForRequest();
+      request = requestQueue.getOldest();
+    }
+    return request;
+  }
 
+
+  //
+  // -- getYoungests ---------------------------------------------------
+  //
+  
   /**
    * Returns the youngest request from the queue or null if the queue is empty
    * The request queue is unchanged by this call
@@ -470,7 +531,121 @@ public class Service {
   }
 
 
+  /**
+   * Returns the oldest request from the queue
+   * If no request is available the method block until one request can be returned
+   * The request queue is unchanged by this call
+   * @return the oldest request or null
+   */
+  public Request blockingGetYoungest() {
+    Request request = null;
+    while (request == null && ! requestQueue.isDestroyed()) {
+      waitForRequest();
+      request = requestQueue.getYoungest();
+    }
+    return request;
+  }
 
+
+
+  //
+  // -- blockingRemoveOldests ---------------------------------------------------
+  //
+  
+
+  /**
+   * Blocks the calling thread until there is a request that can be accepted
+   * be the given RequestFilter.
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @param requestFilter the request filter that select the request to be returned
+   * @return the oldest request found in the queue that is accepted by the filter.
+   */
+  public Request blockingRemoveOldest(RequestFilter requestFilter) {
+    return requestQueue.blockingRemoveOldest(requestFilter);
+  }
+
+  /**
+   * Blocks the calling thread until there is a request of name methodName
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @param methodName the name of the method to wait for
+   * @return the oldest request of name methodName found in the queue.
+   */
+  public Request blockingRemoveOldest(String methodName) {
+    return requestQueue.blockingRemoveOldest(methodName);
+  }
+
+  /**
+   * Blocks the calling thread until there is a request available
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @return the oldest request found in the queue.
+   */
+  public Request blockingRemoveOldest() {
+    return requestQueue.blockingRemoveOldest();
+  }
+
+  /**
+   * Blocks the calling thread until there is a request available but try 
+   * to limit the time the thread is blocked to timeout.
+   * Returns immediately if there is already one. The request returned is non 
+   * null if a request has been found during the given time.
+   * @return the oldest request found in the queue or null.
+   */
+  public Request blockingRemoveOldest(long timeout) {
+    return requestQueue.blockingRemoveOldest(timeout);
+  }
+
+
+
+  //
+  // -- blockingRemoveYoungests ---------------------------------------------------
+  //
+
+  /**
+   * Blocks the calling thread until there is a request that can be accepted
+   * be the given RequestFilter.
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @param requestFilter the request filter that select the request to be returned
+   * @return the youngest request found in the queue that is accepted by the filter.
+   */
+  public Request blockingRemoveYoungest(RequestFilter requestFilter) {
+    return requestQueue.blockingRemoveYoungest(requestFilter);
+  }
+
+  /**
+   * Blocks the calling thread until there is a request of name methodName
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @param methodName the name of the method to wait for
+   * @return the youngest request of name methodName found in the queue.
+   */
+  public Request blockingRemoveYoungest(String methodName) {
+    return requestQueue.blockingRemoveYoungest(methodName);
+  }
+
+  /**
+   * Blocks the calling thread until there is a request available
+   * Returns immediately if there is already one. The request returned is non 
+   * null unless the thread has been asked not to wait anymore.
+   * @return the youngest request found in the queue.
+   */
+  public Request blockingRemoveYoungest() {
+    return requestQueue.blockingRemoveYoungest();
+  }
+
+  /**
+   * Blocks the calling thread until there is a request available but try 
+   * to limit the time the thread is blocked to timeout.
+   * Returns immediately if there is already one. The request returned is non 
+   * null if a request has been found during the given time.
+   * @return the youngest request found in the queue or null.
+   */
+  public Request blockingRemoveYoungest(long timeout) {
+    return requestQueue.blockingRemoveYoungest(timeout);
+  }
 
 
   //

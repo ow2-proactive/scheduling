@@ -55,7 +55,8 @@ public class TalkativeAgent implements org.objectweb.proactive.RunActive, Serial
 
 
   public void runActivity(org.objectweb.proactive.Body b) {
-    b.fifoPolicy();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
+    service.fifoServing();
   }
 
   // public void live (ExplicitBody b)

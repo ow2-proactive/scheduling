@@ -77,7 +77,7 @@ public class AgentForFuture implements Serializable {
    * Request its body futurePool and create an empty future list
    */
   public void createFutureList() {
-    org.objectweb.proactive.core.body.BodyImpl b = (org.objectweb.proactive.core.body.BodyImpl) ProActive.getBodyOnThis();
+    org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) ProActive.getBodyOnThis();
     FuturePool futurePool = b.getFuturePool();
     this.futureList = new FutureList(futurePool);
   }

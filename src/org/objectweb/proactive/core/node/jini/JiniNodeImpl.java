@@ -42,7 +42,7 @@ import net.jini.lease.LeaseRenewalEvent;
 import net.jini.lookup.entry.Name;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.mop.ConstructorCall;
@@ -116,7 +116,7 @@ public class JiniNodeImpl
   }
 
   public UniqueID[] getActiveObjectIDs() {
-    BodyMap knownBodies = AbstractBody.getLocalBodies();
+    BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
     UniqueID[] uniqueIDs = new UniqueID[knownBodies.size()];
     int i = 0;
     java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();

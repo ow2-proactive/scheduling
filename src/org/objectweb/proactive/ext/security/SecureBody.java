@@ -38,7 +38,7 @@ import java.security.PublicKey;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
@@ -61,7 +61,7 @@ import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
  *@author     Arnaud Contes
  *<br>created    27 juillet 2001
  */
-public class SecureBody extends BodyImpl implements SessionsManagerInt {
+public class SecureBody extends ActiveBody implements SessionsManagerInt {
   /*
    * implements SecureBodyInterface
    */

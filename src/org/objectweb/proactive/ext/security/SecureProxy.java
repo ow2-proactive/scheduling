@@ -138,7 +138,9 @@ public class SecureProxy extends UniversalBodyProxy {
 	  if (isLocal) {
 	  
 	    System.out.println("SecureProxy : SecureLocalBodyProxy : sendRequest  " + methodCall.getName() + " to local");
-	    sourceBody.sendRequest(methodCall, future, universalBody, secureRequestFactory);
+      //sourceBody.sendRequest(methodCall, future, universalBody, secureRequestFactory);
+      // ::TODO:: find a proper solution to pass to the body the data needed to encrypt
+      sourceBody.sendRequest(methodCall, future, universalBody);
 	    
 	  } else {
 	  
@@ -171,7 +173,9 @@ public class SecureProxy extends UniversalBodyProxy {
 	  	  System.out.println("key negociated");
 	    }
 
-	    sourceBody.sendRequest(methodCall, future, universalBody, secureRequestFactory);
+      //sourceBody.sendRequest(methodCall, future, universalBody, secureRequestFactory);
+      // ::TODO:: find a proper solution to pass to the body the data needed to encrypt
+      sourceBody.sendRequest(methodCall, future, universalBody);
 	  }
 	}
 

@@ -54,7 +54,7 @@ public class StreamReader implements XMLReader {
   
   public StreamReader(org.xml.sax.InputSource inputSource, XMLHandler xmlHandler) throws java.io.IOException {
     this.inputSource = inputSource;
-    DefaultHandlerAdaptor adaptor = new DefaultHandlerAdaptor(xmlHandler);
+    DefaultHandlerAdapter adaptor = new DefaultHandlerAdapter(xmlHandler);
     try {
     	javax.xml.parsers.SAXParserFactory factory = javax.xml.parsers.SAXParserFactory.newInstance();
     	parser = factory.newSAXParser().getXMLReader();

@@ -156,6 +156,11 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
+  protected void cancelMigration() {
+    isGhost = false;
+    repaint();
+  }
+  
   protected AbstractDataObject getAbstractDataObject() {
     return activeObject;
   }

@@ -84,7 +84,8 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive, 
    */
   public void runActivity(org.objectweb.proactive.Body body) {
     this.register();
-    body.fifoPolicy();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    service.fifoServing();
   }
 
 

@@ -60,6 +60,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
     shouldWait = false;
     notifyAll();
   }
+  
+  public synchronized boolean isDestroyed() {
+    return ! shouldWait;
+  }
 
   public synchronized void add(Request r) {
     super.add(r);

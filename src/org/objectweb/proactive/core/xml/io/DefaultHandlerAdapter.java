@@ -40,7 +40,7 @@ import java.io.IOException;
  * @version      0.91
  *
  */
-public class DefaultHandlerAdaptor extends org.xml.sax.helpers.DefaultHandler {
+public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
   
   protected XMLHandler targetHandler;
   
@@ -49,7 +49,7 @@ public class DefaultHandlerAdaptor extends org.xml.sax.helpers.DefaultHandler {
   // -- CONSTRUCTORS -----------------------------------------------
   //  
   
-  public DefaultHandlerAdaptor(XMLHandler targetHandler) {
+  public DefaultHandlerAdapter(XMLHandler targetHandler) {
     this.targetHandler = targetHandler;
   }
 

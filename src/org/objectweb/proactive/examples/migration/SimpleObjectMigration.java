@@ -27,7 +27,7 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.examples.migration;
 
 import org.objectweb.proactive.core.node.NodeException;
@@ -52,12 +52,11 @@ import java.io.Serializable;
  */
 public class SimpleObjectMigration implements Serializable {
 
-  private static final int SLEEP_TIME = 9000; 
+  private static final int SLEEP_TIME = 9000;
 
-  private String name;		// The name of the instance
+  private String name; // The name of the instance
   private String hi = " say hello from "; // The 'hello' sentence
-  
-  
+
   /**
    * Creates a new <code>SimpleObjectMigration</code> instance.
    *
@@ -66,7 +65,6 @@ public class SimpleObjectMigration implements Serializable {
     System.out.println("SimpleObjectMigration> Empty constructor");
   }
 
-
   /**
    * Creates a new <code>SimpleObjectMigration</code> instance.
    *
@@ -74,11 +72,9 @@ public class SimpleObjectMigration implements Serializable {
    of the instance
   */
   public SimpleObjectMigration(String name) {
-    System.out.println("SimpleObjectMigration> Constructor with a parameter : "
-		       + name);
+    System.out.println("SimpleObjectMigration> Constructor with a parameter : " + name);
     this.name = name;
   }
-
 
   /**
    * Describe <code>sayHello</code> method here.
@@ -94,12 +90,10 @@ public class SimpleObjectMigration implements Serializable {
       e.printStackTrace();
     }
     String sentence = name + hi + localhost;
-    System.out.println("SimpleObjectMigration> sayHello() --> "
-		       + sentence);
+    System.out.println("SimpleObjectMigration> sayHello() --> " + sentence);
     return sentence;
-  } 
+  }
 
-  
   /**
    * Describe <code>moveTo</code> method here.
    * This methods is used to migrate the instance
@@ -108,12 +102,10 @@ public class SimpleObjectMigration implements Serializable {
    */
   public void moveTo(String t) {
     try {
-      
-      System.out.println("SimpleObjectMigration> moveTo("+t+") " 
-			 + "% start migration");
+
+      System.out.println("SimpleObjectMigration> moveTo(" + t + ") " + "% start migration");
       ProActive.migrateTo(t);
-      System.out.println("SimpleObjectMigration> moveTo("+t+") "
-			 + "% stop migration");
+      System.out.println("SimpleObjectMigration> moveTo(" + t + ") " + "% stop migration");
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -133,212 +125,197 @@ public class SimpleObjectMigration implements Serializable {
    */
   public static void main(String[] args) {
     // The source node
-    String urlSourceNode = "";	
+    String urlSourceNode = "";
     Node sourceNode = null;
 
     // The destination node
-    String urlDestinationNode = ""; 
+    String urlDestinationNode = "";
     Node destinationNode = null;
-    
+
     // we need 2 args to migrate
     if (args.length == 2) {
       urlSourceNode = args[0];
       urlDestinationNode = args[1];
     } else {
-      System.out.println("USAGE   : java SimpleObjectMigration "
-			 + "urlSourceNode        urlDestinationNode ");
-      System.out.println("Example : java SimpleObjectMigration "
-			 + "rmi://host1/Mynode1  jini://host2/MyNode2 ");
+      System.out.println("USAGE   : java SimpleObjectMigration " + "urlSourceNode        urlDestinationNode ");
+      System.out.println("Example : java SimpleObjectMigration " + "rmi://host1/Mynode1  jini://host2/MyNode2 ");
       System.exit(1);
     }
- 
-    
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "We are going to try to migrate a simple object from "
-		       + urlSourceNode + " to "+urlDestinationNode); 
-    
+
+    System.out.println(
+      "SimpleObjectMigration> main() > "
+        + "We are going to try to migrate a simple object from "
+        + urlSourceNode
+        + " to "
+        + urlDestinationNode);
+
     try {
 
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "we try to get the source node : "
-			 + urlSourceNode);
- 
-      sourceNode = NodeFactory.getNode(urlSourceNode); 
+      System.out.println("SimpleObjectMigration> main() > " + "we try to get the source node : " + urlSourceNode);
 
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "we obtain the source node : " 
-			 + urlSourceNode); 
+      sourceNode = NodeFactory.getNode(urlSourceNode);
+
+      System.out.println("SimpleObjectMigration> main() > " + "we obtain the source node : " + urlSourceNode);
 
     } catch (NodeException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the getting of "
-			 + " the source node "+urlSourceNode
-			 + " ("+e.getMessage()+")");
+      System.out.println(
+        "SimpleObjectMigration> main() > "
+          + "Exception during the getting of "
+          + " the source node "
+          + urlSourceNode
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     }
-    
+
     try {
 
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "we try to get the destination node : "
-			 + urlDestinationNode);
- 
-      destinationNode = NodeFactory.getNode(urlDestinationNode); 
+      System.out.println(
+        "SimpleObjectMigration> main() > " + "we try to get the destination node : " + urlDestinationNode);
 
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "we obtain the destination node : "
-			 + urlDestinationNode); 
+      destinationNode = NodeFactory.getNode(urlDestinationNode);
+
+      System.out.println("SimpleObjectMigration> main() > " + "we obtain the destination node : " + urlDestinationNode);
 
     } catch (NodeException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the getting of "
-			 +" the destination node "+urlDestinationNode
-			 + " ("+e.getMessage()+")");
+      System.out.println(
+        "SimpleObjectMigration> main() > "
+          + "Exception during the getting of "
+          + " the destination node "
+          + urlDestinationNode
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     }
-    
 
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "We shows the state before" 
-		       +" to create the Active Object");
+    System.out.println(
+      "SimpleObjectMigration> main() > " + "We shows the state before" + " to create the Active Object");
     // We show the two nodes states
-    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
+    showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
+    System.out.println("SimpleObjectMigration> main() > " + "We try to create an simple active object");
 
-
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "We try to create an simple active object");
-    
     // The active obect
     SimpleObjectMigration activeHello = null;
     try {
       String className = SimpleObjectMigration.class.getName();
-      Object[] params = new Object[]{"Created by "
-				     + InetAddress.getLocalHost().toString()};
-      
-      activeHello = (SimpleObjectMigration)ProActive.newActive(className,
-							       params,
-							       sourceNode);
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "We created an simple active object");
+      Object[] params = new Object[] { "Created by " + InetAddress.getLocalHost().toString()};
 
-      
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "The simple active object want to say hello ;)");
+      activeHello = (SimpleObjectMigration) ProActive.newActive(className, params, sourceNode);
+      System.out.println("SimpleObjectMigration> main() > " + "We created an simple active object");
 
-      
+      System.out.println("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
+
       String helloAnswer = activeHello.sayHello();
 
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "The simple active object said '"+helloAnswer+"'");
+      System.out.println("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
 
-
-  
     } catch (UnknownHostException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the creation of the active object"
-			 + " ("+e.getMessage()+")");
+      System.out.println(
+        "SimpleObjectMigration> main() > "
+          + "Exception during the creation of the active object"
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     } catch (ActiveObjectCreationException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the creation of the active object"
-			 + " ("+e.getMessage()+")");
+      System.out.println(
+        "SimpleObjectMigration> main() > "
+          + "Exception during the creation of the active object"
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     } catch (NodeException e) {
-      System.out.println("SimpleObjectMigration> main() > "
-			 + "Exception during the creation of the active object"
-			 + " ("+e.getMessage()+")");
+      System.out.println(
+        "SimpleObjectMigration> main() > "
+          + "Exception during the creation of the active object"
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     }
 
-
-
-
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "We show the state before" 
-		       +" the migration of the Active Object");
+    System.out.println(
+      "SimpleObjectMigration> main() > " + "We show the state before" + " the migration of the Active Object");
     // We show the two nodes states
-    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
-
+    showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
     try {
-      System.out.println("SimpleObjectMigration> main() > "
-			 +"begin sleep "+SLEEP_TIME+" ...");
+      System.out.println("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
       Thread.sleep(SLEEP_TIME);
-      System.out.println("SimpleObjectMigration> main() > "
-			 +"... end of sleep "+SLEEP_TIME);
-	
-    } catch (InterruptedException e2) {}
+      System.out.println("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
 
-    System.out.println("SimpleObjectMigration> main() > "
-		       +"migrate active object to "+urlDestinationNode);
+    } catch (InterruptedException e2) {
+    }
 
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "We show the state after" 
-		       +" the migration of the Active Object");
+    System.out.println("SimpleObjectMigration> main() > " + "migrate active object to " + urlDestinationNode);
+
+    System.out.println(
+      "SimpleObjectMigration> main() > " + "We show the state after" + " the migration of the Active Object");
 
     System.out.println("");
 
-     // We migrate the Active Object
+    // We migrate the Active Object
     activeHello.moveTo(urlDestinationNode);
 
     System.out.println("");
 
     try {
-      System.out.println("SimpleObjectMigration> main() > "
-			 +"begin sleep "+SLEEP_TIME+" ...");
+      System.out.println("SimpleObjectMigration> main() > " + "begin sleep " + SLEEP_TIME + " ...");
       Thread.sleep(SLEEP_TIME);
-      System.out.println("SimpleObjectMigration> main() > "
-			 +"... end of sleep "+SLEEP_TIME);
-	
-    } catch (InterruptedException e2) {}
+      System.out.println("SimpleObjectMigration> main() > " + "... end of sleep " + SLEEP_TIME);
+
+    } catch (InterruptedException e2) {
+    }
 
     // We show the two nodes states
-    showIds(urlSourceNode,sourceNode,urlDestinationNode,destinationNode);
+    showIds(urlSourceNode, sourceNode, urlDestinationNode, destinationNode);
 
-  
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "The simple active object want to say hello ;)");
-      
+    System.out.println("SimpleObjectMigration> main() > " + "The simple active object want to say hello ;)");
+
     String helloAnswer = activeHello.sayHello();
-      
-    System.out.println("SimpleObjectMigration> main() > "
-		       + "The simple active object said '"+helloAnswer+"'");
-      
 
-      
+    System.out.println("SimpleObjectMigration> main() > " + "The simple active object said '" + helloAnswer + "'");
+
     System.out.println("SimpleObjectMigration> main() > end of test");
-    
+
   }
 
-
-  protected static void showIds(String urlSourceNode, 
-				Node sourceNode,
-				String urlDestinationNode, 
-				Node destinationNode) {
+  protected static void showIds(
+    String urlSourceNode,
+    Node sourceNode,
+    String urlDestinationNode,
+    Node destinationNode) {
     try {
       System.out.println("");
       System.out.println("SimpleObjectMigration> showIds() > ");
-      System.out.println("-------- Ids on "+urlSourceNode+" ------");
+      System.out.println("-------- Ids on " + urlSourceNode + " ------");
+      /*
       UniqueID[] ids = sourceNode.getActiveObjectIDs();
-      for(int j=0;j<ids.length;j++) {
-	System.out.println("\t id"+j+" = "+ids[j]);
+      for (int j = 0; j < ids.length; j++) {
+        System.out.println("\t id" + j + " = " + ids[j]);
       }
       System.out.println("-----------------------------------------------");
 
       System.out.println("");
 
-      System.out.println("-------- Ids on "+urlDestinationNode+" ------");
+      System.out.println("-------- Ids on " + urlDestinationNode + " ------");
       ids = destinationNode.getActiveObjectIDs();
-      for(int j=0;j<ids.length;j++) {
-	System.out.println("\t id"+j+" = "+ids[j]);
+      for (int j = 0; j < ids.length; j++) {
+        System.out.println("\t id" + j + " = " + ids[j]);
       }
       System.out.println("-----------------------------------------------");
-      
-    } catch (NodeException e) {
-      System.out.println("SimpleObjectMigration> showIds() > "
-			 + "Exception during the of the node's state"
-			 + " ("+e.getMessage()+")");
+      */
+    } catch (Exception e) {
+      System.out.println(
+        "SimpleObjectMigration> showIds() > "
+          + "Exception during the of the node's state"
+          + " ("
+          + e.getMessage()
+          + ")");
       e.printStackTrace();
     }
   }

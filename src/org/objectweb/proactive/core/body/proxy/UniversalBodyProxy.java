@@ -33,11 +33,11 @@ package org.objectweb.proactive.core.body.proxy;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Active;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
@@ -85,7 +85,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       // This is simple connection to an existant local body
       this.universalBody = (UniversalBody) p0;
       this.bodyID = universalBody.getID();
-      isLocal = AbstractBody.getLocalActiveBody(bodyID) != null;
+      isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
       //System.out.println("UniversalBodyProxy created from UniversalBody bodyID="+bodyID+" isLocal="+isLocal);
     } else {
       // instantiate the body locally or remotely
@@ -174,13 +174,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     // address space because being a local representative for something remote
     // is what the proxy is all about. This is why we know that the table that
     // can be accessed by using a static methode has this information.
-    Body sourceBody = AbstractBody.getCurrentThreadBody();
+    Body sourceBody = LocalBodyStore.getInstance().getCurrentThreadBody();
     // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
     // Maybe we could use some optimisation here
     UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());
     if (newBody != null) {
       universalBody = newBody;
-      isLocal = AbstractBody.getLocalActiveBody(bodyID) != null;
+      isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
     }
     if (isLocal) {
       // Replaces the effective arguments with a deep copy
@@ -192,7 +192,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   }
 
   protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {
-    sourceBody.sendRequest(methodCall, future, universalBody, null);
+    sourceBody.sendRequest(methodCall, future, universalBody);
   }
 
   //
@@ -223,7 +223,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
   }
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-    Body localBody = AbstractBody.getLocalActiveBody(bodyID);
+    Body localBody = LocalBodyStore.getInstance().getLocalBody(bodyID);
     if (localBody != null) {
       // the body is local
       universalBody = localBody;

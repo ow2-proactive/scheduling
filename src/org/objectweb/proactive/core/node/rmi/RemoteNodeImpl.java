@@ -116,30 +116,6 @@ public class RemoteNodeImpl extends java.rmi.server.UnicastRemoteObject implemen
   }
 
 
-  public UniqueID[] getActiveObjectIDs() {
-    BodyMap knownBodies = AbstractBody.getLocalBodies();
-    UniqueID[] uniqueIDs = new UniqueID[knownBodies.size()];
-    int i = 0;
-    java.util.Iterator bodiesIterator = knownBodies.bodiesIterator();
-    while (bodiesIterator.hasNext()) {
-      Body activeObjectBody = (Body) bodiesIterator.next();
-      if (activeObjectBody.isActive()) {
-        uniqueIDs[i] = activeObjectBody.getID();
-        i++;
-      }
-    }
-    if (i < knownBodies.size()) {
-      UniqueID[] newUniqueIDs = new UniqueID[i];
-      if (i > 0) {
-        System.arraycopy(uniqueIDs, 0, newUniqueIDs, 0, i);
-      }
-      return newUniqueIDs;
-    } else {
-      return uniqueIDs;
-    }
-  }
-
-
   public NodeInformation getNodeInformation() {
     return nodeInformation;
   }

@@ -41,7 +41,7 @@ package org.objectweb.proactive.core;
 public interface Constants  {
   
   /** The explicit local body default class */
-  public static final Class DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.BodyImpl.class;
+  public static final Class DEFAULT_BODY_CLASS = org.objectweb.proactive.core.body.ActiveBody.class;
   /** The name of the explicit local body default class */
   public static final String DEFAULT_BODY_CLASS_NAME = DEFAULT_BODY_CLASS.getName();
 

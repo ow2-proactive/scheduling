@@ -117,15 +117,6 @@ public class RemoteNodeAdapter implements Node, java.io.Serializable {
     }
   }
 
-  public UniqueID[] getActiveObjectIDs() throws NodeException {
-    try {
-      return remoteNode.getActiveObjectIDs();
-    } catch (java.rmi.RemoteException e) {
-      throw new NodeException(e);
-    }
-  }
-
-
   public NodeInformation getNodeInformation() {
     return nodeInformation;
   }

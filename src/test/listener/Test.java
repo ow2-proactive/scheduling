@@ -39,7 +39,8 @@ public class Test implements org.objectweb.proactive.RunActive {
   public void runActivity(Body body) {
     System.out.println("Test: starting custom live()");
     body.addMessageEventListener(new MyListener());
-    body.fifoPolicy();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    service.fifoServing();
   }
 
 

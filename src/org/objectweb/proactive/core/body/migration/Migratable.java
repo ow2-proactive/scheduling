@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 
 public interface Migratable {
 
-  public void migrateTo(Node nodeTarget) throws MigrationException;
+  public UniversalBody migrateTo(Node nodeTarget) throws MigrationException;
   
   public UniversalBody cloneTo(Node nodeTarget) throws MigrationException;
 

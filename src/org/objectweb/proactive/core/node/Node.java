@@ -106,14 +106,4 @@ public interface Node {
    */
   public NodeInformation getNodeInformation();
 
-
-
-  /**
-   * Returns an array containing all UniqueIDs of all ActiveObjects known
-   * on the JVM this nodes belongs to.
-   * @return an array of UniqueIDs
-   */
-  public UniqueID[] getActiveObjectIDs() throws NodeException;
-
-
 }

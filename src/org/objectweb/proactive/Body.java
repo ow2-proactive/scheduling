@@ -31,14 +31,9 @@
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
@@ -47,12 +42,13 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * of an ActiveObject. This representation is local to the ActiveObject. By contrast there
  * is a remote representation of Body that can be accessed by distant object.
  * </P><P>
+ * <code>UniversalBody</code> defines the remote accessible part of the body while
+ * <code>LocalBody</code> defines the remote accessible part of the body.
+ * </P><P>
  * The body of an ActiveObject provides needed services such as a the ability to sent and
  * receive request and reply.
  * </P><P>
- * The interface also defines how the 'live' method of an active object sees its Body.
- * Subclasses of Body implementing additional service routines should extend this
- * interface to provide access to these new routines from the 'live' method.
+ * The interface also defines how the activity methods of an active object sees its Body.
  * </P><P>
  * A body has 2 associated states :
  * <ul>
@@ -68,75 +64,15 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
-public interface Body extends UniversalBody, MessageEventProducer {
+public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer {
 
-  /** 
-   * Returns the request queue associated to this body 
-   * @return the request queue associated to this body
-   */ 
-  public BlockingRequestQueue getRequestQueue();
+  /**
+   * Terminate the body. After this call the body is no more alive and no more active
+   * although the active thread is not interrupted. The body is unuseable after this call.
+   */
+  public void terminate();
 
-
-  /** 
-   * Returns the reified object that body is for
-   * The reified object is the object that has been turned active.
-   * @return the reified object that body is for
-   */ 
-  public Object getReifiedObject();
   
-  
-  /** 
-   * Returns the name of this body that can be used for displaying information
-   * @return the name of this body
-   */ 
-  public String getName();
-
-
-  /**
-   * Tries to find a local version of the body of id uniqueID. If a local version
-   * is found it is returned. If not, tries to find the body of id uniqueID in the 
-   * known body of this body. If a body is found it is returned, else null is returned.
-   * @param uniqueID the id of the body to lookup
-   * @return the last known version of the body of id uniqueID or null if not known
-   */
-  public UniversalBody checkNewLocation(UniqueID uniqueID);
-
-
-  /**
-   * Sends the request <code>request</code> with the future <code>future</code> to the local body
-   * <code>body</code>.
-   * @param methodCall the methodCall to send
-   * @param future the future associated to the request
-   * @param destinationBody the body the request is sent to
-   * @param factory the RequestFactory to used to create the request to send or null to delegate 
-   * the creation of the request to this body.
-   * @exception java.io.IOException if the request cannot be sent to the destination body
-   */
-  public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody, RequestFactory factory) throws java.io.IOException;
-
-
-  /**
-   * blocks all incoming communications. After this call, the body cannot
-   * receive any request or reply.
-   */
-  public void blockCommunication();
-
-
-  /**
-   * Signals the body to accept all incoming communications. This call undo 
-   * a previous call to blockCommunication.
-   */
-  public void acceptCommunication();
-
-
-  /**
-   * Invoke the default fifo policy to pick up the requests from the request queue.
-   * This does not return until the body terminate, as the active thread enters in
-   * an infinite for processing the request in the fifo order.
-   */
-  public void fifoPolicy();
-
-
   /**
    * Returns whether the body is alive or not.
    * The body is alive as long as it is processing request and reply
@@ -155,19 +91,27 @@ public interface Body extends UniversalBody, MessageEventProducer {
 
 
   /**
-   * Terminate the body. After this call the body is no more alive and no more active
-   * although the active thread is not interrupted. The body is unuseable after this call.
+   * blocks all incoming communications. After this call, the body cannot
+   * receive any request or reply.
    */
-  public void terminate();
+  public void blockCommunication();
 
-  
+
   /**
-   * Serves the request <code>request</code> by the invoking the targeted method on the
-   * reified object. Some specific type of request may involve special processing that 
-   * does not trigger a method on the reified object.
-   * @param request the request to serve
+   * Signals the body to accept all incoming communications. This call undo 
+   * a previous call to blockCommunication.
    */
-  public void serve(Request request);
+  public void acceptCommunication();
+
+
+  /**
+   * Tries to find a local version of the body of id uniqueID. If a local version
+   * is found it is returned. If not, tries to find the body of id uniqueID in the 
+   * known body of this body. If a body is found it is returned, else null is returned.
+   * @param uniqueID the id of the body to lookup
+   * @return the last known version of the body of id uniqueID or null if not known
+   */
+  public UniversalBody checkNewLocation(UniqueID uniqueID);
 
 
 }

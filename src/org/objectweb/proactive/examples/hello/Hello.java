@@ -56,8 +56,9 @@ public class Hello implements org.objectweb.proactive.RunActive, java.io.Seriali
 
   
   public void runActivity(org.objectweb.proactive.Body body) {
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     nodeURL = body.getNodeURL();
-    body.fifoPolicy();
+    service.fifoServing();
   }
 
   /*

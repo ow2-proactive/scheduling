@@ -37,9 +37,10 @@ public class BlockedObject implements org.objectweb.proactive.RunActive, java.io
 
   public void runActivity(org.objectweb.proactive.Body body) {
     //first we wait to allow the caller to migrate with its futures
-    body.getRequestQueue().blockingRemoveOldest("go");
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    service.blockingRemoveOldest("go");
     System.out.println("BlockedObject: Now in service");
-    body.fifoPolicy();
+    service.fifoServing();
   }
 
 

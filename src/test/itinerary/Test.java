@@ -58,7 +58,8 @@ public class Test implements org.objectweb.proactive.RunActive, Serializable {
       }
       etape++;
     }
-    body.fifoPolicy();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    service.fifoServing();
   }
 
 

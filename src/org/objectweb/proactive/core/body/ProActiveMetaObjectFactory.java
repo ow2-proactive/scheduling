@@ -30,20 +30,19 @@
 */
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
+import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
+import org.objectweb.proactive.core.body.reply.ReplyReceiver;
+import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
@@ -245,7 +244,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
 
 
   protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
-    public UniversalBody newRemoteBody(Body body) {
+    public UniversalBody newRemoteBody(UniversalBody body) {
       try {
           return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
       } catch (ProActiveException e) {

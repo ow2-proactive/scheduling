@@ -85,7 +85,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
 
   public void warn(String message) {
     logInternal(message, errorStyle);
-    DialogUtils.displayWarningDialog(messageArea, message);
+    invokeDialog(message);
   }
 
   public void log(String message) {
@@ -99,7 +99,7 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
     e.printStackTrace(pw);
     pw.flush();
     logInternal(baos.toString(), stackTraceStyle);
-    DialogUtils.displayWarningDialog(messageArea, message);
+    invokeDialog(message);
   }
 
   public void log(Throwable e) {
@@ -111,20 +111,34 @@ public class TextPaneMessageLogger implements IC2DMessageLogger {
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
+  
+  // make sure the caller thread (especially if it is the gui thread does not get stuck
+  // with a deadlock.
+  private void invokeDialog(final String message) {
+    new Thread(new Runnable() {
+      public void run() {
+        DialogUtils.displayWarningDialog(messageArea, message);
+      }
+    }).start();
+  }
 
-  private synchronized void logInternal(String message, javax.swing.text.AttributeSet style) {
-    append(dateFormat.format(new java.util.Date()), timeStampStyle);
-    append(" (", threadNameStyle);
-    append(Thread.currentThread().getName(), threadNameStyle);
-    append(") => ", threadNameStyle);
-    append(message, style);
-    append("\n", style);
-    messageArea.setCaretPosition(document.getLength());
+  private void logInternal(final String message, final javax.swing.text.AttributeSet style) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        append(dateFormat.format(new java.util.Date()), timeStampStyle);
+        append(" (", threadNameStyle);
+        append(Thread.currentThread().getName(), threadNameStyle);
+        append(") => ", threadNameStyle);
+        append(message, style);
+        append("\n", style);
+        messageArea.setCaretPosition(document.getLength());
+      }
+    });
   }
   
   private void append(String str, javax.swing.text.AttributeSet style) {
     try {
-        document.insertString(document.getLength(), str, style);
+      document.insertString(document.getLength(), str, style);
     } catch (javax.swing.text.BadLocationException e) {}
   }
   

@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d.spy;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -80,7 +80,7 @@ public class Spy implements org.objectweb.proactive.RunActive {
 
 
   public void sendEventsForAllActiveObjects() {
-    SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(AbstractBody.getCurrentThreadBody());
+    SpyEvent[] spyEvents = spyEventManager.createSpyEventForExistingBodies(LocalBodyStore.getInstance().getCurrentThreadBody());
     notifyListener(spyEvents);
   }
 
@@ -91,7 +91,7 @@ public class Spy implements org.objectweb.proactive.RunActive {
 
 
   public void migrateTo(UniqueID bodyId, String nodeDestination) throws MigrationException {
-    Body body = AbstractBody.getLocalBody(bodyId);
+    Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
     if (body == null) {
       throw new MigrationException("Cannot find object id="+bodyId);
     }
@@ -123,13 +123,13 @@ public class Spy implements org.objectweb.proactive.RunActive {
   //
 
   public void addMessageEventListener(UniqueID bodyId) {
-    Body body = AbstractBody.getLocalBody(bodyId);
+    Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
     if (body != null) spyEventManager.addMessageEventListener(body);
   }
 
 
   public void removeMessageEventListener(UniqueID bodyId) {
-    Body body = AbstractBody.getLocalBody(bodyId);
+    Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
     if (body != null) spyEventManager.removeMessageEventListener(body);
   }
 

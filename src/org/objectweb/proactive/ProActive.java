@@ -32,7 +32,7 @@ package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -488,7 +488,7 @@ public class ProActive {
    *     this method.
    */
   public static Body getBodyOnThis() {
-    return AbstractBody.getCurrentThreadBody();
+    return LocalBodyStore.getInstance().getCurrentThreadBody();
   }
 
   /**

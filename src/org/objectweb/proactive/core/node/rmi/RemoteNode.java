@@ -84,12 +84,6 @@ public interface RemoteNode extends java.rmi.Remote {
   public NodeInformation getNodeInformation() throws java.rmi.RemoteException;
 
 
-  /**
-   * Returns an array containing all UniqueIDs of all ActiveObjects known
-   * on the JVM this nodes belongs to.
-   * @return an array of UniqueIDs
-   */
-  public UniqueID[] getActiveObjectIDs() throws java.rmi.RemoteException;
 }
 
 

@@ -27,60 +27,56 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.rmi;
 
-import org.objectweb.proactive.Body;
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 
-import java.rmi.RemoteException;
-
 /**
  *   An adapter for a LocalBody to be able to receive remote calls. This helps isolate RMI-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
  */
-public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject implements RemoteBody, java.rmi.server.Unreferenced {
+public class RemoteBodyImpl
+  extends java.rmi.server.UnicastRemoteObject
+  implements RemoteBody, java.rmi.server.Unreferenced {
 
+  /**
+   * A custom socket Factory
+   */
+  protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(37002, 5000);
 
-    /**
-     * A custom socket Factory
-     */
-    protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(37002, 5000);
-  
-    /**
-     * The encapsulated local body
-     * transient to deal with custom serialization of requests.
-     */
-    protected transient Body body;
-  
+  /**
+   * The encapsulated local body
+   * transient to deal with custom serialization of requests.
+   */
+  protected transient UniversalBody body;
 
-    //
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
+  //
+  // -- CONSTRUCTORS -----------------------------------------------
+  //
 
-    public RemoteBodyImpl() throws RemoteException {
-    }
-
-  public RemoteBodyImpl(Body body) throws RemoteException {
-      // super(0, factory, factory);
-    this.body = body;
+  public RemoteBodyImpl() throws RemoteException {
   }
 
+  public RemoteBodyImpl(UniversalBody body) throws RemoteException {
+    // super(0, factory, factory);
+    this.body = body;
+  }
 
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
-  
   //
   // -- implements RemoteBody -----------------------------------------------
   //
-
 
   public void receiveRequest(Request r) throws java.io.IOException {
     // 	System.out.println("RemoteBodyImpl: receiveRequest() for " + this.localBody);
@@ -91,7 +87,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject implemen
   public void receiveReply(Reply r) throws java.io.IOException {
     body.receiveReply(r);
   }
-
 
   public String getNodeURL() {
     return body.getNodeURL();
@@ -110,26 +105,26 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject implemen
     System.gc();
   }
 
-    //
-    // -- PRIVATE METHODS -----------------------------------------------
-    //
-  
-    //
-    // -- SERIALIZATION -----------------------------------------------
-    //
-  
-    /*    
-	  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-	  long startTime=System.currentTimeMillis();
-	  out.defaultWriteObject();
-	  long endTime=System.currentTimeMillis();
-	  System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
-	
-	  }
+  //
+  // -- PRIVATE METHODS -----------------------------------------------
+  //
 
-    
-	  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-	  in.defaultReadObject();
-	  }
-    */
+  //
+  // -- SERIALIZATION -----------------------------------------------
+  //
+
+  /*    
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+  long startTime=System.currentTimeMillis();
+  out.defaultWriteObject();
+  long endTime=System.currentTimeMillis();
+  System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
+  
+  }
+  
+  
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+  in.defaultReadObject();
+  }
+  */
 }

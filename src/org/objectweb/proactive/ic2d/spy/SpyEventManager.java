@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d.spy;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.BodyMap;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;
@@ -134,17 +134,17 @@ public class SpyEventManager {
   //
   
   void addBodyEventListener() {
-    AbstractBody.addBodyEventListener(bodyEventListener);
+    LocalBodyStore.getInstance().addBodyEventListener(bodyEventListener);
   }
 
 
   void removeBodyEventListener() {
-    AbstractBody.removeBodyEventListener(bodyEventListener);
+    LocalBodyStore.getInstance().removeBodyEventListener(bodyEventListener);
   }
 
 
   SpyEvent[] createSpyEventForExistingBodies(Body spyBody) {
-    BodyMap knownBodies = AbstractBody.getLocalBodies();
+    BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
     // remove our body
     knownBodies.removeBody(masterSpyID);
     SpyEvent[] spyEvents = new SpyEvent[knownBodies.size()]; // messages to send bufferized
@@ -244,7 +244,7 @@ public class SpyEventManager {
   private void checkMasterSpy() {
     if (lastTimeMasterSpyCheck + MASTER_SPY_CHECK_INTERVAL < System.currentTimeMillis()) return;
     lastTimeMasterSpyCheck = System.currentTimeMillis();
-    if (AbstractBody.getLocalBody(masterSpyID) != null) return;
+    if (LocalBodyStore.getInstance().getLocalBody(masterSpyID) != null) return;
     // the master Spy is gone : we have no more reason to exist.
     // we deregister from everybody
     removeBodyEventListener();
@@ -253,7 +253,7 @@ public class SpyEventManager {
       while (l.hasNext()) {
         SpyEvent event = (SpyEvent)l.next();
         UniqueID bodyID = event.getBodyID();
-        Body body = AbstractBody.getLocalBody(bodyID);
+        Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
         if (body != null) {
           removeListenersFromDeadBody(body);
         }
@@ -280,7 +280,7 @@ public class SpyEventManager {
       Body body = checkBody(event.getBody());
       if (body == null) return;
       //System.out.println("bodyCreated name="+body.getNodeURL());
-      addEvent(new BodyCreationSpyEvent(body.getID(), body.getNodeURL(), body.getName()));
+      addEvent(new BodyCreationSpyEvent(body.getID(), body.getNodeURL(), body.getName(), body.isActive()));
       addListenersToNewBody(body);
     }
     

@@ -91,10 +91,11 @@ public class PenguinControler implements org.objectweb.proactive.RunActive, Peng
 
 
   public void runActivity(Body b) {
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
     myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) b);
     myStrategyManager.onDeparture("clean");
     rebuild();
-    b.fifoPolicy();
+    service.fifoServing();
     clean();
   }
 

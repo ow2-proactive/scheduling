@@ -18,24 +18,24 @@ public class AgentForThread implements org.objectweb.proactive.RunActive, Serial
 
 
   public void runActivity(Body body) {
-    org.objectweb.proactive.core.body.request.BlockingRequestQueue requestQueue = body.getRequestQueue();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     try {
 
       if (etape == 0) //Not migrated yet
       {
         //b.migrateTo(new URL("http://oasis/Node1"));
         //  System.out.println("TOTOTOTOTOTOT");
-        Request request = requestQueue.blockingRemoveOldest("moveTo");
+        Request request = service.blockingRemoveOldest("moveTo");
         System.out.println("AgentForThread: live() The request moveTo has just arrived");
         System.out.println("AgentForThread: live() The requestQueue is ");
-        System.out.println(requestQueue.toString());
+        System.out.println(service);
         etape++;
-        body.serve(request);
+        service.serve(request);
       } else if (etape == 1) {
         //Now we can serve the others request
         System.out.println("AgentForThread: I am now back after migration");
-        System.out.println(requestQueue.toString());
-        body.fifoPolicy();
+        System.out.println(service);
+        service.fifoServing();
       }
     } catch (Exception e) {
       e.printStackTrace();

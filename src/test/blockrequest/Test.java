@@ -34,7 +34,8 @@ public class Test implements org.objectweb.proactive.RunActive {
     }
     System.out.println("----- Test: accepting requests");
     body.acceptCommunication();
-    body.fifoPolicy();
+    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
+    service.fifoServing();
   }
 
 

@@ -112,10 +112,11 @@ public class FakeBench2 {
         }
 
         public void runActivity(Body b) {
-            this.id = b.getID();
-            this.body = b.getRemoteAdapter();
-            b.fifoPolicy();
-        }
+          org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
+          this.id = b.getID();
+          this.body = b.getRemoteAdapter();
+          service.fifoServing();
+       }
     }
 
 

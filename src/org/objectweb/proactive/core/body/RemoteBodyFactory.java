@@ -30,8 +30,6 @@
 */ 
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.Body;
-
 /**
  * <p>
  * A class implementing this interface is a factory of RequestReceiver objects.
@@ -50,6 +48,6 @@ public interface RemoteBodyFactory {
    * @param body the body that remote body is mode for.
    * @return the newly created or already existing RequestReceiver object.
    */
-  public UniversalBody newRemoteBody(Body body);
+  public UniversalBody newRemoteBody(UniversalBody body);
   
 }

@@ -31,13 +31,13 @@
 package org.objectweb.proactive.core.body.migration;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 
-public abstract class AbstractMigratableBody extends AbstractBody implements Migratable, java.io.Serializable {
+public class MigratableBody extends BodyImpl implements Migratable, java.io.Serializable {
 
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
@@ -53,9 +53,9 @@ public abstract class AbstractMigratableBody extends AbstractBody implements Mig
   // -- CONSTRUCTORS -----------------------------------------------
   //
 
-  public AbstractMigratableBody() {}
+  public MigratableBody() {}
 
-  public AbstractMigratableBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
+  public MigratableBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
     super(reifiedObject, nodeURL, factory);
     this.migrationManager = factory.newMigrationManagerFactory().newMigrationManager();
   }
@@ -68,35 +68,27 @@ public abstract class AbstractMigratableBody extends AbstractBody implements Mig
   // -- implements Migratable -----------------------------------------------
   //
 
-  public void migrateTo(Node node) throws MigrationException {
-    UniversalBody remoteBody = internalMigrateTo(node, false);
+  public UniversalBody migrateTo(Node node) throws MigrationException {
+    return internalMigrateTo(node, false);
   }
 
   public UniversalBody cloneTo(Node node) throws MigrationException {
-    UniversalBody remoteBody = internalMigrateTo(node, true);
-    return remoteBody;
+    return internalMigrateTo(node, true);
   }
 
   public void addMigrationEventListener(MigrationEventListener listener) {
-    migrationManager.addMigrationEventListener(listener);
+    if (migrationManager != null)
+      migrationManager.addMigrationEventListener(listener);
   }
 
   public void removeMigrationEventListener(MigrationEventListener listener) {
-    migrationManager.removeMigrationEventListener(listener);
+    if (migrationManager != null)
+      migrationManager.removeMigrationEventListener(listener);
   }
 
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
-
-  /**
-   * Whenever an exception occurs during the migration
-   * this method will leave the Body in a safe state
-   * ready to continue its normal service
-   */
-  protected void cancelMigration() {
-    futures.unsetMigrationTag();
-  }
 
 
   /**
@@ -118,14 +110,18 @@ public abstract class AbstractMigratableBody extends AbstractBody implements Mig
   //
 
   protected UniversalBody internalMigrateTo(Node node, boolean byCopy) throws MigrationException {
-    if (!isAlive())
-      throw new MigrationException("The body has been terminated");
+    if (!isAlive()) throw new MigrationException("Attempt to migrate a dead body that has been terminated");
+    if (!isActive()) throw new MigrationException("Attempt to migrate a non active body");
     // check node with Manager
     node = migrationManager.checkNode(node);
 
     // get the name of the node
     String saveNodeURL = nodeURL;
     nodeURL = node.getNodeInformation().getURL();
+
+    // stop accepting communication
+    blockCommunication();
+
     // save the id
     UniqueID savedID = bodyID;
     if (byCopy) {
@@ -133,10 +129,6 @@ public abstract class AbstractMigratableBody extends AbstractBody implements Mig
       // the bodyID will be automatically recreate when deserialized
       bodyID = null;
     }
-
-    // stop accepting communication
-    blockCommunication();
-
     // try to migrate
     UniversalBody migratedBody = null;
     try {
@@ -144,26 +136,30 @@ public abstract class AbstractMigratableBody extends AbstractBody implements Mig
     } catch (MigrationException e) {
       nodeURL = saveNodeURL;
       bodyID = savedID;
-      cancelMigration();
+      localBodyStrategy.getFuturePool().unsetMigrationTag();
       acceptCommunication();
       throw e;
     }
     if (!byCopy) {
-      // cleanup after migration
-      activityStopped();
-      reifiedObject = new Object();
-      requestReceiver = migrationManager.createRequestReceiver(migratedBody, requestReceiver);
-      replyReceiver = migrationManager.createReplyReceiver(migratedBody, replyReceiver);
-
-      //replySender = null;
-      //requestSender = null;
-      //migrationManager = null;
-
+      changeBodyAfterMigration(migratedBody);
+    } else {
+      bodyID = savedID;
+      nodeURL = saveNodeURL;
     }
     acceptCommunication();
     return migratedBody;
   }
+  
 
+  protected void changeBodyAfterMigration(UniversalBody migratedBody) {
+    // cleanup after migration
+    activityStopped();
+    requestReceiver = migrationManager.createRequestReceiver(migratedBody, requestReceiver);
+    replyReceiver = migrationManager.createReplyReceiver(migratedBody, replyReceiver);
+    migrationManager = null;
+  }
+  
+  
   //
   // -- SERIALIZATION METHODS -----------------------------------------------
   //

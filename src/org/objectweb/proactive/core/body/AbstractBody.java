@@ -31,24 +31,12 @@
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.request.ServeException;
-import org.objectweb.proactive.core.event.AbstractEventProducer;
-import org.objectweb.proactive.core.event.BodyEvent;
-import org.objectweb.proactive.core.event.BodyEventListener;
-import org.objectweb.proactive.core.event.MessageEvent;
-import org.objectweb.proactive.core.event.MessageEventListener;
-import org.objectweb.proactive.core.event.ProActiveEvent;
-import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
 
@@ -78,65 +66,23 @@ import org.objectweb.proactive.core.util.ThreadStore;
  * @see UniqueID
  *
  */
-public abstract class AbstractBody extends AbstractEventProducer implements Body, java.io.Serializable {
+public abstract class AbstractBody extends AbstractUniversalBody implements Body, java.io.Serializable {
 
   //
   // -- STATIC MEMBERS -----------------------------------------------
   //
 
-  /**
-   * This table maps all known active Bodies in this JVM with their UniqueID
-   * From one UniqueID it is possible to get the corresponding body if
-   * it belongs to this JVM
-   */
-  private static BodyMap localBodyMap = new BodyMap();
+  private static final String TERMINATED_BODY_EXCEPTION_MESSAGE = "The body has been Terminated";
 
-  /**
-   * Static object that manages the registration of listeners and the sending of
-   * events
-   */
-  private static BodyEventProducer bodyEventProducer = new BodyEventProducer();
-
-  private static ThreadLocal bodyPerThread = new ThreadLocal();
-  
-  private static MetaObjectFactory halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
 
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
   //
 
-  /** Unique ID of the body. */
-  protected UniqueID bodyID;
-
-  /** A pool future id/future couples that contains the pending future objects */
-  protected FuturePool futures;
-
-  /** The reified object target of the request processed by this body */
-  protected Object reifiedObject;
-
-  /** A table containing a mapping from a UniqueID toward a Body. The location table
-   caches the location of all known bodies to whom this body communicated */
-  protected BodyMap location;
-
-  /** The URL of the node this body is attached to */
-  protected String nodeURL;
-
-  /** A remote version of this body that is used to send to remote peer */
-  protected transient UniversalBody remoteBody;
-
-  /** The component in charge of receiving reply */
-  protected ReplyReceiver replyReceiver;
-
-  /** The component in charge of receiving request */
-  protected RequestReceiver requestReceiver;
-
-  protected BlockingRequestQueue requestQueue;
-
-  protected RequestFactory internalRequestFactory;
-
-  protected RemoteBodyFactory remoteBodyFactory;
-
   protected ThreadStore threadStore;
+  
+  // the current implementation of the local view of this body
+  protected LocalBodyStrategy localBodyStrategy;
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
@@ -149,7 +95,6 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
    stopping the activity thread is not immediate */
   private transient boolean isDead;
 
-  private long absoluteSequenceID;
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -169,306 +114,60 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
    *                needed by this body
    */
   public AbstractBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
-    this.reifiedObject = reifiedObject;
-    this.nodeURL = nodeURL;
-    this.bodyID = new UniqueID();
-    this.location = new BodyMap();
-    this.futures = new FuturePool();
-    this.requestQueue = factory.newRequestQueueFactory().newRequestQueue(bodyID);
-    this.requestReceiver = factory.newRequestReceiverFactory().newRequestReceiver();
-    this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
-    this.remoteBodyFactory = factory.newRemoteBodyFactory();
-    this.remoteBody = remoteBodyFactory.newRemoteBody(this);
-    this.internalRequestFactory = factory.newRequestFactory();
+    super(nodeURL, factory.newRemoteBodyFactory());
     this.threadStore = factory.newThreadStoreFactory().newThreadStore();
-    //we register in this JVM
-    registerBody(this);
-    //System.out.println(toString()+" created");
   }
 
-  //
-  // -- STATIC METHODS -----------------------------------------------
-  //
-
-  public static MetaObjectFactory getHalfBodyMetaObjectFactory() {
-    return halfBodyMetaObjectFactory;
-  }
-  
-  
-   public static void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
-    halfBodyMetaObjectFactory = factory;
-  }
-   
-
-  /**
-   * Returns the body associated with the thread calling the method. If no body is associated with the
-   * calling thread, an HalfBody is created to manage the futures.
-   * @return the body associated to the active object whose active thread is calling this method.
-   */
-  public static Body getCurrentThreadBody() {
-    AbstractBody body = (AbstractBody) bodyPerThread.get();
-    if (body == null) {
-      // If we cannot find the body from the current thread we assume that the current thread
-      // is not the one from an active object. Therefore in this case we create an HalfBody
-      // that handle the futures
-      body = HalfBody.getHalfBody(halfBodyMetaObjectFactory);
-      bodyPerThread.set(body);
-      registerBody(body);
-    }
-    return body;
-  }
-
-
-  /**
-   * Returns the body belonging to this JVM whose ID is the one specified.
-   * Returns null if a body with such an id is not found in this jvm
-   * @param bodyID the ID to look for
-   * @return the body with matching id or null
-   */
-  public static Body getLocalBody(UniqueID bodyID) {
-    return (Body) localBodyMap.getBody(bodyID);
-  }
-
-
-  /**
-   * Returns the body belonging to this JVM whose ID is the one specified.
-   * Returns null if a body with such an id is not found or if a body exists
-   * but is not active
-   * @param bodyID the ID to look for
-   * @return the active body with matching id or null
-   */
-  public static Body getLocalActiveBody(UniqueID bodyID) {
-    Body b = getLocalBody(bodyID);
-    if (b == null)
-      return null;
-    return b.isActive() ? b : null;
-  }
-
-
-  /**
-   * Returns all local Bodies in a new BodyMap
-   * @return all local Bodies in a new BodyMap
-   */
-  public static BodyMap getLocalBodies() {
-    return (BodyMap) localBodyMap.clone();
-  }
-
-
-  /**
-   * Adds a listener of body events. The listener is notified every time a body
-   * (active or not) is registered or unregistered in this JVM.
-   * @param listener the listener of body events to add
-   */
-  public static void addBodyEventListener(BodyEventListener listener) {
-    bodyEventProducer.addBodyEventListener(listener);
-  }
-
-
-  /**
-   * Removes a listener of body events.
-   * @param listener the listener of body events to remove
-   */
-  public static void removeBodyEventListener(BodyEventListener listener) {
-    bodyEventProducer.removeBodyEventListener(listener);
-  }
-
-
-  private static void registerBody(AbstractBody body) {
-    localBodyMap.putBody(body.bodyID, body);
-    bodyEventProducer.fireBodyCreated(body);
-  }
-
-  private static void unregisterBody(AbstractBody body) {
-    localBodyMap.removeBody(body.bodyID);
-    bodyEventProducer.fireBodyRemoved(body);
-  }
 
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
   /**
-  * Returns the future pool of this body
-  * @return the future pool of this body
-  */
-  public FuturePool getFuturePool() {
-    return futures;
-  }
-
-  /**
    * Returns a string representation of this object.
    * @return a string representation of this object
    */
   public String toString() {
-    return reifiedObject.getClass().getName() + " Body | " + nodeURL + " | " + bodyID;
+    return "Body for "+localBodyStrategy.getName()+" node="+nodeURL+" id=" + bodyID;
   }
 
-  //
-  // -- implements MessageEventProducer -----------------------------------------------
-  //
-
-  public void addMessageEventListener(MessageEventListener listener) {
-    addListener(listener);
-  }
-
-  public void removeMessageEventListener(MessageEventListener listener) {
-    removeListener(listener);
-  }
 
   //
   // -- implements UniversalBody -----------------------------------------------
   //
-
-  /**
-   * Receives a request for later processing. The call to this method is non blocking
-   * unless the body cannot temporary receive the request.
-   * @param request the request to process
-   * @exception java.io.IOException if the request cannot be accepted
-   */
+  
   public void receiveRequest(Request request) throws java.io.IOException {
     //if (reifiedObject != null)
     //  System.out.println("  --> "+reifiedObject.getClass().getName()+".receiveRequest m="+request.getMethodName());
-    if (isDead)
-      throw new java.io.IOException("The body has been Terminated");
+    if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
-    if (hasListeners())
-      notifyAllListeners(new MessageEvent(request, MessageEvent.REQUEST_RECEIVED, bodyID));
-    requestReceiver.receiveRequest(request, this);
+    internalReceiveRequest(request);
     this.threadStore.exit();
   }
 
-  /**
-   * Receives a reply in response to a former request.
-   * @param reply the reply received
-   * @exception java.io.IOException if the reply cannot be accepted
-   */
   public void receiveReply(Reply reply) throws java.io.IOException {
     //if (reifiedObject != null)
     //  System.out.println("  --> "+reifiedObject.getClass().getName()+".receiveReply m="+reply.getMethodName());
-    if (isDead)
-      throw new java.io.IOException("The body has been Terminated");
+    if (isDead) throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
     this.threadStore.enter();
-    if (hasListeners())
-      notifyAllListeners(new MessageEvent(reply, MessageEvent.REPLY_RECEIVED, bodyID));
-    replyReceiver.receiveReply(reply, this, futures);
+    internalReceiveReply(reply);
     this.threadStore.exit();
   }
-
-  /**
-   * Returns the url of the node this body is associated to
-   * The url of the node can change if the active object migrates
-   * @return the url of the node this body is associated to
-   */
-  public String getNodeURL() {
-    return nodeURL;
-  }
-
-  /**
-   * Returns the remote version of this body
-   * @return the remote version of this body
-   */
-  public UniversalBody getRemoteAdapter() {
-    return remoteBody;
-  }
-
-  /**
-   * Returns the UniqueID of this body
-   * This identifier is unique accross all JVMs
-   * @return the UniqueID of this body
-   */
-  public UniqueID getID() {
-    return this.bodyID;
-  }
-
-  /**
-   * Signals to this body that the body identified by id is now to a new
-   * remote location. The body given in parameter is a new stub pointing
-   * to this new location. This call is a way for a body to signal to his
-   * peer that it has migrated to a new location
-   * @param id the id of the body
-   * @param body the stub to the new location
-   */
-  public void updateLocation(UniqueID bodyID, UniversalBody body) {
-    location.putBody(bodyID, body);
-  }
+  
+  
 
   //
   // -- implements Body -----------------------------------------------
   //
-
-  public BlockingRequestQueue getRequestQueue() {
-    return requestQueue;
-  }
-
-  public Object getReifiedObject() {
-    return reifiedObject;
-  }
-
-  public String getName() {
-    return reifiedObject.getClass().getName();
-  }
-
-  public void serve(Request request) {
-    if (request == null)
-      return;
-    try {
-      Reply reply = request.serve(this);
-      if (reply == null) return;
-      UniqueID destinationBodyId = request.getSourceBodyID();
-      if (destinationBodyId != null && hasListeners()) {
-        notifyAllListeners(new MessageEvent(reply, MessageEvent.REPLY_SENT, destinationBodyId));
-      }
-      reply.send(request.getSender());
-    } catch (ServeException e) {
-      // handle error here
-      throw new ProActiveRuntimeException("Exception in serve (Still not handled) : throws killer RuntimeException", e);
-    } catch (java.io.IOException e) {
-      // handle error here
-      throw new ProActiveRuntimeException("Exception in sending reply (Still not handled) : throws killer RuntimeException", e);
-    }
-  }
-
-  public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody, RequestFactory requestFactory)
-    throws java.io.IOException {
-    if (isDead)
-      throw new java.io.IOException("The body has been Terminated");
-    long sequenceID = getNextSequenceID();
-    Request request = null;
-    if (requestFactory == null) {
-      request = internalRequestFactory.newRequest(methodCall, this, future == null, sequenceID);
-    } else {
-      request = requestFactory.newRequest(methodCall, this, future == null, sequenceID);
-    }
-    if (future != null)
-      futures.put(sequenceID, future);
-    if (hasListeners())
-      notifyAllListeners(new MessageEvent(request, MessageEvent.REQUEST_SENT, destinationBody.getID()));
-    request.send(destinationBody);
-  }
-
+  
   public void terminate() {
-    if (isDead)
-      return;
+    if (isDead) return;
     isDead = true;
     activityStopped();
-    // we are no longer an existing body
-    //unregisterBody(this);
     // unblock is thread was block
     acceptCommunication();
   }
-
-  public UniversalBody checkNewLocation(UniqueID bodyID) {
-    //we look in the location table of the current JVM
-    Body body = (Body) localBodyMap.getBody(bodyID);
-    if (body != null) {
-      // we update our table to say that this body is local
-      location.putBody(bodyID, body);
-      return body;
-    } else {
-      //it was not found in this vm let's try the location table
-      return location.getBody(bodyID);
-    }
-  }
+  
 
   public void blockCommunication() {
     threadStore.close();
@@ -487,160 +186,102 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
   }
 
 
+  public UniversalBody checkNewLocation(UniqueID bodyID) {
+    //we look in the location table of the current JVM
+    Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
+    if (body != null) {
+      // we update our table to say that this body is local
+      location.putBody(bodyID, body);
+      return body;
+    } else {
+      //it was not found in this vm let's try the location table
+      return location.getBody(bodyID);
+    }
+  }
+
+  //
+  // -- implements LocalBody -----------------------------------------------
+  //
+
+  public FuturePool getFuturePool() {
+    return localBodyStrategy.getFuturePool();
+  }
+
+  public BlockingRequestQueue getRequestQueue() {
+    return localBodyStrategy.getRequestQueue();
+  }
+
+  public Object getReifiedObject() {
+    return localBodyStrategy.getReifiedObject();
+  }
+
+  public String getName() {
+    return localBodyStrategy.getName();
+  }
+
+  public void serve(Request request) {
+    localBodyStrategy.serve(request);
+  }
+
+  public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException {
+    localBodyStrategy.sendRequest(methodCall, future, destinationBody);
+  }
 
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
   /**
-  * Returns a unique identifier that can be used to tag a future, a request
-  * @return a unique identifier that can be used to tag a future, a request.
-  */
-  protected synchronized long getNextSequenceID() {
-    return ++absoluteSequenceID;
-  }
+   * Receives a request for later processing. The call to this method is non blocking
+   * unless the body cannot temporary receive the request.
+   * @param request the request to process
+   * @exception java.io.IOException if the request cannot be accepted
+   */
+  protected abstract void internalReceiveRequest(Request request) throws java.io.IOException;
 
+  /**
+   * Receives a reply in response to a former request.
+   * @param reply the reply received
+   * @exception java.io.IOException if the reply cannot be accepted
+   */
+  protected abstract void internalReceiveReply(Reply reply) throws java.io.IOException;
+
+
+  protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
+    localBodyStrategy = localBody;
+  }
+  
+  
   /**
    * Signals that the activity of this body, managed by the active thread has just stopped.
    */
   protected void activityStopped() {
+    if (! isActive) return;
     isActive = false;
     //We are no longer an active body
-    unregisterBody(this);
-    //bodyEventProducer.fireBodyChanged(this);
-    requestQueue.destroy();
-    //System.out.println("Body:activityStopped localBodyMap.removeBody(bodyID)");
+    LocalBodyStore.getInstance().unregisterBody(this);
   }
 
   /**
    * Signals that the activity of this body, managed by the active thread has just started.
    */
   protected void activityStarted() {
+    if (isActive) return;
     isActive = true;
     // we associated this body to the thread running it
-    bodyPerThread.set(this);
-    //We are now an active body
-    bodyEventProducer.fireBodyChanged(this);
-    //System.out.println("Body:activityStarted localBodyMap.putBody(bodyID)");
+    LocalBodyStore.getInstance().setCurrentThreadBody(this);
+    // we register in this JVM
+    LocalBodyStore.getInstance().registerBody(this);
   }
-
-  protected void notifyOneListener(ProActiveListener listener, ProActiveEvent event) {
-    MessageEvent messageEvent = (MessageEvent) event;
-    MessageEventListener messageEventListener = (MessageEventListener) listener;
-    switch (messageEvent.getType()) {
-      case MessageEvent.REQUEST_SENT :
-        // WARNING: we don't generate an event in the following case:
-        //   - The listener is an active object  AND
-        //   - The destination of the request is the listener
-        // This is done to avoid recursive generation of events
-        if (listener instanceof org.objectweb.proactive.core.mop.StubObject) {
-          org.objectweb.proactive.core.mop.StubObject so = (org.objectweb.proactive.core.mop.StubObject) listener;
-          UniqueID id = ((org.objectweb.proactive.core.body.proxy.BodyProxy) so.getProxy()).getBodyID();
-          if (id.equals(messageEvent.getDestinationBodyID())) {
-            break;
-          }
-        }
-        messageEventListener.requestSent(messageEvent);
-        break;
-
-      case MessageEvent.REQUEST_RECEIVED :
-        messageEventListener.requestReceived(messageEvent);
-        break;
-
-      case MessageEvent.REPLY_SENT :
-        messageEventListener.replySent(messageEvent);
-        break;
-
-      case MessageEvent.REPLY_RECEIVED :
-        messageEventListener.replyReceived(messageEvent);
-        break;
-    }
-  }
-
 
 
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
 
-  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-    out.defaultWriteObject();
-  }
 
-  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-    in.defaultReadObject();
-    // remoteBody is transient so we recreate it here
-    this.remoteBody = remoteBodyFactory.newRemoteBody(this);
-    // threadStore is transient so we recreate it here
-    //this.threadStore = threadStoreFactory.newThreadStore();
-    if (bodyID == null) {
-      // it may append that the bodyID is set to null before serialization if we want to
-      // create a copy of the Body that is distinct from the original
-      bodyID = new UniqueID();
-    }
-    //we register in this JVM
-    registerBody(this);
-    // open the threadStore in order to accept communication
-    threadStore.open();
-  }
-  
-  
 
   //
   // -- inner classes -----------------------------------------------
   //
-
-  private static class BodyEventProducer extends AbstractEventProducer {
-
-    BodyEventProducer() {}
-
-    void fireBodyCreated(AbstractBody b) {
-      if (hasListeners())
-        notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
-    }
-
-    void fireBodyRemoved(AbstractBody b) {
-      if (hasListeners())
-        notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
-    }
-
-    void fireBodyChanged(AbstractBody b) {
-      //System.out.println("fireBodyChanged from AbstractBody active="+b.isActive());
-      if (hasListeners())
-        notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CHANGED));
-    }
-    //
-    // -- implements BodyEventProducer -----------------------------------------------
-    //
-
-    public void addBodyEventListener(BodyEventListener listener) {
-      addListener(listener);
-    }
-
-    public void removeBodyEventListener(BodyEventListener listener) {
-      removeListener(listener);
-    }
-
-    //
-    // -- PROTECTED METHODS -----------------------------------------------
-    //
-
-    protected void notifyOneListener(ProActiveListener listener, ProActiveEvent event) {
-      BodyEvent bodyEvent = (BodyEvent) event;
-      switch (bodyEvent.getType()) {
-        case BodyEvent.BODY_CREATED :
-           ((BodyEventListener) listener).bodyCreated(bodyEvent);
-          break;
-
-        case BodyEvent.BODY_DESTROYED :
-           ((BodyEventListener) listener).bodyDestroyed(bodyEvent);
-          break;
-
-        case BodyEvent.BODY_CHANGED :
-           ((BodyEventListener) listener).bodyChanged(bodyEvent);
-          break;
-      }
-    }
-  } // end inner class BodyEventProducer
-
 }

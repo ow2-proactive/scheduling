@@ -42,7 +42,8 @@ package org.objectweb.proactive.core.util;
 public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
 
   private int counter;
-  private boolean open;
+  private boolean defaultOpenState;
+  private transient boolean open;
 
   /**
    * Creates a new ThreadStore that is opened after creation.
@@ -57,7 +58,8 @@ public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
    * @param isOpened true is the store is opened after creation
    */
   public ThreadStoreImpl(boolean isOpened) {
-    open = isOpened;
+    defaultOpenState = isOpened;
+    open = defaultOpenState;
   }
 
 
@@ -112,4 +114,18 @@ public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
     notifyAll();
   }
 
+
+  //
+  // -- PRIVATE METHODS -----------------------------------------------
+  //
+
+  private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+    out.defaultWriteObject();
+  }
+
+  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+    in.defaultReadObject();
+    // set open to the default value
+    open = defaultOpenState;
+  }
 }

@@ -3,7 +3,7 @@ package modelisation.server;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -103,7 +103,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
                 if (sender != null)
                     sender.updateLocation(bodyID, remoteBody);
                 else {
-                    AbstractBody.getLocalBody(getSourceBodyID()).updateLocation(bodyID, remoteBody);
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID()).updateLocation(bodyID, remoteBody);
                 }
                 ok = true;
             } catch (Exception e) {
