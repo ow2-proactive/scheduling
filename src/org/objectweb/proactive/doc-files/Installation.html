@@ -304,11 +304,15 @@ log4j.appender.A1.layout.ConversionPattern=%m %n
 examples, please make sure you correctly followed all the steps described
 above. If it doesn't help, here is a list of the most common mistakes:   
 <ul class="listWithSpace">
+ <li class="textNormal"> <b>Permission denied when trying to launch scripts under Linux</b>
+   Permissions do not allow to execute files. Just change the permissions with <b>chmod 755 *.sh</b><br></br>
+</li>
    <li class="textNormal"> <b>Java complains about not being able to find 
 ProActive's classes.</b> Your <code>CLASSPATH</code> environment variable 
 does not contain the entry for the ProActive's or ASM's or  Log4j's or Xerces' or Fractal's or BouncyCastle's classes.
     <code>ProActive.jar,     </code><code>asm.jar, log4j-core.jar, xercesImpl.jar, fractal.jar, bouncycastle.jar</code> must
-be in your <code>CLASSPATH</code>.    </li>
+be in your <code>CLASSPATH</code>.   <br></br>
+ </li>
    <li class="textNormal"> <b>Java complains about denial of access.</b>
 If you get the following exceptions, you probably didn't change the file
 java.policy as described in step 4.      
