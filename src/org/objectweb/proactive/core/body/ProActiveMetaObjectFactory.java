@@ -67,12 +67,25 @@ package org.objectweb.proactive.core.body;
  * @since   ProActive 0.9.2
  */
 import org.apache.log4j.Logger;
-
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ibis.ProActiveIbisMetaObjectFactory;
+import org.objectweb.proactive.core.body.migration.MigrationManager;
+import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
+import org.objectweb.proactive.core.body.reply.ReplyReceiver;
+import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
+import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.request.RequestQueueFactory;
+import org.objectweb.proactive.core.body.request.RequestReceiver;
+import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
 import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.ThreadStore;
+import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
 
-public class ProActiveMetaObjectFactory implements java.io.Serializable {
+public abstract class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
 
     //
@@ -98,26 +111,26 @@ public class ProActiveMetaObjectFactory implements java.io.Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
-    //  protected RequestFactory requestFactoryInstance;
-    //  protected ReplyReceiverFactory replyReceiverFactoryInstance;
-    //  protected RequestReceiverFactory requestReceiverFactoryInstance;
-    //  protected RequestQueueFactory requestQueueFactoryInstance;
-    //  protected MigrationManagerFactory migrationManagerFactoryInstance;
-    //  protected RemoteBodyFactory remoteBodyFactoryInstance;
-    //  protected ThreadStoreFactory threadStoreFactoryInstance;
-    //  
+      protected RequestFactory requestFactoryInstance;
+      protected ReplyReceiverFactory replyReceiverFactoryInstance;
+      protected RequestReceiverFactory requestReceiverFactoryInstance;
+      protected RequestQueueFactory requestQueueFactoryInstance;
+      protected MigrationManagerFactory migrationManagerFactoryInstance;
+      protected RemoteBodyFactory remoteBodyFactoryInstance;
+      protected ThreadStoreFactory threadStoreFactoryInstance;
+      
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    //  protected ProActiveMetaObjectFactory() {
-    //    requestFactoryInstance = newRequestFactorySingleton();
-    //    replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-    //    requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-    //    requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-    //    migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-    //    remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-    //    threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-    //  }
+      protected ProActiveMetaObjectFactory() {
+        requestFactoryInstance = newRequestFactorySingleton();
+        replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+        requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+        requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+        migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+        remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+        threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+      }
     //
     // -- PUBLICS METHODS -----------------------------------------------
     //
@@ -132,132 +145,132 @@ public class ProActiveMetaObjectFactory implements java.io.Serializable {
     //
     // -- implements MetaObjectFactory -----------------------------------------------
     //
-    //  public RequestFactory newRequestFactory() {
-    //    return requestFactoryInstance;
-    //  }
-    //  
-    //
-    //  public ReplyReceiverFactory newReplyReceiverFactory() {
-    //    return replyReceiverFactoryInstance;
-    //  }
-    //  
-    //
-    //  public RequestReceiverFactory newRequestReceiverFactory() {
-    //    return requestReceiverFactoryInstance;
-    //  }
-    //  
-    //
-    //  public RequestQueueFactory newRequestQueueFactory() {
-    //    return requestQueueFactoryInstance;
-    //  }
-    //  
-    //
-    //  public MigrationManagerFactory newMigrationManagerFactory() {
-    //    return migrationManagerFactoryInstance;
-    //  }
-    //  
-    //
-    //  public RemoteBodyFactory newRemoteBodyFactory() {
-    //    return remoteBodyFactoryInstance;
-    //  }
-    //
-    //
-    //  public ThreadStoreFactory newThreadStoreFactory() {
-    //    return threadStoreFactoryInstance;
-    //  }
+      public RequestFactory newRequestFactory() {
+        return requestFactoryInstance;
+      }
+      
+    
+      public ReplyReceiverFactory newReplyReceiverFactory() {
+        return replyReceiverFactoryInstance;
+      }
+      
+    
+      public RequestReceiverFactory newRequestReceiverFactory() {
+        return requestReceiverFactoryInstance;
+      }
+      
+    
+      public RequestQueueFactory newRequestQueueFactory() {
+        return requestQueueFactoryInstance;
+      }
+      
+    
+      public MigrationManagerFactory newMigrationManagerFactory() {
+        return migrationManagerFactoryInstance;
+      }
+      
+    
+      public RemoteBodyFactory newRemoteBodyFactory() {
+        return remoteBodyFactoryInstance;
+      }
+    
+    
+      public ThreadStoreFactory newThreadStoreFactory() {
+        return threadStoreFactoryInstance;
+      }
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    //  protected RequestFactory newRequestFactorySingleton() {
-    //    return new RequestFactoryImpl();
-    //  }
-    //  
-    //
-    //  protected ReplyReceiverFactory newReplyReceiverFactorySingleton() {
-    //    return new ReplyReceiverFactoryImpl();
-    //  }
-    //  
-    //
-    //  protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
-    //    return new RequestReceiverFactoryImpl();
-    //  }
-    //  
-    //
-    //  protected RequestQueueFactory newRequestQueueFactorySingleton() {
-    //    return new RequestQueueFactoryImpl();
-    //  }
-    //  
-    //
-    //  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
-    //    return new MigrationManagerFactoryImpl();
-    //  }
-    //  
-    //
-    //  protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-    //    return new RemoteBodyFactoryImpl();
-    //  }
-    //
-    //
-    //  protected ThreadStoreFactory newThreadStoreFactorySingleton() {
-    //    return new ThreadStoreFactoryImpl();
-    //  }
-    //
-    //
-    //
+      protected RequestFactory newRequestFactorySingleton() {
+        return new RequestFactoryImpl();
+      }
+      
+    
+      protected ReplyReceiverFactory newReplyReceiverFactorySingleton() {
+        return new ReplyReceiverFactoryImpl();
+      }
+      
+    
+      protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
+        return new RequestReceiverFactoryImpl();
+      }
+      
+    
+      protected RequestQueueFactory newRequestQueueFactorySingleton() {
+        return new RequestQueueFactoryImpl();
+      }
+      
+    
+      protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
+        return new MigrationManagerFactoryImpl();
+      }
+      
+    
+      protected abstract RemoteBodyFactory newRemoteBodyFactorySingleton() ;
+//        return new RemoteBodyFactoryImpl();
+//      }
+    
+    
+      protected ThreadStoreFactory newThreadStoreFactorySingleton() {
+        return new ThreadStoreFactoryImpl();
+      }
+    
+    
+    
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
-    //
-    //  protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
-    //    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-    //        return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
-    //    }
-    //  } // end inner class RequestFactoryImpl
-    //
-    //  
-    //  protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
-    //    public ReplyReceiver newReplyReceiver() {
-    //        return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
-    //    }
-    //  } // end inner class ReplyReceiverFactoryImpl
-    //
-    //
-    //  protected static class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
-    //    public RequestReceiver newRequestReceiver() {
-    //        return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
-    //    }
-    //  } // end inner class RequestReceiverFactoryImpl
-    //
-    //
-    //  protected static class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
-    //    public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-    //        return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
-    //    }
-    //  } // end inner class RequestQueueFactoryImpl
-    //
-    //
-    //  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
-    //    public MigrationManager newMigrationManager() {
-    //        return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
-    //    }
-    //  } // end inner class MigrationManagerFactoryImpl
-    //
-    //
-    //  protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
-    //    public UniversalBody newRemoteBody(UniversalBody body) {
-    //      try {
-    //          return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
-    //      } catch (ProActiveException e) {
-    //          throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
-    //      }
-    //    }
-    //  } // end inner class RemoteBodyFactoryImpl
-    //
-    //
-    //  protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
-    //    public ThreadStore newThreadStore() {
-    //        return new org.objectweb.proactive.core.util.ThreadStoreImpl();
-    //    }
-    //  } // end inner class ThreadStoreFactoryImpl
-    //
+    
+      protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
+        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+            return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
+        }
+      } // end inner class RequestFactoryImpl
+    
+      
+      protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
+        public ReplyReceiver newReplyReceiver() {
+            return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
+        }
+      } // end inner class ReplyReceiverFactoryImpl
+    
+    
+      protected static class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
+        public RequestReceiver newRequestReceiver() {
+            return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
+        }
+      } // end inner class RequestReceiverFactoryImpl
+    
+    
+      protected static class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
+        public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
+            return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
+        }
+      } // end inner class RequestQueueFactoryImpl
+    
+    
+      protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
+        public MigrationManager newMigrationManager() {
+            return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
+        }
+      } // end inner class MigrationManagerFactoryImpl
+    
+    
+//      protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
+//        public UniversalBody newRemoteBody(UniversalBody body) {
+//          try {
+//              return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+//          } catch (ProActiveException e) {
+//              throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
+//          }
+//        }
+//      } // end inner class RemoteBodyFactoryImpl
+    
+    
+      protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
+        public ThreadStore newThreadStore() {
+            return new org.objectweb.proactive.core.util.ThreadStoreImpl();
+        }
+      } // end inner class ThreadStoreFactoryImpl
+    
 }
