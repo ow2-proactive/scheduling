@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body.rmi;
 
 import java.rmi.RemoteException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -47,6 +48,9 @@ import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     implements RemoteBody,
                java.rmi.server.Unreferenced {
+               	
+               	
+   protected static Logger logger = Logger.getLogger(RemoteBodyImpl.class.getName());
 
     /**
    * A custom socket Factory
@@ -69,6 +73,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
   public RemoteBodyImpl(UniversalBody body) throws RemoteException {
   //   super(0, factory, factory);
     this.body = body;
+    
   }
 
   //
@@ -80,9 +85,6 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
   //
 
   public void receiveRequest(Request r) throws java.io.IOException {
-	//  System.out.println("RemoteBody.receiveRequest " + body);
-    // 	System.out.println("RemoteBodyImpl: receiveRequest() for " + this.localBody);
-    //  System.out.println("RemoteBodyImpl: receiveRequest() request is " + r.getMethodName());
       body.receiveRequest(r);     
   }
 
@@ -127,18 +129,20 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
   // -- SERIALIZATION -----------------------------------------------
   //
 
-  /*    
+    
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-  long startTime=System.currentTimeMillis();
+ // long startTime=System.currentTimeMillis();
+ //System.out.println("i am in serialization");
   out.defaultWriteObject();
-  long endTime=System.currentTimeMillis();
-  System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
+  //System.out.println("i am in serialization");
+  //long endTime=System.currentTimeMillis();
+  //System.out.println(" SERIALIZATION OF REMOTEBODYIMPL lasted " + (endTime - startTime));
   
   }
   
   
-  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-  in.defaultReadObject();
-  }
-  */
+//  private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+//  in.defaultReadObject();
+//  }
+//  */
 }

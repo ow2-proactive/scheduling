@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.body;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEventListener;
@@ -54,6 +55,8 @@ public class LocalBodyStore {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
+    static Logger logger = Logger.getLogger(LocalBodyStore.class.getName());
+    
     private static LocalBodyStore instance = new LocalBodyStore();
 
     //
@@ -184,6 +187,7 @@ public class LocalBodyStore {
         bodyEventProducer.addBodyEventListener(listener);
     }
 
+
     /**
      * Removes a listener of body events.
      * @param listener the listener of body events to remove
@@ -197,7 +201,7 @@ public class LocalBodyStore {
     //
     void registerBody(AbstractBody body) {
         if (localBodyMap.getBody(body.getID()) != null) {
-            System.out.println("WARNININININININININGGGGGGG");
+            logger.warn("WARNING Body already registered in the body map");
         }
         localBodyMap.putBody(body.bodyID, body);
         bodyEventProducer.fireBodyCreated(body);
