@@ -17,6 +17,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -304,6 +305,8 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
 
         try {
             sendRequest(new RuntimeRequest("registerVirtualNode", params));
+            String url = buildNodeURL(virtualNodeName);
+            logger.info(url + " successfully bound in registry at " + url);
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
@@ -595,4 +598,20 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             throw new ProActiveException(e);
         }
     }
+
+    private String buildNodeURL(String url)
+    throws java.net.UnknownHostException {
+    int i = url.indexOf('/');
+    if (i == -1) {
+        //it is an url given by a descriptor
+        String host = getVMInformation().getInetAddress().getCanonicalHostName();
+
+        int port = RemoteRuntimeFactory.getRegistryHelper()
+                                       .getRegistryPortNumber();
+        return UrlBuilder.buildUrl(host, url, "http:", port);
+    } else {
+        return UrlBuilder.checkUrl(url);
+    }
+}
+
 }
