@@ -145,7 +145,7 @@ public class HostPanel extends AbstractDataObjectPanel
     public void alignLayout(String align) {
         alignLayout = align;
         setPreferredSize(null);
-        if (align == "H") {
+        if (align.equals(new String("H"))) {
             setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
         } else {
             setLayout(new javax.swing.BoxLayout(HostPanel.this,

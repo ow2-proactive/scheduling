@@ -110,7 +110,7 @@ public class VMPanel extends AbstractDataObjectPanel implements VMObjectListener
     public void alignLayout(String align) {
         alignLayout = align;
         setPreferredSize(null);
-        if (align == "H") {
+        if (align.equals(new String("H"))) {
             setLayout(new java.awt.GridLayout(1, 0, 4, 4));
         } else {
             this.setLayout(new java.awt.GridLayout(0, 1, 4, 4));
