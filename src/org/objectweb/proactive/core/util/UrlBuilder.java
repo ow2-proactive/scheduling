@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.Constants;
  * This class is a utility class to perform modifications and operations on urls.
  */
 
-public class UrlBuilder {
+public class UrlBuilder { 
     private static String[] LOCAL_URLS = { "///", "//localhost", "//127.0.0.1" };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
 
@@ -302,5 +302,6 @@ public class UrlBuilder {
             url = url.substring(0, url.length() - 1);
         }
         return url;
+    }
 
 }
