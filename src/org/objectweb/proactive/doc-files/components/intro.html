@@ -170,6 +170,7 @@ The <code>Fractive</code> class acts as :
 <p class="textNormal">The Architecture Description Language (ADL) is used to configure and deploy component systems. The architecture of the system is described in a normalized XML file.</p>
 <p><b>The ADL has been updated </b>and is now an extension of the standard Fractal ADL, allowing to reuse ProActive-specific features such as distributed deployment using deployment descriptors.</p><p>The distributed deployment facilities offered by ProActive are reused, and the notion of virtual node is integrated in the component ADL. For this reason, the components ADL has to be associated with a deployment descriptor (this is done at parsing time : both files are given to the parser).</p>
 <p>One should refer to the <a href="http://fractal.objectweb.org/tutorials/adl/index.html">Fractal ADL tutorial</a> for more detailed information about the ADL. Here is a short overview, and a presentation of some added features.</p>
+    <p>Note that because this ADL is based on the Fractal ADL, it requires the following libraries (included in the /lib directory of the ProActive distribution) : fractal-adl.jar, dtdparser.jar, ow_deployment_scheduling.jar</p>
 
 <h3>Overview</h3>
 <p>Components are defined in <b>definition</b> files, which are .fractal files. The syntax of the document is validated against a DTD retreived from the classpath <pre class="snippet">classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd</pre></p>
@@ -238,7 +239,7 @@ The component will be instantiated on the virtual node it specified (or the one 
     </p>
     <p> As a result, the client and server component will be colocated / deployed on the same virtual node. This can be profitable if there is a lot of communications between these two components.</p>
     <p>When specifying "null" as the name of an exported virtual node, the components will be deployed on the current virtual machine. This can be useful for debugging purposes.</p>
-   
+<br>
     <p>This new ADL will facilitate integration with other tools from the Fractal community, notably the Fractal GUI and the packaging tools. We are currently finalizing an extension of the FractalGUI for ProActive.</p>
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
@@ -440,7 +441,7 @@ Another configuration is also possible, where client and server are wrapped arou
 </p>
 
 <h4>Execution</h4>
-<p>You can either compile and run the code yourself, or follow the instructions for preparing the examples and use the script helloworld_fractal.sh (or .bat)</p>
+<p>You can either compile and run the code yourself, or follow the instructions for preparing the examples and use the script helloworld_fractal.sh (or .bat). If you choose the first solution, do not forget to set the fractal.provider system property.</p>
 <p>If you run the program with no arguments (i.e. not using the parser, no wrapper composite components, and local deployment) , you should get something like this: </p>
 <pre class="snippet">
 01  --> This ClassFileServer is reading resources from classpath
