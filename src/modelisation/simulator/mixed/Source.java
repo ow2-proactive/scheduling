@@ -104,8 +104,8 @@ public class Source extends SimulatorElement {
 	}
 
 	public void receiveReplyFromServer(int location) {
-		//        System.out.println("Source.receiveReplyFromServer currentLocation"
-		//                           + location);
+		      System.out.println("Source.receiveReplyFromServer currentLocation "
+		                           + location);
 		this.currentLocation = location;
 		this.remainingTime = 0;
 	}

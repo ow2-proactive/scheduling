@@ -27,7 +27,7 @@ public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFac
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
 
-  private static final MetaObjectFactory instance = new TimedLocationServerMetaObjectFactory();
+  private static MetaObjectFactory instance = null; 
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -46,6 +46,9 @@ public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFac
   //
 
   public static MetaObjectFactory newInstance() {
+  	if (instance == null) {
+  		instance = new TimedLocationServerMetaObjectFactory();
+  	}
     return instance;
   }
 

@@ -66,6 +66,14 @@ public class Server extends SimulatorElement {
         }
     }
 
+
+    public void receiveRequestFromForwarder(int number) {
+        System.out.println("Server.receiveRequestFromForwarder");
+        this.requestQueue.addRequest(new Request(Request.AGENT, number));
+        this.receiveRequest();
+//        this.messageFromAgent = true;
+    }
+
     public void receiveRequestFromAgent(int number) {
         System.out.println("Server.receiveRequestFromAgent");
         this.requestQueue.addRequest(new Request(Request.AGENT, number));

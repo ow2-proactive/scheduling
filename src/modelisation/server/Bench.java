@@ -153,12 +153,12 @@ System.out.println("NODES SIZE = " + nodes.length);
 		System.out.println("Test: looking up for the server");
 		System.out.println(
 			"Test: using lambda = " + args[0] + " nu = " + args[1]);
-		   if (!auto.startAllNodes(auto.readDestinationFile(args[2]), "")) {
+/*	   if (!auto.startAllNodes(auto.readDestinationFile(args[2]), "")) {
 		     auto.killAllProcess();
 		     System.err.println("Error creating nodes, aborting");
 		     System.exit(-1);
 		
-		   }
+		   }*/
 
 		Bench.initialise(auto);
 

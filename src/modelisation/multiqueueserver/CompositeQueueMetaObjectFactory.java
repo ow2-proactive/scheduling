@@ -22,8 +22,7 @@ public class CompositeQueueMetaObjectFactory extends ProActiveMetaObjectFactory 
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
 
-  private static final MetaObjectFactory instance = new CompositeQueueMetaObjectFactory();
-
+  private static  MetaObjectFactory instance = null;
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -40,7 +39,11 @@ public class CompositeQueueMetaObjectFactory extends ProActiveMetaObjectFactory 
   // -- PUBLICS METHODS -----------------------------------------------
   //
 
-  public static MetaObjectFactory newInstance() {
+  public static synchronized MetaObjectFactory newInstance() {
+  		if (instance == null) {
+  			instance = new CompositeQueueMetaObjectFactory();
+
+  		}
     return instance;
   }
 

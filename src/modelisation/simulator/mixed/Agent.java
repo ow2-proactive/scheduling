@@ -136,6 +136,20 @@ public class Agent extends SimulatorElement {
     }
 
 
+	public String getStateAsLetter() {
+		switch (this.state) {
+			case WAITING :
+				return "w";
+			case MIGRATING :
+				return "m";
+			case CALLING_SERVER :
+				return "u";
+		}
+		return "";
+	}
+
+
+
     public String toString() {
         StringBuffer tmp = new StringBuffer();
         switch (this.state) {
