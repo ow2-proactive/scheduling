@@ -30,8 +30,7 @@
 */ 
 package org.objectweb.proactive.examples.futurelist;
 
-import org.objectweb.proactive.core.body.future.FutureList;
-import org.objectweb.proactive.core.body.future.FuturePool;
+import org.objectweb.proactive.ext.util.FutureList;
 
 public class FutureReceiver implements java.io.Serializable {
 
@@ -85,8 +84,7 @@ public class FutureReceiver implements java.io.Serializable {
    */
   public void createFutureList() {
     org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) org.objectweb.proactive.ProActive.getBodyOnThis();
-    FuturePool futurePool = b.getFuturePool();
-    this.futureList = new FutureList(futurePool);
+    this.futureList = new FutureList();
   }
 
 
