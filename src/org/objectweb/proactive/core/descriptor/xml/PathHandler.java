@@ -44,6 +44,7 @@ class PathHandler extends BasicUnmarshaller {
   //
   //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
   //
+  
   private static final String TYPE_ATTRIBUTE = "type";
   private static final String ABSOLUTE_TYPE = "absolute";
   private static final String RELATIVE_TYPE = "relative";
@@ -69,6 +70,7 @@ class PathHandler extends BasicUnmarshaller {
   //
 
   public PathHandler() {
+  
   }
 
 
@@ -87,7 +89,9 @@ class PathHandler extends BasicUnmarshaller {
     String origin = attributes.getValue(ORIGIN_ATTRIBUTE);
     if (! checkNonEmpty(origin)) origin = DEFAULT_ORIGIN;
     String value = attributes.getValue(VALUE_ATTRIBUTE);
-    //System.out.println("Found Path Element type="+type+" origin="+origin+" value="+value);
+		if (logger.isDebugEnabled()) {
+    	logger.debug("Found Path Element type="+type+" origin="+origin+" value="+value);
+		}
     if (! checkNonEmpty(value)) throw new org.xml.sax.SAXException("Path element defined without a value");
     // build the associated string
     if (type.equals(ABSOLUTE_TYPE)) {
