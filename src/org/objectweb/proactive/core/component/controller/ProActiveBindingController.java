@@ -69,9 +69,7 @@ import java.util.List;
 
 
 /**
- * Abstract implementation of BindingController.
- *
- * It defines common operations of both primitive and composite binding controllers.
+ * Implementation of the {@link org.objectweb.fractal.api.control.BindingController} interface.
  *
  * @author Matthieu Morel
  *
@@ -80,14 +78,11 @@ public class ProActiveBindingController extends ProActiveController
     implements BindingController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger("components");
 
-    //private Vector bindings; // contains Binding objects
-    //private Hashtable bindings; // key = clientInterfaceName ; value = Binding
     private Bindings bindings; // key = clientInterfaceName ; value = Binding
     protected Hashtable groupBindings;
     private List collectiveInterfacesNames = null;
     private List singleInterfacesNames = null;
 
-    // to avoid searching for these names each time
     public ProActiveBindingController(Component owner) {
         super(owner);
         try {
@@ -104,7 +99,6 @@ public class ProActiveBindingController extends ProActiveController
     }
 
     public void addBinding(Binding binding) {
-        //bindings.put(binding.getClientInterface().getFcItfName(), binding);
         bindings.add(binding);
     }
 
@@ -437,7 +431,8 @@ public class ProActiveBindingController extends ProActiveController
     }
 
     /**
-     * 
+     * Returns the interfaces with cardinality equal to single  
+     * @return a list of the names of the interfaces with single cardinality
      */
     public List getSingleInterfacesNames() {
         if (singleInterfacesNames == null) {
