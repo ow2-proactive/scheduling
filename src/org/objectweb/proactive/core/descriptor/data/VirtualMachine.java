@@ -82,17 +82,17 @@ public interface VirtualMachine {
      */
     public String getAcquisitionMethod();
 
-    /**
-     * Sets the port number of the acquisition process
-     * @param s
-     */
-    public void setPortNumber(String s);
-
-    /**
-     * Return the Acquisition port number
-     * @param s
-     */
-    public String getPortNumber();
+//    /**
+//     * Sets the port number of the acquisition process
+//     * @param s
+//     */
+//    public void setPortNumber(String s);
+//
+//    /**
+//     * Return the Acquisition port number
+//     * @param s
+//     */
+//    public String getPortNumber();
 
     /**
      * Sets the process mapped to this VirtualMachine to the given process
