@@ -50,6 +50,7 @@
 			<unitTest class="nonregressiontest.component.creation.remote.newactive.parallel.virtualnode.Test"/>
 			<unitTest class="nonregressiontest.component.binding.local.collective.Test"/>
 			<unitTest class="nonregressiontest.component.binding.remote.collective.Test"/>
+			<unitTest class="nonregressiontest.component.binding.local.Test"/>
 			<unitTest class="nonregressiontest.component.descriptor.Test"/>
 			<unitTest class="nonregressiontest.component.descriptor.fractaladl.Test"/>
 	</packageGroup>
