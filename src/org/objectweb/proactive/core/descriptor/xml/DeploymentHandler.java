@@ -102,8 +102,7 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
             }
             String protocol = attributes.getValue("protocol");
             if (!checkNonEmpty(protocol)) {
-                throw new org.xml.sax.SAXException(
-                    "lookup Tag without any protocol defined");
+                protocol = System.getProperty("proactive.communication.protocol");
             }
             protocol = UrlBuilder.checkProtocol(protocol);
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(vn,
@@ -226,6 +225,9 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
                 throws org.xml.sax.SAXException {
                 if (name.equals(CURRENTJVM_TAG)) {
                     String protocol = (String) activeHandler.getResultObject();
+                    if (!checkNonEmpty(protocol)) {
+                        protocol = System.getProperty("proactive.communication.protocol");
+                    }
                     vn.createNodeOnCurrentJvm(protocol);
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
@@ -300,45 +302,44 @@ class DeploymentHandler extends PassiveCompositeUnmarshaller
         private class AcquisitionHandler extends PassiveCompositeUnmarshaller {
             private AcquisitionHandler() {
                 this.addHandler(SERVICE_REFERENCE_TAG,
-                        new ProcessReferenceHandler());
+                    new ProcessReferenceHandler());
             }
-            
+
             protected void notifyEndActiveHandler(String name,
-                    UnmarshallerHandler activeHandler)
-                    throws org.xml.sax.SAXException {
-                    Object o = activeHandler.getResultObject();
-                    if (o == null) {
-                        return;
-                    }
-                    proActiveDescriptor.registerService(currentVM, (String)o);
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                Object o = activeHandler.getResultObject();
+                if (o == null) {
+                    return;
                 }
+                proActiveDescriptor.registerService(currentVM, (String) o);
+            }
 
-//            public void startContextElement(String name, Attributes attributes)
-//                throws org.xml.sax.SAXException {
-//                String runtimeURL = attributes.getValue("url");
-//
-//                //String portNumber = attributes.getValue("port");
-//                if (runtimeURL != null) {
-//                    String protocol = UrlBuilder.getProtocol(runtimeURL);
-//                    String url = UrlBuilder.removeProtocol(runtimeURL, protocol);
-//                    proActiveDescriptor.registerProcess(currentVM,
-//                        (String) runtimeURL);
-//                    ProActiveRuntime proActiveRuntimeRegistered = null;
-//                    try {
-//                        proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,
-//                                protocol);
-//                    } catch (ProActiveException e) {
-//                        e.printStackTrace();
-//                    }
-//                    currentVM.setAcquired(true);
-//                    currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
-//                    //currentVM.setAcquisitionMethod(acquisitionMethod);
-//                }
-
-                ////               if (portNumber != null) {
-                /////                    currentVM.setPortNumber(portNumber);
-                ////                }
-         //   }
+            //            public void startContextElement(String name, Attributes attributes)
+            //                throws org.xml.sax.SAXException {
+            //                String runtimeURL = attributes.getValue("url");
+            //
+            //                //String portNumber = attributes.getValue("port");
+            //                if (runtimeURL != null) {
+            //                    String protocol = UrlBuilder.getProtocol(runtimeURL);
+            //                    String url = UrlBuilder.removeProtocol(runtimeURL, protocol);
+            //                    proActiveDescriptor.registerProcess(currentVM,
+            //                        (String) runtimeURL);
+            //                    ProActiveRuntime proActiveRuntimeRegistered = null;
+            //                    try {
+            //                        proActiveRuntimeRegistered = RuntimeFactory.getRuntime(url,
+            //                                protocol);
+            //                    } catch (ProActiveException e) {
+            //                        e.printStackTrace();
+            //                    }
+            //                    currentVM.setAcquired(true);
+            //                    currentVM.setRemoteRuntime(proActiveRuntimeRegistered);
+            //                    //currentVM.setAcquisitionMethod(acquisitionMethod);
+            //                }
+            ////               if (portNumber != null) {
+            /////                    currentVM.setPortNumber(portNumber);
+            ////                }
+            //   }
         }
 
         // end inner class AcquisitionHandler
