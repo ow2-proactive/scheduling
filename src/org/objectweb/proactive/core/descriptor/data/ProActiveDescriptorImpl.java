@@ -41,6 +41,20 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
+/**
+ * <p>
+ * A <code>ProactiveDescriptor</code> is an internal representation of XML
+ * Descriptor. It offers a set of services to access/activate/desactivate
+ * <code>VirtualNode</code>.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
+ * @see VirtualNode
+ * @see VirtualMachine
+ */
+
 public class ProActiveDescriptorImpl implements ProActiveDescriptor
 
 

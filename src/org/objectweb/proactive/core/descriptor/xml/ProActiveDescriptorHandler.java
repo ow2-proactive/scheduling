@@ -39,10 +39,13 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
+/**
+ *
+ * Receives SAX event and pass them on
+ *
+ */
+
 public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator implements ProActiveDescriptorConstants {
-
-
-
 
   private ProActiveDescriptor proActiveDescriptor;
 
