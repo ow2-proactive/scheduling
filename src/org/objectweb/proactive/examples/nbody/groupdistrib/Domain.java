@@ -1,6 +1,5 @@
 package org.objectweb.proactive.examples.nbody.groupdistrib;
 
-
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -24,56 +23,65 @@ public class Domain implements Serializable{
         }
     }
     
-    private Displayer display;
-    private int identification;
-    private String hostName = "unknown";
-    private Domain neighbours;
-    private Planet info;
-    private Force currentForce ;
+    private Displayer display;								// If we want some graphical interface
+    private int identification;                         	// unique domain identifier
+    private String hostName = "unknown";					// to display on which host we're running
+    private Domain neighbours;								// The Group containing all the other Domains
+    private Planet info;									// the body information
+    private Force currentForce ;							// the sum of the forces already worked out 
     
-    private int nbvalues, nbReceived=0;
+    private int nbvalues, nbReceived=0;						// iteration related
     private int iter, maxIter;
-    private Vector prematureValues;
+    private Vector prematureValues;							// if values arrive too early, put them here.
     
+    /**
+     * Required by ProActive Active Objects
+     */
     public Domain (){}
     
+    /**
+     * Constructor
+     * @param i the unique identifier
+     * @param r the boundaries containing the Planet at the begining of the simulation
+     */
     public Domain (Integer i, Rectangle r) {
         this.identification = i.intValue();
         this.prematureValues = new Vector(); 
         this.info = new Planet(r);
-        try {
-            this.hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public void init(Domain domainG, Displayer dp, int maxIter) {
-        init(domainG, maxIter);
-        this.display=dp;
+        try {this.hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {e.printStackTrace();}
     }
     
     /**
-     * Initialize all necessary variables, namely the variables concerning neighborhood and forces.  
+     * Initialize all necessary variables, namely the variables concerning neighborhood, the display, and forces. 
      * @param domainGroup the Group of all Domains within universe 
+     * @param dp The Displayer used to show on screen the movement of the objects.
      * @param maxIter The number of iterations to compute before stoppping
      */
-    
-    public void init(Domain domainGroup, int maxIter) {
+    public void init(Domain domainGroup, Displayer dp, int maxIter) {
+        this.display=dp;
         this.maxIter = maxIter;
         this.neighbours = domainGroup;
         Group g = ProActiveGroup.getGroup(neighbours);
         g.remove(ProActive.getStubOnThis()); // no need to send information to self
-        this.nbvalues = g.size();
+        this.nbvalues = g.size();			// number of expected values to receive.
         reset();
     }
     
     
-    public void computeNewValue() {
+    /**
+     * Move the Planet contained, applying the force computed. 
+     */
+    public void moveBody() {
         this.info.moveWithForce(currentForce);    
         sendValueToNeighbours();
     }
     
+    /**
+     * Called by a distant Domain, this method adds the inf contribution to the force applied on the local Planet
+     * @param inf the distant Planet which adds its contribution.
+     * @param receivedIter the distant iteration, to make sure we're synchronized 
+     */
     public void setValue(Planet inf, int receivedIter) {
         if (this.iter == receivedIter) {
             this.currentForce.add(info, inf);
@@ -81,7 +89,7 @@ public class Domain implements Serializable{
             if (this.nbReceived > this.nbvalues)
                 System.err.println(identification +  " : Too many answers " + this.nbReceived + "/" + this.nbvalues);
             if (this.nbReceived == this.nbvalues) 
-                computeNewValue();
+                moveBody();
         }
         else { 
             if (this.iter > receivedIter)
@@ -90,7 +98,9 @@ public class Domain implements Serializable{
         }
     }
     
-    
+    /**
+     * Triggers the emission of the local Planet to all the other Domains.
+     */
     public void sendValueToNeighbours() {
         reset();
         this.iter++;
@@ -132,6 +142,9 @@ public class Domain implements Serializable{
     }
     
     
+    /**
+     * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
+     */
     private void readObject(java.io.ObjectInputStream in) 
     throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();

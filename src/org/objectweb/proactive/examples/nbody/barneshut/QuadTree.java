@@ -1,9 +1,5 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-//import java.io.DataInputStream;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
-//import java.io.IOException;
 import java.io.Serializable;
 import java.util.Vector;
 
@@ -44,36 +40,10 @@ public class QuadTree implements Serializable {
     //	public QuadTree(String fileName) {
     //		Rectangle R = new Rectangle (-100,-100,200,200);
     //		Vector v = new Vector ();	// of type vector of planets
-    //		DataInputStream in;
-    //		try {
-    //			in = new DataInputStream(new FileInputStream(fileName));
-    //		} catch (FileNotFoundException e) {
-    //			e.printStackTrace();
-    //			throw new NullPointerException("File " + fileName + " not found.");
-    //		}
-    //		try {
-    //			while (true) {
-    //				double x = in.readDouble();
-    //				in.readChar();       //throws out the tab
-    //				double y = in.readDouble();
-    //				in.readChar();       //throws out the tab
-    //				double vx = in.readDouble();
-    //				in.readChar();       //throws out the tab
-    //				double vy = in.readDouble();
-    //				in.readChar();       //throws out the tab
-    //				double mass = in.readDouble();
-    //				in.readLine();
     //				Planet p = new Planet(x,y,vx,vy,mass);
     //				System.out.println("Planet : " + p);
     //				v.add (p);
-    //			}    
-    //		} catch (IOException e) { }
-    //		try {
-    //			in.close();
-    //		} catch (IOException e) {
-    //			e.printStackTrace();
     //			throw new NullPointerException("File " + fileName + " couldn't be closed.");
-    //		}
     //		myConstructor(R, v);
     //		label(0);
     //	}
@@ -94,7 +64,7 @@ public class QuadTree implements Serializable {
      * 
      */
     private void myConstructor(Rectangle R, Vector bodies) {
-        info = new Info(bodies,R);
+        this.info = new Info(bodies,R);
         
         if (bodies.size() >  MAX_BODIES_IN_DOMAIN)	{ 	    // Split into sub-trees
             
@@ -122,12 +92,12 @@ public class QuadTree implements Serializable {
                 trees.add( new QuadTree(new Rectangle(new Point2D(middle.x, middle.y), new Point2D(R.x + R.width, R.y + R.height)), subtree[3]));  
             
             //  Q=(QuadTree[]) trees.toArray(); 
-            Q = new QuadTree[trees.size()];
+            this.Q = new QuadTree[trees.size()];
             for (int i = 0 ; i < Q.length ; i++ )
-                Q[i]=(QuadTree) trees.get(i);
+                this.Q[i]=(QuadTree) trees.get(i);
         }
         else { // no sons to this Node 
-            Q = null; 
+            this.Q = null; 
         }
     }
     
@@ -150,14 +120,6 @@ public class QuadTree implements Serializable {
     }
     
     
-    //Adds a body to this quadtree
-    //void insert(Info body) {throw new NullPointerException("Method not written");}
-    
-    
-    //Removes a body from this quadtree
-    //void remove(Info body)  {throw new NullPointerException("Method not written");}
-    
-    
     /*
      * Helper methods
      */
@@ -174,11 +136,11 @@ public class QuadTree implements Serializable {
      */
     private int label(int index){
         this.label = index;
-        info.identification = label;
+        this.info.identification = label;
         index++;
-        if (Q != null) {
-            for (int i = 0 ; i < Q.length ; i++)
-                index = Q[i].label(index) ;
+        if (this.Q != null) {
+            for (int i = 0 ; i < this.Q.length ; i++)
+                index = this.Q[i].label(index) ;
         }
         return index;
     }
@@ -222,12 +184,12 @@ public class QuadTree implements Serializable {
      */
     public Vector getInfo(){
         Vector v = new Vector ();
-        info.clean(Q==null); // DEBUG : this causes trouble
+        info.clean(this.Q==null); // DEBUG : this causes trouble
         v.add(info);
-        if (Q!=null) {
-            for (int i = 0 ; i < Q.length ; i++) 
-                v.addAll(Q[i].getInfo());
-            info.setNbSons(Q.length);
+        if (this.Q!=null) {
+            for (int i = 0 ; i < this.Q.length ; i++) 
+                v.addAll(this.Q[i].getInfo());
+            info.setNbSons(this.Q.length);
         }
         info = null;	 // make the tree as light as possible
         return v;
@@ -238,10 +200,10 @@ public class QuadTree implements Serializable {
      * @return the number of nodes in the tree
      */
     public int size () {
-        if (Q != null) {
+        if (this.Q != null) {
             int res = 1;
-            for (int i = 0 ; i < Q.length ; i++)
-                res += Q[i].size() ;
+            for (int i = 0 ; i < this.Q.length ; i++)
+                res += this.Q[i].size() ;
             return res; 
         }
         else 
@@ -257,9 +219,9 @@ public class QuadTree implements Serializable {
     
     private String toString(String add) {
         String res = "";
-        if (Q != null) {
-            for (int i = 0 ; i < Q.length ; i++)
-                res = Q[i].toString(add + " ") + "\n" + res ;
+        if (this.Q != null) {
+            for (int i = 0 ; i < this.Q.length ; i++)
+                res = this.Q[i].toString(add + " ") + "\n" + res ;
             //			return add + "i=" + label + " M="+info.mass + " nb=" + info.planets.length + " sons=" + "\n" + res;
             return add + "i=" + label + " sons=" + "\n" + res;
         }
@@ -269,4 +231,3 @@ public class QuadTree implements Serializable {
     }
     
 }
-

@@ -1,17 +1,14 @@
-package org.objectweb.proactive.examples.nbody.groupcom;
+package org.objectweb.proactive.examples.nbody.simple;
 
 import java.io.Serializable;
-
-import org.objectweb.proactive.core.group.ProActiveGroup;
 
 /**
  * Synchronization of the computation of the Domains
  */
 public class Maestro implements Serializable {
     
-    private Domain domainGroup;
-    private int nbFinished = 0, iter = 0, maxIter;
-    private int size;
+    private int nbFinished = 0, iter = 0, maxIter;   // iteration related fields
+    private Domain[] domainArray;					 // references on all the Active Domains
     
     /**
      * Required by ProActive Active Objects
@@ -23,24 +20,24 @@ public class Maestro implements Serializable {
      * @param domainG the group of Domains which are to be controled by this Maestro.
      * @param max the total number of iterations that should be simulated
      */
-    public Maestro (Domain domainG, Integer max) {
+    public Maestro (Domain [] domainArray, Integer max) {
         this.maxIter = max.intValue(); 
-        this.domainGroup = domainG;
-        this.size = ProActiveGroup.getGroup(domainGroup).size();
+        this.domainArray = domainArray;
     }
     
     /**
      * Called by a Domain when computation is finished. 
-     * This method counts the answers, and restarts all Domains when all have finished. 
+     * This method counts the calls, and restarts all Domains only once all have finished. 
      */
     public void notifyFinished() {
         this.nbFinished ++ ;
-        if (this.nbFinished == this.size) {
+        if (this.nbFinished == this.domainArray.length) {
             this.iter ++;
             if (this.iter == this.maxIter)  
                 org.objectweb.proactive.examples.nbody.common.Start.quit ();
             this.nbFinished = 0 ;
-            this.domainGroup.sendValueToNeighbours();
+            for (int i = 0 ; i < domainArray.length ; i++)
+                this.domainArray[i].sendValueToNeighbours();
         }
     }
     

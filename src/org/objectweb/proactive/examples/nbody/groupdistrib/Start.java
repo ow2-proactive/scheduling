@@ -30,20 +30,18 @@ public class Start {
         
         Domain domainGroup = null;
         try {
+            // Create a group containing all the Domain in the simulation 
             domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
         }
         catch (ClassNotReifiableException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
         catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
         catch (ActiveObjectCreationException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
         catch (NodeException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
-
+        
         System.out.println("[NBODY] " + totalNbBodies + " Planets are deployed");
         
         // init workers
-        if (displayer != null)
-            domainGroup.init(domainGroup, displayer, maxIter);
-        else
-            domainGroup.init(domainGroup, maxIter);
+        domainGroup.init(domainGroup, displayer, maxIter);
         
         // launch computation
         domainGroup.sendValueToNeighbours();

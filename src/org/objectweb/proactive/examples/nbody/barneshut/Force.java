@@ -1,11 +1,8 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
-
-public class Force implements Serializable {
+public class Force  {
     
     double x=0,y=0;    
     final double G=9.81, RMIN = 1;
@@ -27,10 +24,10 @@ public class Force implements Serializable {
         if (p2.radius > distance)					
             throw new TooCloseBodiesException();    
         double cube = distance*distance;            
-        double coeff = G * p2.mass / cube ; // * p1.mass removed, because division removed as well
+        double coeff = this.G * p2.mass / cube ; // * p1.mass removed, because division removed as well
         // Watch out : no minus sign : we want to have force of 2 on 1!
-        x = coeff * (p2.x - p1.x);
-        y = coeff * (p2.y - p1.y);
+        this.x = coeff * (p2.x - p1.x);
+        this.y = coeff * (p2.y - p1.y);
     } 
     
     /**
@@ -45,10 +42,10 @@ public class Force implements Serializable {
         if (distance < p1.diameter ) // avoids division by zero 
             distance = p1.diameter; 
         double cube = distance*distance; 
-        double coeff = G  * p2.mass / cube; // * p1.mass removed, because division removed as well
+        double coeff = this.G  * p2.mass / cube; // * p1.mass removed, because division removed as well
         // Watch out : no minus sign : we want to have force of 2 on 1!
-        x = coeff * (p2.x - p1.x);
-        y = coeff * (p2.y - p1.y);
+        this.x = coeff * (p2.x - p1.x);
+        this.y = coeff * (p2.y - p1.y);
     } 
     
     /**
@@ -56,12 +53,12 @@ public class Force implements Serializable {
      * @param f, the force to be added to this
      */
     public void add(Force f) {
-        x += f.x;
-        y += f.y;
+        this.x += f.x;
+        this.y += f.y;
     }
     
     public String toString(){
-        return "<" + (int) x + " " + (int) y + ">";
+        return "<" + (int) this.x + " " + (int) this.y + ">";
     }
 }
 

@@ -62,7 +62,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener, 
     public NBodyFrame(String title, int nb, boolean displayft) throws HeadlessException {
         super(title);
         setSize(SIZE+11, SIZE+90);
-        setLocation(10, 10);
+        setLocation(500, 50);
         bodies = new int[nb][6];
         bodyname = new String[nb];
         historics = new CircularPostionList[nb];

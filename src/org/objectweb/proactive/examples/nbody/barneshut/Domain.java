@@ -6,13 +6,20 @@ import java.net.UnknownHostException;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
-
+/**
+ * Domains are set over a given region of space.
+ * They contain either Bodies, or more Domains, which have smaller space coverage. 
+ * Communication is achieved through group communication. Neighbours are chosen
+ * so that they cover the biggest area possible, without creating too big errors in computations. 
+ */
 public class Domain implements Serializable{
     
     private class Carrier {
@@ -24,35 +31,30 @@ public class Domain implements Serializable{
             this.iter = iter;
         }
     }
+    private int identification;					// unique domain identifier
+    private Domain neighbours;					// The Group containing all the other Domains
+    private boolean [] canIReceiveInfoFrom;		// list of Domains that can send info
+    private String hostName = "unknown";		// to display on which host we're running
     
-    public int identification;
+    private Displayer display;					// If we want some graphical interface
     
-    private Displayer display = null;
-    private String hostName = "unknown";
     
-    private Domain [] domainArray; // a copy of the above domainGroup, but as an array
-    private Domain neighbours; // Domains that need to know my coordinates 
-    private QuadTree quadTree, treeNode;
+    private Domain [] domainArray; 				// references to all the Domains
+    private QuadTree quadTree, treeNode;		// hierarchy between domains  
     
-    private Info info; 
-    private Force [] totalForce;  
-    private int nbNeighbours = 0, nbReceived = 0;
-    
-    private boolean isLeaf;
-    
+    private boolean isLeaf;						// isLeaf = (treeNode.Q==null)
+    private Info info; 							// The local information
+    private Force [] totalForce;  				// the forces applying to the Planets inside the Info
+    private int nbNeighbours = 0, nbReceived = 0;  // iteration related variables, counting the "pings"
     private int iter = 0, maxIter;
     
-    private Vector prematureValues;
-    
-    private int synchron = 0;
-    
+    private Vector prematureValues;				// If demands come too early, or a bit late. 				
     private Info [] savedInfo;
     
-    private boolean [] listNeighId;
     
-    private boolean [] canIReceiveInfoFrom;
-    
-    
+    /**
+     * Required by ProActive Active Objects
+     */
     public Domain (){}
     
     /**
@@ -64,7 +66,7 @@ public class Domain implements Serializable{
         this.info = info;
         this.prematureValues = new Vector();
         this.identification = id.intValue();
-        this.domainArray= null; // will be correctly initialized later on
+        this.domainArray= null; // will be correctly initialized by init(...)
         try {
             this.neighbours = (Domain) ProActiveGroup.newGroup( Domain.class.getName() );
         }
@@ -72,9 +74,7 @@ public class Domain implements Serializable{
         catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
         try {
             this.hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        } catch (UnknownHostException e) {e.printStackTrace();}
     }
     
     /**
@@ -85,17 +85,7 @@ public class Domain implements Serializable{
      * @param maxIter the number of iterations before stoppping  
      */
     public void init(Domain [] domainArray, Displayer dp, QuadTree tree, int maxIter) {
-        init(domainArray,  tree, maxIter);
         this.display=dp;
-    }
-    
-    /**
-     * Assigns neighbours, and the treenode corresponding to this Domain.
-     * @param domainArray an array of Domains with which to communicate
-     * @param tree the QuadTree which allows to find more Infos when needed
-     * @param maxIter the number of iterations before stoppping
-     */
-    public void init(Domain [] domainArray,  QuadTree tree, int maxIter) {
         this.maxIter = maxIter;
         this.savedInfo = new Info [maxIter];
         this.savedInfo[0] = this.info.copy();
@@ -103,11 +93,8 @@ public class Domain implements Serializable{
         this.quadTree = tree ;
         this.treeNode = tree.getNode(identification);
         this.domainArray = domainArray;
-        this.listNeighId = new boolean[domainArray.length];
-        for (int i =0 ; i <listNeighId.length ; i++)
-            listNeighId[i]= false;
         this.canIReceiveInfoFrom= new boolean[domainArray.length];
-        for (int i =0 ; i <listNeighId.length ; i++)
+        for (int i =0 ; i <canIReceiveInfoFrom.length ; i++)
             canIReceiveInfoFrom[i] = false;
         this.isLeaf = (treeNode.Q==null);
         if (isLeaf) {
@@ -115,21 +102,8 @@ public class Domain implements Serializable{
             for (int i = 0 ; i < totalForce.length ; i++)  
                 this.totalForce [i] = new Force();
         }
-        if (identification != 0)
-            domainArray[0].synchro();
-        else
-            synchro();
-    }
-    
-    public void synchro() {
-        synchron++;
-        if (domainArray != null)
-            if (synchron == domainArray.length) {
-                System.out.println("SYNCHRONIZED ALL") ;
-                for (int i=1 ; i < domainArray.length ; i++)
-                    domainArray[i].finishInit();
-                this.finishInit();
-            }
+        ProSPMD.barrier("INIT");	// all Domains must be initialized before communication takes place.
+        ((Domain) ProActive.getStubOnThis()).finishInit();
     }
     
     
@@ -160,14 +134,14 @@ public class Domain implements Serializable{
     public void addNeighbour( int domainIdent, int checkIter ) {
         
         if (checkIter -1> iter) { // checkIter - iter = 1 is ok, means start sending on next iteration 
-            throw new NullPointerException("XXXXXXXXXXXXXXXXXXXXX  Domain " +
+            throw new NullPointerException("Domain " +
                     domainIdent + "["+checkIter+"] asking for a future info to Domain"  + identification + "[" + iter + "] , not possible!");
         }
         Group gr = ProActiveGroup.getGroup(neighbours);
         
         gr.add(domainArray[domainIdent]);
         for (int i = checkIter ; i <= iter ; i++)   	// resend left out information
-            domainArray[domainIdent].setValue(this.savedInfo[i], i);
+            this.domainArray[domainIdent].setValue(this.savedInfo[i], i);
     }
     
     /**
@@ -189,19 +163,19 @@ public class Domain implements Serializable{
      * Should only be called once all neighbouring nodes have sent their new value. 
      */
     public void computeMovement() {
-        if (isLeaf) { // Domain contains bodies, let's add their mutual interactions 
+        if (this.isLeaf) { // Domain contains bodies, let's add their mutual interactions 
             // add attractions of forces in the same Domain
-            for (int i = 0 ; i < info.planets.length ; i++) // compute iteraction with every close planet 
-                for (int j = 0 ; j < info.planets.length ; j++)     
+            for (int i = 0 ; i < this.info.planets.length ; i++) // compute iteraction with every close planet 
+                for (int j = 0 ; j < this.info.planets.length ; j++)     
                     if (i!=j)
-                        totalForce[i].add(new Force (info.planets[i], info.planets[j])); 
+                        this.totalForce[i].add(new Force (this.info.planets[i], this.info.planets[j])); 
                     // It would be good to have the bodies bounce away 
                     // if they are too close!
-            for (int i = 0 ; i < info.planets.length; i++ )
-                info.planets[i].moveWithForce(totalForce[i]);
+            for (int i = 0 ; i < this.info.planets.length; i++ )
+                this.info.planets[i].moveWithForce(this.totalForce[i]);
         }
         
-        info.recomputeCenterOfMass();
+        this.info.recomputeCenterOfMass();
         sendValueToNeighbours();
     }
     
@@ -213,24 +187,26 @@ public class Domain implements Serializable{
      * @param receivedIter the iteration of the distant Domain, to enable synchronization
      */
     public void setValue(Info inf , int receivedIter) {  // FIXME : this never gets called if nb Domains=1
-        if (!canIReceiveInfoFrom[inf.identification]) {
+        if (!this.canIReceiveInfoFrom[inf.identification]) {
             return;
         }
-        if (iter == receivedIter) {
-            nbReceived ++ ;
-            if (nbReceived > nbNeighbours)  // This is a bad sign!
+        if (this.iter == receivedIter) {
+            this.nbReceived ++ ;
+            if (this.nbReceived > this.nbNeighbours)  // This is a bad sign!
                 throw new NullPointerException("Domain " + identification + " received too many answers");
-            if (isLeaf)
+            if (this.isLeaf)
                 addToTotalForce(inf);
             else
                 if (isSon(inf.identification))
-                    info.addSon(inf);
-                
-            if (nbReceived == nbNeighbours) 
+                    this.info.addSon(inf);
+                else 
+                    throw new NullPointerException("Domain " + identification + " received not son!!");
+            
+            if (this.nbReceived == this.nbNeighbours) 
                 computeMovement();
         }
         else { 
-            if (iter > receivedIter)
+            if (this.iter > receivedIter)
                 throw new NullPointerException("Value arrives too late!");
             this.prematureValues.add(new Carrier (inf, receivedIter));
         }
@@ -244,7 +220,7 @@ public class Domain implements Serializable{
      * @return true if the parameter is the identifier of one of the sons.
      */
     private boolean isSon(int ident) {   
-        for (int i = 0 ; i < treeNode.Q.length  ; i++)
+        for (int i = 0 ; i < this.treeNode.Q.length  ; i++)
             if ( treeNode.Q[i].label == ident)
                 return true; 
         return false;
@@ -259,7 +235,7 @@ public class Domain implements Serializable{
         try {
             Force [] localForces = new Force [info.planets.length]; 
             for (int i = 0 ; i < info.planets.length ; i++)  // try to create a force for each planet
-                localForces[i] = new Force (info.planets[i], distantInfo); 
+                localForces[i] = new Force (this.info.planets[i], distantInfo); 
             for (int i = 0 ; i < info.planets.length ; i++)  // if no exception, add this force to totalforce
                 this.totalForce[i].add(localForces[i]) ;	
         }
@@ -268,8 +244,8 @@ public class Domain implements Serializable{
             if (distantTreeNode.Q == null) {   // there are no subTrees, compute with every planet  
                 Planet [] distantPlanets = distantInfo.planets;
                 for (int j=0; j < distantPlanets.length ; j++) 
-                    for (int i=0; i < info.planets.length ; i ++) 
-                        this.totalForce[i].add(new Force (info.planets[i], distantPlanets[j]));
+                    for (int i=0; i < this.info.planets.length ; i ++) 
+                        this.totalForce[i].add(new Force (this.info.planets[i], distantPlanets[j]));
             }
             else {// since there are subtrees, put them in the queue.
                 this.nbNeighbours--;   this.nbReceived--; // totally hide the existence of this Domain 
@@ -293,18 +269,18 @@ public class Domain implements Serializable{
      */
     public void sendValueToNeighbours() {
         reset () ; 
-        iter++;
-        if (iter < maxIter) {	  
-            savedInfo[this.iter] = this.info.copy();
-            neighbours.setValue(this.info, this.iter);
-            if (display == null) {// if no display, only the first Domain outputs message to say recompute is going on
-                if (identification==0 && iter % 50 == 0) 
-                    System.out.println("Compute movement." + iter);
+        this.iter++;
+        if (this.iter < this.maxIter) {	  
+            this.savedInfo[this.iter] = this.info.copy();
+            this.neighbours.setValue(this.info, this.iter);
+            if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
+                if (this.identification==0 && this.iter % 50 == 0) 
+                    System.out.println("Compute movement." + this.iter);
             }
             else 
-                if (isLeaf) {  // only leaves contain enough information, concerning planets
-                    for (int i = 0 ; i < info.planets.length ; i ++) {
-                        Planet planet = info.planets[i];    
+                if (this.isLeaf) {  // only leaves contain enough information, concerning planets
+                    for (int i = 0 ; i < this.info.planets.length ; i ++) {
+                        Planet planet = this.info.planets[i];    
                         display.drawBody((int)planet.x, (int)planet.y, (int)planet.vx, (int)planet.vy, 
                                 (int)planet.mass, (int)planet.diameter, planet.identification, hostName);
                     }
@@ -312,7 +288,7 @@ public class Domain implements Serializable{
             treatPremature();
         }
         else // finished all iterations.
-            if (identification==0) // only need one quit signal man, and 0 always has smallest iteration!
+            if (this.identification==0) // only need one quit signal man, and 0 always has smallest iteration!
                 org.objectweb.proactive.examples.nbody.common.Start.quit();
     }
     
@@ -332,15 +308,16 @@ public class Domain implements Serializable{
      */
     private void reset() {
         this.nbReceived = 0 ;
-        if (isLeaf) 
-            for (int i = 0 ; i < totalForce.length ; i++)  
+        if (this.isLeaf) 
+            for (int i = 0 ; i < this.totalForce.length ; i++)  
                 this.totalForce [i] = new Force();
         else 
             this.info.emptySons(); 
     }
     
     /**
-     * When Domain migrates or gets restarted by Fault Tolerance servers, re-initializes the hostname information.
+     * When Domain migrates or gets restarted by Fault Tolerance servers, 
+     * re-initializes the hostname information.
      */
     private void readObject(java.io.ObjectInputStream in) 
     throws java.io.IOException, ClassNotFoundException {
@@ -354,14 +331,22 @@ public class Domain implements Serializable{
         
     }
     
+    /**
+     * Remove this Domain from the Domain that are allowed to give their information
+     * @param distantId the identifier of the Distant Domain to remove.
+     */ 
     private void stopReceivingInfoFrom(int distantId) {
-        canIReceiveInfoFrom[distantId] = false; 
-        domainArray[distantId].removeNeighbour(this.identification);
+        this.canIReceiveInfoFrom[distantId] = false; 
+        this.domainArray[distantId].removeNeighbour(this.identification);
     }
     
+    /**
+     * Put tjhis Domain on the list of the Domains which send thjeir information to this.
+     * @param distantId the identifier of the Domain to add to list.
+     */
     private void askToReceiveInfoFrom(int distantId) {
-        canIReceiveInfoFrom[distantId] = true; 
-        domainArray[distantId].addNeighbour(this.identification, this.iter);
+        this.canIReceiveInfoFrom[distantId] = true; 
+        this.domainArray[distantId].addNeighbour(this.identification, this.iter);
     }
     
 }

@@ -1,9 +1,12 @@
-package org.objectweb.proactive.examples.nbody.groupcom;
+package org.objectweb.proactive.examples.nbody.simple;
 
 import java.io.Serializable;
 
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
+/**
+ * The implementation of a physical body
+ */
 public class Planet implements Serializable{
     
     final double dt = 0.002; 		// the time step. The smaller the more precise the movement
@@ -15,7 +18,7 @@ public class Planet implements Serializable{
      * Required by ProActive, because this Object will be send as a parameter of a method on 
      * a distant Active Object.
      */
-    public Planet(){}
+    public Planet(){};
     
     /**
      * Builds one Planet within the given frame.
@@ -28,13 +31,12 @@ public class Planet implements Serializable{
         //vx = 2000*(Math.random () -0.5 );  
         //vy = 2000*(Math.random () -0.5 );
         this.vx = 0 ; this.vy = 0;
-        
         this.diameter = this.mass/2000+3; ;              
     }
     
     /**
      * 	Move the given Planet with the Force given as parameter. 
-     *  @param force
+     *  @param force the force that causes the movement of the Planet
      */
     public void moveWithForce(Force force) {
         // Using f(t+dt) ~= f(t) + dt * f'(t)

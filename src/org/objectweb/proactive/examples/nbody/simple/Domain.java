@@ -1,86 +1,76 @@
-package org.objectweb.proactive.examples.nbody.groupcom;
-
+package org.objectweb.proactive.examples.nbody.simple;
 
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
-/**
- * Domains encapsulate one Planet, do their calculations, communicates with a Group, and synchronized by a master.
- */
 public class Domain implements Serializable{
     
-    private int identification;					// unique domain identifier
-    private Domain neighbours;					// The Group containing all the other Domains
-    private String hostName = "unknown";		// to display on which host we're running
+    private int identification;       		// a unique number to differentiate this Domain from the others
+    private Domain [] neighbours;     		// the list of all the Domains
+    private String hostName = "unknown"; 	// to display on which host we're running
     
-    private Maestro maestro;					// the master for synchronization
-    private Displayer display;					// If we want some graphical interface
+    private Maestro maestro;				// used for synchronization
+    private Displayer display; 				// optional, to have a nice output 
     
-    Planet info;								// the body information
-    private Planet [] values; 					// list of all the bodies sent by the other domains
-    private int nbvalues, nbReceived=0;			// iteration related variables, counting the "pings"
+    Planet info;							// the information of the body considered
+    private Planet [] values; 				// list of all the bodies within all the other domains
+    private int nbvalues, nbReceived=0;		// have we received all values awaited ?
     
-    /**
-     * Required by ProActive Active Objects
-     */
-    public Domain (){}
     
     /**
-     * Constructor
-     * @param i the unique identifier
-     * @param r the boundaries containing the Planet at the begining of the simulation
+     * Empty constructor, required by ProActive
      */
-    public Domain (Integer i, Rectangle r) {
-        identification = i.intValue();
-        info = new Planet(r);
+    public Domain (){}						
+    
+    /**
+     * Creates a container for a Planet, within a region of space.
+     * @param i The unique identifier of this Domain
+     * @param r The Planet will be created inside the region r 
+     */
+    public Domain (Integer i, Rectangle r) {	 
+        this.identification = i.intValue();
+        this.info = new Planet(r);
         try { this.hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) {  e.printStackTrace();  }
+        } catch (UnknownHostException e) { e.printStackTrace(); }
     }
     
     /**
      * Sets some execution-time related variables. 
-     * @param domainGroup all the other Domains.
+     * @param domainArray all the other Domains.
      * @param dp The Displayer used to show on screen the movement of the objects.
      * @param master Maestro used to synchronize the computations. 
      */
-    public void init(Domain domainGroup, Displayer dp, Maestro master) {
-        this.display=dp;
+    public void init(Domain [] domainArray, Displayer dp, Maestro master) {
+        this.display=dp;	// even if Displayer is null
         this.maestro = master;
-        this.neighbours = domainGroup;
-        Group g = ProActiveGroup.getGroup(neighbours);
-        g.remove(ProActive.getStubOnThis()); 				// no need to send information to self
-        this.nbvalues = g.size();							// number of expected values to receive.
-        this.values = new Planet [nbvalues + 1] ; 			// leave empty slot for self
+        this.neighbours = domainArray;
+        this.values = new Planet [domainArray.length]; 
+        this.values[this.identification] = null; // null will mean don't compute for this value
+        this.nbvalues = domainArray.length -1 ; // will never receive value from self!
     }
     
     /**
-     * Reset iteration-related variables
-     *
+     * 	Reset all iteration related variables
      */
     public void clearValues(){
         this.nbReceived = 0 ;
     } 
     
     /**
-     * Move the Planet contained, applying the force computed. 
+     * Work out the movement of the Planet, 
      */
     public void moveBody() {
-        // System.out.println("Domain " + identification + " starting mvt computation");
         Force force = new Force();  
-        for (int i = 0 ; i < values.length ; i++) {
-            force.add(info, values[i]); // adds the interaction of the distant body 
+        for (int i = 0 ; i < this.values.length ; i++) {
+            force.add(this.info, this.values[i]); // adds the interaction of the distant body 
         }
         this.info.moveWithForce(force);
         clearValues();
     }
-    
     
     /**
      * Called by a distant Domain, this method adds the inf contribution to the force applied on the local Planet
@@ -91,7 +81,7 @@ public class Domain implements Serializable{
         this.values [id] = inf;
         this.nbReceived ++ ;
         if (this.nbReceived > this.nbvalues)  // This is a bad sign!
-            throw new RuntimeException("Domain " + identification + " received too many answers");
+            System.err.println("Domain " + identification + " received too many answers");
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
             moveBody();
@@ -102,7 +92,9 @@ public class Domain implements Serializable{
      * Triggers the emission of the local Planet to all the other Domains.
      */
     public void sendValueToNeighbours() {
-        this.neighbours.setValue(info,identification);
+        for (int i = 0 ; i < this.neighbours.length ; i ++)
+            if (i != this.identification) // don't notify self!
+                this.neighbours[i].setValue(this.info, this.identification);
         if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
             if (this.identification==0) 
                 System.out.println("Compute movement.");

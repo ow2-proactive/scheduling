@@ -1,11 +1,11 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -24,7 +24,7 @@ public class Start {
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args) ; 
     }
-
+    
     public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes) {
         System.out.println("RUNNING Barnes-Hut VERSION");
         
@@ -41,7 +41,8 @@ public class Start {
         }
         Domain domainGroup = null;
         try {
-            domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
+            // Create all the Domains, inside an SPMD Group, to enable barriers
+            domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
         }
         catch (ClassNotReifiableException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
         catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
@@ -59,11 +60,7 @@ public class Start {
             domainArray[i] = dom; 
         }
         
-        if (displayer != null)
-            domainGroup.init(domainArray, displayer, tree, maxIter);
-        else
-            domainGroup.init(domainArray, tree, maxIter);
-        
+        domainGroup.init(domainArray, displayer, tree, maxIter);
         // Within init, there are enough instructions to start computing the movement. 
     }
     
