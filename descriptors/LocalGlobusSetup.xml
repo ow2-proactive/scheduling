@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor>
+	<infrastructure>
+		<processes>
+			<jvmProcess id="linuxJVM" class="org.objectweb.proactive.core.process.JVMProcessImpl">
+				<classpath>
+					<path type="relative" origin="userHome" value="/ProActive/classes"/>
+					<path type="relative" origin="userHome" value="/ProActive/lib/bcel.jar"/>
+					<path type="relative" origin="userHome" value="/ProActive/lib/asm.jar"/>
+					<path type="relative" origin="userHome" value="/ProActive/lib/jini-core.jar"/>
+					<path type="relative" origin="userHome" value="/ProActive/lib/jini-ext.jar"/>
+					<path type="relative" origin="userHome" value="/ProActive/lib/reggie.jar"/>
+				</classpath>
+				<javaPath>
+					<path type="absolute" value="/usr/local/jdk1.4.0/bin/java"/>
+				</javaPath>
+				<policyFile>
+					<path type="relative" origin="userHome" value="/ProActive/classes/proactive.java.policy"/>
+				</policyFile>
+			</jvmProcess>
+			<process id="globusProcess" class="org.objectweb.proactive.core.process.globus.GlobusProcess">
+				<jvmProcess refid="linuxJVM"/>
+				<globusOption>
+					<gramPort>2119</gramPort>
+					<gisPort>2135</gisPort>
+					<globusHostList>
+						<globusHost>globus1.inria.fr</globusHost>
+						<globusHost>globus2.inria.fr</globusHost>
+						<globusHost>globus3.inria.fr</globusHost>
+						<globusHost>globus4.inria.fr</globusHost>
+					</globusHostList>
+				</globusOption>
+			</process>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
