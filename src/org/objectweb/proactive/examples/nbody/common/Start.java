@@ -1,6 +1,7 @@
 package org.objectweb.proactive.examples.nbody.common;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
@@ -11,8 +12,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 
-public class Start {
-
+public class Start implements Serializable{
+    
     private static ProActiveDescriptor staticPad; // is set as static, to use with quit() which calls killall
     /**
      * Options should be "java Start xmlFile [-display] totalNbBodies maxIter"
@@ -22,6 +23,10 @@ public class Start {
      * @param maxIter The number of iterations before the program stops.
      */
     public static void main(String[] args) {
+        new Start ().run(args);
+    }
+    
+    public void run (String[] args) {
         int input = 0;
         boolean display = true;
         boolean displayft = false;
@@ -73,7 +78,7 @@ public class Start {
         System.out.println(" 3 : group communication, odd-even-synchronization");
         if (displayft){
             System.out.print("Choose which version you want to run [123] : ");
-                try {
+            try {
                 while ( true ) {
                     // Read a character from keyboard
                     input  = System.in.read();
@@ -81,9 +86,9 @@ public class Start {
                         break;
                 }
             } catch (IOException ioe) {
-                System.out.println( "IO error:" + ioe );
+                abort (ioe);
             }
-
+            
         }else{
             System.out.println(" 4 : group communication, oospmd synchronization");
             System.out.println(" 5 : Barnes-Hut, and oospmd");
@@ -96,7 +101,7 @@ public class Start {
                         break;
                 }
             } catch (IOException ioe) {
-                System.out.println( "IO error:" + ioe );
+                abort(ioe);
             }
         }
         System.out.println ("Thank you!");
@@ -121,11 +126,11 @@ public class Start {
         try { nodes = vnode.getNodes(); }
         catch (NodeException e) { abort(e); }
         switch (input) {
-        case 49 :  org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies, maxIter, displayer, nodes); break;
-        case 50 :  org.objectweb.proactive.examples.nbody.groupcom.Start.main(totalNbBodies, maxIter, displayer, nodes); break;
-        case 51 :  org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(totalNbBodies, maxIter, displayer, nodes); break;
-        case 52 :  quit(); //org.objectweb.proactive.examples.nbody.groupoospmd.Start.main(totalNbBodies, maxIter, displayer, nodes); break;
-        case 53 :  org.objectweb.proactive.examples.nbody.barneshut.Start.main(totalNbBodies, maxIter, displayer, nodes); break;
+        case 49 :  org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies, maxIter, displayer, nodes, this); break;
+        case 50 :  org.objectweb.proactive.examples.nbody.groupcom.Start.main(totalNbBodies, maxIter, displayer, nodes, this); break;
+        case 51 :  org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(totalNbBodies, maxIter, displayer, nodes, this); break;
+        case 52 :  org.objectweb.proactive.examples.nbody.groupoospmd.Start.main(totalNbBodies, maxIter, displayer, nodes, this); break;
+        case 53 :  org.objectweb.proactive.examples.nbody.barneshut.Start.main(totalNbBodies, maxIter, displayer, nodes, this); break;
         }
     }
     /**
@@ -140,17 +145,18 @@ public class Start {
      * Stop with an error.
      * @param e the Exception which triggered the abrupt end of the program
      */
-    public static void abort (Exception e) {
+    public void abort (Exception e) {
         e.printStackTrace();
         System.exit(-1);
     }
     /**
      * End the program, removing extra JVM that have been created with the deployment of the Domains
-     */       public static void quit (){
-         System.out.println(" PROGRAM ENDS " + staticPad);
-         try {
-             staticPad.killall(true);            // FIXME why does this generate an exception?
-         } catch (ProActiveException e) { e.printStackTrace(); }
-         System.exit(0);
-     }
+     */    
+    public void quit (){
+        System.out.println(" PROGRAM ENDS " + staticPad);
+        try {
+            staticPad.killall(true);            
+        } catch (ProActiveException e) { e.printStackTrace(); }
+        System.exit(0);
+    }
 }
