@@ -35,6 +35,7 @@ public class TypesHandler extends CollectionUnmarshaller {
             Object[] component_type_info = (Object[]) getHandler(ComponentsDescriptorConstants.COMPONENT_TYPE_TAG)
                                                           .getResultObject();
             componentTypes.put(component_type_info[0], component_type_info[1]);
+            ((ComponentTypeHandler) activeHandler).reset();
         }
     }
 
