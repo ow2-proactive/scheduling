@@ -13,8 +13,8 @@ import org.apache.log4j.Logger;
 public class Utils {
     protected static Logger logger = Logger.getLogger(Utils.class.getName());
     public static final String GENERATED_DEFAULT_PREFIX = "Generated_";
-    public static final String REPRESENTATIVE_DEFAULT_POSTFIX = "_representative";
-    public static final String COMPOSITE_REPRESENTATIVE_POSTFIX = "_composite";
+    public static final String REPRESENTATIVE_DEFAULT_SUFFIX = "_representative";
+    public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = "_composite";
     public static final String STUB_DEFAULT_PACKAGE = null;
 
     public static String convertClassNameToRepresentativeClassName(String classname) {
@@ -33,7 +33,7 @@ public class Utils {
     }
 
     public static String getMetaObjectClassName(String functionalInterfaceName, String javaInterfaceName) {
-        // just a way to have an identifier (possibly not unique ... but readable)
+        // just a way to have an identifier (possibly not unique ? ... but readable)
         return (GENERATED_DEFAULT_PREFIX + javaInterfaceName.replace('.', '_') + "_" + 
                functionalInterfaceName.replace('.', '/').replace('-', '_'));
     }
@@ -41,7 +41,7 @@ public class Utils {
     public static String getMetaObjectComponentRepresentativeClassName(String functionalInterfaceName, 
                                                                                 String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ... but readable)
-        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + REPRESENTATIVE_DEFAULT_POSTFIX);
+        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + REPRESENTATIVE_DEFAULT_SUFFIX);
     }
 
 
