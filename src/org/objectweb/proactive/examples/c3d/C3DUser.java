@@ -632,7 +632,12 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
             s_localhost = "";
             try {
-                s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost());
+                String port = "";
+                String protocol = System.getProperty("proactive.communication.protocol");
+                if(!protocol.equals("jini") && !protocol.equals("ibis")){
+                    port=":"+System.getProperty("proactive."+protocol+".port");
+                }
+                s_localhost = UrlBuilder.getHostNameorIP(InetAddress.getLocalHost())+port;
             } catch (UnknownHostException e) {
                 s_localhost = "unknown!";
             }
