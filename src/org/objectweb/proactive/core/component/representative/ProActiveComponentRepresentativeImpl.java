@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -67,7 +68,7 @@ public class ProActiveComponentRepresentativeImpl
     implements ProActiveComponentRepresentative, BindingController,
         LifeCycleController, ContentController, ComponentParametersController,
         ProActiveSuperController, Interface, Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveComponentRepresentativeImpl.class.getName());
+    private static Logger logger = ProActiveLogger.getLogger("components");
     private Interface[] interfaceReferences;
     private Proxy proxy;
 
@@ -114,8 +115,8 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.BindingController#lookupFc(String)}
+    /*
+     *implements  org.objectweb.fractal.api.control.BindingController#lookupFc(String)}
      */
     public Object lookupFc(String clientItfName) {
         return (Interface) reifyCall(BindingController.class.getName(),
@@ -123,8 +124,8 @@ public class ProActiveComponentRepresentativeImpl
             new Object[] { clientItfName });
     }
 
-    /**
-     *see {@link  BindingController#bindFc(java.lang.String, java.lang.Object)}
+    /*
+     *implements  BindingController#bindFc(java.lang.String, java.lang.Object)}
      */
     public void bindFc(String clientItfName, Object serverItf) {
         reifyCall(BindingController.class.getName(), "bindFc",
@@ -132,81 +133,81 @@ public class ProActiveComponentRepresentativeImpl
             new Object[] { clientItfName, serverItf });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.BindingController#unbindFc(String)}
+    /*
+     *implements  org.objectweb.fractal.api.control.BindingController#unbindFc(String)}
      */
     public void unbindFc(String clientItfName) {
         reifyCall(BindingController.class.getName(), "unbindFc",
             new Class[] { String.class }, new Object[] { clientItfName });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.LifeCycleController#getFcState()}
+    /*
+     *implements  org.objectweb.fractal.api.control.LifeCycleController#getFcState()}
      */
     public String getFcState() {
         return (String) reifyCall(LifeCycleController.class.getName(),
             "getFcState", new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.LifeCycleController#startFc()}
+    /*
+     *implements  org.objectweb.fractal.api.control.LifeCycleController#startFc()}
      */
     public void startFc() {
         reifyCall(LifeCycleController.class.getName(), "startFc",
             new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.LifeCycleController#stopFc()}
+    /*
+     *implements  org.objectweb.fractal.api.control.LifeCycleController#stopFc()}
      */
     public void stopFc() {
         reifyCall(LifeCycleController.class.getName(), "stopFc",
             new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()}
+    /*
+     *implements  org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()}
      */
     public Object[] getFcInternalInterfaces() {
         return (Object[]) reifyCall(ContentController.class.getName(),
             "getFcInternalInterfaces", new Class[] {  }, new Object[] {  });
     }
 
-    /**
+    /*
      * in this implementation, internal interfaces are also external interfaces.
-     *see {@link  org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)}
+     *implements  org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)}
      */
     public Object getFcInternalInterface(String interfaceName)
         throws NoSuchInterfaceException {
         return getFcInterface(interfaceName);
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.ContentController#getFcSubComponents()}
+    /*
+     *implements  org.objectweb.fractal.api.control.ContentController#getFcSubComponents()}
      */
     public Component[] getFcSubComponents() {
         return (Component[]) reifyCall(ContentController.class.getName(),
             "getFcSubComponents", new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.ContentController#addFcSubComponent(Component)}
+    /*
+     *implements  org.objectweb.fractal.api.control.ContentController#addFcSubComponent(Component)}
      */
     public void addFcSubComponent(Component subComponent) {
         reifyCall(ContentController.class.getName(), "addFcSubComponent",
             new Class[] { Component.class }, new Object[] { subComponent });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)}
+    /*
+     *implements  org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)}
      */
     public void removeFcSubComponent(Component subComponent) {
         reifyCall(ContentController.class.getName(), "removeFcSubComponent",
             new Class[] { Component.class }, new Object[] { subComponent });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Interface#getFcItfOwner()}
+    /*
+     *implements  org.objectweb.fractal.api.Interface#getFcItfOwner()}
      */
     public Component getFcItfOwner() {
         return this;
@@ -214,8 +215,8 @@ public class ProActiveComponentRepresentativeImpl
         //            "getFcItfOwner", new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Interface#getFcItfName()}
+    /*
+     *implements  org.objectweb.fractal.api.Interface#getFcItfName()}
      */
     public String getFcItfName() {
         // PB is that the current object implements several functional interfaces.
@@ -223,15 +224,15 @@ public class ProActiveComponentRepresentativeImpl
         return null;
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Interface#getFcItfType()}
+    /*
+     *implements  org.objectweb.fractal.api.Interface#getFcItfType()}
      */
     public Type getFcItfType() {
         return getFcType();
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Interface#isFcInternalItf()}
+    /*
+     *implements  org.objectweb.fractal.api.Interface#isFcInternalItf()}
      */
     public boolean isFcInternalItf() {
         return false;
@@ -255,8 +256,8 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Component#getFcInterface(String)}
+    /*
+     *implements  org.objectweb.fractal.api.Component#getFcInterface(String)}
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
@@ -300,30 +301,30 @@ public class ProActiveComponentRepresentativeImpl
         throw new NoSuchInterfaceException(interfaceName);
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Component#getFcInterfaces()}
+    /*
+     *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
         return (Object[]) reifyCall(Component.class.getName(),
             "getFcInterfaces", new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.Component#getFcType()}
+    /*
+     *implements  org.objectweb.fractal.api.Component#getFcType()}
      */
     public Type getFcType() {
         return componentType;
     }
 
-    /**
-     *see {@link  org.objectweb.proactive.core.mop.StubObject#getProxy()}
+    /*
+     *implements  org.objectweb.proactive.core.mop.StubObject#getProxy()}
      */
     public Proxy getProxy() {
         return proxy;
     }
 
-    /**
-     *see {@link  org.objectweb.proactive.core.mop.StubObject#setProxy(Proxy)}
+    /*
+     *implements  org.objectweb.proactive.core.mop.StubObject#setProxy(Proxy)}
      */
     public void setProxy(Proxy proxy) {
         this.proxy = proxy;
@@ -344,7 +345,7 @@ public class ProActiveComponentRepresentativeImpl
                 "can only compare proactive components to proactive components ");
             return false;
         }
-        return getProxy().equals(((ProActiveComponentRepresentative)component).getProxy());
+        return getProxy().equals(((ProActiveComponentRepresentative) component).getProxy());
     }
 
     public int hashCode() {
@@ -363,50 +364,50 @@ public class ProActiveComponentRepresentativeImpl
         if (!(getProxy() instanceof ProxyForGroup)) {
             return ((UniversalBodyProxy) getProxy()).getBodyID();
         } else {
-           return null;
+            return null;
         }
     }
 
-    /**
-     *see {@link  ComponentParametersController#setComponentParameters(ComponentParameters)}
+    /*
+     *implements  ComponentParametersController#setComponentParameters(ComponentParameters)}
      */
     public void setComponentParameters(ComponentParameters componentParameters) {
         logger.error("only available in the meta-objects");
     }
 
-    /**
-     *see {@link  ComponentParametersController#getComponentParameters()}
+    /*
+     *implements  ComponentParametersController#getComponentParameters()}
      */
     public ComponentParameters getComponentParameters() {
         return (ComponentParameters) reifyCall(ComponentParametersController.class.getName(),
             "getComponentParameters", new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     *see {@link  org.objectweb.fractal.api.control.BindingController#listFc()}
+    /*
+     *implements  org.objectweb.fractal.api.control.BindingController#listFc()}
      */
     public String[] listFc() {
         return null;
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.control.NameController#setFcName(String name)}
+    /*
+     * implements org.objectweb.fractal.api.control.NameController#setFcName(String name)}
      */
     public void setFcName(String componentName) {
         reifyCall(NameController.class.getName(), "setFcName",
             new Class[] { String.class }, new Object[] { componentName });
     }
 
-    /**
-     * see {@link org.objectweb.fractal.api.control.NameController#getFcName()}
+    /*
+     * implements org.objectweb.fractal.api.control.NameController#getFcName()}
      */
     public String getFcName() {
         return (String) reifyCall(NameController.class.getName(), "getFcName",
             new Class[] {  }, new Object[] {  });
     }
 
-    /**
-     * see {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
+    /*
+     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
      */
     public Object getReferenceOnBaseObject() {
         return null;
@@ -420,8 +421,8 @@ public class ProActiveComponentRepresentativeImpl
         return null;
     }
 
-    /** (non-Javadoc)
-     * see {@link org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
+    /* (non-Javadoc)
+     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
     public Component getRepresentativeOnThis() {
         return this;
