@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -63,7 +64,7 @@ import java.util.List;
  */
 public class ProActiveContentController extends ProActiveController
     implements ContentController, Serializable {
-    protected static Logger logger = Logger.getLogger(ProActiveContentController.class.getName());
+    private static Logger logger = ProActiveLogger.getLogger("components");
     List fcSubComponents;
 
     /**
@@ -226,7 +227,8 @@ public class ProActiveContentController extends ProActiveController
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("TODO : check the bindings");
+            logger.debug(this.getClass().getName() + " : " +
+                " TODO : check the bindings");
         }
     }
 }

@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -70,12 +71,11 @@ import java.util.Map;
  */
 public class RepresentativeInterfaceClassGenerator
     extends AbstractInterfaceClassGenerator {
-    protected static Logger logger = Logger.getLogger(RepresentativeInterfaceClassGenerator.class.getName());
-
     // A few constants that come in handy when using ASM in our case
     protected static final String PROXY_TYPE = "Lorg/objectweb/proactive/core/mop/Proxy;";
     protected static final String STUB_INTERFACE_NAME = "org/objectweb/proactive/core/mop/StubObject";
     protected static final String PROXY_FIELD_NAME = "myProxy";
+    private static final Logger logger = logger;
 
     // generatedClassesCache that contains all the generated classes according to their name
     private static Hashtable generatedClassesCache = new Hashtable();
@@ -163,21 +163,24 @@ public class RepresentativeInterfaceClassGenerator
                 }
 
                 //                // Next few lines for debugging only
-                //                                            try {
-                //                                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
-                //                                                                                     stubClassFullName + ".class");
-                //                                
-                //                                                if (logger.isDebugEnabled()) {
-                //                                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-                //                                                }
-                //                                
-                //                                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-                //                                                fos.write(bytes);
-                //                                                fos.close();
-                //                                			} catch (Exception e) {
-                //                                				// e.printStackTrace();
-                //                                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-                //                                			}
+                //                try {
+                //                    java.io.File file = new java.io.File(System.getProperty(
+                //                                "user.home") + "/ProActive/generated/" +
+                //                            stubClassFullName + ".class");
+                //
+                //                    if (ProActiveLogger.getLogger(
+                //                                "components.bytecodegeneration").isDebugEnabled()) {
+                //                        //logger.debug("writing down the generated class : " + file.getAbsolutePath());
+                //                    }
+                //
+                //                    java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+                //                    fos.write(bytes);
+                //                    fos.close();
+                //                } catch (Exception e) {
+                //                    // e.printStackTrace();
+                //                    logger.info(
+                //                        "if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                }
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
             }

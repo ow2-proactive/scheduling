@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.component.asmgen;
 
-import org.apache.log4j.Logger;
-
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Type;
 
@@ -40,6 +38,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -67,18 +66,11 @@ import java.util.Hashtable;
  */
 public class MetaObjectInterfaceClassGenerator
     extends AbstractInterfaceClassGenerator {
-    protected static Logger logger = Logger.getLogger(MetaObjectInterfaceClassGenerator.class.getName());
     protected static final String IMPL_FIELD_NAME = "impl"; //delegatee
     private static MetaObjectInterfaceClassGenerator instance;
 
     // generatedClassesCache that contains all the generated classes according to their name
     private static Hashtable generatedClassesCache = new Hashtable();
-
-    // Those fields contain information about the class
-    // for which we are building a wrapper
-    protected Class cl;
-    protected String className;
-    protected String packageName;
 
     // this boolean for deciding of a possible indirection for the functionnal calls
     protected boolean isPrimitive = false;
@@ -122,8 +114,10 @@ public class MetaObjectInterfaceClassGenerator
         Component owner, InterfaceType interfaceType, boolean isInternal,
         boolean isPrimitive) throws InterfaceGenerationFailedException {
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("generating metaobject interface reference");
+            if (ProActiveLogger.getLogger("components.bytecodegeneration")
+                                   .isDebugEnabled()) {
+                ProActiveLogger.getLogger("components.bytecodegeneration")
+                               .debug("generating metaobject interface reference");
             }
 
             //isPrimitive = ((ProActiveComponent) owner).getHierarchicalType().equals(ComponentParameters.PRIMITIVE);
@@ -149,9 +143,13 @@ public class MetaObjectInterfaceClassGenerator
                 setInfos();
                 bytes = create();
                 getGeneratedClassesCache().put(stubClassFullName, bytes);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("added " + stubClassFullName + " to cache");
-                    logger.debug("generated classes cache is : " +
+                if (ProActiveLogger.getLogger("components.bytecodegeneration")
+                                       .isDebugEnabled()) {
+                    ProActiveLogger.getLogger("components.bytecodegeneration")
+                                   .debug("added " + stubClassFullName +
+                        " to cache");
+                    ProActiveLogger.getLogger("components.bytecodegeneration")
+                                   .debug("generated classes cache is : " +
                         getGeneratedClassesCache().toString());
                 }
 
@@ -165,7 +163,7 @@ public class MetaObjectInterfaceClassGenerator
                 //                				fos.close();
                 //                			} catch (Exception e) {
                 //                				// e.printStackTrace();
-                //                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                				ProActiveLogger.getLogger("components.bytecodegeneration").info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
                 //                			}
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);

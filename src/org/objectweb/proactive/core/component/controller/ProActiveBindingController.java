@@ -56,6 +56,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.ProActiveLogger;
 
 import java.io.Serializable;
 
@@ -77,9 +78,10 @@ import java.util.List;
  */
 public class ProActiveBindingController extends ProActiveController
     implements BindingController, Serializable {
+    private static Logger logger = ProActiveLogger.getLogger("components");
+
     //private Vector bindings; // contains Binding objects
     //private Hashtable bindings; // key = clientInterfaceName ; value = Binding
-    protected static Logger logger = Logger.getLogger(ProActiveBindingController.class.getName());
     private Bindings bindings; // key = clientInterfaceName ; value = Binding
     protected Hashtable groupBindings;
     private List collectiveInterfacesNames = null;
@@ -140,7 +142,8 @@ public class ProActiveBindingController extends ProActiveController
         //			throw new IllegalBindingException(serverItf.getFcItfName() + " is not a server interface");
         //		}
         // TODO : other checks are to be performed (viability of the bindings)
-        if (((LifeCycleController) getFcItfOwner().getFcInterface(Constants.LIFECYCLE_CONTROLLER)).getFcState() != LifeCycleController.STOPPED) {
+        if (!((LifeCycleController) getFcItfOwner().getFcInterface(Constants.LIFECYCLE_CONTROLLER)).getFcState()
+                  .equals(LifeCycleController.STOPPED)) {
             throw new IllegalLifeCycleException(
                 "component has to be stopped to perform binding operations");
         }
@@ -322,7 +325,7 @@ public class ProActiveBindingController extends ProActiveController
                     " because it does not correspond to the specified type");
             }
         }
-        addBinding(new Binding(clientItf, clientItfName, (Interface) serverItf));
+        addBinding(new Binding(clientItf, clientItfName, serverItf));
     }
 
     /**
