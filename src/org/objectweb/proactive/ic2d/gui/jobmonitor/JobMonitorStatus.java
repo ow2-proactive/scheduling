@@ -1,8 +1,12 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GridLayout;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -12,9 +16,6 @@ import javax.swing.JTree;
 import javax.swing.SwingConstants;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 
 
 class StatusCell extends JPanel implements JobMonitorConstants {
@@ -29,7 +30,7 @@ class StatusCell extends JPanel implements JobMonitorConstants {
             " in the hierarchy";
         setLayout(new GridLayout(3, 1));
         setBackground(Color.WHITE);
-        
+
         JLabel title = new JLabel(NAMES[KEY2INDEX[key]],
                 Icons.getIconForKey(key), SwingConstants.LEFT);
 
@@ -59,25 +60,28 @@ class StatusCell extends JPanel implements JobMonitorConstants {
     }
 
     private static String timeDiff(Calendar d1, Calendar d2) {
-    	long d1Sec = d1.getTimeInMillis() / 1000;
-    	long d2Sec = d2.getTimeInMillis() / 1000;
+        long d1Sec = d1.getTimeInMillis() / 1000;
+        long d2Sec = d2.getTimeInMillis() / 1000;
 
-    	long diff = d1Sec - d2Sec;
-    	if (diff < 120)
-    		return diff + " seconds";
-    	
-    	diff /= 60;
-    	if (diff < 120)
-    		return diff + " minutes";
-    	
-    	diff /= 60;
-    	if (diff < 120)
-    		return diff + " hours";
+        long diff = d1Sec - d2Sec;
+        if (diff < 120) {
+            return diff + " seconds";
+        }
 
-    	diff /= 24;
-    	return diff + " days";
+        diff /= 60;
+        if (diff < 120) {
+            return diff + " minutes";
+        }
+
+        diff /= 60;
+        if (diff < 120) {
+            return diff + " hours";
+        }
+
+        diff /= 24;
+        return diff + " days";
     }
-    
+
     public void updateDeleted(GregorianCalendar deletedSince) {
         if (deletedSince == null) {
             state.setText("Alive");

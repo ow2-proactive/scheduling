@@ -267,9 +267,10 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             String jobID = rba.getJobID();
-            if (isSkipped(JOB, jobID))
-            	continue;
-            
+            if (isSkipped(JOB, jobID)) {
+                continue;
+            }
+
             className = className.substring(className.lastIndexOf(".") + 1);
             String aoName = (String) aos.get(rba.getID());
             if (aoName == null) {
@@ -278,8 +279,8 @@ public class NodeExploration implements JobMonitorConstants {
             }
 
             if (!isSkipped(AO, aoName)) {
-            	addChild(NODE, nodeName, AO, aoName);
-            	addChild(JOB, rba.getJobID(), AO, aoName);
+                addChild(NODE, nodeName, AO, aoName);
+                addChild(JOB, rba.getJobID(), AO, aoName);
             }
         }
     }

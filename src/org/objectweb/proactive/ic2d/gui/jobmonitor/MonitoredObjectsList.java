@@ -69,7 +69,7 @@ public class MonitoredObjectsList extends JDialog {
     }
 
     private JTabbedPane init() {
-    	setTitle("Monitored objects");
+        setTitle("Monitored objects");
         getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(),
                 javax.swing.BoxLayout.Y_AXIS));
 
@@ -126,7 +126,7 @@ public class MonitoredObjectsList extends JDialog {
         JButton removeButton = createRemoveButton(removeButtonName, list);
 
         list.setCellRenderer(new MonitoredObjectsListCellRenderer());
-        
+
         container.add(Box.createVerticalGlue());
         container.add(horizontalCenter(new JScrollPane(list)));
 
@@ -152,7 +152,6 @@ public class MonitoredObjectsList extends JDialog {
 
 class MonitoredObjectsListCellRenderer extends DefaultListCellRenderer
     implements JobMonitorConstants {
-	
     public Component getListCellRendererComponent(JList list, Object value,
         int index, boolean isSelected, boolean cellHasFocus) {
         super.getListCellRendererComponent(list, value, index, isSelected,

@@ -1,5 +1,15 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor;
 
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -12,7 +22,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.rmi.registry.Registry;
+
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -30,16 +42,6 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataModelTraversal;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
@@ -77,7 +79,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         monitoredHosts = new DefaultListModel();
         skippedObjects = new DefaultListModel();
-        skippedObjects.addElement(BasicMonitoredObject.create(JOB, ProActive.getJobId()));
+        skippedObjects.addElement(BasicMonitoredObject.create(JOB,
+                ProActive.getJobId()));
 
         tabs = new JTabbedPane();
         frames = new Vector();
@@ -185,7 +188,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public void addMonitoredHost(String host) {
-    	BasicMonitoredObject hostObject = BasicMonitoredObject.create(HOST, host);
+        BasicMonitoredObject hostObject = BasicMonitoredObject.create(HOST, host);
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
@@ -231,7 +234,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             asso.clear();
 
             for (int i = 0, size = monitoredHosts.size(); i < size; ++i) {
-            	BasicMonitoredObject hostObject = (BasicMonitoredObject) monitoredHosts.get(i);
+                BasicMonitoredObject hostObject = (BasicMonitoredObject) monitoredHosts.get(i);
                 String host = hostObject.getFullName();
 
                 //				System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
@@ -292,18 +295,18 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public DefaultListModel getMonitoredHosts() {
-    	return monitoredHosts;
+        return monitoredHosts;
     }
-    
+
     public DefaultListModel getSkippedObjects() {
-    	return skippedObjects;
+        return skippedObjects;
     }
-    
+
     public void clearDeleted() {
-    	asso.clearDeleted();
-    	rebuildAll();
+        asso.clearDeleted();
+        rebuildAll();
     }
-    
+
     class TreeView {
         private String label;
         private JTree tree;
@@ -325,59 +328,61 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         private void constructPopupMenu(TreePath[] selection) {
             popupmenu = new JPopupMenu();
-            
+
             AbstractAction a = new AbstractAction("Refresh monitoring tree") {
-            	public void actionPerformed(ActionEvent e) {
-            		updateHosts();
-            	}
-            };
+                    public void actionPerformed(ActionEvent e) {
+                        updateHosts();
+                    }
+                };
 
             JMenuItem menuItem = new JMenuItem(a);
             menuItem.setEnabled(monitoredHosts.size() > 0);
             popupmenu.add(menuItem);
 
             final MonitoredObjectSet objects = new MonitoredObjectSet();
-            boolean hasHosts = false; 
+            boolean hasHosts = false;
 
             if (selection != null) {
-            	for (int i = 0; i < selection.length; i++) {
-            		DataTreeNode node = (DataTreeNode) selection[i].getLastPathComponent();
-            		BasicMonitoredObject object = node.getObject();
-            		if (!node.isRoot()) {
-            			if (object.getKey() == HOST)
-            				hasHosts = true;
+                for (int i = 0; i < selection.length; i++) {
+                    DataTreeNode node = (DataTreeNode) selection[i].getLastPathComponent();
+                    BasicMonitoredObject object = node.getObject();
+                    if (!node.isRoot()) {
+                        if (object.getKey() == HOST) {
+                            hasHosts = true;
+                        }
 
-            			objects.add(object);
-            		}
-            	}
+                        objects.add(object);
+                    }
+                }
             }
-                
+
             a = new AbstractAction("Refresh selected hosts") {
-            	public void actionPerformed(ActionEvent e) {
-            		Iterator iter = objects.iterator();
-            		while (iter.hasNext()) {
-            			BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
-            			if (object.getKey() == HOST)
-            				updateHost(object);
-            		}
-            		rebuildAll();
-            		tree.repaint();
-            	}
-            };
-                
+                        public void actionPerformed(ActionEvent e) {
+                            Iterator iter = objects.iterator();
+                            while (iter.hasNext()) {
+                                BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+                                if (object.getKey() == HOST) {
+                                    updateHost(object);
+                                }
+                            }
+                            rebuildAll();
+                            tree.repaint();
+                        }
+                    };
+
             menuItem = new JMenuItem(a);
             menuItem.setEnabled(hasHosts);
             popupmenu.add(menuItem);
-            
+
             a = new AbstractAction("Stop monitoring these objects") {
-            	public void actionPerformed(ActionEvent e) {
-            		Iterator iter = objects.iterator();
-            		while (iter.hasNext()) {
-            			BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
-            			skippedObjects.addElement(object);
-            		}
-            	}
-            };
+                        public void actionPerformed(ActionEvent e) {
+                            Iterator iter = objects.iterator();
+                            while (iter.hasNext()) {
+                                BasicMonitoredObject object = (BasicMonitoredObject) iter.next();
+                                skippedObjects.addElement(object);
+                            }
+                        }
+                    };
 
             menuItem = new JMenuItem(a);
             menuItem.setEnabled(!objects.isEmpty());
@@ -388,7 +393,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             JPanel buttons = new JPanel();
             buttons.setLayout(new FlowLayout());
             panel.add(buttons, BorderLayout.SOUTH);
-            
+
             JButton expand = new JButton("Expand all");
             expand.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent ae) {
@@ -421,10 +426,10 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
             tree.addMouseListener(new MouseAdapter() {
                     public void mousePressed(MouseEvent e) {
-                    	TreePath[] selection = tree.getSelectionPaths();
+                        TreePath[] selection = tree.getSelectionPaths();
                         if (e.isPopupTrigger()) {
-                        	constructPopupMenu(selection);
-                        	popupmenu.show(tree, e.getX(), e.getY());
+                            constructPopupMenu(selection);
+                            popupmenu.show(tree, e.getX(), e.getY());
                         }
                     }
                 });
