@@ -9,11 +9,13 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Force;
+import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
     
-    private class Carrier {
+    private class Carrier implements Serializable{
         Planet planet;
         int iter;
         
@@ -33,6 +35,7 @@ public class Domain implements Serializable{
     private int nbvalues, nbReceived=0;						// iteration related
     private int iter, maxIter;
     private Vector prematureValues;							// if values arrive too early, put them here.
+    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
     
     /**
      * Required by ProActive Active Objects
@@ -58,7 +61,8 @@ public class Domain implements Serializable{
      * @param dp The Displayer used to show on screen the movement of the objects.
      * @param maxIter The number of iterations to compute before stoppping
      */
-    public void init(Domain domainGroup, Displayer dp, int maxIter) {
+    public void init(Domain domainGroup, Displayer dp, int maxIter, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+        this.killsupport = killsupport;
         this.display=dp;
         this.maxIter = maxIter;
         this.neighbours = domainGroup;
@@ -93,7 +97,7 @@ public class Domain implements Serializable{
         }
         else { 
             if (this.iter > receivedIter)
-                throw new NullPointerException("Value arrives too late!");
+                this.killsupport.abort( new NullPointerException("Value arrives too late!"));
             this.prematureValues.add(new Carrier (inf, receivedIter));
         }
     }
@@ -117,7 +121,7 @@ public class Domain implements Serializable{
         }
         else
             if (this.identification==0) // only need one quit signal man!
-                org.objectweb.proactive.examples.nbody.common.Start.quit();
+                this.killsupport.quit(); 
             
     }    
     

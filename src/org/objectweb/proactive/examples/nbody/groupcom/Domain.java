@@ -9,6 +9,8 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Force;
+import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 /**
@@ -26,6 +28,7 @@ public class Domain implements Serializable{
     Planet info;								// the body information
     private Planet [] values; 					// list of all the bodies sent by the other domains
     private int nbvalues, nbReceived=0;			// iteration related variables, counting the "pings"
+    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
     
     /**
      * Required by ProActive Active Objects
@@ -37,7 +40,8 @@ public class Domain implements Serializable{
      * @param i the unique identifier
      * @param r the boundaries containing the Planet at the begining of the simulation
      */
-    public Domain (Integer i, Rectangle r) {
+    public Domain (Integer i, Rectangle r, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+        this.killsupport = killsupport;
         identification = i.intValue();
         info = new Planet(r);
         try { this.hostName = InetAddress.getLocalHost().getHostName();
@@ -51,13 +55,13 @@ public class Domain implements Serializable{
      * @param master Maestro used to synchronize the computations. 
      */
     public void init(Domain domainGroup, Displayer dp, Maestro master) {
-        this.display=dp;
-        this.maestro = master;
         this.neighbours = domainGroup;
         Group g = ProActiveGroup.getGroup(neighbours);
         g.remove(ProActive.getStubOnThis()); 				// no need to send information to self
         this.nbvalues = g.size();							// number of expected values to receive.
         this.values = new Planet [nbvalues + 1] ; 			// leave empty slot for self
+        this.display=dp;
+        this.maestro = master;
     }
     
     /**
@@ -91,7 +95,7 @@ public class Domain implements Serializable{
         this.values [id] = inf;
         this.nbReceived ++ ;
         if (this.nbReceived > this.nbvalues)  // This is a bad sign!
-            throw new RuntimeException("Domain " + identification + " received too many answers");
+            this.killsupport.abort( new RuntimeException("Domain " + identification + " received too many answers"));
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
             moveBody();

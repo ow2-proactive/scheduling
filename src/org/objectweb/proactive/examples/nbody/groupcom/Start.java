@@ -22,26 +22,28 @@ public class Start {
     /**
      * Called by common.Start if this version is selected.
      */
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         
         System.out.println("RUNNING groupcom VERSION");
         
         int root = (int) Math.sqrt(totalNbBodies);
         int STEP_X = 200 / root , STEP_Y = 200 / root;  // to split the region in equal sized squares
-        Object [][] params = new Object [totalNbBodies][2] ;
+        Object [][] params = new Object [totalNbBodies][3] ;
         for (int  i = 0 ; i < totalNbBodies ; i++) {
             params[i][0] = new Integer(i);		      
             params[i][1] = new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y);
+            params[i][2] = killsupport ; 
         }
         Domain  domainGroup = null;
         try {
             // Create all the Domains as part of a Group
             domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), params, nodes);
         } 
-        catch (ClassNotReifiableException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
-        catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
-        catch (ActiveObjectCreationException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
-        catch (NodeException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
+        catch (ClassNotReifiableException e) { killsupport.abort(e); }
+        catch (ClassNotFoundException e) { killsupport.abort(e); }
+        catch (ActiveObjectCreationException e) { killsupport.abort(e); } 
+        catch (NodeException e) { killsupport.abort(e); }
         
         System.out.println("[NBODY] " + totalNbBodies + " Domains are deployed");
         
@@ -49,10 +51,10 @@ public class Start {
         try {
             // Supervizes the synchronisations
             maestro = (Maestro) ProActive.newActive(
-                    Maestro.class.getName(), new Object[] {domainGroup, new Integer(maxIter)}, nodes[0]);
+                    Maestro.class.getName(), new Object[] {domainGroup, new Integer(maxIter), killsupport}, nodes[0]);
         } 
-        catch (ActiveObjectCreationException e) { e.printStackTrace();   }
-        catch(NodeException ex){  	ex.printStackTrace();    }
+        catch (ActiveObjectCreationException e) {  killsupport.abort(e); }
+        catch(NodeException e){  killsupport.abort(e); }
         
         
         // init workers

@@ -14,8 +14,8 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args) ; 
     }
     
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes) {
-        
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING simplest VERSION");
         
         int root = (int) Math.sqrt(totalNbBodies);
@@ -24,8 +24,9 @@ public class Start {
         for (int  i = 0 ; i < totalNbBodies ; i++) {
             Object [] params = new Object [] {
                     new Integer(i), 
-                    new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y)
-            };
+                    new Rectangle(STEP_X * (i % root), STEP_Y * (i / root) , STEP_X, STEP_Y),
+                    killsupport
+            	};
             
             try {
                 // Create all the Domains used in the simulation 
@@ -35,8 +36,8 @@ public class Start {
                         nodes[(i+1) % nodes.length]
                 );
             }
-            catch (ActiveObjectCreationException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
-            catch (NodeException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
+            catch (ActiveObjectCreationException e) { killsupport.abort(e); } 
+            catch (NodeException e) { killsupport.abort(e); }
         }
         
         System.out.println("[NBODY] " + totalNbBodies + " Planets are deployed");
@@ -46,20 +47,16 @@ public class Start {
         try {
             maestro = (Maestro) ProActive.newActive (
                     Maestro.class.getName(), 
-                    new Object[] {domainArray, new Integer(maxIter)} , 
+                    new Object[] {domainArray, new Integer(maxIter), killsupport} , 
                     nodes[0]
             );
         } 
-        catch (ActiveObjectCreationException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
-        catch (NodeException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
+        catch (ActiveObjectCreationException e) { killsupport.abort(e); } 
+        catch (NodeException e) { killsupport.abort(e); }
         
         // init workers
         for (int i=0 ; i < totalNbBodies ; i ++)
             domainArray[i].init(domainArray, displayer, maestro);
-        
-        // launch computation
-        for (int i =0 ; i < totalNbBodies ; i ++)
-            domainArray[i].sendValueToNeighbours();
         
     }
     

@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.examples.nbody.common.Displayer;
+import org.objectweb.proactive.examples.nbody.common.Force;
+import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 public class Domain implements Serializable{
@@ -35,7 +37,7 @@ public class Domain implements Serializable{
         this.identification = i.intValue();
         this.info = new Planet(r);
         try { this.hostName = InetAddress.getLocalHost().getHostName();
-        } catch (UnknownHostException e) { e.printStackTrace(); }
+        } catch (UnknownHostException e) { e.printStackTrace();}
     }
     
     /**
@@ -51,6 +53,7 @@ public class Domain implements Serializable{
         this.values = new Planet [domainArray.length]; 
         this.values[this.identification] = null; // null will mean don't compute for this value
         this.nbvalues = domainArray.length -1 ; // will never receive value from self!
+        maestro.notifyFinished(); 				// say we're ready to start .
     }
     
     /**

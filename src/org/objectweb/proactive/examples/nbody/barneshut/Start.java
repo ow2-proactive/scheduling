@@ -25,7 +25,8 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args) ; 
     }
     
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING Barnes-Hut VERSION");
         
         // Create all the Domains, based on the tree structure
@@ -34,31 +35,27 @@ public class Start {
         System.err.println(tree);
         int size = tree.size();
         
-        Object [][] params = new Object [size][2]; // the parameters passed to the Domain constructors
+        Object [][] params = new Object [size][3]; // the parameters passed to the Domain constructors
         for (int  i = 0 ; i < size; i++)  {
             params[i][0] = new Integer(i);		      
-            params[i][1] = (Info) info.get(i);		
+            params[i][1] = (Info) info.get(i);	
+            params[i][2] = killsupport;
         }
         Domain domainGroup = null;
         try {
             // Create all the Domains, inside an SPMD Group, to enable barriers
             domainGroup = (Domain) ProSPMD.newSPMDGroup( Domain.class.getName(), params, nodes);
         }
-        catch (ClassNotReifiableException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
-        catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
-        catch (ActiveObjectCreationException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
-        catch (NodeException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); } 
+        catch (ClassNotReifiableException e) { killsupport.abort(e); }
+        catch (ClassNotFoundException e) { killsupport.abort(e); }
+        catch (ActiveObjectCreationException e) { killsupport.abort(e); } 
+        catch (NodeException e) { killsupport.abort(e); } 
         
         System.out.println("[NBODY] " + size + " domains are deployed");
         
         // init Domains, with their possible neighbours, display, and quadtree
         Group group = ProActiveGroup.getGroup(domainGroup); 
-        //	Domain [] domainArray = (Domain []) group.toArray(); FIXME : this should work, man!
-        Domain [] domainArray = new Domain [size];
-        for (int  i = 0 ; i < size; i++) {
-            Domain dom = (Domain) group.get(i);
-            domainArray[i] = dom; 
-        }
+        Domain [] domainArray = (Domain []) group.toArray(new Domain [] {}); 
         
         domainGroup.init(domainArray, displayer, tree, maxIter);
         // Within init, there are enough instructions to start computing the movement. 

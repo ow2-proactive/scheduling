@@ -26,10 +26,7 @@ public class Info implements Serializable{
     public Info(Vector planetVector, Rectangle bounds){
         this.radius=Math.sqrt(bounds.width*bounds.width + bounds.height*bounds.height) / 2 ; 
         
-        //FIXME : why don't this work? planets = ((Planet [])planetVector.toArray());
-        this.planets = new Planet[planetVector.size()];		
-        for (int i = 0 ; i < this.planets.length ; i++ )
-            this.planets[i]=(Planet) planetVector.get(i);
+        this.planets = ((Planet [])planetVector.toArray(new Planet []{}));
         recomputeCenterOfMass();
         
         this.mass = totalMass();

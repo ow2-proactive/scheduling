@@ -12,7 +12,6 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
-import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
 /**
  * Domains are set over a given region of space.
@@ -50,6 +49,7 @@ public class Domain implements Serializable{
     
     private Vector prematureValues;				// If demands come too early, or a bit late. 				
     private Info [] savedInfo;
+    private org.objectweb.proactive.examples.nbody.common.Start killsupport;
     
     
     /**
@@ -62,7 +62,8 @@ public class Domain implements Serializable{
      * @param info the Info linked to this Domain 
      * @param id the unique integer which unambiguously denotes this Domain.
      */
-    public Domain (Integer id, Info info) {
+    public Domain (Integer id, Info info, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+        this.killsupport = killsupport;
         this.info = info;
         this.prematureValues = new Vector();
         this.identification = id.intValue();
@@ -70,8 +71,8 @@ public class Domain implements Serializable{
         try {
             this.neighbours = (Domain) ProActiveGroup.newGroup( Domain.class.getName() );
         }
-        catch (ClassNotReifiableException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
-        catch (ClassNotFoundException e) { org.objectweb.proactive.examples.nbody.common.Start.abort(e); }
+        catch (ClassNotReifiableException e) { this.killsupport.abort(e); }
+        catch (ClassNotFoundException e) { this.killsupport.abort(e); }
         try {
             this.hostName = InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {e.printStackTrace();}
@@ -134,8 +135,8 @@ public class Domain implements Serializable{
     public void addNeighbour( int domainIdent, int checkIter ) {
         
         if (checkIter -1> iter) { // checkIter - iter = 1 is ok, means start sending on next iteration 
-            throw new NullPointerException("Domain " +
-                    domainIdent + "["+checkIter+"] asking for a future info to Domain"  + identification + "[" + iter + "] , not possible!");
+            killsupport.abort( new RuntimeException("Domain " +
+                    domainIdent + "["+checkIter+"] asking for a future info to Domain"  + identification + "[" + iter + "] , not possible!") );
         }
         Group gr = ProActiveGroup.getGroup(neighbours);
         
@@ -154,7 +155,7 @@ public class Domain implements Serializable{
         
         boolean correct = group.remove (domainArray[domainIdent]);
         if (!correct)
-            throw new NoSuchElementException("Domain " + domainIdent + " cannot be removed, because it's not in neighbour Group! ");
+            killsupport.abort(new NoSuchElementException("Domain " + domainIdent + " cannot be removed, because it's not in neighbour Group! "));
     }
     
     
@@ -193,21 +194,21 @@ public class Domain implements Serializable{
         if (this.iter == receivedIter) {
             this.nbReceived ++ ;
             if (this.nbReceived > this.nbNeighbours)  // This is a bad sign!
-                throw new NullPointerException("Domain " + identification + " received too many answers");
+                killsupport.abort( new NullPointerException("Domain " + identification + " received too many answers"));
             if (this.isLeaf)
                 addToTotalForce(inf);
             else
                 if (isSon(inf.identification))
                     this.info.addSon(inf);
                 else 
-                    throw new NullPointerException("Domain " + identification + " received not son!!");
+                    killsupport.abort( new NullPointerException("Domain " + identification + " received not son!!"));
             
             if (this.nbReceived == this.nbNeighbours) 
                 computeMovement();
         }
         else { 
             if (this.iter > receivedIter)
-                throw new NullPointerException("Value arrives too late!");
+                killsupport.abort(  new NullPointerException("Value arrives too late!") );
             this.prematureValues.add(new Carrier (inf, receivedIter));
         }
         
@@ -289,7 +290,7 @@ public class Domain implements Serializable{
         }
         else // finished all iterations.
             if (this.identification==0) // only need one quit signal man, and 0 always has smallest iteration!
-                org.objectweb.proactive.examples.nbody.common.Start.quit();
+                killsupport.quit();
     }
     
     /**

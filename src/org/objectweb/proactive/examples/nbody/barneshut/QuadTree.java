@@ -7,7 +7,7 @@ import org.objectweb.proactive.examples.nbody.common.Point2D;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 /**
- * @see also http://www.reed.edu/~jimfix/MSRI/quadtree/Quadtree.java
+ * @see also <a href="http://www.reed.edu/~jimfix/MSRI/quadtree/Quadtree.java">this page</a>.
  */
 public class QuadTree implements Serializable {
     
@@ -91,10 +91,7 @@ public class QuadTree implements Serializable {
             if (!subtree[3].isEmpty())
                 trees.add( new QuadTree(new Rectangle(new Point2D(middle.x, middle.y), new Point2D(R.x + R.width, R.y + R.height)), subtree[3]));  
             
-            //  Q=(QuadTree[]) trees.toArray(); 
-            this.Q = new QuadTree[trees.size()];
-            for (int i = 0 ; i < Q.length ; i++ )
-                this.Q[i]=(QuadTree) trees.get(i);
+            this.Q=(QuadTree[]) trees.toArray(new QuadTree[] {}); 
         }
         else { // no sons to this Node 
             this.Q = null; 
