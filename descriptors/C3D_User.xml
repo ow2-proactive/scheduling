@@ -13,11 +13,11 @@
 		<mapping>
 			<map virtualNode="User">
 				<jvmSet>
-					<currentJVM protocol="http"/>
+					<currentJVM protocol="rmi"/>
 				</jvmSet>
 			</map>
 		</mapping>
-		<lookup virtualNode="Dispatcher" host="*" protocol="http"/>
+		<lookup virtualNode="Dispatcher" host="*" protocol="rmi"/>
 	</deployment>
 	<infrastructure>
 		<processes>
