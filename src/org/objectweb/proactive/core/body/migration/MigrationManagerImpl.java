@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverForwarder;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverForwarder;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.AbstractEventProducer;
 import org.objectweb.proactive.core.event.MigrationEvent;
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 public class MigrationManagerImpl extends AbstractEventProducer implements MigrationManager, java.io.Serializable {
 
@@ -85,14 +87,20 @@ public class MigrationManagerImpl extends AbstractEventProducer implements Migra
       notifyAllListeners(new MigrationEvent(body, MigrationEvent.BEFORE_MIGRATION));
     try {
 //      long l1 = System.currentTimeMillis();
+
+      //UniversalBody remoteBody = node.receiveBody(body);
+      //--------------------added lines---------------------------
+      ProActiveRuntime part = node.getProActiveRuntime();
+      UniversalBody remoteBody = part.receiveBody(node.getNodeInformation().getName(),body);
+      //--------------------added lines--------------------------
 		
-      	UniversalBody remoteBody = node.receiveBody(body);
+      	
 //      long l2 = System.currentTimeMillis();
       //System.out.println("Migration took "+(l2-l1));
       if (hasListeners())
         notifyAllListeners(new MigrationEvent(body, MigrationEvent.AFTER_MIGRATION));
       return remoteBody;  
-    } catch (NodeException e) {
+    } catch (ProActiveException e) {
       MigrationException me = new MigrationException("Exception while sending the Object", e.getTargetException()); 
       if (hasListeners())
         notifyAllListeners(new MigrationEvent(me));
