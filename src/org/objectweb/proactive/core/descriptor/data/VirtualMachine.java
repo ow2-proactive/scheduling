@@ -33,80 +33,50 @@ package org.objectweb.proactive.core.descriptor.data;
 import org.objectweb.proactive.core.process.ExternalProcess;
 
 /**
- * This class represents a VirtualNode
+ * A <code>VirtualMachine</code> is a conceptual entity that represents
+ * a JVM running a ProActiveRuntime
  *
- * @author       Lionel Mestre
- * @version      1.0
+ * @author  ProActive Team
+ * @version 1.0,  2002/06/20
+ * @since   ProActive 0.9.3
+ *
  */
-public class VirtualMachine {
+public interface VirtualMachine {
 
-  //
-  //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
-  //
-
-  /** the name of this VirtualMachine */
-  private String name;
-
-  /** true if this VirtualMachine is cyclic */
-  private boolean cyclic;
   
-  /** the acquisition method to use to find the VirtualMachine once created */
-  private String acquisitionMethod;
-
-  /** the process to start in order to create the JVM */
-  private ExternalProcess process;
-
-  //
-  //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
-  //
-
- /**
-  * Contructs a new intance of VirtualNode
-  */
-  VirtualMachine() {
-  }
+  public void setCyclic(boolean b);
+  
+  
+  public boolean getCyclic();
+  
+  
+  public void setNodeNumber(String nodeNumber) throws java.io.IOException;
+  
+  
+  public String getNodeNumber();
 
 
-  //
-  //  ----- PUBLIC METHODS -----------------------------------------------------------------------------------
-  //
-  
-  public void setCyclic(boolean b) {
-    cyclic = b;
-  }
-  
-  public boolean getCyclic() {
-    return cyclic;
-  }
-
-
-  public void setName(String s) {
-    name = s;
-  }
-  
-  public String getName() {
-    return name;
-  }
+  public void setName(String s);
   
   
-  public void setAcquisitionMethod(String s) {
-    acquisitionMethod = s;
-  }
+  public String getName();
   
   
-  public String getAcquisitionMethod() {
-    return acquisitionMethod;
-  }
+  public void setAcquisitionMethod(String s) ;
   
   
-  public void setProcess(ExternalProcess p) {
-    process = p;
-  }
+  public String getAcquisitionMethod() ;
   
   
-  public ExternalProcess getProcess() {
-    return process;
-  }
+  public void setProcess(ExternalProcess p) ;
   
   
+  public ExternalProcess getProcess() ;
+  
+  /**
+   * Returns the name of the machine where the process mapped to this virtual machine 
+   * was launched.
+   * @return String
+   */
+  public String getHostName();
 }
