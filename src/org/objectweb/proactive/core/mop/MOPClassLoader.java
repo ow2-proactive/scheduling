@@ -84,7 +84,7 @@ public class MOPClassLoader extends URLClassLoader {
         byte[] cb = null;
         cb = (byte[]) classDataCache.get(classname);
         if (cb == null) {
-            System.out.println(
+            logger.info(
                 "MOPClassLoader: class not found, trying to generate it");
             try {
                 this.loadClass(classname);
