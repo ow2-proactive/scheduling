@@ -34,6 +34,7 @@ public class ObjectWrapper implements java.io.Serializable {
 
   private Object value;
 
+  public ObjectWrapper(){}
 
   public ObjectWrapper(Object value) {
     this.value = value;
