@@ -8,10 +8,12 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 
 
 /**
+ * This one is specialy dedicaced to Fabrice  ;)
+ *
  * @author Laurent Baduel
  */
-public class Hypercube extends TopologyGroup {
-    public Hypercube(Group g, int size)
+public class Tetrahedron extends TopologyGroup {
+    public Tetrahedron(Group g, int size)
         throws ConstructionOfReifiedObjectFailedException {
         super(g, size);
         for (int i = 0; i < size; i++) {
