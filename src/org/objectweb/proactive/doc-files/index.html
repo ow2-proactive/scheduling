@@ -1,176 +1,217 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-   <head>
-        <title>ProActive Documentation Index</title>
-        <link rel="stylesheet" href="ProActive.css">
-   </head>
-<body bgcolor="white">
-
+<head>
+  <title>ProActive Documentation Index</title>
+  <link rel="stylesheet" href="ProActive.css">
+</head>
+<body style="background-color: white;">
 <!--
  Header : start 
 ~~~ -->
 <table width="100%">
-<tr>
-<td align="left" valign="middle">
-    <table cellpadding="2" cellspacing="0" border="1">
+  <tbody>
     <tr>
-    <td class="smallLink1" nowrap>&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2" nowrap>&nbsp;&nbsp;<a class="smallLink2" href="Principles.html">next</a>&nbsp;&nbsp;</td>
+      <td align="left" valign="middle">
+      <table border="1" cellpadding="2" cellspacing="0">
+        <tbody>
+          <tr>
+            <td class="smallLink1" nowrap="nowrap">&nbsp;&nbsp;<a
+ class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+            <td class="smallLink2" nowrap="nowrap">&nbsp;&nbsp;<a
+ class="smallLink2" href="Principles.html">next</a>&nbsp;&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+      </td>
+      <td align="right" valign="top"> <img
+ src="ProActiveLogo200x34.gif"></td>
     </tr>
-    </table>
-</td>
-<td  align="right" valign="top">
-<img src="ProActiveLogo200x34.gif"/>
-</td>
-</tr>
+  </tbody>
 </table>
 <hr>
-<!-- Header : end -->
-<img src="ProActiveLogo.gif"/>
+<!-- Header : end --><img src="ProActiveLogo.gif">
 <h3>version 1.0.3 (October 2003)</h3>
 <p class="textNormal">
-<b>ProActive</b> is a Java library for <b>parallel</b>, <b>distributed</b>, and
+<b>ProActive</b> is a Java library for <b>parallel</b>, <b>distributed</b>,
+and
 <b>concurrent</b> computing, also featuring <b>mobility</b> and <b>security</b>
 in a uniform framework.
-With a reduced set of simple primitives, <b>ProActive</b> provides a comprehensive API allowing to simplify the
-programming of applications that are distributed on <b>Local Area Network (LAN)</b>,
+With a reduced set of simple primitives, <b>ProActive</b> provides a
+comprehensive API allowing to simplify the
+programming of applications that are distributed on <b>Local Area
+Network (LAN)</b>,
 on <b>cluster of workstations</b>, or on <b>Internet Grids</b>.
-The library is based on an Active Object pattern that is a uniform way to encapsulate:
-<ul class="listWithSpace">
-<li>a <b>remotely</b> accessible object,</li>
-<li>a <b>thread</b> as an asynchronous activity,</li>
-<li>an <b>actor</b> with its own script,</li>
-<li>a <b>server</b> of incoming requests,</li>
-<li>a <b>mobile</b> and potentially secure entity.</li>
-</ul>
+The library is based on an Active Object pattern that is a uniform way
+to encapsulate:
 </p>
+<ul class="listWithSpace">
+  <li>a <b>remotely</b> accessible object,</li>
+  <li>a <b>thread</b> as an asynchronous activity,</li>
+  <li>an <b>actor</b> with its own script,</li>
+  <li>a <b>server</b> of incoming requests,</li>
+  <li>a <b>mobile</b> and potentially secure entity.</li>
+</ul>
 <p class="textNormal">
-<b>ProActive</b> is only made of standard Java classes, and requires <b>no changes
-to the Java Virtual Machine</b>, no preprocessing or compiler modification; programmers write
+<b>ProActive</b> is only made of standard Java classes, and requires <b>no
+changes
+to the Java Virtual Machine</b>, no preprocessing or compiler
+modification; programmers write
 standard Java code.
-Based on a simple Meta-Object Protocol, the library is itself extensible, making the system open for
-adaptations and optimizations. <b>ProActive</b> currently uses the <b>RMI</b> Java
+Based on a simple Meta-Object Protocol, the library is itself
+extensible, making the system open for
+adaptations and optimizations. <b>ProActive</b> currently uses the <b>RMI</b>
+Java
 standard library as a portable transport layer.
 </p>
 <p class="textNormal">
-<b>ProActive</b> features several optimizations improving performances. For instance, whenever two active objects
-are located within the same virtual machine, a direct communication is always achieved, without going through the
-network stack. This optimization is ensured even when the co-location occurs after a migration of one or both of the active objects.
+<b>ProActive</b> features several optimizations improving performances.
+For instance, whenever two active objects
+are located within the same virtual machine, a direct communication is
+always achieved, without going through the
+network stack. This optimization is ensured even when the co-location
+occurs after a migration of one or both of the active objects.
 </p>
 <p class="textNormal">
-Please send us comments, suggestions, bug reports at <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
+Please send us comments, suggestions, bug reports at <a
+ href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>
 Your input will be greatly appreciated.
 </p>
 <!--
  Table of Contents : start 
 ~~~ -->
-<table cellpadding="4" cellspacing="0" border="0" align="center">
-<tbody>
+<table align="center" border="0" cellpadding="4" cellspacing="0">
+  <tbody>
     <tr>
-        <th class="navyCell" colspan="2">Content</th>
-    </tr>
-    <tr>
-        <td class="navyCell">&nbsp;0.&nbsp;</td>
-        <td class="whiteCell"><a href="Principles.html">ProActive Principles</a></td>
+      <th class="navyCell" colspan="2">Content</th>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;1.&nbsp;</td>
-        <td class="whiteCell"><a href="Installation.html">ProActive Installation</a></td>
+      <td class="navyCell">&nbsp;0.&nbsp;</td>
+      <td class="whiteCell"><a href="Principles.html">ProActive
+Principles</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;2.&nbsp;</td>
-        <td class="whiteCell"><a href="HelloWorld.html">Hello World ! Example</a></td>
+      <td class="navyCell">&nbsp;1.&nbsp;</td>
+      <td class="whiteCell"><a href="Installation.html">ProActive
+Installation</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;3.&nbsp;</td>
-        <td class="whiteCell"><a href="ProActiveBasis.html">ProActive Basis</a></td>
+      <td class="navyCell">&nbsp;2.&nbsp;</td>
+      <td class="whiteCell"><a href="HelloWorld.html">Hello World !
+Example</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;4.&nbsp;</td>
-        <td class="whiteCell"><a href="ActiveObjectCreation.html">Active objects creation</a></td>
+      <td class="navyCell">&nbsp;3.&nbsp;</td>
+      <td class="whiteCell"><a href="ProActiveBasis.html">ProActive
+Basis</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;5.&nbsp;</td>
-        <td class="whiteCell"><a href="FutureObjectCreation.html">Asynchronous calls and future objects</a></td>
+      <td class="navyCell">&nbsp;4.&nbsp;</td>
+      <td class="whiteCell"><a href="ActiveObjectCreation.html">Active
+objects creation</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;6.&nbsp;</td>
-        <td class="whiteCell"><a href="Migration.html">Migration of active objects</a></td>
-    </tr>
-     <tr>
-        <td class="navyCell">&nbsp;7.&nbsp;</td>
-        <td class="whiteCell"><a href="Configuration.html">ProActive Basics Configuration</a></td>
+      <td class="navyCell">&nbsp;5.&nbsp;</td>
+      <td class="whiteCell"><a href="FutureObjectCreation.html">Asynchronous
+calls and future objects</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;8.&nbsp;</td>
-        <td class="whiteCell"><a href="Descriptor.html">XML Deployment Descriptors</a></td>
-    </tr>
-	<tr>
-        <td class="navyCell">&nbsp;9.&nbsp;</td>
-        <td class="whiteCell"><a href="TypedGroupCommunication.html">Groups Communication</a></td>
+      <td class="navyCell">&nbsp;6.&nbsp;</td>
+      <td class="whiteCell"><a href="Migration.html">Migration of
+active objects</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;10.&nbsp;</td>
-        <td class="whiteCell"><a href="MOP.html">MOP : Metaobject protocol</a></td>
+      <td class="navyCell">&nbsp;7.&nbsp;</td>
+      <td class="whiteCell"><a href="Configuration.html">ProActive
+Basics Configuration</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;11.&nbsp;</td>
-        <td class="whiteCell"><a href="AC.html">Automatic continuations</a></td>
-    </tr>
-     <tr>
-        <td class="navyCell">&nbsp;12.&nbsp;</td>
-        <td class="whiteCell"><a href="guided_tour/index.html">Guided Tour</a></td>
+      <td class="navyCell">&nbsp;8.&nbsp;</td>
+      <td class="whiteCell"><a href="Descriptor.html">XML Deployment
+Descriptors</a></td>
     </tr>
     <tr>
-        <td class="navyCell">&nbsp;13.&nbsp;</td>
-        <td class="whiteCell"><a href="FAQ.html">Frequently Asked Questions</a></td>
+      <td class="navyCell">&nbsp;9.&nbsp;</td>
+      <td class="whiteCell"><a href="TypedGroupCommunication.html">Groups
+Communication</a></td>
     </tr>
-</tbody>
+    <tr>
+      <td class="navyCell">&nbsp;10.&nbsp;</td>
+      <td class="whiteCell"><a href="MOP.html">MOP : Metaobject protocol</a></td>
+    </tr>
+    <tr>
+      <td class="navyCell">&nbsp;11.&nbsp;</td>
+      <td class="whiteCell"><a href="AC.html">Automatic continuations</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="navyCell">&nbsp;12.&nbsp;</td>
+      <td style="vertical-align: top;"><a href="Security.html">Security</a><br>
+      </td>
+    </tr>
+    <tr>
+      <td class="navyCell">&nbsp;12.&nbsp;</td>
+      <td class="whiteCell"><a href="guided_tour/index.html">Guided Tour</a></td>
+    </tr>
+    <tr>
+      <td class="navyCell">&nbsp;13.&nbsp;</td>
+      <td class="whiteCell"><a href="FAQ.html">Frequently Asked
+Questions</a></td>
+    </tr>
+  </tbody>
 </table>
 <!-- Table of Contents : end -->
-
 <!--
 CREDIT
 -->
-<p class="textNormal">
-<b>Credits :</b>
-<ul>
-    <li class="textNormal">ProActive is using <a href="http://www.objectweb.org/asm/">ASM</a> to dynamically generate the java bytecode of the Stubs.</li>
-    <li class="textNormal">ProActive still provides the ability to use the <a href="http://jakarta.apache.org/bcel/">Byte Code Engineering Library (BCEL)</a> for this task (-DbyteCodeManipulator=BCEL option).</li>
-    <li class="textNormal">ProActive is using <a href="http://jakarta.apache.org/ant/">Apache Ant</a> to compile.</li>
-    <li class="textNormal">ProActive is using <a href="http://xml.apache.org/xerces2-j/index.html">Apache Xerces2</a> to parse XML.</li>
-</ul>
-
+<p class="textNormal"><b>Credits :</b>
 </p>
-
-
+<ul>
+  <li class="textNormal">ProActive is using <a
+ href="http://www.objectweb.org/asm/">ASM</a> to dynamically generate
+the java bytecode of the Stubs.</li>
+  <li class="textNormal">ProActive still provides the ability to use
+the <a href="http://jakarta.apache.org/bcel/">Byte Code Engineering
+Library (BCEL)</a> for this task (-DbyteCodeManipulator=BCEL option).</li>
+  <li class="textNormal">ProActive is using <a
+ href="http://jakarta.apache.org/ant/">Apache Ant</a> to compile.</li>
+  <li class="textNormal">ProActive is using <a
+ href="http://xml.apache.org/xerces2-j/index.html">Apache Xerces2</a>
+to parse XML.</li>
+</ul>
 <!--
 Patterns
 -->
-<p class="textNormal">
-<b>Design Patterns used in the library :</b>
+<p class="textNormal"><b>Design Patterns used in the library :</b>
+</p>
 <ul>
-    <li class="textNormal">Adapter</li>
-    <li class="textNormal">Chain of responsibility</li>
-    <li class="textNormal">Composite</li>
-    <li class="textNormal">Decorator</li>
-    <li class="textNormal">Facade</li>
-    <li class="textNormal">Factory</li>
-    <li class="textNormal">Observer</li>
-    <li class="textNormal">Producer-Consumer</li>
-    <li class="textNormal">Proxy</li>
-    <li class="textNormal">Singleton</li>
-    <li class="textNormal">Strategy</li>
+  <li class="textNormal">Adapter</li>
+  <li class="textNormal">Chain of responsibility</li>
+  <li class="textNormal">Composite</li>
+  <li class="textNormal">Decorator</li>
+  <li class="textNormal">Facade</li>
+  <li class="textNormal">Factory</li>
+  <li class="textNormal">Observer</li>
+  <li class="textNormal">Producer-Consumer</li>
+  <li class="textNormal">Proxy</li>
+  <li class="textNormal">Singleton</li>
+  <li class="textNormal">Strategy</li>
 </ul>
-
-</p><br></br>
-<p align="center"><b>ProActive</b> is part of the <b><a href="http://www.objectweb.org/">ObjectWeb consortium</b></a> for <b>OpenSource middleware</b><p></p>
+<br>
+<br>
+<p align="center"><b>ProActive</b> is part of the <b><a
+ href="http://www.objectweb.org/">ObjectWeb consortium</a></b> for <b>OpenSource
+middleware</b></p>
 <p align="center">
-<a href="http://www.objectweb.org/" target="NEW"><img border="0" src="../../../../../../images/objectweb150x60.gif"/></a></p>
-
+<a href="http://www.objectweb.org/" target="NEW"><img
+ src="../../../../../../images/objectweb150x60.gif" border="0"></a></p>
 <!--
  Footer : start 
 ~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; October 2003 INRIA All Rights Reserved.</p>
+<br>
+<hr>
+<div class="textSmall" align="right">Copyright &copy; October 2003
+INRIA All Rights Reserved.
 <!-- Footer : end -->
+</div>
 </body>
 </html>
