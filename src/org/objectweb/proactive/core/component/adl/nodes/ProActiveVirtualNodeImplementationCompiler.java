@@ -5,11 +5,13 @@ package org.objectweb.proactive.core.component.adl.nodes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProviderTask;
 import org.objectweb.fractal.adl.components.ComponentContainer;
-import org.objectweb.fractal.adl.implementations.ControllerContainer;
 import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
+import org.objectweb.fractal.adl.nodes.VirtualNode;
+import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;

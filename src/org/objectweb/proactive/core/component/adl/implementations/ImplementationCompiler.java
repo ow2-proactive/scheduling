@@ -36,6 +36,11 @@ import org.objectweb.fractal.adl.TaskMap;
 import org.objectweb.fractal.adl.components.Component;
 import org.objectweb.fractal.adl.components.ComponentContainer;
 import org.objectweb.fractal.adl.components.PrimitiveCompiler;
+import org.objectweb.fractal.adl.implementations.ControllerContainer;
+import org.objectweb.fractal.adl.implementations.Implementation;
+import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
+import org.objectweb.fractal.adl.implementations.ImplementationContainer;
+import org.objectweb.fractal.adl.implementations.TemplateControllerContainer;
 import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
 import org.objectweb.fractal.api.control.BindingController;
 

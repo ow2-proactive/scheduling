@@ -31,6 +31,8 @@ import org.objectweb.deployment.scheduling.component.lib.AbstractInstanceProvide
 import org.objectweb.fractal.adl.components.ComponentContainer;
 import org.objectweb.fractal.adl.implementations.ImplementationBuilder;
 import org.objectweb.fractal.adl.implementations.ImplementationCompiler;
+import org.objectweb.fractal.adl.nodes.VirtualNode;
+import org.objectweb.fractal.adl.nodes.VirtualNodeContainer;
 
 public class VirtualNodeImplementationCompiler extends ImplementationCompiler {
   

@@ -2,7 +2,7 @@
  * Created on Apr 20, 2004
  * author : Matthieu Morel
   */
-package org.objectweb.proactive.core.component..adl.implementations;
+package org.objectweb.proactive.core.component.adl.implementations;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +16,10 @@ import org.objectweb.fractal.adl.Node;
 import org.objectweb.fractal.adl.TaskMap;
 import org.objectweb.fractal.adl.components.Component;
 import org.objectweb.fractal.adl.components.ComponentContainer;
+import org.objectweb.fractal.adl.implementations.ControllerContainer;
+import org.objectweb.fractal.adl.implementations.Implementation;
+import org.objectweb.fractal.adl.implementations.ImplementationContainer;
+import org.objectweb.fractal.adl.implementations.TemplateControllerContainer;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
