@@ -9,31 +9,36 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractAction;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingConstants;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.Branch;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.Icons;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeModel;
 
 
-public class Switcher extends JPanel implements JobMonitorConstants
+public class Switcher extends Box implements JobMonitorConstants
 {
 	private JLabel [] labels;
 	
 	public Switcher (final JTree jtree, final boolean allowExchange)
 	{
+		super(BoxLayout.X_AXIS);
+		
 		final DataTreeModel treeModel = (DataTreeModel) jtree.getModel();
 		final JPopupMenu popupmenu = new JPopupMenu ();
 		int size = treeModel.getNbKey();
 		labels = new JLabel [size];
-		
-		setLayout (new GridLayout (1, size, 2, 0));
+		setBackground(Color.WHITE);
+		setForeground(Color.WHITE);
 		
 		for (int i = 0; i < size; ++i)
 		{
@@ -83,7 +88,17 @@ public class Switcher extends JPanel implements JobMonitorConstants
 			});
 			
 			updateLabel(l, true);
-			add (l);
+			
+			if (i == 0)
+				add(Box.createHorizontalGlue());
+			
+			add(l);
+			if (i != size - 1) {
+				add(Box.createHorizontalGlue());
+				add(new JLabel(Icons.getSeparatorIcon()));
+			}
+			
+			add(Box.createHorizontalGlue());
 				
 			labels [i] = l;
 		}		

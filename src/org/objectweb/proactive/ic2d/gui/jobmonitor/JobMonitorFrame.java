@@ -10,7 +10,7 @@ import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
 public class JobMonitorFrame extends JFrame
 {
-	private static final int DEFAULT_WIDTH = 1000;
+	private static final int DEFAULT_WIDTH = 800;
 	private static final int DEFAULT_HEIGHT = 600;
 
 	private JobMonitorPanel panel;

@@ -94,7 +94,7 @@ public class JobMonitorStatus extends JPanel implements JobMonitorConstants,
 
         tree.addTreeSelectionListener(this);
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        setLayout(new GridLayout(cells.length, 1, 0, 40));
+        setLayout(new GridLayout(cells.length, 1, 0, 20));
         setBackground(Color.WHITE);
 
         for (int i = 0; i < cells.length; i++) {
@@ -103,9 +103,6 @@ public class JobMonitorStatus extends JPanel implements JobMonitorConstants,
             cell.clear();
             add(cell);
         }
-        
-        validate();
-        setSize(200, 300);
     }
 
     public void valueChanged(TreeSelectionEvent e) {

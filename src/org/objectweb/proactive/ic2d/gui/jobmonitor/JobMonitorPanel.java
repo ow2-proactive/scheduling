@@ -9,6 +9,7 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataTreeNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.switcher.Switcher;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
@@ -24,8 +25,19 @@ import java.rmi.registry.Registry;
 
 import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 
 public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
@@ -416,6 +428,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
             Switcher s = new Switcher(tree, allowExpand);
             JPanel switcher = new JPanel(new GridLayout(1, 1));
+            switcher.setBackground(Color.WHITE);
             switcher.add(s);
             switcher.setBorder(BorderFactory.createEtchedBorder());
             left.add(switcher, BorderLayout.NORTH);

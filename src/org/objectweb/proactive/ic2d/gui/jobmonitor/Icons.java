@@ -11,6 +11,7 @@ public class Icons implements JobMonitorConstants {
 	private static final String JVM_ICON_GIF  = "jvm_icon.png";
 	private static final String NODE_ICON_GIF = "node_icon.png";
 	private static final String AO_ICON_GIF   = "ao_icon.png";
+	private static final String SEPARATOR_ICON_GIF   = "separator_icon.png";
 	
 	private static Icon JOB_ICON = createImageIcon (JOB_ICON_GIF);
 	private static Icon VN_ICON = createImageIcon (VN_ICON_GIF);
@@ -18,6 +19,7 @@ public class Icons implements JobMonitorConstants {
 	private static Icon JVM_ICON = createImageIcon (JVM_ICON_GIF);
 	private static Icon NODE_ICON = createImageIcon (NODE_ICON_GIF);
 	private static Icon AO_ICON = createImageIcon (AO_ICON_GIF);
+	private static Icon SEPARATOR_ICON = createImageIcon (SEPARATOR_ICON_GIF);
 	
 	private static Icon[] ICONS = new Icon[] {HOST_ICON, JVM_ICON, NODE_ICON, AO_ICON, JOB_ICON, VN_ICON};
 	
@@ -38,5 +40,9 @@ public class Icons implements JobMonitorConstants {
 			return ICONS[KEY2INDEX[key]];
 		
 		return null;
+	}
+	
+	public static Icon getSeparatorIcon() {
+		return SEPARATOR_ICON;
 	}
 }
