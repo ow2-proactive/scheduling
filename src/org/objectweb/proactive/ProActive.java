@@ -1133,7 +1133,7 @@ public class ProActive {
 					handler = (IHandler) Class.forName(((Class) level.get(exClass)).getName()).newInstance();
 				} catch (Exception e) {
 					if (e instanceof ClassNotFoundException) {
-						System.out.println("*** Handler for " + exClass.getName() + " is invalid");
+					    // System.out.println("*** Handler for " + exClass.getName() + " is invalid");
 						break;
 					} else {
 						e.printStackTrace();
@@ -1189,7 +1189,7 @@ public class ProActive {
 			}
 		} else {
 			level.put(exName, hName);
-			System.out.println("...OK");
+			//System.out.println("...OK");
 		}
 	}
 
@@ -1228,13 +1228,15 @@ public class ProActive {
 				if (hName != null) {
 					handler = (IHandler) Class.forName(hName).newInstance();            
 					// System.out.println("*** REMOVE [" + handler.getClass().getName() + "] FOR [" + exName.getName() + "] AT LEVEL " + ID_level);
-				} else
-					System.out.println("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+				} else {
+				    //System.out.println("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		} else
-			System.out.println("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !"); 
+		} else {
+		    // System.out.println("*** CAN'T REMOVE ANY HANDLER from DEFAULT LEVEL !"); 
+		}
    
 		// We return the deleted handler
 		return handler;
