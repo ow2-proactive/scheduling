@@ -959,6 +959,14 @@ public class ProxyForGroup extends AbstractProxy
         this.threadpool.ratio(i);
     }
 
+	/**
+	 * Modifies the number of additional threads to serve members
+	 * @param i - the new number
+	 */
+	public void setAdditionalThread(int i) {
+		this.threadpool.thread(i);
+	}
+
     /* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 
     /**
