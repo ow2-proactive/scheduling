@@ -4,12 +4,12 @@
 <definition name="org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers">
   <interface name="r" role="server" signature="java.lang.Runnable"/>
 	<exportedVirtualNodes>
-    	<exportedVirtualNode name="null">
+    	<exportedVirtualNode name="VN1">
     		<composedFrom>
         		<composingVirtualNode component="client" name="client-node"/>
     		</composedFrom>
     	</exportedVirtualNode>
-    	<exportedVirtualNode name="null">
+    	<exportedVirtualNode name="VN2">
     		<composedFrom>
         		<composingVirtualNode component="server" name="server-node"/>
     		</composedFrom>
