@@ -161,7 +161,12 @@ public class RemoteBodyAdapter implements UniversalBody, Serializable {
             message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
                     port, message, ProActiveXMLUtils.MESSAGE);
 
-            return (UniversalBody) message.processMessage();
+            UniversalBody result = (UniversalBody) message.processMessage();  
+            if (result == null)
+            	throw new java.io.IOException("The url " + url +
+       	 	 		" is not bound to any known object");
+            else
+            	return result;
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
