@@ -134,7 +134,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
         }
-        proActiveRuntime.killNode(nodeName);
+        proActiveRuntime.killNode(name);
     }
 
     //	public void createLocalVM(JVMProcess jvmProcess)

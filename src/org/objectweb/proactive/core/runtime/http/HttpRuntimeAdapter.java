@@ -139,7 +139,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     public void killNode(String nodeName) throws ProActiveException {
-        runtimestrategyadapter.killNode(nodeName);
+        runtimestrategyadapter.killNode(UrlBuilder.getNameFromUrl(nodeName));
     }
 
     public void createVM(UniversalProcess remoteProcess)

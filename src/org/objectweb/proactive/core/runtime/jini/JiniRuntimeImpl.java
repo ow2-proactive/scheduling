@@ -178,13 +178,15 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
 
     public void killNode(String nodeName) throws java.rmi.RemoteException {
         String nodeUrl = null;
+        String name = null;
         try {
             nodeUrl = buildNodeURL(nodeName);
+            name = UrlBuilder.getNameFromUrl(nodeUrl);
             unregisterService(nodeUrl, jiniNodeMap);
         } catch (java.net.UnknownHostException e) {
             throw new java.rmi.RemoteException("Host unknown in " + nodeUrl, e);
         }
-        proActiveRuntime.killNode(nodeName);
+        proActiveRuntime.killNode(name);
     }
 
     public void createVM(UniversalProcess remoteProcess)

@@ -446,7 +446,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
                 if (body == null) {
-                    runtimeLogger.warn("body null");
+                    //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
                     // unregister it from this ProActiveRuntime
                     unregisterBody(nodeName, bodyID);
@@ -508,7 +508,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 //check if the body is still on this vm
                 Body body = localBodystore.getLocalBody(bodyID);
                 if (body == null) {
-                    runtimeLogger.warn("body null");
+                    //runtimeLogger.warn("body null");
                     // the body with the given ID is not any more on this ProActiveRuntime
                     // unregister it from this ProActiveRuntime
                     unregisterBody(nodeName, bodyID);
