@@ -1,36 +1,34 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.node;
-
-import java.net.UnknownHostException;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -39,13 +37,16 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import java.net.UnknownHostException;
+
+
 /**
  * <p>
  * The <code>NodeFactory</code> provides a generic way to create and lookup <code>Node</code>
  * without protocol specific code (such as RMI or Jini).
  * </p><p>
  * <code>NodeFactory</code> provides a set of static methods to create and lookup <code>Node</code>.
- * To create a node it is only necessary to associate the protocol in the node url. 
+ * To create a node it is only necessary to associate the protocol in the node url.
  * For instance :
  * </p>
  * <pre>
@@ -67,129 +68,127 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  *
  */
 public class NodeFactory {
+    private static final String DEFAULT_NODE_NAME = "//localhost/Node";
+    private static Node defaultNode = null;
 
-  private static final String DEFAULT_NODE_NAME = "//localhost/Node";
-	private static Node defaultNode = null;
-  // test with class loader
-  //private static final ClassLoader myClassLoader = new NodeClassLoader();
+    // test with class loader
+    //private static final ClassLoader myClassLoader = new NodeClassLoader();
+    //
+    // -- PUBLIC METHODS - STATIC -----------------------------------------------
+    //
 
-
-  //
-  // -- PUBLIC METHODS - STATIC -----------------------------------------------
-  //
-
-
-  /**
-   * Returns the reference to the default node associated to the current JVM
-   * If no default node yet exists, it creates a new one.
-   * @return a reference to the default node associated to this JVM
-   * @exception NodeException if the default node cannot be instantiated
-   */
-  public static synchronized Node getDefaultNode() throws NodeException {
-    String nodeURL;
-    ProActiveRuntime defaultRuntime;
-    if (defaultNode == null) {   
-      try{
-      defaultRuntime = RuntimeFactory.getDefaultRuntime();
-      nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME + Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt()),false);
-      }catch(ProActiveException e){
-      	throw new NodeException("Cannot create the default Node",e);
-      }
-      defaultNode = new NodeImpl(defaultRuntime,nodeURL,Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+    /**
+     * Returns the reference to the default node associated to the current JVM
+     * If no default node yet exists, it creates a new one.
+     * @return a reference to the default node associated to this JVM
+     * @exception NodeException if the default node cannot be instantiated
+     */
+    public static synchronized Node getDefaultNode() throws NodeException {
+        String nodeURL;
+        ProActiveRuntime defaultRuntime;
+        if (defaultNode == null) {
+            try {
+                defaultRuntime = RuntimeFactory.getDefaultRuntime();
+                nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
+                        Integer.toString(
+                            new java.util.Random(System.currentTimeMillis()).nextInt()),
+                        false);
+            } catch (ProActiveException e) {
+                throw new NodeException("Cannot create the default Node", e);
+            }
+            defaultNode = new NodeImpl(defaultRuntime, nodeURL,
+                    Constants.DEFAULT_PROTOCOL_IDENTIFIER);
+        }
+        return defaultNode;
     }
-    return defaultNode;
-  }
 
-
-  /**
-   * Returns true if the given node belongs to this JVM false else.
-   * @return true if the given node belongs to this JVM false else
-   */
-  public static boolean isNodeLocal(Node node) {
-    return node.getNodeInformation().getVMID().equals(UniqueID.getCurrentVMID());
-  }
-
-
-  /**
-   * Creates a new node on the local machine. This call can only be used
-   * to create a node on the local JVM on the local machine.
-   * The node URL can be in the form
-   * <ul>
-   * <li>///nodeName</li>
-   * <li>//localhost/nodeName</li>
-   * <li>//<i>&lt;hostname></i>/nodeName</li>
-   * </ul>
-   * where <i>&lt;hostname></i> is the name of the localhost.
-   * @param <code>nodeURL</code> the URL of the node to create
-   * @return the newly created node on the local JVM
-   * @exception NodeException if the node cannot be created
-   */
-  public static Node createNode(String nodeURL) throws NodeException {
-    return createNode(nodeURL, false);
-  }
-
-  /**
-   * Creates a new node on the local machine. This call can only be used
-   * to create a node on the local JVM on the local machine.
-   * The node URL can be in the form
-   * <ul>
-   * <li>///nodeName</li>
-   * <li>//localhost/nodeName</li>
-   * <li>//<i>&lt;hostname></i>/nodeName</li>
-   * </ul>
-   * where <i>&lt;hostname></i> is the name of the localhost.
-   * @param <code>nodeURL</code> the URL of the node to create
-   * @param <code>replacePreviousBinding</code> 
-   * @return the newly created node on the local JVM
-   * @exception NodeException if the node cannot be created
-   */
-  public static Node createNode(String url, boolean replacePreviousBinding) throws NodeException {
-  	ProActiveRuntime proActiveRuntime;
-  	String nodeURL;
-    //System.out.println("NodeFactory: createNode(" + nodeURL+ ")");
-    //first look for the prototcol
-    String protocol = UrlBuilder.getProtocol(url);
-    //NodeFactory factory = getFactory(protocol);
-    //then create a node
-    try{
-    	proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
-     nodeURL = proActiveRuntime.createLocalNode(UrlBuilder.removeProtocol(url,protocol),replacePreviousBinding);
-    }catch(ProActiveException e){
-    	throw new NodeException("Cannot create a Node based on "+url,e);
+    /**
+     * Returns true if the given node belongs to this JVM false else.
+     * @return true if the given node belongs to this JVM false else
+     */
+    public static boolean isNodeLocal(Node node) {
+        return node.getNodeInformation().getVMID().equals(UniqueID.getCurrentVMID());
     }
-    Node node = new NodeImpl(proActiveRuntime,nodeURL,protocol);
-    return node;
-  }
 
-	/**
-	 * Returns the reference to the node located at the given url.
-	 * This url can be either local or remote.
-	 * @param nodeURL. The url of the node
-	 * @return Node. The reference of the node
-	 * @throws NodeException if the node cannot be found
-	 */
-  public static Node getNode(String nodeURL) throws NodeException {
-  	ProActiveRuntime proActiveRuntime;
-  	String url;
-    // System.out.println("NodeFactory: getNode() for " + nodeURL);
-    //do we have any association for this node?
-		String protocol = UrlBuilder.getProtocol(nodeURL);
-		String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL,protocol);
-		try{
-	  	url = UrlBuilder.checkUrl(noProtocolUrl);
-			proActiveRuntime = RuntimeFactory.getRuntime(url,protocol);
-		}
-		catch (ProActiveException e){
-			throw new NodeException("Cannot get the node based on "+nodeURL,e);
-		}
-		catch (UnknownHostException e){
-			throw new NodeException("Cannot get the node based on "+nodeURL,e);
-		}
-		Node node = new NodeImpl(proActiveRuntime,url,protocol);
-		return node;
-  }
+    /**
+     * Creates a new node on the local machine. This call can only be used
+     * to create a node on the local JVM on the local machine.
+     * The node URL can be in the form
+     * <ul>
+     * <li>///nodeName</li>
+     * <li>//localhost/nodeName</li>
+     * <li>//<i>&lt;hostname></i>/nodeName</li>
+     * </ul>
+     * where <i>&lt;hostname></i> is the name of the localhost.
+     * @param <code>nodeURL</code> the URL of the node to create
+     * @return the newly created node on the local JVM
+     * @exception NodeException if the node cannot be created
+     */
+    public static Node createNode(String nodeURL) throws NodeException {
+        return createNode(nodeURL, false);
+    }
 
+    /**
+     * Creates a new node on the local machine. This call can only be used
+     * to create a node on the local JVM on the local machine.
+     * The node URL can be in the form
+     * <ul>
+     * <li>///nodeName</li>
+     * <li>//localhost/nodeName</li>
+     * <li>//<i>&lt;hostname></i>/nodeName</li>
+     * </ul>
+     * where <i>&lt;hostname></i> is the name of the localhost.
+     * @param <code>nodeURL</code> the URL of the node to create
+     * @param <code>replacePreviousBinding</code>
+     * @return the newly created node on the local JVM
+     * @exception NodeException if the node cannot be created
+     */
+    public static Node createNode(String url, boolean replacePreviousBinding)
+        throws NodeException {
+        ProActiveRuntime proActiveRuntime;
+        String nodeURL;
 
-  
-  
+        //System.out.println("NodeFactory: createNode(" + nodeURL+ ")");
+        //first look for the prototcol
+        String protocol = UrlBuilder.getProtocol(url);
+
+        //NodeFactory factory = getFactory(protocol);
+        //then create a node
+        try {
+            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
+            nodeURL = proActiveRuntime.createLocalNode(UrlBuilder.removeProtocol(
+                        url, protocol), replacePreviousBinding);
+        } catch (ProActiveException e) {
+            throw new NodeException("Cannot create a Node based on " + url, e);
+        }
+        Node node = new NodeImpl(proActiveRuntime, nodeURL, protocol);
+        return node;
+    }
+
+    /**
+     * Returns the reference to the node located at the given url.
+     * This url can be either local or remote.
+     * @param nodeURL. The url of the node
+     * @return Node. The reference of the node
+     * @throws NodeException if the node cannot be found
+     */
+    public static Node getNode(String nodeURL) throws NodeException {
+        ProActiveRuntime proActiveRuntime;
+        String url;
+
+        // System.out.println("NodeFactory: getNode() for " + nodeURL);
+        //do we have any association for this node?
+        String protocol = UrlBuilder.getProtocol(nodeURL);
+        String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);
+        try {
+            url = UrlBuilder.checkUrl(noProtocolUrl);
+            proActiveRuntime = RuntimeFactory.getRuntime(url, protocol);
+        } catch (ProActiveException e) {
+            throw new NodeException("Cannot get the node based on " + nodeURL, e);
+        } catch (UnknownHostException e) {
+            throw new NodeException("Cannot get the node based on " + nodeURL, e);
+        }
+        Node node = new NodeImpl(proActiveRuntime, url, protocol);
+        return node;
+    }
 }

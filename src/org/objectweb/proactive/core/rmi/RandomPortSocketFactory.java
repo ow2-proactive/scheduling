@@ -38,11 +38,16 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 /**
  * This factory creates server socket with randomly choosen port number
  * it tries 5 different ports before reporting a failure
  */
 public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClientSocketFactory, Serializable {
+
+
+	static Logger logger = Logger.getLogger(RandomPortSocketFactory.class.getName());
 
   static protected final int MAX = 5;
   static protected Random random = new Random();
@@ -52,12 +57,12 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClien
   protected int range = 5000;
 
   public RandomPortSocketFactory() {
-    //	System.out.println("RandomPortSocketFactory constructor()");
+    logger.debug("RandomPortSocketFactory constructor()");
   }
 
 
   public RandomPortSocketFactory(int basePort, int range) {
-    //System.out.println("RandomPortSocketFactory constructor(2) basePort = " + basePort + " range " + range);
+    logger.debug("RandomPortSocketFactory constructor(2) basePort = " + basePort + " range " + range);
     this.basePort = basePort;
     this.range = range;
   }
@@ -65,14 +70,14 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClien
 
   public ServerSocket createServerSocket(int port) throws IOException {
     int tries = 0;
-   	System.out.println("RandomPortSocketFactory: createServerSocket " + port + " requested" );
+   	logger.debug("RandomPortSocketFactory: createServerSocket " + port + " requested" );
     while (true) {
       try {
         int offset = random.nextInt(range);
-        //	    System.out.println("RandomPortSocketFactory: createServerSocket with defaultRMI trying to use port " + (basePort+offset));
+        //	    logger.debug("RandomPortSocketFactory: createServerSocket with defaultRMI trying to use port " + (basePort+offset));
         ServerSocket socket = new ServerSocket(basePort + offset);
-        System.out.println("RandomPortSocketFactory: success for port " + (basePort + offset));
-        //	    System.out.println("RandomPortSocketFactory: socket says port " +  socket.getLocalPort());
+        logger.debug("RandomPortSocketFactory: success for port " + (basePort + offset));
+        //	    logger.debug("RandomPortSocketFactory: socket says port " +  socket.getLocalPort());
         return socket;
       } catch (IOException e) {
         tries++;
@@ -85,7 +90,7 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClien
 
 
   public Socket createSocket(String host, int port) throws IOException {
-    	System.out.println("RandomPortServerSocketFactory: createSocket to host " + host + " on port "  + port);
+    	logger.debug("RandomPortServerSocketFactory: createSocket to host " + host + " on port "  + port);
 //    	Object t = null;
 //    	t.toString();
     //try {

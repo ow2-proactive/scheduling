@@ -121,7 +121,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
     return new RemoteProActiveRuntimeAdapter();
   }
   
-  protected static RegistryHelper getRegistryHelper(){
+  public static RegistryHelper getRegistryHelper(){
   	return registryHelper;
   }
 

@@ -1,0 +1,67 @@
+package test.ibis.migration;
+
+import java.io.Serializable;
+
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.util.IbisProperties;
+
+
+public class Test implements Serializable {
+
+    static {
+        IbisProperties.load();
+    }
+
+    public Test() {
+        System.out.println("Test constructor");
+    }
+
+    public Test(Integer i) {
+        System.out.println("Test constructor with parameter");
+    }
+
+    public void echo() {
+        System.out.println("Hello, I am here");
+    }
+
+    public void migrateTo(String url) {
+        System.out.println("Test migrating to " + url);
+        try {
+            ProActive.migrateTo(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void runtimeException() {
+
+        Integer s = null;
+        s.toString();
+    }
+
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.err.println("Usage: java test.migration.Test <nodeName>");
+            System.exit(1);
+        }
+
+        Test test = null;
+
+        try {
+            System.out.println("Creating object");
+            test = (Test) ProActive.newActive(Test.class.getName(), null, null,
+                    null, ProActiveMetaObjectFactory.newInstance());
+            System.out.println("Requesting migration");
+            test.migrateTo(args[0]);
+            Thread.sleep(5000);
+            System.out.println("Calling echo");
+            test.echo();
+            Thread.sleep(5000);
+            System.out.println("Calling runtimeException");
+            test.runtimeException();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

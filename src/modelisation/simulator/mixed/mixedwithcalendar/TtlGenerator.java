@@ -56,7 +56,7 @@ public class TtlGenerator {
         this.initialTTL = ttl;
         this.currentTtl = this.initialTTL;
         this.way = 1;
-        //    this.times = new ArrayList(TtlGenerator.LENGTH);
+        //    this.times = new ArrayList(TimeAnalyse.LENGTH);
         factor = 1.1;
 
         this.expoAveragatorTime = new ExpoAverageWithMemory(0.99, 10);
@@ -105,8 +105,8 @@ public class TtlGenerator {
      */
     public boolean newCommunicationTime(double time) {
         this.expoAveragatorTime.add(time);
-        System.out.println("Time EWMA = " +
-            this.expoAveragatorTime.getLastValue());
+   //     System.out.println("Time EWMA = " +
+    //        this.expoAveragatorTime.getLastValue());
         this.timeCount++;
         //  if (this.timeCount > 10) {
         this.timeCount = 0;
@@ -127,23 +127,23 @@ public class TtlGenerator {
 
         // System.err.println("IT IS VERY NORMAL " + this.timeMemory);
         double rate = this.timeHistory.calculateRate();
-        System.out.println("History = " + this.timeHistory.getAverage() + " " +
-            this.expoAveragatorTime.getLastCounter());
-        System.out.println("HistoryRate = " + rate + " " +
-            this.expoAveragatorTime.getLastCounter() + "values " +
-            this.timeHistory);
+     //   System.out.println("History = " + this.timeHistory.getAverage() + " " +
+     //       this.expoAveragatorTime.getLastCounter());
+    //    System.out.println("HistoryRate = " + rate + " " +
+   //         this.expoAveragatorTime.getLastCounter() + "values " +
+  //          this.timeHistory);
         //now we try to perform a change
         if (rate > 1) {
             this.currentTtl *= 1.1;
-            System.err.println("TTL going up");
+         //   System.err.println("TTL going up");
         } else { // if (rate<5) {
-            System.err.println("TTL going down");
+      //      System.err.println("TTL going down");
             this.currentTtl /= 1.1;
         }
       //  this.currentTtl = this.initialTTL;
-        System.out.println("TTL = " + this.currentTtl + " " +
-            this.expoAveragatorTime.getLastCounter());
-        return this.currentTtl;
+ //      System.out.println("TTL = " + this.currentTtl + " " +
+   //         this.expoAveragatorTime.getLastCounter());
+        return this.initialTTL;
     }
 
     /**
@@ -152,24 +152,24 @@ public class TtlGenerator {
      */
     protected boolean analyseConditions() {
         this.expoRate.add(this.expoAveragatorTime.calculateRate());
-        System.out.println("Rate = " + this.expoRate.getAverage() + " " +
-            this.expoAveragatorTime.getLastCounter());
+  //      System.out.println("Rate = " + this.expoRate.getAverage() + " " +
+    //        this.expoAveragatorTime.getLastCounter());
 
         int variation = this.currentVariation();
         switch (variation) {
         case NORMAL_RATE:
-            System.out.println("normal " + normalCounter);
+  //          System.out.println("normal " + normalCounter);
             if (normalCounter++ > NORMAL_TRESHOLD) {
                 this.normalCounter = 0;
                 return true;
             }
             break;
         case POSITIVE_RATE:
-            System.out.println("positive");
+  //          System.out.println("positive");
             normalCounter = 0;
             break;
         case NEGATIVE_RATE:
-            System.out.println("negative");
+//            System.out.println("negative");
             normalCounter = 0;
             break;
         default:
@@ -290,7 +290,7 @@ public class TtlGenerator {
 
         //        double[] tmp = { 10, 5, 1 };
         //        double pente;
-        //        TtlGenerator tg = new TtlGenerator();
+        //        TimeAnalyse tg = new TimeAnalyse();
         //
         //        // v = tg.simpleVariance(tmp);
         //        //  cov = tg.covariance(tmp);

@@ -30,6 +30,8 @@
 */
 package classloader;
 
+import org.apache.log4j.Logger;
+
 import sun.misc.Resource;
 import sun.misc.URLClassPath;
 
@@ -47,6 +49,7 @@ import java.net.URLClassLoader;
  */
 public class CustomURLClassLoader extends URLClassLoader {
 
+    protected static Logger logger = Logger.getLogger(CustomURLClassLoader.class.getName());
     protected URLClassPath ucp;
 
     public CustomURLClassLoader(URL[] urls) {
@@ -59,12 +62,13 @@ public class CustomURLClassLoader extends URLClassLoader {
     }
 
     protected Class findClass(String name) throws ClassNotFoundException {
+        logger.debug("Looking for class " + name);
 
         String path = name.replace('.', '/').concat(".class");
         Resource res = ucp.getResource(path, false);
+        logger.debug("Got resource " + res);
         if (res != null) {
             try {
-
                 byte[] b = res.getBytes();
                 Class clc = Class.forName("java.lang.ClassLoader");
                 Class[] argumentTypes = new Class[5];
@@ -84,12 +88,18 @@ public class CustomURLClassLoader extends URLClassLoader {
                 effectiveArguments[2] = new Integer(0);
                 effectiveArguments[3] = new Integer(b.length);
                 effectiveArguments[4] = this.getClass().getProtectionDomain();
-                System.out.println("Context class loader " +
+                logger.debug("Context class loader " +
                     Thread.currentThread().getContextClassLoader());
-                return (Class) m.invoke(Thread.currentThread()
-                                              .getContextClassLoader(),
-                    effectiveArguments);
-            } catch (Exception ex) {
+
+                Class tmpClass = (Class) m.invoke(Thread.currentThread()
+                                                        .getContextClassLoader(),
+                        effectiveArguments);
+                logger.debug("Calling defineClass");
+
+              //  Class tmpClass = 
+                 super.defineClass(name, b, 0, b.length);
+                return tmpClass;
+            } catch (Throwable ex) {
                 ex.printStackTrace();
                 throw new ClassNotFoundException(ex.getMessage());
             }
@@ -97,4 +107,17 @@ public class CustomURLClassLoader extends URLClassLoader {
             throw new ClassNotFoundException(name);
         }
     }
+
+//    public synchronized Class loadClass(String name)
+//        throws ClassNotFoundException {
+//        logger.debug(name);
+//        return super.loadClass(name);
+//    }
+//
+//    protected synchronized Class loadClass(String name, boolean resolve)
+//        throws ClassNotFoundException {
+//
+//        Class c = super.loadClass(name, resolve);
+//        return c;
+//    }
 }

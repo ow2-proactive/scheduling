@@ -2,14 +2,13 @@ package modelisation.forwarder;
 
 import modelisation.TimedMigrationManager;
 import modelisation.timedrequest.TimedFactory;
-import org.objectweb.proactive.core.body.MetaObjectFactory;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.body.ibis.ProActiveIbisMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.util.ThreadStore;
-import org.objectweb.proactive.core.util.ThreadStoreImpl;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
+import org.objectweb.proactive.core.util.ThreadStoreImpl;
 
 /**
  * <p>
@@ -21,13 +20,13 @@ import org.objectweb.proactive.core.util.ThreadStoreFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class FowarderMetaObjectFactory extends ProActiveMetaObjectFactory {
+public class ForwarderIbisMetaObjectFactory extends ProActiveIbisMetaObjectFactory {
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
 
-  private static final MetaObjectFactory instance = new FowarderMetaObjectFactory();
+  //private static final MetaObjectFactory instance = new FowarderIbisMetaObjectFactory();
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -36,7 +35,7 @@ public class FowarderMetaObjectFactory extends ProActiveMetaObjectFactory {
   /**
    * Constructor for TimedLocationServerMetaObjectFactory.
    */
-  public FowarderMetaObjectFactory() {
+  public ForwarderIbisMetaObjectFactory() {
     super();
   }
 
@@ -45,9 +44,9 @@ public class FowarderMetaObjectFactory extends ProActiveMetaObjectFactory {
   // -- PUBLICS METHODS -----------------------------------------------
   //
 
-  public static MetaObjectFactory newInstance() {
-    return instance;
-  }
+//  public static MetaObjectFactory newInstance() {
+//    return instance;
+//  }
 
   //
   // -- PROTECTED METHODS -----------------------------------------------

@@ -33,12 +33,11 @@ package org.objectweb.proactive.core.mop;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import sun.rmi.server.MarshalInputStream;
+import sun.rmi.server.MarshalOutputStream;
 
 /**
  * Instances of this class represent method calls performed on reified
@@ -120,7 +119,8 @@ public final class MethodCall implements java.io.Serializable {
 	if ((serializedEffectiveArguments == null) && (effectiveArguments != null)) {
         try {
    		   ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-	       ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+	     //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+		 MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
 	       objectOutputStream.writeObject(effectiveArguments);
 	       objectOutputStream.flush();
     	   objectOutputStream.close();
@@ -263,7 +263,8 @@ public final class MethodCall implements java.io.Serializable {
 	if ((serializedEffectiveArguments != null) && (effectiveArguments == null)) {
 		try {
 			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
-			ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			//ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+			MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
 			effectiveArguments = (Object[])objectInputStream.readObject();
 			objectInputStream.close();
 			byteArrayInputStream.close();
@@ -383,7 +384,8 @@ public final class MethodCall implements java.io.Serializable {
     if ((serializedEffectiveArguments != null) && (effectiveArguments == null)) {
   		try {
 			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(serializedEffectiveArguments);
-		    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+	//	    ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+	MarshalInputStream objectInputStream = new MarshalInputStream(byteArrayInputStream);
 	    	effectiveArguments = (Object[])objectInputStream.readObject();
     		objectInputStream.close();
     		byteArrayInputStream.close();

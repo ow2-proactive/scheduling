@@ -1,10 +1,12 @@
 package test.migration;
 
-import org.objectweb.proactive.ProActive;
-
 import java.io.Serializable;
 
-public class Test implements Serializable {
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.EndActive;
+import org.objectweb.proactive.ProActive;
+
+public class Test implements Serializable, EndActive { //  , RunActive {
 
   public Test() {
     System.out.println("Test constructor");
@@ -19,7 +21,6 @@ public class Test implements Serializable {
   public void echo() {
     System.out.println("Hello, I am here");
   }
-
 
   public void migrateTo(String url) {
   	System.out.println("Test migrating to " + url);
@@ -46,7 +47,7 @@ public class Test implements Serializable {
 
     try {
       System.out.println("Creating object");
-      test = (Test)ProActive.newActive("test.migration.Test", null);
+      test = (Test)ProActive.newActive(Test.class.getName(), null);
       System.out.println("Requesting migration");
       test.migrateTo(args[0]);
       Thread.sleep(5000);
@@ -60,4 +61,18 @@ public class Test implements Serializable {
     }
 
   }
+
+
+public void endActivity(Body body) {
+	// TODO Auto-generated method stub
+	
+}
+
+//
+//public void runActivity(Body body) {
+//	System.out.println("Activity Started");
+//	Service s = new Service(body);
+//	s.fifoServing();
+//	
+//}
 }

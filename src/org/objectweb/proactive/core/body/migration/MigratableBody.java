@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.body.migration;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
@@ -40,6 +42,8 @@ import org.objectweb.proactive.core.node.Node;
 
 public class MigratableBody extends BodyImpl implements Migratable,
     java.io.Serializable {
+    protected static Logger logger = Logger.getLogger(MigratableBody.class.getName());
+
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -99,7 +103,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
     protected void activityStarted() {
         super.activityStarted();
 
-        //System.out.println("Body run on node "+nodeURL+" migration="+hasJustMigrated);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Body run on node " + nodeURL + " migration=" +
+                hasJustMigrated);
+        }
         if (hasJustMigrated) {
             if (migrationManager != null) {
                 migrationManager.startingAfterMigration(this);
@@ -181,11 +188,17 @@ public class MigratableBody extends BodyImpl implements Migratable,
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("stream =  " + out);
+        }
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("stream =  " + in);
+        }
         in.defaultReadObject();
         hasJustMigrated = true;
     }

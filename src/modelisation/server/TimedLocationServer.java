@@ -1,11 +1,3 @@
-/*
- * Created by IntelliJ IDEA.
- * User: fhuet
- * Date: Feb 6, 2002
- * Time: 6:32:43 PM
- * To change template for new class use
- * Code Style | Class Templates options (Tools | IDE Options).
- */
 package modelisation.server;
 
 import org.objectweb.proactive.Body;

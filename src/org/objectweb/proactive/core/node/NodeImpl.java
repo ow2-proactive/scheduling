@@ -110,7 +110,7 @@ public class NodeImpl implements Node, Serializable
 
 
 	/**
-	 * @see org.objectweb.proactive.core.node.Node#getActiveObjects(String)
+	 * @see org.objectweb.proactive.core.node.Node#getActiveObject(String)
 	 */
 	public Object[] getActiveObjects(String className) throws NodeException,ActiveObjectCreationException
 	{
@@ -245,3 +245,4 @@ public class NodeImpl implements Node, Serializable
     
 	}
 }
+

@@ -281,8 +281,6 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     }
 
 
-	
-
 	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
 		// we must set migration tag because requests could contain awaited future (parameters)
 		org.objectweb.proactive.Body owner = LocalBodyStore.getInstance().getLocalBody(ownerID);

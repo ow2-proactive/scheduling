@@ -1,36 +1,38 @@
-/* 
+/*
 * ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
+*
+* ProActive: The Java(TM) library for Parallel, Distributed,
 *            Concurrent computing with Security and Mobility
-* 
+*
 * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
 * Contact: proactive-support@inria.fr
-* 
+*
 * This library is free software; you can redistribute it and/or
 * modify it under the terms of the GNU Lesser General Public
 * License as published by the Free Software Foundation; either
 * version 2.1 of the License, or any later version.
-*  
+*
 * This library is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 * Lesser General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU Lesser General Public
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 * USA
-*  
+*
 *  Initial developer(s):               The ProActive Team
 *                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
+*  Contributor(s):
+*
 * ################################################################
 */
 package classloader;
 
 import org.apache.log4j.Logger;
+
+//import org.objectweb.proactive.core.classloader.CustomURLClassLoader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -45,13 +47,14 @@ import java.rmi.server.RMIClassLoaderSpi;
  */
 public class ProActiveClassLoader extends RMIClassLoaderSpi {
 
+    protected CustomURLClassLoader ucl;
     protected static Logger logger = Logger.getLogger(ProActiveClassLoader.class.getName());
     protected ClassLoader parent = Thread.currentThread().getContextClassLoader();
     protected RMIClassLoaderSpi defaultProvider = RMIClassLoader.getDefaultProviderInstance();
 
     //  protected MOPClassLoader mopClassLoader = new MOPClassLoader();
     public ProActiveClassLoader() {
-        System.out.println("ProactiveClassLoader");
+        logger.debug("ProactiveClassLoader");
     }
 
     public Class loadClass(String codebase, String name,
@@ -59,13 +62,17 @@ public class ProActiveClassLoader extends RMIClassLoaderSpi {
         throws MalformedURLException, ClassNotFoundException {
         logger.debug("loadClass " + name + "with classloader " + defaultLoader +
             " with codebase " + codebase);
-
         try {
             if (defaultLoader == null) {
                 if (codebase != null) {
 
                     URL[] urls = new URL[] { new URL(codebase) };
-                    CustomURLClassLoader ucl = new CustomURLClassLoader(urls);
+
+                    //  CustomURLClassLoader ucl = new CustomURLClassLoader(urls);
+                   // if (ucl == null) {
+                    	logger.debug("CREATING CUSTOMURLCLASSLOADER");
+                        ucl = new CustomURLClassLoader(urls);
+                 //   }
 
                     //CustomURLClassLoader.newInstance(urls);
                     Class c = ucl.loadClass(name);
@@ -81,7 +88,7 @@ public class ProActiveClassLoader extends RMIClassLoaderSpi {
         } catch (ClassNotFoundException e) {
             logger.debug("class not found, should call MOPClassLoader");
             e.printStackTrace();
-            throw e;
+           throw  e;
         }
     }
 
@@ -89,7 +96,6 @@ public class ProActiveClassLoader extends RMIClassLoaderSpi {
         ClassLoader defaultLoader)
         throws MalformedURLException, ClassNotFoundException {
         logger.debug("loadProxyClass ");
-
         // return super.loadProxyClass(codebase, interfaces, defaultLoader);
         return defaultProvider.loadProxyClass(codebase, interfaces,
             defaultLoader);
@@ -102,9 +108,8 @@ public class ProActiveClassLoader extends RMIClassLoaderSpi {
     }
 
     public String getClassAnnotation(Class cl) {
-        logger.debug("getClassAnnotation " + cl);
+        logger.debug("getClassAnnotation " + cl + " = " + defaultProvider.getClassAnnotation(cl));
         return defaultProvider.getClassAnnotation(cl);
-
         //return null;
     }
 }

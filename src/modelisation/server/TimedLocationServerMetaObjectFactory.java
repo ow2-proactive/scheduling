@@ -1,12 +1,12 @@
 package modelisation.server;
 
 import org.objectweb.proactive.core.body.MetaObjectFactory;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
+import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
@@ -21,7 +21,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFactory {
+public class TimedLocationServerMetaObjectFactory extends ProActiveRmiMetaObjectFactory {
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
@@ -47,7 +47,7 @@ public class TimedLocationServerMetaObjectFactory extends ProActiveMetaObjectFac
 
   public synchronized static MetaObjectFactory newInstance() {
   	if (instance == null) {
-  		instance = new TimedLocationServerMetaObjectFactory();
+  		instance =  new TimedLocationServerMetaObjectFactory();
   	}
     return instance;
   }

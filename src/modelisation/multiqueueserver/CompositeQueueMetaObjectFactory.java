@@ -2,9 +2,9 @@ package modelisation.multiqueueserver;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
+import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
 
 /**
  * <p>
@@ -16,7 +16,7 @@ import org.objectweb.proactive.core.body.request.RequestQueueFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class CompositeQueueMetaObjectFactory extends ProActiveMetaObjectFactory {
+public class CompositeQueueMetaObjectFactory extends ProActiveRmiMetaObjectFactory {
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------

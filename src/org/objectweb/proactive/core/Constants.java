@@ -73,6 +73,8 @@ public interface Constants  {
   /** jini protocol identifier */
   public static final String JINI_PROTOCOL_IDENTIFIER = "jini:";
   
+  public static final String IBIS_PROTOCOL_IDENTIFIER = "ibis:";
+  
   /** default protocol identifier */
   public static final String DEFAULT_PROTOCOL_IDENTIFIER = RMI_PROTOCOL_IDENTIFIER;
   

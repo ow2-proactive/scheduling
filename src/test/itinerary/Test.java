@@ -65,7 +65,7 @@ public class Test implements org.objectweb.proactive.RunActive, Serializable {
 
   public static void main(String[] args) {
     if (args.length < 1) {
-      System.err.println("Usage: java test.migrationStrategy.Test <nodeName> ... <nodeName>");
+      System.err.println("Usage: java " +  Test.class.getName() +"  <nodeName> ... <nodeName>");
       System.exit(1);
     }
 
@@ -74,7 +74,7 @@ public class Test implements org.objectweb.proactive.RunActive, Serializable {
     arg[0] = args;
     try {
       System.out.println("Creating object");
-      test = (Test)ProActive.newActive("test.migrationStrategy.Test", arg);
+      test = (Test)ProActive.newActive(Test.class.getName(), arg);
     } catch (Exception e) {
       e.printStackTrace();
     }

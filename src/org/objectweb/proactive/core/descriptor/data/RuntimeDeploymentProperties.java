@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.ProActiveException;
 
 /**
  * This class represents an array of properties that can be set at runtime when using
- * XML deployment descriptors 
+ * XML deployment descriptor 
  * @author  ProActive Team
  * @version 1.0,  2003/04/01
  * @since   ProActive 1.0.2

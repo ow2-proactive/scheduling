@@ -155,7 +155,9 @@
       ================================================================
 	-->
 	<target name="test" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="test/**" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="test/**" deprecation="on" debug="${debug}">
+		<classpath refid="project.classpath"/>
+		</javac>
 	</target>
 	<!--
 	   ================================================================
@@ -165,7 +167,9 @@
       ================================================================
 	-->
 	<target name="essai" depends="ext">
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on" debug="${debug}"/>
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="essai/**" deprecation="on" debug="${debug}">
+		<classpath refid="project.classpath"/>
+		</javac>
 		<copy todir="${classes.dir}/essai" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/essai">
 				<exclude name="**/*.java"/>

@@ -51,190 +51,171 @@ import org.objectweb.proactive.core.event.BodyEventProducerImpl;
  *
  */
 public class LocalBodyStore {
+    //
+    // -- STATIC MEMBERS -----------------------------------------------
+    //
+    private static LocalBodyStore instance = new LocalBodyStore();
 
-  //
-  // -- STATIC MEMBERS -----------------------------------------------
-  //
+    //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
 
-  private static LocalBodyStore instance = new LocalBodyStore();
-  
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
+    /**
+     * This table maps all known active Bodies in this JVM with their UniqueID
+     * From one UniqueID it is possible to get the corresponding body if
+     * it belongs to this JVM
+     */
+    private BodyMap localBodyMap = new BodyMap();
 
-  /**
-   * This table maps all known active Bodies in this JVM with their UniqueID
-   * From one UniqueID it is possible to get the corresponding body if
-   * it belongs to this JVM
-   */
-  private BodyMap localBodyMap = new BodyMap();
+    /**
+     * This table maps all known HalfBodies in this JVM with their UniqueID
+     * From one UniqueID it is possible to get the corresponding halfbody if
+     * it belongs to this JVM
+     */
+    private BodyMap localHalfBodyMap = new BodyMap();
 
- 
-  /**
-   * This table maps all known HalfBodies in this JVM with their UniqueID
-   * From one UniqueID it is possible to get the corresponding halfbody if
-   * it belongs to this JVM
-   */
-  private BodyMap localHalfBodyMap = new BodyMap();
-  
+    /**
+     * Static object that manages the registration of listeners and the sending of
+     * events
+     */
+    private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
+    private ThreadLocal bodyPerThread = new ThreadLocal();
+    private MetaObjectFactory halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
 
-  /**
-   * Static object that manages the registration of listeners and the sending of
-   * events
-   */
-  private BodyEventProducerImpl bodyEventProducer = new BodyEventProducerImpl();
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
 
-  private ThreadLocal bodyPerThread = new ThreadLocal();
-  
-  private MetaObjectFactory halfBodyMetaObjectFactory = ProActiveMetaObjectFactory.newInstance();
-
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-
-  /**
-   * Creates a new AbstractBody.
-   * Used for serialization.
-   */
-  private LocalBodyStore() {}
-
-  //
-  // -- STATIC METHODS -----------------------------------------------
-  //
-
-  public static LocalBodyStore getInstance() {
-    return instance;
-  }
-  
-  
-  //
-  // -- PUBLIC METHODS -----------------------------------------------
-  //
-
-  public MetaObjectFactory getHalfBodyMetaObjectFactory() {
-    return halfBodyMetaObjectFactory;
-  }
-  
-  
-  public void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
-    halfBodyMetaObjectFactory = factory;
-  }
-   
-
-  /**
-   * Returns the body associated with the thread calling the method. If no body is associated with the
-   * calling thread, an HalfBody is created to manage the futures.
-   * @return the body associated to the active object whose active thread is calling this method.
-   */
-  public Body getCurrentThreadBody() {
-    AbstractBody body = (AbstractBody) bodyPerThread.get();
-    if (body == null) {
-      // If we cannot find the body from the current thread we assume that the current thread
-      // is not the one from an active object. Therefore in this case we create an HalfBody
-      // that handle the futures
-      body = HalfBody.getHalfBody(halfBodyMetaObjectFactory);
-      bodyPerThread.set(body);
-      registerHalfBody(body);
+    /**
+     * Creates a new AbstractBody.
+     * Used for serialization.
+     */
+    private LocalBodyStore() {
     }
-    return body;
-  }
 
+    //
+    // -- STATIC METHODS -----------------------------------------------
+    //
+    public static LocalBodyStore getInstance() {
+        return instance;
+    }
 
-  /**
-   * Associates the body with the thread calling the method. 
-   * @param the body to associate to the active thread that calls this method.
-   */
-  public void setCurrentThreadBody(Body body) {
-    bodyPerThread.set(body);
-  }
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
+    public MetaObjectFactory getHalfBodyMetaObjectFactory() {
+        return halfBodyMetaObjectFactory;
+    }
 
+    public void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
+        halfBodyMetaObjectFactory = factory;
+    }
 
-  /**
-   * Returns the body belonging to this JVM whose ID is the one specified.
-   * Returns null if a body with such an id is not found in this jvm
-   * @param bodyID the ID to look for
-   * @return the body with matching id or null
-   */
-  public Body getLocalBody(UniqueID bodyID) {
-    return (Body) localBodyMap.getBody(bodyID);
-  }
+    /**
+     * Returns the body associated with the thread calling the method. If no body is associated with the
+     * calling thread, an HalfBody is created to manage the futures.
+     * @return the body associated to the active object whose active thread is calling this method.
+     */
+    public Body getCurrentThreadBody() {
+        AbstractBody body = (AbstractBody) bodyPerThread.get();
 
-  
+        if (body == null) {
+            // If we cannot find the body from the current thread we assume that the current thread
+            // is not the one from an active object. Therefore in this case we create an HalfBody
+            // that handle the futures
+            body = HalfBody.getHalfBody(halfBodyMetaObjectFactory);
+            bodyPerThread.set(body);
+            registerHalfBody(body);
+        }
 
-  /**
-   * Returns the halfbody belonging to this JVM whose ID is the one specified.
-   * Returns null if a halfbody with such an id is not found in this jvm
-   * @param bodyID the ID to look for
-   * @return the halfbody with matching id or null
-   */
-  public Body getLocalHalfBody(UniqueID bodyID) {
-    return (Body) localHalfBodyMap.getBody(bodyID);
-  }
+        return body;
+    }
 
+    /**
+     * Associates the body with the thread calling the method.
+     * @param the body to associate to the active thread that calls this method.
+     */
+    public void setCurrentThreadBody(Body body) {
+        bodyPerThread.set(body);
+    }
 
+    /**
+     * Returns the body belonging to this JVM whose ID is the one specified.
+     * Returns null if a body with such an id is not found in this jvm
+     * @param bodyID the ID to look for
+     * @return the body with matching id or null
+     */
+    public Body getLocalBody(UniqueID bodyID) {
+        return (Body) localBodyMap.getBody(bodyID);
+    }
 
-  /**
-   * Returns all local Bodies in a new BodyMap
-   * @return all local Bodies in a new BodyMap
-   */
-  public BodyMap getLocalBodies() {
-    return (BodyMap) localBodyMap.clone();
-  }
+    /**
+     * Returns the halfbody belonging to this JVM whose ID is the one specified.
+     * Returns null if a halfbody with such an id is not found in this jvm
+     * @param bodyID the ID to look for
+     * @return the halfbody with matching id or null
+     */
+    public Body getLocalHalfBody(UniqueID bodyID) {
+        return (Body) localHalfBodyMap.getBody(bodyID);
+    }
 
- 
-  /**
-   * Returns all local HalfBodies in a new BodyMap
-   * @return all local HalfBodies in a new BodyMap
-   */
-  public BodyMap getLocalHalfBodies() {
-    return (BodyMap) localHalfBodyMap.clone();
-  }
+    /**
+     * Returns all local Bodies in a new BodyMap
+     * @return all local Bodies in a new BodyMap
+     */
+    public BodyMap getLocalBodies() {
+        return (BodyMap) localBodyMap.clone();
+    }
 
+    /**
+     * Returns all local HalfBodies in a new BodyMap
+     * @return all local HalfBodies in a new BodyMap
+     */
+    public BodyMap getLocalHalfBodies() {
+        return (BodyMap) localHalfBodyMap.clone();
+    }
 
-  /**
-   * Adds a listener of body events. The listener is notified every time a body
-   * (active or not) is registered or unregistered in this JVM.
-   * @param listener the listener of body events to add
-   */
-  public void addBodyEventListener(BodyEventListener listener) {
-    bodyEventProducer.addBodyEventListener(listener);
-  }
+    /**
+     * Adds a listener of body events. The listener is notified every time a body
+     * (active or not) is registered or unregistered in this JVM.
+     * @param listener the listener of body events to add
+     */
+    public void addBodyEventListener(BodyEventListener listener) {
+        bodyEventProducer.addBodyEventListener(listener);
+    }
 
+    /**
+     * Removes a listener of body events.
+     * @param listener the listener of body events to remove
+     */
+    public void removeBodyEventListener(BodyEventListener listener) {
+        bodyEventProducer.removeBodyEventListener(listener);
+    }
 
-  /**
-   * Removes a listener of body events.
-   * @param listener the listener of body events to remove
-   */
-  public void removeBodyEventListener(BodyEventListener listener) {
-    bodyEventProducer.removeBodyEventListener(listener);
-  }
+    //
+    // -- FRIENDLY METHODS -----------------------------------------------
+    //
+    void registerBody(AbstractBody body) {
+        if (localBodyMap.getBody(body.getID()) != null) {
+            System.out.println("WARNININININININININGGGGGGG");
+        }
+        localBodyMap.putBody(body.bodyID, body);
+        bodyEventProducer.fireBodyCreated(body);
+    }
 
+    void unregisterBody(AbstractBody body) {
+        localBodyMap.removeBody(body.bodyID);
+        bodyEventProducer.fireBodyRemoved(body);
+    }
 
-  //
-  // -- FRIENDLY METHODS -----------------------------------------------
-  //
+    void registerHalfBody(AbstractBody body) {
+        localHalfBodyMap.putBody(body.bodyID, body);
 
-  void registerBody(AbstractBody body) {
-    localBodyMap.putBody(body.bodyID, body);
-    bodyEventProducer.fireBodyCreated(body);
-  }
+        //bodyEventProducer.fireBodyCreated(body);
+    }
 
-  void unregisterBody(AbstractBody body) {
-    localBodyMap.removeBody(body.bodyID);
-    bodyEventProducer.fireBodyRemoved(body);
-  }
-
-  
-  void registerHalfBody(AbstractBody body) {
-    localHalfBodyMap.putBody(body.bodyID, body);
-    //bodyEventProducer.fireBodyCreated(body);
-  }
-
-  void unregisterHalfBody(AbstractBody body) {
-    localHalfBodyMap.removeBody(body.bodyID);
-    //bodyEventProducer.fireBodyRemoved(body);
-  }
-  
-
-
+    void unregisterHalfBody(AbstractBody body) {
+        localHalfBodyMap.removeBody(body.bodyID);
+        //bodyEventProducer.fireBodyRemoved(body);
+    }
 }

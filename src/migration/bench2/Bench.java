@@ -22,7 +22,7 @@ public class Bench {
     for (currentAgent = 0; currentAgent < numberAgents; currentAgent++) {
       try {
         parameters[0] = new Integer(currentAgent);
-        allAgents[currentAgent] = (Agent)ProActive.newActive("migration.bench2.Agent", parameters);
+        allAgents[currentAgent] = (Agent)ProActive.newActive(Agent.class.getName(), parameters);
         allAgents[currentAgent].setDestinationList(v);
       } catch (Exception e) {
         e.printStackTrace();
@@ -52,7 +52,7 @@ public class Bench {
 
   public static void main(String args[]) {
     if (args.length < 2) {
-      System.out.println("Usage: java migration.bench2.Bench number fileName");
+      System.out.println("Usage: java " + Bench.class.getName() +" number fileName");
       System.exit(-1);
     }
 

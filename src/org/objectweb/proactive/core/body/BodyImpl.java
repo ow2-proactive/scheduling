@@ -188,6 +188,10 @@ public abstract class BodyImpl extends AbstractBody
 		setLocalBodyImpl(new InactiveLocalBodyStrategy());
 	}
 
+//protected void activityStopped2() {
+//	super.activityStopped2();
+//	
+//}
 
 	public void setImmediateService(String methodName) throws java.io.IOException {
 		this.requestReceiver.setImmediateService(methodName);

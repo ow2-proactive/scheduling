@@ -30,47 +30,31 @@
 */
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.migration.MigrationManager;
-import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestQueueFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.util.ThreadStore;
-import org.objectweb.proactive.core.util.ThreadStoreFactory;
-
 
 /**
+ * THIS JAVADOC SHOULD BE REWRITTEN
  * <p>
  * This class provides singleton instances of all default factories
  * creating MetaObjects used in the Body.
  * </p>
  * <p>
- * One can inherit from this class in order to provide custom implementation 
- * of one or several factories. This class provide a default implementation that 
- * makes the factories a singleton. One instance of each mata object factory is 
- * created when this object is built and the same instance is returned each time 
+ * One can inherit from this class in order to provide custom implementation
+ * of one or several factories. This class provide a default implementation that
+ * makes the factories a singleton. One instance of each mata object factory is
+ * created when this object is built and the same instance is returned each time
  * somebody ask for an instance.
  * </p>
  * <p>
- * In order to change one meta object factory following that singleton pattern, 
+ * In order to change one meta object factory following that singleton pattern,
  * only the protected method <code>newXXXSingleton</code> has to be overwritten.
- * The method <code>newXXXSingleton</code> is guarantee to be called only once at 
+ * The method <code>newXXXSingleton</code> is guarantee to be called only once at
  * construction time of this object.
  * </p>
  * <p>
- * In order to change one meta object factory that does not follow the singleton 
+ * In order to change one meta object factory that does not follow the singleton
  * pattern, the public method <code>newXXX</code> has to be overwritten in order
- * to return a new instance of the factory each time. The default implementation 
- * of each <code>newXXX</code> method if to return the singleton instance of the 
+ * to return a new instance of the factory each time. The default implementation
+ * of each <code>newXXX</code> method if to return the singleton instance of the
  * factory created from <code>newXXXSingleton</code> method call.
  * </p>
  * <p>
@@ -82,183 +66,198 @@ import org.objectweb.proactive.core.util.ThreadStoreFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable {
+import org.apache.log4j.Logger;
 
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
-
-  private static final MetaObjectFactory instance = new ProActiveMetaObjectFactory();
-
-  //
-  // -- PROTECTED MEMBERS -----------------------------------------------
-  //
-
-  protected RequestFactory requestFactoryInstance;
-  protected ReplyReceiverFactory replyReceiverFactoryInstance;
-  protected RequestReceiverFactory requestReceiverFactoryInstance;
-  protected RequestQueueFactory requestQueueFactoryInstance;
-  protected MigrationManagerFactory migrationManagerFactoryInstance;
-  protected RemoteBodyFactory remoteBodyFactoryInstance;
-  protected ThreadStoreFactory threadStoreFactoryInstance;
-  
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
-  
-  protected ProActiveMetaObjectFactory() {
-    requestFactoryInstance = newRequestFactorySingleton();
-    replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-    requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-    requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-    migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-    remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-    threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-  }
-
-  //
-  // -- PUBLICS METHODS -----------------------------------------------
-  //
-
-  public static MetaObjectFactory newInstance() {
-    return instance;
-  }
-
-  //
-  // -- implements MetaObjectFactory -----------------------------------------------
-  //
-
-  public RequestFactory newRequestFactory() {
-    return requestFactoryInstance;
-  }
-  
-
-  public ReplyReceiverFactory newReplyReceiverFactory() {
-    return replyReceiverFactoryInstance;
-  }
-  
-
-  public RequestReceiverFactory newRequestReceiverFactory() {
-    return requestReceiverFactoryInstance;
-  }
-  
-
-  public RequestQueueFactory newRequestQueueFactory() {
-    return requestQueueFactoryInstance;
-  }
-  
-
-  public MigrationManagerFactory newMigrationManagerFactory() {
-    return migrationManagerFactoryInstance;
-  }
-  
-
-  public RemoteBodyFactory newRemoteBodyFactory() {
-    return remoteBodyFactoryInstance;
-  }
+import org.objectweb.proactive.core.body.ibis.ProActiveIbisMetaObjectFactory;
+import org.objectweb.proactive.core.body.rmi.ProActiveRmiMetaObjectFactory;
 
 
-  public ThreadStoreFactory newThreadStoreFactory() {
-    return threadStoreFactoryInstance;
-  }
+public class ProActiveMetaObjectFactory implements java.io.Serializable {
+    protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
 
-
-
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-
-  protected RequestFactory newRequestFactorySingleton() {
-    return new RequestFactoryImpl();
-  }
-  
-
-  protected ReplyReceiverFactory newReplyReceiverFactorySingleton() {
-    return new ReplyReceiverFactoryImpl();
-  }
-  
-
-  protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
-    return new RequestReceiverFactoryImpl();
-  }
-  
-
-  protected RequestQueueFactory newRequestQueueFactorySingleton() {
-    return new RequestQueueFactoryImpl();
-  }
-  
-
-  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
-    return new MigrationManagerFactoryImpl();
-  }
-  
-
-  protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-    return new RemoteBodyFactoryImpl();
-  }
-
-
-  protected ThreadStoreFactory newThreadStoreFactorySingleton() {
-    return new ThreadStoreFactoryImpl();
-  }
-
-
-
-  //
-  // -- INNER CLASSES -----------------------------------------------
-  //
-
-  protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-        return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
+    //
+    // -- PRIVATE MEMBERS -----------------------------------------------
+    //
+    static {
+        if ("ibis".equals(System.getProperty("proactive.rmi"))) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Factory is ibis");
+            }
+            ProActiveMetaObjectFactory.instance = new ProActiveIbisMetaObjectFactory();
+        } else {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Factory is rmi");
+            }
+            ProActiveMetaObjectFactory.instance = new ProActiveRmiMetaObjectFactory();
+        }
     }
-  } // end inner class RequestFactoryImpl
 
-  
-  protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
-    public ReplyReceiver newReplyReceiver() {
-        return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
+    // private static final MetaObjectFactory instance = new ProActiveMetaObjectFactory();
+    private static MetaObjectFactory instance;
+
+    //
+    // -- PROTECTED MEMBERS -----------------------------------------------
+    //
+    //  protected RequestFactory requestFactoryInstance;
+    //  protected ReplyReceiverFactory replyReceiverFactoryInstance;
+    //  protected RequestReceiverFactory requestReceiverFactoryInstance;
+    //  protected RequestQueueFactory requestQueueFactoryInstance;
+    //  protected MigrationManagerFactory migrationManagerFactoryInstance;
+    //  protected RemoteBodyFactory remoteBodyFactoryInstance;
+    //  protected ThreadStoreFactory threadStoreFactoryInstance;
+    //  
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    //  protected ProActiveMetaObjectFactory() {
+    //    requestFactoryInstance = newRequestFactorySingleton();
+    //    replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
+    //    requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
+    //    requestQueueFactoryInstance = newRequestQueueFactorySingleton();
+    //    migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
+    //    remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
+    //    threadStoreFactoryInstance = newThreadStoreFactorySingleton();
+    //  }
+    //
+    // -- PUBLICS METHODS -----------------------------------------------
+    //
+    public static MetaObjectFactory newInstance() {
+        return instance;
     }
-  } // end inner class ReplyReceiverFactoryImpl
 
-
-  protected static class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
-    public RequestReceiver newRequestReceiver() {
-        return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
+    public static void setNewInstance(MetaObjectFactory mo) {
+        instance = mo;
     }
-  } // end inner class RequestReceiverFactoryImpl
 
-
-  protected static class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
-    public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-        return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
-    }
-  } // end inner class RequestQueueFactoryImpl
-
-
-  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
-    public MigrationManager newMigrationManager() {
-        return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
-    }
-  } // end inner class MigrationManagerFactoryImpl
-
-
-  protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
-    public UniversalBody newRemoteBody(UniversalBody body) {
-      try {
-          return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
-      } catch (ProActiveException e) {
-          throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
-      }
-    }
-  } // end inner class RemoteBodyFactoryImpl
-
-
-  protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
-    public ThreadStore newThreadStore() {
-        return new org.objectweb.proactive.core.util.ThreadStoreImpl();
-    }
-  } // end inner class ThreadStoreFactoryImpl
-
-
+    //
+    // -- implements MetaObjectFactory -----------------------------------------------
+    //
+    //  public RequestFactory newRequestFactory() {
+    //    return requestFactoryInstance;
+    //  }
+    //  
+    //
+    //  public ReplyReceiverFactory newReplyReceiverFactory() {
+    //    return replyReceiverFactoryInstance;
+    //  }
+    //  
+    //
+    //  public RequestReceiverFactory newRequestReceiverFactory() {
+    //    return requestReceiverFactoryInstance;
+    //  }
+    //  
+    //
+    //  public RequestQueueFactory newRequestQueueFactory() {
+    //    return requestQueueFactoryInstance;
+    //  }
+    //  
+    //
+    //  public MigrationManagerFactory newMigrationManagerFactory() {
+    //    return migrationManagerFactoryInstance;
+    //  }
+    //  
+    //
+    //  public RemoteBodyFactory newRemoteBodyFactory() {
+    //    return remoteBodyFactoryInstance;
+    //  }
+    //
+    //
+    //  public ThreadStoreFactory newThreadStoreFactory() {
+    //    return threadStoreFactoryInstance;
+    //  }
+    //
+    // -- PROTECTED METHODS -----------------------------------------------
+    //
+    //  protected RequestFactory newRequestFactorySingleton() {
+    //    return new RequestFactoryImpl();
+    //  }
+    //  
+    //
+    //  protected ReplyReceiverFactory newReplyReceiverFactorySingleton() {
+    //    return new ReplyReceiverFactoryImpl();
+    //  }
+    //  
+    //
+    //  protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
+    //    return new RequestReceiverFactoryImpl();
+    //  }
+    //  
+    //
+    //  protected RequestQueueFactory newRequestQueueFactorySingleton() {
+    //    return new RequestQueueFactoryImpl();
+    //  }
+    //  
+    //
+    //  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
+    //    return new MigrationManagerFactoryImpl();
+    //  }
+    //  
+    //
+    //  protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
+    //    return new RemoteBodyFactoryImpl();
+    //  }
+    //
+    //
+    //  protected ThreadStoreFactory newThreadStoreFactorySingleton() {
+    //    return new ThreadStoreFactoryImpl();
+    //  }
+    //
+    //
+    //
+    //  //
+    //  // -- INNER CLASSES -----------------------------------------------
+    //  //
+    //
+    //  protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
+    //    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+    //        return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
+    //    }
+    //  } // end inner class RequestFactoryImpl
+    //
+    //  
+    //  protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
+    //    public ReplyReceiver newReplyReceiver() {
+    //        return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
+    //    }
+    //  } // end inner class ReplyReceiverFactoryImpl
+    //
+    //
+    //  protected static class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
+    //    public RequestReceiver newRequestReceiver() {
+    //        return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
+    //    }
+    //  } // end inner class RequestReceiverFactoryImpl
+    //
+    //
+    //  protected static class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
+    //    public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
+    //        return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
+    //    }
+    //  } // end inner class RequestQueueFactoryImpl
+    //
+    //
+    //  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
+    //    public MigrationManager newMigrationManager() {
+    //        return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
+    //    }
+    //  } // end inner class MigrationManagerFactoryImpl
+    //
+    //
+    //  protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
+    //    public UniversalBody newRemoteBody(UniversalBody body) {
+    //      try {
+    //          return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+    //      } catch (ProActiveException e) {
+    //          throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
+    //      }
+    //    }
+    //  } // end inner class RemoteBodyFactoryImpl
+    //
+    //
+    //  protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
+    //    public ThreadStore newThreadStore() {
+    //        return new org.objectweb.proactive.core.util.ThreadStoreImpl();
+    //    }
+    //  } // end inner class ThreadStoreFactoryImpl
+    //
 }

@@ -74,7 +74,7 @@ import org.objectweb.proactive.core.body.request.RequestProcessor;
  * @see RunActive
  *
  */
-public class Service {
+public class Service  {
   
   //
   // -- PROTECTED MEMBERS -----------------------------------------------

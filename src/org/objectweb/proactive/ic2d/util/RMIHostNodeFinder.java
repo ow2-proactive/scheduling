@@ -98,6 +98,7 @@ public class RMIHostNodeFinder implements HostNodeFinder {
     // enumarate through the rmi binding on the registry
     log("Listing bindings for " + registry);
     String[] list = registry.list();
+    System.out.println("list " + list.length);
     if (list.length == 0) {
       return new Node[0];
     }

@@ -60,6 +60,12 @@ public abstract class ClassServer implements Runnable {
   protected String hostname;
 
 
+static {
+	System.out.println("ClassServer loaded by " + ClassServer.class.getClassLoader());
+	System.out.println("Context Class loader " + Thread.currentThread().getContextClassLoader());
+	
+}
+
   /**
    * Constructs a ClassServer that listens on a random port. The port number
    * used is the first one found free starting from a default base port.
@@ -81,6 +87,7 @@ public abstract class ClassServer implements Runnable {
   protected ClassServer(int port) throws java.io.IOException {
     if (port == 0){
       this.port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
+	  System.out.println("Port is " + this.port);
     } else {
       this.port = port;
       server = new java.net.ServerSocket(port);
@@ -91,6 +98,7 @@ public abstract class ClassServer implements Runnable {
 
 
   public int getServerSocketPort() {
+  	//System.out.println("XXXXXX " + this.port);
     return port;
   }
 
@@ -141,7 +149,8 @@ public abstract class ClassServer implements Runnable {
         }
       } catch (Exception e) {
         // write out error response
-        System.out.println("!!! ClassServer failed to load class " + info.path+".");
+        e.printStackTrace();
+        System.out.println("!!! ClassServer failed to load class " + info.path);
         out.writeBytes("HTTP/1.0 400 " + e.getMessage() + "\r\n");
         out.writeBytes("Content-Type: text/html\r\n\r\n");
         out.flush();
