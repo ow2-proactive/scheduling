@@ -85,7 +85,7 @@ only has a Stub and a Proxy as shown in figure below :
 </p>
 
 <br><div align="center">
-<img src="images/futureObject.gif"/>
+<img src="futureObject.gif"/>
 <br><b class="legend">
 A future object
 </b><br></div>
@@ -175,7 +175,7 @@ different classes.
 </p>
 
 <br><div align="center">
-<img src="images/sequentialCallUMLDiagram.gif"/>
+<img src="sequentialCallUMLDiagram.gif"/>
 <br><b class="legend">
 Sequence Diagram - single-threaded version of the program
 </b><br><br></div>
@@ -194,7 +194,7 @@ stub (an instance of class <code>Stub_B</code>, which actually inherits
 directly from <code>B</code>), a <code>BodyProxy</code>, a <code>Body</code> and the
 actual instance of <code>B</code>.
 <br><div align="center">
-<img src="images/activeObjectComponents.gif"/>
+<img src="activeObjectComponents.gif"/>
 <br><b class="legend">
 The components of an active object
 </b><br><br></div>
@@ -205,7 +205,7 @@ now holds a reference onto a future object representing the
 not-yet-available result of the call. It is actually composed of a
 <code>Stub_V</code> and a <code>FutureProxy</code> as shown on the figure below.
 <br><div align="center">
-<img src="images/futureObjectComponents.gif"/>
+<img src="futureObjectComponents.gif"/>
 <br><b class="legend">
 The components of a future object before the result is set
 </b><br><br></div>
@@ -216,7 +216,7 @@ the thread of the <code>Body</code> sets the result in the future, which
 results in the <code>FutureProxy</code> having a reference onto a <code>V</code>
 (see figure below).
 <br><div align="center">
-<img src="images/futureObjectAllComponents.gif"/>
+<img src="futureObjectAllComponents.gif"/>
 <br><b class="legend">
 All components of a future object
 </b><br></div>
@@ -266,7 +266,7 @@ If the object the future represents is available (the <i>second thread</i> has a
 is described in figure below, the call is executed on it and returns a value to the calling code in <code>A</code>.
 </p>
 <br><div align="center">
-<img src="images/usingFutureAfterGettingResultDiagram.gif"/>
+<img src="usingFutureAfterGettingResultDiagram.gif"/>
 <br><b class="legend">
 Sequence Diagram
 </b><br></div>
@@ -276,7 +276,7 @@ If it is not yet available, the first thread is suspended in <code>FutureProxy</
 future object (see figure below).
 </p>
 <br><div align="center">
-<img src="images/usingFutureBeforeGettingResultDiagram.gif"/>
+<img src="usingFutureBeforeGettingResultDiagram.gif"/>
 <br><b class="legend">
 Sequence Diagram
 </b><br></div>

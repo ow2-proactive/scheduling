@@ -63,17 +63,17 @@ public class FilterDocFiles {
 
   
   /**
-   * change img src="images/..." to img src="pdf_images/..."
+   * change img src="... .gif" to img src="..._pdf.gif"
    */
   private static String changeImagesPath(String html) {
     StringBuffer newHtml = new StringBuffer(html.length());
     int currentIndex = 0;
     while (true) {
-      int markerIndex = html.indexOf("src=\"", currentIndex);
-      if (markerIndex == -1) break;
-      newHtml.append(html.substring(currentIndex, markerIndex+5));
-      newHtml.append("pdf_");
-      currentIndex = markerIndex+5;
+      int gifIndex = html.indexOf(".gif\"", currentIndex);
+      if (gifIndex == -1) break;
+      newHtml.append(html.substring(currentIndex, gifIndex));
+      newHtml.append("_pdf.gif");
+      currentIndex = gifIndex+4;
     }
     if (currentIndex < html.length()) {
       newHtml.append(html.substring(currentIndex, html.length()));
