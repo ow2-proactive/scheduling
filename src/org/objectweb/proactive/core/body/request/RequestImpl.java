@@ -207,35 +207,35 @@ public class RequestImpl extends MessageImpl implements Request,
         if (logger.isDebugEnabled()) {
             logger.debug(" sending request " + methodCall.getName());
         }
-//        try {
-//            if (!ciphered && !hasBeenForwarded()) {
-//                sessionID = 0;
-//
-//                if (sender == null) {
-//                    logger.warn("sender is null but why ?");
-//                }
-//
-//                this.psm = sender.getProActiveSecurityManager();
-//
-//                byte[] certE = destinationBody.getCertificateEncoded();
-//                X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-//                sessionID = psm.getSessionIDTo(cert);
-//                System.out.println("session ID is : " + sessionID);
-//                if (sessionID != 0) {
-//                    methodCallCiphered = psm.encrypt(sessionID, methodCall);
-//                    ciphered = true;
-//                    methodCall = null;
-//
-//                    System.out.println("methodcallciphered " +
-//                        methodCallCiphered + ", ciphered " + ciphered +
-//                        ", methodCall " + methodCall);
-//                }
-//            }
-//        } catch (SecurityNotAvailableException e) {
-//            // do nothing
-//            //e.printStackTrace();
-//            logger.debug("Request : security disabled");
-//        }
+        try {
+            if (!ciphered && !hasBeenForwarded()) {
+                sessionID = 0;
+
+                if (sender == null) {
+                    logger.warn("sender is null but why ?");
+                }
+
+                this.psm = sender.getProActiveSecurityManager();
+
+                byte[] certE = destinationBody.getCertificateEncoded();
+                X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                sessionID = psm.getSessionIDTo(cert);
+                System.out.println("session ID is : " + sessionID);
+                if (sessionID != 0) {
+                    methodCallCiphered = psm.encrypt(sessionID, methodCall);
+                    ciphered = true;
+                    methodCall = null;
+
+                    System.out.println("methodcallciphered " +
+                        methodCallCiphered + ", ciphered " + ciphered +
+                        ", methodCall " + methodCall);
+                }
+            }
+        } catch (SecurityNotAvailableException e) {
+            // do nothing
+            //e.printStackTrace();
+            logger.debug("Request : security disabled");
+        }
 
         destinationBody.receiveRequest(this);
 

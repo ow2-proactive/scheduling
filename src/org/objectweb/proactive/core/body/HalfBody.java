@@ -241,40 +241,40 @@ public class HalfBody extends AbstractBody {
 
             //	logger.debug("send Request Body" + destinationBody);
             //   logger.debug(" halfbla" + destinationBody.getRemoteAdapter());
-//            try {
-//                try {
-//                    if (!isSecurityOn) {
-//                        logger.debug("security is off");
-//                        throw new SecurityNotAvailableException();
-//                    }
-//                    if (internalBodySecurity.isLocalBody()) {
-//                        byte[] certE = destinationBody.getRemoteAdapter()
-//                                                      .getCertificateEncoded();
-//                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-//                        if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
-//                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
-//                                destinationBody.getRemoteAdapter());
-//                            sessionID = psm.getSessionIDTo(cert);
-//                        }
-//                    }
-//                } catch (SecurityNotAvailableException e) {
-//                    // do nothing 
-//                    logger.debug("communication without security");
-//                    //e.printStackTrace();
-//                }
+            try {
+                try {
+                    if (!isSecurityOn) {
+                        logger.debug("security is off");
+                        throw new SecurityNotAvailableException();
+                    }
+                    if (internalBodySecurity.isLocalBody()) {
+                        byte[] certE = destinationBody.getRemoteAdapter()
+                                                      .getCertificateEncoded();
+                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                        if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
+                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
+                                destinationBody.getRemoteAdapter());
+                            sessionID = psm.getSessionIDTo(cert);
+                        }
+                    }
+                } catch (SecurityNotAvailableException e) {
+                    // do nothing 
+                    logger.debug("communication without security");
+                    //e.printStackTrace();
+                }
                 request.send(destinationBody);
-//            } catch (RenegotiateSessionException e) {
-//                //e.printStackTrace();
-//                updateLocation(destinationBody.getID(), e.getUniversalBody());
-//                psm.terminateSession(sessionID);
-//                logger.debug("renegotiate session");
-//                sendRequest(methodCall, future, e.getUniversalBody());
-//            } catch (CommunicationForbiddenException e) {
-//                logger.warn(e);
-//                //e.printStackTrace();
-//            } catch (AuthenticationException e) {
-//                e.printStackTrace();
-//            }
+            } catch (RenegotiateSessionException e) {
+                //e.printStackTrace();
+                updateLocation(destinationBody.getID(), e.getUniversalBody());
+                psm.terminateSession(sessionID);
+                logger.debug("renegotiate session");
+                sendRequest(methodCall, future, e.getUniversalBody());
+            } catch (CommunicationForbiddenException e) {
+                logger.warn(e);
+                //e.printStackTrace();
+            } catch (AuthenticationException e) {
+                e.printStackTrace();
+            }
         }
 
         //

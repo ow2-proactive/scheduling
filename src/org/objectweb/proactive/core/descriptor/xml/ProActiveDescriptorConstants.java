@@ -71,6 +71,8 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_PROCESS_TAG = "prunProcess";
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
+    public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
+    public static final String GRID_ENGINE_OPTIONS_TAG="gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
     public static final String SERVICES_TAG = "services";
     public static final String PROCESS_REFERENCE_TAG = "processReference";
@@ -89,6 +91,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PROCESSOR_PER_NODE_TAG = "processorPerNode";
     public static final String BOOKING_DURATION_TAG = "bookingDuration";
     public static final String QUEUE_NAME_TAG = "queueName";
+    public static final String PARALLEL_ENVIRONMENT_TAG ="parallelEnvironment";
     public static final String PRUN_OUTPUT_FILE = "outputFile";
     public static final String PBS_OPTIONS_TAG = "pbsOption";
     public static final String OAR_OPTIONS_TAG="oarOption";
