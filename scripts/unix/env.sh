@@ -88,7 +88,7 @@ if [ -f $PROACTIVE/lib/xercesImpl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xercesImpl.jar
 fi
-if [ -f $PROACTIVE/lib/fractal.jar ]
+if [ -f $PROACTIVE/lib/components/fractal.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal.jar
 fi
@@ -108,17 +108,17 @@ if [ -f $PROACTIVE/lib/bouncycastle.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bouncycastle.jar
 fi
-if [ -f $PROACTIVE/lib/fractal-adl.jar ]
+if [ -f $PROACTIVE/lib/components/fractal-adl.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal-adl.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal-adl.jar
 fi
-if [ -f $PROACTIVE/lib/dtdparser.jar ]
+if [ -f $PROACTIVE/lib/components/dtdparser.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/dtdparser.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/dtdparser.jar
 fi
-if [ -f $PROACTIVE/lib/ow_deployment_scheduling.jar ]
+if [ -f $PROACTIVE/lib/components/ow_deployment_scheduling.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/ow_deployment_scheduling.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/ow_deployment_scheduling.jar
 fi
 if [ -f $PROACTIVE/lib/components/fractal-gui.jar ]
 then
