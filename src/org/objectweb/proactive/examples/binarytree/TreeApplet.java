@@ -140,8 +140,8 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 		int nb = 0;
 		try {
 		    // We re-initialize automatic continuations
-		    continuation.setSelected(false);
-		    AC = false;
+		    continuation.setSelected(true);
+		    AC = true;
 		    nb = (new Integer(nodeNb)).intValue();
 		    display.createTree(nb, AC);
 		}
