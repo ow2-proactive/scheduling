@@ -29,12 +29,12 @@ import org.objectweb.proactive.ic2d.gui.components.model.ProActiveConfigurationL
 
 
 /**
- * Basic implementation of the {@link HistoryManager} interface.
+ * Basic implementation of the {@link org.objectweb.fractal.gui.history.model.HistoryManager} interface.
  */
 public class ProActiveHistoryManager extends BasicHistoryManager
     implements ProActiveConfigurationListener {
 
-    /* (non-Javadoc)
+    /*
      * @see org.objectweb.fractal.gui.model.ConfigurationListener#virtualNodeChanged(org.objectweb.fractal.gui.model.Component, java.lang.String)
      */
     public void virtualNodeChanged(ProActiveComponent component, String oldValue) {
