@@ -44,7 +44,7 @@ The third section is a word on the current Architecture Description Language. Th
 <p class="textNormal"><i>For a general overview of our work , you can also refer to a paper presented at the International Symposium on Distributed Objects and Applications (DOA), in November 2003. (<a href="http://www-sop.inria.fr/oasis/ProActive/doc/HierarchicalGridComponents.pdf">.pdf</a>)
 </i>
 
-<h2>A new implementation of the Fractal component model</h2>
+<h2>An implementation of the Fractal component model with ProActive</h2>
 <p class="textNormal">Fractal defines a general conceptual model, along with a
   programming application interface (API) in Java. According to the official documentation,
   the Fractal component model is "<i>a modular and extensible component model
@@ -62,8 +62,8 @@ The third section is a word on the current Architecture Description Language. Th
   the other hand, ProActive is based on a meta-object protocol and provides a reference to an active object through
   a typed stub. If we wanted to use active objects with Julia, the Julia runtime would try to manipulate the stub, and
   not the active object itself. And if trying to force Julia to work on the same base object than ProActive, the control flow
-  could not traverse both ProActive and Julia.<br> Eventually, one could re-implement ProActive using Julia... but that is another story.<br>
-  More generally speaking, Julia is designed to work with standard objects, but not with active objects. Some features would not be
+  could not traverse both ProActive and Julia.<br> Eventually, re-implementing ProActive using Julia could be a solution, but it would imply a full refactoring of the library, and therefore quite a few resources...<br>
+  More generally speaking, Julia is designed to work with standard objects, but not with the active objects of ProActive. Some features would not be
    reusable using Julia with active objects, as explained in the following section. <br>
    Therefore, we had to go for our own implementation. </p>
 <p class="textNormal">This implementation is different from Julia both in its
@@ -71,12 +71,12 @@ The third section is a word on the current Architecture Description Language. Th
   Grid and P2P environments. The programming techniques and the architecture of
   the implementation is described in a following section.</p>
 
-   <h3>Specific features</h3>
+   <h3>Specific features of this implementation</h3>
 <p class="textNormal">The combination of the Fractal model with the ProActive library leverages the capabilities of both of them.</p>
-<h4>distribution</h4>
+<h4>Distribution</h4>
 <p>Distribution is achieved in a transparent manner over the Java RMI protocol thanks to the use of a stub/proxy pattern.
 Components are manipulated indifferently of their location (local or on a remote JVM).</p>
-<h4>deployment framework</h4>
+<h4>Deployment framework</h4>
 <p>ProActive provides a deployment framework for creating a distributed component system. Using a configuration file and the concept of
 virtual nodes, this framework :
 <ul>
@@ -85,7 +85,7 @@ virtual nodes, this framework :
 <LI>3. instantiates components on these newly created JVMs</LI>
 </ul>
 </p>
-<h4>activities</h4>
+<h4>Activities</h4>
 <p>A fundamental concept of the ProActive library is this of <a href="../ProActiveBasis.html">active objects</a>, where activities can actually be <a href="../ActiveObjectCreation.html">redefined </a>so as to customize their <b>behavior</b>.
 </p>
 <h4>Asynchronous method calls with futures</h4>
@@ -133,11 +133,11 @@ The <code>Fractive</code> class acts as :
 </ul>
 </p>
 
-<h4>content and controller descriptions</h4>
+<h4>Content and controller descriptions</h4>
 <p class="textNormal">The controller description and the content description of the components, as specified in the method <code>public Component newFcInstance(Type type, Object controllerDesc, Object contentDesc) throws InstantiationException</code> of the <code>org.objectweb.fractal.api.factory.Factory</code> class, correspond in this implementation to the classes <code>org.objectweb.proactive.core.component.ControllerDescription</code> and <code>org.proactive.core.component.ContentDescription</code>.
 </p>
 
-<h4>collective bindings</h4>
+<h4>Collective bindings</h4>
 <p class="textNormal">In composite or parallel components, collective bindings are performed automatically. For primitive component, the developer has to implement the bindings explicitely in the code. We provide a method in the <code>org.objectweb.proactive.core.component.Fractal</code> class for creating collective bindings : </p>
 <pre class="snippet">public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature) throws ProActiveRuntimeException</pre>
 <p class="textNormal">where <code>itfName </code>is the name of the interface, and <code>itfSignature </code>is the signature of the interface.</p>
@@ -153,7 +153,7 @@ The <code>Fractive</code> class acts as :
 <pre class="snippet">Collection c = ProActiveGroup.getGroup(i);</pre>
 </p>
 
-<h4>requirements</h4>
+<h4>Requirements</h4>
 <p class="textNormal">As this implementation is based on ProActive, some <a href="../ActiveObjectCreation.html">conditions</a> are required :
  <ul>
 <li class="textNormal">the base class for the implementation of a primitive component has to provide an empty, no-args constructor.</LI>
@@ -191,30 +191,64 @@ As you can see, the document is validated against an xml schema (first line of t
 </p>
 
 <h3>From objects to active objects to distributed components</h3>
-<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes. </p>
-<pre class="snippet">Toto object = new Toto(constructorParameters);</pre>
+<p>In Java, objects are created by instantiation of classes. With ProActive, one can create active objects from Java classes. We will also see that components are created from component definitions. Let us first consider the "Toto" interface :</p>
+<pre class="snippet">public interface Toto {
+        public String foo(); // dummy method
+}
+</pre>
+<p>"TotoImpl" is the class implementing this interface :</p>
+<pre class="snippet">public class TotoImpl implements Toto {
+        public Toto() {}
 
-<p>The <a href="../HelloWorld.html">ProActive Hello World example </a>explains this. It is possible to specify the activity of the active object, the location (node or virtual node), or a factory for meta-objects, using the appropriate factory method :
+        public String foo() {
+                // do something
+        }
+}
+</pre>
+<p>The class is then instantiated in a standard way :
 </p>
-<pre class="snippet">
-Toto active_object = (Toto)ProActive.newActive(
-        classname, // signature of the base class
-        constructorParameters, // Object[]
-        node, // location, could also be a virtual node
-        activity, // implements the Active interface
-        factory // allows internal configuration of the library
+<pre class="snippet">Toto object = new TotoImpl();</pre>
+
+<p>Active objects are instantiated using factory methods from the ProActive class (see the <a href="../HelloWorld.html">ProActive Hello World example </a>). It is also possible to specify the activity of the active object, the location (node or virtual node), or a factory for meta-objects, using the appropriate factory method.
+</p>
+<pre class="snippet">Toto active_object = (Toto)ProActive.newActive(
+        TotoImpl, // signature of the base class
+        new Object[] {}, // Object[]
+        aNode, // location, could also be a virtual node
         );
 </pre>
-<p>As components are also active objects in this implementation, they benefit from the same features, and are configurable the same way. The configurable properties shown above are now specified in the ContentDescription parameter :
+<p>As components are also active objects in this implementation, they benefit from the same features, and are configurable in a similar way. Constructor parameters, nodes, activity, or factories, that can be specified for active objects, are also specifiable for components. The definition of a component involves 3 steps : the type, the description of the content, and the description of the controller.</p>
+
+<h4>Type</h4>
+<p>The type of the component (i.e. the functional interfaces provided and required) is specified in a standard way : (as taken from the Fractal tutorial) </p>
+<p>We begin by creating objects that represent the types of the components of the application. In order to do this, we must first get a bootstrap component. The standard way to do this is the following one (this method creates an instance of the class specified in the fractal.provider system property, and uses this instance to get the bootstrap component):
+<pre class="snippet">Component boot = Fractal.getBootstrapComponent();
+</pre>
+<p>
+We then get the TypeFactory interface provided by this bootstrap component:
+</p>
+<pre class="snippet">TypeFactory tf = (TypeFactory)boot.getFcInterface("type-factory");
+</pre>
+<p>
+We can then create the type of the first component, which only provides a Toto server interface named "toto":
+</p>
+<pre class="snippet">// type of the toto component
+ComponentType totoType = tf.createFcType(new InterfaceType[] {
+  tf.createFcItfType("toto", "Toto", false, false, false)
+});
+</pre>
+
+<h4>Description of the content</h4>
+<p>The second step in the definition of a component is the definition of its content. In this implementation, this is done through the ContentDescription class :
 </p>
 <pre class="snippet">ContentDescription contentDesc = new ContentDescription(
-            className, // signature of the base class
-            constructorParameters, // Object[]
-            node, // location, could also be a virtual node
-            activity, // implements the Active interface
-            factory // allows internal customization of the library
+            TotoImpl, // signature of the base class
+            new Object[] {}, // Object[]
+            aNode, // location, could also be a virtual node
             );
 </pre>
+
+<h4>Description of the controller</h4>
 <p>Properties relative to the controller can be specified in the ControllerDescription :</p>
 <pre class="snippet">ControllerDescription controllerDesc = new ControllerDescription(
             "myName", // name of the component
@@ -222,7 +256,7 @@ Toto active_object = (Toto)ProActive.newActive(
                                  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
              );
 </pre>
-<p>Then, a component is instantiated using the standard Fractal API.  This component can then be manipulated as any other Fractal component. </p>
+<p>Eventually, the component definition is instantiated using the standard Fractal API.  This component can then be manipulated as any other Fractal component. </p>
 <pre class="snippet">Component component = componentFactory.newFcInstance(
               componentType, // type of the component (defining the client and server interfaces)
               controllerDesc, // implementation-specific description for the controller
@@ -230,13 +264,73 @@ Toto active_object = (Toto)ProActive.newActive(
               );
 </pre>
 
+<h4>From attributes to client interfaces</h4>
+<p>There are 2 kinds of interfaces for a component : those that offer services, and those that require services. They are named respectively server and client interfaces.
+</p>
+<p>From a Java class, it is fairly natural to identify server interfaces : they (can) correspond to the Java interfaces implemented by the class. In the above example, "toto" is the name of an interface provided by the component, corresponding to the "Toto" Java interface.
+</p>
+<p>On the other hand, client interfaces usually correspond to attributes of the class, in the case of a primitive component. If the component defined above requires a service from another component, say the one corresponding to the "Service" Java interface, the TotoImpl class should be modified. As we use the <i>inversion of control </i>pattern, a BindingController is provided, and a binding operation on the "requiredService" interface will actually set the value of the "service" attribute, of type "Service".</p>
+<p>First, the type of the component is changed :</p>
+<pre class="snippet">// type of the toto component
+ComponentType totoType = tf.createFcType(new InterfaceType[] {
+  tf.createFcItfType("toto", "Toto", false, false, false),
+  tf.createFcItfType("requiredService", "Toto", true, false, false)
+});
+</pre>
+<p>The Service interface is the following :
+</p>
+<pre class="snippet">// The Service interface
+public interface Service {
+        public String bar();
+}
+</pre>
+<p>And the TotoImpl class is :
+</p>
+<pre class="snippet">// The modified TotoImpl class
+public class TotoImpl implements Toto, BindingController {
+        Service service; // attribute corresponding to a client interface
+
+        public Toto() {}
+
+        // implementation of the Toto interface
+        public String foo() {
+                return s.bar(); // for example
+        }
+
+        // implementation of BindingController
+        public Object lookupFc (final String cItf) {
+                if (cItf.equals("requiredService")) {
+                        return service;
+                }
+                return null;
+        }
+
+        // implementation of BindingController
+        public void bindFc (final String cItf, final Object sItf) {
+                if (cItf.equals("requiredService")) {
+                        service = (Service)sItf;
+                }
+        }
+
+        // implementation of BindingController
+        public void unbindFc (final String cItf) {
+                if (cItf.equals("requiredService")) {
+                        service = null;
+                }
+        }
+}
+</pre>
+
+<hr width="50%" align="center">
+
+
 
 
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
  <h3>The HelloWorld example</h3>
 
  <p class="textNormal">
- The mandatory helloworld example is a good start as it shows the different ways of creating a component system, and it can easily be implemented using ProActive.
+ The mandatory helloworld example shows the different ways of creating a component system, and it can easily be implemented using ProActive.
 </p>
 <p class="textNormal">
 <h4>Set-up</h4>
@@ -252,7 +346,7 @@ You can find the code for this example in the package org.objectweb.proactive.ex
 </ul>
 
 
-<h4>architecture</h4>
+<h4>Architecture</h4>
 
 <p class="textNormal">
 The helloworld example is a simple client-server application, where the client (c) and the server (s) are components, and they are both contained in the same root component (root).
@@ -262,7 +356,7 @@ Another configuration is also possible, where client and server are wrapped arou
 <img align="middle" src="http://fractal.objectweb.org/tutorials/fractal/model.gif" alt="helloworld-example"/>
 
 
-<h4>distributed deployment</h4>
+<h4>Distributed deployment</h4>
 <P class="textNormal">This section is specific to the ProActive implementation, as it uses the deployment framework of this library.</P>
 <p class="textNormal">If the application is started with the parameter "distributed", a different ADL is used, where virtualNode attributes are specified for primitive components. The loader (the parser) then loads the ADL file "helloworld-distributed.xml". Virtual node names match those defined in the deployment descriptor "deployment.xml".</p>
 <p class="textNormal">One can of course customize the deployment descriptor and deploy components onto virtually any computer, provided it is connectable by supported protocols. Supported protocols include LAN, clusters and Grid protocols (see <a href="../Descriptor.html">deployment descriptors documentation</a>).</p>
@@ -286,7 +380,7 @@ Another configuration is also possible, where client and server are wrapped arou
 <p class="textNormal">Currently, bindings are not optimized. For example, in the configuration with wrappers, there is an indirection that can be costly, between the client and the server. We are currently working on optimizations that would allow to shortcut communications. It is the same idea than in Julia, but we are dealing here with distributed components. It will probably imply compromises between dynamicity and performance issues.
 </p>
 
-<h4>execution</h4>
+<h4>Execution</h4>
 <p>You should get something like :</p>
 <pre class="snippet">
 01 Server: print method called
@@ -320,7 +414,7 @@ stack):
 <h3>The Comanche example</h3>
  <p class="textNormal"><a href="http://fractal.objectweb.org/tutorial/index.html">
 The Comanche example</a> is a nice introduction to component based development with Fractal. It explains how to design applications using components, and how to implement these applications using the Fractal API.</p>
- <p class="textNormal">You will notice that the example presented in this tutorial is based on Comanche, a simplistic http server. However, this example extensively uses reference passing through components. For example <code>Request</code> objects are passed by reference. This is incompatible with the ProActive programming model, where, to avoid shared passive objects, all passive objects passed to active objects are actually <b>passed by copy</b>(see <a href="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/ProActiveBasis.html">ProActive basis</a>). As active objects are themselves passed by reference, one could argue that we could turn some passive object into active objects. Unfortunately, for reasons specific to the Sockets and Streams implementations, (Socket streams implementations do not provide empty no-arg constructors), it is not (easily) possible to encapsulate some of the needed resource classes into active objects.</p>
+ <p class="textNormal">You will notice that the example presented in this tutorial is based on Comanche, a simplistic http server. However, this example extensively uses reference passing through components. For example <code>Request</code> objects are passed by reference. This is incompatible with the ProActive programming model, where, to avoid shared passive objects, all passive objects passed to active objects are actually <b>passed by copy</b>(see <a href="http://www-sop.inria.fr/oasis/proactive/doc/api/org/objectweb/proactive/doc-files/ProActiveBasis.html">ProActive basis</a>). As active objects are themselves passed by reference, one could argue that we could turn some passive object into active objects. This would allow remote referencing through stubs. Unfortunately, for reasons specific to the Sockets and Streams implementations, (Socket streams implementations do not provide empty no-arg constructors), it is not easily possible to encapsulate some of the needed resource classes into active objects.</p>
 
 <h2>Perspectives : a support for our research work</h2>
 
