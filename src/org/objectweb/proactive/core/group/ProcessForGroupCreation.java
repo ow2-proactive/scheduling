@@ -8,7 +8,7 @@ import org.objectweb.proactive.ProActive;
  *
  * @author Laurent Baduel
  */
-public class ProcessForGroupCreation implements Runnable {
+public class ProcessForGroupCreation extends AbstractProcessForGroup implements Runnable {
     private ProxyForGroup proxyGroup;
     private String className;
     private Object[] param;
@@ -33,4 +33,10 @@ public class ProcessForGroupCreation implements Runnable {
 			e.printStackTrace();
 		}
 	}
+
+	
+	public int getMemberListSize() {
+		return 1;
+	}
+
 }

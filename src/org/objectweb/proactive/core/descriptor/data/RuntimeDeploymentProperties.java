@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.ProActiveException;
 
-
 /**
  * This class represents an array of properties that can be set at runtime when using
  * XML deployment descriptor

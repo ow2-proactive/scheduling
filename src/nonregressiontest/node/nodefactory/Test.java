@@ -67,7 +67,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         NodeFactory.createNode(rmiURL);
         NodeFactory.createNode(jiniURL);
-        //NodeFactory.createNode("ibis://localhost/IBISNode");
+//        NodeFactory.createNode("ibis://localhost/IBISNode");
     }
 
     /**
@@ -93,5 +93,7 @@ public class Test extends FunctionalTest {
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
         return ((rmiNode != null) && (jiniNode != null) &&
         NodeFactory.isNodeLocal(rmiNode));
+//        return ((rmiNode != null) &&
+//        		NodeFactory.isNodeLocal(rmiNode));
     }
 }

@@ -4,9 +4,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -18,29 +16,13 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author Laurent Baduel
  */
 
-public class ProcessForAsyncCall implements Runnable {
-	private ProxyForGroup proxyGroup;
-	private Vector memberList;
+public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runnable {
+	//private ProxyForGroup proxyGroup;
+//	private Vector memberList;
 	private Vector memberListOfResultGroup;
 	private int index;
 	private MethodCall mc;
 	private Body body;
-
-	private static Proxy findLastProxy (Object obj) {
-		if (!MOP.isReifiedObject(obj)) {
-			return null;
-		}
-		Proxy proxy = ((StubObject) obj).getProxy();
-		while (proxy instanceof FutureProxy) {
-			if (MOP.isReifiedObject(((FutureProxy) proxy).getResult())) {
-				return ProcessForAsyncCall.findLastProxy(((FutureProxy) proxy).getResult());
-			}
-			else {
-				return proxy;
-			}
-		}
-		return proxy;
-	}
 
 
 	public ProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
@@ -59,7 +41,8 @@ public class ProcessForAsyncCall implements Runnable {
 
 		/* only do the communication (reify) if the object is not an error nor an exception */ 
 		if (!(object instanceof Throwable)) {
-			Proxy lastProxy = ProcessForAsyncCall.findLastProxy(object);
+//			Proxy lastProxy = ProcessForAsyncCall.findLastProxy(object);
+			Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
 			if (lastProxy instanceof UniversalBodyProxy) {
 				objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
 			} 

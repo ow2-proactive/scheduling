@@ -32,13 +32,7 @@ package org.objectweb.proactive.core.body.ibis;
 
 import ibis.rmi.RemoteException;
 
-/**
- *   An adapter for a LocalBody to be able to receive remote calls. This helps isolate RMI-specific
- *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
- *   to anothe remote objects library.
- */
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -144,6 +138,14 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     // -- SERIALIZATION -----------------------------------------------
     //
 
+    
+    private void readObject(java.io.ObjectInputStream in)
+    throws java.io.IOException, ClassNotFoundException {
+    	System.out.println("----- IbisRemoteBodyImpl.readObject() ");
+    	in.defaultReadObject();
+    	
+    }
+    
     /*
        private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
        long startTime=System.currentTimeMillis();
