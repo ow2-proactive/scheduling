@@ -9,8 +9,7 @@ echo "
  syntax:
 
    ./c3d_user.sh local
-     - launch one user on the local node ///<HOSTNAME>UserNode
-       The node IS created.
+     - launch one user on the local node ///defaultNode
 
    ./c3d_user.sh <host index>
      - launch one user on the node 2 on the host given by the index
@@ -38,9 +37,7 @@ then
     targetHost=`cat $workingDir/hostsList | cut -f $1 -d " "`
     targetNode=//${targetHost}/${targetHost}Node2
 else
-    targetNode=///${HOSTNAME}UserNode
-    $JAVACMD org.objectweb.proactive.rmi.StartNode $targetNode &
-    sleep 5
+    targetNode=""
 fi
 
 $JAVACMD org.objectweb.proactive.examples.c3d.C3DUser $targetNode

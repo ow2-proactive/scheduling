@@ -12,9 +12,8 @@ goto end
 :doit
 SETLOCAL
 call init.bat
-start %JAVA_CMD% org.objectweb.proactive.rmi.StartNode //localhost/users
 
-%JAVA_CMD% org.objectweb.proactive.examples.c3d.C3DUser //localhost/users
+%JAVA_CMD% org.objectweb.proactive.examples.c3d.C3DUser
 ENDLOCAL
 
 :end

@@ -182,22 +182,17 @@ public class C3DUser implements java.io.Serializable {
    * Entry point of the program
    */
   public static void main(String argv[]) {
-    boolean isBot;
-    String url;
-    if (argv.length != 1) {
-      System.err.println("Usage: java org.objectweb.proactive.examples.c3d.C3DUser <nodeURL>");
-      System.exit(0);
+    String nodeURL = null;
+    if (argv.length == 1) {
+      nodeURL = argv[0];
     }
-    isBot = false;
-    url = "";
-    Object params[] = { new Boolean(false),new Boolean(isBot),url };
+    Object params[] = { new Boolean(false),new Boolean(false), ""};
     try {
-      C3DUser c3duser = (C3DUser)org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DUser", params, argv[0]);
+      C3DUser c3duser = (C3DUser)org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DUser", params, nodeURL);
       c3duser.go();
     } catch (Exception e) {
       e.printStackTrace();
     }
-    //System.exit(0);
   }
 
 

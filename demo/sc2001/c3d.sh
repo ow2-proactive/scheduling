@@ -43,7 +43,7 @@ else
     sleep 5
 fi
 
-$JAVACMD org.objectweb.proactive.examples.c3d.C3DDispatcher $targetNode nodesList
+$JAVACMD org.objectweb.proactive.examples.c3d.C3DDispatcher nodesList $targetNode
 
 killall java
 

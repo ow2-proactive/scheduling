@@ -30,6 +30,9 @@
 */ 
 package org.objectweb.proactive.examples.c3d;
 
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
@@ -799,16 +802,20 @@ public class C3DDispatcher {
    *
    * @param argv Name of the hosts file
    */
-  public static void main(String argv[]) {
-    String s_hosts = "";
-    if (argv.length < 2) {
-      System.err.println("Usage: java org.objectweb.proactive.examples.c3d.C3DDispatcher <nodeURL> <engineFile>");
+  public static void main(String argv[]) throws NodeException {
+    if (argv.length < 1) {
+      System.err.println("Usage: java org.objectweb.proactive.examples.c3d.C3DDispatcher <engineFile> [<nodeURL>]");
       System.exit(0);
     }
-    s_hosts = argv[1];
-    Object param[] = { s_hosts };
+    Node node = null;
+    if (argv.length == 2) {
+      node = NodeFactory.getNode("//localhost/dispatcher");
+    } else {
+      node = NodeFactory.createNode("//localhost/dispatcher");
+    }
+    Object param[] = { argv[0] };
     try {
-      org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DDispatcher", param, argv[0]);
+      org.objectweb.proactive.ProActive.newActive("org.objectweb.proactive.examples.c3d.C3DDispatcher", param, node);
     } catch (Exception e) {
       e.printStackTrace();
     }
