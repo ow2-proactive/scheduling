@@ -87,21 +87,27 @@ public class Switcher extends Box implements JobMonitorConstants
 				}
 			});
 			
-			updateLabel(l, true);
-			
+			updateLabel(l, true);				
+			labels [i] = l;
+		}
+		
+		placeLabels();
+	}
+	
+	private void placeLabels() {
+		removeAll();
+		for (int i = 0; i < labels.length; i++) {
 			if (i == 0)
 				add(Box.createHorizontalGlue());
 			
-			add(l);
-			if (i != size - 1) {
+			add(labels[i]);
+			if (i != labels.length - 1) {
 				add(Box.createHorizontalGlue());
 				add(new JLabel(Icons.getSeparatorIcon()));
 			}
 			
 			add(Box.createHorizontalGlue());
-				
-			labels [i] = l;
-		}		
+		}
 	}
 	
 	private void exchange(DataTreeModel treeModel, int fromKey, int toKey) {
@@ -114,11 +120,8 @@ public class Switcher extends Box implements JobMonitorConstants
 		labels[fromId] = labels[toId];
 		labels[toId] = tmp;
 		
-		setLayout (new GridLayout (1, labels.length, 2, 0));
-		
-		for (int i = 0; i < labels.length; i++)
-			add(labels[i]);
-		
+		placeLabels();
+
 		revalidate();
 		repaint();
 	}
