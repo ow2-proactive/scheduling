@@ -147,562 +147,627 @@ import org.objectweb.proactive.core.node.NodeFactory;
  */
 public class ProActive {
 
-  //
-  // -- STATIC MEMBERS -----------------------------------------------
-  //
+	//
+	// -- STATIC MEMBERS -----------------------------------------------
+	//
 
-  static {
-    Class c = org.objectweb.proactive.core.node.NodeFactory.class;
-  }
+	static {
+		Class c = org.objectweb.proactive.core.node.NodeFactory.class;
+	}
 
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
 
-  private ProActive() {
-  }
+	private ProActive() {
+	}
 
-  //
-  // -- PUBLIC METHODS -----------------------------------------------
-  //
+	//
+	// -- PUBLIC METHODS -----------------------------------------------
+	//
 
-  /**
-   * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
-   * @param classname the name of the class to instanciate as active
-   * @param constructorParameters the parameters of the constructor.
-   * @return a reference (possibly remote) on a Stub of the newly created active object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the DefaultNode cannot be created
-   */
-  public static Object newActive(String classname, Object[] constructorParameters)
-    throws ActiveObjectCreationException, NodeException {
-    return newActive(classname, constructorParameters, null, null, null);
-  }
+	/**
+	 * Creates a new ActiveObject based on classname attached to a default node in the local JVM.
+	 * @param classname the name of the class to instanciate as active
+	 * @param constructorParameters the parameters of the constructor.
+	 * @return a reference (possibly remote) on a Stub of the newly created active object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the DefaultNode cannot be created
+	 */
+	public static Object newActive(String classname, Object[] constructorParameters)
+		throws ActiveObjectCreationException, NodeException {
+		return newActive(classname, constructorParameters, null, null, null);
+	}
 
-  /**
-   * Creates a new ActiveObject based on classname attached to the node of the given URL.
-   * @param classname the name of the class to instanciate as active
-   * @param constructorParameters the parameters of the constructor.
-   * @param nodeURL the URL of the node where to create the active object. If null, the active object 
-   *       is created localy on a default node 
-   * @return a reference (possibly remote) on a Stub of the newly created active object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node URL cannot be resolved as an existing Node
-   */
-  public static Object newActive(String classname, Object[] constructorParameters, String nodeURL)
-    throws ActiveObjectCreationException, NodeException {
-    if (nodeURL == null) {
-      return newActive(classname, constructorParameters, null, null, null);
-    } else {
-      return newActive(classname, constructorParameters, NodeFactory.getNode(nodeURL), null, null);
-    }
-  }
+	/**
+	 * Creates a new ActiveObject based on classname attached to the node of the given URL.
+	 * @param classname the name of the class to instanciate as active
+	 * @param constructorParameters the parameters of the constructor.
+	 * @param nodeURL the URL of the node where to create the active object. If null, the active object 
+	 *       is created localy on a default node 
+	 * @return a reference (possibly remote) on a Stub of the newly created active object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node URL cannot be resolved as an existing Node
+	 */
+	public static Object newActive(String classname, Object[] constructorParameters, String nodeURL)
+		throws ActiveObjectCreationException, NodeException {
+		if (nodeURL == null) {
+			return newActive(classname, constructorParameters, null, null, null);
+		} else {
+			return newActive(classname, constructorParameters, NodeFactory.getNode(nodeURL), null, null);
+		}
+	}
 
-  /**
-   * Creates a new ActiveObject based on classname attached to the given node or on
-   * a default node in the local JVM if the given node is null.
-   * @param classname the name of the class to instanciate as active
-   * @param constructorParameters the parameters of the constructor.
-   * @param node the possibly null node where to create the active object.
-   * @return a reference (possibly remote) on a Stub of the newly created active object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object newActive(String classname, Object[] constructorParameters, Node node)
-    throws ActiveObjectCreationException, NodeException {
-    return newActive(classname, constructorParameters, node, null, null);
-  }
+	/**
+	 * Creates a new ActiveObject based on classname attached to the given node or on
+	 * a default node in the local JVM if the given node is null.
+	 * @param classname the name of the class to instanciate as active
+	 * @param constructorParameters the parameters of the constructor.
+	 * @param node the possibly null node where to create the active object.
+	 * @return a reference (possibly remote) on a Stub of the newly created active object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object newActive(String classname, Object[] constructorParameters, Node node)
+		throws ActiveObjectCreationException, NodeException {
+		return newActive(classname, constructorParameters, node, null, null);
+	}
 
-  /**
-   * Creates a new ActiveObject based on classname attached to the given node or on
-   * a default node in the local JVM if the given node is null.
-   * The object returned is a stub class that extends the target class and that is automatically 
-   * generated on the fly. The Stub class reference a the proxy object that reference the body
-   * of the active object. The body referenced by the proxy can either be local of remote, 
-   * depending or the respective location of the object calling the newActive and the active object
-   * itself. 
-   * @param classname the name of the class to instanciate as active
-   * @param constructorParameters the parameters of the constructor of the object
-   *    to instantiate as active. If some parameters are primitive types, the wrapper 
-   *    class types should be given here. null can be used to specify that no parameter
-   *    are passed to the constructor.
-   * @param node the possibly null node where to create the active object. If null, the active object 
-   *       is created localy on a default node 
-   * @param activity the possibly null activity object defining the different step in the activity of the object.
-   *               see the definition of the activity in the javadoc of this classe for more information. 
-   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-   * @return a reference (possibly remote) on a Stub of the newly created active object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object newActive(
-    String classname,
-    Object[] constructorParameters,
-    Node node,
-    Active activity,
-    MetaObjectFactory factory)
-    throws ActiveObjectCreationException, NodeException {
-    //using default proactive node
-    if (node == null) {
-      node = NodeFactory.getDefaultNode();
-    }
-    if (factory == null) {
-      factory = ProActiveMetaObjectFactory.newInstance();
-    }
-    try {
-      return createStubObject(classname, constructorParameters, node, activity, factory);
-    } catch (MOPException e) {
-      Throwable t = e;
-      if (e.getTargetException() != null)
-        t = e.getTargetException();
-      throw new ActiveObjectCreationException(t);
-    }
-  }
+	/**
+	 * Creates a new ActiveObject based on classname attached to the given node or on
+	 * a default node in the local JVM if the given node is null.
+	 * The object returned is a stub class that extends the target class and that is automatically 
+	 * generated on the fly. The Stub class reference a the proxy object that reference the body
+	 * of the active object. The body referenced by the proxy can either be local of remote, 
+	 * depending or the respective location of the object calling the newActive and the active object
+	 * itself. 
+	 * @param classname the name of the class to instanciate as active
+	 * @param constructorParameters the parameters of the constructor of the object
+	 *    to instantiate as active. If some parameters are primitive types, the wrapper 
+	 *    class types should be given here. null can be used to specify that no parameter
+	 *    are passed to the constructor.
+	 * @param node the possibly null node where to create the active object. If null, the active object 
+	 *       is created localy on a default node 
+	 * @param activity the possibly null activity object defining the different step in the activity of the object.
+	 *               see the definition of the activity in the javadoc of this classe for more information. 
+	 * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+	 *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+	 * @return a reference (possibly remote) on a Stub of the newly created active object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object newActive(
+		String classname,
+		Object[] constructorParameters,
+		Node node,
+		Active activity,
+		MetaObjectFactory factory)
+		throws ActiveObjectCreationException, NodeException {
+		//using default proactive node
+		if (node == null) {
+			node = NodeFactory.getDefaultNode();
+		}
+		if (factory == null) {
+			factory = ProActiveMetaObjectFactory.newInstance();
+		}
+		try {
+			return createStubObject(classname, constructorParameters, node, activity, factory);
+		} catch (MOPException e) {
+			Throwable t = e;
+			if (e.getTargetException() != null)
+				t = e.getTargetException();
+			throw new ActiveObjectCreationException(t);
+		}
+	}
 
-  /**
-   * Turns the target object into an ActiveObject attached to a default node in the local JVM.
-   * The type of the stub is is the type of the existing object.
-   * @param target The object to turn active
-   * @return a reference (possibly remote) on a Stub of the existing object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target) throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, (Node) null);
-  }
+	/**
+	 * Turns the target object into an ActiveObject attached to a default node in the local JVM.
+	 * The type of the stub is is the type of the existing object.
+	 * @param target The object to turn active
+	 * @return a reference (possibly remote) on a Stub of the existing object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target) throws ActiveObjectCreationException, NodeException {
+		return turnActive(target, (Node) null);
+	}
 
-  /**
-   * Turns the target object into an Active Object and send it to the Node
-   * identified by the given url.
-   * The type of the stub is is the type of the existing object.
-   * @param target The object to turn active
-   * @param nodeURL the URL of the node where to create the active object on. If null, the active object 
-   *       is created localy on a default node 
-   * @return a reference (possibly remote) on a Stub of the existing object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target, String nodeURL) throws ActiveObjectCreationException, NodeException {
-    if (nodeURL == null) {
-      return turnActive(target, target.getClass().getName(), null, null, null);
-    } else {
-      return turnActive(target, target.getClass().getName(), NodeFactory.getNode(nodeURL), null, null);
-    }
-  }
+	/**
+	 * Turns the target object into an Active Object and send it to the Node
+	 * identified by the given url.
+	 * The type of the stub is is the type of the existing object.
+	 * @param target The object to turn active
+	 * @param nodeURL the URL of the node where to create the active object on. If null, the active object 
+	 *       is created localy on a default node 
+	 * @return a reference (possibly remote) on a Stub of the existing object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target, String nodeURL) throws ActiveObjectCreationException, NodeException {
+		if (nodeURL == null) {
+			return turnActive(target, target.getClass().getName(), null, null, null);
+		} else {
+			return turnActive(target, target.getClass().getName(), NodeFactory.getNode(nodeURL), null, null);
+		}
+	}
 
-  /**
-   * Turns the target object into an Active Object and send it to the given Node
-   * or to a default node in the local JVM if the given node is null.
-   * The type of the stub is is the type of the target object.
-   * @param target The object to turn active
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
-   * @return a reference (possibly remote) on a Stub of the target object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target, Node node) throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, target.getClass().getName(), node, null, null);
-  }
+	/**
+	 * Turns the target object into an Active Object and send it to the given Node
+	 * or to a default node in the local JVM if the given node is null.
+	 * The type of the stub is is the type of the target object.
+	 * @param target The object to turn active
+	 * @param node The Node the object should be sent to or null to create the active 
+	 *       object in the local JVM
+	 * @return a reference (possibly remote) on a Stub of the target object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target, Node node) throws ActiveObjectCreationException, NodeException {
+		return turnActive(target, target.getClass().getName(), node, null, null);
+	}
 
-  /**
-   * Turns the target object into an Active Object and send it to the given Node
-   * or to a default node in the local JVM if the given node is null.
-   * The type of the stub is is the type of the target object.
-   * @param target The object to turn active
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
-   * @param activity the possibly null activity object defining the different step in the activity of the object.
-   *               see the definition of the activity in the javadoc of this classe for more information. 
-   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-   * @return a reference (possibly remote) on a Stub of the target object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target, Node node, 
-      Active activity,
-      MetaObjectFactory factory)
-    throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, target.getClass().getName(), node, activity, factory);
-  }
+	/**
+	 * Turns the target object into an Active Object and send it to the given Node
+	 * or to a default node in the local JVM if the given node is null.
+	 * The type of the stub is is the type of the target object.
+	 * @param target The object to turn active
+	 * @param node The Node the object should be sent to or null to create the active 
+	 *       object in the local JVM
+	 * @param activity the possibly null activity object defining the different step in the activity of the object.
+	 *               see the definition of the activity in the javadoc of this classe for more information. 
+	 * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+	 *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+	 * @return a reference (possibly remote) on a Stub of the target object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target, Node node, Active activity, MetaObjectFactory factory)
+		throws ActiveObjectCreationException, NodeException {
+		return turnActive(target, target.getClass().getName(), node, activity, factory);
+	}
 
-  /**
-   * Turns a Java object into an Active Object and send it to a remote Node or to a 
-   * local node if the given node is null.
-   * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
-   * @param target The object to turn active
-   * @param nameOfTargetType the fully qualified name of the type the stub class should
-   * inherit from. That type can be less specific than the type of the target object.
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
-   * @return a reference (possibly remote) on a Stub of the target object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target, String nameOfTargetType, Node node)
-    throws ActiveObjectCreationException, NodeException {
-    return turnActive(target, nameOfTargetType, node, null, null);
-  }
+	/**
+	 * Turns a Java object into an Active Object and send it to a remote Node or to a 
+	 * local node if the given node is null.
+	 * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+	 * @param target The object to turn active
+	 * @param nameOfTargetType the fully qualified name of the type the stub class should
+	 * inherit from. That type can be less specific than the type of the target object.
+	 * @param node The Node the object should be sent to or null to create the active 
+	 *       object in the local JVM
+	 * @return a reference (possibly remote) on a Stub of the target object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target, String nameOfTargetType, Node node)
+		throws ActiveObjectCreationException, NodeException {
+		return turnActive(target, nameOfTargetType, node, null, null);
+	}
 
-  /**
-   * Turns a Java object into an Active Object and send it to a remote Node or to a 
-   * local node if the given node is null.
-   * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
-   * A Stub is dynamically generated for the existing object. The result of the call 
-   * will be an instance of the Stub class pointing to the proxy object pointing
-   * to the body object pointing to the existing object. The body can be remote 
-   * or local depending if the existing is sent remotely or not.
-   * @param target The object to turn active
-   * @param nameOfTargetType the fully qualified name of the type the stub class should
-   * inherit from. That type can be less specific than the type of the target object.
-   * @param node The Node the object should be sent to or null to create the active 
-   *       object in the local JVM
-   * @param activity the possibly null activity object defining the different step in the activity of the object.
-   *               see the definition of the activity in the javadoc of this classe for more information. 
-   * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-   *                body associated to the reified object. If null the default ProActive MataObject factory is used.
-   * @return a reference (possibly remote) on a Stub of the target object
-   * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
-   * @exception NodeException if the node was null and that the DefaultNode cannot be created
-   */
-  public static Object turnActive(Object target, String nameOfTargetType, Node node, 
-      Active activity,
-      MetaObjectFactory factory)
-    throws ActiveObjectCreationException, NodeException {
-    if (node == null) {
-      //using default proactive node
-      node = NodeFactory.getDefaultNode();
-    }
-    if (factory == null) {
-      factory = ProActiveMetaObjectFactory.newInstance();
-    }
-    try {
-      return createStubObject(target, nameOfTargetType, node, activity, factory );
-    } catch (MOPException e) {
-      Throwable t = e;
-      if (e.getTargetException() != null)
-        t = e.getTargetException();
-      throw new ActiveObjectCreationException(t);
-    }
-  }
+	/**
+	 * Turns a Java object into an Active Object and send it to a remote Node or to a 
+	 * local node if the given node is null.
+	 * The type of the stub is given by the parameter <code>nameOfTargetType</code>.
+	 * A Stub is dynamically generated for the existing object. The result of the call 
+	 * will be an instance of the Stub class pointing to the proxy object pointing
+	 * to the body object pointing to the existing object. The body can be remote 
+	 * or local depending if the existing is sent remotely or not.
+	 * @param target The object to turn active
+	 * @param nameOfTargetType the fully qualified name of the type the stub class should
+	 * inherit from. That type can be less specific than the type of the target object.
+	 * @param node The Node the object should be sent to or null to create the active 
+	 *       object in the local JVM
+	 * @param activity the possibly null activity object defining the different step in the activity of the object.
+	 *               see the definition of the activity in the javadoc of this classe for more information. 
+	 * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
+	 *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+	 * @return a reference (possibly remote) on a Stub of the target object
+	 * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @exception NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object turnActive(Object target, String nameOfTargetType, Node node, Active activity, MetaObjectFactory factory)
+		throws ActiveObjectCreationException, NodeException {
+		if (node == null) {
+			//using default proactive node
+			node = NodeFactory.getDefaultNode();
+		}
+		if (factory == null) {
+			factory = ProActiveMetaObjectFactory.newInstance();
+		}
+		try {
+			return createStubObject(target, nameOfTargetType, node, activity, factory);
+		} catch (MOPException e) {
+			Throwable t = e;
+			if (e.getTargetException() != null)
+				t = e.getTargetException();
+			throw new ActiveObjectCreationException(t);
+		}
+	}
 
-  /**
-   * Registers an active object into a RMI registry. In fact it is the
-   * remote version of the body of the active object that is registered into the 
-   * RMI Registry under the given URL. 
-   * @param obj the active object to register.
-   * @param url the url under which the remote body is registered.
-   * @exception java.io.IOException if the remote body cannot be registered
-   */
-  public static void register(Object obj, String url) throws java.io.IOException {
-    // Check if obj is really a reified object
-    if (!(MOP.isReifiedObject(obj))) {
-      throw new java.io.IOException("The given object " + obj + " is not a reified object");
-    }
-    // Find the appropriate remoteBody
-    org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-    if (myProxy == null)
-      throw new java.io.IOException("Cannot find a Proxy on the stub object: " + obj);
-    BodyProxy myBodyProxy = (BodyProxy) myProxy;
-    UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
-    if (body instanceof RemoteBodyAdapter) {
-      RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
-      System.out.println("Success at binding url " + url);
-    } else {
-      throw new java.io.IOException("Cannot reconize the type of this UniversalBody: " + body.getClass().getName());
-    }
-  }
+	/**
+	 * Registers an active object into a RMI registry. In fact it is the
+	 * remote version of the body of the active object that is registered into the 
+	 * RMI Registry under the given URL. 
+	 * @param obj the active object to register.
+	 * @param url the url under which the remote body is registered.
+	 * @exception java.io.IOException if the remote body cannot be registered
+	 */
+	public static void register(Object obj, String url) throws java.io.IOException {
+		// Check if obj is really a reified object
+		if (!(MOP.isReifiedObject(obj))) {
+			throw new java.io.IOException("The given object " + obj + " is not a reified object");
+		}
+		// Find the appropriate remoteBody
+		org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+		if (myProxy == null)
+			throw new java.io.IOException("Cannot find a Proxy on the stub object: " + obj);
+		BodyProxy myBodyProxy = (BodyProxy) myProxy;
+		UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+		if (body instanceof RemoteBodyAdapter) {
+			RemoteBodyAdapter.register((RemoteBodyAdapter) body, url);
+			System.out.println("Success at binding url " + url);
+		} else {
+			throw new java.io.IOException("Cannot reconize the type of this UniversalBody: " + body.getClass().getName());
+		}
+	}
 
-  /**
-   * Unregisters an active object previously registered into a RMI registry.
-   * @param url the url under which the active object is registered.
-   * @exception java.io.IOException if the remote object cannot be removed from the registry
-   */
-  public static void unregister(String url) throws java.io.IOException {
-    RemoteBodyAdapter.unregister(url);
-    System.out.println("Success at unbinding url " + url);
-  }
+	/**
+	 * Unregisters an active object previously registered into a RMI registry.
+	 * @param url the url under which the active object is registered.
+	 * @exception java.io.IOException if the remote object cannot be removed from the registry
+	 */
+	public static void unregister(String url) throws java.io.IOException {
+		RemoteBodyAdapter.unregister(url);
+		System.out.println("Success at unbinding url " + url);
+	}
 
-  /**
-   * Looks-up an active object previously registered in a RMI registry. In fact it is the
-   * remote version of the body of an active object that can be registered into the 
-   * RMI Registry under a given URL. If the lookup is successful, the method reconstructs
-   * a Stub-Proxy couple and point it to the RemoteBody found.
-   * @param classname the fully qualified name of the class the stub should inherit from.
-   * @param url the url under which the remote body is registered.
-   * @return a remote reference on a Stub of type <code>classname</code> pointing to the 
-   *     remote body found
-   * @exception java.io.IOException if the remote body cannot be found under the given url
-   *      or if the object found is not of type RemoteBody
-   * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
-   */
-  public static Object lookupActive(String classname, String url)
-    throws ActiveObjectCreationException, java.io.IOException {
-    UniversalBody b = RemoteBodyAdapter.lookup(url);
-    try {
-      return createStubObject(classname, b);
-    } catch (MOPException e) {
-      Throwable t = e;
-      if (e.getTargetException() != null)
-        t = e.getTargetException();
-      throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
-    }
-  }
+	/**
+	 * Looks-up an active object previously registered in a RMI registry. In fact it is the
+	 * remote version of the body of an active object that can be registered into the 
+	 * RMI Registry under a given URL. If the lookup is successful, the method reconstructs
+	 * a Stub-Proxy couple and point it to the RemoteBody found.
+	 * @param classname the fully qualified name of the class the stub should inherit from.
+	 * @param url the url under which the remote body is registered.
+	 * @return a remote reference on a Stub of type <code>classname</code> pointing to the 
+	 *     remote body found
+	 * @exception java.io.IOException if the remote body cannot be found under the given url
+	 *      or if the object found is not of type RemoteBody
+	 * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
+	 */
+	public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException, java.io.IOException {
+		UniversalBody b = RemoteBodyAdapter.lookup(url);
+		try {
+			return createStubObject(classname, b);
+		} catch (MOPException e) {
+			Throwable t = e;
+			if (e.getTargetException() != null)
+				t = e.getTargetException();
+			throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
+		}
+	}
 
-  /**
-   * Blocks the calling thread until the object <code>future</code>
-   * is available. <code>future</code> must be the result object of an
-   * asynchronous call. Usually the the wait by necessity model take care
-   * of blocking the caller thread asking for a result not yet available.
-   * This method allows to block before the result is first used.
-   */
-  public static void waitFor(Object future) {
-    // If the object is not reified, it cannot be a future
-    if ((MOP.isReifiedObject(future)) == false) {
-      return;
-    } else {
-      org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
-      // If it is reified but its proxy is not of type future, we cannot wait
-      if (!(theProxy instanceof Future)) {
-        return;
-      } else {
-        ((Future) theProxy).waitFor();
-      }
-    }
-  }
+	/**
+	 * Blocks the calling thread until the object <code>future</code>
+	 * is available. <code>future</code> must be the result object of an
+	 * asynchronous call. Usually the the wait by necessity model take care
+	 * of blocking the caller thread asking for a result not yet available.
+	 * This method allows to block before the result is first used.
+	 */
+	public static void waitFor(Object future) {
+		// If the object is not reified, it cannot be a future
+		if ((MOP.isReifiedObject(future)) == false) {
+			return;
+		} else {
+			org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+			// If it is reified but its proxy is not of type future, we cannot wait
+			if (!(theProxy instanceof Future)) {
+				return;
+			} else {
+				((Future) theProxy).waitFor();
+			}
+		}
+	}
 
-  /**
-   * When an active object is created, it is associated with a Body that takes care
-   * of all non fonctionnal properties. Assuming that the active object is only 
-   * accessed by the different Stub objects, all method calls end-up as Requests sent
-   * to this Body. Therefore the only thread calling the method of the active object 
-   * is the active thread managed by the body. There is an unique mapping between the
-   * active thread and the body responsible for it. From any method in the active object
-   * the current thread caller of the method is the active thread. When a reified method wants
-   * to get a reference to the Body associated to the active object, it can invoke this
-   * method. Assuming that the current thread is the active thread, the associated body
-   * is returned.
-   * @return the body associated to the active object whose active thread is calling
-   *     this method.
-   */
-  public static Body getBodyOnThis() {
-    return LocalBodyStore.getInstance().getCurrentThreadBody();
-  }
 
-  /**
-   * Returns a Stub-Proxy couple pointing to the local body associated to the active
-   * object whose active thread is calling this method.
-   * @return a Stub-Proxy couple pointing to the local body.
-   * @see #getBodyOnThis
-   */
-  public static StubObject getStubOnThis() {
-    Body body = getBodyOnThis();
-    //System.out.println("ProActive: getStubOnThis() returns " + body);
-    if (body == null)
-      return null;
-    return getStubForBody(body);
-  }
+	/**
+	 * Return false if the object <code>future</code> is available.
+	 */
+	public static boolean isAwaited(Object future) {
+		// If the object is not reified, it cannot be a future
+		if ((MOP.isReifiedObject(future)) == false) {
+			return false;
+		} else {
+			org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+			// If it is reified but its proxy is not of type future, we cannot wait
+			if (!(theProxy instanceof Future)) {
+				return false;
+			} else {
+				return ((Future) theProxy).isAwaited();
+			}
+		}
+	}
 
-  /**
-   * Migrates the active object whose active thread is calling this method to the 
-   * same location as the active object given in parameter.
-   * This method must be called from an active object using the active thread as the
-   * current thread will be used to find which active object is calling the method.
-   * The object given as destination must be an active object.
-   * @param activeObject the active object indicating the destination of the migration.
-   * @exception MigrationException if the migration fails
-   * @see #getBodyOnThis
-   */
-  public static void migrateTo(Object activeObject) throws MigrationException {
-    migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
-  }
+	
+	
+	/**
+	 * Return the object contains by the future (ie its target).
+	 * If parameter is not a future, it is returned.
+	 * A wait-by-necessity occurs if future is not available. 
+	 */
+	public static Object extractValue(Object future) {
+		// If the object is not reified, it cannot be a future
+		if ((MOP.isReifiedObject(future)) == false) {
+			return future;
+		} else {
+		org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject) future).getProxy();
+			// If it is reified but its proxy is not of type future, we cannot wait
+			if (!(theProxy instanceof Future)) {
+				return future;
+			} else {
+				return ((Future) theProxy).getResult();
+			}
+		}
+	}			
+		
+		
+	
+	/** 
+	 * Enable the automatic continuation mechanism for this active object.
+	 */
+	public static void enableAC(Object obj) throws java.io.IOException {
+		// Check if obj is really a reified object
+		if (!(MOP.isReifiedObject(obj))) {
+			throw new ProActiveRuntimeException("The given object " + obj + " is not a reified object");
+		}
+		// Find the appropriate remoteBody
+		org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+		if (myProxy == null)
+			throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + obj);
+		BodyProxy myBodyProxy = (BodyProxy) myProxy;
+		UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+		body.enableAC();
+	}
 
-  /**
-   * Migrates the active object whose active thread is calling this method to the 
-   * node caracterized by the given url.
-   * This method must be called from an active object using the active thread as the
-   * current thread will be used to find which active object is calling the method.
-   * The url must be the url of an existing node.
-   * @param nodeURL the url of an existing where to migrate to.
-   * @exception MigrationException if the migration fails
-   * @see #getBodyOnThis
-   */
-  public static void migrateTo(String nodeURL) throws MigrationException {
-    ProActive.migrateTo(getNodeFromURL(nodeURL));
-  }
+	/** 
+	 * Disable the automatic continuation mechanism for this active object.
+	 */
+	public static void disableAC(Object obj) throws java.io.IOException {
+		// Check if obj is really a reified object
+		if (!(MOP.isReifiedObject(obj))) {
+			throw new ProActiveRuntimeException("The given object " + obj + " is not a reified object");
+		}
+		// Find the appropriate remoteBody
+		org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
+		if (myProxy == null)
+			throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + obj);
+		BodyProxy myBodyProxy = (BodyProxy) myProxy;
+		UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+		body.disableAC();
+	}
 
-  /**
-   * Migrates the active object whose active thread is calling this method to the 
-   * given node.
-   * This method must be called from an active object using the active thread as the
-   * current thread will be used to find which active object is calling the method.
-   * @param node an existing node where to migrate to.
-   * @exception MigrationException if the migration fails
-   * @see #getBodyOnThis
-   */
-  public static void migrateTo(Node node) throws MigrationException {
-    Body bodyToMigrate = getBodyOnThis();
-    if (!(bodyToMigrate instanceof Migratable)) {
-      throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
-    }
-    ((Migratable) bodyToMigrate).migrateTo(node);
-  }
+	/**
+	 * When an active object is created, it is associated with a Body that takes care
+	 * of all non fonctionnal properties. Assuming that the active object is only 
+	 * accessed by the different Stub objects, all method calls end-up as Requests sent
+	 * to this Body. Therefore the only thread calling the method of the active object 
+	 * is the active thread managed by the body. There is an unique mapping between the
+	 * active thread and the body responsible for it. From any method in the active object
+	 * the current thread caller of the method is the active thread. When a reified method wants
+	 * to get a reference to the Body associated to the active object, it can invoke this
+	 * method. Assuming that the current thread is the active thread, the associated body
+	 * is returned.
+	 * @return the body associated to the active object whose active thread is calling
+	 *     this method.
+	 */
+	public static Body getBodyOnThis() {
+		return LocalBodyStore.getInstance().getCurrentThreadBody();
+	}
 
-  /**
-   * Migrates the given body to the same location as the active object given in parameter.
-   * This method can be called from any object and does not perform the migration. 
-   * Instead it generates a migration request that is sent to the targeted body.
-   * Two strategies are possible :
-   *   - the request is high priority and is processed before all existing requests
-   *   the body may have received (priority = true)
-   *   - the request is normal priority and is processed after all existing requests
-   *   the body may have received (priority = false)
-   * The object given as destination must be an active object.
-   * @param bodyToMigrate the body to migrate.
-   * @param activeObject the active object indicating the destination of the migration.
-   * @param priority a boolean indicating the priority of the migration request sent to the body.
-   * @exception MigrationException if the migration fails
-   */
-  public static void migrateTo(Body bodyToMigrate, Object activeObject, boolean priority) throws MigrationException {
-    migrateTo(bodyToMigrate, getNodeFromURL(getNodeURLFromActiveObject(activeObject)), priority);
-  }
+	/**
+	 * Returns a Stub-Proxy couple pointing to the local body associated to the active
+	 * object whose active thread is calling this method.
+	 * @return a Stub-Proxy couple pointing to the local body.
+	 * @see #getBodyOnThis
+	 */
+	public static StubObject getStubOnThis() {
+		Body body = getBodyOnThis();
+		//System.out.println("ProActive: getStubOnThis() returns " + body);
+		if (body == null)
+			return null;
+		return getStubForBody(body);
+	}
 
-  /**
-   * Migrates the given body to the node caracterized by the given url.
-   * This method can be called from any object and does not perform the migration. 
-   * Instead it generates a migration request that is sent to the targeted body.
-   * Two strategies are possible :
-   *   - the request is high priority and is processed before all existing requests
-   *   the body may have received (priority = true)
-   *   - the request is normal priority and is processed after all existing requests
-   *   the body may have received (priority = false)
-   * The object given as destination must be an active object.
-   * @param bodyToMigrate the body to migrate.
-   * @param nodeURL the url of an existing where to migrate to.
-   * @param priority a boolean indicating the priority of the migration request sent to the body.
-   * @exception MigrationException if the migration fails
-   */
-  public static void migrateTo(Body bodyToMigrate, String nodeURL, boolean priority) throws MigrationException {
-    ProActive.migrateTo(bodyToMigrate, getNodeFromURL(nodeURL), priority);
-  }
+	/**
+	 * Migrates the active object whose active thread is calling this method to the 
+	 * same location as the active object given in parameter.
+	 * This method must be called from an active object using the active thread as the
+	 * current thread will be used to find which active object is calling the method.
+	 * The object given as destination must be an active object.
+	 * @param activeObject the active object indicating the destination of the migration.
+	 * @exception MigrationException if the migration fails
+	 * @see #getBodyOnThis
+	 */
+	public static void migrateTo(Object activeObject) throws MigrationException {
+		migrateTo(getNodeFromURL(getNodeURLFromActiveObject(activeObject)));
+	}
 
-  /**
-   * Migrates the body <code>bodyToMigrate</code> to the given node.
-   * This method can be called from any object and does not perform the migration. 
-   * Instead it generates a migration request that is sent to the targeted body.
-   * Two strategies are possible :
-   *   - the request is high priority and is processed before all existing requests
-   *   the body may have received (priority = true)
-   *   - the request is normal priority and is processed after all existing requests
-   *   the body may have received (priority = false)
-   * The object given as destination must be an active object.
-   * @param bodyToMigrate the body to migrate.
-   * @param node an existing node where to migrate to.
-   * @param priority a boolean indicating the priority of the migration request sent to the body.
-   * @exception MigrationException if the migration fails
-   */
-  public static void migrateTo(Body bodyToMigrate, Node node, boolean priority) throws MigrationException {
-    if (!(bodyToMigrate instanceof Migratable)) {
-      throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
-    }
-    Object[] arguments = { node };
-    try {
-      BodyRequest request =
-        new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class }, arguments, priority);
-      request.send(bodyToMigrate);
-    } catch (NoSuchMethodException e) {
-      throw new MigrationException(
-        "Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
-        e);
-    } catch (java.io.IOException e) {
-      throw new MigrationException("Cannot send the request to migrate", e);
-    }
-  }
+	/**
+	 * Migrates the active object whose active thread is calling this method to the 
+	 * node caracterized by the given url.
+	 * This method must be called from an active object using the active thread as the
+	 * current thread will be used to find which active object is calling the method.
+	 * The url must be the url of an existing node.
+	 * @param nodeURL the url of an existing where to migrate to.
+	 * @exception MigrationException if the migration fails
+	 * @see #getBodyOnThis
+	 */
+	public static void migrateTo(String nodeURL) throws MigrationException {
+		ProActive.migrateTo(getNodeFromURL(nodeURL));
+	}
 
-  //
-  // -- PRIVATE METHODS -----------------------------------------------
-  //
+	/**
+	 * Migrates the active object whose active thread is calling this method to the 
+	 * given node.
+	 * This method must be called from an active object using the active thread as the
+	 * current thread will be used to find which active object is calling the method.
+	 * @param node an existing node where to migrate to.
+	 * @exception MigrationException if the migration fails
+	 * @see #getBodyOnThis
+	 */
+	public static void migrateTo(Node node) throws MigrationException {
+		Body bodyToMigrate = getBodyOnThis();
+		if (!(bodyToMigrate instanceof Migratable)) {
+			throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
+		}
+		((Migratable) bodyToMigrate).migrateTo(node);
+	}
 
-  private static String getNodeURLFromActiveObject(Object o) throws MigrationException {
-    //first we check if the parameter is an active object,
-    if (!org.objectweb.proactive.core.mop.MOP.isReifiedObject(o)) {
-      throw new MigrationException("The parameter is not an active object");
-    }
-    //now we get a reference on the remoteBody of this guy
-    BodyProxy destProxy = (BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) o).getProxy();
-    return destProxy.getBody().getNodeURL();
-  }
+	/**
+	 * Migrates the given body to the same location as the active object given in parameter.
+	 * This method can be called from any object and does not perform the migration. 
+	 * Instead it generates a migration request that is sent to the targeted body.
+	 * Two strategies are possible :
+	 *   - the request is high priority and is processed before all existing requests
+	 *   the body may have received (priority = true)
+	 *   - the request is normal priority and is processed after all existing requests
+	 *   the body may have received (priority = false)
+	 * The object given as destination must be an active object.
+	 * @param bodyToMigrate the body to migrate.
+	 * @param activeObject the active object indicating the destination of the migration.
+	 * @param priority a boolean indicating the priority of the migration request sent to the body.
+	 * @exception MigrationException if the migration fails
+	 */
+	public static void migrateTo(Body bodyToMigrate, Object activeObject, boolean priority) throws MigrationException {
+		migrateTo(bodyToMigrate, getNodeFromURL(getNodeURLFromActiveObject(activeObject)), priority);
+	}
 
-  private static Node getNodeFromURL(String url) throws MigrationException {
-    try {
-      return NodeFactory.getNode(url);
-    } catch (NodeException e) {
-      throw new MigrationException("The node of given URL " + url + " cannot be localized", e);
-    }
-  }
+	/**
+	 * Migrates the given body to the node caracterized by the given url.
+	 * This method can be called from any object and does not perform the migration. 
+	 * Instead it generates a migration request that is sent to the targeted body.
+	 * Two strategies are possible :
+	 *   - the request is high priority and is processed before all existing requests
+	 *   the body may have received (priority = true)
+	 *   - the request is normal priority and is processed after all existing requests
+	 *   the body may have received (priority = false)
+	 * The object given as destination must be an active object.
+	 * @param bodyToMigrate the body to migrate.
+	 * @param nodeURL the url of an existing where to migrate to.
+	 * @param priority a boolean indicating the priority of the migration request sent to the body.
+	 * @exception MigrationException if the migration fails
+	 */
+	public static void migrateTo(Body bodyToMigrate, String nodeURL, boolean priority) throws MigrationException {
+		ProActive.migrateTo(bodyToMigrate, getNodeFromURL(nodeURL), priority);
+	}
 
-  // -------------------------------------------------------------------------------------------
-  // 
-  // STUB CREATION
-  // 
-  // -------------------------------------------------------------------------------------------
+	/**
+	 * Migrates the body <code>bodyToMigrate</code> to the given node.
+	 * This method can be called from any object and does not perform the migration. 
+	 * Instead it generates a migration request that is sent to the targeted body.
+	 * Two strategies are possible :
+	 *   - the request is high priority and is processed before all existing requests
+	 *   the body may have received (priority = true)
+	 *   - the request is normal priority and is processed after all existing requests
+	 *   the body may have received (priority = false)
+	 * The object given as destination must be an active object.
+	 * @param bodyToMigrate the body to migrate.
+	 * @param node an existing node where to migrate to.
+	 * @param priority a boolean indicating the priority of the migration request sent to the body.
+	 * @exception MigrationException if the migration fails
+	 */
+	public static void migrateTo(Body bodyToMigrate, Node node, boolean priority) throws MigrationException {
+		if (!(bodyToMigrate instanceof Migratable)) {
+			throw new MigrationException("This body cannot migrate. It doesn't implement Migratable interface");
+		}
+		Object[] arguments = { node };
+		try {
+			BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class }, arguments, priority);
+			request.send(bodyToMigrate);
+		} catch (NoSuchMethodException e) {
+			throw new MigrationException(
+				"Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
+				e);
+		} catch (java.io.IOException e) {
+			throw new MigrationException("Cannot send the request to migrate", e);
+		}
+	}
 
-  private static StubObject getStubForBody(Body body) {
-    try {
-      return createStubObject(
-        body.getReifiedObject(),
-        new Object[] { body },
-        body.getReifiedObject().getClass().getName());
-    } catch (MOPException e) {
-      throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
-    }
-  }
+	//
+	// -- PRIVATE METHODS -----------------------------------------------
+	//
 
-  private static Object createStubObject(String className, UniversalBody body) throws MOPException {
-    return createStubObject(className, null, new Object[] { body });
-  }
+	private static String getNodeURLFromActiveObject(Object o) throws MigrationException {
+		//first we check if the parameter is an active object,
+		if (!org.objectweb.proactive.core.mop.MOP.isReifiedObject(o)) {
+			throw new MigrationException("The parameter is not an active object");
+		}
+		//now we get a reference on the remoteBody of this guy
+		BodyProxy destProxy = (BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) o).getProxy();
+		return destProxy.getBody().getNodeURL();
+	}
 
-  private static Object createStubObject(
-    String className,
-    Object[] constructorParameters,
-    Node node,
-    Active activity,
-    MetaObjectFactory factory)
-    throws MOPException {
-    return createStubObject(className, constructorParameters, new Object[] { node, activity, factory });
-  }
+	private static Node getNodeFromURL(String url) throws MigrationException {
+		try {
+			return NodeFactory.getNode(url);
+		} catch (NodeException e) {
+			throw new MigrationException("The node of given URL " + url + " cannot be localized", e);
+		}
+	}
 
-  private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters)
-    throws MOPException {
-    try {
-      return MOP.newInstance(
-        className,
-        constructorParameters,
-        Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-        proxyParameters);
-    } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
-    }
-  }
+	// -------------------------------------------------------------------------------------------
+	// 
+	// STUB CREATION
+	// 
+	// -------------------------------------------------------------------------------------------
 
-  private static Object createStubObject(Object target, String nameOfTargetType, Node node, Active activity, MetaObjectFactory factory)
-    throws MOPException {
-    return createStubObject(target, new Object[] { node, activity, factory }, nameOfTargetType);
-  }
+	private static StubObject getStubForBody(Body body) {
+		try {
+			return createStubObject(body.getReifiedObject(), new Object[] { body }, body.getReifiedObject().getClass().getName());
+		} catch (MOPException e) {
+			throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
+		}
+	}
 
-  private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType)
-    throws MOPException {
-    try {
-      return (StubObject) MOP.turnReified(
-        nameOfTargetType,
-        Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-        proxyParameters,
-        object);
-    } catch (ClassNotFoundException e) {
-      throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
-    }
-  }
+	private static Object createStubObject(String className, UniversalBody body) throws MOPException {
+		return createStubObject(className, null, new Object[] { body });
+	}
+
+	private static Object createStubObject(
+		String className,
+		Object[] constructorParameters,
+		Node node,
+		Active activity,
+		MetaObjectFactory factory)
+		throws MOPException {
+		return createStubObject(className, constructorParameters, new Object[] { node, activity, factory });
+	}
+
+	private static Object createStubObject(String className, Object[] constructorParameters, Object[] proxyParameters)
+		throws MOPException {
+		try {
+			return MOP.newInstance(className, constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
+		} catch (ClassNotFoundException e) {
+			throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
+		}
+	}
+
+	private static Object createStubObject(
+		Object target,
+		String nameOfTargetType,
+		Node node,
+		Active activity,
+		MetaObjectFactory factory)
+		throws MOPException {
+		return createStubObject(target, new Object[] { node, activity, factory }, nameOfTargetType);
+	}
+
+	private static StubObject createStubObject(Object object, Object[] proxyParameters, String nameOfTargetType)
+		throws MOPException {
+		try {
+			return (StubObject) MOP.turnReified(nameOfTargetType, Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters, object);
+		} catch (ClassNotFoundException e) {
+			throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
+		}
+	}
 
 }

@@ -103,6 +103,19 @@ public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProd
    */
   public void acceptCommunication();
 
+    
+  /**
+   * Allows the calling thread to enter in the ThreadStore of this body.
+   */
+  public void enterInThreadStore();
+
+	
+	/**
+   * Allows the calling thread to exit from the ThreadStore of this body.
+   */
+  public void exitFromThreadStore();
+
+
 
   /**
    * Tries to find a local version of the body of id uniqueID. If a local version

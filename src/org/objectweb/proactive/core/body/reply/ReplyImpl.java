@@ -35,13 +35,15 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.request.Request;
 
+
 public class ReplyImpl extends MessageImpl implements Reply, java.io.Serializable {
 
   /**
    * The hypothetic result
    */
   protected Object result;
-
+  
+  
   public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, Object result) {
     super(senderID, sequenceNumber, true, methodName);
     this.result = result;

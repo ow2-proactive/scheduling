@@ -195,6 +195,14 @@ public class JiniBodyAdapter implements UniversalBody, java.io.Serializable {
     return this;
   }
   
+  
+  public void enableAC() throws java.io.IOException {
+  	proxiedJiniBody.enableAC();
+  }
+  
+  public void disableAC() throws java.io.IOException {
+  	proxiedJiniBody.disableAC();
+  }
 
   //
   // -- PRIVATE METHODS -----------------------------------------------

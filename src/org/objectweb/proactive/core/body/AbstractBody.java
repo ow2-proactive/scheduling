@@ -36,6 +36,7 @@ import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.ThreadStore;
@@ -116,6 +117,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   public AbstractBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
     super(nodeURL, factory.newRemoteBodyFactory());
     this.threadStore = factory.newThreadStoreFactory().newThreadStore();
+    
   }
 
 
@@ -153,6 +155,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   }
   
   
+  public void enableAC(){
+  	localBodyStrategy.getFuturePool().enableAC();
+  }
+  
+  public void disableAC(){
+  	localBodyStrategy.getFuturePool().disableAC();
+  }
 
   //
   // -- implements Body -----------------------------------------------
@@ -168,12 +177,21 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
   
 
   public void blockCommunication() {
-    threadStore.close();
+     threadStore.close();
   }
 
   public void acceptCommunication() {
-    threadStore.open();
+     threadStore.open();
   }
+  
+  public void enterInThreadStore() {
+	    threadStore.enter();
+  }
+  
+  public void exitFromThreadStore() {
+    threadStore.exit();
+  }
+ 
 
   public boolean isAlive() {
     return !isDead;

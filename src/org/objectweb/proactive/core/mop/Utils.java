@@ -37,7 +37,8 @@ import java.lang.reflect.Modifier;
 /**
  * This class contains static convenience and utility methods
  */
-abstract class Utils extends Object {
+
+public abstract class Utils extends Object {
 
   /**
    * Static variables

@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
@@ -182,13 +183,16 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
       universalBody = newBody;
       isLocal = LocalBodyStore.getInstance().getLocalBody(bodyID) != null;
     }
+    sourceBody.getFuturePool().setContinuationTag(universalBody);
     if (isLocal) {
       // Replaces the effective arguments with a deep copy
       // Only do this if the body is local
       // For remote bodies, this is automatically handled by the RMI stub
       methodCall.makeDeepCopyOfArguments();
     }
+    
     sendRequestInternal(methodCall, future, sourceBody);
+    sourceBody.getFuturePool().unsetContinuationTag();
   }
 
   protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody) throws java.io.IOException {

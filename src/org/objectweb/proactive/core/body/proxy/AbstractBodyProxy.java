@@ -163,6 +163,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     } catch (ClassNotFoundException e) {
       throw new MethodCallExecutionFailedException("Exception occured in reifyAsAsynchronous while creating future for m="+methodCall.getName(), e);
     }
+   
+    // Set the id of the body creator in the created future
+    FutureProxy fp = (FutureProxy)(futureobject.getProxy());
+    fp.setCreatorID(bodyID);
+   
     // Send the request
     try {
       sendRequest(methodCall, (Future)futureobject.getProxy());
@@ -177,6 +182,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
   protected Object reifyAsSynchronous(MethodCall methodCall) throws Throwable, MethodCallExecutionFailedException {
     // Setting methodCall.res to null means that we do not use the future mechanism
     Future f = FutureProxy.getFutureProxy();
+    f.setCreatorID(bodyID);
     // Set it as the 'thing' to send results to methodCall.res = f;
     // Send the request
     try {

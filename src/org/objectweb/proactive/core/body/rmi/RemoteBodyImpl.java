@@ -104,6 +104,14 @@ public class RemoteBodyImpl
     // System.out.println("RemoteBodyImpl: unreferenced()");      
     System.gc();
   }
+  
+	public void enableAC() throws java.io.IOException {
+		body.enableAC();
+	}
+	
+	public void disableAC() throws java.io.IOException {
+		body.disableAC();
+	}
 
   //
   // -- PRIVATE METHODS -----------------------------------------------

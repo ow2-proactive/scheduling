@@ -99,4 +99,15 @@ public interface UniversalBody  {
   public UniversalBody getRemoteAdapter();
 
 
+	/**
+	 * Enables automatic continuation mechanism for this body
+	 */
+	public void enableAC() throws java.io.IOException;
+
+	
+	/**
+	 * Disables automatic continuation mechanism for this body
+	 */
+	public void disableAC() throws java.io.IOException;	
+
 }

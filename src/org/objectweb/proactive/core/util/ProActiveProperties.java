@@ -37,6 +37,13 @@ public final class ProActiveProperties {
    * The rmi name of the location server
    */
   public static final String PROACTIVE_DEFAULT_LOCATIONSERVER_RMI = "proactive.locationserver.rmi";
+  
+	/** 
+	 * default state (enable or disable) of the automatic continuation mechanism 
+	 */
+	public static final String PROACTIVE_DEFAULT_AC_STATE = "proactive.future.ac";
+  
+  
   private static java.util.Properties defaultProperties;
 
   static {
@@ -47,6 +54,7 @@ public final class ProActiveProperties {
   public static void loadDefaultProperties() {
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER, "org.objectweb.proactive.ext.locationserver.LocationServer");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER_RMI, "//localhost/LocationServer");
+    defaultProperties.setProperty(PROACTIVE_DEFAULT_AC_STATE,"disable");
     ProActiveProperties.addPropertiesToSystem(defaultProperties);
   }
 
@@ -71,5 +79,9 @@ public final class ProActiveProperties {
 
   public static String getLocationServerRmi() {
     return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_LOCATIONSERVER_RMI);
+  }
+  
+  public static String getACState() {
+  	return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_AC_STATE);
   }
 }

@@ -105,6 +105,14 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject implements
     body.updateLocation(id, jiniBody);
   }
 
+	public void enableAC() throws java.io.IOException {
+		body.enableAC();
+	}
+	
+	public void disableAC() throws java.io.IOException {
+		body.disableAC();
+	}
+
   public void unreferenced() {
     System.out.println("JiniBodyImpl: unreferenced()");      
     System.gc();

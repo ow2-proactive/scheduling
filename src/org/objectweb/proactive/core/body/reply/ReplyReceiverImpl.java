@@ -34,15 +34,13 @@ import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.Body;
 
+
 public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
 
   public ReplyReceiverImpl() {
   }
-
+  
   public void receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException {
-    Future f = futurePool.receiveResult(r.getSequenceNumber(), r.getResult());
-    if (f == null) {
-      throw new java.io.IOException("Cannot find future for id " + r.getSequenceNumber());
-    }
+    futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult());
   }
 }

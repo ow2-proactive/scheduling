@@ -195,6 +195,14 @@ public class RemoteBodyAdapter implements UniversalBody, java.io.Serializable {
     return this;
   }
   
+  public void enableAC () throws java.io.IOException {
+  	proxiedRemoteBody.enableAC();
+  }
+  
+  public void disableAC() throws java.io.IOException {
+  	proxiedRemoteBody.disableAC();
+  }
+  
 
   //
   // -- PRIVATE METHODS -----------------------------------------------

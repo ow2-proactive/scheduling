@@ -69,6 +69,15 @@ public class LocalBodyStore {
    */
   private BodyMap localBodyMap = new BodyMap();
 
+ 
+  /**
+   * This table maps all known HalfBodies in this JVM with their UniqueID
+   * From one UniqueID it is possible to get the corresponding halfbody if
+   * it belongs to this JVM
+   */
+  private BodyMap localHalfBodyMap = new BodyMap();
+  
+
   /**
    * Static object that manages the registration of listeners and the sending of
    * events
@@ -125,7 +134,7 @@ public class LocalBodyStore {
       // that handle the futures
       body = HalfBody.getHalfBody(halfBodyMetaObjectFactory);
       bodyPerThread.set(body);
-      //registerBody(body);
+      registerHalfBody(body);
     }
     return body;
   }
@@ -150,6 +159,19 @@ public class LocalBodyStore {
     return (Body) localBodyMap.getBody(bodyID);
   }
 
+  
+
+  /**
+   * Returns the halfbody belonging to this JVM whose ID is the one specified.
+   * Returns null if a halfbody with such an id is not found in this jvm
+   * @param bodyID the ID to look for
+   * @return the halfbody with matching id or null
+   */
+  public Body getLocalHalfBody(UniqueID bodyID) {
+    return (Body) localHalfBodyMap.getBody(bodyID);
+  }
+
+
 
   /**
    * Returns all local Bodies in a new BodyMap
@@ -157,6 +179,15 @@ public class LocalBodyStore {
    */
   public BodyMap getLocalBodies() {
     return (BodyMap) localBodyMap.clone();
+  }
+
+ 
+  /**
+   * Returns all local HalfBodies in a new BodyMap
+   * @return all local HalfBodies in a new BodyMap
+   */
+  public BodyMap getLocalHalfBodies() {
+    return (BodyMap) localHalfBodyMap.clone();
   }
 
 
@@ -192,5 +223,18 @@ public class LocalBodyStore {
     localBodyMap.removeBody(body.bodyID);
     bodyEventProducer.fireBodyRemoved(body);
   }
+
+  
+  void registerHalfBody(AbstractBody body) {
+    localHalfBodyMap.putBody(body.bodyID, body);
+    //bodyEventProducer.fireBodyCreated(body);
+  }
+
+  void unregisterHalfBody(AbstractBody body) {
+    localHalfBodyMap.removeBody(body.bodyID);
+    //bodyEventProducer.fireBodyRemoved(body);
+  }
+  
+
 
 }

@@ -36,150 +36,153 @@ import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 
+
 public class HalfBody extends AbstractBody {
 
-  //
-  // -- PRIVATE MEMBERS -----------------------------------------------
-  //
+	//
+	// -- PRIVATE MEMBERS -----------------------------------------------
+	//
+	
+	private static final String HALF_BODY_EXCEPTION_MESSAGE = "This method is not implemented in class HalfBody.";
 
-  private static final String HALF_BODY_EXCEPTION_MESSAGE = "This method is not implemented in class HalfBody.";
+	private static final String NAME = "Other thread";
+	/** The component in charge of receiving reply */
+	private ReplyReceiver replyReceiver;
 
-  private static final String NAME = "Other thread";
-  /** The component in charge of receiving reply */
-  private ReplyReceiver replyReceiver;
+	public synchronized static HalfBody getHalfBody(MetaObjectFactory factory) {
+		return new HalfBody(factory);
+	}
 
-  
-  public synchronized static HalfBody getHalfBody(MetaObjectFactory factory) {
-    return new HalfBody(factory);
-  }
+	//
+	// -- CONSTRUCTORS -----------------------------------------------
+	//
 
+	private HalfBody(MetaObjectFactory factory) {
+		super(new Object(), "LOCAL", factory);
+		this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
+		setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
+		this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+	}
 
-  //
-  // -- CONSTRUCTORS -----------------------------------------------
-  //
+	//
+	// -- PUBLIC METHODS -----------------------------------------------
+	//
 
-  private HalfBody(MetaObjectFactory factory) {
-    super(new Object(),"LOCAL", factory);
-    this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
-    setLocalBodyImpl(new HalfLocalBodyStrategy(factory.newRequestFactory()));
-  }
+	//
+	// -- implements MessageEventProducer -----------------------------------------------
+	//
 
+	public void addMessageEventListener(MessageEventListener listener) {
+	}
 
-  //
-  // -- PUBLIC METHODS -----------------------------------------------
-  //
+	public void removeMessageEventListener(MessageEventListener listener) {
+	}
 
-  //
-  // -- implements MessageEventProducer -----------------------------------------------
-  //
+	//
+	// -- PROTECTED METHODS -----------------------------------------------
+	//
 
-  public void addMessageEventListener(MessageEventListener listener) {
-  }
+	/**
+	 * Receives a request for later processing. The call to this method is non blocking
+	 * unless the body cannot temporary receive the request.
+	 * @param request the request to process
+	 * @exception java.io.IOException if the request cannot be accepted
+	 */
+	protected void internalReceiveRequest(Request request) throws java.io.IOException {
+		throw new ProActiveRuntimeException("The method 'receiveRequest' is not implemented in class HalfBody.");
+	}
 
-  public void removeMessageEventListener(MessageEventListener listener) {
-  }
+	/**
+	 * Receives a reply in response to a former request.
+	 * @param reply the reply received
+	 * @exception java.io.IOException if the reply cannot be accepted
+	 */
+	protected void internalReceiveReply(Reply reply) throws java.io.IOException {
 
+		replyReceiver.receiveReply(reply, this, getFuturePool());
+	}
 
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
+	//
+	// -- inner classes -----------------------------------------------
+	//
 
-  /**
-   * Receives a request for later processing. The call to this method is non blocking
-   * unless the body cannot temporary receive the request.
-   * @param request the request to process
-   * @exception java.io.IOException if the request cannot be accepted
-   */
-  protected void internalReceiveRequest(Request request) throws java.io.IOException {
-    throw new ProActiveRuntimeException("The method 'receiveRequest' is not implemented in class HalfBody.");
-  }
+	private class HalfLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
 
-  /**
-   * Receives a reply in response to a former request.
-   * @param reply the reply received
-   * @exception java.io.IOException if the reply cannot be accepted
-   */
-  protected void internalReceiveReply(Reply reply) throws java.io.IOException {
-    replyReceiver.receiveReply(reply, this, getFuturePool());
-  }
+		/** A pool future that contains the pending future objects */
+		protected FuturePool futures;
 
+		protected RequestFactory internalRequestFactory;
 
+		private long absoluteSequenceID;
 
-  //
-  // -- inner classes -----------------------------------------------
-  //
+		//
+		// -- CONSTRUCTORS -----------------------------------------------
+		//
 
-  private class HalfLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
+		public HalfLocalBodyStrategy(RequestFactory requestFactory) {
+			this.futures = new FuturePool();
+			this.internalRequestFactory = requestFactory;
+		}
 
-    /** A pool future id/future couples that contains the pending future objects */
-    protected FuturePool futures;
-  
-    protected RequestFactory internalRequestFactory;
+		//
+		// -- PUBLIC METHODS -----------------------------------------------
+		//
 
-    private long absoluteSequenceID;
-  
-    //
-    // -- CONSTRUCTORS -----------------------------------------------
-    //
-  
-    public HalfLocalBodyStrategy(RequestFactory requestFactory) {
-      this.futures = new FuturePool();
-      this.internalRequestFactory = requestFactory;
-    }
-    
-    //
-    // -- PUBLIC METHODS -----------------------------------------------
-    //
-    
-    //
-    // -- implements LocalBody -----------------------------------------------
-    //
-  
-    public FuturePool getFuturePool() {
-      return futures;
-    }
+		//
+		// -- implements LocalBody -----------------------------------------------
+		//
 
-    public BlockingRequestQueue getRequestQueue() {
-      throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
-    }
-  
-    public Object getReifiedObject() {
-      throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
-    }
-  
-    public String getName() {
-      return NAME;
-    }
-  
-    public void serve(Request request) {
-      throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
-    }
-  
-    public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
-      throws java.io.IOException {
-      long sequenceID = getNextSequenceID();
-      Request request = internalRequestFactory.newRequest(methodCall, HalfBody.this, future == null, sequenceID);
-      if (future != null)
-        futures.put(sequenceID, future);
-      request.send(destinationBody);
-    }
-  
-    //
-    // -- PROTECTED METHODS -----------------------------------------------
-    //
+		public FuturePool getFuturePool() {
+			return futures;
+		}
 
-    /**
-    * Returns a unique identifier that can be used to tag a future, a request
-    * @return a unique identifier that can be used to tag a future, a request.
-    */
-    private synchronized long getNextSequenceID() {
-      return ++absoluteSequenceID;
-    }
+		public BlockingRequestQueue getRequestQueue() {
+			throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+		}
+		
+		public RequestQueue getHighPriorityRequestQueue() {
+			throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+		}
 
-  } // end inner class LocalHalfBody
+		public Object getReifiedObject() {
+			throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+		}
+
+		public String getName() {
+			return NAME;
+		}
+
+		public void serve(Request request) {
+			throw new ProActiveRuntimeException(HALF_BODY_EXCEPTION_MESSAGE);
+		}
+
+		public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody) throws java.io.IOException {
+			long sequenceID = getNextSequenceID();
+			Request request = internalRequestFactory.newRequest(methodCall, HalfBody.this, future == null, sequenceID);
+			if (future != null) {
+				future.setID(sequenceID);
+				futures.receiveFuture(sequenceID, future.getCreatorID(), future);
+			}
+			request.send(destinationBody);
+		}
+
+		//
+		// -- PROTECTED METHODS -----------------------------------------------
+		//
+
+		/**
+		* Returns a unique identifier that can be used to tag a future, a request
+		* @return a unique identifier that can be used to tag a future, a request.
+		*/
+		private synchronized long getNextSequenceID() {
+			return ++absoluteSequenceID;
+		}
+
+	} // end inner class LocalHalfBody
 }

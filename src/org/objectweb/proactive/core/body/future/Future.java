@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.body.future;
 
+import org.objectweb.proactive.core.UniqueID;
+
 /**
  * <p>
  * An object implementing this interface if a place holder object for an upcomming result yet
@@ -44,7 +46,7 @@ package org.objectweb.proactive.core.body.future;
  *
  */
 public interface Future extends LocalFuture {
-
+	
   public boolean isAwaited();
 
   public void waitFor();
@@ -52,4 +54,48 @@ public interface Future extends LocalFuture {
   public Throwable getRaisedException();
 
   public Object getResult();
+
+	/**
+	 * To set the sequence id of this future.
+	 */ 
+  public void setID(long id);
+
+	/**	
+	 * To get the sequence id of this future.
+	 */ 	
+  public long getID();
+
+	/**
+	 * To set the creatorID, ie the UniqueID of the body which create this future
+	 */ 
+  public void setCreatorID(UniqueID i);
+
+	/**
+	 * To get the creatorID.
+	 */ 
+  public UniqueID getCreatorID();
+
+	/**
+	 * To set the senderID, ie the UniqueID of the body that will send this future,
+	 * in case of automatic continuation.
+	 */ 
+  public void setSenderID(UniqueID i);
+
+	/**
+	 * To get the senderID.
+	 */ 
+  public UniqueID getSenderID();
+
+	/**
+	 * To set the receiverID, ie the UniqueID of the body that will receive this future,
+	 * in case of automatic continuation.
+	 */ 	
+  public void setReceiverID(UniqueID i);
+
+
+	/**
+	 * To get the receiverID.
+	 */ 
+  public UniqueID getReceiverID();
+ 
 }

@@ -27,32 +27,32 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.future.FuturePool;
 
 public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
 
-  public RequestReceiverImpl() {
-  }
+	public RequestReceiverImpl() {
+	}
 
+	public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
+		if (immediateExecution(request.getMethodName())) {
+			bodyReceiver.serve(request);
+		} else {
+			request.notifyReception(bodyReceiver);
+			bodyReceiver.getRequestQueue().add(request);
+		}
+	}
 
-  public void receiveRequest(Request request, Body bodyReceiver) throws java.io.IOException {
-    if (immediateExecution(request.getMethodName())) {
-      bodyReceiver.serve(request);
-    } else {
-      request.notifyReception(bodyReceiver);
-      bodyReceiver.getRequestQueue().add(request);
-    }
-  }
+	private boolean immediateExecution(String methodName) {
+		if (methodName.equals("toString") || methodName.equals("hashCode")) {
+			return true;
+		}
+		return false;
+	}
 
-
-  private boolean immediateExecution(String methodName) {
-    if (methodName.equals("toString") || methodName.equals("hashCode")) {
-      return true;
-    }
-    return false;
-  }
 
 }

@@ -68,6 +68,14 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     public UniversalBody getRemoteAdapter() {
         return this.wrappedBody.getRemoteAdapter();
     }
+    
+    public void enableAC() throws java.io.IOException {
+    	this.wrappedBody.enableAC();
+    }
+    
+    public void disableAC() throws java.io.IOException {
+    	this.wrappedBody.disableAC();
+    }
 
     protected void updateServer() {
         System.out.println("UniversalBodyWrapper.updateServer");
