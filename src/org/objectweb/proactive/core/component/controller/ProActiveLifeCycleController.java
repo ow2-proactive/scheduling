@@ -37,10 +37,14 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.TypeFactory;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 import java.io.Serializable;
 
@@ -57,7 +61,16 @@ public class ProActiveLifeCycleController extends ProActiveController
     protected static Logger logger = Logger.getLogger(ProActiveLifeCycleController.class.getName());
 
     public ProActiveLifeCycleController(Component owner) {
-        super(owner, Constants.LIFECYCLE_CONTROLLER);
+        super(owner);
+		try {
+			setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+										ProActiveContentController.class.getName(),
+								TypeFactory.SERVER, TypeFactory.MANDATORY,
+								TypeFactory.SINGLE));
+		} catch (InstantiationException e) {
+			throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
+		}
+
     }
 
     /**
