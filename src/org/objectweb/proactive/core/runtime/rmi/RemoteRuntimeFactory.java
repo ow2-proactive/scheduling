@@ -31,6 +31,8 @@
  */
 package org.objectweb.proactive.core.runtime.rmi;
 
+import java.rmi.RemoteException;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
@@ -54,13 +56,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
-
-        //		String port = System.getProperty("proactive.rmi.port");
-        //random = new java.util.Random(System.currentTimeMillis());
-        //        if ( port != null){
-        //			registryHelper.setRegistryPortNumber(new Integer(port).intValue());
-        //        }
-        registryHelper.initializeRegistry();
+        //registryHelper.initializeRegistry();
     }
 
     //
@@ -92,6 +88,11 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         throws ProActiveException {
         //return createRuntimeAdapter(s,false);
         if (defaultRmiRuntime == null) {
+			try {
+				registryHelper.initializeRegistry();
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
             defaultRmiRuntime = createRuntimeAdapter();
         }
 

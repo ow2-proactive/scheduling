@@ -435,7 +435,6 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 }
 
                 proActiveRuntime.killRT(false);
-                System.out.println("no object in registry");
             } catch (InterruptedException e) {
                 proActiveRuntime.killRT(false);
                 e.printStackTrace();
