@@ -77,18 +77,36 @@ public class BodyMap extends AbstractEventProducer implements Cloneable, java.io
   //
 
   /**
-   * update the set (id, node) in the idToBodyMap
-   * add if it doesn't exist
+   * add the set (id, node) in the idToBodyMap
+   * block if it already exists until it is removed
    */
   public synchronized void putBody(UniqueID id, UniversalBody b) {
+  	while ( idToBodyMap.get(id) != null) {
+  		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+  	}
     idToBodyMap.put(id,b);
     if (hasListeners())
       notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
   }
 
+  /**
+	 * add the set (id, node) in the idToBodyMap
+	 * erase any previous entry
+	 */
+public synchronized void updateBody(UniqueID id, UniversalBody b){
+	idToBodyMap.put(id,b);
+	  if (hasListeners())
+		notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_CREATED));
+}
+
 
   public synchronized void removeBody(UniqueID id) {
     UniversalBody b = (UniversalBody) idToBodyMap.remove(id);
+    notifyAll();
     if (b != null && hasListeners())
       notifyAllListeners(new BodyEvent(b, BodyEvent.BODY_DESTROYED));
   }
