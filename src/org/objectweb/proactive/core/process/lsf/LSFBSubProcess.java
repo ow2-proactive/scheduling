@@ -269,7 +269,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   	bSubCommand.append(scriptLocation+" "+getTargetProcess().getCommand());
   	}
   	
-  	logger.info("bsub command is "+bSubCommand.toString());
+  	//logger.info("bsub command is "+bSubCommand.toString());
     return bSubCommand.toString();
   }
   
