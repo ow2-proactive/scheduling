@@ -101,9 +101,12 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * <code>newActive</code> or <code>turnActive</code> (parameter active in those methods)</li>
  * </ul>
  * </p><p>
+ * Note that the methods defined by those 3 interfaces are guaranted to be called by the active 
+ * thread of the active object.
+ * </p><p>
  * The algorithms that decide for each phase what to do are the following (<code>activity</code> is 
  * the eventual object passed as a parameter to <code>newActive</code> or <code>turnActive</code>) :
- * 
+ * </p>
  * <h3>InitActive</h3>
  * <pre>
  * if activity is non null and implements InitActive
@@ -133,7 +136,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * else
  *   we don't do any cleanup
  * </pre>
- * </p><p>
+ * <p>
  * <b>see <a href="doc-files/ActiveObjectCreation.html">active object creation doumentation</a></b>
  * </p>
  *

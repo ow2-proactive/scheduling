@@ -105,11 +105,7 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     } else if (reifiedObject instanceof RunActive) {
       runActive = (RunActive) reifiedObject;
     } else {
-      runActive = new RunActive() {
-          public void runActivity(Body body) {
-            fifoPolicy();
-          }
-        };
+      runActive = new FIFORunActive();
     }
     
     // EndActive
@@ -123,7 +119,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
 
     startBody();
   }
-
 
   //
   // -- PUBLIC METHODS -----------------------------------------------
@@ -206,6 +201,7 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
+  
   private static String shortClassName(String fqn) {
     int n = fqn.lastIndexOf('.');
     if (n == -1 || n == fqn.length()-1) return fqn;
@@ -221,6 +217,17 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     in.defaultReadObject();
     startBody();
+  }
+
+
+  //
+  // -- INNER CLASSES -----------------------------------------------
+  //
+  
+  private class FIFORunActive implements RunActive, java.io.Serializable {
+    public void runActivity(Body body) {
+      fifoPolicy();
+    }
   }
 
 }
