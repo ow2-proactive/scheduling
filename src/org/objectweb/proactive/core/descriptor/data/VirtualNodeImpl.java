@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 /**
@@ -302,6 +303,29 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   }
   
   
+  public void createNodeOnCurrentJvm(String protocol){
+  	try{
+    // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
+    // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
+    // we must increase the node count
+  	increaseNodeCount(1);
+  	String nodeName = this.name+Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt());
+  	String nodeHost = java.net.InetAddress.getLocalHost().getHostName();
+  	String url = buildURL(nodeHost,nodeName,protocol);
+  	// get the Runtime for the given protocol
+  	ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(protocol));
+  	//create the node
+  	defaultRuntime.createLocalNode(url,false);
+  	//add this node to this virtualNode
+  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
+  	System.out.println("**** Mapping VirtualNode "+this.name+" with Node: "+url+" done");	
+		nodeCreated = true;
+  	nodeCountCreated ++ ;
+  	}catch(Exception e)
+  	{
+			e.printStackTrace();
+		}
+  }
   //
   //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
   //
@@ -507,6 +531,7 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   
   
   private String buildURL(String host, String name,String protocol){
+  	protocol = checkProtocol(protocol);
   	if(protocol.equals("jini:")) return UrlBuilder.buildUrl(host,name,protocol);
   	return UrlBuilder.buildUrl(host,name);
   } 
@@ -527,6 +552,13 @@ public class VirtualNodeImpl implements VirtualNode,Serializable
   			lastNodeIndex = (lastNodeIndex + 1) % createdNodes.size();
   	}
   }
+  	
+  private String checkProtocol(String protocol){
+  	
+  	if(protocol.indexOf(":") == -1) return protocol.concat(":");
+  	return protocol;
+  }
+ 
   
 
   

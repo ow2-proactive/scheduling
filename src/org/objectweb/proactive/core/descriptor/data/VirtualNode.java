@@ -161,6 +161,14 @@ public interface VirtualNode extends RuntimeRegistrationEventListener
 	 * @return Node the node of the given url or null if such node does not exist
 	 */
   public Node getNode(String url) throws NodeException;
+  
+  
+	/**
+	 * Creates a node with the given protocol on the current jvm, i.e the jvm that originates the creation of this VirtualNode.
+	 *  This newly created node will is mapped on this VirtualNode
+	 * @param protocol the protocol to create the node. It has to be rmi or jini.
+	 */
+  public void createNodeOnCurrentJvm(String protocol);
   	
  
 }
