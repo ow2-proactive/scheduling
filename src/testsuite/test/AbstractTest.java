@@ -235,5 +235,4 @@ public abstract class AbstractTest implements Serializable, Beanable {
 	public void setManager(AbstractManager manager) {
 		this.manager = manager;
 	}
-
 }

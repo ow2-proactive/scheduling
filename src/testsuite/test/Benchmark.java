@@ -166,4 +166,11 @@ public abstract class Benchmark extends AbstractTest implements Serializable {
     public boolean isFailed() {
         return failed;
     }
+
+    /**
+     * @param resultTime
+     */
+    public void setResultTime(long resultTime) {
+        this.resultTime = resultTime;
+    }
 }

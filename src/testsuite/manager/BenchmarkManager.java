@@ -7,6 +7,7 @@ package testsuite.manager;
 import testsuite.group.Group;
 
 import testsuite.result.AbstractResult;
+import testsuite.result.BenchmarkResult;
 import testsuite.result.ResultsCollections;
 
 import testsuite.test.Benchmark;
@@ -101,16 +102,22 @@ public abstract class BenchmarkManager extends AbstractManager {
             int runs = 0;
             int errors = 0;
             long sum = 0;
-            for (int i = 0; i < getNbRuns(); i++) {
-                Iterator itTest = group.iterator();
-                while (itTest.hasNext()) {
-                    Benchmark test = (Benchmark) itTest.next();
+            Iterator itTest = group.iterator();
+            while (itTest.hasNext()) {
+                Benchmark test = (Benchmark) itTest.next();
+                long min = -1;
+                long sumTest = 0;
+                for (int i = 0; i < getNbRuns(); i++) {
                     AbstractResult result = test.runTest();
-                    resultsGroup.add(result);
+
                     if (test.isFailed()) {
                         logger.warn("Bench " + test.getName() + " [FAILED]");
                         errors++;
                     } else {
+                        if ((min < 0) || (test.getResultTime() < min)) {
+                            min = test.getResultTime();
+                        }
+                        sumTest += test.getResultTime();
                         if (logger.isInfoEnabled()) {
                             logger.info("Bench " + test.getName() +
                                 " runs with success in " +
@@ -119,6 +126,14 @@ public abstract class BenchmarkManager extends AbstractManager {
                         runs++;
                         sum += test.getResultTime();
                     }
+                }
+                test.setResultTime(min);
+                resultsGroup.add(new BenchmarkResult(test,
+                        AbstractResult.GLOBAL_RESULT,
+                        "Moy=" + ((double) sumTest / getNbRuns())));
+                if (logger.isInfoEnabled()) {
+                    logger.info("Bench " + test.getName() +
+                        " runs with success in " + min + "ms");
                 }
             }
             resultsGroup.add(AbstractResult.GLOBAL_RESULT,
