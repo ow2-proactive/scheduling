@@ -144,12 +144,12 @@ public class BytecodeStubBuilder {
         JavaClass theClass = this.classGenerator.getJavaClass();
         
         // Next few lines for debugging only
-        
+        /*
         try {
           theClass.dump (theClass.getClassName()+".class");
         } catch (java.io.IOException e) {
           e.printStackTrace();
-	  }
+	  }*/
         return theClass.getBytes();
     }
 
