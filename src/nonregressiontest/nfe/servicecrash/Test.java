@@ -106,7 +106,7 @@ public class Test extends FunctionalTest {
 			resultServeRequest = remoteVM.serveRequestTest();
 			//System.out.println("ServeException");
 		} catch (Throwable t) {
-			System.out.println(t);
+			//System.out.println(t);
 			loggerNFE.warn("*** ERROR when calling erroneous methodcall " + t.getMessage());
 			resultServeRequest = new Integer(-1);
 			//System.out.println("Throwable");
