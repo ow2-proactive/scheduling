@@ -15,11 +15,11 @@
     <tr>
     <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
 href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>    <td
-class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to
-index</a>&nbsp;&nbsp;</td>    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
-href="TypedGroupCommunication.html">prev</a>&nbsp;&nbsp;</td>    <td 
+class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../index.html">back to
+index</a>&nbsp;&nbsp;</td>    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+href="../AC.html">prev</a>&nbsp;&nbsp;</td>    <td
 class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
-href="guided_tour/index.html">next</a>&nbsp;&nbsp;</td>    </tr>    </table></td>
+href="../guided_tour/index.html">next</a>&nbsp;&nbsp;</td>    </tr>    </table></td>
 <td  align="right" valign="top">
 <img align="middle" src="ProActiveLogo200x34.gif"/>
 </td>
@@ -62,7 +62,7 @@ The third section is a word on the current Architecture Description Language. Th
   the other hand, ProActive is based on a meta-object protocol and provides a reference to an active object through
   a typed stub. If we wanted to use active objects with Julia, the Julia runtime would try to manipulate the stub, and
   not the active object itself. And if trying to force Julia to work on the same base object than ProActive, the control flow
-  could not traverse both ProActive and Julia.<br>
+  could not traverse both ProActive and Julia.<br> Eventually, one could re-implement ProActive using Julia... but that is another story.<br>
   More generally speaking, Julia is designed to work with standard objects, but not with active objects. Some features would not be
    reusable using Julia with active objects, as explained in the following section. <br>
    Therefore, we had to go for our own implementation. </p>
@@ -91,7 +91,8 @@ virtual nodes, this framework :
 <h4>Asynchronous method calls with futures</h4>
 <p><a href="../FutureObjectCreation.htmlAsynchronous">Asynchronous method calls with transparent futures </a>is a core feature of ProActive, and it allows concurrent processing. Indeed, suppose a caller invokes a method on a callee. This method returns a result on a component. With synchronous method calls, the flow of execution of the caller is blocked until the result of the method called is received. In the case of intensive computations, this can be relatively long. With asynchronous method calls, the caller gets a future object and will continue its tasks until it really uses the result of the method call. The process is then blocked (it is called wait-by-necessity) until the result has effectively been calculated.</p>
 
-<LI class="textNormal">typed group communications</LI>
+<!--<LI class="textNormal">typed group communications</LI> -->
+
 
 
 
@@ -162,12 +163,7 @@ The <code>Fractive</code> class acts as :
 <!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
 
-<!--Automatic continuations is a feature that allows the manipulation of future results. In this example, an invocation returning a result, performed on A.i1,  is delegated to B. To compute the result, B needs to manipulate the result of a call to A.i2. -->
 
-
-
-<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
-<!---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
 
 
 
@@ -191,7 +187,7 @@ As you can see, the document is validated against an xml schema (first line of t
 
  <h2>Examples</h2>
 
- <p>So far, one basic example is presented : the "hello world", from the Fractal tutorial. Indeed, the programming model used here is Fractal, and one should refer to the Fractal documentation for detailed examples. However, the helloworld example explains the use of deployment descriptors for automatic deployment of the components. It shows
+ <p>2 examples are presented : code snippets for visualizing the transition between active objects and components, and the "hello world", from the Fractal tutorial. The programming model is Fractal, and one should refer to the Fractal documentation for detailed examples. the helloworld example explains the use of deployment descriptors for automatic deployment of the components. It shows
 </p>
 
 <h3>From objects to active objects to distributed components</h3>
@@ -226,9 +222,9 @@ Toto active_object = (Toto)ProActive.newActive(
                                  // it could be PRIMITIVE, COMPOSITE, or PARALLEL
              );
 </pre>
-<p>Then, the component is instantiated using the standard Fractal API :</p>
+<p>Then, a component is instantiated using the standard Fractal API.  This component can then be manipulated as any other Fractal component. </p>
 <pre class="snippet">Component component = componentFactory.newFcInstance(
-              componentType, // type of the component
+              componentType, // type of the component (defining the client and server interfaces)
               controllerDesc, // implementation-specific description for the controller
               contentDesc // implementation-specific description for the content
               );
@@ -252,7 +248,7 @@ You can find the code for this example in the package org.objectweb.proactive.ex
 <ul>
 <li class="textNormal">The reference example is provided for level 3.3. implementation, whereas this current implementation is at level 3.2 : templates are not provided. Thus you will have to skip the specific code for templates. </LI>
 <li class="textNormal">The <code>newFcInstance</code> method of the <code>GenericFactory</code> interface, used for directly creating components, takes 2 implementation-specific parameters. So you should use the <code>org.objectweb.proactive.component.ControllerDescription</code> and <code>org.objectweb.proactive.component.ContentDescription</code> classes to define ProActive components. (It is possible to use the same parameters than in Julia, but that hinders you from using some functionalities specific to ProActive, such as distributed deployment or definition of the activity).</li>
-<li class="textNormal">Collective interfaces could be implemented the same way than suggested, but using the <code>Fractive.createCollectiveInterface</code> method will prove useful with this implementation : you are then able to use the functionalities provided by the typed groups API.</li>
+<li class="textNormal">Collective interfaces could be implemented the same way than suggested, but using the <code>Fractive.createCollectiveClientInterface</code> method will prove useful with this implementation : you are then able to use the functionalities provided by the typed groups API.</li>
 </ul>
 
 
@@ -359,10 +355,11 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <ul>
 <li class="textNormal">Shared components</li>
 <li class="textNormal">Templates (generic factories)</li>
+<li class="textNormal">Super-controllers</li>
 </ul>
 </p>
 
-
+<hr>
 <p class="textSmall"><i>
 History :<BR>
 March 2004 : 1st version
