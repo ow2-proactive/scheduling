@@ -47,6 +47,7 @@ import testsuite.test.FunctionalTest;
 public class Test extends FunctionalTest {
     Node rmiNode;
     Node jiniNode;
+    private String rmiURL = "//localhost/RMINode" + System.currentTimeMillis();
 
     //Node ibisNode;
 
@@ -62,7 +63,7 @@ public class Test extends FunctionalTest {
      * @see testsuite.test.FunctionalTest#action()
      */
     public void action() throws Exception {
-        NodeFactory.createNode("//localhost/RMINode");
+        NodeFactory.createNode(rmiURL);
         NodeFactory.createNode("jini://localhost/JININode");
         //NodeFactory.createNode("ibis://localhost/IBISNode");
     }
@@ -80,7 +81,7 @@ public class Test extends FunctionalTest {
     }
 
     public boolean postConditions() throws Exception {
-        rmiNode = NodeFactory.getNode("//localhost/RMINode");
+        rmiNode = NodeFactory.getNode(rmiURL);
         jiniNode = NodeFactory.getNode("jini://localhost/JININode");
         //ibisNode = NodeFactory.getNode("ibis://localhost/IBISNode");
         return ((rmiNode != null) && (jiniNode != null) &&
