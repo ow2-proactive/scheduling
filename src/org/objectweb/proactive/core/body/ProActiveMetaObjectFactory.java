@@ -30,13 +30,14 @@
 */
 package org.objectweb.proactive.core.body;
 
+
 /**
  * THIS JAVADOC SHOULD BE REWRITTEN
  * <p>
  * This class provides singleton instances of all default factories
  * creating MetaObjects used in the Body.
  * </p>
- * 
+ *
  * <b>Since version 1.8, it is also possible to parameterized the factories on a per-object basis. </b>
  * In that case,  public ProActiveMetaObjectFactory(Hashtable parameters) is the constructor to use.
  * <p>
@@ -68,8 +69,6 @@ package org.objectweb.proactive.core.body;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-
-
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.Body;
@@ -204,11 +203,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     public ThreadStoreFactory newThreadStoreFactory() {
         return threadStoreFactoryInstance;
     }
-    
-	public ProActiveComponentFactory newComponentFactory() {
-			return componentFactoryInstance;
-		}
 
+    public ProActiveComponentFactory newComponentFactory() {
+        return componentFactoryInstance;
+    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
@@ -285,6 +283,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
             if (componentFactoryInstance != null) {
+                // COMPONENTS
                 // we need a request queue for components
                 return new ComponentRequestQueueImpl(ownerID);
             } else {
@@ -340,6 +339,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     // end inner class ThreadStoreFactoryImpl
     protected class ProActiveComponentFactoryImpl
         implements ProActiveComponentFactory, java.io.Serializable {
+        // COMPONENTS
         private ComponentParameters componentParameters;
 
         public ProActiveComponentFactoryImpl(

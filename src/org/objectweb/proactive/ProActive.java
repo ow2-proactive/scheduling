@@ -312,6 +312,7 @@ public class ProActive {
         Object[] constructorParameters, Node node, Active activity,
         MetaObjectFactory factory, ComponentParameters componentParameters)
         throws ActiveObjectCreationException, NodeException {
+        // COMPONENTS
         // instantiate the component metaobject factory with parameters of the component
         if (factory == null) {
             // first create a hashtable with the parameters

@@ -350,6 +350,7 @@ public class ProxyForGroup extends AbstractProxy
                     }
                     return result;
                 }
+                // COMPONENTS
                 /* if o is a reference on a component interface*/
                 else if (o instanceof ProActiveInterface) {
                     return this.memberList.add(o);
