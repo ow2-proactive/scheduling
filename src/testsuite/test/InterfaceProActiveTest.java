@@ -27,4 +27,11 @@ public interface InterfaceProActiveTest {
      * @param node
      */
     public void setNode(Node node);
+
+	public Node getSameVMNode();
+
+	public Node getLocalVMNode();
+
+	public Node getRemoteVMNode();
+	
 }
