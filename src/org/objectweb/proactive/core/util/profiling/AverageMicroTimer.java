@@ -25,6 +25,9 @@ public class AverageMicroTimer implements Timer, Serializable {
     private long tmp;
     transient private MicroTimer timer = new MicroTimer();
 
+    //used to check that start has been pressed prior to a stop
+    private boolean running; 
+	
     public AverageMicroTimer() {
         this(AverageMicroTimer.class.getName());
     }
@@ -35,6 +38,7 @@ public class AverageMicroTimer implements Timer, Serializable {
 
     public void start() {
         tmp = 0;
+        running = true;
         timer.start();
     }
 
@@ -52,13 +56,17 @@ public class AverageMicroTimer implements Timer, Serializable {
      */
     public void stop() {
         //System.out.println("AverageMicroTimer.stop()");
-        timer.stop();
-        tmp += timer.getCumulatedTime();
-        this.total += tmp;
-        if (tmp > 0) {
-            this.nbrValues++;
-        }
-        tmp = 0;
+    	if (running) {
+    		  timer.stop();
+    	        tmp += timer.getCumulatedTime();
+    	        this.total += tmp;
+//    	        if (tmp >= 0) {
+    	            this.nbrValues++;
+//    	        }
+    	        tmp = 0;
+    	        running = false;
+    	}
+      
     }
 
     /**

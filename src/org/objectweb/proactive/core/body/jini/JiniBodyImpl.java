@@ -134,7 +134,7 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     public void unreferenced() {
         logger.info("JiniBodyImpl: unreferenced()");
-        System.gc();
+       // System.gc();
     }
 
 	// SECURITY

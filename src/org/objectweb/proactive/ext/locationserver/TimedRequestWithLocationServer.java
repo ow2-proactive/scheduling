@@ -14,7 +14,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
-import org.objectweb.proactive.ext.locationserver.util.MicroTimer;
+import org.objectweb.proactive.core.util.timer.MicroTimer;
 
 
 public class TimedRequestWithLocationServer extends RequestImpl

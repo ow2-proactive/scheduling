@@ -48,6 +48,9 @@ import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.util.profiling.CompositeAverageMicroTimer;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 
 
@@ -100,6 +103,10 @@ public abstract class BodyImpl extends AbstractBody
     protected RequestReceiver requestReceiver;
     protected MessageEventProducerImpl messageEventProducer;
 
+    /** Used for profiling */
+    private  CompositeAverageMicroTimer timer;
+
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -129,6 +136,10 @@ public abstract class BodyImpl extends AbstractBody
                 factory.newRequestQueueFactory().newRequestQueue(bodyID),
                 factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this.getID());
+    	if (Profiling.SERVICE) {
+			timer = new CompositeAverageMicroTimer("Service");
+			PAProfilerEngine.registerTimer(timer);
+		}
     }
 
     //
@@ -266,7 +277,15 @@ public abstract class BodyImpl extends AbstractBody
                 messageEventProducer.notifyListeners(request,
                     MessageEvent.SERVING_STARTED, bodyID,
                     getRequestQueue().size());
+                if (Profiling.SERVICE) {
+                	timer.setTimer("serve."+request.getMethodName());
+                	timer.start();
+                }
                 Reply reply = request.serve(BodyImpl.this);
+                if (Profiling.SERVICE) {
+                	//timer.setTimer("serve."+this.getMethodName());
+                	timer.stop();
+                }
                 if (reply == null) {
                     if (!isActive()) {
                         return; //test if active in case of terminate() method otherwise eventProducer would be null

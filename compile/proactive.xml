@@ -271,29 +271,6 @@
 	<!--
 	   ================================================================
 	   ==
-      ==  Compile timer
-      ==
-      ================================================================
-	-->
-	<target name="timer">
-		<mkdir dir="${src.dir}/util/timer/linux"/>
-		<mkdir dir="${src.dir}/util/timer/solaris"/>
-		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/local/bin/gcc" os="Linux" output="output.txt">
-			<arg line=" -shared -I/usr/local/sun-java/jdk1.4/include/ -I/usr/local/sun-java/jdk1.4/include/linux -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc"/>
-		</exec>
-		<exec dir="${src.dir}/util/timer/linux/" executable="/usr/bin/ld" os="Linux" output="output2.txt">
-			<arg line="  -G Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so"/>
-		</exec>
-		<exec dir="${src.dir}/util/timer/solaris" executable="/usr/local/bin/gcc" os="SunOS" output="output.txt">
-			<arg line="-G -I/usr/local/jdk1.3/include -I/usr/local/jdk1.3/include/solaris -o Util_timer_MicroTimer.o  ../util_timer_MicroTimer.cc"/>
-		</exec>
-		<exec dir="${src.dir}/util/timer/solaris" executable="/usr/ccs/bin/ld" os="SunOS" output="output.txt">
-			<arg line="  -G  Util_timer_MicroTimer.o -o  libUtil_timer_MicroTimer.so"/>
-		</exec>
-	</target>
-	<!--
-	   ================================================================
-	   ==
       ==  Compile All
       ==
       ================================================================
@@ -525,18 +502,19 @@
       ================================================================
 	-->
 	<target name="microTimer">
-	        <exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/local/bin/g++" os="Linux" >
-			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o MicroTimer.o  MicroTimer.cc"/>
+	        <exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/g++" os="Linux" >
+			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o libMicroTimer.so  MicroTimer.cc"/>
 		</exec>
-		<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/ld" os="Linux">
+		<!--<exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/ld" os="Linux">
 			<arg line="  -G MicroTimer.o -o  libMicroTimer.so"/>
-		</exec>
-		<copy toDir="${classes.dir}">
+		</exec>-->
+		<copy file="${src.dir}/org/objectweb/proactive/core/util/timer/libMicroTimer.so" todir="${base}/lib"/>
+		<!--<copy toDir="${base}/lib">
 			<fileset dir="${src.dir}">
 				<include name="**/*.so"/>
 				<include name="**/*.o"/>
 			</fileset>
-		</copy>
+		</copy> -->
 	</target>
 	<target name="benchmark" depends="testsuite, microTimer">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}">

@@ -94,8 +94,9 @@ public class ThreadPool {
      * @param members - the number of members in the group
      */
     public void checkNumberOfThreads(int members) {
+    	//System.out.println("ThreadPool there are " + members + " members in the pool");
 		int i, f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) + this.additionalThreads;
-
+	//	System.out.println("ThreadPool we need " + f + " threads and we have " + this.threads.length);
 		if (this.threads.length < f) {
 			Thread[] tmp = new Thread[f];
 			for (i = 0 ; i < this.threads.length ; i++) {
@@ -146,9 +147,12 @@ public class ThreadPool {
      */
     public synchronized Runnable getJobForThePendingQueue() {
         try {
+//        	System.out.println("ThreadPool.getJobForThePendingQueue() currently " + this.pendingJobs.size() + " in the queue" );
             while (!this.pendingJobs.iterator().hasNext()) {
                 this.wait();
+//              	System.out.println("ThreadPool.getJobForThePendingQueue() woken currently " + this.pendingJobs.size() + " in the queue" );
             }
+//        	System.out.println("ThreadPool.getJobForThePendingQueue() picking a job from the queue");
             Runnable r = (Runnable) this.pendingJobs.iterator().next();
             this.pendingJobs.remove(r);
             return r;

@@ -56,7 +56,9 @@ public class ThreadInThePool extends Thread {
         do {
             target = this.myPool.getJobForThePendingQueue();
             if (target != null) {
+            //	System.out.println("ThreadInThePool.run() got tarket, now executing " +target.getClass().getName());
                 target.run();
+           //     System.out.println("ThreadInThePool.run() execution of targer finished");
                 this.myPool.controler.jobFinish();
             }
         } while (target != null);

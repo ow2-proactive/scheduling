@@ -45,7 +45,7 @@ public class EndControler {
      * this object from falsely reporting that the ThreadPool is done, just because the first
      * thread has not yet started.
 	 */
-    private boolean started = false;
+  //  private boolean started = false;
 
     /** Suspends the current thread until all the pending jobs in the ThreadPool are done. */
 	synchronized public void waitDone() {
@@ -72,13 +72,15 @@ public class EndControler {
 	/** A ThreadInThePool object calls this method to indicate it has started a job. */
 	synchronized public void jobStart() {
 //		Thread.dumpStack();
+	//	System.out.println("EndControler.jobStart()");
 		this.numberOfAwakeThreads++;
-		this.started = true;
-		this.notify();
+	//	this.started = true;
+	//	this.notify();
 	}
 
 	/** A ThreadInThePool object calls this method to indicate it has finished a job. */
     synchronized public void jobFinish() {
+   // 	System.out.println("EndControler.jobFinish()");
 //    	Thread.dumpStack();
         this.numberOfAwakeThreads--;
         this.notify();

@@ -30,8 +30,12 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import org.apache.log4j.Logger;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+import java.security.cert.X509Certificate;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -47,18 +51,13 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 import sun.rmi.server.MarshalInputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-
-import java.security.cert.X509Certificate;
-
 
 public class RequestImpl extends MessageImpl implements Request,
     java.io.Serializable {
     public static Logger logger = Logger.getLogger(RequestImpl.class.getName());
     protected MethodCall methodCall;
-
+    
+    
     /**
      * Indicates if the method has been sent through a forwarder
      */

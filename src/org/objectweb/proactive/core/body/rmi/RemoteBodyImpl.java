@@ -30,14 +30,23 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.rmi.server.RMIClientSocketFactory;
+import java.rmi.server.RMIServerSocketFactory;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.ext.benchsocket.BenchSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -48,18 +57,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.rmi.RemoteException;
-import java.rmi.server.RMIClientSocketFactory;
-import java.rmi.server.RMIServerSocketFactory;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -92,7 +89,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public RemoteBodyImpl(UniversalBody body) throws RemoteException {
-        //   super(0, factory, factory);
+     //      super(0, factory, factory);
         this.body = body;
     }
 
@@ -137,7 +134,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
 
     public void unreferenced() {
         // System.out.println("RemoteBodyImpl: unreferenced()");      
-        System.gc();
+       // System.gc();
     }
 
     public void enableAC() throws java.io.IOException {

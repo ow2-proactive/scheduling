@@ -33,12 +33,11 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
         this.exceptionList = exceptionList;
     }
 
-    public synchronized void run() {
+    public  void run() {
     	
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
         Object object = this.memberList.get(this.index);
         boolean objectIsLocal = false;
-
         /* only do the communication (reify) if the object is not an error nor an exception */
         if (!(object instanceof Throwable)) {
             Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);

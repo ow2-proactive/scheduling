@@ -33,7 +33,7 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
         this.body = body;
     }
 
-    public synchronized void run() {
+    public  void run() {
         Object object = this.memberList.get(this.index);
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
         boolean objectIsLocal = false;

@@ -14,7 +14,7 @@ public class Main {
 	
     public static void main (String args[]) {
 	if (args.length != 2) {
-	   logger.error("missing argument : <MatrixSize>");
+	   logger.error("Usage: java " + Main.class.getName() + " <size> <deploiement file>");
 	    System.exit(0);
 	}
 

@@ -164,7 +164,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //        System.out.println("UniversalBodyWrapper.run end of life...");
         this.updateServer();
         this.wrappedBody = null;
-        System.gc();
+//        System.gc();
     }
 
     /** Give a reference to a local map of handlers

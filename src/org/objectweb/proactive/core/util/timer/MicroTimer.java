@@ -33,29 +33,37 @@ package org.objectweb.proactive.core.util.timer;
 import testsuite.timer.Timeable;
 
 
-/**
- * @author Fabrice Huet
- *
- */
 public class MicroTimer implements Timeable {
-
+	private static boolean nativeMode; 
     static {
+    	try {
         System.loadLibrary("MicroTimer");
+        nativeMode = true;
+    	} catch (Throwable e) {
+    		e.printStackTrace();
+    		System.err.println("WARNING: couldn't load native lib, falling back to milliseconds");
+    		nativeMode =false;
+    	}
     }
 
-    private long[] cumulatedTime;
     private long[] startTime;
     private long[] endTime;
-
     public native long[] currentTime();
+    
+    public long startTime2;
+    public long endTime2;
 
     public MicroTimer() {
     }
 
     public void start() {
+    	if (nativeMode) {
         this.startTime = currentTime();
         this.endTime = currentTime();
-        this.cumulatedTime = new long[2];
+    	} else {
+    		this.startTime2 = System.currentTimeMillis();
+    		this.endTime2 = this.startTime2;
+    	}
     }
 
     /**
@@ -63,7 +71,11 @@ public class MicroTimer implements Timeable {
      * returns the cumulated time
      */
     public void stop() {
+    	if (MicroTimer.nativeMode) {
         this.endTime = currentTime();
+    	} else {
+    		this.endTime2 = System.currentTimeMillis();
+    	}
     }
 
     /**
@@ -72,10 +84,12 @@ public class MicroTimer implements Timeable {
      * in microseconds
      */
     public long getCumulatedTime() {
+    	if (nativeMode) {
         long[] tmp = this.updateCumulatedTime(startTime, endTime); //this.stop();
-
-        // this.resume();
         return (tmp[0] * 1000000) + tmp[1];
+    	} else {
+    		return (endTime2 - startTime2);
+    	}
     }
 
     protected long[] updateCumulatedTime(long[] t1, long[] t2) {
@@ -92,11 +106,13 @@ public class MicroTimer implements Timeable {
         return tmp;
     }
 
-    /**
-     * @see testsuite.timer.Timeable#getUnit()
-     */
+    
     public String getUnit() {
+    	if (nativeMode) {
         return "micros";
+    	} else {
+    		return "millis";
+    	}
     }
 
     public static void main(String[] args) {

@@ -7,6 +7,7 @@ package org.objectweb.proactive.core.util.profiling;
 public class Profiling {
 
 	public static final boolean STARTNODE = false;
-	public static final boolean GROUP =true;
+	public static final boolean GROUP =false;
+	public static final boolean SERVICE = true;
 	
 }

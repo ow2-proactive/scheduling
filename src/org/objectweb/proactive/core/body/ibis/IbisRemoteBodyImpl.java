@@ -124,7 +124,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
         if (logger.isDebugEnabled()) {
             // logger.debug("IbisRemoteBodyImpl: unreferenced()");      
         }
-        System.gc();
+      //  System.gc();
     }
 
     public void enableAC() throws java.io.IOException {

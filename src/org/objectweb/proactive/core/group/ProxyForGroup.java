@@ -53,6 +53,9 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.util.profiling.CompositeAverageMicroTimer;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 public class ProxyForGroup extends AbstractProxy
@@ -91,38 +94,39 @@ public class ProxyForGroup extends AbstractProxy
     /** A pool of thread to serve the request */
     transient private ThreadPool threadpool;
 
+    /** Used for profiling */
+     private CompositeAverageMicroTimer timer;
+    
     /* ----------------------- CONSTRUCTORS ----------------------- */
     public ProxyForGroup(String nameOfClass)
         throws ConstructionOfReifiedObjectFailedException {
+        this();
         this.className = nameOfClass;
-        this.memberList = new Vector();
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-        this.elementNames = new HashMap();
     }
 
-    public ProxyForGroup(String nameOfClass, Integer size)
-        throws ConstructionOfReifiedObjectFailedException {
-        this.className = nameOfClass;
-        this.memberList = new Vector(size.intValue());
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-		this.elementNames = new HashMap();
-    }
+//    public ProxyForGroup(String nameOfClass, Integer size)
+//        throws ConstructionOfReifiedObjectFailedException {
+//        this.className = nameOfClass;
+//        this.memberList = new Vector(size.intValue());
+//        this.proxyForGroupID = new UniqueID();
+//        this.threadpool = new ThreadPool();
+//		this.elementNames = new HashMap();
+//    }
 
     public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
         this.memberList = new Vector();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();
 		this.elementNames = new HashMap();
+		if (Profiling.GROUP) {
+			timer = new CompositeAverageMicroTimer("Group");
+			PAProfilerEngine.registerTimer(timer);
+		}
     }
 
     public ProxyForGroup(ConstructorCall c, Object[] p)
         throws ConstructionOfReifiedObjectFailedException {
-        this.memberList = new Vector();
-        this.proxyForGroupID = new UniqueID();
-        this.threadpool = new ThreadPool();
-		this.elementNames = new HashMap();
+      this();
     }
 
     /* ----------------------------- GENERAL ---------------------------------- */
@@ -230,7 +234,10 @@ public class ProxyForGroup extends AbstractProxy
     protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
         Object result;
         Body body = ProActive.getBodyOnThis();
-
+        if (Profiling.GROUP) {
+        	timer.setTimer("asynchronousCallOnGroup."+mc.getName());
+        	timer.start();
+        }
         // Creates a stub + ProxyForGroup for representing the result
         try {
             Object[] paramProxy = new Object[0];
@@ -281,7 +288,9 @@ public class ProxyForGroup extends AbstractProxy
         }
 
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
-
+        if (Profiling.GROUP) {
+        	timer.stop();
+        }
         return result;
     }
 
@@ -305,7 +314,10 @@ public class ProxyForGroup extends AbstractProxy
     protected synchronized void oneWayCallOnGroup(MethodCall mc) {
         Body body = ProActive.getBodyOnThis();
         ExceptionList exceptionList = new ExceptionList();
-
+        if (Profiling.GROUP) {
+        	timer.setTimer("oneWayCallOnGroup."+mc.getName());
+        	timer.start();
+        }
         // Creating Threads
         if (isDispatchingCall(mc) == false) {
             if (uniqueSerialization) {
@@ -338,6 +350,10 @@ public class ProxyForGroup extends AbstractProxy
         if (exceptionList.size() != 0) {
             throw exceptionList;
         }
+        
+        if (Profiling.GROUP) {
+            	timer.stop();
+            }
     }
 
     /* ------------------- THE COLLECTION'S METHOD ------------------ */

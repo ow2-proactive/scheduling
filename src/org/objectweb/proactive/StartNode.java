@@ -40,6 +40,9 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
 import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
+import org.objectweb.proactive.core.util.profiling.AverageMicroTimer;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 /**
@@ -74,10 +77,7 @@ public class StartNode {
     protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
     protected static final String NO_REGISTRY_OPTION_NAME = "-noRegistry";
     protected static final String MULTICAST_LOCATOR_NAME = "-multicastLocator";
-//    private static final String FS = System.getProperty("file.separator");
-//    private static final String XML_LOCATION = System.getProperty("user.dir") +
-//        FS + ".." + FS + ".." + FS + "descriptors" + FS +
-//        "RemoteGlobusSetup.xml";
+
     protected boolean noClassServer = false;
     protected boolean noRebind = false;
     protected boolean noRegistry = false;
@@ -151,28 +151,12 @@ public class StartNode {
      *               java org.objectweb.proactive.StartNode //localhost/node2 -noClassServer -noRebind<br>
      */
     public static void main(String[] args) {
-//        if ((args.length != 0) && (args[0].compareTo("-g") == 0)) {
-//            try {
-//                //ProActiveDescriptor pad = ProActive.getProactiveDescriptor("file://Z:/test/ProActive/classes/GlobusSetupWithRlogin.xml");
-//                ProActiveDescriptor pad = ProActive.getProactiveDescriptor(
-//                        "file:" + XML_LOCATION);
-//                ExternalProcess rLoginProcess = pad.getProcess("rLoginProcess");
-//                JVMProcess jvmProcess = (JVMProcess) pad.getProcess("globusJVM");
-//                jvmProcess.setParameters(args[1]);
-//                //pad.activateMappings();
-//                rLoginProcess.startProcess();
-//                //gp.startNodeWithGlobus(args[1]);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        } else {
             try {
                 new StartNode(args).run();
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.fatal(e.toString());
             }
-        //}
     }
 
     //
@@ -196,7 +180,6 @@ public class StartNode {
         if (noClassServer) {
             return;
         }
-
         // look for classpath
         for (int i = start; i < args.length; i++) {
             String s = args[i];
@@ -207,16 +190,16 @@ public class StartNode {
         }
     }
 
-    /**
-     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * sets the properties needed for the node creation
-     */
-    protected void setProperties() {
-        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
-        //  System.setProperty("java.rmi.dgc.leaseValue","800");
-        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
-        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
-    }
+//    /**
+//     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
+//     * sets the properties needed for the node creation
+//     */
+//    protected void setProperties() {
+//        //  System.setProperty("sun.rmi.dgc.checkInterval","400");
+//        //  System.setProperty("java.rmi.dgc.leaseValue","800");
+//        //  System.setProperty("sun.rmi.dgc.cleanInterval","400");
+//        //  System.setProperty("sun.rmi.dgc.client.gcInterval","400");
+//    }
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -234,8 +217,6 @@ public class StartNode {
                 	//TODO allow start alone node with security parameters 
                     node = NodeFactory.createNode(nodeURL, !noRebind,null,null);
                 }
-
-                //System.out.println("nodeurl "+node.getNodeInformation().getURL());
                 logger.info("OK. Node " + node.getNodeInformation().getName() +
                     " is created in VM id=" + UniqueID.getCurrentVMID());
                 break;
@@ -263,18 +244,27 @@ public class StartNode {
      * helper methods
      */
     protected void run() throws java.io.IOException, NodeException {
-        setProperties();
+        //setProperties();
         // set options on node factory
         RemoteRuntimeFactory.setShouldCreateClassServer(!noClassServer);
         RemoteRuntimeFactory.setShouldCreateRegistry(!noRegistry);
         RemoteRuntimeFactory.setRegistryPortNumber(registryPortNumber);
         if (RuntimeFactory.JINI_ENABLED) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
-            // System.out.println("jini not yet implemented");
         }
-
+  
+        AverageMicroTimer mt = null;
+        if (Profiling.STARTNODE) {
+        	mt = new AverageMicroTimer("StartNode");
+        	PAProfilerEngine.registerTimer(mt);
+        	mt.start();
+        }
         // create node
         createNode(nodeURL, noRebind);
+        if (Profiling.STARTNODE) {
+        	mt.stop();
+        //	mt.dump();
+        }
     }
 
     /**

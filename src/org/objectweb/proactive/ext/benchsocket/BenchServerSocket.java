@@ -8,18 +8,18 @@ import java.net.Socket;
 
 
 public class BenchServerSocket extends ServerSocket {
-	private BenchFactory parent; 
+	private BenchFactoryInterface parent; 
 	
     public BenchServerSocket() throws IOException {
         super();
     }
 
-    public BenchServerSocket(int port, BenchFactory parent) throws IOException {
+    public BenchServerSocket(int port, BenchFactoryInterface parent) throws IOException {
         super(port);
         this.parent = parent;
     }
 
-    public BenchServerSocket(int port, InetAddress localAddress, BenchFactory parent)
+    public BenchServerSocket(int port, InetAddress localAddress, BenchFactoryInterface  parent)
         throws IOException {
         super(port, -1, localAddress);
         this.parent = parent; 

@@ -36,6 +36,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ObjectToByteConverter;
 
 import sun.rmi.server.MarshalInputStream;
 import sun.rmi.server.MarshalOutputStream;
@@ -133,15 +134,16 @@ public class MethodCall implements java.io.Serializable {
         if ((serializedEffectiveArguments == null) &&
                 (effectiveArguments != null)) {
             try {
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
-                objectOutputStream.writeObject(effectiveArguments);
-                objectOutputStream.flush();
-                objectOutputStream.close();
-                byteArrayOutputStream.close();
-                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+//                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//
+//                //  ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+//                MarshalOutputStream objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
+//                objectOutputStream.writeObject(effectiveArguments);
+//                objectOutputStream.flush();
+//                objectOutputStream.close();
+//                byteArrayOutputStream.close();
+//                serializedEffectiveArguments = byteArrayOutputStream.toByteArray();
+            	 serializedEffectiveArguments = ObjectToByteConverter.convert(effectiveArguments);
             } catch (Exception e) {
                 e.printStackTrace();
             }
