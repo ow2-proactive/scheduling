@@ -261,6 +261,7 @@ public interface Group extends Collection {
 	 * If the Group previously contained a mapping for this key, the old value is replaced by
 	 * the specified value. (A map <code>m</code> is said to contain a mapping for a key
 	 * <code>k</code> if and only if <code>m.containsKey(k)</code> would return <code>true</code>.))
+	 * In that case, the old value is also removed from the group.
 	 * @param key - key with which the specified value is to be associated.
 	 * @param value - value to be associated with the specified key.
 	 * @throws UnsupportedOperationException - if the put operation is not supported by this Group.
