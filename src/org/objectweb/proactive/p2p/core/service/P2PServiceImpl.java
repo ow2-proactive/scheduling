@@ -247,9 +247,9 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
      */
     public void registerP2PService(String remoteUrl) {
         // 	we should find an hostname matching this kind of pattern : hostname.inria.fr:PORT
-        if (this.peerHostname.compareTo(UrlBuilder.getNameFromUrlWithoutPort(
-                        remoteUrl)) != 0) {
-            try {
+        try {
+            if (this.peerHostname.compareTo(UrlBuilder.removePortFromHost(
+                            UrlBuilder.getHostNameFromUrl(remoteUrl))) != 0) {
                 P2PService dist;
                 Node remoteP2PNode = P2PServiceImpl.getRemoteNode(remoteUrl);
 
@@ -262,12 +262,14 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                             remoteUrl);
                     }
                 }
-            } catch (NodeException e) {
-                logger.error("Could't register the P2P Service in: " +
-                    remoteUrl);
-            } catch (ActiveObjectCreationException e) {
-                logger.error("No P2P Service was found in: " + remoteUrl);
             }
+        } catch (NodeException e) {
+            logger.error("Could't register the P2P Service in: " + remoteUrl +
+                e.getMessage());
+        } catch (ActiveObjectCreationException e) {
+            logger.error("No P2P Service was found in: " + remoteUrl);
+        } catch (UnknownHostException e) {
+            logger.error("Host unknown: " + remoteUrl);
         }
     }
 
@@ -301,7 +303,7 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                 // get it from the distInfo
                 if ((distService = P2PServiceImpl.getRemoteP2PService(this.acquisitionMethod +
                                 "//" +
-                                UrlBuilder.getNameFromPARUrl(
+                                UrlBuilder.getHostNameAndPortFromUrl(
                                     remoteProActiveRuntimeURL))) != null) {
                     distService.registerP2PService(this.getServiceName(),
                         this.serviceInfo, false);
@@ -312,9 +314,12 @@ public class P2PServiceImpl implements P2PService, InitActive, Serializable {
                     }
                 }
             } catch (NodeException e) {
-                logger.error("Could't register the P2P Service in: " + peerUrl);
+                logger.error("Could't register the P2P Service in: " + peerUrl +
+                    e.getMessage());
             } catch (ActiveObjectCreationException e) {
                 logger.error("No P2P Service was found in: " + peerUrl);
+            } catch (UnknownHostException e) {
+                logger.error("Cannot get the host from: " + remoteProActiveRuntimeURL);
             }
         }
     }
