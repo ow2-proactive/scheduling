@@ -65,11 +65,7 @@ public class ProActiveGroup {
 
     /** Return a Group corresponding to the Object o representing a group. Return null if o does not representing a group. */
     public static Group getGroup(Object o) {
-        /* check o is an Reified Object representing a group */
-	if ( (MOP.isReifiedObject(o)) && (((StubObject)o).getProxy() instanceof org.objectweb.proactive.core.group.ProxyForGroup) )
-	    return ((ProxyForGroup)((StubObject)o).getProxy());
-	else
-	    return null;
+		return findProxyForGroup(o);
     }
     
 
@@ -83,7 +79,7 @@ public class ProActiveGroup {
 	Object result = null;
 	
 	try {
-	    result = MOP.newInstance (className, null , DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+	    result = MOP.newInstance (className, null, DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
  	}
  	catch (ClassNotReifiableException e) { System.err.println("**** ClassNotReifiableException ****"); }
  	catch (InvalidProxyClassException e) { System.err.println("**** InvalidProxyClassException ****"); }
@@ -121,7 +117,7 @@ public class ProActiveGroup {
 	for (int i = 0 ; i < params.length ; i++)
 	    ((org.objectweb.proactive.core.group.ProxyForGroup)g).createThreadCreation(className, params[i], nodeList[i % nodeList.length]);
 
-	((org.objectweb.proactive.core.group.ProxyForGroup)g).waitForTheWaitedCreation();
+	((org.objectweb.proactive.core.group.ProxyForGroup)g).waitForAllCallsDone();
 
 	return result;
     }
@@ -270,16 +266,11 @@ public class ProActiveGroup {
      * Throws an IllegalArgumentException if <code>obj</code> doesn't represent a Group.
      */
     public static int size (Object obj) {
-	if (!(MOP.isReifiedObject (obj)))
+    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(obj);
+	if (theProxy == null)
 	    throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
-	else {
-	    org.objectweb.proactive.core.mop.Proxy theProxy = ((StubObject)obj).getProxy();
-	    /* If the object does not represent a group */
-	    if (!(theProxy instanceof org.objectweb.proactive.core.group.ProxyForGroup))
-		throw new java.lang.IllegalArgumentException("Parameter doesn't represent a group");
-	    else
+	else
 		return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).size();
-	}
     }
     
 
@@ -288,10 +279,11 @@ public class ProActiveGroup {
      * Returns <code>null</code> if <code>obj</code> doesn't represent a Group.
      */
     public static Object get (Object obj, int index) {
-	if (!(MOP.isReifiedObject (obj)))
+    org.objectweb.proactive.core.mop.Proxy theProxy = findProxyForGroup(obj);
+	if (theProxy == null)
 	    return null;
 	else 
-	    return findProxyForGroup(obj).get(index);
+	    return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).get(index);
     }
 
 
@@ -299,13 +291,27 @@ public class ProActiveGroup {
      * Returns <code>true</code> if <code>obj</code> is an object representing a Group (future or not)
      */  
     public static boolean isGroup (Object obj) {	
-	if (!(MOP.isReifiedObject(obj)))
-	    return false;
-	else {
 	    return (findProxyForGroup(obj) != null);
-	}
     }
     
+    /**
+     * Allows the object group to dispatch parameters
+     */
+    public static void setScatterGroup(Object ogroup) {
+		Proxy proxytmp = findProxyForGroup(ogroup);
+		if (proxytmp != null)
+			((ProxyForGroup)proxytmp).setDispatchingOn();
+    }
+    
+    /**
+     * Allows the object group to broadcast parameters
+     */
+    public static void unsetScatterGroup(Object ogroup) {
+ 		Proxy proxytmp = findProxyForGroup(ogroup);
+		if (proxytmp != null)
+			((ProxyForGroup)proxytmp).setDispatchingOff();
+   }
+   
 
     /**
      * Returns the ProxyForGroup of the object <code>obj</code>.

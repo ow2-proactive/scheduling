@@ -198,7 +198,7 @@ public final class MethodCall implements java.io.Serializable {
    *	because we want to enforce the use of factory methods for getting fresh
    * instances of this class (see <I>Factory</I> pattern in GoF).
    */
-  private MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
+  public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
     this.reifiedMethod = reifiedMethod;
     this.effectiveArguments = effectiveArguments;
     this.key = buildKey(reifiedMethod);
@@ -245,11 +245,17 @@ public final class MethodCall implements java.io.Serializable {
     return reifiedMethod.getName();
   }
 
+  public int getNumberOfParameter() {
+      return this.effectiveArguments.length;
+  }
 
   public Object getParameter(int index) {
     return this.effectiveArguments[index];
   }
 
+  public void setEffectiveArguments(Object[] o) {
+      effectiveArguments = o;
+  }
 
   /**
    * Make a deep copy of all arguments of the constructor

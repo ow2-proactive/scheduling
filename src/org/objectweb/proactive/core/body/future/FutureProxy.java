@@ -241,6 +241,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		return target;
 	}
 
+
+        public synchronized void setResult(Object o) {
+	    target = o;
+	    isAvailable = true;
+	}
+
 	/**
 	 * Tests the status of the returned object
 	 * @return <code>true</code> if the future object is NOT yet available, <code>false</code> if it is.
