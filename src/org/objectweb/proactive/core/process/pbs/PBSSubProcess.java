@@ -1,3 +1,33 @@
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.process.pbs;
 
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
@@ -10,7 +40,25 @@ import java.util.StringTokenizer;
 
 
 /**
- * @author fhuet
+ * <p>
+ * The PBSSubProcess class is able to start any class, of the ProActive library,
+ * on a cluster managed by PBS protocol. An instance of this class can be coupled for instance with
+ * RlLoginProcess or SSHProcess classes in order to log into the cluster's front end with rlogin or
+ * ssh and then to run a job with PBSBSubProcess.
+ * </p>
+ * <p>
+ * For instance:
+ * </p><pre>
+ * ..............
+ * PBSSubProcess PBS = new PBSSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * RLoginProcess p = new RLoginProcess(PBS, false);
+ * p.setHostname("cluster_front_end_name");
+ * p.startProcess();
+ * ...............
+ * </pre>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
  */
 public class PBSSubProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
@@ -92,6 +140,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     	//where there are quotation marks
     	//thus we have to divide our command into tokens 
     	//and pass them to the runtime
+    	//tokens are separated by space or quotation marks
         StringTokenizer st = new StringTokenizer(commandToExecute, " \"", true);
         String token;
         ArrayList al = new ArrayList();
@@ -153,11 +202,12 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (outputFile != null) {
             qsubCommand.append(" -o ").append(outputFile).append(" ");
         }
-        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\'")
-                   .append(targetProcess.getCommand()).append("\' ");
+        //the parameters for the script are given as an 
+        //environment variable
+        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\" ")
+                   .append(targetProcess.getCommand()).append("\" ");
         qsubCommand.append(scriptLocation);
 
-        //	        
         if (queueName != null) {
             qsubCommand.append(" -q " + queueName + " ");
         }
@@ -165,6 +215,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (logger.isDebugEnabled()) {
             logger.debug("qsub command is " + qsubCommand.toString());
         }
+       System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
         return qsubCommand.toString();
     }
 

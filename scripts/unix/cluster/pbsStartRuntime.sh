@@ -1,4 +1,8 @@
 #!/bin/sh
-echo $PROACTIVE_COMMAND
-echo "======================="
-$PROACTIVE_COMMAND
+nodelist=`cat  $PBS_NODEFILE` 
+for i in $nodelist
+do
+rsh $i $PROACTIVE_COMMAND &
+done
+wait
+

@@ -107,7 +107,11 @@ public abstract class AbstractExternalProcessDecorator extends AbstractExternalP
       return internalBuildCommand();
     } else {
       if (targetProcess != null) {
-        return internalBuildCommand()+targetProcess.getCommand();
+      	//we have to process the target command to backslash quotation mark
+      	//so that it is not interpreted by the current process but the target one
+      	//we avoid already backslashed one
+      	String targetCommand = targetProcess.getCommand().replaceAll( "([^\\\\])\"", "$1\\\\\\\\\"");
+        return internalBuildCommand()+targetCommand;
       } else {
         return internalBuildCommand();
       }

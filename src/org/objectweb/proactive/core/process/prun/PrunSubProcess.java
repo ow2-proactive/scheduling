@@ -43,7 +43,7 @@ import java.util.StringTokenizer;
 /**
  * <p>
  * The PrunSubProcess class is able to start any class, of the ProActive library,
- * on a cluster managed by PBS prtocol. An instance of this class can be coupled for instance with
+ * on a cluster using prun on top of PBS. An instance of this class can be coupled for instance with
  * RlLoginProcess or SSHProcess classes in order to log into the cluster's front end with rlogin or
  * ssh and then to run a job with PBSBSubProcess.
  * </p>
@@ -51,8 +51,8 @@ import java.util.StringTokenizer;
  * For instance:
  * </p><pre>
  * ..............
- * PBSBSubProcess PBS = new PBSBSubProcess(new SimpleExternalProcess("ls -lsa"));
- * RLoginProcess p = new RLoginProcess(PBS, false);
+ * PrunSubProcess prun = new PrunSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * RLoginProcess p = new RLoginProcess(prun, false);
  * p.setHostname("cluster_front_end_name");
  * p.startProcess();
  * ...............
@@ -189,6 +189,13 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         return queueName;
     }
 
+	/* (non-Javadoc)
+	 * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
+	 */
+	public void stopProcess() {
+	System.out.println("PrunSubProcess.stopProcess()");
+		super.stopProcess();
+	}
     /**
      * Sets the value of the queue where the job will be launched. The default is 'normal'
      * @param queueName
