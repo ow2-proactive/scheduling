@@ -501,7 +501,7 @@
       ==
       ================================================================
 	-->
-	<target name="microTimer">
+	<target name="microTimer" depends="testsuite">
 	        <exec dir="${src.dir}/org/objectweb/proactive/core/util/timer" executable="/usr/bin/g++" os="Linux" >
 			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o libMicroTimer.so  MicroTimer.cc"/>
 		</exec>
