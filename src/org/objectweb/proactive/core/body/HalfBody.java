@@ -113,7 +113,7 @@ public class HalfBody extends AbstractBody {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Init FTManager on " + this.getNodeURL());
                 }
-                logger.info("** Fault-Tolerance is enable **");
+                logger.info("** Fault-Tolerance is enabled **");
             } catch (ProActiveException e) {
                 logger.error(
                     "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +

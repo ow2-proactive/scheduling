@@ -152,9 +152,6 @@ public abstract class BodyImpl extends AbstractBody
         }
 
         // FAULT TOLERANCE
-        
-        
-        
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
             // if the targetBody is not serilizable, FT is disabled
@@ -166,7 +163,8 @@ public abstract class BodyImpl extends AbstractBody
                     if (logger.isDebugEnabled()) {
                         logger.debug("Init FTManager on " + this.getNodeURL());
                     }
-                    logger.info("** Fault-Tolerance is enable **");
+                    
+                    logger.info("** Fault-Tolerance is enabled **");
                 } catch (ProActiveException e) {
                     logger.error(
                             "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
