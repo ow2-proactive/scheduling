@@ -245,7 +245,7 @@ public class MetaObjectInterfaceClassGenerator
     }
 
     /**
-     * @see org.objectweb.proactive.core.body.component.asmgen.AbstractInterfaceClassGenerator#createDefaultMethods()
+     *implementation of abstract method from superclass
      */
     protected void createDefaultMethods() {
         createGetAndSetFcItfImplMethods();

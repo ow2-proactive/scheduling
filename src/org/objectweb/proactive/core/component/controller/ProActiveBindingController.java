@@ -164,6 +164,7 @@ public class ProActiveBindingController extends ProActiveController
 
     /**
      * implementation of the interface BindingController
+     * see {@link BindingController#bindFc(java.lang.String, java.lang.Object)}
      */
     public void bindFc(String clientItfName, Object serverItf)
         throws NoSuchInterfaceException, IllegalBindingException, 
@@ -186,7 +187,7 @@ public class ProActiveBindingController extends ProActiveController
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
         // delegate binding operation to the reified object
-        BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner()).getReifiedObject();
+        BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject();
 
         // serverItf cannot be a Future (because it has to be casted) => make sure if binding to a composite's internal interface
         serverItf = (Interface) ProActive.getFutureValue(serverItf);
