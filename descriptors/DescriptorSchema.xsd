@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by r (in) -->
+<!-- edited with XMLSPY v2004 rel. 4 U (http://www.xmlspy.com) by Quilici (Inria) -->
 <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 	<!-- 
 The following element ProActiveDescriptor defines the root of the schema
@@ -232,7 +232,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:group>
 	<xs:complexType name="RegisterType">
 		<xs:attribute name="virtualNode" type="xs:string" use="required"/>
-		<xs:attribute name="protocol" use="required">
+		<xs:attribute name="protocol" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
@@ -278,7 +278,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:group>
 	<!--currentVM element has one attribute: protocol wich is required and can take only two values rmi or jini. This element when set, indicates that a node will be created  on the jvm running the program and this node will be mapped on the virtualNode defined in deployment/mapping/map@virtualNode-->
 	<xs:complexType name="CurrentJVMType">
-		<xs:attribute name="protocol" use="required">
+		<xs:attribute name="protocol" use="optional">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="rmi"/>
@@ -297,6 +297,7 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:complexContent>
 			<xs:extension base="RegisterType">
 				<xs:attribute name="host" type="xs:string" use="required"/>
+				<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
@@ -524,7 +525,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element ref="processReference"/>
 			<xs:element ref="commandPath" minOccurs="0"/>
 		</xs:sequence>
-		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.lsf.RLoginProcess"/>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.rlogin.RLoginProcess"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
 	</xs:complexType>
 	<!--bsubProcess element has two childs: processReference element which represents a process defined elsewhere in the infrastructure section(ProcessDefinition@id)  and may not appear, bsubOption element that may not appear and represents different options of bsub command and three attributes: class which is required and can take only one value: org.objectweb.proactive.core.process.lsf.LSFBSubProcess, interactive which is optinal to run bsub command in interactive mode, and queue to specify in which queue to run the job.This element will be used to run bsub command-->
@@ -638,7 +639,6 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
-	
 	<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
 	<xs:simpleType name="ListType">
 		<xs:list itemType="xs:string"/>
