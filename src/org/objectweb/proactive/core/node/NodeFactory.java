@@ -127,17 +127,15 @@ public abstract class NodeFactory {
    * Associates the factory of class <code>factoryClassName</code> as the factory to create
    * nodes for the given protocol. Replaces any previous association.
    * @param <code>protocol</code> the protocol to associate the factory to
-   * @param <code>factoryClass</code> the class of the factory
+   * @param <code>factoryObject</code> the class of the factory
    * responsible of creating the nodes for that protocol
    * @exception NodeException if a problem occurs while loading or instantiating the class
    */
-  static public void setFactory(String protocol, NodeFactory factoryClass) throws NodeException {
+  static public void setFactory(String protocol, NodeFactory factoryObject) throws NodeException {
     try {
-      String factoryName = factoryClass.getClass().getName();
-
+      String factoryName = factoryObject.getClass().getName();
       protocolFactoryMapping.put(protocol, factoryName);
-
-      instanceFactoryMapping.put(factoryName, factoryClass);
+      instanceFactoryMapping.put(factoryName, factoryObject);
     } catch (Exception e) {
       throw new NodeException("Error while getting the  NodeFactory e="+e);
     }

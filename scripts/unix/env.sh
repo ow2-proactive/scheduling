@@ -32,6 +32,10 @@ if [ -f $PROACTIVE/ProActive.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive.jar
 fi
+if [ -f $PROACTIVE/lib/bcel.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
+fi
 if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
@@ -51,10 +55,6 @@ fi
 if [ -f $PROACTIVE/lib/reggie.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
-fi
-if [ -f $PROACTIVE/lib/bcel.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/bcel.jar
 fi
 
 echo "CLASSPATH"=$CLASSPATH

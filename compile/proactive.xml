@@ -303,11 +303,11 @@
 		<!-- 
 			copy PDF Manual 
 		-->
-		<copy file="${base}/docs/ProActiveManual.pdf" todir="${dist.dir}"/>
+		<copy file="${base}/docs/*.pdf" todir="${dist.dir}"/>
 		<!--
 			create zip version of ProActive Manual 
 		-->
-		<zip zipfile="${dist.dir}/ProActiveManual.zip" basedir="${dist.dir}" includes="ProActiveManual.pdf"/>
+		<zip zipfile="${dist.dir}/ProActiveManual.zip" basedir="${dist.dir}" includes="*.pdf"/>
 		<!-- 
 			create zip version of ProActive doc 
 		-->

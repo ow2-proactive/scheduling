@@ -82,6 +82,19 @@ public class StartNode {
 
   protected String classpath;
   protected String nodeURL;
+  
+  public static boolean JINI_ENABLED;
+  static  {
+    try {
+      // test if Jini is available
+      Class.forName("net.jini.discovery.DiscoveryManagement");
+      JINI_ENABLED = true;
+      System.err.println("Jini enabled");
+    } catch (ClassNotFoundException e) {
+      JINI_ENABLED = false;
+      System.err.println("Jini disabled");
+    }
+  }
  
   
   //
@@ -208,7 +221,7 @@ public class StartNode {
         } else {
 	   node = NodeFactory.createNode(nodeURL, ! noRebind);
         }
-       System.out.println("OK. Node "+node.getNodeInformation().getName()+" is creating in VM id=" + UniqueID.getCurrentVMID());
+       System.out.println("OK. Node "+node.getNodeInformation().getName()+" is created in VM id=" + UniqueID.getCurrentVMID());
 	break;
       } catch (NodeException e) {
         exceptionCount++;
@@ -239,12 +252,11 @@ public class StartNode {
     RemoteNodeFactory.setShouldCreateClassServer(!noClassServer);
     RemoteNodeFactory.setShouldCreateRegistry(!noRegistry);
     RemoteNodeFactory.setRegistryPortNumber(registryPortNumber);
-
-    JiniNodeFactory.setMulticastLocator(multicastLocator);
-
-    // create factory
-    setNodeFactory();
-
+    if (JINI_ENABLED) {
+      JiniNodeFactory.setMulticastLocator(multicastLocator);
+      // create factory
+      setNodeFactory();
+    }
     // cretae node
     createNode(nodeURL, noRebind);
   }
@@ -277,7 +289,6 @@ public class StartNode {
       //there is a port number specified
        try {
 	  //  System.out.println("StartNode: " + nodeURL.substring(deb + 1, nodeURL.lastIndexOf("/")));getporrt
-
         return Integer.parseInt(nodeURL.substring(deb + 1, nodeURL.lastIndexOf("/")));
       } catch (NumberFormatException e) {
         return defaultValue;
