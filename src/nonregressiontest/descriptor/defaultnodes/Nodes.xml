@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Dispatcher"/>
@@ -40,25 +40,21 @@
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="linuxJVM"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm2">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rshProcess"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm3-AC">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rshProcess-AC"/>
 				</creation>
 			</jvm>
 			<jvm name="Jvm4-AC">
-				<acquisition method="rmi"/>
 				<creation>
 					<processReference refid="rshProcess-AC"/>
 				</creation>
@@ -78,12 +74,12 @@
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="rshProcess">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="sea">
 					<processReference refid="linuxJVM"/>
 				</rshProcess>
 			</processDefinition>
-				<processDefinition id="rshProcess-AC">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="amda">
+			<processDefinition id="rshProcess-AC">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="sea">
 					<processReference refid="linuxJVM-AC"/>
 				</rshProcess>
 			</processDefinition>
