@@ -26,4 +26,6 @@ public interface Timer {
 	
 	public void dump();
 	
+	public void reset();
+	
 }

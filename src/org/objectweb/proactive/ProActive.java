@@ -296,10 +296,10 @@ public class ProActive {
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws NodeException if the virtualnode was null
      */
-    public static Object newActive(String classname,
+    public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        return ProActive.newActive(classname, constructorParameters,
+        return ProActive.newActiveAsGroup(classname, constructorParameters,
             virtualnode, null, null);
     }
 
@@ -318,7 +318,7 @@ public class ProActive {
      * @throws NodeException if the virtualnode was null
      *
      */
-    public static Object newActive(String classname,
+    public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode,
         Active activity, MetaObjectFactory factory)
         throws ActiveObjectCreationException, NodeException {

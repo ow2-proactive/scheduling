@@ -7,7 +7,6 @@ import java.io.Serializable;
 
 /**
  * A timer which retains the values measured in addition to calculating the average
- *
  */
 public class TimerWithMemory extends AverageMicroTimer implements Timer,
     Serializable {
@@ -82,6 +81,12 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
 
     public double getStandardDeviation() {
         return Math.sqrt(this.getVariance());
+    }
+    
+    public void reset() {
+    	super.reset();
+    	   this.memory = new long[10];
+           this.position = 0;
     }
 
     public void dump() {

@@ -126,4 +126,10 @@ public class AverageMicroTimer implements Timer, Serializable {
         in.defaultReadObject();
         this.timer = new MicroTimer();
     }
+
+	public void reset() {
+	    this.currentElapsed=0;
+	    this.nbrValues=0;
+	    this.total=0;
+	}
 }

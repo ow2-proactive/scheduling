@@ -35,6 +35,11 @@ public class EWMATimer extends AverageMicroTimer {
         return this.average;
     }
     
+    public void reset() {
+    	super.reset();
+    	this.average = 0;
+    }
+    
     public static void main(String[] args) {
     	int max = 100;
     	Random r = new Random();

@@ -48,6 +48,10 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     	}
     }
 
+    public void reset() {
+    	this.activeTimer.reset();
+    }
+    
     public long getCumulatedTime() {
         long time = 0;
         Iterator it = timerMap.values().iterator();
