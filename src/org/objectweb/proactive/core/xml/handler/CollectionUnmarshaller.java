@@ -93,7 +93,7 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
     }
     // clean-up
     resultList = null;
-    targetClass = null;
+    //targetClass = null;
     return resultArray;
   }
   
