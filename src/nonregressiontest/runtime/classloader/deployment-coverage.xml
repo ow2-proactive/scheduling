@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../descriptors/DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="VN1" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="VN1">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+	
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+					 <relativePath origin="user.home" value="/ProActive/dist/ProActive/ProActive.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/asm.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/log4j.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/xercesImpl.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/reggie.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/bouncycastle.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/lib/components/fractal.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/dev/lib/clover.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/dev/lib/cenquatasks.jar"/>
+				     <relativePath origin="user.home" value="/ProActive/classes/nonregressiontest/runtime/classloader/"/>
+					</classpath>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="rshProcess">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="waha.inria.fr">
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
