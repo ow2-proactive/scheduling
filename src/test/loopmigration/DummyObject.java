@@ -7,5 +7,4 @@ public class DummyObject implements Serializable {
 	public DummyObject() {
 		super();
 	}
-
 }

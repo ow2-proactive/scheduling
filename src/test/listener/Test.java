@@ -97,7 +97,6 @@ public class Test implements org.objectweb.proactive.RunActive {
     public void servingStarted(MessageEvent event) {
       print("Serving", event);
     }
-
   }
   
 }

@@ -2,11 +2,7 @@ package test.descriptor.lookupregister;
 
 
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.EndActive;
-import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
