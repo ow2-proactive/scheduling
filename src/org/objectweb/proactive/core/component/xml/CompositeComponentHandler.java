@@ -11,11 +11,11 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.factory.InstantiationException;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ContentDescription;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -47,7 +47,7 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
         ComponentsHandler fatherHandler) {
         super(deploymentDescriptor, componentsCache, componentTypes,
             fatherHandler);
-        componentParameters.setHierarchicalType(ComponentParameters.COMPOSITE);
+        controllerDescription.setHierarchicalType(Constants.COMPOSITE);
         addHandler(ComponentsDescriptorConstants.BINDINGS_TAG,
             new BindingsHandler(componentsCache));
     }
@@ -68,10 +68,12 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
                     if (virtualNode.equals(ComponentsDescriptorConstants.NULL)) {
                         //					componentsCache.addComponent(componentParameters.getName(),
                         //					//PrimitiveComponentB.class.getName(),
-                        composite = ProActive.newActiveComponent(Composite.class.getName(),
-                                new Object[] {  }, null, null, null,
-                                componentParameters);
-                        componentsCache.addComponent(componentParameters.getName(),
+                        composite = cf.newFcInstance(componentType,
+                                new ControllerDescription(controllerDescription.getName(),
+						controllerDescription.getHierarchicalType()),
+                                new ContentDescription(Composite.class.getName(),
+                                    new Object[] {  }));
+                        componentsCache.addComponent(controllerDescription.getName(),
                             composite);
                         //PrimitiveComponentB.class.getName(),
                     } else {
@@ -83,10 +85,12 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
 
                         // get corresponding node
                         Node targeted_node = vn.getNode();
-                        composite = ProActive.newActiveComponent(Composite.class.getName(),
-                                new Object[] {  }, targeted_node, null, null,
-                                componentParameters);
-                        componentsCache.addComponent(componentParameters.getName(),
+                        composite = cf.newFcInstance(componentType,
+                                new ControllerDescription(controllerDescription.getName(),
+						controllerDescription.getHierarchicalType()),
+                                new ContentDescription(Composite.class.getName(),
+                                    new Object[] {  }, targeted_node));
+                        componentsCache.addComponent(controllerDescription.getName(),
                             composite);
                     }
 
@@ -103,29 +107,28 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
                         ((ContentController) composite.getFcInterface(Constants.CONTENT_CONTROLLER)).addFcSubComponent(componentsCache.getComponent(
                                 sub_component_name));
                     }
+                } catch (InstantiationException e) {
+                    logger.error("cannot instantiate component");
+                    throw new SAXException(e);
                 } catch (NodeException ne) {
                     logger.error(
                         "cannot create active component: node exception");
-                    ne.printStackTrace();
-                } catch (ActiveObjectCreationException aoce) {
-                    logger.error(
-                        "cannot create active component : active object creation exception");
-                    aoce.printStackTrace();
+                    throw new SAXException(ne);
                 } catch (NoSuchInterfaceException nsie) {
                     logger.error(
                         "cannot create active component : interface not found");
-                    nsie.printStackTrace();
+                    throw new SAXException(nsie);
                 } catch (IllegalLifeCycleException ilce) {
                     logger.error(
                         "cannot create active component : illegal life cycle operation");
-                    ilce.printStackTrace();
+                    throw new SAXException(ilce);
                 } catch (IllegalContentException ice) {
                     logger.error(
                         "cannot create active component : illegal content operation");
-                    ice.printStackTrace();
+                    throw new SAXException(ice);
                 }
                 logger.debug("created composite component : " +
-                    componentParameters.getName());
+				controllerDescription.getName());
             }
         }
     }
@@ -134,7 +137,7 @@ public class CompositeComponentHandler extends AbstractContainerComponentHandler
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
     public Object getResultObject() throws SAXException {
-        return new ComponentResultObject(componentParameters.getName());
+        return new ComponentResultObject(controllerDescription.getName());
     }
 
     /* (non-Javadoc)
