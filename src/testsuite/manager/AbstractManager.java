@@ -1,33 +1,33 @@
 /*
-* ################################################################
-*
-* ProActive: The Java(TM) library for Parallel, Distributed,
-*            Concurrent computing with Security and Mobility
-*
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-*
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-*
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s):
-*
-* ################################################################
-*/
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package testsuite.manager;
 
 import org.apache.log4j.Level;
@@ -72,6 +72,7 @@ import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Vector;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -97,7 +98,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private String outputPath = null;
 
     public AbstractManager() {
-      //  logger = Logger.getLogger(getClass().getName());
+        //  logger = Logger.getLogger(getClass().getName());
         testAppender();
     }
 
@@ -110,7 +111,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     }
 
     public AbstractManager(File xmlDescriptor) throws IOException, SAXException {
-    //    logger = Logger.getLogger(getClass().getName());
+        //    logger = Logger.getLogger(getClass().getName());
         testAppender();
         ManagerDescriptorHandler.createManagerDescriptor(xmlDescriptor.getPath(),
             this);
@@ -119,8 +120,11 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
     private void testAppender() {
         int nbAppenders = 0;
         Enumeration enum = Logger.getRootLogger().getAllAppenders();
-        while (enum.hasMoreElements())
+
+        while (enum.hasMoreElements()) {
             nbAppenders++;
+            enum.nextElement();
+        }
         if (nbAppenders == 0) {
             File log = new File(System.getProperty("user.home") +
                     File.separatorChar + "tests.log");
@@ -128,6 +132,7 @@ public abstract class AbstractManager implements ResultsExporter, Beanable,
             try {
                 out = new FileOutputStream(log);
             } catch (FileNotFoundException e) {
+                System.out.println("XXXXXXXXXXXXXXXXXXXXX");
                 logger.warn("Log file not found", e);
             }
             Logger.getRootLogger().addAppender(new WriterAppender(
