@@ -617,6 +617,36 @@ pad.killall(boolean softly);
 			</td>
 	</tbody>
 </table><br></br>
+<table width="100%" border="1">
+	<tbody>
+		<tr>
+			<th>Export Active Objects as Web services</th>
+		</tr>
+		<tr>
+			<td>
+			<p class="textNormal">
+ProActive allows active objects exportation as web services. The service is deployed onto a Jakarta Tomcat web server with a given url. 
+It is identified by its urn, an unique id  of the service. It is also possible to choose the exported methods of the object.<br>
+The WSDL file matching the service  will be accesible at
+http://localhost:8080/servlet/wsdl?id=a for a service which name is
+"a" and which id deployed on a web server which location is
+http://localhost:8080.
+ 
+<pre>
+A a = (A) ProActive.newActive("A", new Object []{});
+<FONT ID="FormalComment">   // Constructs an active object </FONT>
+
+String [] methods = new String [] {"foo", "bar"};
+<FONT ID="FormalComment"> //A String array containing the exported methods </FONT>
+
+ProActive.exposeAsWebService(a,"http://localhost:8080","a",methods);
+<FONT ID="FormalComment"> //Export the active object as a web service </FONT>
+
+ProActive.unExposeAsWebService("a", "http://localhost:8080"); 
+<FONT ID="FormalComment"> //Undeploy the service "a" on the web server located at http://localhost:8080 </FONT>
+</td>
+</tbody>
+</table><br></br>
 
 </p>
 <!--
