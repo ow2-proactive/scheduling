@@ -32,24 +32,9 @@ package org.objectweb.proactive.core.body.ibis;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.MetaObjectFactory;
+import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.RemoteBodyFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.migration.MigrationManager;
-import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
-import org.objectweb.proactive.core.body.reply.ReplyReceiver;
-import org.objectweb.proactive.core.body.reply.ReplyReceiverFactory;
-import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
-import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.request.RequestFactory;
-import org.objectweb.proactive.core.body.request.RequestQueueFactory;
-import org.objectweb.proactive.core.body.request.RequestReceiver;
-import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
-import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.util.IbisProperties;
-import org.objectweb.proactive.core.util.ThreadStore;
-import org.objectweb.proactive.core.util.ThreadStoreFactory;
 
 
 /**
@@ -86,86 +71,28 @@ import org.objectweb.proactive.core.util.ThreadStoreFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class ProActiveIbisMetaObjectFactory implements MetaObjectFactory, java.io.Serializable {
+public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory implements java.io.Serializable {
 
   //
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
 
-  //private static final MetaObjectFactory instance = new ProActiveIbisMetaObjectFactory();
-
+ 
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
   //
 
-  protected RequestFactory requestFactoryInstance;
-  protected ReplyReceiverFactory replyReceiverFactoryInstance;
-  protected RequestReceiverFactory requestReceiverFactoryInstance;
-  protected RequestQueueFactory requestQueueFactoryInstance;
-  protected MigrationManagerFactory migrationManagerFactoryInstance;
-  protected RemoteBodyFactory remoteBodyFactoryInstance;
-  protected ThreadStoreFactory threadStoreFactoryInstance;
-  
+
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
   
-  public ProActiveIbisMetaObjectFactory() {
-    requestFactoryInstance = newRequestFactorySingleton();
-    replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
-    requestReceiverFactoryInstance = newRequestReceiverFactorySingleton();
-    requestQueueFactoryInstance = newRequestQueueFactorySingleton();
-    migrationManagerFactoryInstance = newMigrationManagerFactorySingleton();
-    remoteBodyFactoryInstance = newRemoteBodyFactorySingleton();
-    threadStoreFactoryInstance = newThreadStoreFactorySingleton();
-    IbisProperties.load();
-  }
+
 
   //
   // -- PUBLICS METHODS -----------------------------------------------
   //
 
-//  public static MetaObjectFactory newInstance() {
-//    return instance;
-//  }
-
-  //
-  // -- implements MetaObjectFactory -----------------------------------------------
-  //
-
-  public RequestFactory newRequestFactory() {
-    return requestFactoryInstance;
-  }
-  
-
-  public ReplyReceiverFactory newReplyReceiverFactory() {
-    return replyReceiverFactoryInstance;
-  }
-  
-
-  public RequestReceiverFactory newRequestReceiverFactory() {
-    return requestReceiverFactoryInstance;
-  }
-  
-
-  public RequestQueueFactory newRequestQueueFactory() {
-    return requestQueueFactoryInstance;
-  }
-  
-
-  public MigrationManagerFactory newMigrationManagerFactory() {
-    return migrationManagerFactoryInstance;
-  }
-  
-
-  public RemoteBodyFactory newRemoteBodyFactory() {
-    return remoteBodyFactoryInstance;
-  }
-
-
-  public ThreadStoreFactory newThreadStoreFactory() {
-    return threadStoreFactoryInstance;
-  }
 
 
 
@@ -173,39 +100,13 @@ public class ProActiveIbisMetaObjectFactory implements MetaObjectFactory, java.i
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
-  protected RequestFactory newRequestFactorySingleton() {
-    return new RequestFactoryImpl();
-  }
-  
 
-  protected ReplyReceiverFactory newReplyReceiverFactorySingleton() {
-    return new ReplyReceiverFactoryImpl();
-  }
-  
-
-  protected RequestReceiverFactory newRequestReceiverFactorySingleton() {
-    return new RequestReceiverFactoryImpl();
-  }
-  
-
-  protected RequestQueueFactory newRequestQueueFactorySingleton() {
-    return new RequestQueueFactoryImpl();
-  }
-  
-
-  protected MigrationManagerFactory newMigrationManagerFactorySingleton() {
-    return new MigrationManagerFactoryImpl();
-  }
   
 
   protected RemoteBodyFactory newRemoteBodyFactorySingleton() {
-    return new RemoteBodyFactoryImpl();
+    return new RemoteIbisBodyFactoryImpl();
   }
 
-
-  protected ThreadStoreFactory newThreadStoreFactorySingleton() {
-    return new ThreadStoreFactoryImpl();
-  }
 
 
 
@@ -213,42 +114,10 @@ public class ProActiveIbisMetaObjectFactory implements MetaObjectFactory, java.i
   // -- INNER CLASSES -----------------------------------------------
   //
 
-  protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-        return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody, isOneWay, sequenceID);
-    }
-  } // end inner class RequestFactoryImpl
-
-  
-  protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
-    public ReplyReceiver newReplyReceiver() {
-        return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
-    }
-  } // end inner class ReplyReceiverFactoryImpl
 
 
-  protected static class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
-    public RequestReceiver newRequestReceiver() {
-        return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
-    }
-  } // end inner class RequestReceiverFactoryImpl
 
-
-  protected static class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
-    public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-        return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
-    }
-  } // end inner class RequestQueueFactoryImpl
-
-
-  protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory, java.io.Serializable {
-    public MigrationManager newMigrationManager() {
-        return new org.objectweb.proactive.core.body.migration.MigrationManagerImpl();
-    }
-  } // end inner class MigrationManagerFactoryImpl
-
-
-  protected static class RemoteBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
+  protected static class RemoteIbisBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
     public UniversalBody newRemoteBody(UniversalBody body) {
       try {
      // 	System.out.println("Creating ibis remote body adapter");
@@ -259,12 +128,6 @@ public class ProActiveIbisMetaObjectFactory implements MetaObjectFactory, java.i
     }
   } // end inner class RemoteBodyFactoryImpl
 
-
-  protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
-    public ThreadStore newThreadStore() {
-        return new org.objectweb.proactive.core.util.ThreadStoreImpl();
-    }
-  } // end inner class ThreadStoreFactoryImpl
 
 
 }
