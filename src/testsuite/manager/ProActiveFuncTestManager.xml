@@ -5,7 +5,6 @@
 			<virtualNode name="Dispatcher"/>
 			<virtualNode name="Dispatcher1"/>
 			<virtualNode name="Dispatcher2"/>
-			<virtualNode name="Dispatcher3-AC"/>			
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -25,11 +24,6 @@
 					<vmName value="Jvm2"/>
 				</jvmSet>
 			</map>
-			<map virtualNode="Dispatcher3-AC">
-				<jvmSet>
-					<vmName value="Jvm3-AC"/>
-				</jvmSet>
-			</map>
 		</mapping>
 		<jvms>
 			<jvm name="Jvm1">
@@ -44,12 +38,6 @@
 					<processReference refid="rshProcess"/>
 				</creation>
 			</jvm>
-			<jvm name="Jvm3-AC">
-				<acquisition method="rmi"/>
-				<creation>
-					<processReference refid="rshProcess-AC"/>
-				</creation>
-			</jvm>
 		</jvms>
 	</deployment>
 	<infrastructure>
@@ -57,19 +45,9 @@
 			<processDefinition id="linuxJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
-			<processDefinition id="linuxJVM-AC">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>-Dproactive.future.ac=enable</jvmParameters>
-					</jvmProcess>
-			</processDefinition>
 			<processDefinition id="rshProcess">
 				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="nahuel">
 					<processReference refid="linuxJVM"/>
-				</rshProcess>
-			</processDefinition>
-				<processDefinition id="rshProcess-AC">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="nahuel">
-					<processReference refid="linuxJVM-AC"/>
 				</rshProcess>
 			</processDefinition>
 		</processes>
