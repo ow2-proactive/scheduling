@@ -12,7 +12,9 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
@@ -30,8 +32,8 @@ public class ProActiveComponentRepresentativeImpl
 		ContentController,
 		ComponentParametersController,
 		Interface,
-		Serializable,
-		StubObject {
+		Serializable
+		 {
 	protected static Logger logger = Logger.getLogger(ProActiveComponentRepresentativeImpl.class.getName());
 	private Interface[] interfaceReferences;
 	private Proxy proxy;
@@ -87,7 +89,7 @@ public class ProActiveComponentRepresentativeImpl
 			throw new RuntimeException("cannot create interface references : " + e.getMessage());
 		}
 	}
-
+	
 	/**
 	 * @see org.objectweb.fractal.api.control.BindingController#lookupFc(String)
 	 */
@@ -158,14 +160,11 @@ public class ProActiveComponentRepresentativeImpl
 	}
 
 	/**
+	 * in this implementation, internal interfaces are also external interfaces.
 	 * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)
 	 */
-	public Object getFcInternalInterface(String interfaceName) {
-		return (Interface) reifyCall(
-			ContentController.class.getName(),
-			"getFcInternalInterface",
-			new Class[] { String.class },
-			new Object[] { interfaceName });
+	public Object getFcInternalInterface(String interfaceName) throws NoSuchInterfaceException {
+		return getFcInterface(interfaceName); 
 	}
 
 	/**
@@ -221,8 +220,7 @@ public class ProActiveComponentRepresentativeImpl
 	 * @see org.objectweb.fractal.api.Interface#getFcItfName()
 	 */
 	public String getFcItfName() {
-		// REIFY???
-		// FIXME : PB is that the current object implements several functional interfaces.
+		// PB is that the current object implements several functional interfaces.
 		// Thus it has several names...
 		return null;
 	}
@@ -315,23 +313,24 @@ public class ProActiveComponentRepresentativeImpl
 	}
 
 	/**
-	 *  The comparison of component identity references is actually a comparison of unique
+	 *  The comparison of component references is actually a comparison of unique
 	 * identifiers accross jvms.
 	 */
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ProActiveComponentRepresentative)) {
-			logger.error("can only compare component representative to component representative");
+	public boolean equals(Object component) {
+		if (!(component instanceof ProActiveComponent)) {
+			logger.error("can only compare proactive components to proactive components ");
 			return false;
 		}
-		return ((UniversalBodyProxy) getProxy()).getBodyID().equals(
-			((UniversalBodyProxy) ((ProActiveComponentRepresentativeImpl) obj).getProxy()).getBodyID());
+		return getID().equals( ((ProActiveComponent)component).getID());
 	}
-
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.component.ProActiveComponent#equals(org.objectweb.fractal.api.Component)
-	 */
-	public boolean equals(Component componentIdentity) {
-		return this.equals(componentIdentity);
+	
+	public int hashCode() {
+		// should be cached maybe
+		return	((UniversalBodyProxy) getProxy()).getBodyID().hashCode();
+	}
+	
+	public UniqueID getID() {
+		return	((UniversalBodyProxy) getProxy()).getBodyID();
 	}
 
 	/* (non-Javadoc)
