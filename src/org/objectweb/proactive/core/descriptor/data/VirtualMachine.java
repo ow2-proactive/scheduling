@@ -37,41 +37,83 @@ import org.objectweb.proactive.core.process.ExternalProcess;
  * a JVM running a ProActiveRuntime
  *
  * @author  ProActive Team
- * @version 1.0,  2002/06/20
+ * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
- *
+ * @see ProActiveDescriptor
+ * @see VirtualNode
  */
 public interface VirtualMachine {
 
-  
+  /**
+	 * Method setCyclic.
+	 * @param b the value of cyclic attribute, the default value is false
+	 */
   public void setCyclic(boolean b);
   
   
+  /**
+	 * Returns the value of cyclic attribute.
+	 * @return boolean
+	 */
   public boolean getCyclic();
   
   
+	/**
+	 * Sets the number of nodes that will be created on this VirtualMachine.
+	 * @param nodeNumber
+	 * @throws IOException
+	 */
   public void setNodeNumber(String nodeNumber) throws java.io.IOException;
   
   
+	/**
+	 * Returns the number of nodes that will be created on this VirtualMachine
+	 * @return String
+	 */
   public String getNodeNumber();
 
 
+	/**
+	 * Method setName.
+	 * @param s
+	 */
   public void setName(String s);
   
   
+	/**
+	 * Returns the name of this VirtualMachine
+	 * @return String
+	 */
   public String getName();
   
   
+	/**
+	 * Sets the acquisitionMethod field to the given value
+	 * @param s
+	 */
   public void setAcquisitionMethod(String s) ;
   
   
+	/**
+	 * Returns the AcquisitionMethod value
+	 * @return String
+	 */
   public String getAcquisitionMethod() ;
   
   
+	/**
+	 * Sets the process mapped to this VirtualMachine to the given process
+	 * @param p
+	 */
   public void setProcess(ExternalProcess p) ;
   
   
+	/**
+	 * Returns the process mapped to this VirtualMachine
+	 * @return ExternalProcess
+	 */
   public ExternalProcess getProcess() ;
+  
   
   /**
    * Returns the name of the machine where the process mapped to this virtual machine 
@@ -79,4 +121,18 @@ public interface VirtualMachine {
    * @return String
    */
   public String getHostName();
+  
+  
+	/**
+	 * Sets the creatorId field to the given value
+	 * @param value The Id of the VirtualNode that created this VirtualMachine
+	 */
+  public void setCreatorId(String creatorId);
+  
+  
+	/**
+	 * Returns the value of creatorId field. 
+	 * @return String The Id of the VirtualNode that created this VirtualMachine
+	 */
+  public String getCreatorId();
 }
