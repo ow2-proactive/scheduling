@@ -9,6 +9,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
 
@@ -90,77 +91,89 @@ public class RepresentativeInterfaceClassGenerator
 
     public ProActiveInterface generateInterface(final String fcInterfaceName,
         Component owner, InterfaceType interfaceType, boolean isInternal)
-        throws Exception {
-        this.fcInterfaceName = fcInterfaceName;
-
-        //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
-        //                                                    .equals(ComponentParameters.PRIMITIVE);
-        interfacesToImplement = new Vector();
-
-        // add functional interface
-        interfacesToImplement.add(Class.forName(
-                interfaceType.getFcItfSignature()));
-
-        // add Serializable interface
-        interfacesToImplement.addElement(Serializable.class);
-
-        // add StubObject, so we can set the proxy
-        interfacesToImplement.addElement(StubObject.class);
-
-        //  	String generated_class_name = getGeneratedClassName(fcInterfaceName, interfaceType.getFcItfSignature());
-        //        if (!isPrimitive) {
-        //            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectCompositeComponentRepresentativeClassName(
-        //                                             fcInterfaceName, interfaceType.getFcItfSignature());
-        //        } else {
-        this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
-                interfaceType.getFcItfSignature());
-        //}
-        Class generated_class;
-
-        // check whether class has already been generated
+        throws InterfaceGenerationFailedException {
         try {
-            generated_class = loadClass(stubClassFullName);
-        } catch (ClassNotFoundException cnfe) {
-            byte[] bytes;
-            setInfos();
-            bytes = create();
-            RepresentativeInterfaceClassGenerator.generatedClassesCache.put(stubClassFullName,
-                bytes);
-            if (logger.isDebugEnabled()) {
-                logger.debug("added " + stubClassFullName + " to cache");
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("generated classes cache is : " +
-                    generatedClassesCache.toString());
+            this.fcInterfaceName = fcInterfaceName;
+
+            //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
+            //                                                    .equals(ComponentParameters.PRIMITIVE);
+            interfacesToImplement = new Vector();
+
+            // add functional interface
+            interfacesToImplement.add(Class.forName(
+                    interfaceType.getFcItfSignature()));
+
+            // add Serializable interface
+            interfacesToImplement.addElement(Serializable.class);
+
+            // add StubObject, so we can set the proxy
+            interfacesToImplement.addElement(StubObject.class);
+
+            //  	String generated_class_name = getGeneratedClassName(fcInterfaceName, interfaceType.getFcItfSignature());
+            //        if (!isPrimitive) {
+            //            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectCompositeComponentRepresentativeClassName(
+            //                                             fcInterfaceName, interfaceType.getFcItfSignature());
+            //        } else {
+            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
+                    interfaceType.getFcItfSignature());
+            //}
+            Class generated_class;
+
+            // check whether class has already been generated
+            try {
+                generated_class = loadClass(stubClassFullName);
+            } catch (ClassNotFoundException cnfe) {
+                byte[] bytes;
+                setInfos();
+                bytes = create();
+                RepresentativeInterfaceClassGenerator.generatedClassesCache.put(stubClassFullName,
+                    bytes);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("added " + stubClassFullName + " to cache");
+                }
+                if (logger.isDebugEnabled()) {
+                    logger.debug("generated classes cache is : " +
+                        generatedClassesCache.toString());
+                }
+
+                // Next few lines for debugging only
+                //                            try {
+                //                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
+                //                                                                     stubClassFullName + ".class");
+                //                
+                //                                if (logger.isDebugEnabled()) {
+                //                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
+                //                                }
+                //                
+                //                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+                //                                fos.write(bytes);
+                //                                fos.close();
+                //                			} catch (Exception e) {
+                //                				// e.printStackTrace();
+                //                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                			}
+                // convert the bytes into a Class
+                generated_class = defineClass(stubClassFullName, bytes);
             }
 
-            // Next few lines for debugging only
-            //            try {
-            //                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
-            //                                                     stubClassFullName + ".class");
-            //
-            //                if (logger.isDebugEnabled()) {
-            //                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-            //                }
-            //
-            //                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-            //                fos.write(bytes);
-            //                fos.close();
-            //			} catch (FileNotFoundException fnfe) {
-            //				// e.printStackTrace();
-            //				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-            //			}
-            // convert the bytes into a Class
-            generated_class = defineClass(stubClassFullName, bytes);
+            ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
+            reference.setName(fcInterfaceName);
+            reference.setOwner(owner);
+            reference.setType(interfaceType);
+            reference.setIsInternal(isInternal);
+
+            return reference;
+        } catch (ClassNotFoundException e) {
+            throw new InterfaceGenerationFailedException("cannot find interface signature class",
+                e);
+        } catch (IllegalAccessException e) {
+            throw new InterfaceGenerationFailedException("constructor not accessible",
+                e);
+        } catch (InstantiationException e) {
+            throw new InterfaceGenerationFailedException("constructor belongs to an abstract class?",
+                e);
+            // TODO : check this
         }
-
-        ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
-        reference.setName(fcInterfaceName);
-        reference.setOwner(owner);
-        reference.setType(interfaceType);
-        reference.setIsInternal(isInternal);
-
-        return reference;
     }
 
     protected CodeVisitor createMethod(int methodIndex, Method m) {
