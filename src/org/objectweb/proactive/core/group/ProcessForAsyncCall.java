@@ -32,7 +32,12 @@ public class ProcessForAsyncCall implements Runnable {
 		}
 		Proxy proxy = ((StubObject) obj).getProxy();
 		while (proxy instanceof FutureProxy) {
-			return ProcessForAsyncCall.findLastProxy(((FutureProxy) proxy).getResult());
+			if (MOP.isReifiedObject(((FutureProxy) proxy).getResult())) {
+				return ProcessForAsyncCall.findLastProxy(((FutureProxy) proxy).getResult());
+			}
+			else {
+				return proxy;
+			}
 		}
 		return proxy;
 	}
@@ -57,18 +62,21 @@ public class ProcessForAsyncCall implements Runnable {
 			Proxy lastProxy = ProcessForAsyncCall.findLastProxy(object);
 			if (lastProxy instanceof UniversalBodyProxy) {
 				objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
-			}
+			} 
 			try {
-				if (!objectIsLocal) {
+				if (lastProxy == null) {
+					// means we are dealing with the result of the future object (the object is actually local)
+					this.proxyGroup.addToListOfResult(memberListOfResultGroup, this.mc.execute(object), this.index);
+				}
+				else if (!objectIsLocal) {
 					/* add the return value into the result group */
 					this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object).getProxy().reify(this.mc), this.index);
-				}
-				else {
+				} else {
 					/* add the return value into the result group */
 					this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object).getProxy().reify(new MethodCall(this.mc)), this.index);
 				}
 			} catch (Throwable e) {
-				/* when an exception occurs, put it in the result group instead of the (unreturned) value */ 
+				/* when an exception occurs, put it in the result group instead of the (unreturned) value */
 				this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,new ExceptionInGroup(this.memberList.get(this.index),e),this.index);
 			}
 		}

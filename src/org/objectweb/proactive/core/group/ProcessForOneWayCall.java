@@ -31,7 +31,13 @@ public class ProcessForOneWayCall implements Runnable {
 		}
 		Proxy proxy = ((StubObject) obj).getProxy();
 		while (proxy instanceof FutureProxy) {
-			return ProcessForOneWayCall.findLastProxy(((FutureProxy) proxy).getResult());
+			if (MOP.isReifiedObject(((FutureProxy) proxy).getResult())) {
+				return ProcessForOneWayCall.findLastProxy(((FutureProxy) proxy).getResult());
+			}
+			else {
+				// consider the case where the result is not a reified object
+				return proxy;
+			}
 		}
 		return proxy;
 	}
@@ -58,7 +64,12 @@ public class ProcessForOneWayCall implements Runnable {
 				objectIsLocal = ((UniversalBodyProxy) lastProxy).isLocal();
 			}
 			try {
-				if (!objectIsLocal) {
+				if (lastProxy == null) {
+					// means we are dealing with a non-reified object (in this implementation, 
+					// it is the result of a future object, and the object is local.
+					this.mc.execute(object);
+				}
+				else if (!objectIsLocal) {
 					((StubObject) object).getProxy().reify(this.mc);
 				}
 				else {
