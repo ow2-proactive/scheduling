@@ -82,19 +82,18 @@ A specific tag is provided in <a href="Descriptor.html">Deployment Descriptor</a
 <h2>Example</h2>
 <p class="textNormal">
 Configuration file must have following structure:
-<blockquote><pre>
+<pre>
 &lt;ProActiveUserProperties&gt;
-	&lt;properties&gt;
-		&lt;prop <b>key</b>="schema.validation"<b>value</b>="enable"/&gt;
-		&lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="disable"/&gt;
-		&lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;
-		&lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
-		&lt;prop <b>key</b>="proactive.locationserver" <b>value</b>="org.objectweb.proactive.ext.locationserver.LocationServer"/&gt;
-		&lt;prop <b>key</b>="proactive.locationserver.rmi" <b>value</b>="//localhost/LocationServer"/&gt;
-	&lt;/properties&gt;
+ &lt;properties&gt;
+  &lt;prop <b>key</b>="schema.validation"<b>value</b>="enable"/&gt;
+  &lt;prop <b>key</b>="proactive.future.ac" <b>value</b>="disable"/&gt;
+  &lt;prop <b>key</b>="proactive.communication.protocol" <b>value</b>="rmi"/&gt;
+  &lt;prop <b>key</b>="proactive.rmi.port" <b>value</b>="2005"/&gt;
+  &lt;prop <b>key</b>="proactive.locationserver" <b>value</b>="org.objectweb.proactive.ext.locationserver.LocationServer"/&gt;
+  &lt;prop <b>key</b>="proactive.locationserver.rmi" <b>value</b>="//localhost/LocationServer"/&gt;
+ &lt;/properties&gt;
 &lt;/ProActiveUserProperties&gt;
-</pre></blockquote>
-</p>
+</pre></p>
 <p class="textNormal">
 Note that <b>ProActiveUserProperties</b>, <b>properties</b> tag and  the model: &lt;prop <b>key</b>="somekey" <b>value</b>="somevalue"/&gt; are mandatory for ProActive to parse correctly the document
 </p>
