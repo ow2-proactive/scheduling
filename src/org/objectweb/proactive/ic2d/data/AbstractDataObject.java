@@ -52,6 +52,7 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
   protected boolean monitoringRequestSender;
   protected boolean monitoringReplyReceiver;
   protected boolean monitoringReplySender;
+  protected boolean viewingInEventList;
   protected MessageMonitoringListener messageMonitoringListener;
 
   //
@@ -142,6 +143,16 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
   // -- implements MessageMonitoringController -----------------------------------------------
   //
 
+  public void viewInEventList(boolean shouldView) {
+    if (isDestroyed) return;
+    if (viewingInEventList != shouldView) {
+      viewingInEventList = shouldView;
+      if (messageMonitoringListener != null) messageMonitoringListener.viewingInEventListChanged(shouldView);
+    }
+    viewInEventListCollection(shouldView, childsIterator());
+  }
+
+
   public void monitorRequestReceiver(boolean shouldMonitor) {
     if (isDestroyed) return;
     if (monitoringRequestReceiver != shouldMonitor) {
@@ -212,6 +223,11 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
 
   public boolean isMonitoringReplySender() {
     return monitoringReplySender;
+  }
+
+
+  public boolean isViewingInEventList() {
+    return viewingInEventList;
   }
 
 
@@ -289,6 +305,19 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     while (iterator.hasNext()) {
       AbstractDataObject o = (AbstractDataObject) iterator.next();
       o.destroyObject();
+    }
+  }
+  
+  
+  /**
+   * notifies all known objects of the monitoring request
+   * @param shouldMonitor whether the monitoring is activated or not
+   * @param iterator an iterator on the collection of object to notify
+   */
+  protected synchronized void viewInEventListCollection(boolean shouldView, java.util.Iterator iterator) {
+    while (iterator.hasNext() && ! isDestroyed) {
+      MessageMonitoringController o = (MessageMonitoringController) iterator.next();
+      o.viewInEventList(shouldView);
     }
   }
   
@@ -377,12 +406,15 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
       monitoringRequestSender = parent.monitoringRequestSender;
       monitoringReplyReceiver = parent.monitoringReplyReceiver;
       monitoringReplySender = parent.monitoringReplySender;
+      viewingInEventList = parent.viewingInEventList;
     } else {
       // monitor everything by default
       monitoringRequestReceiver = true;
       monitoringRequestSender = true;
       monitoringReplyReceiver = true;
       monitoringReplySender = true;
+      // not adding in event list by default
+      viewingInEventList = false;
     }
   }
 

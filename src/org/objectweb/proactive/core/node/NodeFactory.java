@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.node;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 
 /**

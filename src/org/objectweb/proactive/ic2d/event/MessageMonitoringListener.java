@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.event.ProActiveListener;
  */
 public interface MessageMonitoringListener extends ProActiveListener {
 
+  public void viewingInEventListChanged(boolean b);
+  
   public void monitoringRequestReceiverChanged(boolean b);
   
   public void monitoringRequestSenderChanged(boolean b);

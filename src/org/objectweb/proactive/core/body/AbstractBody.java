@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
@@ -51,7 +50,7 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
 import org.objectweb.proactive.core.mop.MethodCall;
-
+import org.objectweb.proactive.core.util.ThreadStore;
 
 
 /**
@@ -169,6 +168,8 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
    * Creates a new AbstractBody for an active object attached to a given node.
    * @param reifiedObject the active object that body is for
    * @param nodeURL the URL of the node that body is attached to
+   * @param factory the factory able to construct new factories for each type of meta objects 
+   *                needed by this body
    */
   public AbstractBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory) {
     this.reifiedObject = reifiedObject;
@@ -488,6 +489,8 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
     return isActive;
   }
 
+
+
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
@@ -557,6 +560,8 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
     }
   }
 
+
+
   //
   // -- PRIVATE METHODS -----------------------------------------------
   //
@@ -581,6 +586,8 @@ public abstract class AbstractBody extends AbstractEventProducer implements Body
     // open the threadStore in order to accept communication
     threadStore.open();
   }
+  
+  
 
   //
   // -- inner classes -----------------------------------------------

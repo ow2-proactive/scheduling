@@ -156,6 +156,15 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel impleme
   // -- implements MessageMonitoringListener -----------------------------------------------
   //
 
+  public void viewingInEventListChanged(boolean b) {
+    monitoringMenu.viewingInEventListChanged(b);
+    if (b) {
+      addActiveObjectToWatcher();
+    } else {
+      removeActiveObjectFromWatcher();
+    }
+  }
+  
   public void monitoringRequestReceiverChanged(boolean b) {
     monitoringMenu.monitoringRequestReceiverChanged(b);
   }
@@ -171,7 +180,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel impleme
   public void monitoringReplySenderChanged(boolean b) {
     monitoringMenu.monitoringReplySenderChanged(b);
   }
-  
 
 
   //
@@ -396,8 +404,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel impleme
         }
       });
       addSeparator();
-      addEventListMonitoringItems();
-      addSeparator();
     }  
   
     public java.awt.event.MouseListener getMenuMouseListener() {
@@ -418,18 +424,6 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel impleme
       });
     }
       
-    public void addEventListMonitoringItems() {
-      add(new javax.swing.AbstractAction("Add event timeline for this "+type, null) {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          addActiveObjectToWatcher();
-        }
-      });
-      add(new javax.swing.AbstractAction("Remove event timeline for this "+type, null) {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          removeActiveObjectFromWatcher();
-        }
-      });
-    }  
     
     //
     // -- INNER CLASSES -------------------------------------------------

@@ -27,48 +27,37 @@
 *  Contributor(s): 
 * 
 * ################################################################
-*/ 
+*/
 package org.objectweb.proactive.core.util;
-
-import java.util.Enumeration;
-import java.util.Properties;
 
 public final class ProActiveProperties {
 
-    public static final String PROACTIVE_DEFAULT_REQUESTRECEIVER = "proactive.requestreceiver";  
-    public static final String PROACTIVE_DEFAULT_MIGRATIONMANAGER = "proactive.migrationmanager";
-    public static final String PROACTIVE_DEFAULT_LOCATIONSERVER = "proactive.locationserver";
-    /**
-     * The rmi name of the location server
-     */
+  public static final String PROACTIVE_DEFAULT_LOCATIONSERVER = "proactive.locationserver";
+  /**
+   * The rmi name of the location server
+   */
   public static final String PROACTIVE_DEFAULT_LOCATIONSERVER_RMI = "proactive.locationserver.rmi";
-  private static Properties defaultProperties;
-
+  private static java.util.Properties defaultProperties;
 
   static {
-    defaultProperties = new Properties();
+    defaultProperties = new java.util.Properties();
     ProActiveProperties.loadDefaultProperties();
   }
 
-
   public static void loadDefaultProperties() {
-    defaultProperties.setProperty(PROACTIVE_DEFAULT_REQUESTRECEIVER, "org.objectweb.proactive.core.body.request.RequestReceiverImpl"); 
-    defaultProperties.setProperty(PROACTIVE_DEFAULT_MIGRATIONMANAGER, "org.objectweb.proactive.core.body.migration.MigrationManagerImpl");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER, "org.objectweb.proactive.ext.locationserver.LocationServer");
     defaultProperties.setProperty(PROACTIVE_DEFAULT_LOCATIONSERVER_RMI, "//localhost/LocationServer");
     ProActiveProperties.addPropertiesToSystem(defaultProperties);
-
   }
-
 
   /**
    * Add a set of properties to the system properties
    * Does not overide any existing one
    *
    */
-  protected static void addPropertiesToSystem(Properties p) {
-    for (Enumeration e = p.propertyNames(); e.hasMoreElements();) {
-      String s = (String)e.nextElement();
+  protected static void addPropertiesToSystem(java.util.Properties p) {
+    for (java.util.Enumeration e = p.propertyNames(); e.hasMoreElements();) {
+      String s = (String) e.nextElement();
       //we don't override existing value
       if (System.getProperty(s) == null) {
         System.setProperty(s, p.getProperty(s));
@@ -76,20 +65,9 @@ public final class ProActiveProperties {
     }
   }
 
-
-  public static String getRequestReceiverClass() {
-    return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_REQUESTRECEIVER);
-  }
-
-  public static String getMigrationManagerClass() {
-    return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_MIGRATIONMANAGER);
-  }
-
-
   public static String getLocationServerClass() {
     return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_LOCATIONSERVER);
   }
-
 
   public static String getLocationServerRmi() {
     return System.getProperties().getProperty(ProActiveProperties.PROACTIVE_DEFAULT_LOCATIONSERVER_RMI);

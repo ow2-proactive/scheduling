@@ -39,6 +39,7 @@ public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMen
   protected javax.swing.JCheckBoxMenuItem monitorRequestReceiverMenuItem;
   protected javax.swing.JCheckBoxMenuItem monitorReplySenderMenuItem;
   protected javax.swing.JCheckBoxMenuItem monitorReplyReceiverMenuItem;
+  protected javax.swing.JCheckBoxMenuItem viewInEventListMenuItem;
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -73,12 +74,28 @@ public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMen
     monitorReplySenderMenuItem.setState(b);
   }
   
+  public void viewingInEventListChanged(boolean b) {
+    viewInEventListMenuItem.setState(b);
+  }
+  
 
   //
   // -- PROTECTED METHODS -----------------------------------------------
   //
 
   protected void addMenuOptions() {
+    //
+    // ViewEventList
+    //
+    viewInEventListMenuItem = new javax.swing.JCheckBoxMenuItem("View in event list", controller.isViewingInEventList());
+    viewInEventListMenuItem.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent event) {
+          controller.viewInEventList(viewInEventListMenuItem.isSelected());
+        }
+      });
+    this.add(viewInEventListMenuItem);
+    this.addSeparator();
+    
     //
     // MonitoringRequestSender
     //
@@ -123,5 +140,6 @@ public class StatefullMessageMonitoringMenu extends AbstractMessageMonitoringMen
         }
       });
     this.add(monitorReplyReceiverMenuItem);
+
   }
 }

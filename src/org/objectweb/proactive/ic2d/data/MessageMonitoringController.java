@@ -40,6 +40,8 @@ public interface MessageMonitoringController {
   
   public void monitorReplySender(boolean shouldMonitor);
 
+  public void viewInEventList(boolean shouldView);
+
   public void monitorAll(boolean shouldMonitor);
   
   public boolean isMonitoring();
@@ -51,6 +53,8 @@ public interface MessageMonitoringController {
   public boolean isMonitoringReplyReceiver();
 
   public boolean isMonitoringReplySender();
+  
+  public boolean isViewingInEventList();
   
 }
 
