@@ -290,10 +290,11 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive {
 
             tmp.setScene(scene);
 	    
+	    /* the two folllowing lines have been reversed  in order to correct a bug: engine[e] might be empty when requesting it */ 
+	    engine[e] = tmp;
+	    
             /* Triggers the calculation of this interval on engine e */
             tmp.render(e, interval);
-
-            engine[e] = tmp;
 
             log("Interval " + interval.number + " assigned to engine " + keys[e] + "[" + e + "]");
           } else {
