@@ -90,7 +90,7 @@ then
 fi
 if [ -f $PROACTIVE/lib/components/fractal.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/components/fractal.jar
 fi
 if [ -f $PROACTIVE/lib/cryptix-asn1.jar ]
 then
