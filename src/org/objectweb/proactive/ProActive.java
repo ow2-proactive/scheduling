@@ -30,14 +30,17 @@
  */
 package org.objectweb.proactive;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -83,21 +86,15 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
- 
-
-import java.io.IOException;
-
-import java.net.UnknownHostException;
-
-import java.util.HashMap;
-import java.util.Set;
 
 
 public class ProActive {
-    protected static Logger logger = Logger.getLogger(ProActive.class.getName());
-    public static Logger loggerSecurity = Logger.getLogger("SECURITY");
-    public static Logger loggerGroup = Logger.getLogger("GROUP");
-    public static Logger loggerNFE = Logger.getLogger("NFE");
+    protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
+    public final static Logger loggerSecurity = Logger.getLogger("SECURITY");
+    public final static Logger loggerGroup = Logger.getLogger("GROUP");
+    public final static Logger loggerNFE = Logger.getLogger("NFE");
+    /** Logger for ProActive P2P **/
+    public final static Logger loggerP2P = Logger.getLogger("P2P");
 
     //
     // -- STATIC MEMBERS -----------------------------------------------
@@ -746,6 +743,17 @@ public class ProActive {
         }
     }
 
+	/**
+	 * Return the URL of the remote <code>activeObject</code>.
+	 * @param activeObject the remote active object.
+	 * @return the URL of <code>activeObject</code>.
+	 */
+	public static String getActiveObjectNodeUrl(Object activeObject) {
+		BodyProxy proxy = (BodyProxy)((StubObject)activeObject).getProxy();
+		UniversalBody body =  proxy.getBody();
+		return body.getNodeURL();
+	}
+	
     /**
      * Blocks the calling thread until the object <code>future</code>
      * is available. <code>future</code> must be the result object of an
