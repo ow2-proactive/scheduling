@@ -36,10 +36,12 @@ import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -97,6 +99,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
 
     /** true if the node has been created*/
     private boolean nodeCreated = false;
+    private boolean isActivated = false;
 
     /** the list of VitualNodes Id that this VirualNode is waiting for in order to create Nodes on a JVM
      * already assigned in the XML descriptor */
@@ -185,35 +188,41 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
      * Activates all the Nodes mapped to this VirtualNode in the XML Descriptor
      */
     public void activate() {
-        for (int i = 0; i < virtualMachines.size(); i++) {
-            VirtualMachine vm = getVirtualMachine();
-            boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
-            ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
+        if (!isActivated) {
+            for (int i = 0; i < virtualMachines.size(); i++) {
+                VirtualMachine vm = getVirtualMachine();
+                boolean vmAlreadyAssigned = !((vm.getCreatorId()).equals(this.name));
+                ExternalProcess process = getProcess(vm, vmAlreadyAssigned);
 
-            // Test if that is this virtual Node that originates the creation of the vm
-            // else the vm was already created by another virtualNode, in that case, nothing is
-            // done at this point, nodes creation will occur when the runtime associated with the jvm
-            // will register.
-            if (!vmAlreadyAssigned) {
-                setParameters(process, vm);
-                // It is this virtual Node that originates the creation of the vm
-                try {
-                    proActiveRuntimeImpl.createVM(process);
-                } catch (java.io.IOException e) {
-                    e.printStackTrace();
-                    logger.error("cannot activate virtualNode " + this.name +
-                        " with the process " + process.getCommand());
+                // Test if that is this virtual Node that originates the creation of the vm
+                // else the vm was already created by another virtualNode, in that case, nothing is
+                // done at this point, nodes creation will occur when the runtime associated with the jvm
+                // will register.
+                if (!vmAlreadyAssigned) {
+                    setParameters(process, vm);
+                    // It is this virtual Node that originates the creation of the vm
+                    try {
+                        proActiveRuntimeImpl.createVM(process);
+                    } catch (java.io.IOException e) {
+                        e.printStackTrace();
+                        logger.error("cannot activate virtualNode " +
+                            this.name + " with the process " +
+                            process.getCommand());
+                    }
                 }
-            }
 
-            //			}else{
-            //				// add in the hashtable the vm's creator id, and the number of nodes that should be created
-            //				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
-            //			}
-            increaseIndex();
-        }
-        if (registration) {
-            register();
+                //			}else{
+                //				// add in the hashtable the vm's creator id, and the number of nodes that should be created
+                //				awaitedVirtualNodes.put(vm.getCreatorId(),vm.getNodeNumber());
+                //			}
+                increaseIndex();
+            }
+            isActivated = true;
+            if (registration) {
+                register();
+            }
+        } else {
+            logger.info("VirtualNode " + this.name + " already activated !!!");
         }
     }
 
@@ -333,24 +342,82 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         }
     }
 
+    public void killAll() {
+        Node node;
+        ProActiveRuntime part = null;
+        if (isActivated) {
+            for (int i = 0; i < createdNodes.size(); i++) {
+                node = (Node) createdNodes.get(i);
+                part = node.getProActiveRuntime();
+
+                //we have to be carefull. Indeed if the node is local, we do not
+                // want to kill the runtime, otherwise the application is over
+                // so if the node is local, we just unregister this node from any registry
+                if (!NodeFactory.isNodeLocal(node)) {
+                    try {
+                        part.killRT();
+                    } catch (ProActiveException e1) {
+                        e1.printStackTrace();
+                    } catch (Exception e) {
+                        logger.info(" Virutal Machine " +
+                            part.getVMInformation().getVMID() + " on host " +
+                            part.getVMInformation().getInetAddress()
+                                .getHostName() + " terminated!!!");
+                    }
+                } else {
+                    try {
+                        //					the node is local, unregister it.
+                        part.killNode(node.getNodeInformation().getURL());
+                    } catch (ProActiveException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            isActivated = false;
+            try {
+                //if registered in any regigistry, unregister everything
+                if (registration) {
+                    ProActive.unregisterVirtualNode(this);
+                }
+                //else unregister just in the local runtime
+                else {
+                    proActiveRuntimeImpl.unregisterVirtualNode(this.name);
+                }
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+            }
+
+            // if not activated unregister it from the local runtime
+        } else {
+            proActiveRuntimeImpl.unregisterVirtualNode(this.name);
+        }
+    }
+
     public void createNodeOnCurrentJvm(String protocol) {
         try {
             // this method should be called when in the xml document the tag currenJVM is encountered. It means that one node must be created
             // on the jvm that originates the creation of this virtualNode(the current jvm) and mapped on this virtualNode
             // we must increase the node count
+            String url;
             increaseNodeCount(1);
             String nodeName = this.name +
                 Integer.toString(new java.util.Random(
                         System.currentTimeMillis()).nextInt());
-            String nodeHost = java.net.InetAddress.getLocalHost().getHostName();
-            String url = buildURL(nodeHost, nodeName, protocol);
 
+            //String nodeHost = java.net.InetAddress.getLocalHost().getHostName();
+            //            String port = System.getProperty("proactive.rmi.port");
+            //            if ( port != null){
+            //            	url = buildURL(nodeHost, nodeName, protocol, new Integer(port).intValue());
+            //        	}else{
+            //        		url = buildURL(nodeHost, nodeName, protocol,0);
+            //        		
+            //       		}
             // get the Runtime for the given protocol
             ProActiveRuntime defaultRuntime = RuntimeFactory.getProtocolSpecificRuntime(checkProtocol(
                         protocol));
 
             //create the node
-            defaultRuntime.createLocalNode(url, false);
+            url = defaultRuntime.createLocalNode(nodeName, false);
             //add this node to this virtualNode
             //  	createdNodes.add(new NodeImpl(defaultRuntime,url,checkProtocol(protocol)));
             //		nodeCreated = true;
@@ -389,6 +456,10 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return uniqueActiveObject;
     }
 
+    public boolean isActivated() {
+        return isActivated;
+    }
+
     //
     //-------------------IMPLEMENTS RuntimeRegistrationEventListener------------
     //
@@ -399,6 +470,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         String nodeHost;
         String protocol;
         String url;
+        int port = 0;
 
         //Check if it this virtualNode that originates the process
         if (event.getCreatorID().equals(this.name)) {
@@ -419,9 +491,15 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             // get the host of nodes
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getInetAddress().getHostName();
+            try {
+                port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+            } catch (ProActiveException e) {
+                logger.warn("port unknown: " + port);
+            }
+
             for (int i = 0; i < nodeNames.length; i++) {
                 nodeName = nodeNames[i];
-                url = buildURL(nodeHost, nodeName, protocol);
+                url = buildURL(nodeHost, nodeName, protocol, port);
                 performOperations(proActiveRuntimeRegistered, url, protocol);
             }
         }
@@ -434,6 +512,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getInetAddress().getHostName();
             protocol = event.getProtocol();
+            try {
+                port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+            } catch (ProActiveException e) {
+                logger.warn("port unknown: " + port);
+            }
+
             // it is the only way to get accurate value of nodeNumber
             VirtualMachine vm = (VirtualMachine) awaitedVirtualNodes.get(event.getCreatorID());
             int nodeNumber = (new Integer((String) vm.getNodeNumber())).intValue();
@@ -442,7 +526,7 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                     nodeName = this.name +
                         Integer.toString(new java.util.Random(
                                 System.currentTimeMillis()).nextInt());
-                    url = buildURL(nodeHost, nodeName, protocol);
+                    url = buildURL(nodeHost, nodeName, protocol, port);
                     // nodes are created from the registered runtime, since this virtualNode is
                     // waiting for runtime registration to perform co-allocation in the jvm.
                     proActiveRuntimeRegistered.createLocalNode(url, false);
@@ -572,12 +656,17 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         JVMProcess jvmProcess;
         LSFBSubProcess bsub = null;
         PrunSubProcess prun = null;
+        GlobusProcess globus = null;
+        String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
             logger.debug("nodeNumber " + nodeNumber);
         }
 
         while (ExternalProcessDecorator.class.isInstance(processImpl)) {
+            String processClassname = processImpl.getClass().getName();
+            protocolId = protocolId +
+                findProtocolId(processClassname).toLowerCase();
             if (processImpl instanceof LSFBSubProcess) {
                 //if the process is bsub we have to increase the node count by the number of processors
                 bsub = (LSFBSubProcess) processImpl;
@@ -593,7 +682,13 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                         prun.getProcessorPerNodeNumber());
                     logger.debug("VM " + vm);
                 }
+
                 increaseNodeCount((new Integer(prun.getHostsNumber()).intValue()) * nodeNumber);
+            }
+            if (processImpl instanceof GlobusProcess) {
+                //if the process is globus we have to increase the node count by the number of processors
+                globus = (GlobusProcess) processImpl;
+                increaseNodeCount((new Integer(globus.getCount()).intValue()) * nodeNumber);
             }
 
             processImplDecorator = (ExternalProcessDecorator) processImpl;
@@ -602,44 +697,72 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
                 logger.debug("processImplDecorator " +
                     processImplDecorator.getClass().getName());
             }
-        }
 
+        }
+		protocolId = protocolId + "jvm";
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
         jvmProcess = (JVMProcess) processImpl;
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null) && (prun == null)) {
-                //if bsub and prun are null we can increase the nodeCount
+            if ((bsub == null) && (prun == null) && (globus == null)) {
+				//if bsub and prun and globus are null we can increase the nodeCount
+
                 increaseNodeCount(nodeNumber);
             }
 
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
             String acquisitionMethod = vm.getAcquisitionMethod();
-            String portNumber = vm.getPortNumber();
+            //String portNumber = vm.getPortNumber();
             if (logger.isDebugEnabled()) {
                 logger.debug("Aquisition method : " + acquisitionMethod);
-                logger.debug("Port Number : " + portNumber);
+                //logger.debug("Port Number : " + portNumber);
                 logger.debug(vnName);
             }
 
-            String localruntimeURL = null;
 
-            if (portNumber != null) {
-                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
-                            portNumber));
-            } else {
-                localruntimeURL = proActiveRuntimeImpl.getURL();
+            String localruntimeURL = null;
+            try {
+                localruntimeURL = RuntimeFactory.getDefaultRuntime().getURL();
+            } catch (ProActiveException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
+
+
+//            String localruntimeURL = null;
+//
+//            if (portNumber != null) {
+//                localruntimeURL = proActiveRuntimeImpl.getURL(Integer.parseInt(
+//                            portNumber));
+//            } else {
+//                localruntimeURL = proActiveRuntimeImpl.getURL();
+//            }
+
             if (logger.isDebugEnabled()) {
                 logger.debug(localruntimeURL);
             }
-            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
-                localruntimeURL + " " + acquisitionMethod + ":" + " " +
-                nodeNumber + " " + portNumber);
+
+            jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
+                acquisitionMethod + ":" + " " + nodeNumber+" "+protocolId);
+
+//            jvmProcess.setParameters(vnName + " " + acquisitionMethod + ":" +
+//                localruntimeURL + " " + acquisitionMethod + ":" + " " +
+//                nodeNumber + " " + portNumber);
+
         }
+    }
+
+    /**
+     * @param processClassname
+     * @return
+     */
+    private String findProtocolId(String processClassname) {
+        int index = processClassname.lastIndexOf(".") + 1;
+        int lastIndex = processClassname.lastIndexOf("Process");
+        return processClassname.substring(index, lastIndex) + "-";
     }
 
     /**
@@ -668,12 +791,12 @@ public class VirtualNodeImpl extends RuntimeDeploymentProperties
         return result;
     }
 
-    private String buildURL(String host, String name, String protocol) {
-        protocol = checkProtocol(protocol);
-        if (protocol.equals("jini:")) {
+    private String buildURL(String host, String name, String protocol, int port) {
+        if (port != 0) {
+            return UrlBuilder.buildUrl(host, name, protocol, port);
+        } else {
             return UrlBuilder.buildUrl(host, name, protocol);
         }
-        return UrlBuilder.buildUrl(host, name);
     }
 
     private void increaseIndex() {
