@@ -115,9 +115,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.initGroup();
             } catch (Exception e) {
-                logger.warn("Can't init group of tests: " + group.getName(), e);
+                logger.warn("Cannot initialize group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't init group of tests: " + group.getName(), e);
+                    "Cannot initialize group of tests: " + group.getName(), e);
                 continue;
             }
 
@@ -128,7 +128,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
                     if (logger.isInfoEnabled()) {
-                        logger.info("Lauching test: " + test.getName());
+                        logger.info(" -----  Launching test: " + test.getName());
                     }
                     AbstractResult result = test.runTest();
                     if (result != null) {
@@ -156,9 +156,9 @@ public abstract class FunctionalTestManager extends AbstractManager {
             try {
                 group.endGroup();
             } catch (Exception e) {
-                logger.warn("Can't ending group of tests: " + group.getName(), e);
+                logger.warn("Cannot end group of tests: " + group.getName(), e);
                 resultsGroup.add(AbstractResult.ERROR,
-                    "Can't ending group of tests: " + group.getName(), e);
+                    "Cannot end group of tests: " + group.getName(), e);
                 continue;
             }
             results.addAll(resultsGroup);
@@ -175,10 +175,10 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 try {
                     group.initGroup();
                 } catch (Exception e) {
-                    logger.warn("Can't init group of tests: " +
+                    logger.warn("Cannot initialize group of tests: " +
                         group.getName(), e);
                     resultsGroup.add(AbstractResult.ERROR,
-                        "Can't init group of tests: " + group.getName(), e);
+                        "Cannot initialize group of tests: " + group.getName(), e);
                     continue;
                 }
 
