@@ -81,7 +81,6 @@ public abstract class ClassServer implements Runnable {
   protected ClassServer(int port) throws java.io.IOException {
     if (port == 0){
       this.port = boundServerSockect(DEFAULT_SERVER_BASE_PORT, MAX_RETRY);
-	  System.out.println("Port is " + this.port);
     } else {
       this.port = port;
       server = new java.net.ServerSocket(port);
