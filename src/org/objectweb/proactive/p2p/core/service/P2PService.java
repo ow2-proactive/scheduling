@@ -50,7 +50,7 @@ public interface P2PService extends Load {
     /**
      * <code>TTL</code>: Time To Live to get ProActive JVMs.
      */
-    public static final int TTL = 10;
+    public static final int TTL = 5;
 
     /**
      * <code>P2P_NODE_NAME</code>: name of the node where the P2P Service is
@@ -74,7 +74,7 @@ public interface P2PService extends Load {
      * For a single server use, change it in 0 Friends.
      * </p>
      */
-    public static final int NOA = 0;
+    public static final int NOA = 5;
 
     public static final int MAX_LOAD = 1;
     
