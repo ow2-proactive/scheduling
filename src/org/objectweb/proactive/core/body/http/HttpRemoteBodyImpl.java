@@ -30,20 +30,15 @@
  */
 package org.objectweb.proactive.core.body.http;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.runtime.http.RuntimeReply;
+import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -57,24 +52,36 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
 import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     private static Logger logger = Logger.getLogger("XML_HTTP");
-    private transient RemoteBodyAdapter remoteBodyAdapter;
+    UniqueID bodyID;
+    String url;
+    int port;
 
-    public HttpRemoteBodyImpl(RemoteBodyAdapter newremoteBodyAdapter) {
-        remoteBodyAdapter = newremoteBodyAdapter;
+    public HttpRemoteBodyImpl(UniqueID bodyID, String url) {
+        this.bodyID = bodyID;
+        this.url = url;
+        this.port = UrlBuilder.getPortFromUrl(url);
     }
 
     public void receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
         try {
             //logger.debug("Receive Request " + request.getMethodName());
-            HttpRequest xmlReq = new HttpRequest(request,
-                    remoteBodyAdapter.bodyID);
+            HttpRequest xmlReq = new HttpRequest(request, bodyID);
 
-            String rep = (String) ProActiveXMLUtils.sendMessage(remoteBodyAdapter.url,
-                    remoteBodyAdapter.port, xmlReq, ProActiveXMLUtils.MESSAGE);
+            String rep = (String) ProActiveXMLUtils.sendMessage(url, port,
+                    xmlReq, ProActiveXMLUtils.MESSAGE);
         } catch (RenegotiateSessionException e) {
             throw e;
         } catch (IOException e) {
@@ -88,9 +95,9 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         try {
             logger.debug("Receive Reply " + reply.getResult());
 
-            HttpReply xmlReply = new HttpReply(reply, remoteBodyAdapter.bodyID);
-            String rep = (String) ProActiveXMLUtils.sendMessage(remoteBodyAdapter.url,
-                    remoteBodyAdapter.port, xmlReply, ProActiveXMLUtils.MESSAGE);
+            HttpReply xmlReply = new HttpReply(reply, bodyID);
+            String rep = (String) ProActiveXMLUtils.sendMessage(url, port,
+                    xmlReply, ProActiveXMLUtils.MESSAGE);
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -101,14 +108,14 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public String getNodeURL() {
         try {
             return (String) sendRequest(new BodyRequest("getNodeURL",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (Exception e) {
             return "cannot contact the body to get the nodeURL";
         }
     }
 
     public UniqueID getID() {
-        return remoteBodyAdapter.bodyID;
+        return bodyID;
     }
 
     public void updateLocation(UniqueID id, UniversalBody body)
@@ -117,8 +124,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             ArrayList paramsList = new ArrayList();
             paramsList.add(id);
             paramsList.add(body);
-            sendRequest(new BodyRequest("updateLocation", paramsList,
-                    remoteBodyAdapter.bodyID));
+            sendRequest(new BodyRequest("updateLocation", paramsList, bodyID));
 
             //System.out.println("end update Location");
         } catch (IOException e) {
@@ -130,8 +136,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
 
     public void enableAC() throws IOException {
         try {
-            sendRequest(new BodyRequest("enableAC", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+            sendRequest(new BodyRequest("enableAC", new ArrayList(), bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -141,8 +146,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
 
     public void disableAC() throws IOException {
         try {
-            sendRequest(new BodyRequest("disableAC", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+            sendRequest(new BodyRequest("disableAC", new ArrayList(), bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -156,7 +160,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             ArrayList paramsList = new ArrayList();
             paramsList.add(methodName);
             sendRequest(new BodyRequest("setImmediateService", paramsList,
-                    remoteBodyAdapter.bodyID));
+                    bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -172,8 +176,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Integer(type));
             paramsList.add(body);
-            sendRequest(new BodyRequest("initiateSession", paramsList,
-                    remoteBodyAdapter.bodyID));
+            sendRequest(new BodyRequest("initiateSession", paramsList, bodyID));
         } catch (CommunicationForbiddenException e) {
             throw e;
         } catch (AuthenticationException e) {
@@ -194,8 +197,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         try {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Long(sessionID));
-            sendRequest(new BodyRequest("terminateSession", paramsList,
-                    remoteBodyAdapter.bodyID));
+            sendRequest(new BodyRequest("terminateSession", paramsList, bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -209,7 +211,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws SecurityNotAvailableException, IOException {
         try {
             return (X509Certificate) sendRequest(new BodyRequest(
-                    "getCertificate", new ArrayList(), remoteBodyAdapter.bodyID));
+                    "getCertificate", new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -226,7 +228,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(certificate);
 
             return (Policy) sendRequest(new BodyRequest("getPolicyFrom",
-                    paramsList, remoteBodyAdapter.bodyID));
+                    paramsList, bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -244,7 +246,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(policy);
 
             return ((Long) sendRequest(new BodyRequest("startNewSession",
-                    paramsList, remoteBodyAdapter.bodyID))).longValue();
+                    paramsList, bodyID))).longValue();
         } catch (RenegotiateSessionException e) {
             throw e;
         } catch (SecurityNotAvailableException e) {
@@ -265,8 +267,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(new Long(sessionID));
 
             return (ConfidentialityTicket) sendRequest(new BodyRequest(
-                    "negociateKeyReceiverSide", paramsList,
-                    remoteBodyAdapter.bodyID));
+                    "negociateKeyReceiverSide", paramsList, bodyID));
         } catch (KeyExchangeException e) {
             throw e;
         } catch (SecurityNotAvailableException e) {
@@ -282,7 +283,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws SecurityNotAvailableException, IOException {
         try {
             return (PublicKey) sendRequest(new BodyRequest("getPublicKey",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -300,7 +301,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(cl_rand);
 
             return (byte[]) sendRequest(new BodyRequest("randomValue",
-                    paramsList, remoteBodyAdapter.bodyID));
+                    paramsList, bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -321,7 +322,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         paramsList.add(sig_code);
 
         return (byte[][]) sendRequest(new BodyRequest("publicKeyExchange",
-                paramsList, remoteBodyAdapter.bodyID));
+                paramsList, bodyID));
     }
 
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
@@ -336,7 +337,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         paramsList.add(tmp4);
 
         return (byte[][]) sendRequest(new BodyRequest("secretKeyExchange",
-                paramsList, remoteBodyAdapter.bodyID));
+                paramsList, bodyID));
     }
 
     public Communication getPolicyTo(String type, String from, String to)
@@ -348,7 +349,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(to);
 
             return (Communication) sendRequest(new BodyRequest("getPolicyTo",
-                    paramsList, remoteBodyAdapter.bodyID));
+                    paramsList, bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -365,7 +366,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(securityContext);
 
             return (SecurityContext) sendRequest(new BodyRequest("getPolicy",
-                    paramsList, remoteBodyAdapter.bodyID));
+                    paramsList, bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -378,7 +379,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public String getVNName() throws SecurityNotAvailableException, IOException {
         try {
             return (String) sendRequest(new BodyRequest("getVNName",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -392,8 +393,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws SecurityNotAvailableException, IOException {
         try {
             return (byte[]) sendRequest(new BodyRequest(
-                    "getCertificateEncoded", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+                    "getCertificateEncoded", new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -407,7 +407,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws SecurityNotAvailableException, IOException {
         try {
             return (ArrayList) sendRequest(new BodyRequest("getEntities",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -421,8 +421,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws SecurityNotAvailableException, IOException {
         try {
             return (ProActiveSecurityManager) sendRequest(new BodyRequest(
-                    "getProActiveSecurityManager", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+                    "getProActiveSecurityManager", new ArrayList(), bodyID));
         } catch (SecurityNotAvailableException e) {
             throw e;
         } catch (IOException e) {
@@ -433,8 +432,8 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     }
 
     private Object sendRequest(BodyRequest req) throws Exception {
-        RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(remoteBodyAdapter.url,
-                remoteBodyAdapter.port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
+        RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(url,
+                port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
 
         return reply.getReturnedObject();
     }
@@ -442,7 +441,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public HashMap getHandlersLevel() throws java.io.IOException {
         try {
             return (HashMap) sendRequest(new BodyRequest("getHandlersLevel",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -457,7 +456,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(handler);
             paramsList.add(exception);
             sendRequest(new BodyRequest("setExceptionHandler", paramsList,
-                    remoteBodyAdapter.bodyID));
+                    bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -472,8 +471,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(exception);
 
             return (Handler) sendRequest(new BodyRequest(
-                    "unsetExceptionHandler", paramsList,
-                    remoteBodyAdapter.bodyID));
+                    "unsetExceptionHandler", paramsList, bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -489,7 +487,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             paramsList.add(exception);
 
             sendRequest(new BodyRequest("setExceptionHandler", paramsList,
-                    remoteBodyAdapter.bodyID));
+                    bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -500,7 +498,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public String getJobID() {
         try {
             return (String) sendRequest(new BodyRequest("getJobID",
-                    new ArrayList(), remoteBodyAdapter.bodyID));
+                    new ArrayList(), bodyID));
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -514,7 +512,7 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public void clearHandlersLevel() throws java.io.IOException {
         try {
             sendRequest(new BodyRequest("clearHandlersLevel", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+                    bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
@@ -529,27 +527,27 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public String getHandlerizableInfo() throws java.io.IOException {
         try {
             return (String) sendRequest(new BodyRequest(
-                    "getHandlerizableInfo", new ArrayList(),
-                    remoteBodyAdapter.bodyID));
+                    "getHandlerizableInfo", new ArrayList(), bodyID));
         } catch (IOException e) {
             throw e;
         } catch (Exception e) {
             throw new HTTPUnexpectedException("Unexpected exception", e);
         }
     }
-/*
-    public boolean equals(Object o) {
-    	if (!(o instanceof HttpRemoteBodyImpl)) {
-    		return false; 
-    	} 
-    
-    	HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
-    
-    	return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
-		(remoteBodyAdapter.port == rba.getPort());
-    }
-    */
+
+    /*
+        public boolean equals(Object o) {
+                if (!(o instanceof HttpRemoteBodyImpl)) {
+                        return false;
+                }
+
+                HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
+
+                return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
+                    (remoteBodyAdapter.port == rba.getPort());
+        }
+        */
     public UniversalBody getRemoteAdapter() {
-        return remoteBodyAdapter.getRemoteAdapter();
+        return getRemoteAdapter();
     }
 }
