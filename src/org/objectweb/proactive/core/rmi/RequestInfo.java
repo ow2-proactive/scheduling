@@ -34,13 +34,12 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 import java.io.IOException;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 
 public class RequestInfo {
     /* Reusable variables */
-    private static Pattern pColon = Pattern.compile(": *");
+    
     private static Pattern pSpace = Pattern.compile(" ");
     private static final String METHOD_GET = "GET";
     private static final String METHOD_POST = "POST";
@@ -48,7 +47,6 @@ public class RequestInfo {
     private int contentLength;
     private String classFileName;
     private String action;
-    private HashMap headers = new HashMap();
     private boolean begun;
 
     public String getContentType() {
@@ -80,7 +78,6 @@ public class RequestInfo {
         String line;
 
         /* Clear the previous information */
-        headers.clear();
         classFileName = null;
         contentLength = 0;
         contentType = null;
@@ -138,41 +135,11 @@ public class RequestInfo {
             }
 
             /* Read message headers */
-            String prevFieldName = null;
-
-            do {
-                if ((line = in.getLine()) == null) {
-                    throw new IOException(
-                        "Connection ended before reading all headers");
-                }
-
-                if ((line.length() > 0) && (method != METHOD_GET)) { // we don't care about headers in GET requests
-
-                    if (line.startsWith(" ") || line.startsWith("\t")) {
-                        headers.put(prevFieldName,
-                            headers.get(prevFieldName) + line); // folding
-                    }
-
-                    String[] pair = pColon.split(line, 2);
-                    String fieldName = prevFieldName = pair[0].toLowerCase();
-                    String fieldValue = pair[1];
-
-                    String storedFieldValue = (String) headers.get(fieldName);
-
-                    if (storedFieldValue == null) {
-                        headers.put(fieldName, fieldValue);
-                    } else {
-                        headers.put(fieldName,
-                            storedFieldValue + "," + fieldValue);
-                    }
-
-                    headers.put(fieldName, fieldValue);
-                }
-            } while (line.length() > 0); // empty line, end of headers
-
+            in.parseHeaders();
+            
             // ProActive specific processing
-            this.contentLength = Integer.parseInt(getHeader("Content-Length"));
-            this.contentType = getHeader("Content-Type");
+            this.contentLength = Integer.parseInt(in.getHeader("Content-Length"));
+            this.contentType = in.getHeader("Content-Type");
 
             if (!contentType.equals(
                         ProActiveXMLUtils.SERVICE_REQUEST_CONTENT_TYPE)) {
@@ -182,14 +149,10 @@ public class RequestInfo {
                     contentType);
             }
 
-            this.action = getHeader("ProActive-Action");
+            this.action = in.getHeader("ProActive-Action");
         } else {
             throw new java.io.IOException(
                 "Malformed Request Line, expected method GET or POST: " + line);
         }
-    }
-
-    public String getHeader(String fieldName) {
-        return (String) headers.get(fieldName.toLowerCase());
     }
 }

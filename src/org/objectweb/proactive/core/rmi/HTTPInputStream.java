@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
+import java.util.HashMap;
+import java.util.regex.Pattern;
+
 
 /*
  * Created on Jul 29, 2004
@@ -17,6 +20,9 @@ import java.io.PushbackInputStream;
  * non-deprecated version of readLine
  */
 public class HTTPInputStream extends DataInputStream {
+    private static Pattern pColon = Pattern.compile(": *");
+    HashMap headers = new HashMap();
+	
     public HTTPInputStream(InputStream is) {
         super(is);
         in = in = new PushbackInputStream(in);
@@ -39,8 +45,8 @@ public class HTTPInputStream extends DataInputStream {
                 int c2 = in.read();
 
                 if ((c2 > 0) && (c2 != '\n')) {
-                	// insert the character back in the stream
-                	((PushbackInputStream) in).unread(c2);
+                    // insert the character back in the stream
+                    ((PushbackInputStream) in).unread(c2);
                 }
 
                 // else { ignoreLF(); }
@@ -55,5 +61,46 @@ public class HTTPInputStream extends DataInputStream {
         } else {
             return sb.toString();
         }
+    }
+
+    /* Read message headers */
+    public void parseHeaders() throws IOException {
+        String line;
+        String prevFieldName = null;
+        headers.clear();
+        
+        do {
+            if ((line = getLine()) == null) {
+                throw new IOException(
+                    "Connection ended before reading all headers");
+            }
+
+            if ((line.length() > 0)) { // we don't care about headers in GET requests
+
+                if (line.startsWith(" ") || line.startsWith("\t")) {
+                    headers.put(prevFieldName, headers.get(prevFieldName) +
+                        line); // folding
+                }
+
+                String[] pair = pColon.split(line, 2);
+                String fieldName = prevFieldName = pair[0].toLowerCase();
+                String fieldValue = pair[1];
+
+                String storedFieldValue = (String) headers.get(fieldName);
+
+                if (storedFieldValue == null) {
+                    headers.put(fieldName, fieldValue);
+                } else {
+                    headers.put(fieldName, storedFieldValue + "," + fieldValue);
+                }
+
+                headers.put(fieldName, fieldValue);
+            }
+        } while (line.length() > 0); // empty line, end of headers
+    }
+
+
+    public String getHeader(String fieldName) {
+        return (String) headers.get(fieldName.toLowerCase());
     }
 }
