@@ -447,7 +447,7 @@
       ================================================================
 	-->
 	<target name="microTimer">
-		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/local/bin/gcc" os="Linux" output="output.txt">
+		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/local/bin/g++" os="Linux" output="output.txt">
 			<arg line=" -shared -I/usr/local/jdk1.4.0/include/ -I/usr/local/jdk1.4.0/include/linux -o Testsuite_timer_micro_MicroTimer.o  testsuite_timer_micro_MicroTimer.cc"/>
 		</exec>
 		<exec dir="${src.dir}/testsuite/timer/micro" executable="/usr/bin/ld" os="Linux" output="output2.txt">
@@ -477,6 +477,7 @@
 			<env key="LD_LIBRARY_PATH" value="${classes.dir}/testsuite/timer/micro"/>
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
+			<jvmarg value="-Djava.library.path=${classes.dir}/testsuite/timer/micro" />
 		</java>
 	</target>
 </project>
