@@ -224,7 +224,8 @@ public abstract class ClassServer implements Runnable {
      */
     private static String getPath(String line) {
         // extract class from GET line
-        line = line.substring(5, line.length() - 1).trim();
+        //line = line.substring(5, line.length() - 1).trim();
+		line = line.substring(5, line.length()).trim();
         int index = line.indexOf(".class ");
         if (index != -1) {
             return line.substring(0, index).replace('/', '.');
@@ -240,7 +241,8 @@ public abstract class ClassServer implements Runnable {
      */
     private static String getHost(String line) {
         // extract class from Host line
-        return line.substring(5, line.length() - 1).trim();
+		
+		return line.substring(5, line.length()).trim();
     }
 
     private int boundServerSockect(int basePortNumber, int numberOfTry)
