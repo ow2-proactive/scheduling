@@ -72,10 +72,6 @@ if [ -f $PROACTIVE/lib/cryptix32.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix32.jar
 fi
-if [ -f $PROACTIVE/lib/javaxCrypto.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/javaxCrypto.jar
-fi
 if [ -f $PROACTIVE/lib/log4j-core.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
@@ -87,10 +83,6 @@ fi
 if [ -f $PROACTIVE/lib/xercesImpl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xercesImpl.jar
-fi
-if [ -f $PROACTIVE/lib/xml-apis.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xml-apis.jar
 fi
 if [ -f $PROACTIVE/lib/fractal.jar ]
 then
