@@ -33,7 +33,7 @@ IF EXIST %PROACTIVE%\lib\log4j-core.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\li
 IF EXIST %PROACTIVE%\lib\javaxCrypto.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\javaxCrypto.jar
 IF EXIST %PROACTIVE%\lib\ibis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\ibis.jar
 IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
-IF EXIST %PROACTIVE%\lib\xmlParserAPIs.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xmlParserAPIs.jar
+IF EXIST %PROACTIVE%\lib\xml-apis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xml-apis.jar
 echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD=%JAVA_HOME%\bin\java.exe -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=proactive-log4j

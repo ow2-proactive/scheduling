@@ -88,9 +88,9 @@ if [ -f $PROACTIVE/lib/xercesImpl.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xercesImpl.jar
 fi
-if [ -f $PROACTIVE/lib/xmlParserAPIs.jar ]
+if [ -f $PROACTIVE/lib/xml-apis.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xmlParserAPIs.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xml-apis.jar
 fi
 
 echo "CLASSPATH"=$CLASSPATH
