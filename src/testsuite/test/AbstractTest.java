@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 
 import testsuite.bean.Beanable;
 
+import testsuite.manager.AbstractManager;
 import testsuite.result.TestResult;
 
 import java.io.File;
@@ -50,6 +51,8 @@ public abstract class AbstractTest implements Serializable, Beanable {
     /** Logger. */
     protected static Logger logger = null;
 
+	protected AbstractManager manager = null;
+	
     /**
      * Construct a new <code>AbstractTest</code> with defaults settings and a default logger.
      */
@@ -218,4 +221,19 @@ public abstract class AbstractTest implements Serializable, Beanable {
             }
         }
     }
+    
+	/**
+	 * @return
+	 */
+	public AbstractManager getManager() {
+		return manager;
+	}
+
+	/**
+	 * @param manager
+	 */
+	public void setManager(AbstractManager manager) {
+		this.manager = manager;
+	}
+
 }
