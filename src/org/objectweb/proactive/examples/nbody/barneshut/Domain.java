@@ -10,6 +10,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
 
@@ -29,14 +30,11 @@ public class Domain implements Serializable{
     private QuadTree quadTree, treeNode;
     private Domain neighbours; // Domains that need to know my coordinates 
     Domain [] domainArray; // a copy of the above domainGroup, but as an array
-    private int iter = 0; 
     
     Force [] totalForce;  
     private int nbNeighbours = 0, nbUpdates=0;
     
     private Vector listPositions ;
-    
-    private Vector listSenders;
     
     public Domain (){}
     
@@ -75,8 +73,6 @@ public class Domain implements Serializable{
         maestro = master;
         quadTree = tree;
         treeNode = quadTree.getNode (identification); 
-        Group group = ProActiveGroup.getGroup (domainGroup);
-        int sizeOfDomainGroup = group.size();
         this.domainArray = domainArray;
         
         listPositions = new Vector();
@@ -237,9 +233,10 @@ public class Domain implements Serializable{
      * Update the value of this info (given by it's id) in the tree 
      */
     public void setValue(Info inf) {  // FIXME : this never gets called if nb Domains=1
-        int id = inf.identification;
+        
         nbUpdates++;
         
+        //        int id = inf.identification;
         //        int old  = nbUpdates;
         //        boolean reach = (nbNeighbours == nbUpdates);
         //        System.out.println(identification + " received value from " + id + ". Info is " + inf.x 
@@ -259,11 +256,8 @@ public class Domain implements Serializable{
     public void sendValueToNeighbours() {
 
         started = true;
-        
-        int size = ProActiveGroup.getGroup(neighbours).size();
-        
+        //        int size = ProActiveGroup.getGroup(neighbours).size();
         //        System.out.println(identification + " sends value to " + size + " neighbours");
-        
         
         Info info = treeNode.info ; 
         //System.out.println(identification + " sending to all nodes value " + info.x + " root value is " + quadTree.info.x);

@@ -1,6 +1,7 @@
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 
+import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
 import org.objectweb.proactive.ActiveObjectCreationException;

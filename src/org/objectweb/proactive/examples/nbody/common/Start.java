@@ -42,7 +42,7 @@ public class Start {
            switch (input) {
             case 49 :  org.objectweb.proactive.examples.nbody.groupcom.Start.main(args); break;
           	case 50 :  org.objectweb.proactive.examples.nbody.barneshut.Start.main(args); break;
-//           	case 51 :  org.objectweb.proactive.examples.nbody.spmd.Start.main(args); break;
+           	case 51 :  org.objectweb.proactive.examples.nbody.oospmd.Start.main(args); break;
            }
 
      }

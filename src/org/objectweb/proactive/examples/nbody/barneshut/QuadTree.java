@@ -96,7 +96,6 @@ public class QuadTree implements Serializable {
      * @return the point which lies at average x and y coordinates
      */
     private Point2D average(Vector bodies) {
-        int numPlanets = bodies.size();
         Point2D average = new Point2D() ;
         for (int i = 0 ; i < info.numPlanets ; i++) {
             Info body = (Info) bodies.get(i);

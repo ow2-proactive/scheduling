@@ -14,7 +14,6 @@ public class Planet extends Info{
     double vx,vy;
     double diameter;
     
-    private int debug_count = 0;
     private final double dt = 0.002;
     
     public Planet(){}
