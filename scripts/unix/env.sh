@@ -92,6 +92,11 @@ if [ -f $PROACTIVE/lib/xml-apis.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/xml-apis.jar
 fi
+if [ -f $PROACTIVE/lib/fractal.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/fractal.jar
+fi
+
 
 echo "CLASSPATH"=$CLASSPATH
 export CLASSPATH
