@@ -340,21 +340,21 @@ public class ProActiveComponentRepresentativeImpl
      * identifiers accross jvms.
      */
     public boolean equals(Object component) {
-        if (!(component instanceof ProActiveComponent)) {
-            logger.error(
-                "can only compare proactive components to proactive components ");
-            return false;
-        }
-        return getProxy().equals(((ProActiveComponentRepresentative) component).getProxy());
+        Object result = reifyCall(Object.class.getName(),
+                "equals", new Class[] {Object.class  }, new Object[] { component  });
+        return ((Boolean)result).booleanValue();
+//        if (!(component instanceof ProActiveComponent)) {
+//            logger.error(
+//                "can only compare proactive components to proactive components ");
+//            return false;
+//        }
+//        return getProxy().equals(((ProActiveComponentRepresentative) component).getProxy());
     }
 
     public int hashCode() {
-        // should be cached maybe
-        if (!(getProxy() instanceof ProxyForGroup)) {
-            return ((UniversalBodyProxy) getProxy()).getBodyID().hashCode();
-        } else {
-            return super.hashCode();
-        }
+        Object result = reifyCall(Object.class.getName(),
+                "hashCode", new Class[] {}, new Object[] {});
+        return ((Integer)result).intValue();
     }
 
     /**
