@@ -147,7 +147,39 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	/* if the call is asynchronous the group of result will be a group a future */
 	else // if (AbstractProxy.isAsynchronousCall (c))                // SYNC == ASYNC !!!!
 	    {
-		result = asynchronousCallOnGroup(c);
+	int size = memberListProxy.size();
+	/* Creates a stub + ProxyForGroup for representing the result */
+		Object[] paramProxy = new Object[0];
+		result = MOP.newInstance (c.getReifiedMethod().getReturnType().getName(),
+					  null,
+					  "org.objectweb.proactive.core.group.ProxyForGroup",
+					  paramProxy);
+		((ProxyForGroup)((StubObject)result).getProxy()).className = c.getReifiedMethod().getReturnType().getName();
+	
+	// Init the lists of result with null value to permit the "set(index)" operation
+	List memberListStubOfResult  = ((ProxyForGroup)((StubObject)result).getProxy()).memberListStub;
+	List memberListProxyOfResult = ((ProxyForGroup)((StubObject)result).getProxy()).memberListProxy;
+	for (int i = 0 ; i < size ; i++) {
+	    memberListStubOfResult.add(null);
+	    memberListProxyOfResult.add(null);
+	}
+	
+	// Creating Threads
+	for (int i = 0 ; i < size ; i++) {
+
+
+
+
+	    Object tmp = ((Proxy)(memberListProxy.get(i))).reify(c);
+	    addToListOfResult(memberListProxyOfResult,memberListStubOfResult,tmp,i);
+
+	    memberListStubOfResult.set(i,tmp);
+	    memberListProxyOfResult.set(i,((StubObject)tmp).getProxy());
+
+
+	    //((ProxyForGroup)((StubObject)result).getProxy()).createThreadForAsync(this.memberListProxy,memberListProxyOfResult,memberListStubOfResult,i,c);
+	}
+
 	    }
 
 	return result;
@@ -257,82 +289,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
     }
 
 
-    //	    System.out.println("");
-
-
-    ///** Find the first member with the same ID as o (ID of o's body) and remove it.
-    //    Note : o have to be an Active Object (never a future) otherwise nothing is done  (here, an arrived future is considered as an Active Object)
-    //    that it is not posssible to remove a future who is not arrived */
-    //public synchronized void remove(Object o) {}
-
-    // 	/* if o is a standard Java object do nothing */
-    // 	if (!(MOP.isReifiedObject(o)))
-    // 	    return;
-    // 	/* check o is not a future */
-    // 	if ( (MOP.isReifiedObject(o)) && (((StubObject)o).getProxy() instanceof org.objectweb.proactive.Future) ) 
-    // 	    return;
-
-    // 	/* else we can do something */
-    // 	else {
-	    
-    // 	    boolean found = false;
-    // 	    int i = 0;
-    // 	    while ( (!found) && (i < memberListProxy.size() ) ) {
-
-		
-    // 		/* if current member and proxy of o are a ProxyForBody */
-    // 		if ( (memberListProxy.get(i) instanceof org.objectweb.proactive.ProxyForBody) && (((StubObject)o).getProxy() instanceof org.objectweb.proactive.ProxyForBody) ) {
-    // 		    /* we test the equality of member's ID and o's ID */
-    // 		    if ((((org.objectweb.proactive.ProxyForBody)(memberListProxy.get(i))).getBodyID()).equals( ((org.objectweb.proactive.ProxyForBody)((StubObject)o).getProxy()).getBodyID() )) 
-    // 			found = true;
-    // 		}
-
-		
-    //  		/* if current member is a ProxyForFuture */
-    //  		else if (memberListProxy.get(i) instanceof org.objectweb.proactive.Future) {
-
-    // 		    if (((StubObject)o).getProxy() instanceof org.objectweb.proactive.Future)
-
-
-    //  		    /* if the future is arrived  (not awaited) */
-    //  		    if ( !(((org.objectweb.proactive.ProxyForFuture)(memberListProxy.get(i))).isAwaited()) ) {
-    //  			Object resultFuture = ((org.objectweb.proactive.ProxyForFuture)(memberListProxy.get(i))).getResult();
-			
-			
-
-    // // 			/* if the future is a standard Java object */
-    // // 			if (!MOP.isReifiedObject(resultFuture))
-    // // 			    /* test equality between o and resultFuture with the Object's equals method */
-    // // 			    found = ((Object)o).equals(resultFuture);
-			
-    // // 			/* the future is a simple Active Object */
-    // // 			else if (((StubObject)resultFuture).getProxy() instanceof org.objectweb.proactive.ProxyForBody)
-    // // 			    found = ( ((org.objectweb.proactive.ProxyForBody)(((StubObject)o).getProxy())).getBodyID().equals(((org.objectweb.proactive.ProxyForBody)resultFuture).getBodyID()) );
-			
-    // // 			/* the future is a group Active Object */
-    // // 			else if (((StubObject)resultFuture).getProxy() instanceof org.objectweb.proactive.ProxyForBody)
-    // // 			    found = false;
-    // // 		    }
-    // // 		    /* else the future is not arrived, we can't do anything */ 
-    // // 		}
-		
-		
-    // 		/* if curruent member and proxy of o is a ProxyForGroup */
-    // 		else if ( (memberListProxy.get(i) instanceof org.objectweb.proactive.group.ProxyForGroup) && (((StubObject)o).getProxy() instanceof org.objectweb.proactive.group.ProxyForGroup) ) {
-		    
-    // 		    System.out.println("Je detecte un Group");
-    // 		    /* if o represent a group, we test with ProxyForGroupID */
-    // 		    found = ((org.objectweb.proactive.group.ProxyForGroup)((StubObject)o).getProxy()).proxyForGroupID.equals(((org.objectweb.proactive.group.ProxyForGroup)(memberListProxy.get(i))).proxyForGroupID);
-    // 		}
-		
-    // 		i++;
-    // 	    }
-	    
-    // 	    if (found)
-    // 		memberListProxy.remove( i-1 ); 
-    // 	}
-    //     }
-    // 	}
 
 
 
