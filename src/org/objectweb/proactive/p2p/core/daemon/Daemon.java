@@ -641,6 +641,7 @@ public class Daemon {
 
         RollingFileAppender rfa;
         try {
+           new File(LOG_DIR).mkdir();
             rfa = new RollingFileAppender(layout, filename, true);
         } catch (IOException ioe) {
             ioe.printStackTrace();
