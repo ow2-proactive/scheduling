@@ -127,6 +127,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 	 * this FuturePool
 	 * */
 	public void enableAC() {
+		this.queueAC = new ActiveACQueue();
+		this.queueAC.start();
 		this.acEnabled = true;
 	}
 
@@ -136,6 +138,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 	 * */
 	public void disableAC() {
 		this.acEnabled = false;
+		this.queueAC.killMe();
+		this.queueAC = null;
 	}
 
 	/**
