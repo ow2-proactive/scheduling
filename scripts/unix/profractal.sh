@@ -12,7 +12,7 @@ fi
 workingDir=`dirname $0`
 . $workingDir/env.sh
 CLASSPATH=$CLASSPATH:$PROFRACTALIB/jai_imageio.jar:$PROFRACTALIB/mlibwrapper_jai.jar:$PROFRACTALIB/clibwrapper_jiio.jar:$PROFRACTALIB/jai_codec.jar:$PROFRACTALIB/jai_core.jar
-$JAVACMD org.objectweb.proactive.examples.fractParallel profractalrsrcs
+$JAVACMD org.objectweb.proactive.examples.profractal.fractParallel profractalrsrcs
 
 echo
 echo ------------------------------------------------------------
