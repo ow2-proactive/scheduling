@@ -33,16 +33,14 @@ package org.objectweb.proactive;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.process.JVMProcess;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.node.jini.JiniNodeFactory;
-import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 import org.objectweb.proactive.core.node.NodeException;
-//import org.objectweb.proactive.core.node.jini.JiniNodeFactory;
-//import org.objectweb.proactive.core.node.rmi.RemoteNodeFactory;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.process.JVMProcess;
+import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
+import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 
 /**
  * <p>
@@ -252,7 +250,7 @@ public class StartNode {
     RemoteRuntimeFactory.setShouldCreateRegistry(!noRegistry);
     RemoteRuntimeFactory.setRegistryPortNumber(registryPortNumber);
     if (RuntimeFactory.JINI_ENABLED) {
-      JiniNodeFactory.setMulticastLocator(multicastLocator);
+      JiniRuntimeFactory.setMulticastLocator(multicastLocator);
      // System.out.println("jini not yet implemented");
     }
     // create node
