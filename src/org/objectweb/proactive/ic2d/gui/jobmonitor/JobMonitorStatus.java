@@ -92,7 +92,6 @@ public class JobMonitorStatus extends JPanel implements JobMonitorConstants,
         this.cells = new StatusCell[NB_KEYS];
 
         tree.addTreeSelectionListener(this);
-        tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
         setLayout(new GridLayout(cells.length, 1, 0, 20));
         setBackground(Color.WHITE);
 

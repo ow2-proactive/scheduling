@@ -4,14 +4,18 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 import org.objectweb.proactive.ic2d.gui.IC2DGUIController;
 
 public class JobMonitorFrame extends JFrame
 {
 	private static final int DEFAULT_WIDTH = 830;
-	private static final int DEFAULT_HEIGHT = 600;
+	private static final int DEFAULT_HEIGHT = 630;
 
 	private JobMonitorPanel panel;
 
@@ -59,6 +63,18 @@ public class JobMonitorFrame extends JFrame
 			    
 			    panel.addMonitoredHost (host);
 			    panel.updateHosts ();
+	        }
+	    });
+	    monitoringMenu.add(b);
+	    
+	    b = new JMenuItem("Show monitored objects...");
+	    b.addActionListener(new java.awt.event.ActionListener()
+	    {
+	        public void actionPerformed(java.awt.event.ActionEvent e)
+	        {
+	        	MonitoredObjectsList dialog = new MonitoredObjectsList(JobMonitorFrame.this,
+	        			getPanel());
+	        	dialog.setVisible(true);
 	        }
 	    });
 	    monitoringMenu.add(b);
@@ -160,5 +176,9 @@ public class JobMonitorFrame extends JFrame
 		super.show();
 	
 		panel.showOwnedFrames();
+	}
+	
+	public JobMonitorPanel getPanel() {
+		return panel;
 	}
 }

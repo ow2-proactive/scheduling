@@ -23,24 +23,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
-import java.util.Vector;
+
+import javax.swing.DefaultListModel;
 
 
 public class NodeExploration implements JobMonitorConstants {
     private static final String PA_JVM = "PA_JVM";
     private int maxDepth;
     private DataAssociation asso;
-    private Vector filteredJobs;
+    private DefaultListModel skippedObjects;
     private Map aos;
     private Set visitedVM;
     private Map runtimes;
     private IC2DGUIController controller;
 
-    public NodeExploration(DataAssociation asso, Vector filteredJobs,
-        IC2DGUIController controller) {
+    public NodeExploration(DataAssociation asso,
+        DefaultListModel skippedObjects, IC2DGUIController controller) {
         this.maxDepth = 10;
         this.asso = asso;
-        this.filteredJobs = filteredJobs;
+        this.skippedObjects = skippedObjects;
         this.aos = new HashMap();
         this.runtimes = new HashMap();
         this.controller = controller;
@@ -117,6 +118,10 @@ public class NodeExploration implements JobMonitorConstants {
         Registry registry;
         String[] list;
 
+        if (isSkipped(HOST, hostname)) {
+            return;
+        }
+
         try {
             registry = LocateRegistry.getRegistry(hostname, port);
             list = registry.list();
@@ -144,9 +149,18 @@ public class NodeExploration implements JobMonitorConstants {
         visitedVM = null;
     }
 
+    private boolean isSkipped(int key, String fullname) {
+        BasicMonitoredObject object = BasicMonitoredObject.create(key, fullname);
+        return skippedObjects.contains(object);
+    }
+
     private void addChild(int fromKey, String fromName, int toKey, String toName) {
-        asso.addChild(BasicMonitoredObject.create(fromKey, fromName),
-            BasicMonitoredObject.create(toKey, toName));
+        BasicMonitoredObject fromObject = BasicMonitoredObject.create(fromKey,
+                fromName);
+        BasicMonitoredObject toObject = BasicMonitoredObject.create(toKey,
+                toName);
+
+        asso.addChild(fromObject, toObject);
     }
 
     private void handleProActiveRuntime(ProActiveRuntime pr, int depth) {
@@ -162,24 +176,33 @@ public class NodeExploration implements JobMonitorConstants {
 
         String vmName = pr.getVMInformation().getName();
 
-        if (isJobFiltered(pr.getJobID()) || visitedVM.contains(vmName)) {
+        if (visitedVM.contains(vmName) || isSkipped(JVM, vmName)) {
+            return;
+        }
+
+        String jobID = pr.getJobID();
+        if (isSkipped(JOB, jobID)) {
+            return;
+        }
+
+        String hostname = pr.getVMInformation().getInetAddress()
+                            .getCanonicalHostName();
+        if (isSkipped(HOST, hostname)) {
             return;
         }
 
         visitedVM.add(vmName);
 
-        String jobId = pr.getJobID();
-        String hostname = pr.getVMInformation().getInetAddress()
-                            .getCanonicalHostName();
-
         addChild(HOST, hostname, JVM, vmName);
-        addChild(JOB, pr.getJobID(), JVM, vmName);
+        addChild(JOB, jobID, JVM, vmName);
 
         try {
             String[] nodes = pr.getLocalNodeNames();
             for (int i = 0; i < nodes.length; ++i) {
                 String nodeName = nodes[i];
-                handleNode(pr, vmName, nodeName);
+                if (!isSkipped(NODE, nodeName)) {
+                    handleNode(pr, vmName, nodeName);
+                }
             }
         } catch (ProActiveException e) {
             log(e);
@@ -195,25 +218,36 @@ public class NodeExploration implements JobMonitorConstants {
     }
 
     private void handleNode(ProActiveRuntime pr, String vmName, String nodeName) {
-        String vnName;
-
-        addChild(JVM, vmName, NODE, nodeName);
         try {
-            addChild(JOB, pr.getJobID(pr.getURL() + "/" + nodeName), NODE,
-                nodeName);
-            vnName = pr.getVNName(nodeName);
-
-            ArrayList activeObjects = null;
-            activeObjects = pr.getActiveObjects(nodeName);
-
-            if (vnName != null) {
-                addChild(VN, vnName, NODE, nodeName);
-                VirtualNode vn = pr.getVirtualNode(vnName);
-                if (vn != null) {
-                    addChild(JOB, vn.getJobID(), VN, vnName);
-                }
+            String jobID = pr.getJobID(pr.getURL() + "/" + nodeName);
+            if (isSkipped(JOB, jobID)) {
+                return;
             }
 
+            String vnName = pr.getVNName(nodeName);
+            String vnJobID = null;
+            if (vnName != null) {
+                if (isSkipped(VN, vnName)) {
+                    return;
+                }
+
+                VirtualNode vn = pr.getVirtualNode(vnName);
+                if (vn != null) {
+                    vnJobID = vn.getJobID();
+                    if (isSkipped(JOB, vnJobID)) {
+                        return;
+                    }
+
+                    addChild(JOB, vnJobID, VN, vnName);
+                }
+
+                addChild(VN, vnName, NODE, nodeName);
+            }
+
+            addChild(JVM, vmName, NODE, nodeName);
+            addChild(JOB, jobID, NODE, nodeName);
+
+            ArrayList activeObjects = pr.getActiveObjects(nodeName);
             handleActiveObjects(nodeName, activeObjects);
         } catch (ProActiveException e) {
             log(e);
@@ -226,13 +260,16 @@ public class NodeExploration implements JobMonitorConstants {
             ArrayList aoWrapper = (ArrayList) activeObjects.get(i);
             RemoteBodyAdapter rba = (RemoteBodyAdapter) aoWrapper.get(0);
 
-            //			System.out.println ("Active object " + (i + 1) + " / " + size + " class: " + aoWrapper.get (1));
             String className = (String) aoWrapper.get(1);
             if (className.equalsIgnoreCase(
                         "org.objectweb.proactive.ic2d.spy.Spy")) {
                 continue;
             }
 
+            String jobID = rba.getJobID();
+            if (isSkipped(JOB, jobID))
+            	continue;
+            
             className = className.substring(className.lastIndexOf(".") + 1);
             String aoName = (String) aos.get(rba.getID());
             if (aoName == null) {
@@ -240,19 +277,10 @@ public class NodeExploration implements JobMonitorConstants {
                 aos.put(rba.getID(), aoName);
             }
 
-            addChild(NODE, nodeName, AO, aoName);
-            addChild(JOB, rba.getJobID(), AO, aoName);
-        }
-    }
-
-    private boolean isJobFiltered(String jobId) {
-        for (int i = 0, size = filteredJobs.size(); i < size; ++i) {
-            String job = (String) filteredJobs.get(i);
-            if (job.equalsIgnoreCase(jobId)) {
-                return true;
+            if (!isSkipped(AO, aoName)) {
+            	addChild(NODE, nodeName, AO, aoName);
+            	addChild(JOB, rba.getJobID(), AO, aoName);
             }
         }
-
-        return false;
     }
 }
