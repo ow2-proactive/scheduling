@@ -1,4 +1,4 @@
-/* 
+/*
  * ################################################################
  *
  * ProActive: The Java(TM) library for Parallel, Distributed,
@@ -12,7 +12,7 @@
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful, 
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
@@ -30,18 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.future.Future;
@@ -72,6 +62,20 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.lang.reflect.InvocationTargetException;
+
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 
 /**
@@ -239,8 +243,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
     public void receiveReply(Reply reply) throws java.io.IOException {
         //System.out.println("  --> receiveReply m="+reply.getMethodName());
-       try {
-    	//System.out.println("Body receives Reply on NODE : " + this.nodeURL); 
+        try {
+            //System.out.println("Body receives Reply on NODE : " + this.nodeURL); 
             enterInThreadStore();
             if (isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
@@ -258,7 +262,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             this.registerIncomingFutures();
             internalReceiveReply(reply);
         } finally {
-        	exitFromThreadStore();
+            exitFromThreadStore();
         }
     }
 
@@ -810,19 +814,19 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             try {
                 if (!isSecurityOn) {
                     logger.debug("security is off");
-                    throw new SecurityNotAvailableException();
-                }
-                if (internalBodySecurity.isLocalBody()) {
-                    byte[] certE = destinationBody.getRemoteAdapter()
-                                                  .getCertificateEncoded();
-                    X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                    System.out.println("send Request AbstractBody, method " +
-                        methodCall.getName() + " cert " +
-                        cert.getSubjectDN().getName());
-                    if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
-                        psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                            destinationBody.getRemoteAdapter());
-                        sessionID = psm.getSessionIDTo(cert);
+                } else {
+                    if (internalBodySecurity.isLocalBody()) {
+                        byte[] certE = destinationBody.getRemoteAdapter()
+                                                      .getCertificateEncoded();
+                        X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+                        System.out.println("send Request AbstractBody, method " +
+                            methodCall.getName() + " cert " +
+                            cert.getSubjectDN().getName());
+                        if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
+                            psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+                                destinationBody.getRemoteAdapter());
+                            sessionID = psm.getSessionIDTo(cert);
+                        }
                     }
                 }
             } catch (SecurityNotAvailableException e) {
@@ -845,27 +849,28 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return "BODY (URL=" + this.nodeURL + ") of CLASS ["+ this.getClass()  +"]";
-	}
-	
+    /**
+     * Get information about the handlerizable object
+     * @return information about the handlerizable object
+     */
+    public String getHandlerizableInfo() throws java.io.IOException {
+        return "BODY (URL=" + this.nodeURL + ") of CLASS [" + this.getClass() +
+        "]";
+    }
+
     /** Give a reference to a local map of handlers
-               * @return A reference to a map of handlers
-               */
+     * @return A reference to a map of handlers
+     */
     public HashMap getHandlersLevel() throws java.io.IOException {
         return bodyLevel;
     }
 
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-		 bodyLevel.clear();
-	}
+    /**
+     * Clear the local map of handlers
+     */
+    public void clearHandlersLevel() throws java.io.IOException {
+        bodyLevel.clear();
+    }
 
     /** Set a new handler within the table of the Handlerizable Object
      * @param handler A handler associated with a class of non functional exception.
@@ -881,9 +886,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     /** Remove a handler from the table of the Handlerizable Object
-             * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-             * @return The removed handler or null
-             */
+     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+     * @return The removed handler or null
+     */
     public Handler unsetExceptionHandler(Class exception)
         throws java.io.IOException {
         // remove handler from body level
@@ -918,7 +923,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @exception java.io.IOException if the reply cannot be accepted
      */
     protected abstract void internalReceiveReply(Reply reply)
-        throws java.io.IOException;   
+        throws java.io.IOException;
 
     protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
         localBodyStrategy = localBody;
