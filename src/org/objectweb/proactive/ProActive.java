@@ -30,8 +30,10 @@
 */
 package org.objectweb.proactive;
 
-import org.apache.log4j.Logger;
+import java.net.UnknownHostException;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -47,6 +49,7 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -77,105 +80,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.ProActiveProperties;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
-/**
- * <p>
- * The ProActive class provides a set of static services through static method calls.
- * It is the main entry point for users of ProActive as they will call methods of
- * this class to create active object, to migrate them or to register them to the
- * RMI Registry.
- * </p><p>
- * The main role of <code>ProActive</code> is to provides methods to create active objects.
- * It is possible to create an active object through instantiation using one of the version
- * of <code>newActive</code>. It is also possible to create an active object from an existing
- * object using one of the version of <code>turnActive</code>.
- * </p>
- * <h2>Defining Active Object Activity</h2>
- * <p>
- * When an active object is created from a given object, all method calls are sent as requests
- * to the body (automatically associated to the active object). Those requests are stored in a
- * queue waiting to be served. Serving those requests as well as performing some
- * other work represent the activity of this active object. One can completely specify what will
- * be this activity. The standard behavior is to serve all incoming requests one by one in a FIFO
- * order.
- * </p><p>
- * In addition to the activity, it is possible to specify what to do before the activity starts,
- * and after it ends. The three steps are :
- * <ul>
- * <li>the initialization of the activity (done only once)</li>
- * <li>the activity itself</li>
- * <li>the end of the activity (done only once)</li>
- * </ul>
- * </p><p>
- * Three interfaces are used to define and implement each step :
- * <ul>
- * <li><a href="InitActive.html">InitActive</a></li>
- * <li><a href="RunActive.html">RunActive</a></li>
- * <li><a href="EndActive.html">EndActive</a></li>
- * </ul>
- * </p><p>
- * In case of a migration, an active object stops and restarts its activity
- * automatically without invoking the init or ending phases. Only the
- * activity itself is restarted.
- * </p>
- * <h2>Setting Active Object Activity</h2>
- * <p>
- * Two ways are possible to define each of the three phases of an active object.
- * </p>
- * <ul>
- * <li>Implementing one or more of the three interfaces directly in the class used to create
- * the active object</li>
- * <li>Passing an object implementing one or more of the three interfaces in parameter to the method
- * <code>newActive</code> or <code>turnActive</code> (parameter active in those methods)</li>
- * </ul>
- * </p><p>
- * Note that the methods defined by those 3 interfaces are guaranted to be called by the active
- * thread of the active object.
- * </p><p>
- * The algorithms that decide for each phase what to do are the following (<code>activity</code> is
- * the eventual object passed as a parameter to <code>newActive</code> or <code>turnActive</code>) :
- * </p>
- * <h3>InitActive</h3>
- * <pre>
- * if activity is non null and implements InitActive
- *   we invoke the method initActivity defined in the object activity
- * else if the class of the reified object implements InitActive
- *   we invoke the method initActivity of the reified object
- * else
- *   we don't do any initialization
- * </pre>
- *
- * <h3>RunActive</h3>
- * <pre>
- * if activity is non null and implements RunActive
- *   we invoke the method runActivity defined in the object activity
- * else if the class of the reified object implements RunActive
- *   we invoke the method runActivity of the reified object
- * else
- *   we run the standard FIFO activity
- * </pre>
- *
- * <h3>EndActive</h3>
- * <pre>
- * if activity is non null and implements EndActive
- *   we invoke the method endActivity defined in the object activity
- * else if the class of the reified object implements EndActive
- *   we invoke the method endActivity of the reified object
- * else
- *   we don't do any cleanup
- * </pre>
- * <p>
- * <b>see <a href="doc-files/ActiveObjectCreation.html">active object creation doumentation</a></b>
- * </p>
- *
- * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
- *
- */
-import java.net.UnknownHostException;
-
-import java.util.HashMap;
 
 
 public class ProActive {
@@ -230,6 +134,8 @@ public class ProActive {
             HandlerSecurityException.class, ProActiveSecurityException.class);
         setExceptionHandler(IHandler.ID_defaultLevel, null,
             HandlerServiceException.class, ProActiveServiceException.class);
+
+		ProActiveConfiguration.load();
     }
 
     //
