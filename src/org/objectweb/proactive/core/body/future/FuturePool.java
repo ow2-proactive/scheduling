@@ -258,6 +258,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 			try {
 				wait();
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -446,6 +447,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 					wait();
 				}
 			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 
