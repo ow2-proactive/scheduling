@@ -55,7 +55,7 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 		}
 	}
 	
-	public boolean equals(BasicMonitoredObject value) {
+	public boolean equals(Object value) {
 		return compareTo(value) == 0;
 	}
 	
