@@ -28,15 +28,22 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.process.pbs;
-
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+package org.objectweb.proactive.core.process.oar;
 
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
+import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.MessageSink;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
+
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -60,19 +67,19 @@ import org.objectweb.proactive.core.util.MessageLogger;
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */
-public class PBSSubProcess extends AbstractExternalProcessDecorator {
+public class OARSubProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
-    public final static String DEFAULT_QSUBPATH = "/usr/local/bin/qsub";
+    public final static String DEFAULT_OARSUBPATH = "/usr/local/bin/oarsub";
     private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
             "user.home") + FILE_SEPARATOR + "workProActive/ProActive" +
         FILE_SEPARATOR + "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR +
-        "cluster" + FILE_SEPARATOR + "pbsStartRuntime.sh ";
+        "cluster" + FILE_SEPARATOR + "oarStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
-    protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
+
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     protected String hosts = DEFAULT_HOSTS_NUMBER;
-    protected String processorPerNode = DEFAULT_PROCESSOR_NUMBER;
+
     protected String bookingDuration = DEFAULT_BOOKING_DURATION;
     protected String interactive = "false";
     protected String outputFile;
@@ -81,17 +88,15 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     protected String hostList;
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
 
-    public PBSSubProcess() {
+    public OARSubProcess() {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
         this.hostname = null;
-        this.command_path = DEFAULT_QSUBPATH;
     }
 
-    public PBSSubProcess(ExternalProcess targetProcess) {
+    public OARSubProcess(ExternalProcess targetProcess) {
         super(targetProcess);
         this.hostname = null;
-        this.command_path = DEFAULT_QSUBPATH;
     }
 
     public void setErrorMessageLogger(MessageLogger errorMessageLogger) {
@@ -137,43 +142,20 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         return buildEnvironmentCommand(); // + buildPSubCommand();
     }
 
-    protected void internalStartProcess(String commandToExecute) {
-    	//java does not seem to be able to deal with command
-    	//where there are quotation marks
-    	//thus we have to divide our command into tokens 
-    	//and pass them to the runtime
-    	//tokens are separated by space or quotation marks
-        StringTokenizer st = new StringTokenizer(commandToExecute, " \"", true);
-        String token;
+    protected void internalStartProcess(String commandToExecute)
+        throws java.io.IOException {
         ArrayList al = new ArrayList();
-        int quotationFound = 0;
-        boolean commandFound = false;
-        StringBuffer buff = new StringBuffer();
-        while (st.hasMoreTokens()) {
-            token = (String) st.nextElement();
-            if (!commandFound) {
-                if (token.equals("PROACTIVE_COMMAND=")) {
-                    quotationFound = 0;
-                    buff.append(token);
-                    commandFound = true;
-                } else {
-                    if (!token.equals(" ")) {
-                        al.add(token);
-                    }
-                }
-            } else {
-                //we have found the command, we are now looking for two quotation mark
-                if (token.equals("\"")) {
-                    quotationFound++;
-                    buff.append(token);
-                    if (quotationFound == 2) {
-                        al.add(buff.toString());
-                        commandFound = false;
-                    }
-                } else {
-                    buff.append(token);
-                }
-            }
+        //we divide the command into tokens
+        //it's basically 3 blocks, the script path, the option and the rest
+        Pattern p = Pattern.compile("(.*) .*(-c).*'(.*)'");
+        Matcher m = p.matcher(command);
+        if (!m.matches()) {
+            System.err.println("Could not match command ");
+            System.err.println(commandToExecute);
+        } 
+        for (int i = 1; i <= m.groupCount(); i++) {
+//            System.out.println(m.group(i));
+            al.add(m.group(i));
         }
         String[] command = (String[]) al.toArray(new String[] {  });
 
@@ -193,32 +175,26 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         }
     }
 
+    /**
+     * oarsub is not able to receive env variables or parameters for a script
+     * we thus rely on the following trick, the command has the form
+     * echo "real command" | qsub -I ...   oarStartRuntime.sh
+     */
     protected String buildCommand() {
-        StringBuffer qsubCommand = new StringBuffer();
-        qsubCommand.append(command_path).append(" ");
-        if (interactive.equals("true")) {
-            qsubCommand.append(" -I");
-        }
-
-        qsubCommand.append(buildResourceString());
-        if (outputFile != null) {
-            qsubCommand.append(" -o ").append(outputFile).append(" ");
-        }
-        //the parameters for the script are given as an 
-        //environment variable
-        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\" ")
-                   .append(targetProcess.getCommand()).append("\" ");
-        qsubCommand.append(scriptLocation);
-
-        if (queueName != null) {
-            qsubCommand.append(" -q " + queueName + " ");
-        }
-
+        StringBuffer oarsubCommand = new StringBuffer();
+        oarsubCommand.append(
+            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do rsh \\$i  ");
+        oarsubCommand.append(targetProcess.getCommand());
+        oarsubCommand.append(" \\&  done  \\; wait > ");
+        oarsubCommand.append(scriptLocation).append(" ; ");
+        oarsubCommand.append(DEFAULT_OARSUBPATH);
+        oarsubCommand.append(" ");
+        oarsubCommand.append(buildResourceString()).append(" ");
+        oarsubCommand.append(scriptLocation).append(" '");
         if (logger.isDebugEnabled()) {
-            logger.debug("qsub command is " + qsubCommand.toString());
+            logger.debug("oarsub command is " + oarsubCommand.toString());
         }
-       System.out.println("PBSSubProcess.buildCommand() " + qsubCommand);
-        return qsubCommand.toString();
+        return oarsubCommand.toString();
     }
 
     protected StringBuffer buildResourceString() {
@@ -226,8 +202,7 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         rs.append(" -l walltime=").append(bookingDuration).append(",");
         //to specify nodes and processor per nodes, the syntax is different from
         //other resources
-        rs.append("nodes=").append(hosts).append(":");
-        rs.append("ppn=").append(processorPerNode);
+        rs.append("nodes=").append(hosts);
         return rs;
     }
 
@@ -247,14 +222,14 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
     public String getHostList() {
         return hostList;
     }
-    
+
     public String getHostsNumber() {
         return this.hosts;
     }
 
-    public String getProcessorPerNodeNumber() {
-        return this.processorPerNode;
-    }
+    //    public String getProcessorPerNodeNumber() {
+    //        return this.processorPerNode;
+    //    }
 
     /**
      * Allows to launch this BsubProcess with -I (interactive option)
@@ -298,16 +273,16 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         this.bookingDuration = d;
     }
 
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param processorPerNode processor per node
-     */
-    public void setProcessorPerNodeNumber(String processorPerNode) {
-        checkStarted();
-        if (processorPerNode != null) {
-            this.processorPerNode = processorPerNode;
-        }
-    }
+    //    /**
+    //     * Sets the number of nodes requested when running the job
+    //     * @param processorPerNode processor per node
+    //     */
+    //    public void setProcessorPerNodeNumber(String processorPerNode) {
+    //        checkStarted();
+    //        if (processorPerNode != null) {
+    //            this.processorPerNode = processorPerNode;
+    //        }
+    //    }
 
     /**
      * Sets the value of the queue where the job will be launched. The default is 'normal'
@@ -333,13 +308,8 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         }
 
         public void log(String message) {
-            //System.out.println(" >>> log :" +message);
             int nbProcessor = (new Integer(hosts)).intValue();
             String h = parseHostname(message);
-
-            //            if (h != null) {
-            //                System.out.println(" ---- hostname " + h);
-            //            }
         }
 
         public void log(Throwable t) {
@@ -347,5 +317,13 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
 
         public void log(String message, Throwable t) {
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Testing OARSubProcess");
+        JVMProcessImpl p = new JVMProcessImpl();
+        OARSubProcess oar = new OARSubProcess(p);
+        oar.setHostsNumber("2");
+        System.out.println(oar.buildCommand());
     }
 }

@@ -190,6 +190,7 @@ public class MOPClassLoader extends URLClassLoader {
             // a stub class to be created
             if (Utils.isStubClassName(name)) {
                 logger.info("Generating class : " + name);
+            //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(name);
 
                 //ASM is now the default bytecode manipulator

@@ -68,7 +68,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         this.proActiveRuntimeURL = buildRuntimeURL();
         //            java.rmi.Naming.bind(proActiveRuntimeURL, this);
         register(proActiveRuntimeURL, false);
-        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);    	
+        //System.out.println ("ProActiveRuntime successfully bound in registry at "+proActiveRuntimeURL);
     }
 
     public RemoteProActiveRuntimeImpl()
@@ -430,6 +430,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             logger.info(url + "is not bound in the registry", e);
         }
     }
+
 
     protected String getProtocol() {
         return Constants.RMI_PROTOCOL_IDENTIFIER;

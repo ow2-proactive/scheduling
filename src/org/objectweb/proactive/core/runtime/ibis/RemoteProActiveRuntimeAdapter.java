@@ -350,7 +350,7 @@ public class RemoteProActiveRuntimeAdapter implements ProActiveRuntime,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
         throws ProActiveException, ConstructorCallExecutionFailedException, 
             InvocationTargetException {
-        try {
+          try {
             return remoteProActiveRuntime.createBody(nodeName,
                 bodyConstructorCall, isNodeLocal);
         } catch (RemoteException re) {

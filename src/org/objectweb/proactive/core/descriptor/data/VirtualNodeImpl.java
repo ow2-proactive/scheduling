@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.io.Serializable;
+import java.security.cert.X509Certificate;
+import java.util.Hashtable;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.P2PLookupService;
@@ -48,6 +52,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -707,12 +712,12 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     public void setPolicyFile(String file) {
         policyServerFile = file;
     }
-
+    
     /**
      * see {@link VirtualNode#isMultiple()}
      */
     public boolean isMultiple() {
-        return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
+    	return ((virtualMachines.size() + localVirtualMachines.size()) > 1);
     }
 
     //
@@ -875,6 +880,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         PrunSubProcess prun = null;
         GlobusProcess globus = null;
         PBSSubProcess pbs = null;
+        OARSubProcess oar = null;
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
@@ -904,8 +910,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 increaseNodeCount((new Integer(prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         prun.getHostsNumber()).intValue()) * nodeNumber);
             }
-            if (processImpl instanceof PBSSubProcess) {
-                //if the process is prun we have to increase the node count by the number of processors            
+             if (processImpl instanceof PBSSubProcess) {
+                //if the process is pbs we have to increase the node count by the number of processors            
                 pbs = (PBSSubProcess) processImpl;
                 if (logger.isDebugEnabled()) {
                     logger.debug("VirtualNodeImpl getHostsNumber() " +
@@ -917,6 +923,16 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
                 increaseNodeCount((new Integer(pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
                         pbs.getHostsNumber()).intValue()) * nodeNumber);
+            }
+             if (processImpl instanceof OARSubProcess) {
+                //if the process is oar we have to increase the node count by the number of processors            
+                oar = (OARSubProcess) processImpl;
+                if (logger.isDebugEnabled()) {
+                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+                        oar.getHostsNumber());
+                    logger.debug("VM " + vm);
+                }
+                increaseNodeCount((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
             }
             if (processImpl instanceof GlobusProcess) {
                 //if the process is globus we have to increase the node count by the number of processors
@@ -938,8 +954,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null) && (prun == null) && (globus == null) &&
-                    (pbs == null)) {
+            if ((bsub == null) && (prun == null) && (globus == null) && (pbs == null) && (oar == null)){
                 //if bsub and prun and globus are null we can increase the nodeCount
                 increaseNodeCount(nodeNumber);
             }
@@ -1108,4 +1123,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
+    
+
 }

@@ -417,18 +417,18 @@ public class FuturePool extends Object implements java.io.Serializable {
             // try until it's not null because deserialization of the body 
             // may be not finished when we restart the thread.
             Body owner = null;
-            while (owner == null) {
-                owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
-                // it's a halfbody...
-                if (owner == null) {
-                    owner = LocalBodyStore.getInstance().getLocalHalfBody(ownerBody);
-                }
-            }
+         
 
             while (true) {
                 // if there is no AC to do, wait...
                 waitForAC();
-
+                while (owner == null) {
+                    owner = LocalBodyStore.getInstance().getLocalBody(ownerBody);
+                    // it's a halfbody...
+                    if (owner == null) {
+                        owner = LocalBodyStore.getInstance().getLocalHalfBody(ownerBody);
+                    }
+                }
                 if (kill) {
                     break;
                 }

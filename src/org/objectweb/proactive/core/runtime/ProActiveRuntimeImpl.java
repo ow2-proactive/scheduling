@@ -498,21 +498,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         PolicyServer objectPolicyServer = null;
 
         // SECURITY
-        try {
-            PolicyServer ps = (PolicyServer) policyServerMap.get(nodeName);
-            if (ps != null) {
-                objectPolicyServer = (PolicyServer) ps.clone();
-
-                String objectName = localBody.toString();
-
-                System.out.println("local Object Name " + objectName +
-                    "On node " + nodeName);
-                objectPolicyServer.generateEntityCertificate(objectName);
-
-                localBody.setPolicyServer(objectPolicyServer);
-                localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMap.get(
-                        nodeName));
-            }
+//        try {
+//            PolicyServer ps = (PolicyServer) policyServerMap.get(nodeName);
+//            if (ps != null) {
+//                objectPolicyServer = (PolicyServer) ps.clone();
+//
+//                String objectName = localBody.toString();
+//
+//                System.out.println("local Object Name " + objectName +
+//                    "On node " + nodeName);
+//                objectPolicyServer.generateEntityCertificate(objectName);
+//
+//                localBody.setPolicyServer(objectPolicyServer);
+//             //   localBody.getProActiveSecurityManager().setVNName((String) virtualNodesMap.get(
+            //            nodeName));
+      //      }
 
             /*} catch (IOException e) {
                e.printStackTrace();
@@ -521,14 +521,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                        // security not available
             
              */
-        } catch (CloneNotSupportedException e) {
-            // should never happen
-            e.printStackTrace();
-        } catch (SecurityNotAvailableException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (CloneNotSupportedException e) {
+//            // should never happen
+//            e.printStackTrace();
+//        } catch (SecurityNotAvailableException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         registerBody(nodeName, localBody);
 

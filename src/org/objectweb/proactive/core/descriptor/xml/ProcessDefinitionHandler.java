@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
 import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
+import org.objectweb.proactive.core.process.oar.OARSubProcess;
 import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
 import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.process.rsh.maprsh.MapRshProcess;
@@ -47,7 +48,6 @@ import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
 
 
@@ -78,6 +78,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             new PrunProcessHandler(proActiveDescriptor));
         this.addHandler(PBS_PROCESS_TAG,
             new PBSProcessHandler(proActiveDescriptor));
+        this.addHandler(OAR_PROCESS_TAG,
+                new OARProcessHandler(proActiveDescriptor));
     }
 
     /**
@@ -361,6 +363,64 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         }
     }
 
+    protected class OARProcessHandler extends ProcessHandler {
+        public OARProcessHandler(ProActiveDescriptor proActiveDescriptor) {
+            super(proActiveDescriptor);
+            this.addHandler(OAR_OPTIONS_TAG, new OAROptionHandler());
+        }
+
+        public void startContextElement(String name, Attributes attributes)
+            throws org.xml.sax.SAXException {
+            super.startContextElement(name, attributes);
+            String queueName = (attributes.getValue("queue"));
+            if (checkNonEmpty(queueName)) {
+                ((OARSubProcess) targetProcess).setQueueName(queueName);
+            }
+        }
+
+        protected class OAROptionHandler extends PassiveCompositeUnmarshaller {
+            public OAROptionHandler() {
+                UnmarshallerHandler pathHandler = new PathHandler();
+                this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
+                this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
+              //  this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
+                this.addHandler(BOOKING_DURATION_TAG,
+                    new SingleValueUnmarshaller());
+             //   this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
+                BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
+                bch.addHandler(ABS_PATH_TAG, pathHandler);
+                bch.addHandler(REL_PATH_TAG, pathHandler);
+                this.addHandler(SCRIPT_PATH_TAG, bch);
+            }
+
+            public void startContextElement(String name, Attributes attributes)
+                throws org.xml.sax.SAXException {
+            }
+
+            protected void notifyEndActiveHandler(String name,
+                UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
+                OARSubProcess oarSubProcess = (OARSubProcess) targetProcess;
+
+                if (name.equals(HOST_LIST_TAG)) {
+                    oarSubProcess.setHostList((String) activeHandler.getResultObject());
+                } else if (name.equals(HOSTS_NUMBER_TAG)) {
+                    oarSubProcess.setHostsNumber((String) activeHandler.getResultObject());
+              //  } else if (name.equals(PROCESSOR_PER_NODE_TAG)) {
+             //       oarSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
+                } else if (name.equals(SCRIPT_PATH_TAG)) {
+                    oarSubProcess.setScriptLocation((String) activeHandler.getResultObject());
+                } else if (name.equals(BOOKING_DURATION_TAG)) {
+                    oarSubProcess.setBookingDuration((String) activeHandler.getResultObject());
+                } else if (name.equals(PRUN_OUTPUT_FILE)) {
+                    oarSubProcess.setOutputFile((String) activeHandler.getResultObject());
+                } else {
+                    super.notifyEndActiveHandler(name, activeHandler);
+                }
+            }
+        }
+    }
+    
     //end of inner class PrunProcessHandler
     protected class JVMProcessHandler extends ProcessHandler {
         public JVMProcessHandler(ProActiveDescriptor proActiveDescriptor) {

@@ -222,7 +222,7 @@ public abstract class MOP {
         // build the constructor call for the target object to create
         ConstructorCall reifiedCall = buildTargetObjectConstructorCall(targetClass,
                 constructorParameters);
-
+System.out.println("MOP.newInstance() " + nameOfStubClass);
         // Instanciates the proxy object
         Proxy proxy = createProxyObject(nameOfProxy, proxyParameters,
                 reifiedCall);

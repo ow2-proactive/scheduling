@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.process;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
@@ -142,12 +141,10 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         }
         return sb.toString();
     }
-
+    
     protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    throws java.io.IOException {
         try {
-            //if (inputMessageLogger != null) inputMessageLogger.log("Command is "+commandToExecute);
-	    //System.out.println(commandToExecute);
             externalProcess = Runtime.getRuntime().exec(commandToExecute);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
                         externalProcess.getInputStream()));
@@ -163,8 +160,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     protected void internalStopProcess() {
-        //System.out.println("--> internalStopProcess");
-        if (externalProcess != null) {
+          if (externalProcess != null) {
             externalProcess.destroy();
         }
         if (outputMessageSink != null) {

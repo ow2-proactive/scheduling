@@ -806,43 +806,43 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         //	logger.debug("send Request Body" + destinationBody);
         //logger.debug(" bla" + destinationBody.getRemoteAdapter());
-        try {
-            try {
-                if (!isSecurityOn) {
-                    logger.debug("security is off");
-                    throw new SecurityNotAvailableException();
-                }
-                if (internalBodySecurity.isLocalBody()) {
-                    byte[] certE = destinationBody.getRemoteAdapter()
-                                                  .getCertificateEncoded();
-                    X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                    System.out.println("send Request AbstractBody, method " +
-                        methodCall.getName() + " cert " +
-                        cert.getSubjectDN().getName());
-                    if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
-                        psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                            destinationBody.getRemoteAdapter());
-                        sessionID = psm.getSessionIDTo(cert);
-                    }
-                }
-            } catch (SecurityNotAvailableException e) {
-                // do nothing 
-                logger.debug("communication without security");
-                //e.printStackTrace();
-            }
+   //     try {
+//            try {
+//                if (!isSecurityOn) {
+//                    logger.debug("security is off");
+//                    throw new SecurityNotAvailableException();
+//                }
+//                if (internalBodySecurity.isLocalBody()) {
+//                    byte[] certE = destinationBody.getRemoteAdapter()
+//                                                  .getCertificateEncoded();
+//                    X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
+//                    System.out.println("send Request AbstractBody, method " +
+//                        methodCall.getName() + " cert " +
+//                        cert.getSubjectDN().getName());
+//                    if ((sessionID = psm.getSessionIDTo(cert)) == 0) {
+//                        psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
+//                            destinationBody.getRemoteAdapter());
+//                        sessionID = psm.getSessionIDTo(cert);
+//                    }
+//                }
+//            } catch (SecurityNotAvailableException e) {
+//                // do nothing 
+//                logger.debug("communication without security");
+//                //e.printStackTrace();
+//            }
             localBodyStrategy.sendRequest(methodCall, future, destinationBody);
-        } catch (RenegotiateSessionException e) {
-            if (e.getUniversalBody() != null) {
-                updateLocation(destinationBody.getID(), e.getUniversalBody());
-            }
-            psm.terminateSession(sessionID);
-            sendRequest(methodCall, future, e.getUniversalBody());
-        } catch (CommunicationForbiddenException e) {
-            logger.warn(e);
-            //e.printStackTrace();
-        } catch (AuthenticationException e) {
-            e.printStackTrace();
-        }
+//        } catch (RenegotiateSessionException e) {
+//            if (e.getUniversalBody() != null) {
+//                updateLocation(destinationBody.getID(), e.getUniversalBody());
+//            }
+//            psm.terminateSession(sessionID);
+//            sendRequest(methodCall, future, e.getUniversalBody());
+//        } catch (CommunicationForbiddenException e) {
+//            logger.warn(e);
+//            //e.printStackTrace();
+//        } catch (AuthenticationException e) {
+//            e.printStackTrace();
+//        }
     }
 
 	/**
