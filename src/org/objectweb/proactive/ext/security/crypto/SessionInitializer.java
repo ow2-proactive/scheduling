@@ -42,7 +42,7 @@ import javax.crypto.spec.*;
  *  that ensure confidentiality and integrity.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionInitializer {
   public boolean sessionInitiated = false;

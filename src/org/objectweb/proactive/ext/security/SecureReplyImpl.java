@@ -47,7 +47,7 @@ import java.security.SignedObject;
  *  Description of the Class
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public class SecureReplyImpl extends ReplyImpl implements SecureReply {
 

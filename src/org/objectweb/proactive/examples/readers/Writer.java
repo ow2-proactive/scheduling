@@ -38,7 +38,7 @@ public class Writer implements org.objectweb.proactive.RunActive {
   private ReaderWriter rw;
   private boolean done;
   private boolean autopilot;
-  private boolean writting;
+  private boolean writing;
   private int id;
 
 
@@ -59,7 +59,7 @@ public class Writer implements org.objectweb.proactive.RunActive {
 
     done = false;
     autopilot = true;
-    writting = false;
+    writing = false;
   }
 
 
@@ -68,16 +68,16 @@ public class Writer implements org.objectweb.proactive.RunActive {
   }
 
 
-  public void startWrite() {
-    writting = true;
+  private void startWrite() {
+    writing = true;
     display.setWait(id, false);
     rw.startWrite();
     display.setWrite(id, true);
   }
 
 
-  public void stopWrite() {
-    writting = false;
+  private void stopWrite() {
+    writing = false;
     rw.endWrite();
     display.setWrite(id, false);
   }
@@ -91,7 +91,7 @@ public class Writer implements org.objectweb.proactive.RunActive {
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (!done) {
       service.serveOldest();
-      if (writting)
+      if (writing)
         stopWrite();
       else startWrite();
       try {

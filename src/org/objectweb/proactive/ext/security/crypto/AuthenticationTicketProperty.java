@@ -36,7 +36,7 @@ import java.io.*;
  * This class is used as an attribute of the AuthentificationTicket class. 
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class AuthenticationTicketProperty implements Serializable {
 	public long random1;

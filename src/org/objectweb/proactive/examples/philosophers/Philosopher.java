@@ -122,8 +122,7 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
       }
       try {
         Thread.sleep(50);
-      } catch (InterruptedException e) {
-      }
+      } catch (InterruptedException e) {}
     }
   }
 }

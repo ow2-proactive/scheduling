@@ -38,7 +38,7 @@ import java.io.*;
  * This class provides a command-line tool to display the properties of a public or private certificate.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class CertificateReader {
 

@@ -35,7 +35,7 @@ import java.security.*;
  *  Description of the Class
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 class FixedSecureRandom extends SecureRandom {
 	byte[] seed = {

@@ -52,7 +52,6 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
     try {
       display = new ReaderDisplay(this);
       display = (ReaderDisplay)org.objectweb.proactive.ProActive.turnActive(display);
-      display.init();
       receiveMessage("Running...");
     } catch (Exception e) {
       e.printStackTrace();

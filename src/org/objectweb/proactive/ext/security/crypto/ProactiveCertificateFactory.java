@@ -38,7 +38,7 @@ import java.io.*;
  *  This class  generates the Certificates required for the domains.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class ProactiveCertificateFactory {
 	private PublicKey acPublicKey;

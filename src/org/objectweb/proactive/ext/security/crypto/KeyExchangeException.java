@@ -33,7 +33,7 @@ package org.objectweb.proactive.ext.security.crypto;
  * This exception is thrown when the key negociation protocol fails.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class KeyExchangeException extends Exception {
 	String type;

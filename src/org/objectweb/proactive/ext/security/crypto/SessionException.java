@@ -33,7 +33,7 @@ package org.objectweb.proactive.ext.security.crypto;
  * This exception is thrown when an error ocurs during the creation of a session.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionException extends Exception {
 	String type;

@@ -40,9 +40,7 @@ import org.w3c.dom.NamedNodeMap;
  * Adaptor between a DOM and the XMLHandler 
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public class DOMAdaptor {

@@ -37,7 +37,7 @@ import java.io.*;
  * PublicCertificates are required for the authentification and the key-negociation protocols.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class PublicCertificate implements Serializable {
 	private CertificateIdentity ID_bloc;

@@ -38,9 +38,7 @@ import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
  * This class receives deployment events
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 class InfrastructureHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
 

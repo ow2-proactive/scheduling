@@ -49,13 +49,11 @@ package org.objectweb.proactive.core.xml;
  *    /a/b/c/.   : returns the value of the node or the node c
  *    e/.        : returns the value of the node e which should be a child of the given current node
  *    /a/b/c/@t  : returns the value of the attribute node or the attribute node t
- *    @t         : returns the value of the attribute node or the attribute node t which should be a child of the given current node
+ *    &amp;t         : returns the value of the attribute node or the attribute node t which should be a child of the given current node
  *
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 public class XMLPropertiesStore {
 

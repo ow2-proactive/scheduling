@@ -55,7 +55,7 @@ import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
  *  Description of the Class
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public class SecureProxy extends UniversalBodyProxy {
 

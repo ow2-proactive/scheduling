@@ -38,9 +38,7 @@ import java.io.IOException;
  * constructor is the context of the tree to read.
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public class DOMReader implements XMLReader {

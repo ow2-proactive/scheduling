@@ -39,8 +39,8 @@ import org.objectweb.proactive.core.body.request.RequestProcessor;
 /**
  * <P>
  * Service is a utility class that provides many useful methods to serve requests.
- * It is usually instantiated once at the begining of the live method of an active
- * object in order to be used for serving requests. For instance :
+ * It is usually instantiated once at the begining of the runActivity() method of 
+ * an active object in order to be used for serving requests. For instance :
  * </P><P>
  * <pre>
  * public void runActivity(org.objectweb.proactive.Body body) {
@@ -71,6 +71,7 @@ import org.objectweb.proactive.core.body.request.RequestProcessor;
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
+ * @see RunActive
  *
  */
 public class Service {

@@ -36,7 +36,7 @@ import java.io.*;
  * PrivateCertificates are required for the authentication and the key_negociation protocols
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class PrivateCertificate implements Serializable {
 	private PublicCertificate publicCertificate;

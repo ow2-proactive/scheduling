@@ -35,7 +35,7 @@ import java.io.*;
  * A ConfidentialityTicket is used during the session keys negociation protocols.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class ConfidentialityTicket implements Serializable {
 	public long timestamp;

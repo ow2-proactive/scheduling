@@ -35,7 +35,7 @@ import java.security.*;
  * This class is a proper random generator.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class RandomLongGenerator {
 	private byte[] seed;

@@ -33,7 +33,7 @@ package org.objectweb.proactive.ext.security.crypto;
  * This exception is thrown when an authentication protocol fails 
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class AuthenticationException extends Exception {
 	String type;

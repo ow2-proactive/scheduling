@@ -39,7 +39,7 @@ import java.io.*;
  * The role of the CertificationAuthority is to generate the public/private keypair reference.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class CertificationAuthority {
 	private static PrivateKey privateKey;

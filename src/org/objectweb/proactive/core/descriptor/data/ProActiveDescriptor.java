@@ -38,9 +38,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * This class represents a ProActiveDescriptor
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 public class ProActiveDescriptor {
 

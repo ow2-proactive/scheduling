@@ -54,7 +54,6 @@ public class Reader implements org.objectweb.proactive.RunActive {
     this.display = display;
     this.rw = rw;
     this.id = id;
-
     done = false;
     autopilot = true;
     reading = false;
@@ -66,7 +65,7 @@ public class Reader implements org.objectweb.proactive.RunActive {
   }
 
 
-  public void startRead() {
+  private void startRead() {
     reading = true;
     display.setWait(id, true);
     rw.startRead();
@@ -74,7 +73,7 @@ public class Reader implements org.objectweb.proactive.RunActive {
   }
 
 
-  public void endRead() {
+  private void endRead() {
     reading = false;
     rw.endRead();
     display.setRead(id, false);

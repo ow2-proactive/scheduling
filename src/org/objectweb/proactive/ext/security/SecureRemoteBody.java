@@ -37,7 +37,7 @@ import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
  *  Description of the Interface
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public interface SecureRemoteBody extends RemoteBody, SessionsManagerInt {
 

@@ -34,7 +34,7 @@ package org.objectweb.proactive.ext.security;
  *  The interface implemented by objects who deal with security
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public interface SecureActive {
 

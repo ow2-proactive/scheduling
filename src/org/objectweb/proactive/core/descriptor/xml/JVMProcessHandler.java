@@ -42,9 +42,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * This class reads a infrastructure element from XML
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 public class JVMProcessHandler extends ProcessHandler {
 

@@ -45,7 +45,7 @@ import javax.crypto.spec.*;
  *  It provides also the methods that ensure confidentiality and integrity.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionsManager implements SessionsManagerInt {
 

@@ -36,9 +36,7 @@ package org.objectweb.proactive.core.xml.io;
  * It is used to wrap both SAX and DOM attributes in an independant manner.
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public interface Attributes {
@@ -64,7 +62,7 @@ public interface Attributes {
   * Looks up the index of an attribute by Namespace name.
   * @param uri The Namespace URI, or the empty string if the name has no Namespace URI.
   * @param localName The attribute's local name.
-  * @returns The attribute value as a string, or null if the attribute is not in the list.
+  * @return The attribute value as a string, or null if the attribute is not in the list.
   */
   public String getValue(String uri, String localPart); 
  

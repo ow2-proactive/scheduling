@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.request.Request;
  *  Description of the Interface
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public interface SecureRequest extends Request {
 

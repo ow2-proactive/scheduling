@@ -79,14 +79,14 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * <li>the end of the activity (done only once)</li>
  * </ul>
  * </p><p>
- * Three interfaces are used to define and implements each step :
+ * Three interfaces are used to define and implement each step :
  * <ul>
  * <li><a href="InitActive.html">InitActive</a></li>
  * <li><a href="RunActive.html">RunActive</a></li>
  * <li><a href="EndActive.html">EndActive</a></li>
  * </ul>
  * </p><p>
- * In case of a migration, an active object stop and restart its activity
+ * In case of a migration, an active object stops and restarts its activity
  * automatically without invoking the init or ending phases. Only the
  * activity itself is restarted.
  * </p>

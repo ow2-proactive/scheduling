@@ -40,7 +40,7 @@ import javax.crypto.spec.*;
  * This class contains the basic informations of a communication session.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class Session {
 	private long id;

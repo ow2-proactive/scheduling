@@ -50,7 +50,7 @@ import java.io.Serializable;
  *  Description of the Class
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public class SecureRemoteBodyImpl extends RemoteBodyImpl implements SecureRemoteBody {
 

@@ -37,9 +37,7 @@ import java.io.IOException;
  * Adaptor between the DefaultHandler from SAX API and the XMLHandler 
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public class DefaultHandlerAdaptor extends org.xml.sax.helpers.DefaultHandler {

@@ -41,7 +41,7 @@ import java.io.*;
  * The first set will be saved in "certif_public1" and "certif_private1", the second set in certif_public2" and "certif_private2"
  * 
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class testNegociation {
 

@@ -35,7 +35,7 @@ import java.io.*;
  * An authentificationTichet is required during the authentification process.  
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class AuthenticationTicket implements Serializable {
 	public PublicCertificate certificate;

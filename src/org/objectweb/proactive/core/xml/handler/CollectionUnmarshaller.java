@@ -37,9 +37,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * Receives SAX event and pass them on 
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {

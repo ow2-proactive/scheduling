@@ -37,9 +37,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * This class receives deployment events
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 class PathHandler extends BasicUnmarshaller {
 

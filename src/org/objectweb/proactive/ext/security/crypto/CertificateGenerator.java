@@ -41,7 +41,7 @@ import org.bouncycastle.jce.provider.*;
  *  This class provides a graphical interface for the Certificates Generation.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class CertificateGenerator {
 	boolean packFrame = false;
@@ -108,7 +108,7 @@ public class CertificateGenerator {
  *  Description of the Class
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 class CertificateGeneratorFrame extends JFrame {
 
@@ -174,7 +174,7 @@ class CertificateGeneratorFrame extends JFrame {
  *  Description of the Class
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 class CertificateGeneratorPannel extends JPanel {
 

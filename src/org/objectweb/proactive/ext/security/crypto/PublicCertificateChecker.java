@@ -36,7 +36,7 @@ import java.util.*;
  * The PublicCertificateCheckers are used to check the validity of the PublicCertificates.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class PublicCertificateChecker {
 

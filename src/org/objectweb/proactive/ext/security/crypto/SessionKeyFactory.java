@@ -39,7 +39,7 @@ import javax.crypto.spec.*;
  *  This class generates the symmetric keys (SessionKey) required for the confidentiality.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionKeyFactory {
 	private Provider myProvider;

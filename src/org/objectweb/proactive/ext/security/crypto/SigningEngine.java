@@ -37,7 +37,7 @@ import java.io.*;
  *  A SigningEngine is used to sign object and to check their signature
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SigningEngine {
 	private Signature signingEngine;

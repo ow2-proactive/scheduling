@@ -34,7 +34,7 @@ package org.objectweb.proactive.ext.security.crypto;
  *  This is the Rmi interface of the SessionsManager.
  *
  * @author     Vincent RIBAILLIER
- * @created    July 20, 2001
+ * <br>created    July 20, 2001
  */
 public interface SessionsManagerInt extends java.rmi.Remote {
 

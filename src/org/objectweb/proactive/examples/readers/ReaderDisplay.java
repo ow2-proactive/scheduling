@@ -30,12 +30,12 @@
 */ 
 package org.objectweb.proactive.examples.readers;
 
-public class ReaderDisplay {
+public class ReaderDisplay implements org.objectweb.proactive.InitActive {
 
-  transient private AppletReader applet;
-  transient private ReaderWriter rw;
-  transient private Reader readers[];
-  transient private Writer writers[];
+  private AppletReader applet;
+  private ReaderWriter rw;
+  private Reader readers[];
+  private Writer writers[];
 
 
   public ReaderDisplay() {
@@ -47,14 +47,14 @@ public class ReaderDisplay {
   }
 
 
-  public void init() {
+  public void initActivity(org.objectweb.proactive.Body body) {
     readers = new Reader[3];
     writers = new Writer[3];
 
-    Object param[] = new Object[2];
-    param[0] = org.objectweb.proactive.ProActive.getStubOnThis();
-    param[1] = new Integer(ReaderWriter.DEFAULT_POLICY);
-
+    Object param[] = new Object[] {
+          org.objectweb.proactive.ProActive.getStubOnThis(),
+          new Integer(ReaderWriter.DEFAULT_POLICY)
+        };
     try {
       rw = (ReaderWriter)org.objectweb.proactive.ProActive.newActive(ReaderWriter.class.getName(), param);
     } catch (Exception e) {

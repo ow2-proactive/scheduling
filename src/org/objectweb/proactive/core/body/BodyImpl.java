@@ -69,6 +69,7 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
   // -- PRIVATE MEMBERS -----------------------------------------------
   //
   
+  private transient InitActive initActive; // used only once when active object is started first time
   private RunActive runActive;
   private EndActive endActive;
 
@@ -92,7 +93,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
     super(c.execute(), nodeURL, factory);
     
     // InitActive
-    InitActive initActive = null;
     if (activity != null && activity instanceof InitActive) {
       initActive = (InitActive) activity;
     } else if (reifiedObject instanceof InitActive) {
@@ -121,8 +121,6 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
       endActive = null;
     }
 
-    // execute the initialization if needed
-    if (initActive != null) initActive.initActivity(this);
     startBody();
   }
 
@@ -143,6 +141,11 @@ public class BodyImpl extends AbstractMigratableBody implements Runnable, java.i
    */
   public void run() {
     activityStarted();
+    // execute the initialization if needed. Only once
+    if (initActive != null) {
+      initActive.initActivity(this);
+      initActive = null; // we won't do it again
+    }
     // run the activity of the body
     try {
       runActive.runActivity(this);

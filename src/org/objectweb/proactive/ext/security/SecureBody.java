@@ -59,7 +59,7 @@ import org.objectweb.proactive.ext.security.crypto.SessionsManagerInt;
  *  An implementation of Body interface,wich allows security
  *
  *@author     Arnaud Contes
- *@created    27 juillet 2001
+ *<br>created    27 juillet 2001
  */
 public class SecureBody extends BodyImpl implements SessionsManagerInt {
   /*

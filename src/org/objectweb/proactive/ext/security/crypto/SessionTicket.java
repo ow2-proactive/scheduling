@@ -40,7 +40,7 @@ import javax.crypto.spec.*;
  *  A sessionTicket is required to initiate a new session
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionTicket {
 	public PublicCertificate senderCertificate;

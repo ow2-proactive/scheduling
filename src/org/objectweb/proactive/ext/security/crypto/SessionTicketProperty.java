@@ -35,7 +35,7 @@ import java.io.*;
  *  This class is used as an attribute of the SessionTicket class
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class SessionTicketProperty implements Serializable {
 	public long ta;

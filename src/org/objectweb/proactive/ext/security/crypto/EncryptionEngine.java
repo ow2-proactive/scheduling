@@ -39,7 +39,7 @@ import javax.crypto.spec.*;
  * This class is used to provide confidentiality. 
  *
  * @author     Vincent RIBAILLIER
- * @created    July 19, 2001
+ * <br>created    July 19, 2001
  */
 public class EncryptionEngine {
 	private SecureRandom rand = new FixedSecureRandom();

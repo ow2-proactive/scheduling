@@ -69,7 +69,7 @@ public class UniqueID implements java.io.Serializable {
 
   /**
    * Returns the VMID of the current VM in which this class has been loaded.
-   * @returns the VMID of the current VM
+   * @return the VMID of the current VM
    */
   public static java.rmi.dgc.VMID getCurrentVMID() {
     return uniqueVMID; 

@@ -34,9 +34,7 @@ package org.objectweb.proactive.core.descriptor.data;
  * This class represents a VirtualNode
  *
  * @author       Lionel Mestre
- * @date         2001/10
  * @version      1.0
- * @copyright    INRIA - Project Oasis
  */
 public class VirtualNode {
 

@@ -34,9 +34,7 @@ package org.objectweb.proactive.core.xml.io;
  * A class implementing this interface is able to read XML data
  *
  * @author       Lionel Mestre
- * @date         2002/02
  * @version      0.91
- * @copyright    INRIA - Project Oasis
  *
  */
 public interface XMLReader {
