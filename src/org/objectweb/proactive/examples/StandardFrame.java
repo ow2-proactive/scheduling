@@ -30,24 +30,30 @@
 */ 
 package org.objectweb.proactive.examples;
 
+import java.text.*;
+import javax.swing.*;
+import javax.swing.text.*;
+import javax.swing.border.*;
+
 /**
  * Title:
  * Description:
  * Copyright:    Copyright (c) 2001
  * Company:      Inria
  * @author Lionel Mestre
- * @version 1.0
+ * @author Roland Bertuli
+ * @version 1.1
  */
-public abstract class StandardFrame extends javax.swing.JFrame {
 
-  //javax.swing.JPanel {
+public abstract class StandardFrame extends javax.swing.JFrame {
 
   protected final static int MESSAGE_ZONE_HEIGHT = 250;
   protected String name;
   protected int width;
   protected int height;
-  protected java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("HH:mm:ss");
-  protected transient javax.swing.JTextArea messageArea;
+  protected DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+  protected transient JTextPane messageArea;
+  protected transient Style regularStyle;
 
   //
   // -- CONSTRUCTORS -----------------------------------------------
@@ -69,17 +75,41 @@ public abstract class StandardFrame extends javax.swing.JFrame {
   // -- PUBLIC METHODS -----------------------------------------------
   //
 
-  public void receiveMessage(final String s) {
+  public void receiveMessage(final String message) {
     final String date = dateFormat.format(new java.util.Date());
     final String threadName = Thread.currentThread().getName();
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+    SwingUtilities.invokeLater(new Runnable() {
       public void run() {
-        messageArea.append(date);
-        messageArea.append(" (");
-        messageArea.append(threadName);
-        messageArea.append(") => ");
-        messageArea.append(s);
-        messageArea.append("\n");
+	  Document doc = messageArea.getDocument();
+	try {
+   	  doc.insertString(doc.getLength(), date + " (" + threadName 
+			   + ")\n      => " + message + "\n", regularStyle);
+	}
+	catch (Exception e) {
+	  System.err.println("Couldn't insert initial text.");
+	}
+      }
+    });
+  }
+
+  
+  //Method with possibility of color text
+  public void receiveMessage(final String message, final java.awt.Color color) {
+    final String date = dateFormat.format(new java.util.Date());
+    final String threadName = Thread.currentThread().getName();
+    final Style s = messageArea.addStyle("colored", regularStyle);
+    StyleConstants.setForeground(s, color);
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+      public void run() {	
+        Document doc = messageArea.getDocument();
+	try {
+   	  doc.insertString(doc.getLength(), date + " (" + threadName + ")\n      => ", 
+			   regularStyle);
+	  doc.insertString(doc.getLength(), message + "\n", s);
+	}
+	catch (Exception e) {
+	  System.err.println("Couldn't insert initial text.");
+	}
       }
     });
   }
@@ -103,9 +133,12 @@ public abstract class StandardFrame extends javax.swing.JFrame {
   protected abstract javax.swing.JPanel createRootPanel();
 
 
-  protected javax.swing.JPanel createMessageZonePanel(final javax.swing.JTextArea area) {
+  protected javax.swing.JPanel createMessageZonePanel(final javax.swing.JTextPane area) {
+    Style styleDef = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
+    regularStyle = area.addStyle("regular", styleDef);
     area.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10));
-    javax.swing.JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout());
+    
+    JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout());
     javax.swing.border.TitledBorder border = new javax.swing.border.TitledBorder("Messages");
     panel.setBorder(border);
     javax.swing.JPanel topPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
@@ -133,18 +166,18 @@ public abstract class StandardFrame extends javax.swing.JFrame {
     c.setLayout(new java.awt.GridLayout(1, 1));
 
     // create topPanel
-    javax.swing.JPanel topPanel = new javax.swing.JPanel(new java.awt.GridLayout(1, 1));
-    javax.swing.border.TitledBorder border = new javax.swing.border.TitledBorder(name);
+    JPanel topPanel = new JPanel(new java.awt.GridLayout(1, 1));
+    TitledBorder border = new javax.swing.border.TitledBorder(name);
     topPanel.setBorder(border);
     topPanel.add(createRootPanel());
 
     // create bottom Panel
-    messageArea = new javax.swing.JTextArea();
+    messageArea = new javax.swing.JTextPane();
     messageArea.setEditable(false);
     javax.swing.JPanel bottomPanel = createMessageZonePanel(messageArea);
 
     // create an vertical split Panel
-    javax.swing.JSplitPane verticalSplitPane = new javax.swing.JSplitPane(javax.swing.JSplitPane.VERTICAL_SPLIT);
+    javax.swing.JSplitPane verticalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     verticalSplitPane.setDividerLocation(height);
     verticalSplitPane.setTopComponent(topPanel);
     verticalSplitPane.setBottomComponent(bottomPanel);
