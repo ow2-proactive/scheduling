@@ -28,17 +28,17 @@
  *
  * ################################################################
  */
-
 /**
  * @author rquilici
  *
- * This class represents a Globus Process. 
+ * This class represents a Globus Process.
  */
 package org.objectweb.proactive.core.process.globus;
 
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.UniversalProcess;
 
 
 /**
@@ -160,6 +160,28 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
      */
     public void setCount(String count) {
         this.count = count;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "globus_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return (new Integer(getCount()).intValue());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        return targetProcess.getFinalProcess();
     }
 
     /**

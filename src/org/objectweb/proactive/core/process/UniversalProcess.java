@@ -94,6 +94,26 @@ public interface UniversalProcess extends java.io.Serializable {
     public String getCommand();
 
     /**
+     * Returns the id of the process
+     * @return the id of the process. This id is just the first letters of the process
+     * class, to be able to identify the sequence of processes used
+     */
+    public String getProcessId();
+
+    /**
+     * Returns the number of nodes targeted
+     * @return the number of nodes targeted. Represents the number of nodes expected to use
+     * when starting this process
+     */
+    public int getNodeNumber();
+
+    /**
+     * Returns the last process of the chain
+     * @return the last process of the chain
+     */
+    public UniversalProcess getFinalProcess();
+
+    /**
      * Starts the process by executing the command. The process can only
      * be started once.
      * @exception java.io.IOException if the process cannot be started.

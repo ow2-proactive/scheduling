@@ -221,6 +221,28 @@ public class JVMProcessImpl extends AbstractExternalProcess
         jvmParameters.append(string + " ");
     }
 
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "jvm";
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return 1;
+    }
+    
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        return this;
+    }
+    
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -266,19 +288,23 @@ public class JVMProcessImpl extends AbstractExternalProcess
             javaCommand.append(LOG4J_OPTION);
             javaCommand.append(checkWhiteSpaces(log4jFile));
         }
-        
+
         // dynamic classloading through runtimes
         // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
-        if ("enable".equals(System.getProperty("proactive.classloader")) 
-                || "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System.getProperty("java.system.class.loader"))) {
-            javaCommand.append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
-	    // the following allows the deserializing of streams that were annotated with rmi utilities
-	    javaCommand.append(" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
+        if ("enable".equals(System.getProperty("proactive.classloader")) ||
+                "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(
+                    System.getProperty("java.system.class.loader"))) {
+            javaCommand.append(
+                " -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
+            // the following allows the deserializing of streams that were annotated with rmi utilities
+            javaCommand.append(
+                " -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
             // to avoid clashes due to multiple classloader, we initiate the
             // configuration of log4j ourselves 
             // (see StartRuntime.main)
             javaCommand.append(" -Dlog4j.defaultInitOverride=true");
         }
+
         // append proactive policy File
         // if (securityFile != null) {
         //      javaCommand.append(PROACTIVE_POLICYFILE_OPTION);
@@ -334,19 +360,23 @@ public class JVMProcessImpl extends AbstractExternalProcess
             return new File(path).getCanonicalPath();
         } catch (IOException e) {
             logger.error(e.getMessage());
-       		return path;
+            return path;
         }
     }
-    
-    private String checkWhiteSpaces(String path){
-        if (!path.startsWith("\"") && !path.startsWith("'")){
+
+    private String checkWhiteSpaces(String path) {
+        if (!path.startsWith("\"") && !path.startsWith("'")) {
             //if path does not start with " or ' we can check if there is whitespaces, 
             //if it does, we let the user handle its path
-            if(path.indexOf(" ")> 0 ){
+            if (path.indexOf(" ") > 0) {
                 //if whitespaces, we surround all the path with double quotes
-                path="\""+path+"\"";
+                path = "\"" + path + "\"";
             }
         }
         return path;
     }
+
+    
+
+   
 }

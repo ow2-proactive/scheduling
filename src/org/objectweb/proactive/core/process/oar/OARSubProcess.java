@@ -34,6 +34,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.MessageSink;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 import java.util.ArrayList;
@@ -129,7 +130,29 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
             this.hostNumber = hosts;
         }
     }
-    
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "oar_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return (new Integer(getHostsNumber()).intValue());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        return targetProcess.getFinalProcess();
+    }
+
     /**
      * Sets the location of the script on the remote host
      * @param location

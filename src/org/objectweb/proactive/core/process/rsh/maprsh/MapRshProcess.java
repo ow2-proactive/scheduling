@@ -1,44 +1,45 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.core.process.rsh.maprsh;
 
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
+import org.objectweb.proactive.core.process.UniversalProcess;
 
 
 /**
  * <p>
- * The MapRshProcess class is able to start any class, of the ProActive library, 
+ * The MapRshProcess class is able to start any class, of the ProActive library,
  * using maprsh.
  * </p><p>
  * For instance:
@@ -55,7 +56,6 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */
-
 public class MapRshProcess extends AbstractExternalProcessDecorator {
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
@@ -76,24 +76,22 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         super(targetProcess);
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
     }
-    
 
-		/**
-		 * Set the -n option with the given parameter for the maprsh command
-		 * @param parallelize
-		 */
+    /**
+     * Set the -n option with the given parameter for the maprsh command
+     * @param parallelize
+     */
     public void setParallelization(String parallelize) {
         this.parallelize = parallelize;
-    } 
+    }
 
-		/**
-		 * Returns the degree of parallelization of maprsh command (value of -n option)
-		 * @return String
-		 */
+    /**
+     * Returns the degree of parallelization of maprsh command (value of -n option)
+     * @return String
+     */
     public String getParallelization() {
         return this.parallelize;
     }
-    
 
     /**
      * Sets the variable scriptLocation with the given location
@@ -102,14 +100,35 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
     public void setScriptLocation(String scriptLocation) {
         this.scriptLocation = scriptLocation;
     }
-    
 
-		/**
-		 * Returns the value of scriptLocation 
-		 * @return String
-		 */
+    /**
+     * Returns the value of scriptLocation
+     * @return String
+     */
     public String getScriptLocation() {
         return scriptLocation;
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "maprsh_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return targetProcess.getNodeNumber();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        return targetProcess.getFinalProcess();
     }
 
     //
@@ -152,7 +171,6 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         }
         return command.toString();
     }
-    
 
     /**
      * Method appendJavaCommand.
@@ -168,7 +186,6 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         return newScriptText.toString();
     }
 
-
     /**
      * Method removeJavaCommand.
      * @param scriptText
@@ -181,7 +198,6 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         //System.out.println(newScriptText);
         return newScriptText;
     }
-    
 
     public static void main(String[] args) {
         try {
@@ -196,15 +212,14 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
             e.printStackTrace();
         }
     }
-    
 
     /**
-    * Returns an array of bytes containing the bytecodes for
-    * the class represented by the InputStream
-    * @param in the inputstream of the class file
-    * @return the bytecodes for the class
-    * @exception java.io.IOException if the class cannot be read
-    */
+     * Returns an array of bytes containing the bytecodes for
+     * the class represented by the InputStream
+     * @param in the inputstream of the class file
+     * @return the bytecodes for the class
+     * @exception java.io.IOException if the class cannot be read
+     */
     private static byte[] getBytesFromInputStream(java.io.InputStream in)
         throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);

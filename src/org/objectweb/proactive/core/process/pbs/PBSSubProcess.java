@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.process.pbs;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 import java.util.ArrayList;
@@ -130,6 +131,28 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
         if (nodeNumber != null) {
             this.hostNumber = nodeNumber;
         }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "pbs_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return (new Integer(getProcessorPerNodeNumber()).intValue()) * (new Integer(getHostsNumber()).intValue());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        return targetProcess.getFinalProcess();
     }
 
     /**

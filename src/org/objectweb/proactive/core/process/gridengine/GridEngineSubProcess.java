@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.process.gridengine;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 
@@ -135,6 +136,29 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
         if (hostNumber != null) {
             this.hostNumber = hostNumber;
         }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "gridengine_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return (new Integer(getHostsNumber()).intValue());
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        ;
+        return targetProcess.getFinalProcess();
     }
 
     /**

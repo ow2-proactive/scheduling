@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.process.SimpleExternalProcess;
+import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.util.MessageLogger;
 
 import java.util.StringTokenizer;
@@ -78,7 +79,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
 
     //  public final static String DEFAULT_QJOBPATH = DEFAULT_PBSPATH +
     //       FILE_SEPARATOR + "qjobs";
-   // public static final String DEFAULT_QUEUE_NAME = "normal";
+    // public static final String DEFAULT_QUEUE_NAME = "normal";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
@@ -189,13 +190,14 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         return queueName;
     }
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
-	 */
-	public void stopProcess() {
-	System.out.println("PrunSubProcess.stopProcess()");
-		super.stopProcess();
-	}
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.process.UniversalProcess#stopProcess()
+     */
+    public void stopProcess() {
+        System.out.println("PrunSubProcess.stopProcess()");
+        super.stopProcess();
+    }
+
     /**
      * Sets the value of the queue where the job will be launched. The default is 'normal'
      * @param queueName
@@ -308,6 +310,28 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     }
 
     /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
+     */
+    public String getProcessId() {
+        return "prun_" + targetProcess.getProcessId();
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
+     */
+    public int getNodeNumber() {
+        return (new Integer(getProcessorPerNodeNumber()).intValue() * (new Integer(getHostsNumber()).intValue()));
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.process.UniversalProcess#getFinalProcess()
+     */
+    public UniversalProcess getFinalProcess() {
+        checkStarted();
+        return targetProcess.getFinalProcess();
+    }
+
+    /**
      * Returns the number of nodes requested for the job
      * @return String
      */
@@ -366,10 +390,9 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         if (outputFile != null) {
             prunCommand.append("-o " + outputFile + " ");
         }
-        
+
         if (queueName != null) {
-        	
-          prunCommand.append("-q " + queueName + " ") ;	
+            prunCommand.append("-q " + queueName + " ");
         }
 
         prunCommand.append(commandAndOptions[0] + " " + hosts + " " +

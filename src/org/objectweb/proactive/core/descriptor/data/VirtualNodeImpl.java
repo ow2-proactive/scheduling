@@ -54,14 +54,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.node.NodeImpl;
 import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
-import org.objectweb.proactive.core.process.globus.GlobusProcess;
-import org.objectweb.proactive.core.process.gridengine.GridEngineSubProcess;
-import org.objectweb.proactive.core.process.lsf.LSFBSubProcess;
-import org.objectweb.proactive.core.process.oar.OARSubProcess;
-import org.objectweb.proactive.core.process.pbs.PBSSubProcess;
-import org.objectweb.proactive.core.process.prun.PrunSubProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
@@ -950,100 +943,109 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * @param process
      */
     private void setParameters(ExternalProcess process, VirtualMachine vm) {
-        ExternalProcess processImpl = process;
-        ExternalProcessDecorator processImplDecorator;
+        //ExternalProcess processImpl = process;
+        //ExternalProcessDecorator processImplDecorator;
         JVMProcess jvmProcess;
-        LSFBSubProcess bsub = null;
-        PrunSubProcess prun = null;
-        GlobusProcess globus = null;
-        PBSSubProcess pbs = null;
-        OARSubProcess oar = null;
-        GridEngineSubProcess sge = null;
+        //LSFBSubProcess bsub = null;
+        //PrunSubProcess prun = null;
+        //GlobusProcess globus = null;
+        //PBSSubProcess pbs = null;
+        //OARSubProcess oar = null;
+        //GridEngineSubProcess sge = null;
+        
         String protocolId = "";
         int nodeNumber = new Integer(vm.getNodeNumber()).intValue();
         if (logger.isDebugEnabled()) {
             logger.debug("askedNodes " + nodeNumber);
         }
+        protocolId = process.getProcessId();
+        
+        increaseNumberOfNodes(process.getNodeNumber()* nodeNumber);
+        
+        
 
-        while (ExternalProcessDecorator.class.isInstance(processImpl)) {
-            String processClassname = processImpl.getClass().getName();
-            protocolId = protocolId +
-                findProtocolId(processClassname).toLowerCase();
-            if (processImpl instanceof LSFBSubProcess) {
-                //if the process is bsub we have to increase the node count by the number of processors
-                bsub = (LSFBSubProcess) processImpl;
-                increaseNumberOfNodes((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
-            }
-            if (processImpl instanceof PrunSubProcess) {
-                //if the process is prun we have to increase the node count by the number of processors            
-                prun = (PrunSubProcess) processImpl;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-                        prun.getHostsNumber());
-                    logger.debug("VirtualNodeImpl getnodeNumber() " +
-                        prun.getProcessorPerNodeNumber());
-                    logger.debug("VM " + vm);
-                }
-
-                increaseNumberOfNodes((new Integer(
-                        prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
-                        prun.getHostsNumber()).intValue()) * nodeNumber);
-            }
-            if (processImpl instanceof PBSSubProcess) {
-                //if the process is pbs we have to increase the node count by the number of processors            
-                pbs = (PBSSubProcess) processImpl;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-                        pbs.getHostsNumber());
-                    logger.debug("VirtualNodeImpl getnodeNumber() " +
-                        pbs.getProcessorPerNodeNumber());
-                    logger.debug("VM " + vm);
-                }
-
-                increaseNumberOfNodes((new Integer(
-                        pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
-                        pbs.getHostsNumber()).intValue()) * nodeNumber);
-            }
-            if (processImpl instanceof OARSubProcess) {
-                //if the process is oar we have to increase the node count by the number of processors            
-                oar = (OARSubProcess) processImpl;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("VirtualNodeImpl getHostsNumber() " +
-                        oar.getHostsNumber());
-                    logger.debug("VM " + vm);
-                }
-                increaseNumberOfNodes((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
-            }
-            if (processImpl instanceof GlobusProcess) {
-                //if the process is globus we have to increase the node count by the number of processors
-                globus = (GlobusProcess) processImpl;
-                increaseNumberOfNodes((new Integer(globus.getCount()).intValue()) * nodeNumber);
-            }
-
-            if (processImpl instanceof GridEngineSubProcess) {
-                sge = (GridEngineSubProcess) processImpl;
-                increaseNumberOfNodes((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
-            }
-
-            processImplDecorator = (ExternalProcessDecorator) processImpl;
-            processImpl = processImplDecorator.getTargetProcess();
-            if (logger.isDebugEnabled()) {
-                logger.debug("processImplDecorator " +
-                    processImplDecorator.getClass().getName());
-            }
-        }
-        protocolId = protocolId + "jvm";
+//        while (ExternalProcessDecorator.class.isInstance(processImpl)) {
+//            String processClassname = processImpl.getClass().getName();
+//            protocolId = protocolId +
+//                findProtocolId(processClassname).toLowerCase();
+//            if (processImpl instanceof LSFBSubProcess) {
+//                //if the process is bsub we have to increase the node count by the number of processors
+//                bsub = (LSFBSubProcess) processImpl;
+//                increaseNumberOfNodes((new Integer(bsub.getProcessorNumber()).intValue()) * nodeNumber);
+//            }
+//            if (processImpl instanceof PrunSubProcess) {
+//                //if the process is prun we have to increase the node count by the number of processors            
+//                prun = (PrunSubProcess) processImpl;
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+//                        prun.getHostsNumber());
+//                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+//                        prun.getProcessorPerNodeNumber());
+//                    logger.debug("VM " + vm);
+//                }
+//
+//                increaseNumberOfNodes((new Integer(
+//                        prun.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+//                        prun.getHostsNumber()).intValue()) * nodeNumber);
+//            }
+//            if (processImpl instanceof PBSSubProcess) {
+//                //if the process is pbs we have to increase the node count by the number of processors            
+//                pbs = (PBSSubProcess) processImpl;
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+//                        pbs.getHostsNumber());
+//                    logger.debug("VirtualNodeImpl getnodeNumber() " +
+//                        pbs.getProcessorPerNodeNumber());
+//                    logger.debug("VM " + vm);
+//                }
+//
+//                increaseNumberOfNodes((new Integer(
+//                        pbs.getProcessorPerNodeNumber()).intValue()) * (new Integer(
+//                        pbs.getHostsNumber()).intValue()) * nodeNumber);
+//            }
+//            if (processImpl instanceof OARSubProcess) {
+//                //if the process is oar we have to increase the node count by the number of processors            
+//                oar = (OARSubProcess) processImpl;
+//                if (logger.isDebugEnabled()) {
+//                    logger.debug("VirtualNodeImpl getHostsNumber() " +
+//                        oar.getHostsNumber());
+//                    logger.debug("VM " + vm);
+//                }
+//                increaseNumberOfNodes((new Integer(oar.getHostsNumber()).intValue()) * nodeNumber);
+//            }
+//            if (processImpl instanceof GlobusProcess) {
+//                //if the process is globus we have to increase the node count by the number of processors
+//                globus = (GlobusProcess) processImpl;
+//                increaseNumberOfNodes((new Integer(globus.getCount()).intValue()) * nodeNumber);
+//            }
+//
+//            if (processImpl instanceof GridEngineSubProcess) {
+//                sge = (GridEngineSubProcess) processImpl;
+//                increaseNumberOfNodes((new Integer(sge.getHostsNumber()).intValue()) * nodeNumber);
+//            }
+//
+//            processImplDecorator = (ExternalProcessDecorator) processImpl;
+//            processImpl = processImplDecorator.getTargetProcess();
+//            if (logger.isDebugEnabled()) {
+//                logger.debug("processImplDecorator " +
+//                    processImplDecorator.getClass().getName());
+//            }
+//        }
+        //protocolId = protocolId + "jvm";
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
-        jvmProcess = (JVMProcess) processImpl;
+        jvmProcess = (JVMProcess) process.getFinalProcess();
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname().equals("org.objectweb.proactive.core.runtime.StartRuntime")) {
             //we increment the index of nodecount
-            if ((bsub == null) && (prun == null) && (globus == null) &&
-                    (pbs == null) && (oar == null) && (sge == null)) {
-                //if bsub and prun and globus are null we can increase the nodeCount
-                increaseNumberOfNodes(nodeNumber);
-            }
+//            if ((bsub == null) && (prun == null) && (globus == null) &&
+//                    (pbs == null) && (oar == null) && (sge == null)) {
+//                //if bsub and prun and globus are null we can increase the nodeCount
+//                increaseNumberOfNodes(nodeNumber);
+//            }
+//            if( ! useScheduler){
+//                increaseNumberOfNodes(nodeNumber);
+//            }
 
             //if(!vmAlreadyAssigned){
             String vnName = this.name;
