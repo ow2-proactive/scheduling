@@ -345,10 +345,6 @@ public class CircularArrayList extends java.util.AbstractList
         }
     }
 
-    public Iterator fastIterator() {
-        return new CircularArrayListIterator(this);
-    }
-
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
         s.writeInt(size);
@@ -373,32 +369,4 @@ public class CircularArrayList extends java.util.AbstractList
             array[i] = s.readObject();
     }
 
-    
-    /**
-     * This class implements an iterator for the CircularArrayList.
-     * It is more efficient than the default implementation of the 
-     * AbstractList Iterator.
-     * @author Laurent Baduel
-     */
-    private class CircularArrayListIterator implements Iterator {
-        private CircularArrayList clist;
-        private int pos;
-
-        public CircularArrayListIterator(CircularArrayList clist) {
-            this.clist = clist;
-            this.pos = -1;
-        }
-
-        public boolean hasNext() {
-            return (this.clist.convert(this.pos+1) < this.clist.size);
-        }
-
-        public Object next() {
-            return this.clist.get(++this.pos);
-        }
-
-        public void remove() {
-            this.clist.remove(this.pos);
-        }
-    }
 }
