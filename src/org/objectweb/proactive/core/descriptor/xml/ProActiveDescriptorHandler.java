@@ -1,4 +1,4 @@
-/* 
+/*  
 * ################################################################
 * 
 * ProActive: The Java(TM) library for Parallel, Distributed, 
@@ -31,7 +31,11 @@
 package org.objectweb.proactive.core.descriptor.xml;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
+import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -53,9 +57,14 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
   public ProActiveDescriptorHandler() {
     super();
-    proActiveDescriptor = new ProActiveDescriptor();
+    proActiveDescriptor = new ProActiveDescriptorImpl();
     addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
     addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
+    {
+    PassiveCompositeUnmarshaller ch = new PassiveCompositeUnmarshaller();
+    ch.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler());
+    this.addHandler(VIRTUAL_NODES_TAG, ch);
+    }
   }
 
 
@@ -67,10 +76,31 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
 
   public static void main(String[] args) throws java.io.IOException {
     InitialHandler h = new InitialHandler();
-    String uri = "file:///D:/public/ProActiveDescriptor2.xml";
+    String uri = "file:///Z:/test/ProActive/descriptors/Runtime.xml";
     org.objectweb.proactive.core.xml.io.StreamReader sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
     sr.read();
   }
+  
+  /**
+   * Creates ProActiveDescriptor object from XML Descriptor
+   * @param xmlDescriptorUrl the URL of XML Descriptor
+   */
+  public static ProActiveDescriptorHandler createProActiveDescriptor(String xmlDescriptorUrl) throws java.io.IOException,org.xml.sax.SAXException {
+      //static method added to replace main method
+      try {
+        InitialHandler h = new InitialHandler();
+        String uri = xmlDescriptorUrl;
+        org.objectweb.proactive.core.xml.io.StreamReader sr =
+          new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
+        sr.read();
+        return(ProActiveDescriptorHandler)h.getResultObject();
+      }
+        catch (org.xml.sax.SAXException e){
+        e.printStackTrace();
+        System.out.println("a problem occurs when getting the ProActiveDescriptorHandler");
+        throw e;
+      }
+    }
 
 
   //
@@ -108,17 +138,44 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator im
    * Receives deployment events
    */
   private static class InitialHandler extends AbstractUnmarshallerDecorator {
+    // line added to return a ProactiveDescriptorHandlr object
+    private ProActiveDescriptorHandler proActiveDescriptorHandler;
     private InitialHandler() {
       super();
-      this.addHandler(PROACTIVE_DESCRIPTOR_TAG, new ProActiveDescriptorHandler());
+      proActiveDescriptorHandler = new ProActiveDescriptorHandler();
+      this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);
     }
     public Object getResultObject() throws org.xml.sax.SAXException {
-      return null;
+      return proActiveDescriptorHandler;
     }
     public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
     protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
     }
   }
+  
+  /**
+   * This class receives virtualNode events
+   */
+  private class VirtualNodeHandler extends BasicUnmarshaller {
+    private VirtualNodeHandler() {
+    }
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
+      // create and register a VirtualNode
+      String vnName = attributes.getValue("name");
+      if (! checkNonEmpty(vnName)) throw new org.xml.sax.SAXException("VirtualNode defined without name");
+      VirtualNode vn = proActiveDescriptor.createVirtualNode(vnName);
+      // cyclic
+      String cyclic = attributes.getValue("cyclic");
+      if (checkNonEmpty(cyclic)) {
+        vn.setCyclic(cyclic.equals("true"));
+      }
+      // localbackup
+      String localBackup = attributes.getValue("localBackup");
+      if (checkNonEmpty(localBackup)) {
+        vn.setLocalBackup(Boolean.getBoolean(localBackup));
+      }
+    }
+  } // end inner class VirtualNodeHandler
 
 }
