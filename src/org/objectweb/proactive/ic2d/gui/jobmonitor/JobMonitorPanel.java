@@ -48,13 +48,13 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private static final String VN_VIEW_LABEL = "Job view / Virtual Nodes";
     private static final String JOB_VIEW_LABEL = "Job view / Hosts";
     private static final String HOST_VIEW_LABEL = "Host view";
-    private static final String JOB_VIEW_ROOT = "Jobs";
-    private static final String HOST_VIEW_ROOT = "Hosts";
+    private static final String CUSTOM_VIEW_LABEL = "Custom view";
     private static final int DEFAULT_RMI_PORT = Registry.REGISTRY_PORT;
     private static final String EXTRACT_MENU_LABEL = "Extract view to a new window";
     private static final int[] JOB_VIEW_KEYS = { JOB, HOST, JVM, VN, NODE, AO };
     private static final int[] HOST_VIEW_KEYS = { HOST, JOB, JVM, VN, NODE, AO };
     private static final int[] VN_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
+    private static final int[] CUSTOM_VIEW_KEYS = { JOB, VN, HOST, JVM, NODE, AO };
     private IC2DGUIController controller;
     private JTabbedPane tabs;
     private Vector frames;
@@ -62,6 +62,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private DataTreeModel jobViewModel;
     private DataTreeModel vnViewModel;
     private DataTreeModel hostViewModel;
+    private DataTreeModel customViewModel;
     private Map aos;
     private Vector monitoredHosts;
     private Vector filteredJobs;
@@ -118,7 +119,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs.addTab(JOB_VIEW_LABEL, createJobView());
         tabs.addTab(VN_VIEW_LABEL, createVNView());
         tabs.addTab(HOST_VIEW_LABEL, createHostView());
-
+        tabs.addTab(CUSTOM_VIEW_LABEL, createCustomView());
+        
         tabs.addMouseListener(new MouseAdapter() {
                 public void mousePressed(MouseEvent e) {
                     if (e.isPopupTrigger()) {
@@ -230,6 +232,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         vnViewModel.rebuild();
         jobViewModel.rebuild();
         hostViewModel.rebuild();
+        customViewModel.rebuild();
     }
 
     public void updateHost(final DataTreeNode hostNode) {
@@ -241,6 +244,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                     vnViewModel.rebuild(hostNode);
                     jobViewModel.rebuild(hostNode);
                     hostViewModel.rebuild(hostNode);
+                    customViewModel.rebuild(hostNode);
                 }
             }).start();
     }
@@ -478,7 +482,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         buttons.add(collapse);
     }
 
-    private Container createContent(DataTreeModel model) {
+    private Container createContent(DataTreeModel model, boolean allowExpand) {
         //JSplitPane sp = new JSplitPane ();
         //sp.setOneTouchExpandable (true);
         JPanel left = new JPanel(new BorderLayout());
@@ -525,7 +529,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
 
         addButtons(left, j);
 
-        Switcher s = new Switcher(model.getSwitcherModel(), j);
+        Switcher s = new Switcher(model.getSwitcherModel(), j, allowExpand);
         JPanel switcher = new JPanel(new GridLayout(1, 1));
         switcher.add(s);
         switcher.setBorder(BorderFactory.createEtchedBorder());
@@ -534,9 +538,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         return left;
     }
 
-    private JPanel createPanel(DataTreeModel model) {
+    private JPanel createPanel(DataTreeModel model, boolean allowExpand) {
         JPanel p = new JPanel(new GridLayout(1, 1));
-        p.add(createContent(model));
+        p.add(createContent(model, allowExpand));
         return p;
     }
 
@@ -546,7 +550,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         DataModelTraversal traversal = new DataModelTraversal(JOB_VIEW_KEYS);
         jobViewModel = new DataTreeModel(asso, jobSwitchModel, traversal);
 
-        return createPanel(jobViewModel);
+        return createPanel(jobViewModel, false);
     }
 
     private JPanel createHostView() {
@@ -555,7 +559,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         DataModelTraversal traversal = new DataModelTraversal(HOST_VIEW_KEYS);
         hostViewModel = new DataTreeModel(asso, hostSwitchModel, traversal);
 
-        return createPanel(hostViewModel);
+        return createPanel(hostViewModel, false);
     }
 
     private JPanel createVNView() {
@@ -564,6 +568,15 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         DataModelTraversal traversal = new DataModelTraversal(VN_VIEW_KEYS);
         vnViewModel = new DataTreeModel(asso, vnSwitchModel, traversal);
 
-        return createPanel(vnViewModel);
+        return createPanel(vnViewModel, false);
+    }
+    
+    private JPanel createCustomView() {
+        SwitcherModel customSwitchModel = new SwitcherModel(CUSTOM_VIEW_KEYS);
+
+        DataModelTraversal traversal = new DataModelTraversal(CUSTOM_VIEW_KEYS);
+        customViewModel = new DataTreeModel(asso, customSwitchModel, traversal);
+
+        return createPanel(customViewModel, true);
     }
 }

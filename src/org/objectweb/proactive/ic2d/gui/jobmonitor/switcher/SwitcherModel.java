@@ -90,4 +90,10 @@ public class SwitcherModel implements JobMonitorConstants
 		int key = labelToKey(label);
 		return treeModel.isHidden(key);
 	}
+	
+	public void exchange(String fromLabel, String toLabel) {
+		int fromKey = labelToKey(fromLabel);
+		int toKey = labelToKey(toLabel);
+		treeModel.exchange(fromKey, toKey);
+	}
 }

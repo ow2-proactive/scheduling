@@ -16,7 +16,7 @@ public class Switcher extends JPanel
 	private SwitcherModel model;
 	private JLabel [] labels;
 	
-	public Switcher (SwitcherModel _model, final JTree jtree)
+	public Switcher (SwitcherModel _model, final JTree jtree, final boolean allowExchange)
 	{
 		model = _model;
 		
@@ -29,6 +29,7 @@ public class Switcher extends JPanel
 		for (int i = 0; i < size; ++i)
 		{
 			final JLabel l = new JLabel (model.getLabel (i), model.getIcon(i), SwingConstants.CENTER);
+			
 			l.setHorizontalAlignment (SwingConstants.CENTER);
 			l.setOpaque (true);
 			l.addMouseListener (new MouseAdapter()
@@ -61,6 +62,11 @@ public class Switcher extends JPanel
 					});
 					popupmenu.add(highlight);
 
+					if (allowExchange) {
+						JMenu exchange = createExchangeMenu(l.getText(), jtree);
+						popupmenu.add(exchange);
+					}
+
 					popupmenu.show (l, e.getX(), e.getY());
 				}
 			});
@@ -73,7 +79,51 @@ public class Switcher extends JPanel
 		}		
 	}
 	
+	private void exchange(String fromName, String toName) {
+		model.exchange(fromName, toName);
+
+		int fromId = -1, toId = -1;
+		for (int i = 0; i < labels.length; i++) {
+			if (labels[i].getText().equals(fromName))
+				fromId = i;
+			
+			if (labels[i].getText().equals(toName))
+				toId = i;
+		}
+		
+		if (fromId < 0 || toId < 0)
+			throw new RuntimeException("Unknown labels : " + fromName + " or " + toName);
+		
+		JLabel tmp = labels[fromId];
+		labels[fromId] = labels[toId];
+		labels[toId] = tmp;
+		
+		setLayout (new GridLayout (1, labels.length, 2, 0));
+		
+		for (int i = 0; i < labels.length; i++)
+			add(labels[i]);
+		
+		revalidate();
+		repaint();
+	}
 	
+	private JMenu createExchangeMenu(String name, final JTree jtree) {
+		JMenu submenu = new JMenu("Exchange '" + name + "' with");
+		
+		for (int i = 0, size = model.size(); i < size; i++)
+			if (!name.equals(model.getLabel(i))) {
+				final String fromName = name;
+				final String toName = model.getLabel(i);
+				JMenuItem menuItem = new JMenuItem(new AbstractAction(toName, model.getIcon(i)) {
+					public void actionPerformed(ActionEvent e) {
+						exchange(fromName, toName);
+						jtree.repaint();
+					}
+				});
+				submenu.add(menuItem);
+			}
+		return submenu;
+	}
 	
 	private static final Color ON = Color.WHITE;
 	private static final Color OFF = Color.LIGHT_GRAY;

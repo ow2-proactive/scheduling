@@ -71,4 +71,9 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 	public boolean isHidden(int key) {
 		return traversal.isHidden(key);
 	}
+	
+	public void exchange(int fromKey, int toKey) {
+		traversal.exchange(fromKey, toKey);
+		rebuild();
+	}
 }

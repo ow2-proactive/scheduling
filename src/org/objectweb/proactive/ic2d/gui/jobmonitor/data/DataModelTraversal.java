@@ -59,4 +59,16 @@ public class DataModelTraversal implements JobMonitorConstants
 		
 		return false;
 	}
+	
+	public void exchange(int fromKey, int toKey) {
+		int fromIndex = indexOf(fromKey);
+		int toIndex = indexOf(toKey);
+
+		boolean hiddenTmp = hidden[fromIndex];
+		hidden[fromIndex] = hidden[toIndex];
+		hidden[toIndex] = hiddenTmp;
+		
+		keys.set(fromIndex, new Integer(toKey));
+		keys.set(toIndex, new Integer(fromKey));
+	}
 }
