@@ -30,11 +30,12 @@
 */
 package benchmark.rmi.functionscall.stringreturn;
 
-import benchmark.rmi.functionscall.RMIFunctionCall;
+import java.net.InetAddress;
 
 import org.objectweb.proactive.core.node.NodeImpl;
 
-import java.net.InetAddress;
+import benchmark.functionscall.FunctionCall;
+import benchmark.rmi.functionscall.RMIFunctionCall;
 
 /**
  * @author Alexandre di Costanzo
@@ -53,9 +54,9 @@ public class BenchRMIFuncCall02 extends RMIFunctionCall {
         
         
         BenchRMIFuncCall02 activeObject = (BenchRMIFuncCall02) getRmiObject();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         activeObject.f(0);
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 

@@ -34,6 +34,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 
 import testsuite.test.ProActiveBenchmark;
+import benchmark.functionscall.FunctionCall;
 import benchmark.util.ReifiableObject;
 
 
@@ -67,9 +68,9 @@ public class BenchTurnActive extends ProActiveBenchmark {
         ReifiableObject object = new ReifiableObject();
         String className = ReifiableObject.class.getName();
         Node node = getNode();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         object = (ReifiableObject) ProActive.turnActive(object, node);
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 

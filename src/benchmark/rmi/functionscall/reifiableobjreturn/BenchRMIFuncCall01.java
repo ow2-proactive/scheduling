@@ -34,6 +34,7 @@ import java.net.InetAddress;
 
 import org.objectweb.proactive.core.node.NodeImpl;
 
+import benchmark.functionscall.FunctionCall;
 import benchmark.rmi.functionscall.RMIFunctionCall;
 import benchmark.util.ReifiableObject;
 
@@ -54,9 +55,9 @@ public class BenchRMIFuncCall01 extends RMIFunctionCall {
         
         
         BenchRMIFuncCall01 activeObject = (BenchRMIFuncCall01) getRmiObject();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         activeObject.f();
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 

@@ -3,7 +3,7 @@
 
 	<name>ProActive's Benchmarks</name>
 	<description>Manage all benchmarks.</description>
-	<nbRuns>100</nbRuns>
+	<nbRuns>1</nbRuns>
 	
 	<result type="html" file="../benchmark.html" />
 	

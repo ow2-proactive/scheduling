@@ -57,9 +57,9 @@ public class BenchFuncCall09 extends FunctionCall {
         BenchFuncCall09 activeObject = (BenchFuncCall09) getActiveObject();
         ReifiableObject o = new ReifiableObject();
         ReifiableObject p = new ReifiableObject();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         activeObject.f(o, p);
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 

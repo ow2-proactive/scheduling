@@ -54,9 +54,9 @@ public class BenchFuncCall04 extends FunctionCall {
         
         
         BenchFuncCall04 activeObject = (BenchFuncCall04) getActiveObject();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         activeObject.f(1, 2, 3);
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 

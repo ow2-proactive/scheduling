@@ -58,9 +58,9 @@ public class BenchFuncCall10 extends FunctionCall {
         ReifiableObject o = new ReifiableObject();
         ReifiableObject p = new ReifiableObject();
         ReifiableObject q = new ReifiableObject();
-        this.timer.start();
+        this.timer.start(); for(int i = 0 ; i < FunctionCall.MAX_CALL ; i++) {
         activeObject.f(o, p, q);
-        this.timer.stop();
+        } this.timer.stop();
         return this.timer.getCumulatedTime();
     }
 
