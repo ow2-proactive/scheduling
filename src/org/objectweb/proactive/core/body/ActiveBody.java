@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
  * @since   ProActive 0.9
  * @see org.objectweb.proactive.Body
  * @see AbstractBody
- * @see AbstractMigratableBody
+ * @see org.objectweb.proactive.core.body.migration.AbstractMigratableBody
  *
  */
 public class ActiveBody extends MigratableBody implements Runnable, java.io.Serializable {
