@@ -27,7 +27,7 @@
     </types>
     <components>
         <primitive-component implementation="nonregressiontest.component.PrimitiveComponentB"
-            name="p2" type="B-Type" virtualNode="VN1"/>
+            name="p2" type="B-Type" virtualNode="null"/>
         <composite-component name="c" type="A-Type" virtualNode="VN2">
             <components>
                 <primitive-component
