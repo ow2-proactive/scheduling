@@ -97,14 +97,14 @@ public class ComponentsDescriptorHandler
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
+	/**
+     * see {@link org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)}
 	 */
 	protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
 	}
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
+	/**
+     * see {@link org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)}
 	 */
 	public void startContextElement(String name, Attributes attributes) throws SAXException {
 	}
@@ -181,8 +181,8 @@ public class ComponentsDescriptorHandler
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
+	/**
+     * see {@link org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()}
 	 */
 	public Object getResultObject() throws SAXException {
 		return componentsCache;
