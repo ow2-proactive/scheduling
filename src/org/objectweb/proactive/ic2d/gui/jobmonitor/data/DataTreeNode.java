@@ -1,5 +1,6 @@
 package org.objectweb.proactive.ic2d.gui.jobmonitor.data;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -120,5 +121,16 @@ public class DataTreeNode extends DefaultMutableTreeNode implements JobMonitorCo
 			return NAMES[KEY2INDEX[key]];
 		
 		return name;
+	}
+	
+	public Map makeConstraints() {
+		if (isRoot())
+			return new HashMap(NB_KEYS);
+		
+		DataTreeNode parent = (DataTreeNode) getParent();
+		Map constraints = parent.makeConstraints();
+		constraints.put(new Integer(key), name);
+		
+		return constraints;
 	}
 }
