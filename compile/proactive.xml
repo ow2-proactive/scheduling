@@ -419,4 +419,29 @@
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
 		</java>
 	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile benchmark
+      ==
+      ================================================================
+	-->
+	<target name="benchmark" depends="testsuite">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="benchmark/**" deprecation="on" debug="${debug}" >
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Run benchmark with TestSuite API
+      ==
+      ================================================================
+	-->
+	<target name="runBench" depends="testsuite, benchmark">
+		<java classname="benchmark.BenchCenter" fork="true">
+			<classpath refid="project.classpath"/>
+			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy" />
+		</java>
+	</target>
 </project>

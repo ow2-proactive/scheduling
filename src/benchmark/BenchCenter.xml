@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Manager>
+
+	<name>ProActive's Benchmarks</name>
+	<description>Manage all benchmarks.</description>
+	<nbRuns>100</nbRuns>
+	
+	<properties>
+		<prop key="RemoteHostname" value="owenii" />
+	</properties>
+
+</Manager>

@@ -244,6 +244,13 @@ public abstract class AbstractManager implements ResultsExporter, Beanable {
             logger.debug("Nb runs change in " + nbRuns);
         }
     }
+    
+    public void setNbRuns(String i){
+    	this.nbRuns = Integer.parseInt(i);
+		if (logger.isDebugEnabled()) {
+			logger.debug("Nb runs change in " + this.nbRuns);
+		}
+    }
 
     /**
      * @return

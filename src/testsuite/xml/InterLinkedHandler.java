@@ -58,10 +58,10 @@ public class InterLinkedHandler extends AbstractUnmarshallerDecorator
 
     InterLinkedHandler(FunctionalTestManager manager) {
         super();
-        
+
         this.manager = manager;
         this.manager.setInterLinkedGroups(new ArrayList());
-        
+
         this.table = new Hashtable();
         addHandler(ID_TEST_TAG, new IdTestHandler(this.table, this.manager));
         addHandler(INTERLINKS_TAG, new InterLinksHandler(this.table));

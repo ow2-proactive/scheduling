@@ -66,8 +66,10 @@ public class ManagerDescriptorHandler extends AbstractUnmarshallerDecorator
             new GroupHandler.SimpleGroupHandler(manager));
         addHandler(PACKAGE_GROUP_TAG,
             new GroupHandler.PackageGroupHandler(manager));
-        addHandler(INTERLINKED_TESTS_TAG,
-            new InterLinkedHandler((FunctionalTestManager) manager));
+        if (manager instanceof FunctionalTestManager) {
+            addHandler(INTERLINKED_TESTS_TAG,
+                new InterLinkedHandler((FunctionalTestManager) manager));
+        }
         addHandler(PROPERTIES_TAG, new PropertiesHandler());
     }
 
