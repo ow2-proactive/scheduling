@@ -41,6 +41,7 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
   protected java.awt.Dimension minimumSize = new java.awt.Dimension(150,80);
   protected PanelPopupMenu popup;
 
+  
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
@@ -52,10 +53,9 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
 //    if (hostObject.isGlobusEnabled())
 //      setBackground(new java.awt.Color(0xff, 0xd0, 0xd0));
     //else 
-    setBackground(new java.awt.Color(0xd0, 0xd0, 0xd0));
+    setBackground(new java.awt.Color(0x00, 0xd0, 0xd0));
     createBorder(hostObject.getOperatingSystem());
-    setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
-
+    setAlignLayout(false);
     // Popup menu
     popup = new PanelPopupMenu("Host " + name+" OS "+hostObject.getOperatingSystem());
     popup.add(new javax.swing.AbstractAction("Look for new nodes", null) {
@@ -69,7 +69,36 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
         hostObject.destroyObject();
       }
     });
-  
+    
+    /*** ebe 17/06/2004 adding layout menu item rb H V *************/ 
+    javax.swing.JMenu jvmLayoutJmenu = new javax.swing.JMenu("JVMLayout"); 
+    popup.add(jvmLayoutJmenu);
+    //menu rb Horiz
+    javax.swing.ButtonGroup group = new javax.swing.ButtonGroup();
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemHoriz = new javax.swing.JRadioButtonMenuItem("Horizontal");
+    JRadioButtonMenuItemHoriz.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            setAlignLayout(false);
+        }
+    });
+    //menu rb Vertic
+    javax.swing.JRadioButtonMenuItem JRadioButtonMenuItemVertic = new javax.swing.JRadioButtonMenuItem("Vertical");
+    JRadioButtonMenuItemVertic.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            setAlignLayout(true);
+        }
+    });
+    
+    JRadioButtonMenuItemHoriz.setSelected(true);
+    group.add(JRadioButtonMenuItemHoriz);
+    popup.add(JRadioButtonMenuItemHoriz);
+    group.add(JRadioButtonMenuItemVertic);
+    popup.add(JRadioButtonMenuItemVertic);
+
+    jvmLayoutJmenu.add(JRadioButtonMenuItemHoriz);
+    jvmLayoutJmenu.add(JRadioButtonMenuItemVertic); 
+   /***********************************************************/
+
     //Monitoring Event 
     addMouseListener(popup.getMenuMouseListener());
 
@@ -92,7 +121,18 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
+  
+  // ebe 06/2004
+  // set VM horiz or vertic layout for that host
+  public void setAlignLayout(boolean align){
+      setPreferredSize(null);
+      if (align==false) setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 9, 5));
+      else setLayout(new javax.swing.BoxLayout(HostPanel.this, javax.swing.BoxLayout.Y_AXIS)); 
+      revalidate();
+      repaint();
+  }
 
+  
   //
   // -- implements HostObjectListener -----------------------------------------------
   //
@@ -112,6 +152,7 @@ public class HostPanel extends AbstractDataObjectPanel implements HostObjectList
     popup.setName("Host " + name+" OS "+os);
     repaint();
   }
+  
   
 
   //
