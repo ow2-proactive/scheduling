@@ -53,9 +53,9 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
-import org.objectweb.proactive.core.util.profiling.CompositeAverageMicroTimer;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
+import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 
 
 public class ProxyForGroup extends AbstractProxy
