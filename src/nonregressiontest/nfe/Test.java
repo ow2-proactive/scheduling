@@ -51,104 +51,114 @@ import testsuite.test.FunctionalTest;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class Test extends FunctionalTest  {
-	
-	/** An active object on the same VM */
-	A sameVM;
-	
-	/** An active object on a different but local VM */
-	A localVM;
-	
-	/** An active object on a remote VM */
-	A remoteVM;
-	 
-	/**
-	 * Constructor for Test.
-	 */
-	public Test() {
-		super("NFE Configuration",
-			"Test the configuration of exception handlers on local and remote active objects");
-	}
+public class Test extends FunctionalTest {
 
-	/**
-	 * @see testsuite.test.AbstractTest#initTest()
-	 */
-	public void initTest() throws Exception {
-	}
+    /** An active object on the same VM */
+    A sameVM;
 
+    /** An active object on a different but local VM */
+    A localVM;
 
-	/**
-	* @see testsuite.test.AbstractTest#preConditions()
-	*/
-   public boolean preConditions() throws Exception {
-	   
-		// Every active object must be different from null
-		//return ((sameVM != null) && (localVM != null) && (remoteVM != null));
-		return true;
-   }
-	   
-	   
-	/**
-	 * @see testsuite.test.FunctionalTest#action()
-	 */
-	public void action() throws Exception {
-	
-		// Get universal body of every active object
-		//UniversalBody bodySameVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) sameVM).getProxy()).getBody();
-		//UniversalBody bodyLocalVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) localVM).getProxy()).getBody();
-		//UniversalBody bodyRemoteVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remoteVM).getProxy()).getBody();
+    /** An active object on a remote VM */
+    A remoteVM;
 
-		// Creation of active objects
-		sameVM = (A) ProActive.newActive(A.class.getName(), new Object[]{"sameVM"}, TestNodes.getSameVMNode());
-		localVM = (A) ProActive.newActive(A.class.getName(), new Object[]{"localVM"}, TestNodes.getLocalVMNode());
-		remoteVM = (A) ProActive.newActive(A.class.getName(), new Object[]{"remoteVM"}, TestNodes.getRemoteVMNode());
-		
-		// URL
-		String sameURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) sameVM).getProxy()).getBody().getNodeURL();
-		String localURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) localVM).getProxy()).getBody().getNodeURL();
-		String remoteURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remoteVM).getProxy()).getBody().getNodeURL();
-		//System.out.println("*** URL " + TestNodes.getRemoteVMNode().getNodeInformation().getURL());
-		//System.out.println("*** OA " + TestNodes.getRemoteVMNode().getActiveObjects(A.class.getName()));
-		
-		// Add exception handler to the active object on the same VM
-		System.out.println("*** SET HANDLER IN SAME VM : " + sameURL);
-		ProActive.setExceptionHandler(HandlerCommunicationException.class, ProActiveCommunicationException.class, Handler.ID_Body, sameVM);
-		ProActive.setExceptionHandler(HandlerMigrationException.class, ProActiveMigrationException.class, Handler.ID_Body, sameVM); 
+    /**
+     * Constructor for Test.
+     */
+    public Test() {
+        super("NFE Configuration",
+            "Test the configuration of exception handlers on local and remote active objects");
+    }
 
-		// Add exception handler to the active object on a local VM
-		System.out.println("*** SET HANDLER IN LOCAL VM : " + localURL);
-		ProActive.setExceptionHandler(HandlerCommunicationException.class, ProActiveCommunicationException.class, Handler.ID_Body, localVM);
-		ProActive.setExceptionHandler(HandlerMigrationException.class, ProActiveMigrationException.class, Handler.ID_Body, localVM); 
+    /**
+     * @see testsuite.test.AbstractTest#initTest()
+     */
+    public void initTest() throws Exception {
+    }
 
-		// Add exception handler to the active object on a remote VM
-		System.out.println("*** SET HANDLER IN REMOTE VM : " + remoteURL);
-		ProActive.setExceptionHandler(HandlerCommunicationException.class, ProActiveCommunicationException.class, Handler.ID_Body, remoteVM);
-		ProActive.setExceptionHandler(HandlerMigrationException.class, ProActiveMigrationException.class, Handler.ID_Body, remoteVM); 
-	}
+    /**
+    * @see testsuite.test.AbstractTest#preConditions()
+    */
+    public boolean preConditions() throws Exception {
+        // Every active object must be different from null
+        //return ((sameVM != null) && (localVM != null) && (remoteVM != null));
+        return true;
+    }
 
-	/**
-	 * @see testsuite.test.AbstractTest#postConditions()
-	 */
-	public boolean postConditions() throws Exception {
-		
-		// We create on the fly two non functional exception
-		ProActiveMigrationException nfeMig = new ProActiveMigrationException(null); 
-		ProActiveCommunicationException nfeCom = new ProActiveCommunicationException(null);
-		
-		// We check if handlers table contains handlers for both migration and communication exception at active object level 
-		/*return (sameVM.protectedFrom(nfeCom) && sameVM.protectedFrom(nfeMig) &&
-					 localVM.protectedFrom(nfeCom) && localVM.protectedFrom(nfeMig) &&
-					 remoteVM.protectedFrom(nfeCom) && remoteVM.protectedFrom(nfeMig)
-					 );
-		*/
-		return ((ProActive.searchExceptionHandler(nfeCom, sameVM)!=null) && (ProActive.searchExceptionHandler(nfeMig, sameVM)!=null) && 
-					(ProActive.searchExceptionHandler(nfeCom, localVM)!=null) && (ProActive.searchExceptionHandler(nfeMig, localVM)!=null) &&
-					(ProActive.searchExceptionHandler(nfeCom, remoteVM)!=null) && (ProActive.searchExceptionHandler(nfeMig, remoteVM)!=null));
-	}
-	
-	/**
-	 * @see testsuite.test.AbstractTest#endTest()
-	 */
-	public void endTest() throws Exception {
-	}
+    /**
+     * @see testsuite.test.FunctionalTest#action()
+     */
+    public void action() throws Exception {
+        // Get universal body of every active object
+        //UniversalBody bodySameVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) sameVM).getProxy()).getBody();
+        //UniversalBody bodyLocalVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) localVM).getProxy()).getBody();
+        //UniversalBody bodyRemoteVM = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remoteVM).getProxy()).getBody();
+        // Creation of active objects
+        sameVM = (A) ProActive.newActive(A.class.getName(),
+                new Object[] { "sameVM" }, TestNodes.getSameVMNode());
+        localVM = (A) ProActive.newActive(A.class.getName(),
+                new Object[] { "localVM" }, TestNodes.getLocalVMNode());
+        remoteVM = (A) ProActive.newActive(A.class.getName(),
+                new Object[] { "remoteVM" }, TestNodes.getRemoteVMNode());
+
+        // URL
+        String sameURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) sameVM)
+                          .getProxy()).getBody().getNodeURL();
+        String localURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) localVM)
+                           .getProxy()).getBody().getNodeURL();
+        String remoteURL = ((BodyProxy) ((org.objectweb.proactive.core.mop.StubObject) remoteVM)
+                            .getProxy()).getBody().getNodeURL();
+
+        //System.out.println("*** URL " + TestNodes.getRemoteVMNode().getNodeInformation().getURL());
+        //System.out.println("*** OA " + TestNodes.getRemoteVMNode().getActiveObjects(A.class.getName()));
+        // Add exception handler to the active object on the same VM
+        //System.out.println("*** SET HANDLER IN SAME VM : " + sameURL);
+        ProActive.setExceptionHandler(HandlerCommunicationException.class,
+            ProActiveCommunicationException.class, Handler.ID_Body, sameVM);
+        ProActive.setExceptionHandler(HandlerMigrationException.class,
+            ProActiveMigrationException.class, Handler.ID_Body, sameVM);
+
+        // Add exception handler to the active object on a local VM
+        //System.out.println("*** SET HANDLER IN LOCAL VM : " + localURL);
+        ProActive.setExceptionHandler(HandlerCommunicationException.class,
+            ProActiveCommunicationException.class, Handler.ID_Body, localVM);
+        ProActive.setExceptionHandler(HandlerMigrationException.class,
+            ProActiveMigrationException.class, Handler.ID_Body, localVM);
+
+        // Add exception handler to the active object on a remote VM
+        //System.out.println("*** SET HANDLER IN REMOTE VM : " + remoteURL);
+        ProActive.setExceptionHandler(HandlerCommunicationException.class,
+            ProActiveCommunicationException.class, Handler.ID_Body, remoteVM);
+        ProActive.setExceptionHandler(HandlerMigrationException.class,
+            ProActiveMigrationException.class, Handler.ID_Body, remoteVM);
+    }
+
+    /**
+     * @see testsuite.test.AbstractTest#postConditions()
+     */
+    public boolean postConditions() throws Exception {
+        // We create on the fly two non functional exception
+        ProActiveMigrationException nfeMig = new ProActiveMigrationException(null);
+        ProActiveCommunicationException nfeCom = new ProActiveCommunicationException(null);
+
+        // We check if handlers table contains handlers for both migration and communication exception at active object level 
+
+        /*return (sameVM.protectedFrom(nfeCom) && sameVM.protectedFrom(nfeMig) &&
+                                 localVM.protectedFrom(nfeCom) && localVM.protectedFrom(nfeMig) &&
+                                 remoteVM.protectedFrom(nfeCom) && remoteVM.protectedFrom(nfeMig)
+                                 );
+        */
+        return ((ProActive.searchExceptionHandler(nfeCom, sameVM) != null) &&
+        (ProActive.searchExceptionHandler(nfeMig, sameVM) != null) &&
+        (ProActive.searchExceptionHandler(nfeCom, localVM) != null) &&
+        (ProActive.searchExceptionHandler(nfeMig, localVM) != null) &&
+        (ProActive.searchExceptionHandler(nfeCom, remoteVM) != null) &&
+        (ProActive.searchExceptionHandler(nfeMig, remoteVM) != null));
+    }
+
+    /**
+     * @see testsuite.test.AbstractTest#endTest()
+     */
+    public void endTest() throws Exception {
+    }
 }

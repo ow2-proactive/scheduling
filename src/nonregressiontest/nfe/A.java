@@ -30,11 +30,11 @@
 */
 package nonregressiontest.nfe;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+
+import java.io.Serializable;
 
 
 /**
@@ -53,14 +53,14 @@ public class A implements Serializable {
 
     public A(String name) {
         this.name = name;
-		
-		/*InetAddress inet = null;
-		try {
-			inet = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+        /*InetAddress inet = null;
+        try {
+                inet = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+        }
         System.out.println("Object A sur //" + inet.getCanonicalHostName() );
         */
     }
@@ -72,17 +72,16 @@ public class A implements Serializable {
     public String getNodeUrl() {
         return ProActive.getBodyOnThis().getNodeURL();
     }
-    
+
     public boolean protectedFrom(NonFunctionalException nfe) {
-    	try {
-    		if  (!ProActive.getBodyOnThis().getHandlersLevel().isEmpty()) {
-				return (ProActive.searchExceptionHandler(nfe, this) != null);
-    		} else {
-				return false;
-    		}
-    	} catch (ProActiveException e) {
-    		return false;
-    	}
+        try {
+            if (!ProActive.getBodyOnThis().getHandlersLevel().isEmpty()) {
+                return (ProActive.searchExceptionHandler(nfe, this) != null);
+            } else {
+                return false;
+            }
+        } catch (ProActiveException e) {
+            return false;
+        }
     }
-    
 }
