@@ -42,6 +42,10 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public interface ProActiveComponentRepresentative extends ProActiveComponent, StubObject {
 	
+	public StubObject getStubOnBaseObject();
+	
+	public void setStubOnBaseObject(StubObject stub);
+	
 	
 	
 
