@@ -1006,7 +1006,7 @@ public class ProActive {
             }
         }
     }
-
+    
     /**
      * Blocks the calling thread until all futures in the vector are available.
      * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
@@ -1054,7 +1054,31 @@ public class ProActive {
             }
         }
     }
+ 
+    /**
+     * Return <code>false</code> if one object of <code>futures</code> is 
+     * available.
+     * @param futures a table with futures.
+     * @return <code>true</code> if all futures are awaited, else <code>false
+     * </code>.
+     */
+    public static boolean allAwaited(java.util.Vector futures){
+        FuturePool fp = getBodyOnThis().getFuturePool();
 
+        synchronized (fp) {
+                java.util.Iterator it = futures.iterator();
+
+                while (it.hasNext()) {
+                    Object current = it.next();
+
+                    if (! isAwaited(current)) {
+                        return false;
+                    }
+                }
+                return true;
+        }
+    }
+    
     /**
      * Return false if the object <code>future</code> is available.
      * This method is recursive, i.e. if result of future is a future too,
