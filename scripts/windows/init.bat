@@ -48,6 +48,17 @@ IF EXIST %PROACTIVE%\lib\components\julia-mixins.jar set CLASSPATH=%CLASSPATH%;%
 IF EXIST %PROACTIVE%\lib\components\julia-runtime.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\julia-runtime.jar
 IF EXIST %PROACTIVE%\lib\components\SVGGraphics.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\SVGGraphics.jar
 IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
+
+IF EXIST %PROACTIVE%\lib\soap.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\soap.jar
+IF EXIST %PROACTIVE%\lib\wsdl4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\wsdl4j.jar
+IF EXIST %PROACTIVE%\lib\axis.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\axis.jar
+IF EXIST %PROACTIVE%\lib\jaxrpc.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jaxrpc.jar
+IF EXIST %PROACTIVE%\lib\activation.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\activation.jar
+IF EXIST %PROACTIVE%\lib\saaj-api.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\saaj-api.jar
+IF EXIST %PROACTIVE%\lib\commons-logging.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\commons-logging.jar
+IF EXIST %PROACTIVE%\lib\commons-discovery.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\commons-discovery.jar
+IF EXIST %PROACTIVE%\lib\mail.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\mail.jar
+
 echo CLASSPATH=%CLASSPATH%
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:proactive-log4j
