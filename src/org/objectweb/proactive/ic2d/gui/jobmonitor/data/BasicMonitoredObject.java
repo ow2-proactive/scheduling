@@ -25,11 +25,6 @@ public abstract class BasicMonitoredObject implements JobMonitorConstants, Compa
 		o.deleted = deleted;
 	}
 	
-	public String toString() {
-		String del = deleted ? "deleted" : "not deleted";
-		return fullname + "(" + del + ")";
-	}
-	
 	public static BasicMonitoredObject create(int key, String fullname) {
 		switch (key) {
 		case JOB:

@@ -10,19 +10,6 @@ public class MonitoredObjectSet {
         map = new TreeMap();
     }
 
-    public String toString() {
-        String str = "";
-        Iterator i = iterator();
-        while (i.hasNext()) {
-            BasicMonitoredObject o = (BasicMonitoredObject) i.next();
-            if (o.isDeleted()) {
-                str += (i.next().toString() + " ");
-            }
-        }
-
-        return str;
-    }
-
     public BasicMonitoredObject add(BasicMonitoredObject o) {
         BasicMonitoredObject orig = (BasicMonitoredObject) map.get(o);
         if (orig == null) {
