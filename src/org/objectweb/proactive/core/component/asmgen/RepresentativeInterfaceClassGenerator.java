@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component.asmgen;
 
 import org.apache.log4j.Logger;
@@ -47,9 +47,9 @@ import java.io.Serializable;
 
 import java.lang.reflect.Method;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -106,16 +106,16 @@ public class RepresentativeInterfaceClassGenerator
     }
 
     /**
-    * retreives the bytecode associated to the generated class of the given name
-    */
+     * retreives the bytecode associated to the generated class of the given name
+     */
     public static byte[] getClassData(String classname) {
         return (byte[]) getGeneratedClassesCache().get(classname);
     }
 
     /**
-    * Returns the generatedClassesCache.
-    * @return a Map acting as a cache for generated classes  
-    */
+     * Returns the generatedClassesCache.
+     * @return a Map acting as a cache for generated classes
+     */
     public static Map getGeneratedClassesCache() {
         return generatedClassesCache;
     }
@@ -128,17 +128,17 @@ public class RepresentativeInterfaceClassGenerator
 
             //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
             //                                                    .equals(ComponentParameters.PRIMITIVE);
-            interfacesToImplement = new Vector();
+            interfacesToImplement = new ArrayList();
 
             // add functional interface
             interfacesToImplement.add(Class.forName(
                     interfaceType.getFcItfSignature()));
 
             // add Serializable interface
-            interfacesToImplement.addElement(Serializable.class);
+            interfacesToImplement.add(Serializable.class);
 
             // add StubObject, so we can set the proxy
-            interfacesToImplement.addElement(StubObject.class);
+            interfacesToImplement.add(StubObject.class);
 
             this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
                     interfaceType.getFcItfSignature());
@@ -162,22 +162,22 @@ public class RepresentativeInterfaceClassGenerator
                         generatedClassesCache.toString());
                 }
 
-//                // Next few lines for debugging only
-//                                            try {
-//                                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
-//                                                                                     stubClassFullName + ".class");
-//                                
-//                                                if (logger.isDebugEnabled()) {
-//                                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-//                                                }
-//                                
-//                                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-//                                                fos.write(bytes);
-//                                                fos.close();
-//                                			} catch (Exception e) {
-//                                				// e.printStackTrace();
-//                                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-//                                			}
+                //                // Next few lines for debugging only
+                //                                            try {
+                //                                                java.io.File file = new java.io.File(System.getProperty("user.home") + "/ProActive/generated/" + 
+                //                                                                                     stubClassFullName + ".class");
+                //                                
+                //                                                if (logger.isDebugEnabled()) {
+                //                                                    //logger.debug("writing down the generated class : " + file.getAbsolutePath());
+                //                                                }
+                //                                
+                //                                                java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+                //                                                fos.write(bytes);
+                //                                                fos.close();
+                //                                			} catch (Exception e) {
+                //                                				// e.printStackTrace();
+                //                                				logger.info("if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+                //                                			}
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
             }
@@ -371,7 +371,7 @@ public class RepresentativeInterfaceClassGenerator
             pushInt(cv, i);
 
             // Loads the generatedClassName of the class onto the stack
-            String s = ((Class) interfacesToImplement.elementAt(i)).getName();
+            String s = ((Class) interfacesToImplement.get(i)).getName();
             cv.visitLdcInsn(s);
 
             // Performs the call to Class.forName
@@ -521,7 +521,7 @@ public class RepresentativeInterfaceClassGenerator
     }
 
     /**
-     * implementation of abstract method defined in mother class  
+     * implementation of abstract method defined in mother class
      */
     protected void createDefaultMethods() {
         createGetAndSetProxyMethods();
