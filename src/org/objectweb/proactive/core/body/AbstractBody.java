@@ -272,6 +272,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     return localBodyStrategy.getName();
   }
 
+		/** Serves the request. The request should be removed from the request queue
+		 * before serving, which is correctly done by all methods of the Service class.
+		 * However, this condition is not ensured for custom calls on serve. */
   public void serve(Request request) {
     localBodyStrategy.serve(request);
   }

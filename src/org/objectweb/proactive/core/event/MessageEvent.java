@@ -35,7 +35,8 @@ import org.objectweb.proactive.core.body.message.Message;
 
 /**
  * <p>
- * A <code>MessageEvent</code> occurs when a <code>Message</code> get sent or received.
+ * A <code>MessageEvent</code> occurs when a <code>Message</code> get sent or received or
+ * when the treatment of a request begins or ends.
  * </p>
  * 
  * @see org.objectweb.proactive.core.body.message.Message
@@ -54,19 +55,32 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   public static final int REPLY_SENT = 30;
   /** constant indicating the encapsulated message has been received */
   public static final int REPLY_RECEIVED = 40;
+  /** constant indicating the encapsulated request without reply has been served */
+  public static final int VOID_REQUEST_SERVED = 50;
+  /** constant indicating that the serving of the encapsulated request has started */
+  public static final int SERVING_STARTED = 60;
 
   protected UniqueID destinationID;
+  
+  /** Length of the request queue of the body that sends this event or -1
+   * if this message did not affect the request queue length. */
+  protected int requestQueueLength;
   
   /**
    * Creates a new <code>MessageEvent</code> based on the message 
    * <code>message</code> and on the given action
    * @param <code>message</code> the message on which this event is based.
    * @param <code>messageActionType</code> the type of the action occuring with
-   * this message either REQUEST_SENT/RECEIVED or REPLY_SENT/RECEIVED.
+   * this message either REQUEST_SENT/RECEIVED, REPLY_SENT/RECEIVED,
+   * VOID_REQUEST_SERVED or SERVING_STARTED.
+   * @param <code>requestQueueLength</code> the length of the request queue of the
+   * body that sends this event or -1 if this event did not affect the queue length.
    */
-  public MessageEvent(Message message, int messageActionType, UniqueID destinationID) {
+  public MessageEvent(Message message, int messageActionType, UniqueID destinationID,
+  			int requestQueueLength) {
     super(message, messageActionType);
     this.destinationID = destinationID;
+    this.requestQueueLength = requestQueueLength;
   }
   
 
@@ -75,13 +89,22 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   //
 
   /**
-   * Returns the id of the body receiver of the encapsulated message
+   * Returns the id of the body receiver of the encapsulated message.
+   * For a VOID_REQUEST_SERVED message, this is the destination body of the
+   * encapsulated request, i.e. the body that sends this event!
    * @return the id of the body receiver of the encapsulated message
    */
   public UniqueID getDestinationBodyID() {
     return destinationID;
   }
   
+	/**
+	 * Returns the length of the request queue of the sending body or -1.
+	 * @return the length of the request queue of the sending body or -1.
+	 */
+  public int getRequestQueueLength() {
+		return requestQueueLength;
+  }
   
   /**
    * Returns a string representation of this event
@@ -123,4 +146,5 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   private final Message getMessage() {
     return (Message) getSource();
   }
+
 }

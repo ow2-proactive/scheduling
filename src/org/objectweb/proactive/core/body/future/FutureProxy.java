@@ -43,8 +43,11 @@ import org.objectweb.proactive.core.mop.StubObject;
 import java.lang.reflect.InvocationTargetException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.event.FutureEvent;
+
 
 /**
  * This proxy class manages the semantic of future objects
@@ -71,6 +74,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	private static boolean shouldPoolFutureProxyObjects;
 
 	private static int index;
+
+    /** Static point for management of events related to futures. 
+     * This FutureEventProducer is responsible for all FutureProxys of this VM */
+    private static FutureEventProducerImpl futureEventProducer;
+
 
 	//
 	// -- PROTECTED MEMBERS -----------------------------------------------
@@ -178,6 +186,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		return result;
 	}
 
+    /** Returns the <code>FutureEventProducer</code> that is responsible for the
+     * FutureProxys of this VM. Listeners can register themselves here. */
+    public static FutureEventProducer getFutureEventProducer() {
+      if (futureEventProducer == null) futureEventProducer = new FutureEventProducerImpl();
+      return futureEventProducer;	
+    }
+
 	//
 	// -- PUBLIC METHODS -----------------------------------------------
 	//
@@ -254,13 +269,32 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	 * Blocks the calling thread until the future object is available.
 	 */
 	public synchronized void waitFor() {
-	
+
+	    if (isAvailable) return;	    
+	    
+	    UniqueID id = null;
+	    
+	    // send WAIT_BY_NECESSITY event to listeners if there are any
+	    if (futureEventProducer != null) {
+	      id = ProActive.getBodyOnThis().getID();
+	      if (LocalBodyStore.getInstance().getLocalBody(id) != null) { 
+	      	// send event only if ActiveObject, not for HalfBodies
+  	        futureEventProducer.notifyListeners(id,
+	      									  getCreatorID(), FutureEvent.WAIT_BY_NECESSITY);	
+	      } else id = null;
+	    }	    
 		while (!isAvailable) {
 			try {
 				this.wait();
 			} catch (InterruptedException e) {
 			}
 		}
+	    // send RECEIVED_FUTURE_RESULT event to listeners if there are any
+	    if (id != null) {
+	      futureEventProducer.notifyListeners(id,
+	      									  getCreatorID(), FutureEvent.RECEIVED_FUTURE_RESULT);	
+	    }	    
+
 	}
 	
 	

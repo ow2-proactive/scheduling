@@ -37,11 +37,14 @@ public class SpyEvent extends ProActiveEvent implements java.io.Serializable {
   
   public static final int GENERIC_TYPE = 0;
   public static final int OBJECT_WAIT_BY_NECESSITY_TYPE = 20;
+  public static final int OBJECT_RECEIVED_FUTURE_RESULT_TYPE = 21;
   public static final int OBJECT_WAIT_FOR_REQUEST_TYPE = 30;
   public static final int REQUEST_SENT_MESSAGE_TYPE = 50;
   public static final int REPLY_SENT_MESSAGE_TYPE = 60;
   public static final int REQUEST_RECEIVED_MESSAGE_TYPE = 51;
   public static final int REPLY_RECEIVED_MESSAGE_TYPE = 61;
+  public static final int VOID_REQUEST_SERVED_TYPE = 70;
+  public static final int SERVING_STARTED_TYPE = 80;
   public static final int BODY_EVENT_TYPE = 100;
   public static final int BODY_CREATION_EVENT_TYPE = 200;
 
@@ -70,10 +73,13 @@ public class SpyEvent extends ProActiveEvent implements java.io.Serializable {
       case GENERIC_TYPE: return "GENERIC_TYPE";
       case OBJECT_WAIT_BY_NECESSITY_TYPE: return "OBJECT_WAIT_BY_NECESSITY_TYPE";
       case OBJECT_WAIT_FOR_REQUEST_TYPE: return "OBJECT_WAIT_FOR_REQUEST_TYPE";
+      case OBJECT_RECEIVED_FUTURE_RESULT_TYPE: return "OBJECT_RECEIVED_FUTURE_RESULT_TYPE";
       case REQUEST_SENT_MESSAGE_TYPE: return "REQUEST_SENT_MESSAGE_TYPE";
       case REPLY_SENT_MESSAGE_TYPE: return "REPLY_SENT_MESSAGE_TYPE";
       case REQUEST_RECEIVED_MESSAGE_TYPE: return "REQUEST_RECEIVED_MESSAGE_TYPE";
       case REPLY_RECEIVED_MESSAGE_TYPE: return "REPLY_RECEIVED_MESSAGE_TYPE";
+      case VOID_REQUEST_SERVED_TYPE: return "VOID_REQUEST_SERVED_TYPE";
+      case SERVING_STARTED_TYPE: return "SERVING_STARTED_TYPE";
       case BODY_EVENT_TYPE: return "BODY_EVENT_TYPE";
       case BODY_CREATION_EVENT_TYPE: return "BODY_CREATION_EVENT_TYPE";
     }

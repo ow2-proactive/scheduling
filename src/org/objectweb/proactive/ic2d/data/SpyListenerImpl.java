@@ -113,6 +113,10 @@ public class SpyListenerImpl implements SpyListener {
         spyEventListener.objectWaitingByNecessity(spyEvent.getBodyID(), spyEvent);
         break;
 
+      case SpyEvent.OBJECT_RECEIVED_FUTURE_RESULT_TYPE:
+        spyEventListener.objectReceivedFutureResult(spyEvent.getBodyID(), spyEvent);
+        break;
+
       case SpyEvent.OBJECT_WAIT_FOR_REQUEST_TYPE:
         spyEventListener.objectWaitingForRequest(spyEvent.getBodyID(), spyEvent);
         break;
@@ -132,6 +136,15 @@ public class SpyListenerImpl implements SpyListener {
       case SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE:
         spyEventListener.replyMessageReceived(spyEvent.getBodyID(), spyEvent);
       break;
+
+      case SpyEvent.VOID_REQUEST_SERVED_TYPE:
+        spyEventListener.voidRequestServed(spyEvent.getBodyID(), spyEvent);
+      break;
+
+      case SpyEvent.SERVING_STARTED_TYPE:
+        spyEventListener.servingStarted(spyEvent.getBodyID(), spyEvent);
+      break;
+
     }
   }
 

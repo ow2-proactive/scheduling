@@ -51,6 +51,7 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
   /**
    * A reference to the layout\
    */
+  protected DinnerLayout layout;
 
   /**
    * No arg constructor
@@ -62,9 +63,10 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
   /**
    * Real constructor
    */
-  public Philosopher(int id, Table table) {
+  public Philosopher(int id, Table table, DinnerLayout layout) {
     this.id = id;
     this.table = table;
+    this.layout = layout;
     autopilot = false;
     hasBothForks = false;
   }
@@ -74,6 +76,7 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
    * getForks
    */
   public void getForks() {
+    layout.update(id, 1); // set to waiting
     // do a synchronous call
     table.getForks(id);
     hasBothForks = true;

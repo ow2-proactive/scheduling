@@ -30,6 +30,7 @@
 */ 
 package org.objectweb.proactive.core.body.request;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.event.*;
@@ -164,17 +165,30 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
             notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
         }
-    }
+    } 
 
-    public synchronized void processRequests(RequestProcessor processor) {
-        java.util.Iterator iterator = requestQueue.iterator();
-        while (iterator.hasNext()) {
-            Request r = (Request) iterator.next();
-            if (processor.processRequest(r)) {
-                iterator.remove();
-                if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                    notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
-                }
+    public synchronized void processRequests(RequestProcessor processor, Body body) {
+	    for (int i = 0; i < requestQueue.size(); i++) {
+            Request r = (Request) requestQueue.get(i);
+            int result = processor.processRequest(r);
+            switch (result) {
+            	case RequestProcessor.REMOVE_AND_SERVE :
+                    requestQueue.remove(i);
+                    i --;
+	                if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+	                    notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
+	                }
+	   	            body.serve(r);
+             	  break;
+            	case RequestProcessor.REMOVE :
+                    requestQueue.remove(i);
+                    i --;
+	                if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+	                    notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
+	                }
+            	  break;
+            	case RequestProcessor.KEEP :
+            	  break;
             }
         }
     }

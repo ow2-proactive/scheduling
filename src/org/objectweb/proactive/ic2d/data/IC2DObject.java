@@ -166,6 +166,13 @@ public class IC2DObject extends AbstractDataObject {
        }
     }
 
+    public void voidRequestServed(ActiveObject object, SpyEvent spyEvent) {
+       if (listener != null) {
+         // System.out.println("voidRequestServed method="+((org.objectweb.proactive.ic2d.spy.SpyMessageEvent)spyEvent).getMethodName());
+         listener.voidRequestServed(object, spyEvent);
+       }
+    }
+
     public void allEventsProcessed() {
       if (listener != null) {
         listener.allEventsProcessed();

@@ -30,9 +30,12 @@
 */ 
 package org.objectweb.proactive.ic2d.gui;
 
-import javax.swing.SwingConstants;
-
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.event.MessageEvent;
+import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
+import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
+import org.objectweb.proactive.ic2d.spy.SpyFutureEvent;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.data.IC2DObject;
 import org.objectweb.proactive.ic2d.event.CommunicationEventListener;
@@ -50,9 +53,12 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
   private static final String REQUEST_RECEIVED_ICON = IMAGES_DIR+"RequestReceived.gif";
   private static final String REQUEST_SENT_ICON = IMAGES_DIR+"RequestSent.gif";
   private static final String WAITING_FOR_REQUEST_ICON = IMAGES_DIR+"WaitingForRequest.gif";
+  private static final String WAIT_BY_NECESSITY_ICON = IMAGES_DIR+"WaitByNecessity.gif";
+  private static final String VOID_REQUEST_SERVED_ICON = IMAGES_DIR+"VoidRequestServed.gif";
   
-  private static final int RELATED_EVENT_COLOR_MODE = 1;
-  private static final int ABSOLUTE_EVENT_COLOR_MODE = 2;
+  private static final int RELATED_EVENT_COLOR_MODE = 0;
+  private static final int ABSOLUTE_EVENT_COLOR_MODE = 1;
+  private static final int NO_COLOR_MODE = 2;
   
   private static final java.awt.Color LIST_BG_COLOR = new java.awt.Color(0, 0, 80);
   private static final java.awt.Font MFONT = new java.awt.Font("Dialog", 1, 10);
@@ -61,11 +67,11 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
     // Create the SHADES!
     SHADES = new java.awt.Color[21];
     for (int i = 0; i < 10; i++) {
-      SHADES[i] = new java.awt.Color(0, 0, 50 + i * 20);
+      SHADES[i] = new java.awt.Color(i*13+30, i*13+30, 150 + i * 10);
     }
     SHADES[10] = java.awt.Color.orange;
     for (int i = 11; i < 21; i++) {
-      SHADES[20 - (i - 11)] = new java.awt.Color(50 + (i - 11) * 20, 0, 0);
+      SHADES[i] = new java.awt.Color(150 + (20-i) * 10, (20-i)*13+30, (20-i)*13+30);
     }
   }
 
@@ -74,6 +80,8 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
   private javax.swing.ImageIcon requestSentIcon;
   private javax.swing.ImageIcon replyReceivedIcon;
   private javax.swing.ImageIcon waitingForRequestIcon;
+  private javax.swing.ImageIcon waitByNecessityIcon;
+  private javax.swing.ImageIcon voidRequestServedIcon;
                      
   /**
    * KEY: id
@@ -89,6 +97,8 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
   public javax.swing.JPopupMenu popup;
   private javax.swing.JPanel centerPanel;
   private PlayerFrameTimeLine recorder;
+  /** last object in one of the lists that was selected */
+  private Object lastSelected; 
 
   protected IC2DGUIController controller;
   protected IC2DObject ic2dObject;
@@ -115,19 +125,19 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
     setLayout(new java.awt.BorderLayout());
     {
       javax.swing.JPanel tools = new javax.swing.JPanel();
-      final javax.swing.JButton colorButton = new javax.swing.JButton("Related events");
-      colorButton.addActionListener(new java.awt.event.ActionListener() {
+      final javax.swing.JComboBox colorCombo = new javax.swing.JComboBox(
+      		new String [] {"Color related events", "Color chronological order", "No coloring"});
+      colorCombo.addActionListener(new java.awt.event.ActionListener() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          if (colorMode == RELATED_EVENT_COLOR_MODE) {
-            colorButton.setText("Absolute events");
-            colorMode = ABSOLUTE_EVENT_COLOR_MODE;
-          } else {
-            colorButton.setText("Related events");
-            colorMode = RELATED_EVENT_COLOR_MODE;
-          }
+        	switch (colorCombo.getSelectedIndex()) {
+        		case 0 : colorMode = RELATED_EVENT_COLOR_MODE; break;
+        		case 1 : colorMode = ABSOLUTE_EVENT_COLOR_MODE; break;	
+        		case 2 : colorMode = NO_COLOR_MODE; break;
+        	}
+        	colorEvents();
         }
       });
-      tools.add(colorButton); 
+      tools.add(colorCombo); 
       {
       javax.swing.JButton b = new javax.swing.JButton("Messages recorder");
       b.addActionListener(new java.awt.event.ActionListener() {
@@ -252,6 +262,10 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
     recordEvent(object, spyEvent, false);
   }
 
+  public void voidRequestServed(ActiveObject object, SpyEvent spyEvent) {
+    recordEvent(object, spyEvent, false);
+  }
+
   public void allEventsProcessed() {
     //Code for downScrolling should be there...
     synchronized (objectTrackPanelMap) {
@@ -290,6 +304,12 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
     waitingForRequestIcon = new javax.swing.ImageIcon(c.getResource(WAITING_FOR_REQUEST_ICON));
     if (waitingForRequestIcon == null)
       controller.log("Can't load image "+WAITING_FOR_REQUEST_ICON);
+    waitByNecessityIcon = new javax.swing.ImageIcon(c.getResource(WAIT_BY_NECESSITY_ICON));
+    if (waitingForRequestIcon == null)
+      controller.log("Can't load image "+WAITING_FOR_REQUEST_ICON);
+    voidRequestServedIcon = new javax.swing.ImageIcon(c.getResource(VOID_REQUEST_SERVED_ICON));
+    if (voidRequestServedIcon == null)
+      controller.log("Can't load image "+VOID_REQUEST_SERVED_ICON);
   }
   
 
@@ -323,13 +343,153 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
 
 
   private void showLegend() {
-    javax.swing.JOptionPane.showMessageDialog(
-          this,                                         // Component parentComponent,
-          new LegendPanel(),                            // Object message,
-          "EventsList Legend",                          // String title,
-          javax.swing.JOptionPane.INFORMATION_MESSAGE   // int messageType,
-        );
+  	javax.swing.JFrame legendFrame = new javax.swing.JFrame("Eventslist Legend");
+  	legendFrame.getContentPane().add(new LegendPanel());
+    legendFrame.setSize(400, 600);
+    legendFrame.show();
   }
+
+  /** Colors the events correctly. <br>Possible modes:<br><ul>
+   * <li>NO_COLOR_MODE: No coloring</li>
+   * <li>RELATED_EVENT_COLOR_MODE: The four Qsent/Qrecv, Rsent/Rrecv (or Vserved) messages
+   * belonging to the one the user clicked on are colored. Requests in blue, replies in red.
+   * All others remain white.</li>
+   * <li>ABSOLUTE_EVENT_COLOR_MODE: The message the user clicked on and its corresponding
+   * four messages are colored yellow. If the user clicked on a request, older request
+   * messages in the same list with their corresponding messages are colored blue and newer ones red.
+   * If the user clicked on a reply, older reply
+   * messages in the same list with their corresponding messages are colored blue and newer ones red.</li>
+   */
+  private void colorEvents() {
+    for (int i = 0; i < events.size(); i++) {
+      SpyEvent tmp = (SpyEvent)events.get(i);
+      tmp.setPos(-1);
+    }
+    if (lastSelected != null && lastSelected instanceof SpyMessageEvent) {     
+      SpyMessageEvent m = (SpyMessageEvent) lastSelected;
+      switch (colorMode) {
+        case ABSOLUTE_EVENT_COLOR_MODE:
+          UniqueID id = m.getBodyID();
+          if (id == null) return;
+          java.util.LinkedList bef = getMsgBefore(m, id);
+          java.util.LinkedList aft = getMsgAfter(m, id);
+          computeColor(m, 10);
+          for (int i = 0; i < bef.size(); i++)
+            computeColor((SpyEvent)bef.get(i), 9 - i);
+          for (int i = 0; i < aft.size(); i++) {
+            computeColor((SpyEvent)aft.get(i), 11 + i);
+          }
+        break;
+         
+        case RELATED_EVENT_COLOR_MODE:
+          if (m.getSequenceNumber() == 0) {
+            m.setPos(11);
+          } else {
+            for (int i = 0; i < events.size(); i++) {
+              SpyEvent tmp = (SpyEvent)events.get(i);
+              if (tmp instanceof SpyMessageEvent) {
+                SpyMessageEvent myEvent = (SpyMessageEvent) tmp;
+                if (m.matches(myEvent)) tmp.setPos(getPosFromType(myEvent.getType()));
+              }
+            }
+          }
+        break;
+      }
+    }
+    repaint();
+  	
+  }
+
+    /** calculates the corresponding SHADES index for related events */
+	private int getPosFromType(int type) {
+	  switch (type) {
+	    case SpyEvent.REQUEST_SENT_MESSAGE_TYPE :
+	      return 11;
+	    case SpyEvent.REQUEST_RECEIVED_MESSAGE_TYPE :
+	      return 11;
+	    case SpyEvent.REPLY_SENT_MESSAGE_TYPE :
+	    case SpyEvent.VOID_REQUEST_SERVED_TYPE :
+	      return 9;
+	    case SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE :
+	      return 9;
+	  }
+	  return -1;
+	}
+	
+	/**
+	 * Compute the color given the position
+	 * and set the one of the message and its peers for absolute events
+	 */
+	private void computeColor(SpyEvent m, int pos) {
+	  m.setPos(pos);
+	  if (! (m instanceof SpyMessageEvent)) return;
+	  SpyMessageEvent myEvent = (SpyMessageEvent) m;
+	  if (myEvent.getSequenceNumber() == 0) return;
+	  for (int i = 0; i < events.size(); i++) {
+	    Object o = events.get(i);
+	    if (o instanceof SpyMessageEvent) {
+	      SpyMessageEvent myEvent2 = (SpyMessageEvent) o;
+	      if (myEvent.matches(myEvent2)) myEvent2.setPos(pos);
+	    }
+	  }
+	}
+	
+	/** returns all SpyMessageEvents that belong to the same body, 
+	 * the same type (request or reply) and occured before target */
+	private java.util.LinkedList getMsgBefore(SpyMessageEvent target, UniqueID id) {
+	  java.util.LinkedList result = new java.util.LinkedList();
+	  int index = events.indexOf(target);
+	  if (index == -1) return result;
+	  boolean isRequest;
+	  if (target.isRequestMessage()) isRequest = true;
+	  else if (target.isReplyMessage()) isRequest = false;
+	  else return result;
+	  
+	  for (int i = index-1; i >= 0; i--) {
+	    Object o = events.get(i);
+	    if (o instanceof SpyMessageEvent) {      
+	      SpyMessageEvent myEvent = (SpyMessageEvent) o;
+	      if ((isRequest && myEvent.isRequestMessage()) || (!isRequest && myEvent.isReplyMessage())) {
+ 		    if (myEvent.wasSent()) {
+		      if (id.equals(myEvent.getSourceBodyID())) result.add(o);
+		    } else {
+		      if (id.equals(myEvent.getDestinationBodyID())) result.add(o);
+		    }
+	      }
+	    }
+	  }
+	  //System.out.println(result.size()+" size");
+	      return result;
+	    }
+	  
+	  
+	/** returns all SpyMessageEvents that belong to the same body, 
+	 * the same type (request or reply) and occured after target */
+    private java.util.LinkedList getMsgAfter(SpyMessageEvent target, UniqueID id) {
+	  java.util.LinkedList result = new java.util.LinkedList();
+	  int index = events.indexOf(target);
+	  if (index == -1) return result;
+	  boolean isRequest;
+	  if (target.isRequestMessage()) isRequest = true;
+	  else if (target.isReplyMessage()) isRequest = false;
+	  else return result;
+	  
+	  for (int i = index+1; i < events.size(); i++) {
+	    Object o = events.get(i);
+	    if (o instanceof SpyMessageEvent) {      
+	      SpyMessageEvent myEvent = (SpyMessageEvent) o;
+	      if ((isRequest && myEvent.isRequestMessage()) || (!isRequest && myEvent.isReplyMessage())) {
+ 		    if (myEvent.wasSent()) {
+		      if (id.equals(myEvent.getSourceBodyID())) result.add(o);
+		    } else {
+		      if (id.equals(myEvent.getDestinationBodyID())) result.add(o);
+		    }
+	      }
+	    }
+	  }
+	      //	System.out.println(result.size()+" size");
+	  return result;
+	}
 
 
   //
@@ -341,136 +501,13 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
     /**
      * When an item is selected, 
      * this method is fired and changes the colors of the other items
-     * + last 5 requests in a shade of red [SHADES [0-4]
-     * + current shade[5]
-     * + next 5 SHADES[6-10]
      */
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
       if (e.getValueIsAdjusting()) return;
-      Object o = ((javax.swing.JList)e.getSource()).getSelectedValue();
-      if (! (o instanceof SpyMessageEvent)) return;      
-      SpyMessageEvent m = (SpyMessageEvent) o;
-      switch (colorMode) {
-        case RELATED_EVENT_COLOR_MODE:
-          setEventPosition(-1);
-          UniqueID id = m.getBodyID();
-          if (id == null) return;
-          java.util.LinkedList bef = getMsgBefore(m, id);
-          java.util.LinkedList aft = getMsgAfter(m, id);
-          computeColor(m, 10, bef, aft);
-          int a = 4;
-          for (int i = 1; i < a && i < bef.size(); i++)
-            if (bef.get(i) == null)
-              a++;
-            else computeColor((SpyEvent)bef.get(i), 10 - 2 * i + 2 * (a - 4), bef, aft);
-          int b = 4;
-          for (int i = 1; i < b && i < aft.size(); i++) {
-            if (aft.get(i) == null)
-              b++;
-            else computeColor((SpyEvent)aft.get(i), 10 + 2 * i - 2 * (b - 4), bef, aft);
-          }
-        break;
-         
-         
-        case ABSOLUTE_EVENT_COLOR_MODE:
-          if (m.getSequenceNumber() == 0) {
-            setEventPosition(-1);
-            m.setPos(9);
-          } else {
-            for (int i = 0; i < events.size(); i++) {
-              SpyEvent tmp = (SpyEvent)events.get(i);
-              tmp.setPos(-1);
-              if (tmp instanceof SpyMessageEvent) {
-                SpyMessageEvent myEvent = (SpyMessageEvent) tmp;
-                if (m.matches(myEvent)) tmp.setPos(getPosFromType(myEvent.getType()));
-              }
-            }
-          }
-        break;
-      }
-      repaint();
-    }
+      lastSelected = ((javax.swing.JList)e.getSource()).getSelectedValue();
+      colorEvents();
+    }    
     
-    
-    private int getPosFromType(int type) {
-      switch (type) {
-        case SpyEvent.REQUEST_SENT_MESSAGE_TYPE :
-          return 19;
-        case SpyEvent.REQUEST_RECEIVED_MESSAGE_TYPE :
-          return 17;
-        case SpyEvent.REPLY_SENT_MESSAGE_TYPE :
-          return 13;
-        case SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE :
-          return 11;
-      }
-      return -1;
-    }
-    
-    /**
-     * Compute the color given the position
-     * and set the one of the message and his peer.
-     */
-    private void computeColor(SpyEvent m, int pos, java.util.LinkedList bef, java.util.LinkedList aft) {
-      m.setPos(pos);
-      if (! (m instanceof SpyMessageEvent)) return;
-      SpyMessageEvent myEvent = (SpyMessageEvent) m;
-      if (myEvent.getSequenceNumber() == 0) return;
-      for (int i = 0; i < events.size(); i++) {
-        Object o = events.get(i);
-        if (o instanceof SpyMessageEvent) {
-          SpyMessageEvent myEvent2 = (SpyMessageEvent) o;
-          if (myEvent.matches(myEvent2)) myEvent2.setPos(pos);
-        }
-      }
-    }
-    
-
-    private java.util.LinkedList getMsgBefore(SpyMessageEvent target, UniqueID id) {
-      java.util.LinkedList result = new java.util.LinkedList();
-      int index = events.indexOf(target);
-      if (index == -1) return result;
-      for (int i = index; i > 0; i--) {
-        Object o = events.get(i);
-        if (o instanceof SpyMessageEvent) {      
-          SpyMessageEvent myEvent = (SpyMessageEvent) o;
-          if (myEvent.wasSent()) {
-            if (id.equals(myEvent.getSourceBodyID())) result.add(o);
-          } else {
-            if (id.equals(myEvent.getDestinationBodyID())) result.add(o);
-          }
-        }
-      }
-      //System.out.println(result.size()+" size");
-      return result;
-    }
-  
-  
-    private java.util.LinkedList getMsgAfter(SpyMessageEvent target, UniqueID id) {
-      java.util.LinkedList result = new java.util.LinkedList();
-      int index = events.indexOf(target);
-      if (index == -1) return result;
-      for (int i = index; i < events.size(); i++) {
-        Object o = events.get(i);
-        if (o instanceof SpyMessageEvent) {      
-          SpyMessageEvent myEvent = (SpyMessageEvent) o;
-          if (myEvent.wasSent()) {
-            if (id.equals(myEvent.getSourceBodyID())) result.add(o);
-          } else {
-            if (id.equals(myEvent.getDestinationBodyID())) result.add(o);
-          }
-        }
-      }
-      //	System.out.println(result.size()+" size");
-      return result;
-    }
-
-
-    private void setEventPosition(int value) {
-      for (int i = 0; i < events.size(); i++) {
-        SpyEvent tmp = (SpyEvent)events.get(i);
-        tmp.setPos(value);
-      }
-    }
 
   }
   
@@ -537,18 +574,28 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
           }
           break;
           
+        case SpyEvent.VOID_REQUEST_SERVED_TYPE:
+          {
+            SpyMessageEvent rp = (SpyMessageEvent)val;
+            UniqueID id = rp.getSourceBodyID();
+            setToolTipText("Void request from "+id+" served");
+            if (voidRequestServedIcon != null) setIcon(voidRequestServedIcon);
+            formatItem(rp, id);
+          }
+          break;
           
         case SpyEvent.OBJECT_WAIT_BY_NECESSITY_TYPE:
-          setToolTipText("");
-          setText("-- ObjectWaitByNecessity");
+          SpyFutureEvent fe = (SpyFutureEvent)val;
+          setToolTipText("Waiting for a future created by "+fe.getCreatorID());
+          setText("Waiting by necessity");
           setBackground(java.awt.Color.white);
-          if (waitingForRequestIcon != null) setIcon(waitingForRequestIcon);
+          if (waitByNecessityIcon != null) setIcon(waitByNecessityIcon);
           break;
           
           
         case SpyEvent.OBJECT_WAIT_FOR_REQUEST_TYPE:
           setToolTipText("");
-          setText("-- ObjectWaitForRequest");
+          setText("Waiting for request");
           setBackground(java.awt.Color.white);
           if (waitingForRequestIcon != null) setIcon(waitingForRequestIcon);
           break;
@@ -566,7 +613,7 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
       else
         setText("[?]" + msg.getMethodName());
       // Background
-      if (msg.getPos() <= -1 || msg.getPos() > 21)
+      if (msg.getPos() <= -1 || msg.getPos() >= SHADES.length)
         setBackground(java.awt.Color.white);
       else setBackground(SHADES[msg.getPos()]);
     }
@@ -683,14 +730,23 @@ public class EventListsPanel extends javax.swing.JPanel implements Communication
    */
   private class LegendPanel extends javax.swing.JPanel {
     public LegendPanel() {
-      setLayout(new java.awt.GridLayout(0, 1));
+      setLayout(new java.awt.GridLayout(0, 1, 0, 0));
+      add(new javax.swing.JLabel("Object waiting for request", waitingForRequestIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object waiting for result (wait by necessity)", waitByNecessityIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object sent a request", requestSentIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object received a request", requestReceivedIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object finished serving a request (void return type)", voidRequestServedIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object finished serving a request and sent a reply", replySentIcon, javax.swing.JLabel.LEFT));
+      add(new javax.swing.JLabel("Object received a reply", replyReceivedIcon, javax.swing.JLabel.LEFT));
       add(new javax.swing.JLabel());
       // populate panels
       for (int i = SHADES.length - 1; i >= 0; i--) {
-        javax.swing.JLabel l = new javax.swing.JLabel("SpyEvent position: " + (-(i - ((SHADES.length - 1) / 2))), javax.swing.JLabel.LEFT);
+        javax.swing.JLabel l = new javax.swing.JLabel(
+            i == 10 ? "Event you clicked on" : i == SHADES.length-5 ? "Older events"
+            								 : i == 5 ? "Newer events" : "", javax.swing.JLabel.CENTER);
         l.setBackground(SHADES[i]);
         l.setOpaque(true);
-        l.setVerticalAlignment(SwingConstants.CENTER);
+        l.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
         add(l);
       }
     }

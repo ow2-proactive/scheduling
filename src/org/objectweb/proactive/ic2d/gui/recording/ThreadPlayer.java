@@ -92,6 +92,7 @@ public class ThreadPlayer {
       play = false;
       t = null;
     } else {
+      recordMark = 0;
       play = true;
       t = new Thread(new Runner(), "IC2D ThreadPlayer");
       t.start();
@@ -123,6 +124,10 @@ public class ThreadPlayer {
           
         case SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE:
           communicationEventListener.replyMessageReceived(activeObject, event);
+          break;
+        
+        case SpyEvent.VOID_REQUEST_SERVED_TYPE:
+          communicationEventListener.voidRequestServed(activeObject, event);
           break;
         
     }

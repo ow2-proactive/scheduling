@@ -199,7 +199,6 @@ public abstract class AbstractDataObject implements MessageMonitoringController 
     monitorReplySender(shouldMonitor);
   }
 
-
   public boolean isMonitoring() {
     return monitoringRequestReceiver || monitoringRequestSender || monitoringReplyReceiver || monitoringReplySender;
   }

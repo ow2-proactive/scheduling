@@ -35,8 +35,12 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.event.BodyEvent;
 import org.objectweb.proactive.core.event.BodyEventListener;
+import org.objectweb.proactive.core.event.FutureEvent;
+import org.objectweb.proactive.core.event.FutureEventListener;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.event.RequestQueueEvent;
@@ -54,6 +58,8 @@ public class SpyEventManager {
   protected RequestQueueEventListener requestQueueEventListener;
   
   protected BodyEventListener bodyEventListener;
+  
+  protected FutureEventListener futureEventListener;
   
   /**
    * Log of all the RequestSent messages received
@@ -84,6 +90,7 @@ public class SpyEventManager {
     messageEventListener = new MyMessageEventListener();
     requestQueueEventListener = new MyRequestQueueEventListener();
     bodyEventListener = new MyBodyEventListener();
+    futureEventListener = new MyFutureEventListener();
     
     // Initialises the list of pending messages
     pendingSpyEvents = new java.util.ArrayList();
@@ -139,6 +146,15 @@ public class SpyEventManager {
 
   void removeBodyEventListener() {
     LocalBodyStore.getInstance().removeBodyEventListener(bodyEventListener);
+  }
+
+  void addFutureEventListener() {
+    FutureProxy.getFutureEventProducer().addFutureEventListener(futureEventListener);
+  }
+
+
+  void removeFutureEventListener() {
+    FutureProxy.getFutureEventProducer().addFutureEventListener(futureEventListener);
   }
 
 
@@ -325,6 +341,23 @@ public class SpyEventManager {
   } // end inner class MyRequestQueueEventListener
 
 
+  /**
+   * MyFutureEventListener
+   */
+  private class MyFutureEventListener implements FutureEventListener {
+    //
+    // -- implements FutureEventListener -----------------------------------------------
+    //
+    public void waitingForFuture(FutureEvent event) {
+      addEvent(new SpyFutureEvent(SpyEvent.OBJECT_WAIT_BY_NECESSITY_TYPE, event));
+    }
+
+    public void receivedFutureResult(FutureEvent event) {
+      addEvent(new SpyFutureEvent(SpyEvent.OBJECT_RECEIVED_FUTURE_RESULT_TYPE, event));
+    }
+
+  } // end inner class MyRequestQueueEventListener
+
 
   /**
    * RequestReceiverListener
@@ -358,6 +391,16 @@ public class SpyEventManager {
         addEvent(new SpyMessageEvent(SpyEvent.REPLY_RECEIVED_MESSAGE_TYPE, event));
       }
     }
+
+    public void voidRequestServed(MessageEvent event) {
+      addEvent(new SpyMessageEvent(SpyEvent.VOID_REQUEST_SERVED_TYPE, event));
+    }
+    
+    public void servingStarted(MessageEvent event) {
+      addEvent(new SpyMessageEvent(SpyEvent.SERVING_STARTED_TYPE, event));
+    }
+    
+
   } // end inner class MyMessageEventListener
 
 }

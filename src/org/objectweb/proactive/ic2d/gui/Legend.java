@@ -31,16 +31,25 @@
 package org.objectweb.proactive.ic2d.gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 
+import javax.swing.Icon;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.TitledBorder;
+
+import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
 
 public class Legend extends JFrame {
 
@@ -51,48 +60,166 @@ public class Legend extends JFrame {
   }
 
   private Legend() {
-    super("Legend");
-    setSize(300, 300);
+    super("World Panel Legend");
+    setSize(500, 400);
     {
-       getContentPane().setLayout(new GridLayout(0, 2, 10, 10));
+       GridBagLayout gridBagLayout;
+       getContentPane().setLayout(gridBagLayout = new GridBagLayout());
+       
+       JPanel activeObjectsPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+       getContentPane().add(activeObjectsPanel);
+       activeObjectsPanel.setBorder(new TitledBorder("Active objects"));
+       gridBagLayout.setConstraints(activeObjectsPanel,
+       		new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
       {
         JComponent comp = new JPanel() {
 
-          private int w = 100;
-          private int h = 50;
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_ACTIVE);
+            g.fillOval(w/4, 0, w/2, h);
+          }
+        };
+        activeObjectsPanel.add(comp);
+        activeObjectsPanel.add(new JLabel("Active by itself"));
+      }
+
+      {
+        JComponent comp = new JPanel() {
 
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
             int w = dim.width;
             int h = dim.height;
 
-            g.setColor(Color.white);
-            g.fillOval(w / 3, h / 3, w * 3 / 6, h * 3 / 6);
-            g.setColor(Color.blue);
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_SERVING_REQUEST);
+            g.fillOval(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Active Object"));
+        activeObjectsPanel.add(comp);
+        activeObjectsPanel.add(new JLabel("Serving request"));
       }
 
       {
         JComponent comp = new JPanel() {
 
-          private int w = 100;
-          private int h = 50;
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_WAITING_REQUEST);
+            g.fillOval(w/4, 0, w/2, h);
+          }
+        };
+        activeObjectsPanel.add(comp);
+        activeObjectsPanel.add(new JLabel("Waiting for request"));
+      }
+
+      {
+        JComponent comp = new JPanel() {
 
           public void paintComponent(Graphics g) {
             Dimension dim = getSize();
             int w = dim.width;
             int h = dim.height;
-            g.setColor(new Color(200, 200, 255));
-            g.fillOval(w / 3, h / 3, w * 3 / 6, h * 3 / 6);
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_WAITING_BY_NECESSITY);
+            g.fillOval(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Object waiting"));
+        activeObjectsPanel.add(comp);
+        activeObjectsPanel.add(new JLabel("Waiting for result (wait by necessity)"));
       }
+
+      {
+        JComponent comp = new JPanel() {
+
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_MIGRATING);
+            g.fillOval(w/4, 0, w/2, h);
+          }
+        };
+        activeObjectsPanel.add(comp);
+        activeObjectsPanel.add(new JLabel("Migrating"));
+      }
+
+      JPanel requestQueuePanel = new JPanel(new GridLayout(2, 2, 0, 0));
+      getContentPane().add(requestQueuePanel);
+      requestQueuePanel.setBorder(new TitledBorder("Pending Requests"));
+       gridBagLayout.setConstraints(requestQueuePanel,
+       		new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+
+      {
+        JComponent comp = new JPanel() {
+
+          public void paintComponent(Graphics g) {
+            Dimension dim = getSize();
+            int w = dim.width;
+            int h = dim.height;
+
+            g.setColor(ActiveObjectPanel.COLOR_WHEN_SERVING_REQUEST);
+            g.fillOval(w/4, 0, w/2, h);
+
+            g.setColor(ActiveObjectPanel.COLOR_REQUEST_SINGLE);
+			for (int i = 0; i < 5; i ++)            
+              g.fillRect(w / 2 - 15 + i*6, 2, 4, 4);
+
+            g.setColor(ActiveObjectPanel.COLOR_REQUEST_SEVERAL);
+			for (int i = 0; i < 3; i ++)            
+              g.fillRect(w / 2 - 9 + i*6, h - 6, 4, 4);
+
+          }
+        };
+        requestQueuePanel.add(comp);
+        requestQueuePanel.add(new JLabel("Pending requests:"));
+        requestQueuePanel.add(new JLabel());
+        JPanel requestQueuePanel2 = new JPanel(new GridLayout(1, 3));
+        requestQueuePanel.add(requestQueuePanel2);
+        requestQueuePanel2.add(new JLabel("1  ",
+        	new Icon() {
+        		public int getIconHeight() { return 4; }
+        		public int getIconWidth() { return 4; }
+        		public void paintIcon(Component c, Graphics g, int x, int y) { 
+                  g.setColor(ActiveObjectPanel.COLOR_REQUEST_SINGLE);
+                  g.fillRect(x, y, 4, 4);
+        	    }
+        	}, JLabel.LEFT));
+        requestQueuePanel2.add(new JLabel(ActiveObjectPanel.NUMBER_OF_REQUESTS_FOR_SEVERAL+"  ",
+        	new Icon() {
+        		public int getIconHeight() { return 4; }
+        		public int getIconWidth() { return 4; }
+        		public void paintIcon(Component c, Graphics g, int x, int y) { 
+                  g.setColor(ActiveObjectPanel.COLOR_REQUEST_SEVERAL);
+                  g.fillRect(x, y, 4, 4);
+        	    }
+        	}, JLabel.LEFT));
+        requestQueuePanel2.add(new JLabel(ActiveObjectPanel.NUMBER_OF_REQUESTS_FOR_MANY+
+        								"  ",
+        	new Icon() {
+        		public int getIconHeight() { return 4; }
+        		public int getIconWidth() { return 4; }
+        		public void paintIcon(Component c, Graphics g, int x, int y) { 
+                  g.setColor(ActiveObjectPanel.COLOR_REQUEST_MANY);
+                  g.fillRect(x, y, 4, 4);
+        	    }
+        	}, JLabel.LEFT));
+      }
+
+      JPanel jvmPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+      getContentPane().add(jvmPanel);
+      jvmPanel.setBorder(new TitledBorder("Nodes"));
+       gridBagLayout.setConstraints(jvmPanel,
+       		new GridBagConstraints(0, 2, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
       {
         JComponent comp = new JPanel() {
@@ -102,11 +229,11 @@ public class Legend extends JFrame {
             int w = dim.width;
             int h = dim.height;
             g.setColor(new Color(0xd0, 0xd0, 0xe0));
-            g.fillRect(0, 0, w, h);
+            g.fillRect(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Rmi VM"));
+        jvmPanel.add(comp);
+        jvmPanel.add(new JLabel("RMI Node"));
       }
       
       {
@@ -118,12 +245,19 @@ public class Legend extends JFrame {
             int h = dim.height;
             
             g.setColor(java.awt.Color.cyan);
-            g.fillRect(0, 0, w, h);
+            g.fillRect(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Jini VM"));
+        jvmPanel.add(comp);
+        jvmPanel.add(new JLabel("Jini Node"));
       }
+
+      JPanel hostPanel = new JPanel(new GridLayout(-1, 2, 5, 5));
+      getContentPane().add(hostPanel);
+      hostPanel.setBorder(new TitledBorder("Hosts"));
+       gridBagLayout.setConstraints(hostPanel,
+       		new GridBagConstraints(0, 3, 1, 1, 1.0, 1.0, GridBagConstraints.CENTER,
+       		GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 
       {
         JComponent comp = new JPanel() {
@@ -136,11 +270,11 @@ public class Legend extends JFrame {
             int w = dim.width;
             int h = dim.height;
             g.setColor(new Color(0xd0, 0xd0, 0xd0));
-            g.fillRect(0, 0, w, h);
+            g.fillRect(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Standard Host"));
+        hostPanel.add(comp);
+        hostPanel.add(new JLabel("Standard Host"));
       }
 
       {
@@ -154,11 +288,11 @@ public class Legend extends JFrame {
             int w = dim.width;
             int h = dim.height;
             g.setColor(new Color(0xff, 0xd0, 0xd0));
-            g.fillRect(0, 0, w, h);
+            g.fillRect(w/4, 0, w/2, h);
           }
         };
-        getContentPane().add(comp);
-        getContentPane().add(new JLabel("Globus Host"));
+        hostPanel.add(comp);
+        hostPanel.add(new JLabel("Globus Host"));
       }
 
       getContentPane().validate();

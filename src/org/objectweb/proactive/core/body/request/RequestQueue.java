@@ -30,6 +30,7 @@
 */
 package org.objectweb.proactive.core.body.request;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.event.RequestQueueEventListener;
 
 public interface RequestQueue {
@@ -155,11 +156,12 @@ public interface RequestQueue {
 
   /**
    * Processes all requests in the queue using  the given RequestProcessor.
-   * Requests are removed from the queue if the method processRequest of the
-   * processor return true.
+   * Requests are removed from the queue and served depending on the result returned
+   * by the processor
    * @param processor the RequestProcessor to use
+   * @param body the body that processes the requests
    */
-  public void processRequests(RequestProcessor processor);
+  public void processRequests(RequestProcessor processor, Body body);
 
   public void addRequestQueueEventListener(RequestQueueEventListener listener);
 

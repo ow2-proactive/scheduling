@@ -72,7 +72,7 @@ public abstract class AbstractDataObjectPanel extends javax.swing.JPanel impleme
   protected IC2DGUIController controller;
 
   protected MessageMonitoringMenu monitoringMenu;
-
+  
   protected java.awt.Font defaultFont;
 
   // Data representation

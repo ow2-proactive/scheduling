@@ -72,7 +72,7 @@ public class ActiveObjectCommunicationRecorder {
     if (source.isDestroyed() || dest.isDestroyed()) return;
     // try to find a mapping source <-> dest
     java.util.HashMap destMap = (java.util.HashMap) panelToPanelsMap.get(source);
-    if (destMap == null) {
+    if (destMap == null) { // leads to weird results???
       // try to find a mapping dest <-> source
       destMap = (java.util.HashMap) panelToPanelsMap.get(dest);
       if (destMap != null) {
@@ -81,7 +81,7 @@ public class ActiveObjectCommunicationRecorder {
         source = dest;
         dest = temp;
       }
-    }
+    } 
     if (destMap == null) {
       // new association source <-> dest
       destMap = new java.util.HashMap();
@@ -265,7 +265,6 @@ public class ActiveObjectCommunicationRecorder {
       int xDest = pDest.x - topLeftCornerScreenCoordinate.x;
       int yDest = pDest.y - topLeftCornerScreenCoordinate.y;
       int destWidth = destPanel.getWidth();
-    
       // drawing line
       g2.setPaint(STROKE_COLOR);
       float strokeWidth = communicationCount * ratio + 1;
@@ -295,13 +294,13 @@ public class ActiveObjectCommunicationRecorder {
     } else if (Math.abs(xDest - xSource) > Math.abs(xDest + destWidth - xSource)) {
       xDest += destWidth;
     }
-    g2.fillOval(xSource - 4, ySource + 9, 8, 8);
+    g2.fillOval(xDest - 4, yDest + 9, 8, 8);  // xySource before, but that was obviously wrong
   }
 
   private void drawCommunicationPointSameVM(int xSource, int ySource, int sourceWidth, int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
     // draw a little black circle meaning : com point
     if (ySource > yDest) {
-      g2.fillOval(xSource - 4 + sourceWidth, ySource + 9 - Math.abs(ySource - yDest), 8, 8);
+      g2.fillOval(xSource - 4 + sourceWidth, yDest + 9, 8, 8);
     } else {
       g2.fillOval(xDest - 4, yDest + 9, 8, 8);
     }

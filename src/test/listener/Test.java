@@ -89,6 +89,15 @@ public class Test implements org.objectweb.proactive.RunActive {
     public void requestSent(MessageEvent event) {
       print("Request", event);
     }
+
+    public void voidRequestServed(MessageEvent event) {
+      print("Served", event);
+    }
+
+    public void servingStarted(MessageEvent event) {
+      print("Serving", event);
+    }
+
   }
   
 }

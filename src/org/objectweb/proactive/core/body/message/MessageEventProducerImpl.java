@@ -45,9 +45,14 @@ public class MessageEventProducerImpl extends AbstractEventProducer implements M
   // -- PUBLIC METHODS -----------------------------------------------
   //
   
+  public void notifyListeners(Message message, int type, UniqueID bodyID, int requestQueueLength) {
+    if (hasListeners())
+      notifyAllListeners(new MessageEvent(message, type, bodyID, requestQueueLength));
+  }
+
   public void notifyListeners(Message message, int type, UniqueID bodyID) {
     if (hasListeners())
-      notifyAllListeners(new MessageEvent(message, type, bodyID));
+      notifyAllListeners(new MessageEvent(message, type, bodyID, -1));
   }
 
 
@@ -97,6 +102,12 @@ public class MessageEventProducerImpl extends AbstractEventProducer implements M
 
       case MessageEvent.REPLY_RECEIVED :
         messageEventListener.replyReceived(messageEvent);
+        break;
+      case MessageEvent.VOID_REQUEST_SERVED :
+        messageEventListener.voidRequestServed(messageEvent);
+        break;
+      case MessageEvent.SERVING_STARTED :
+        messageEventListener.servingStarted(messageEvent);
         break;
     }
   }

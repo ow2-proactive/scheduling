@@ -50,7 +50,7 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
   private IC2DObject ic2dObject;
   private ActiveObjectCommunicationRecorder communicationRecorder;
   private ActiveObjectWatcher activeObjectWatcher;
-
+  
   private WorldPanel worldPanel;
 
                      
@@ -103,19 +103,25 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
   }
   
   public void requestMessageSent(ActiveObject object, SpyEvent spyEvent) {
-    recordCommunication(object, ((SpyMessageEvent) spyEvent).getDestinationBodyID());
+   // recordCommunication(object, ((SpyMessageEvent) spyEvent).getDestinationBodyID(), true);
+   // already recorded in requestMessageReceived
   }
   
   public void replyMessageSent(ActiveObject object, SpyEvent spyEvent) {
-    recordCommunication(object, ((SpyMessageEvent) spyEvent).getDestinationBodyID());
+   // recordCommunication(object, ((SpyMessageEvent) spyEvent).getDestinationBodyID(), true);
+   // not recording replies
   }
 
   public void requestMessageReceived(ActiveObject object, SpyEvent spyEvent) {
-    recordCommunication(object, ((SpyMessageEvent) spyEvent).getSourceBodyID());
+    recordCommunication(object, ((SpyMessageEvent) spyEvent).getSourceBodyID(), false);
   }
   
   public void replyMessageReceived(ActiveObject object, SpyEvent spyEvent) {
-    recordCommunication(object, ((SpyMessageEvent) spyEvent).getSourceBodyID());
+   // recordCommunication(object, ((SpyMessageEvent) spyEvent).getSourceBodyID(), false);
+   // not recording replies
+  }
+
+  public void voidRequestServed(ActiveObject object, SpyEvent spyEvent) {
   }
 
   public void allEventsProcessed() {
@@ -231,7 +237,7 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
 
 
   // Record that two objects talked together
-  private void recordCommunication(ActiveObject activeObjectOriginator, UniqueID peerActiveObjectID) {
+  private void recordCommunication(ActiveObject activeObjectOriginator, UniqueID peerActiveObjectID, boolean isSend) {
     ActiveObject peerActiveObject = ic2dObject.getWorldObject().findActiveObjectById(peerActiveObjectID);
     if (peerActiveObject == null) return;
     // now get the 2 panels associated with the two objects
@@ -239,7 +245,8 @@ public class IC2DPanel extends AbstractDataObjectPanel implements CommunicationE
     if (originatorPanel == null) return;
     ActiveObjectPanel peerPanel = getActiveObjectPanel(peerActiveObject);
     if (peerPanel == null) return;
-    communicationRecorder.recordCommunication(originatorPanel,peerPanel);
+    if (isSend) communicationRecorder.recordCommunication(originatorPanel,peerPanel);
+    else communicationRecorder.recordCommunication(peerPanel,originatorPanel);
   }
   
   

@@ -44,6 +44,8 @@ public interface SpyEventListener extends ProActiveListener {
   
   public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent);
   
+  public void objectReceivedFutureResult(UniqueID uniqueID, SpyEvent spyEvent);
+
   public void requestMessageSent(UniqueID id, SpyEvent spyEvent);
   
   public void replyMessageSent(UniqueID id, SpyEvent spyEvent);
@@ -51,6 +53,11 @@ public interface SpyEventListener extends ProActiveListener {
   public void requestMessageReceived(UniqueID id, SpyEvent spyEvent);
   
   public void replyMessageReceived(UniqueID id, SpyEvent spyEvent);
+  
+  public void voidRequestServed(UniqueID id, SpyEvent spyEvent);
 
   public void allEventsProcessed();
+
+  public void servingStarted(UniqueID uniqueID, SpyEvent spyEvent);
+
 }

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.data;
 
 import java.rmi.dgc.VMID;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -45,6 +44,7 @@ import org.objectweb.proactive.ic2d.event.SpyEventListener;
 import org.objectweb.proactive.ic2d.event.VMObjectListener;
 import org.objectweb.proactive.ic2d.spy.Spy;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
+import org.objectweb.proactive.ic2d.spy.SpyMessageEvent;
 
 /**
  * Holder class for the host data representation
@@ -348,31 +348,46 @@ public class VMObject extends AbstractDataObject {
       if (object == null) return;
       if (! isAlive) {
         object.destroyObject();
-      } else {
-        object.setIsActive(isActive);
-      }
+      } 
     }
     
     public void objectWaitingForRequest(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
-      object.setWaitingForRequest(true);
+      if (object == null) { return; }
+      object.setServingStatus(ActiveObject.STATUS_WAITING_FOR_REQUEST);
+      object.setRequestQueueLength(0);
       communicationEventListener.objectWaitingForRequest(object, spyEvent);
     }
   
     public void objectWaitingByNecessity(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
-      object.setWaitingForRequest(false);
+      if (object == null) { return; }
+      object.setServingStatus(object.getServingStatus() == ActiveObject.STATUS_SERVING_REQUEST ?
+                         ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_SERVING :
+                         ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE);
       communicationEventListener.objectWaitingByNecessity(object, spyEvent);
+    }
+  
+    public void objectReceivedFutureResult(UniqueID id, SpyEvent spyEvent) {
+      if (! controller.isMonitoring()) return;
+      ActiveObject object = findActiveObject(id);
+      if (object == null) { return; }
+      switch (object.getServingStatus()) {
+        case ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_SERVING : 
+          object.setServingStatus(ActiveObject.STATUS_SERVING_REQUEST);
+          break;
+        case ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE : 
+          object.setServingStatus(ActiveObject.STATUS_ACTIVE);
+          break;
+      }
     }
   
     public void requestMessageSent(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
+      if (object == null) {  return; }
       if (! object.isMonitoringRequestSender()) return;
       communicationEventListener.requestMessageSent(object, spyEvent);
     }
@@ -380,7 +395,9 @@ public class VMObject extends AbstractDataObject {
     public void replyMessageSent(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
+      if (object == null) { return; }
+      object.setRequestQueueLength(((SpyMessageEvent)spyEvent).getRequestQueueLength());
+      object.setServingStatus(ActiveObject.STATUS_ACTIVE);
       if (! object.isMonitoringReplySender()) return;
       communicationEventListener.replyMessageSent(object, spyEvent);
     }
@@ -388,7 +405,8 @@ public class VMObject extends AbstractDataObject {
     public void requestMessageReceived(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
+      if (object == null) { return; }
+      object.setRequestQueueLength(((SpyMessageEvent)spyEvent).getRequestQueueLength());
       if (! object.isMonitoringRequestReceiver()) return;
       communicationEventListener.requestMessageReceived(object, spyEvent);
     }
@@ -396,9 +414,27 @@ public class VMObject extends AbstractDataObject {
     public void replyMessageReceived(UniqueID id, SpyEvent spyEvent) {
       if (! controller.isMonitoring()) return;
       ActiveObject object = findActiveObject(id);
-      if (object == null) return;
+      if (object == null) { return; }
       if (! object.isMonitoringReplySender()) return;
       communicationEventListener.replyMessageReceived(object, spyEvent);
+    }
+    
+    public void voidRequestServed(UniqueID id, SpyEvent spyEvent) {
+      if (! controller.isMonitoring()) return;
+      ActiveObject object = findActiveObject(id);
+      if (object == null) { return; }
+      object.setRequestQueueLength(((SpyMessageEvent)spyEvent).getRequestQueueLength());
+      object.setServingStatus(ActiveObject.STATUS_ACTIVE);
+      if (! object.isMonitoringReplySender()) return;
+      communicationEventListener.voidRequestServed(object, spyEvent);
+    }
+    
+    public void servingStarted(UniqueID id, SpyEvent spyEvent) {
+      if (! controller.isMonitoring()) return;
+      ActiveObject object = findActiveObject(id);
+      if (object == null) { return; }
+      object.setRequestQueueLength(((SpyMessageEvent)spyEvent).getRequestQueueLength());
+      object.setServingStatus(ActiveObject.STATUS_SERVING_REQUEST);
     }
     
     public void allEventsProcessed() {

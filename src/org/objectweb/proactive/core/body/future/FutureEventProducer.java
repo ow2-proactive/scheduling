@@ -28,15 +28,26 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.ic2d.event;
 
-/**
- * Listener of events from ActiveObject
- */
-public interface ActiveObjectListener extends MessageMonitoringListener {
+package org.objectweb.proactive.core.body.future;
 
-  public void servingStatusChanged(int value);
-  
-  public void requestQueueLengthChanged(int value);
+import org.objectweb.proactive.core.event.FutureEventListener;
+
+public interface FutureEventProducer {
+
+  /**
+   * Adds a listener of FutureEvent to this body. The listener will receive 
+   * all events related to calls on futur objects
+   * @param listener the listener to add
+   */
+  public void addFutureEventListener(FutureEventListener listener);
+
+
+  /**
+   * Removes the FutureEventListener from this body.
+   * @param listener the listener to remove
+   */
+  public void removeFutureEventListener(FutureEventListener listener);
+
 
 }

@@ -41,6 +41,13 @@ public class ActiveObject extends AbstractDataObject {
 
   private static final int ACTIVE_OBJECT_CACHE_CLEANUP_INTERVAL = 300000; // 300 seconds
 
+  public static final int STATUS_UNKNOWN = 0;
+  public static final int STATUS_WAITING_FOR_REQUEST = 1;
+  public static final int STATUS_SERVING_REQUEST = 2;
+  public static final int STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE = 3;
+  public static final int STATUS_WAITING_BY_NECESSITY_WHILE_SERVING = 4;
+  public static final int STATUS_ACTIVE = 5;
+
  /**
   * Every so often we cleanup the cache
   */
@@ -49,12 +56,10 @@ public class ActiveObject extends AbstractDataObject {
   protected UniqueID id;
   protected String className;
   protected String name;
+  protected int requestQueueLength = -1; // -1 = not known
     
-  // false if waiting by necessity
-  protected boolean isWaitingForRequest = true;
-  
-  // true if the activeObject is active
-  protected boolean isActive;
+  // current status 
+  protected int servingStatus;
   
   protected ActiveObjectListener listener;
 
@@ -66,7 +71,6 @@ public class ActiveObject extends AbstractDataObject {
   public ActiveObject(NodeObject parent, UniqueID id, String className, boolean isActive) {
     super(parent);
     this.className = className;
-    this.isActive = isActive;
     name = shortClassName(className)+"#"+counter(id);
     //System.out.println("AO "+name+" created with Id "+id);
     this.id = id;
@@ -91,7 +95,6 @@ public class ActiveObject extends AbstractDataObject {
 
   public boolean migrateTo(String nodeTargetURL) {
     if (isDestroyed) return false;
-    if (! isActive) return false;
     try {
       getTypedParent().getTypedParent().migrateTo(id, nodeTargetURL);
       if (controller != null) controller.log("Successfully migrated " + className + " to "+nodeTargetURL);
@@ -109,30 +112,27 @@ public class ActiveObject extends AbstractDataObject {
   }
  
   
-  public void setWaitingForRequest(boolean value) {
+  public void setServingStatus(int value) {
     if (isDestroyed) return;
-    if (value != isWaitingForRequest) {
-      isWaitingForRequest = value;
-      if (listener != null) listener.waitingStatusChanged(value);
+    if (value != servingStatus) {
+      servingStatus = value;
+      if (listener != null) listener.servingStatusChanged(value);
     }
   }
   
-  
-  public void setIsActive(boolean value) {
-    if (isDestroyed) return;
-    if (value != isActive) {
-      isActive = value;
-      if (listener != null) listener.activeStatusChanged(value);
-    }
-  }
-
-
   public ActiveObject findActiveObjectById(UniqueID id) {
     if (id == this.id) 
       return this;
     else return null;  
   }
 
+  public void setRequestQueueLength(int value) {
+    if (isDestroyed) return;
+    if (requestQueueLength != value) {
+      requestQueueLength = value;
+      if (listener != null) listener.requestQueueLengthChanged(value);
+    }
+  }
 
   public void destroyObject() {
     getTypedParent().removeActiveObject(id);
@@ -165,8 +165,12 @@ public class ActiveObject extends AbstractDataObject {
     return id;
   }
   
-  public boolean isActive() {
-    return isActive;
+  public int getRequestQueueLength() {
+  	return requestQueueLength;
+  }
+  
+  public int getServingStatus() {
+  	return servingStatus;
   }
   
 

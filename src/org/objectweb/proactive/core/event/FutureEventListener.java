@@ -28,15 +28,29 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.ic2d.event;
+package org.objectweb.proactive.core.event;
 
 /**
- * Listener of events from ActiveObject
+ * <p>
+ * A class implementating this interface is listener of <code>FutureEvent</code>.
+ * </p>
+ * 
+ * @see FutureEvent
+ * @author  ProActive Team
+ * @version 1.0,  2001/10/23
+ * @since   ProActive 0.9
+ *
  */
-public interface ActiveObjectListener extends MessageMonitoringListener {
+public interface FutureEventListener extends ProActiveListener {
 
-  public void servingStatusChanged(int value);
-  
-  public void requestQueueLengthChanged(int value);
+  /** Signals that a Thread was forced to wait for a future result.
+   *  @param <code>futureEvent</code> the event caused by the waiting
+   */
+  public void waitingForFuture(FutureEvent futureEvent);
+
+  /** Signals that a Thread finished waiting for a future result.
+   *  @param <code>futureEvent</code> the event caused by the waiting
+   */
+  public void receivedFutureResult(FutureEvent futureEvent);
 
 }

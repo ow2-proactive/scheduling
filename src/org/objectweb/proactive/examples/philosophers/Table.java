@@ -88,6 +88,7 @@ public class Table implements org.objectweb.proactive.RunActive {
   public ObjectForSynchronousCall getForks(int id) {
     int nextId = (id+1) % forks.length;
     forks[id] = forks[nextId] = true;
+    layout.update(id, 2);
     layout.updateFork(id,4);
     layout.updateFork(nextId,4);
     return new ObjectForSynchronousCall();
@@ -124,10 +125,6 @@ public class Table implements org.objectweb.proactive.RunActive {
   // -- INNER CLASSES -----------------------------------------------
   //
 
-  /**
-   * Filter that will accept the first Request for methodA only if there is no Request for method B
-   * before it.
-   */
   private class GetForkRequestFilter implements org.objectweb.proactive.core.body.request.RequestFilter {
   
     public GetForkRequestFilter() {
@@ -138,10 +135,8 @@ public class Table implements org.objectweb.proactive.RunActive {
       int place = ((Integer)request.getParameter(0)).intValue();
       if (mayEat(place)) {
         // Notify the user interface
-        layout.update(place, 2);
         return true;
       } else {
-        layout.update(place, 1);
         return false;
       }
     }

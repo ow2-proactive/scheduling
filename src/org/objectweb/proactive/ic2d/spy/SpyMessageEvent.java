@@ -46,6 +46,9 @@ public class SpyMessageEvent extends SpyEvent implements java.io.Serializable {
 
   /** The unique sequence number for the call */
   protected long sequenceNumber;
+  
+  /** The request queue length of the body that sent the event or -1 */
+  protected int requestQueueLength;
 
 
   public SpyMessageEvent(int eventType, MessageEvent message) {
@@ -54,10 +57,11 @@ public class SpyMessageEvent extends SpyEvent implements java.io.Serializable {
     this.sourceID = message.getSourceBodyID();
     this.destinationID = message.getDestinationBodyID();
     this.sequenceNumber = message.getSequenceNumber();
+    this.requestQueueLength = message.getRequestQueueLength();
   }
   
   public String toString() {
-    return super.toString()+" methodName="+methodName;
+    return super.toString()+" methodName="+methodName+" requestQueue="+requestQueueLength;
   }
   
   /**
@@ -81,11 +85,29 @@ public class SpyMessageEvent extends SpyEvent implements java.io.Serializable {
   public UniqueID getDestinationBodyID() {
     return destinationID;
   }
-  
+
+  public int getRequestQueueLength() {
+  	 return requestQueueLength;
+  }
+
+  /** Returns whether the body that created the event sent the message included in the event
+   *  or received it. */ 
   public boolean wasSent() {
     return type == REPLY_SENT_MESSAGE_TYPE || type == REQUEST_SENT_MESSAGE_TYPE;
   }
-  
+
+  /** Returns true if the event was created when a request was sent or received. */
+  public boolean isRequestMessage() {
+  	return type == REQUEST_SENT_MESSAGE_TYPE || type == REQUEST_RECEIVED_MESSAGE_TYPE;
+  }
+
+  /** Returns true if the event was created when a reply was sent or received or a void request was finished. */
+  public boolean isReplyMessage() {
+  	return type == REPLY_SENT_MESSAGE_TYPE || type == REPLY_RECEIVED_MESSAGE_TYPE ||
+  	        type == VOID_REQUEST_SERVED_TYPE;
+  }
+
+  /** Returns whether matching event belongs to the same Qsend Qrecv Rsend Rrecv set */   
   public boolean matches(SpyMessageEvent matchingEvent) {
     if (matchingEvent.sequenceNumber != sequenceNumber) return false;
     if (! matchingEvent.methodName.equals(methodName)) return false;

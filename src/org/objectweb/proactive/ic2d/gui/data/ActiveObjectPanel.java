@@ -39,11 +39,20 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   private static final String GENERIC_TOOL_TIP_TEXT = "Drag to migrate";
   private static final String WAITING_REQUEST_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- WaitingForRequest";
   private static final String INACTIVE_TOOL_TIP_TEXT = "Cannot Migrate -- Inactive";
-  private static final String WAITING_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- Waiting";
-  private static final java.awt.Color COLOR_WHEN_INACTIVE = new java.awt.Color(176, 168, 222);
-  private static final java.awt.Color COLOR_WHEN_WAITING = new java.awt.Color(248, 208, 156);
-  private static final java.awt.Color COLOR_WHEN_WAITING_REQUEST = java.awt.Color.white;
-  private static final java.awt.Color COLOR_WHEN_MIGRATED = java.awt.Color.red;
+  private static final String SERVING_REQUEST_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- ServingRequest";
+  private static final String WAITING_BY_NECESSITY_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- WaitByNecessity";
+  private static final String ACTIVE_TOOL_TIP_TEXT = GENERIC_TOOL_TIP_TEXT + " -- Active, not serving request";
+  public static final java.awt.Color COLOR_WHEN_ACTIVE = new java.awt.Color(225, 255, 225);
+  public static final java.awt.Color COLOR_WHEN_WAITING_BY_NECESSITY = new java.awt.Color(238, 208, 156);
+  public static final java.awt.Color COLOR_WHEN_SERVING_REQUEST = java.awt.Color.white;
+  public static final java.awt.Color COLOR_WHEN_WAITING_REQUEST = new java.awt.Color(225, 225, 225);
+  public static final java.awt.Color COLOR_WHEN_MIGRATING = java.awt.Color.red;
+  public static final java.awt.Color COLOR_REQUEST_SINGLE = java.awt.Color.green;
+  public static final java.awt.Color COLOR_REQUEST_SEVERAL = java.awt.Color.red;
+  public static final java.awt.Color COLOR_REQUEST_MANY = new java.awt.Color(150, 0, 255);
+  public static final int SHOWN_REQUEST_QUEUE_LENGTH = 5;
+  public static final int NUMBER_OF_REQUESTS_FOR_SEVERAL = 5;
+  public static final int NUMBER_OF_REQUESTS_FOR_MANY = 50;
 
   private ActiveObject activeObject;
   private javax.swing.JLabel nameLabel;
@@ -63,10 +72,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   public ActiveObjectPanel(AbstractDataObjectPanel parentDataObjectPanel, ActiveObject targetActiveObject) {
     super(parentDataObjectPanel, targetActiveObject.getClassName(), "ActiveObject");
     activeObject = targetActiveObject;
-    if (activeObject.isActive())
-      setBackground(COLOR_WHEN_WAITING_REQUEST);
-    else
-      setBackground(COLOR_WHEN_INACTIVE);
+    setBackground(COLOR_WHEN_WAITING_REQUEST);
     setOpaque(false);
     nameLabel = new javax.swing.JLabel(activeObject.getName());
     setFontSize(defaultFont);
@@ -107,11 +113,45 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
     super.paintComponent(g);
     java.awt.Color old = g.getColor();
     if (isGhost)
-      g.setColor(COLOR_WHEN_MIGRATED);
+      g.setColor(COLOR_WHEN_MIGRATING);
     else
       g.setColor(getBackground());
     // 	g.fillRoundRect(0,0,getWidth(),getHeight(),20,20);
     g.fillOval(0, 0, getWidth(), getHeight());
+    
+    // paint request queue information    
+	int length = activeObject.getRequestQueueLength();
+	int numSingle;
+	int numSeveral;
+	int numMany;
+	numSingle = Math.min(length, SHOWN_REQUEST_QUEUE_LENGTH);
+    length -= numSingle;
+	numSeveral = Math.min((int)Math.ceil(length / (double)NUMBER_OF_REQUESTS_FOR_SEVERAL),
+														 SHOWN_REQUEST_QUEUE_LENGTH);
+	length -= numSeveral * NUMBER_OF_REQUESTS_FOR_SEVERAL;
+    numMany = (int)Math.ceil(length / (double)NUMBER_OF_REQUESTS_FOR_MANY);
+	if (numSingle > 0) {
+        int requestQueueX = (getWidth() - 6 * numSingle) / 2;
+        int requestQueueY = 2;
+		g.setColor(COLOR_REQUEST_SINGLE);
+  	    for (int i = 0; i < numSingle; i ++)
+			  g.fillRect(requestQueueX + i*6, requestQueueY, 4, 4);
+	}    
+	if (numSeveral > 0) {
+        int requestQueueX = (getWidth() - 6 * (numSeveral+numMany)) / 2;
+        int requestQueueY = getHeight() - 6;
+		g.setColor(COLOR_REQUEST_SEVERAL);
+  	    for (int i = 0; i < numSeveral; i ++)
+			  g.fillRect(requestQueueX + i*6, requestQueueY, 4, 4);
+	} 
+	if (numMany > 0) {
+        int requestQueueX = (getWidth() - 6 * (numSeveral+numMany)) / 2 + 6 * numSeveral;
+        int requestQueueY = getHeight() - 6;
+		g.setColor(COLOR_REQUEST_MANY);
+  	    for (int i = 0; i < numMany; i ++)
+			  g.fillRect(requestQueueX + i*6, requestQueueY, 4, 4);
+	} 
+	  
     g.setColor(old);
     paintChildren(g);
   }
@@ -120,31 +160,29 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
   // -- implements ActiveObjectListener -----------------------------------------------
   //
 
-  public void waitingStatusChanged(boolean b) {
-    if (b) {
+  public void servingStatusChanged(int v) {
+    if (v == ActiveObject.STATUS_SERVING_REQUEST) {
+      // busy
+      setBackground(COLOR_WHEN_SERVING_REQUEST);
+      setToolTipText(SERVING_REQUEST_TOOL_TIP_TEXT);
+    } else if (v == ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_ACTIVE ||
+    			v == ActiveObject.STATUS_WAITING_BY_NECESSITY_WHILE_SERVING) {
+      // waiting by necessity
+      setBackground(COLOR_WHEN_WAITING_BY_NECESSITY);
+      setToolTipText(WAITING_BY_NECESSITY_TOOL_TIP_TEXT);
+    } else if (v == ActiveObject.STATUS_WAITING_FOR_REQUEST) {
       // waiting for request
       setBackground(COLOR_WHEN_WAITING_REQUEST);
       setToolTipText(WAITING_REQUEST_TOOL_TIP_TEXT);
     } else {
-      // waiting by necessity
-      setBackground(COLOR_WHEN_WAITING);
-      setToolTipText(WAITING_TOOL_TIP_TEXT);
+      // active
+      setBackground(COLOR_WHEN_ACTIVE);
+      setToolTipText(ACTIVE_TOOL_TIP_TEXT);
     }
     repaint();
   }
 
-  public void activeStatusChanged(boolean b) {
-    if (isGhost)
-      isGhost = false;
-    if (b) {
-      // is active
-      setBackground(COLOR_WHEN_WAITING_REQUEST);
-      setToolTipText(WAITING_REQUEST_TOOL_TIP_TEXT);
-    } else {
-      // is not active
-      setBackground(COLOR_WHEN_INACTIVE);
-      setToolTipText(INACTIVE_TOOL_TIP_TEXT);
-    }
+  public void requestQueueLengthChanged(int value) {  	
     repaint();
   }
 
@@ -195,8 +233,8 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
     activeObjectWatcher.addActiveObject(activeObject);
   }
 
-  protected void removeAllActiveObjectromWatcher() {
-    activeObjectWatcher.removeActiveObject(activeObject);
+  protected void removeAllActiveObjectsFromWatcher() {
+    activeObjectWatcher.removeActiveObject(activeObject); 
   }
 
   //
@@ -227,7 +265,7 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
      */
     public void dragGestureRecognized(java.awt.dnd.DragGestureEvent event) {
       // if the action is ok we go ahead otherwise we punt
-      if (isGhost || !activeObject.isActive())
+      if (isGhost)
         return; // cannot migrate if isGhost or if non active
       if ((event.getDragAction() & java.awt.dnd.DnDConstants.ACTION_COPY_OR_MOVE) == 0)
         return;
@@ -306,5 +344,6 @@ public class ActiveObjectPanel extends AbstractDataObjectPanel implements Active
       dragEnter(event);
     }
   } // end inner class MyDraSourceListener
+  
 
 }

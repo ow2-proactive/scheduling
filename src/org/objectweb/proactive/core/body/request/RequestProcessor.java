@@ -34,15 +34,16 @@ package org.objectweb.proactive.core.body.request;
  * <p>
  * A class implementing this interface can process requests.
  * </p><p>
- * It implements one method <code>processRequest</code> that takes a request,
- * does some processing with that request and returns a boolean saying whether
- * the request has been properly processed so that it can be removed.
+ * It implements one method <code>processRequest</code> that takes a request
+ * and returns an int saying whether
+ * the request shall be removed and served, removed without serving or kept.
  * </p><p>
  * It is used as a call back interface allowing a custom processing on request
- * stored in the request queue.
+ * stored in the request queue. 
  * </p><p>
  * Typically it can be used to serve requests stored in a request queue in a 
- * custom manner.
+ * custom manner. When doing custom processing, a request should 
+ * be REMOVED from the queue BEFORE serving.
  * </p>
  *
  * @author  ProActive Team
@@ -52,13 +53,18 @@ package org.objectweb.proactive.core.body.request;
  */
 public interface RequestProcessor {
 
+  /** Constant indicating that the request shall be removed and served. */
+  public final static int REMOVE_AND_SERVE = 1;
+  /** Constant indicating that the request shall removed without being served. */
+  public final static int REMOVE = 2;
+  /** Constant indicating that the request shall be kept. */
+  public final static int KEEP = 3;
+
   /**
-   * Processes the request and returns true if the request can be discarded 
-   * after processing.
+   * Returns one of the constants indicating the desired treatment for the request.
    * @param request the request to process
-   * @return true if the request can be discarded (removed from the
-   * container it is stored), false if it has to be kept.
+   * @return 
    */
-  public boolean processRequest(Request request);
+  public int processRequest(Request request);
   
 }

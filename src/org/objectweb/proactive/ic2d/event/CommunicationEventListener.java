@@ -50,6 +50,8 @@ public interface CommunicationEventListener extends ProActiveListener {
   public void requestMessageReceived(ActiveObject object, SpyEvent spyEvent);
   
   public void replyMessageReceived(ActiveObject object, SpyEvent spyEvent);
+
+  public void voidRequestServed(ActiveObject object, SpyEvent spyEvent);
   
   public void allEventsProcessed();
 

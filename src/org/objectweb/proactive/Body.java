@@ -35,7 +35,6 @@ import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
 
-
 /**
  * <P>
  * An object implementing this interface is an implementation of the non fonctionnal part 

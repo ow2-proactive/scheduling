@@ -70,5 +70,19 @@ public interface MessageEventListener extends ProActiveListener {
    * @param <code>event</code> the message event that details the targeted message
    */
   public void requestSent(MessageEvent event);
+
+  /**
+   * Signals that the request encapsulated in the event <code>event</code>
+   * has been served without needing a reply
+   * @param <code>event</code> the message event that details the targeted message
+   */
+  public void voidRequestServed(MessageEvent event);
+ 
+  /**
+   * Signals that serving of the request encapsulated in the event <code>event</code>
+   * has started
+   * @param <code>event</code> the message event that details the targeted message
+   */
+  public void servingStarted(MessageEvent event);
  
 }

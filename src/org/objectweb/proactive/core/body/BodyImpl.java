@@ -161,7 +161,10 @@ public abstract class BodyImpl extends AbstractBody
 	 */
 	protected void internalReceiveRequest(Request request) throws java.io.IOException {
 		if (messageEventProducer != null)
-			messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_RECEIVED, bodyID);
+			messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_RECEIVED, bodyID,
+			getRequestQueue().size() + 1);
+			// request queue length = number of requests in queue
+			//							+ the one to add now 
 		requestReceiver.receiveRequest(request, this);
 	}
 
@@ -247,16 +250,27 @@ public abstract class BodyImpl extends AbstractBody
 			return reifiedObject.getClass().getName();
 		}
 
+		/** Serves the request. The request should be removed from the request queue
+		 * before serving, which is correctly done by all methods of the Service class.
+		 * However, this condition is not ensured for custom calls on serve. */
 		public void serve(Request request) {
 			if (request == null)
 				return;
 			try {
+				messageEventProducer.notifyListeners(request, MessageEvent.SERVING_STARTED, 
+							bodyID, getRequestQueue().size());
+							
 				Reply reply = request.serve(BodyImpl.this);
-				if (reply == null)
+				
+				if (reply == null) {
+					messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, 
+							bodyID, getRequestQueue().size());
 					return;
-				UniqueID destinationBodyId = request.getSourceBodyID();
+				}
+ 				UniqueID destinationBodyId = request.getSourceBodyID();
 				if (destinationBodyId != null)
-					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId);
+					messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT, destinationBodyId,
+  						getRequestQueue().size());
 				this.getFuturePool().registerDestination(request.getSender());
 				reply.send(request.getSender());
 				this.getFuturePool().removeDestination();

@@ -135,6 +135,7 @@ public class Spy implements org.objectweb.proactive.RunActive {
   public void runActivity(org.objectweb.proactive.Body body) {
     spyEventManager = new SpyEventManager(body.getID());
     spyEventManager.addBodyEventListener();
+    spyEventManager.addFutureEventListener();
     org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
     while (isActive) {
       long nextUpdate = System.currentTimeMillis() + updateFrequence;
@@ -153,6 +154,8 @@ public class Spy implements org.objectweb.proactive.RunActive {
         notifyListener(spyEvents);
       }
     }
+    spyEventManager.removeBodyEventListener();
+    spyEventManager.removeFutureEventListener();
     body.terminate();
   }
 

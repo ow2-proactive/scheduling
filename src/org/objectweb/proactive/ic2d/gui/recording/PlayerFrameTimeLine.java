@@ -132,6 +132,9 @@ public class PlayerFrameTimeLine extends javax.swing.JFrame {
     });
     createListenerButtons(tools);
     this.threadPlayer = new ThreadPlayer(eventListsPanel, eventReplayProgressBar);
+    
+    toggleMonitoring();
+    toggleMonitoring();
   }
 
 

@@ -335,8 +335,8 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     }
 
     public void refresh() {
-	verticalSplitPane.validate();
-	verticalSplitPane.repaint();
+	  verticalSplitPane.validate();
+	  verticalSplitPane.repaint();
     }
 
     public class TreePanel extends javax.swing.JPanel {
@@ -352,6 +352,11 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 		}
 	    });
 	}
+
+    public void repaint() {
+      System.out.println(Thread.currentThread());
+      super.repaint();	
+    }
 
 	public void setDisplay(TreeDisplay display) {
 	    this.display = display;
@@ -389,8 +394,11 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 				height = 5400;
 				break;
 			    }
-			    setPreferredSize(new java.awt.Dimension(height, width));
-			    scrollTree.getViewport().add(this);
+			    java.awt.Dimension newSize = new java.awt.Dimension(height, width);
+			    if (!newSize.equals(getPreferredSize())) {
+  			      setPreferredSize(newSize);
+  			      scrollTree.getViewport().doLayout();
+			    }
 			    paintTree(g, tree, (int) height / 2, 30, tree.depth());
 			}
 			catch (NullPointerException e) {}
@@ -402,7 +410,6 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 	
 	public void paintTree(java.awt.Graphics g, Tree tree, int x, int y, int depth) {
 	    if (tree != null && tree.getKey() != null) {
-
 		// Analyse of the key size to paint the node
 		int keySize = 5;
 		java.text.StringCharacterIterator it1

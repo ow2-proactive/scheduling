@@ -82,7 +82,7 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
   public void receiveRequest(Request r) throws java.io.IOException {
     // 	System.out.println("RemoteBodyImpl: receiveRequest() for " + this.localBody);
     //  System.out.println("RemoteBodyImpl: receiveRequest() request is " + r.getMethodName());
-    body.receiveRequest(r);     
+      body.receiveRequest(r);     
   }
 
   public void receiveReply(Reply r) throws java.io.IOException {

@@ -317,7 +317,7 @@ public class Service {
    * @param requestFilter The request filter accepting the request
    */
   public void serveAll(RequestFilter requestFilter) {
-    requestQueue.processRequests(new ServingRequestProcessor(requestFilter));
+    requestQueue.processRequests(new ServingRequestProcessor(requestFilter), body);
   }
   
 
@@ -359,7 +359,7 @@ public class Service {
    * @param requestFilter The request filter accepting requests
    */
   public void flushingServeYoungest(RequestFilter requestFilter) {
-    requestQueue.processRequests(new FlushingServeYoungestRequestProcessor(requestFilter));
+    requestQueue.processRequests(new FlushingServeYoungestRequestProcessor(requestFilter), body);
   }
 
 
@@ -401,7 +401,7 @@ public class Service {
    * @param requestFilter The request filter accepting requests
    */
   public void flushingServeOldest(RequestFilter requestFilter) {
-    requestQueue.processRequests(new FlushingServeOldestRequestProcessor(requestFilter));
+    requestQueue.processRequests(new FlushingServeOldestRequestProcessor(requestFilter), body);
   }
 
 
@@ -679,12 +679,11 @@ public class Service {
      * @return true if the request can be discarded (removed from the
      * container it is stored), false if it has to be kept.
      */
-    public boolean processRequest(Request request) {
+    public int processRequest(Request request) {
       if (selectorRequestFilter.acceptRequest(request)) {
-        body.serve(request);
-        return true;  
+        return REMOVE_AND_SERVE;  
       } else {
-        return false;
+        return KEEP;
       }
     }
   } // end inner class ServingRequestProcessor
@@ -721,21 +720,25 @@ public class Service {
      * @return true if the request can be discarded (removed from the
      * container it is stored), false if it has to be kept.
      */
-    public boolean processRequest(Request request) {
+    public int processRequest(Request request) {
       if (counter == 0) {
         // first call
         numberOfRequests = requestQueue.size();
       }
       counter++;
-      boolean shouldRemove;
+      int shouldRemove;
       if (selectorRequestFilter.acceptRequest(request)) {
         requestToServe = request;
-        shouldRemove = true;
+        shouldRemove = REMOVE;
       } else {
-        shouldRemove = false;
+        shouldRemove = KEEP;
       }
       if (counter == numberOfRequests && requestToServe != null) {
-        body.serve(requestToServe);
+        if (request == requestToServe) {
+        	return REMOVE_AND_SERVE; // serve current request
+        } else {
+        	body.serve(requestToServe); // serve an already removed request
+        }
       }
       return shouldRemove;
     }
@@ -769,15 +772,15 @@ public class Service {
      * @return true if the request can be discarded (removed from the
      * container it is stored), false if it has to be kept.
      */
-    public boolean processRequest(Request request) {
+    public int processRequest(Request request) {
       if (selectorRequestFilter.acceptRequest(request)) {
-        if (! hasServed) {
-          body.serve(request);
+        if (!hasServed) {
           hasServed = true;
+          return REMOVE_AND_SERVE;
         }
-        return true;
+        return REMOVE;
       } else {
-        return false;
+        return KEEP;
       }
     }
   } // end inner class FlushingServeYoungestRequestProcessor

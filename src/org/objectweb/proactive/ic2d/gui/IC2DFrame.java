@@ -169,6 +169,11 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener 
     eventListsPanel.replyMessageReceived(object, spyEvent);
   }
 
+  public void voidRequestServed(ActiveObject object, SpyEvent spyEvent) {
+    ic2dPanel.voidRequestServed(object, spyEvent);
+    eventListsPanel.voidRequestServed(object, spyEvent);
+  }
+
   public void allEventsProcessed() {
     ic2dPanel.allEventsProcessed();
     eventListsPanel.allEventsProcessed();

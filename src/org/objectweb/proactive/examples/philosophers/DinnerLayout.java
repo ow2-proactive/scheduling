@@ -31,8 +31,7 @@
 package org.objectweb.proactive.examples.philosophers;
 
 import java.awt.GridBagConstraints;
-
-import org.objectweb.proactive.ObjectForSynchronousCall;
+import org.objectweb.proactive.*;
 
 /**
  * DinnerLayout
@@ -116,8 +115,9 @@ public class DinnerLayout {
     phils = new Philosopher[5];
     
     // Creates the philosophers    
-    params = new Object[2];
+    params = new Object[3];
     params[1] = manager;
+    params[2] = ProActive.getStubOnThis();
 
     for (int n = 0; n < 5; n++) {
       params[0] = new Integer(n);

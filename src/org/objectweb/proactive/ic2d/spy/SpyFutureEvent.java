@@ -28,15 +28,26 @@
 * 
 * ################################################################
 */ 
-package org.objectweb.proactive.ic2d.event;
+package org.objectweb.proactive.ic2d.spy;
 
-/**
- * Listener of events from ActiveObject
- */
-public interface ActiveObjectListener extends MessageMonitoringListener {
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.event.FutureEvent;
 
-  public void servingStatusChanged(int value);
+public class SpyFutureEvent extends SpyEvent implements java.io.Serializable {
   
-  public void requestQueueLengthChanged(int value);
+  protected UniqueID creatorID;
+
+
+  public SpyFutureEvent(int eventType, FutureEvent future) {
+    super(eventType, future.getBodyID());
+    this.creatorID = future.getCreatorID();
+  }
+  
+  /**
+   * Return the id of the creator of the future 
+   */
+  public UniqueID getCreatorID() {
+    return creatorID;
+  }
 
 }
