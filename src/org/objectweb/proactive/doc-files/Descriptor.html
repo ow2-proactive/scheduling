@@ -411,13 +411,13 @@ This filespecify  is read when addind a C3DUser. Two VirtualNodes are defined <b
 In the previous example, all defined JVMs will be created using <b>jvmProcess</b> process. This name is abstract like the other ones, it means that it can be changed. This process is totally defined in the <b>infrastructure</b> part. Of course the process name in the creation part must point at an existing defined process in the <b>infrastructure</b> part. For instance if the name in the creation tag is <b>localJVM</b>, there must be a process defined in the <b>infrastructure</b> with the  id <b>localJVM</b><br></br>
 <ul type="square" class="listWithSpace">
 		<li class="textNormal">Local JVMs<br></br>
-		As said before, all processes are defined in the <b>infrastructure</b> part, under the <b>processes</b> tag. In the previous example, the defined process <b>jvmProcess</b> will create local JVMs. The class attribute defines the class to instantiate in order to create the process. ProActive library provides one class to instantiate in order to create processes that will launch local JVMs:<br></br>
+		As said before, all processes are defined in the <b>infrastructure</b> part, under the <b>processes</b> tag. In the previous example, the defined process <b>jvmProcess</b> will create local JVMs. The class attribute defines the class to instantiate in order to create the process. ProActive library provides one class to instantiate in order to create processes that will launch local JVMs:<br></br></li></ul>
 		<code><a href="../core/process/JVMNodeProcess.html">org.objectweb.proactive.core.process.JVMNodeProcess</a></code>
 <pre>
 &lt;infrastructure&gt;
  &lt;processes&gt;
   &lt;processDefinition id="<b>jvmProcess</b>"&gt;
-   &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;
+   &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcesss"&gt;
     &lt;classpath&gt;
      &lt;relativePath origin="user.home" value="/ProActive/classes"/&gt;
      &lt;relativePath origin="user.home" value="/ProActive/lib/bcel.jar"/&gt;
