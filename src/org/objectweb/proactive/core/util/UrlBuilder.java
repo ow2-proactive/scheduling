@@ -40,7 +40,7 @@ import java.net.UnknownHostException;
  * This class is a utility class to perform modifications and operations on urls.
  */
 public class UrlBuilder {
-    private static String[] LOCAL_URLS = { "///", "//localhost", "//127.0.0.1" };
+    private static String[] LOCAL_URLS = { "///", "//localhost", "//127.0.0.1", "//localhost.localdomain" };
     private final static int DEFAULT_REGISTRY_PORT = 1099;
 
     //
