@@ -20,7 +20,11 @@
 		<pathelement location="${base}/classes"/>
 		<fileset dir="${base}/lib">
 			<include name="*.jar"/>
+			<include name="jini/*.jar"/>
+			<include name="globus/*.jar"/>
+			<include name="ws/*.jar"/>
 			<include name="components/*.jar"/>
+			<include name="ibis/*.jar"/>
 		</fileset>
 		<fileset dir="${base}/lib/ws">
 			<include name="*.jar"/>
