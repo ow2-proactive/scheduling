@@ -158,7 +158,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
     public void execute(Group group, FunctionalTest lastestTest,
         boolean useAttributesFile) {
         if (logger.isInfoEnabled()) {
-            logger.info("Starting with imbricated Tests ...");
+            logger.info("Starting with interlinked Tests ...");
         }
         ResultsCollections results = getResults();
 
@@ -175,7 +175,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
             }
         }
 
-        results.add(AbstractResult.IMP_MSG, "Starting with imbricated Tests ...");
+        results.add(AbstractResult.IMP_MSG, "Starting with interlinked Tests ...");
 
         try {
             initManager();
