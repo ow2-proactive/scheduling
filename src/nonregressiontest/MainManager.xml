@@ -34,6 +34,7 @@
 			<unitTest class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest class="nonregressiontest.descriptor.services.rmilookup.Test" />
 			<unitTest class="nonregressiontest.descriptor.services.p2p.Test" />
+    		<unitTest class="nonregressiontest.runtime.classloader.Test" />
 			<unitTest class="nonregressiontest.group.creation.Test" />
 			<unitTest class="nonregressiontest.group.onewaycall.Test" />
 			<unitTest class="nonregressiontest.group.asynchronouscall.Test" />
