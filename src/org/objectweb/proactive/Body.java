@@ -1,33 +1,33 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details. 
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/ 
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.UniqueID;
@@ -36,9 +36,10 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
 import org.objectweb.proactive.ext.security.PolicyServer;
 
+
 /**
  * <P>
- * An object implementing this interface is an implementation of the non fonctionnal part 
+ * An object implementing this interface is an implementation of the non fonctionnal part
  * of an ActiveObject. This representation is local to the ActiveObject. By contrast there
  * is a remote representation of Body that can be accessed by distant object.
  * </P><P>
@@ -64,74 +65,70 @@ import org.objectweb.proactive.ext.security.PolicyServer;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
-public interface Body extends LocalBodyStrategy, UniversalBody, MessageEventProducer {
+public interface Body extends LocalBodyStrategy, UniversalBody,
+    MessageEventProducer {
 
-  /**
-   * Terminate the body. After this call the body is no more alive and no more active
-   * although the active thread is not interrupted. The body is unuseable after this call.
-   */
-  public void terminate();
+    /**
+     * Terminate the body. After this call the body is no more alive and no more active
+     * although the active thread is not interrupted. The body is unuseable after this call.
+     */
+    public void terminate();
 
-  
-  /**
-   * Returns whether the body is alive or not.
-   * The body is alive as long as it is processing request and reply
-   * @return whether the body is alive or not.
-   */
-  public boolean isAlive();
-  
+    /**
+     * Returns whether the body is alive or not.
+     * The body is alive as long as it is processing request and reply
+     * @return whether the body is alive or not.
+     */
+    public boolean isAlive();
 
-  /**
-   * Returns whether the body is active or not.
-   * The body is active as long as it has an associated thread running
-   * to serve the requests by calling methods on the active object.
-   * @return whether the body is active or not.
-   */
-  public boolean isActive();
+    /**
+     * Returns whether the body is active or not.
+     * The body is active as long as it has an associated thread running
+     * to serve the requests by calling methods on the active object.
+     * @return whether the body is active or not.
+     */
+    public boolean isActive();
 
+    /**
+     * blocks all incoming communications. After this call, the body cannot
+     * receive any request or reply.
+     */
+    public void blockCommunication();
 
-  /**
-   * blocks all incoming communications. After this call, the body cannot
-   * receive any request or reply.
-   */
-  public void blockCommunication();
+    /**
+     * Signals the body to accept all incoming communications. This call undo
+     * a previous call to blockCommunication.
+     */
+    public void acceptCommunication();
 
+    /**
+     * Allows the calling thread to enter in the ThreadStore of this body.
+     */
+    public void enterInThreadStore();
 
-  /**
-   * Signals the body to accept all incoming communications. This call undo 
-   * a previous call to blockCommunication.
-   */
-  public void acceptCommunication();
+    /**
+     * Allows the calling thread to exit from the ThreadStore of this body.
+     */
+    public void exitFromThreadStore();
 
-    
-  /**
-   * Allows the calling thread to enter in the ThreadStore of this body.
-   */
-  public void enterInThreadStore();
+    /**
+     * Tries to find a local version of the body of id uniqueID. If a local version
+     * is found it is returned. If not, tries to find the body of id uniqueID in the
+     * known body of this body. If a body is found it is returned, else null is returned.
+     * @param uniqueID the id of the body to lookup
+     * @return the last known version of the body of id uniqueID or null if not known
+     */
+    public UniversalBody checkNewLocation(UniqueID uniqueID);
 
-	
-	/**
-   * Allows the calling thread to exit from the ThreadStore of this body.
-   */
-  public void exitFromThreadStore();
+    /**
+     * set the policy server of the active object
+     * @param server the policy server
+     */
+    public void setPolicyServer(PolicyServer server);
 
-
-
-  /**
-   * Tries to find a local version of the body of id uniqueID. If a local version
-   * is found it is returned. If not, tries to find the body of id uniqueID in the 
-   * known body of this body. If a body is found it is returned, else null is returned.
-   * @param uniqueID the id of the body to lookup
-   * @return the last known version of the body of id uniqueID or null if not known
-   */
-  public UniversalBody checkNewLocation(UniqueID uniqueID);
-
-
-/**
- * set the policy server of the active object
- * @param server the policy server
- */
-public void setPolicyServer(PolicyServer server);
-
-
+    /**
+     * Set the nodeURL of this body
+     * @param newNodeURL the new URL of the node
+     */
+    public void updateNodeURL(String newNodeURL);
 }
