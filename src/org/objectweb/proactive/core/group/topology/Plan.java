@@ -35,8 +35,7 @@ public class Plan extends Line { // implements Topology2D {
     /**
      * Construtor. The members of <code>g</code> are used to fill the topology group.
      * @param g - the group used a base for the new group (topology)
-     * @param height - the heigth of the two-dimensional topology group
-     * @param width - the width of the two-dimensional topology group
+     * @param nbMembers - the number of member in the two-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
     protected Plan(Group g, int nbMembers)
@@ -45,8 +44,8 @@ public class Plan extends Line { // implements Topology2D {
     }
 
     /**
-     * Return the max size of the line
-     * @return the max size of the one-dimensional topology group (i.e. the line)
+     * Return the size of the lines
+     * @return the size of the the lines
      */
     public int getWidth() {
         return this.width;
@@ -84,11 +83,11 @@ public class Plan extends Line { // implements Topology2D {
      * @return the object at the left of <code>o<code>. If there is no object at the left of <code>o</code>, return <code>null</code>
      */
     public Object left(Object o) {
-        int positionX = this.getX(this.indexOf(o));
-        if (positionX != 0) {
-            return this.get(positionX - 1);
+        int pos = this.indexOf(o);
+        if ((pos % this.getWidth()) == 0) {
+        	return null;
         } else {
-            return null;
+            return this.get(pos-1);
         }
     }
 
@@ -116,11 +115,11 @@ public class Plan extends Line { // implements Topology2D {
      * @return the object at the right of <code>o<code>. If there is no object at the right of <code>o</code>, return <code>null</code>
      */
     public Object right(Object o) {
-        int positionX = this.getX(this.indexOf(o));
-        if (positionX != this.getWidth()) {
-            return this.get(positionX + 1);
+        int pos = this.indexOf(o);
+        if ((pos % this.getWidth()) == this.getWidth()-1) {
+			return null;
         } else {
-            return null;
+            return this.get(pos+1);
         }
     }
 
@@ -130,11 +129,11 @@ public class Plan extends Line { // implements Topology2D {
      * @return the object at the up of <code>o<code>. If there is no object at the up of <code>o</code>, return <code>null</code>
      */
     public Object up(Object o) {
-        int positionY = this.getY(this.indexOf(o));
-        if (positionY != 0) {
-            return this.get(positionY - this.getWidth());
+		int pos = this.indexOf(o);
+        if (pos < this.getWidth()) {
+        	return null;
         } else {
-            return null;
+			return this.get(pos - this.getWidth());
         }
     }
 
@@ -143,14 +142,14 @@ public class Plan extends Line { // implements Topology2D {
      * @param o - the specified object
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
-    public Object down(Object o) {
-        int position = this.getY(this.indexOf(o));
-        if (position != this.getHeight()) {
-            return this.get(position + this.getWidth());
-        } else {
-            return null;
-        }
-    }
+	public Object down(Object o) {
+		int pos = this.indexOf(o);
+		if (pos > ((this.getWidth()-1)*this.getHeight())-1) {
+			return null;
+		} else {
+			return this.get(pos + this.getWidth());
+		}
+	}
 
     /**
      * Returns the line (one-dimensional topology group) with the specified number

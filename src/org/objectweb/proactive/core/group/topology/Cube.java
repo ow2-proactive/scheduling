@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 public class Cube extends Plan { // implements Topology3D {
 
     /** depth of the three-dimensional topology group */
-    protected int depth; //  => Y => number of plans
+    protected int depth; //  => Z => number of plans
 
     /**
      * Construtor. The members of <code>g</code> are used to fill the topology group.
