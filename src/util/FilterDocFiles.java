@@ -14,12 +14,15 @@ package util;
  * <!-- -->
  */
 public class FilterDocFiles {
+	
+	static boolean changeImagePath = true;
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
       System.out.println("Missing target directory");
       System.exit(-1);
     }
+    if (System.getProperty("changeImages").equals("false")) changeImagePath=false;
     java.io.File sourceDir = new java.io.File(args[0]);
     filter(sourceDir);
   }
