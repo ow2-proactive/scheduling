@@ -16,6 +16,7 @@ package util;
 public class FilterDocFiles {
 	
 	static boolean changeImagePath = true;
+	String name;
 
   public static void main(String[] args) throws java.io.IOException {
     if (args.length == 0) {
@@ -36,9 +37,16 @@ public class FilterDocFiles {
     byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
     String html = new String(b);
     html = removeMarkedLine(html);
-    html = changeImagesPath(html);
+    if(changeImagePath){
+		name = "_"+file.getName();
+    }else{
+		name = "__"+file.getName();
+    }
     b = html.getBytes();
-    java.io.File newFile = new java.io.File(file.getParentFile(), "_"+file.getName());
+	if(changeImagePath){
+			html = changeImagesPath(html);
+		}
+    java.io.File newFile = new java.io.File(file.getParentFile(), name);
     newFile.delete();
     java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(newFile));
     out.write(b, 0, b.length);
