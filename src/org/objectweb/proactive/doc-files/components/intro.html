@@ -200,7 +200,7 @@ The component will be instantiated on the virtual node it specified (or the one 
 <h3>Example</h3>
 <p class="textNormal">The easiest way to understand the ADL is to see <a href="helloworld-distributed.html" target="_blank">an example</a>. It corresponds to the helloworld example described later in this document.<br>
 <p></p>
-<h3>Exportation and composition of virtual nodes</h3>
+<A NAME="composition of virtual nodes"></A><h3>Exportation and composition of virtual nodes</h3>
 <p>Components are deployed on the virtual node that is specified in their definition ; it has to appear in the deployment descriptor <u>unless</u> this virtual node is exported. In this case, the name of the exported virtual node should appear in the deployment descriptor, unless this exported virtual node is itself exported.</p>
 <p>When exported, a virtual node can take part in the composition of other exported virtual nodes. The idea is to further extend reusability of existing (and packaged, packaging being a forthcoming feature of Fractal) components.</p>
 <p>In the example, the component defined in helloworld-distributed-wrappers.fractal exports the virtual nodes VN1 and VN2:
@@ -582,8 +582,24 @@ Currently, we have a functional implementation of the Fractal API and model. One
 <h3>Packaging</h3>
 <p>Reusability and Components should be accessible through predefined / preconfigured packages. A bit like enterprise archives for Enterprise JavaBeans, though there is also a notion of composition of deployment that should be addressed</p>
 
-<h3>Tools</h3>
-<p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems. We are currently finalizing an extended version of theFractalGUI that will allow a graphical and interactive design and visualization of component systems.</p>
+<h3>Graphical user interface</h3>
+<p class="textNormal">Another area of investigation is the tools for configuring, deploying and monitoring distributed component systems.</p>
+  <p class="textNormal">Because component based programming is somewhat analogous to the assembly of building blocks into a functional product, graphical tools are well suited for the design and monitoring of component based systems. The Fractal community actually proposes such a tool : the Fractal GUI. We have extended this tool to evaluate the feasibility of a full-fledge graphical interface for the design and monitoring of distributed components. The result is available within the IC2D GUI, you can try it out, but consider it as a product in alpha state. Development is indeed currently discontinued as we are waiting for a new release of the Fractal GUI, and some features are only partially implemented (runtime monitoring, composition of virtual nodes).</p>
+<p>The GUI allows the creation of ADL files representing component systems, and - the other way around - also allows to load ADL files and get a visual representation of systems described in the ADL files.
+We have worked on the manipulation of virtual nodes - a deployment abstraction - : components display the virtual nodes where they are deployed, and it is also possible to <a href="#composition of virtual nodes">compose virtual nodes</a></p><p>Ultimately, we would like to couple the visualization of components at runtime (currently unavailable here) with the standard monitoring capabilities of IC2D : we would get a structural view of the application in the Fractal GUI, and a topological view in the standard IC2D frame</p>
+<h4>Usage</h4>
+<p>If you want to try out the extended Fractal GUI for ProActive :
+<li>start IC2D</li>
+<li>Components --> start components GUI</li>
+<li>to load an ADL file : 
+<ol>
+<LI>File --> Storage --> select the storage repository which is the root repository of your ADL files. <i>For example you can select the "src" directory of the ProActive distribution</i></LI>
+<li>File --> Open --> select an ADL file in the storage repository. <i>For example you can select the "helloworld-distributed-wrappers.fractal" file in the src/org/objectweb/proactive/examples/components/helloworld directory of the ProActive distribution.</i>
+</li></ol> </li>
+<li>to modify an ADL file, you can use the Graph tab for a structural view, while the Dialog tab gives you access to the properties of the components, including the composition of the virtual ndoes.</li>
+<li>to save an ADL file : File --> Save</li>
+ </p>
+ 
 <h3>Other</h3>
 <p class="textNormal">Other areas of research that we are opening around this work include :
 <UL>
@@ -611,7 +627,7 @@ Currently, we have a functional implementation of the Fractal API and model. One
 History :<BR>
 March 2004 : 1st version<br>
 June 2004 : typo fix (bindFc method in "conformance ... / collective bindings" references i, not i2)<br>
-November 2004 : updated ADL documentation and examples ; updated perspectives ; super controller now included (not a limitation anymore)
+November 2004 : updated ADL documentation and examples ; updated perspectives ; super controller now included (not a limitation anymore)<br>
 February 2005 : added ADL parser usage
 </i></p>
 
