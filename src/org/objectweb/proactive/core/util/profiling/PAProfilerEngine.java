@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.util.profiling;
 
+import org.objectweb.proactive.core.util.timer.AverageMicroTimer;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -27,8 +29,8 @@ public class PAProfilerEngine implements Runnable {
      * @return an AverageTimeProfiler
      */
     public static Timer createTimer() {
-    	Timer tmp = new AverageMicroTimer();
-    	registerTimer(tmp);
+        Timer tmp = new AverageMicroTimer();
+        registerTimer(tmp);
         return tmp;
     }
 
@@ -41,7 +43,7 @@ public class PAProfilerEngine implements Runnable {
             engine.profilerList.add(papr);
         }
     }
-    
+
     /**
      * Remove a profiler from this engine
      * It's dump() method will thus never be called
@@ -61,36 +63,35 @@ public class PAProfilerEngine implements Runnable {
      * This method starts when a shutdown of the VM is initiated
      */
     public void run() {
-    	dump();
+        dump();
     }
-    
-    /**
-	 * Call dump on all profilers registered in this engine
-	 */
-	public void dump() {
-		Iterator it = profilerList.iterator();
-    	while (it.hasNext()) {
-			( (Timer) it.next()).dump();
-		}
-	}
 
-	public static void main(String[] args) {
-		System.out.println("Creating a profiler and registering it");
-		PAProfilerEngine.createTimer();
-		System.out.println("Creating an AverageTimeProfiler and registering it");
-		Timer avg = new AverageMicroTimer("Test ");
-		PAProfilerEngine.registerTimer(avg);
-	
-		for (int i=0; i< 10;i++) {
-			avg.start();
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		avg.stop();
-		}
-		System.out.println("Now dying");	
-	}
-    
+    /**
+     * Call dump on all profilers registered in this engine
+     */
+    public void dump() {
+        Iterator it = profilerList.iterator();
+        while (it.hasNext()) {
+            ((Timer) it.next()).dump();
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Creating a profiler and registering it");
+        PAProfilerEngine.createTimer();
+        System.out.println("Creating an AverageTimeProfiler and registering it");
+        Timer avg = new AverageMicroTimer("Test ");
+        PAProfilerEngine.registerTimer(avg);
+
+        for (int i = 0; i < 10; i++) {
+            avg.start();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            avg.stop();
+        }
+        System.out.println("Now dying");
+    }
 }

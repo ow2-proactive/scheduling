@@ -1,6 +1,8 @@
-package org.objectweb.proactive.core.util.profiling;
+package org.objectweb.proactive.core.util.timer;
 
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
+import org.objectweb.proactive.core.util.profiling.Timer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -84,9 +86,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     }
 
     public String toString() {
-        int ln = name.length();
+
         StringBuffer tmp = new StringBuffer();
-        tmp.append("------- ").append(name).append(" -------\n");
+
         tmp.append("Number of measures: ").append(this.getNumberOfValues());
         tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
         tmp.append("\nAverage time: ").append(this.getAverage()).append("\n");
@@ -99,16 +101,22 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         	tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
         	tmp.append("\n        ").append("Average time: ").append(t.getAverage()).append("\n");
         }
+  
+        return tmp.toString();
+    }
+    
+    
+    public void dump() {   
+        int ln = name.length();
+        StringBuffer tmp = new StringBuffer();
+        tmp.append("------- ").append(name).append(" -------\n");
+        tmp.append(this.toString());
         for (int i = 0; i <= (ln + 16); i++) {
             tmp.append("-");
         }
-        return tmp.append("\n").toString();
+       System.out.println(tmp.append("\n").toString());
     }
     
-    
-    public void dump() {
-      System.out.println(this);
-    }
 
     public void setTimer(String name) {
         String realName = this.name + "." + name;

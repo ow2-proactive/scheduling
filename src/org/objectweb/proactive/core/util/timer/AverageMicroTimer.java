@@ -1,11 +1,12 @@
-package org.objectweb.proactive.core.util.profiling;
+package org.objectweb.proactive.core.util.timer;
 
-import org.objectweb.proactive.core.util.timer.MicroTimer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+
+import org.objectweb.proactive.core.util.profiling.Timer;
 
 
 /**
@@ -16,17 +17,17 @@ public class AverageMicroTimer implements Timer, Serializable {
     protected String name;
 
     //the number of values in tis timer so far
-    private int nbrValues;
+    protected int nbrValues;
 
     //the total time measured by this timer
-    private long total;
+    protected  long total;
 
     //temporary counter used to measure time when pausing/resuming
-    private long tmp;
-    transient private MicroTimer timer = new MicroTimer();
+    protected  long currentElapsed;
+    transient protected MicroTimer timer = new MicroTimer();
 
     //used to check that start has been pressed prior to a stop
-    private boolean running; 
+    protected boolean running; 
 	
     public AverageMicroTimer() {
         this(AverageMicroTimer.class.getName());
@@ -37,7 +38,7 @@ public class AverageMicroTimer implements Timer, Serializable {
     }
 
     public void start() {
-        tmp = 0;
+        currentElapsed = 0;
         running = true;
         timer.start();
     }
@@ -48,7 +49,7 @@ public class AverageMicroTimer implements Timer, Serializable {
 
     public void pause() {
         timer.stop();
-        tmp += timer.getCumulatedTime();
+        currentElapsed += timer.getCumulatedTime();
     }
 
     /**
@@ -58,15 +59,14 @@ public class AverageMicroTimer implements Timer, Serializable {
         //System.out.println("AverageMicroTimer.stop()");
     	if (running) {
     		  timer.stop();
-    	        tmp += timer.getCumulatedTime();
-    	        this.total += tmp;
+    	        currentElapsed += timer.getCumulatedTime();
+    	        this.total += currentElapsed;
 //    	        if (tmp >= 0) {
     	            this.nbrValues++;
 //    	        }
-    	        tmp = 0;
+    	        currentElapsed = 0;
     	        running = false;
-    	}
-      
+    	}      
     }
 
     /**
@@ -90,21 +90,22 @@ public class AverageMicroTimer implements Timer, Serializable {
     }
 
     public void dump() {
-        System.out.println(this);
-    }
-
-    public String toString() {
         int ln = name.length();
         StringBuffer tmp = new StringBuffer();
         tmp.append("------- ").append(name).append(" -------\n");
-        tmp.append("Number of measures: ").append(this.getNumberOfValues());
-        tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
-        tmp.append("\nAverage time: ").append(this.getAverage()).append("\n");
-        //  StringBuffer end = new StringBuffer();
+        tmp.append(this.toString());
         for (int i = 0; i <= (ln + 16); i++) {
             tmp.append("-");
         }
-        return tmp.append("\n").toString();
+       System.out.println(tmp.append("\n").toString());
+    }
+
+    public String toString() {
+        StringBuffer tmp = new StringBuffer();
+        tmp.append("Number of measures: ").append(this.getNumberOfValues());
+        tmp.append("\nTotal time measured: ").append(this.getCumulatedTime());
+        tmp.append("\nAverage time: ").append(this.getAverage()).append("\n");
+        return tmp.toString();
     }
 
     public String getName() {
