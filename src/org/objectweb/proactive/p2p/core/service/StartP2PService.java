@@ -92,6 +92,7 @@ public class StartP2PService {
         ProActiveConfiguration.load();
 
         try {
+            
             logger.info("**** Starting jvm on " +
                 java.net.InetAddress.getLocalHost().getHostName());
             if (logger.isDebugEnabled()) {
@@ -161,6 +162,7 @@ public class StartP2PService {
             System.setProperty("proactive." +
                 this.acquisitionMethod.replace(':', ' ').trim() + ".port",
                 this.portNumber);
+            
             ProActiveRuntime paRuntime = RuntimeFactory.getProtocolSpecificRuntime(this.acquisitionMethod);
 
             // Node Creation
@@ -168,7 +170,7 @@ public class StartP2PService {
                     false, null, paRuntime.getVMInformation().getName(),
                     paRuntime.getJobID());
 
-            // P2PServie Active Object Creation
+            // P2PService Active Object Creation
             Object[] params = new Object[3];
             params[0] = this.acquisitionMethod;
             params[1] = this.portNumber;
@@ -176,6 +178,9 @@ public class StartP2PService {
             this.p2pService = (P2PServiceImpl) ProActive.newActive(P2PServiceImpl.class.getName(),
                     params, url);
 
+            if (logger.isInfoEnabled())
+                logger.info("/////////////////////////////  STARTING P2P SERVICE //////////////////////////////");
+            
             // Record the ProActiveRuntime in other from Servers List File
             if (!this.noRegister) {
                 ((P2PServiceImpl) this.p2pService).registerP2PServices(this.serverList);
