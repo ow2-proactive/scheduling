@@ -17,7 +17,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -122,14 +121,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //            System.out.println("XXXX Error XXXX");
         //           // e.printStackTrace();
         //        }
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveComponentIdentity()
-     */
-    public ProActiveComponent getProActiveComponent() throws IOException {
-        // COMPONENTS
-        return this.wrappedBody.getProActiveComponent();
     }
 
     //protected synchronized void stop() {
