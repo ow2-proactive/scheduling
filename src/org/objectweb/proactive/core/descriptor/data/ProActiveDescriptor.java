@@ -148,8 +148,15 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   public void activateMapping(String virtualNodeName);
   
   
+	/**
+	 * Kills all Nodes and JVMs(local or remote) created when activating the descriptor
+	 * @throws ProActiveException if a problem occurs when terminating all jvms
+	 */
+  public void killall() throws ProActiveException;
+  
 //  /**
 //   * Kills all Nodes mapped to VirtualNodes in the XML Descriptor
+//   * This method kills also the jvm on which 
 //   */
 //  public void desactivateMapping();
 //  
