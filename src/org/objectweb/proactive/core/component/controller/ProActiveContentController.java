@@ -1,33 +1,33 @@
-/* 
+/*
  * ################################################################
- * 
- * ProActive: The Java(TM) library for Parallel, Distributed, 
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
- * 
+ *
  * Copyright (C) 1997-2004 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive-support@inria.fr
- * 
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or any later version.
- *  
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
- *  
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://www.inria.fr/oasis/ProActive/contacts.html
- *  Contributor(s): 
- * 
+ *  Contributor(s):
+ *
  * ################################################################
- */ 
+ */
 package org.objectweb.proactive.core.component.controller;
 
 import org.apache.log4j.Logger;
@@ -35,16 +35,21 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.TypeFactory;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 import java.io.Serializable;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -56,14 +61,23 @@ import java.util.Vector;
 public class ProActiveContentController extends ProActiveController
     implements ContentController, Serializable {
     protected static Logger logger = Logger.getLogger(ProActiveContentController.class.getName());
-    Vector fcSubComponents;
+    List fcSubComponents;
 
     /**
      * Constructor for ProActiveContentController.
      */
     public ProActiveContentController(Component owner) {
-        super(owner, Constants.CONTENT_CONTROLLER);
-        fcSubComponents = new Vector();
+        super(owner);
+        try {
+            setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+                    ProActiveContentController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
+        } catch (InstantiationException e) {
+            throw new ProActiveRuntimeException("cannot create controller " +
+                this.getClass().getName());
+        }
+        fcSubComponents = new ArrayList();
     }
 
     /**
@@ -79,8 +93,8 @@ public class ProActiveContentController extends ProActiveController
 
     /**
      * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)
-    *
-    *  in this implementation, the external interfaces are also internal interfaces
+     *
+     *  in this implementation, the external interfaces are also internal interfaces
      *         */
     public Object getFcInternalInterface(String interfaceName)
         throws NoSuchInterfaceException {
@@ -107,7 +121,7 @@ public class ProActiveContentController extends ProActiveController
      * @see org.objectweb.fractal.api.control.ContentController#addFcSubComponent(Component)
      */
     public void addFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException {
+        throws IllegalLifeCycleException, IllegalContentException {
         checkLifeCycleIsStopped();
 
         // check whether the subComponent is the component itself
@@ -136,8 +150,14 @@ public class ProActiveContentController extends ProActiveController
             }
             throw new IllegalArgumentException("already a sub component : " +
                 name);
-        } else {
-            fcSubComponents.addElement(subComponent);
+        }
+        fcSubComponents.add(subComponent);
+        // add a ref on the current component
+        try {
+            ((ProActiveSuperController) subComponent.getFcInterface(Constants.SUPER_CONTROLLER)).addParent(((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis());
+        } catch (NoSuchInterfaceException e) {
+            throw new IllegalContentException(
+                "Cannot add component : cannot find super-controller interface.");
         }
 
         // FIXME : component cycle checking
@@ -169,11 +189,17 @@ public class ProActiveContentController extends ProActiveController
      * @see org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)
      */
     public void removeFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException {
+        throws IllegalLifeCycleException, IllegalContentException {
         checkLifeCycleIsStopped();
-        if (!fcSubComponents.removeElement(subComponent)) {
+        if (!fcSubComponents.remove(subComponent)) {
             throw new IllegalArgumentException("not a sub component : " +
                 subComponent);
+        }
+        try {
+            ((ProActiveSuperController) subComponent.getFcInterface(Constants.SUPER_CONTROLLER)).removeParent(subComponent);
+        } catch (NoSuchInterfaceException e) {
+            throw new IllegalContentException(
+                "Cannot remove component : cannot find super-controller interface");
         }
 
         if (logger.isDebugEnabled()) {
