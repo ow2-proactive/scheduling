@@ -16,9 +16,13 @@ public interface ProActiveComponent extends Component {
 	
 
     /**
-     * @return the reified object at the base of the active object
+     * accessor to the base object : either a direct reference or a stub
+     * @return a reference on the base object. If called from the meta-objects,
+     * it returns a direct reference on the base object. If called from the representative, 
+     * it returns a stub on the base object (standard ProActive stub, same type than 
+     * the base object) 
      */    
-    public Object getReifiedObject();
+    public Object getReferenceOnBaseObject();
 
     /**
      * This method's implementation is only valid in the component meta-objects.
