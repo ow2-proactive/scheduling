@@ -37,7 +37,7 @@ public class ComponentsDescriptorHandler
 		componentsCache = new ComponentsCache();
 		componentTypes = new HashMap();
 		addHandler(TYPES_TAG, new TypesHandler(componentTypes));
-		addHandler(COMPONENTS_TAG, new ComponentsHandler(deploymentDescriptor, componentsCache, componentTypes));
+		addHandler(COMPONENTS_TAG, new ComponentsHandler(deploymentDescriptor, componentsCache, componentTypes, null));
 		addHandler(BINDINGS_TAG, new BindingsHandler(componentsCache));
 	}
 
@@ -59,7 +59,6 @@ public class ComponentsDescriptorHandler
 			for (int i = 0; i < virtual_nodes.length; i++) {
 				VirtualNode vn = virtual_nodes[i];
 				vn.activate();
-				// TODO : consider the cyclic case
 			}
 			logger.debug("virtual nodes activated");
 
