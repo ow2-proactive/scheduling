@@ -48,11 +48,11 @@ public class TestNodes extends FunctionalTest {
     private static String XML_LOCATION = TestNodes.class.getResource(
             "/nonregressiontest/descriptor/defaultnodes/Nodes.xml").getPath();
     private static ProActiveDescriptor proActiveDescriptor = null;
-    private VirtualNode[] virtualNodes = null;
+    private static VirtualNode[] virtualNodes = null;
     private static Node sameVMNode = null;
     private static Node localVMNode = null;
     private static Node remoteVMNode = null;
-	private static Node remoteACVMNode = null;
+    private static Node remoteACVMNode = null;
     private static String remoteHostname = "localhost";
 
     /**
@@ -70,21 +70,35 @@ public class TestNodes extends FunctionalTest {
         proActiveDescriptor = ProActive.getProactiveDescriptor("file:" +
                 XML_LOCATION);
         proActiveDescriptor.activateMappings();
-        this.virtualNodes = proActiveDescriptor.getVirtualNodes();
+        TestNodes.virtualNodes = proActiveDescriptor.getVirtualNodes();
         for (int i = 0; i < virtualNodes.length; i++) {
             VirtualNode virtualNode = virtualNodes[i];
             if (virtualNode.getName().compareTo("Dispatcher") == 0) {
                 sameVMNode = virtualNode.getNode();
             } else if (virtualNode.getName().compareTo("Dispatcher1") == 0) {
                 localVMNode = virtualNode.getNode();
-			} else if (virtualNode.getName().compareTo("Dispatcher3-AC") == 0) {
-				remoteACVMNode = virtualNode.getNode();
+            } else if (virtualNode.getName().compareTo("Dispatcher3-AC") == 0) {
+                remoteACVMNode = virtualNode.getNode();
             } else {
                 remoteVMNode = virtualNode.getNode();
             }
         }
         remoteHostname = remoteVMNode.getNodeInformation().getInetAddress()
                                      .getHostName();
+    }
+
+    /**
+     * TODO : remove this method, as it is used as a walkaround to use deployed nodes
+     * outside of the first packageGroup group of the MainManager.xml
+     * (the endTest() method, that kills all the deployed nodes, is indeed called at the end of each
+     * group of tests)
+     *
+     */
+
+    // COMPONENTS
+    public Object[] action(Object[] parameters) throws Exception {
+        action();
+        return null;
     }
 
     /**
@@ -134,12 +148,20 @@ public class TestNodes extends FunctionalTest {
     public static String getRemoteHostname() {
         return remoteHostname;
     }
-    
-	/**
-	 * @return the node with automatic continuations enabled
-	 */
-	public static Node getRemoteACVMNode() {
-		return remoteACVMNode;
-	}
 
+    /**
+     * @return the node with automatic continuations enabled
+     */
+    public static Node getRemoteACVMNode() {
+        return remoteACVMNode;
+    }
+
+    public static VirtualNode getVirtualNode(String name) {
+        for (int i = 0; i < virtualNodes.length; i++) {
+            if (virtualNodes[i].getName().equals(name)) {
+                return virtualNodes[i];
+            }
+        }
+        return null;
+    }
 }
