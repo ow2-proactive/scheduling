@@ -467,7 +467,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 url, e);
         } catch (java.rmi.NotBoundException e) {
             //No need to throw an exception if an object is already unregistered
-            logger.info(url + "is not bound in the registry", e);
+            logger.info("WARNING "+url + " is not bound in the registry ");
         }
     }
 

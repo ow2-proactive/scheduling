@@ -419,7 +419,8 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("cannot unbind in registry at " + url, e);
         } catch (NotBoundException e) {
-            throw new RemoteException(url + "is not bound in the registry", e);
+//          No need to throw an exception if an object is already unregistered
+            logger.info("WARNING "+url + " is not bound in the registry ");
         }
     }
 
