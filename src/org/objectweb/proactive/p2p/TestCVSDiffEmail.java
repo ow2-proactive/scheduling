@@ -43,7 +43,12 @@ public class TestCVSDiffEmail {
 	public TestCVSDiffEmail() {
 		super();
 	}
+	
+	private void foo() {
+		int i = 9 + 1;
+	}
 
 	public static void main(String[] args) {
+		// Few comments for testing diff message
 	}
 }
