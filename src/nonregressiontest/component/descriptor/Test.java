@@ -20,6 +20,8 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import testsuite.test.FunctionalTest;
 
 /**
+ * This is a test for the former components descriptor, not used anymore : it has been
+ * replaced by the Fractal ADL
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
@@ -34,7 +36,7 @@ public class Test extends FunctionalTest {
 	ProActiveDescriptor deploymentDescriptor;
 
 	public Test() {
-		super("Components descriptor", "Test instantiation of a component system based on a components descriptor");
+		super("Components descriptor (obsolete)", "Test instantiation of a component system based on a components descriptor");
 	}
 
 	/* (non-Javadoc)
