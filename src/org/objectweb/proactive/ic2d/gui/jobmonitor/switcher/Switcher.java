@@ -30,7 +30,7 @@ public class Switcher extends JPanel implements SwitchListener
 		
 		for (int i = 0; i < size; ++i)
 		{
-			final JLabel l = new JLabel (model.getLabel (i));
+			final JLabel l = new JLabel (model.getLabel (i), model.getIcon(i), SwingConstants.CENTER);
 			l.setHorizontalAlignment (SwingConstants.CENTER);
 			l.setOpaque (true);
 			l.addMouseListener (new MouseAdapter()

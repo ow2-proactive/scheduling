@@ -56,24 +56,9 @@ public class JobMonitorTreeCellRenderer extends DefaultTreeCellRenderer implemen
 	{
 		super.getTreeCellRendererComponent (tree, value, sel, expanded, leaf, row, hasFocus);
 		
-		Icon icon = null;
-
 		DataTreeNode currentNode = (DataTreeNode) value;
 		int key = currentNode.getKey();
-		
-		if (key == HOST)
-			icon = host;
-		else if (key == JOB)
-			icon = job;
-		else if (key == AO)
-			icon = ao;
-		else if (key ==JVM)
-			icon = jvm;
-		else if (key == VN)
-			icon = vn;
-		else if (key == NODE)
-			icon = node;
-
+		Icon icon = Icons.getIconForKey(key);		
 		if (icon != null)
 			setIcon (icon);
 		

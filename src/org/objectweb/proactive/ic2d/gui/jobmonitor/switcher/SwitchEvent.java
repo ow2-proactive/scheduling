@@ -7,26 +7,26 @@ public class SwitchEvent
 	
 	private int type;
 	private String label;
-	private String switchedKey;
+	private int switchedKey;
 	
-	private SwitchEvent (int _type, String _label, String _switchedKey)
+	private SwitchEvent (int _type, String _label, int _switchedKey)
 	{
 		type = _type;
 		label = _label;
 		switchedKey = _switchedKey;
 	}
 	
-	public static SwitchEvent getONEvent (String label, String key)
+	public static SwitchEvent getONEvent (String label, int key)
 	{
 		return new SwitchEvent (ON, label, key);
 	}
 	
-	public static SwitchEvent getOFFEvent (String label, String key)
+	public static SwitchEvent getOFFEvent (String label, int key)
 	{
 		return new SwitchEvent (OFF, label, key);
 	} 
 	
-	public String getSwitchedKey()
+	public int getSwitchedKey()
 	{
 		return switchedKey;
 	}

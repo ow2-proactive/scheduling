@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
+import javax.swing.*;
+
+import org.objectweb.proactive.ic2d.gui.jobmonitor.*;
 
 public class SwitcherModel implements JobMonitorConstants
 {
@@ -29,7 +31,7 @@ public class SwitcherModel implements JobMonitorConstants
 			states [i] = true;
 	}
 
-	public String get (String label)
+	public int get (String label)
 	{
 		int i = labels.indexOf (label);
 		return getSwitchKey (i);
@@ -133,11 +135,19 @@ public class SwitcherModel implements JobMonitorConstants
 		return (String) labels.get (i);
 	}
 
-	public String getSwitchKey (int i)
+	public int getSwitchKey (int i)
 	{
 		if (i < 0 || i >= size())
-			return null;
+			return NO_KEY;
 			
-		return (String) keys.get (i);
+		return ((Integer) keys.get (i)).intValue();
+	}
+	
+	public Icon getIcon(int i) {
+		if (i < 0 || i >= size())
+			return null;
+		
+		int key = getSwitchKey(i);
+		return Icons.getIconForKey(key);
 	}
 }
