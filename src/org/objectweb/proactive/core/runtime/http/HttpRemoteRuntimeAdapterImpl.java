@@ -8,7 +8,6 @@ package org.objectweb.proactive.core.runtime.http;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.UnknownHostException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
@@ -34,8 +33,9 @@ import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
-    private HttpRuntimeAdapter runtimeadapter;
-
+    private String url;
+    private int port;
+    
     //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
     // which is already dead
     protected boolean alreadykilled = false;
@@ -46,31 +46,13 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
      */
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
         String newurl) {
-        logger.debug("URL de l'adapter = " + newurl);
-        runtimeadapter = newruntimeadapter;
-        runtimeadapter.url = newurl;
-        createURL();
-        logger.debug("New Remote XML Adapter : " + runtimeadapter.url +
-            " port = " + runtimeadapter.port);
+        logger.debug("Adapter URL = " + newurl);
+        this.url = newurl;
+        this.port = UrlBuilder.getPortFromUrl(newurl);
+        logger.debug("New Remote XML Adapter : " + url +
+            " port = " + port);
     }
 
-    public void createURL() {
-        /* !!! */
-        if (!runtimeadapter.url.startsWith("http:")) {
-            runtimeadapter.url = "http:" + runtimeadapter.url;
-        }
-
-        if (runtimeadapter.port == 0) {
-            runtimeadapter.port = UrlBuilder.getPortFromUrl(runtimeadapter.url);
-        }
-
-        try {
-            runtimeadapter.url = "http://" +
-                UrlBuilder.getHostNameAndPortFromUrl(runtimeadapter.url);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
 
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
@@ -79,29 +61,19 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) throws NodeException {
         try {
-            String methodName = "createLocalNode";
-
-            // first we  v a well-formed url
-            String nodeURL = null;
-
-            nodeURL = runtimeadapter.buildNodeURL(nodeName);
-
-            // then take the name of the node
-            String name = UrlBuilder.getNameFromUrl(nodeURL);
-
             ArrayList paramsList = new ArrayList();
-
-            paramsList.add(name);
+            paramsList.add(nodeName);
             paramsList.add(new Boolean(replacePreviousBinding));
             paramsList.add(ps);
             paramsList.add(vname);
             paramsList.add(jobId);
 
-            RuntimeRequest req = new RuntimeRequest(methodName, paramsList);
+            RuntimeRequest req = new RuntimeRequest("createLocalNode",
+                    paramsList);
 
             Object result = sendRequest(req);
 
-            return nodeURL;
+            return nodeName;
         } catch (NodeException e) {
             throw e;
         } catch (Exception e) {
@@ -116,15 +88,15 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
      * @throws ProActiveException
      */
     private Object sendRequest(RuntimeRequest req) throws Exception {
-        logger.debug("Send request to : " + runtimeadapter.url + ":" +
-            runtimeadapter.port);
+        logger.debug("Send request to : " + url + ":" +
+            port);
 
         if (req.getMethodName() == null) {
             throw new ProActiveException("Null request");
         }
 
-        RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(runtimeadapter.url,
-                runtimeadapter.port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
+        RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(url,
+                port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
 
         if (reply != null) {
             return reply.getReturnedObject();
@@ -254,7 +226,9 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     }
 
     public String getURL() throws ProActiveException {
-        return runtimeadapter.getStrategyURL();
+        //return runtimeadapter.getStrategyURL();
+        throw new ProActiveException("This method should never be called," +
+            " since the Adapter already does the job.");
     }
 
     public ArrayList getActiveObjects(String nodeName)
@@ -326,7 +300,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         try {
             sendRequest(new RuntimeRequest("unregisterAllVirtualNodes"));
         } catch (Exception e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

@@ -48,8 +48,6 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     public HttpRuntimeAdapter() {
         runtimestrategyadapter = ProActiveRuntimeImpl.getProActiveRuntime();
         this.vmInformation = runtimestrategyadapter.getVMInformation();
-        url = ClassServer.getUrl();
-        logger.debug("url de l adapter runtime = " + url);
     }
 
     /**
@@ -57,41 +55,59 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @param url
      */
     public HttpRuntimeAdapter(String newurl) {
+    	this.url = newurl;
+    	createURL();
         runtimestrategyadapter = new HttpRemoteRuntimeAdapterImpl(this, newurl);
         this.vmInformation = runtimestrategyadapter.getVMInformation();
     }
 
+    
+    public void createURL() {
+        /* !!! */
+        if (!url.startsWith("http:")) {
+            url = "http:" + url;
+        }
+
+        if (port == 0) {
+            port = UrlBuilder.getPortFromUrl(url);
+        }
+
+        try {
+            url = "http://" +
+                UrlBuilder.getHostNameAndPortFromUrl(url);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    
     //
     // -- Implements ProActiveRuntime -----------------------------------------------
     //
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) throws NodeException {
-        if (runtimestrategyadapter instanceof ProActiveRuntime) {
+        try {
+            String nodeURL = null;
+
             try {
-                String nodeURL = null;
-
-                try {
-                    nodeURL = buildNodeURL(nodeName);
-                } catch (UnknownHostException e1) {
-                    e1.printStackTrace();
-                }
-
-                //      then take the name of the node
-                String name = UrlBuilder.getNameFromUrl(nodeURL);
-                runtimestrategyadapter.createLocalNode(name,
-                    replacePreviousBinding, ps, vname, jobId);
-
-                return nodeURL;
-            } catch (NodeException e) {
-                e.printStackTrace();
+                nodeURL = buildNodeURL(nodeName);
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();
             }
 
-            return null;
-        } else {
-            return runtimestrategyadapter.createLocalNode(nodeName,
+            //      then take the name of the node
+            String name = UrlBuilder.getNameFromUrl(nodeURL);
+            runtimestrategyadapter.createLocalNode(name,
                 replacePreviousBinding, ps, vname, jobId);
+
+            return nodeURL;
+        } catch (NodeException e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 
     public void killAllNodes() throws ProActiveException {
@@ -112,7 +128,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
     }
 
     public VMInformation getVMInformation() {
-    	return this.vmInformation;
+        return this.vmInformation;
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
