@@ -86,7 +86,6 @@ public interface LocalBodyStrategy {
     public void sendRequest(MethodCall methodCall, Future future,
         UniversalBody destinationBody)
         throws java.io.IOException, RenegotiateSessionException;
-    ;
 
     /**
      * Serves the request <code>request</code> by the invoking the targeted method on the
