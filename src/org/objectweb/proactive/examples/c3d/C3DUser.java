@@ -64,6 +64,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.examples.c3d.geom.Vec;
 import org.objectweb.proactive.examples.c3d.prim.Light;
 import org.objectweb.proactive.examples.c3d.prim.Primitive;
@@ -118,7 +119,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
   /**
    * Destination array for the calculated pixels of the <code>Image</code>
    */
-  int pix[];
+  transient int pix[];
   /**
    * <code>C3DDispatcher</code>, decouples the m user frames and the 
    * n rendering engines. There is always exactly one C3DDispatcher object 
@@ -239,10 +240,11 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     
     if(getOnMigration()) clean();
     //if the activity is restarted it is a migration
-    //to be improve 
+    //to be improved 
    
   }
 
+	
 
   /**
    * Entry point of the program
@@ -304,6 +306,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     try {
       li_users.remove(sName);
     } catch (Exception e) {
+    	e.printStackTrace();
     }
 
     // Remove the user from the hash table
@@ -502,11 +505,15 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
       userframe.setVisible(false);
       userframe.dispose();
       userframe = null;
+      me.terminate();
+     
     } catch (NullPointerException ex) {
+    	ex.printStackTrace();
     }
-    if (!b_isApplet) {
-      System.exit(0);
-    }
+//    if (!b_isApplet) {
+//    	
+//      System.exit(0);
+//    }
   }
 
 
@@ -514,6 +521,10 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
     System.out.println("C3DUser: " + s_message);
   }
 
+
+	public void terminate(){
+		org.objectweb.proactive.ProActive.getBodyOnThis().terminate();
+	}
 
   public class UserFrame extends Frame implements ActionListener, ItemListener {
 
@@ -1399,6 +1410,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Seria
           log("List of current users:");
           log(c3ddispatcher.getUserList());
         } catch (Exception ex) {
+        	ex.printStackTrace();
         }
       } else if (source == b_addSphere) {
         /* The user wants to add a sphere */
