@@ -52,6 +52,7 @@ public class TestNodes extends FunctionalTest {
     private static Node sameVMNode = null;
     private static Node localVMNode = null;
     private static Node remoteVMNode = null;
+	private static Node remoteACVMNode = null;
     private static String remoteHostname = "localhost";
 
     /**
@@ -76,6 +77,8 @@ public class TestNodes extends FunctionalTest {
                 sameVMNode = virtualNode.getNode();
             } else if (virtualNode.getName().compareTo("Dispatcher1") == 0) {
                 localVMNode = virtualNode.getNode();
+			} else if (virtualNode.getName().compareTo("Dispatcher3-AC") == 0) {
+				remoteACVMNode = virtualNode.getNode();
             } else {
                 remoteVMNode = virtualNode.getNode();
             }
@@ -131,4 +134,12 @@ public class TestNodes extends FunctionalTest {
     public static String getRemoteHostname() {
         return remoteHostname;
     }
+    
+	/**
+	 * @return the node with automatic continuations enabled
+	 */
+	public static Node getRemoteACVMNode() {
+		return remoteACVMNode;
+	}
+
 }
