@@ -1,237 +1,303 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<title>ProActive Installation</title>
-<link rel="stylesheet" href="ProActive.css">
+  <title>ProActive Installation</title>
+         
+  <link rel="stylesheet" href="ProActive.css">
 </head>
-<body bgcolor="white">
-
-<!--
+  <body bgcolor="white">
+   <!--
  Header : start 
-~~~ -->
+~~~ -->  
 <table width="100%">
-<tr>
-<td align="left" valign="middle">
-    <table cellpadding="2" cellspacing="0" border="1">
-    <tr>
-    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
-    <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1" href="index.html">back to index</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="Principles.html">prev</a>&nbsp;&nbsp;</td>
-    <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" href="HelloWorld.html">next</a>&nbsp;&nbsp;</td>
-    </tr>
-    </table>
-</td>
-<td  align="right" valign="top">
-<img src="ProActiveLogo200x34.gif"/>
-</td>
-</tr>
+  <tbody>
+     <tr>
+  <td align="left" valign="middle">            
+      <table cellpadding="2" cellspacing="0" border="1">
+      <tbody>
+           <tr>
+      <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="../../../../overview-summary.html">back to API</a>&nbsp;&nbsp;</td>
+      <td class="smallLink1">&nbsp;&nbsp;<a class="smallLink1"
+ href="index.html">back to index</a>&nbsp;&nbsp;</td>
+      <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="Principles.html">prev</a>&nbsp;&nbsp;</td>
+      <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2"
+ href="HelloWorld.html">next</a>&nbsp;&nbsp;</td>
+      </tr>
+               
+        </tbody>       
+      </table>
+  </td>
+  <td align="right" valign="top"> <img src="ProActiveLogo200x34.gif">
+  </td>
+  </tr>
+     
+  </tbody> 
 </table>
-<hr>
-<!-- Link to index : end -->
-
+   
+<hr> <!-- Link to index : end -->   
 <h1>ProActive Installation</h1>
-
-<p class="textNormal">
-ProActive is made available for <a href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download</a> under a <a href="http://www.gnu.org/copyleft/lesser.txt">LGPL license</a>.
-ProActive requires the <a href="http://java.sun.com/j2se/1.3/">JDK 1.3</a> or later to be installed on your computer. Please note that ProActive will NOT run with any version prior 1.2 since some features introduced in JDK 1.2 are essential.
-</p>
+    
+<p class="textNormal"> ProActive is made available for <a
+ href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download</a> 
+under a <a href="http://www.gnu.org/copyleft/lesser.txt">LGPL license</a>.
+ ProActive requires the <a href="http://java.sun.com/j2se/1.3/">JDK 1.3</a> 
+or later to be installed on your computer. Please note that ProActive will 
+NOT run with any version prior 1.2 since some features introduced in JDK 1.2
+are essential. </p>
+   
 <h2>Quick Start</h2>
+   
 <h3>To Test ProActive with the examples</h3>
+   
 <ul>
-    <li class="textNormal">Download and unzip the ProActive archive</li>
-    <li class="textNormal">Set the <code>JAVA_HOME</code> variable to the Java distribution you want to use</li>
-    <li class="textNormal">Launch the scripts located in <code>ProActive/scripts/unix</code> or <code>ProActive/scripts/windows</code></li>
-    <li class="textNormal">no other setting is necessary since the scripts given with the example take care of everything</li>
+      <li class="textNormal">Download and unzip the ProActive archive</li>
+      <li class="textNormal">Set the <code>JAVA_HOME</code> variable to the 
+Java distribution you want to use</li>
+      <li class="textNormal">Launch the scripts located in <code>ProActive/scripts/unix</code> 
+or <code>ProActive/scripts/windows</code></li>
+      <li class="textNormal">no other setting is necessary since the scripts 
+given with the example take care of everything</li>
+   
 </ul>
+   
 <h3>To develop with ProActive</h3>
+   
 <ul>
-    <li class="textNormal">Download and unzip the ProActive archive</li>
-    <li class="textNormal">Include in your <code>CLASSPATH</code> the two jar files <code>ProActive/ProActive.jar</code> and <code>ProActive/lib/bcel.jar</code></li>
-    <li class="textNormal">Don't forget to launch the JVM with a <a href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security policy file</a></li>
+      <li class="textNormal">Download and unzip the ProActive archive</li>
+      <li class="textNormal">Include in your <code>CLASSPATH</code> the two 
+jar files <code>ProActive/ProActive.jar</code> and <code>ProActive/lib/bcel.jar</code></li>
+      <li class="textNormal">Don't forget to launch the JVM with a <a
+ href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">security 
+policy file</a></li>
+   
 </ul>
-<p class="textNormal">
-Below the different step in more details.
-</p>
+   
+<p class="textNormal"> Below the different step in more details. </p>
+   
 <h2>Download and expand the archive</h2>
-<p class="textNormal">
-You can download the archive file (a standard <b>zip</b> file) containing ProActive from the <a href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download section</a> of the ProActive home page. You will be asked to accept the licence agreement and provide a few personal details including your email address. You will then within a few minutes receive an email. 
-</p>
-<p class="textNormal">
-Unzip the archive using your favorite ZIP program, such as <a href="http://www.winzip.com/">Winzip</a> under Windows or the <a href="http://www.info-zip.org/pub/infozip/">unzip</a> command-line utility on most Unix systems. Unzipping the archive creates a <b>ProActive</b> directory and all the files contained in the archive go into this directory and its
-subdirectories.
-</p>
-<p class="textNormal">
-Here is a quick overview of the directory structure of the archive:
-</p>
-<table cellpadding="4" cellspacing="0" border="1" align="center" width="70%">
-    <tr>
-        <th class="navyCell">Directory or File</th>
-        <th class="navyCell">Description</th>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>ProActive.jar</code></b></td>
-        <td class="whiteCell">ProActive bytecode that you need to include in the CLASSPATH in order to use ProActive</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>ProActive_examples.jar</code></td>
-        <td class="whiteCell">The bytecode and resources of all examples included with ProActive. This jar file needs to be included in the CLASSPATH only when trying to run the examples. All examples rely on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH as well. This is done automatically by the scripts driving the examples. The source code is also included in the src directory (see below)</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>ic2d.jar</code></b></td>
-        <td class="whiteCell">The bytecode and resources of IC2D. This jar file needs to be included in the CLASSPATH only when trying to run the application IC2D. IC2D relies on ProActive and therefore the <code>ProActive.jar</code> file must be included in the CLASSPATH. This is done automatically by the scripts launching the application. The source code is also included in the src directory (see below)</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>lib</code></b></td>
-        <td class="whiteCell">The external libraries used by ProActive</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>docs</code></b></td>
-        <td class="whiteCell">ProActive documentation including the full api doc</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>scripts/unix</code></b></td>
-        <td class="whiteCell">Unix <i>sh</i> scripts for running the examples</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>scripts/windows</code></b></td>
-        <td class="whiteCell">Windows <i>.bat</i> batch files for running the examples</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>src</code></b></td>
-        <td class="whiteCell">For source version only, the full source code of ProActive</td>
-    </tr>
-    <tr>
-        <td class="whiteCell"><b><code>compile</code></b></td>
-        <td class="whiteCell">For source version only, the scripts to compile ProActive using Ant.</td>
-    </tr>
+   
+<p class="textNormal"> You can download the archive file (a standard <b>zip</b> 
+file) containing ProActive from the <a
+ href="http://www-sop.inria.fr/oasis/proactive/disclaimer.html">download section</a>
+of the ProActive home page. You will be asked to accept the licence agreement
+and provide a few personal details including your email address. You will
+then within a few minutes receive an email.  </p>
+   
+<p class="textNormal"> Unzip the archive using your favorite ZIP program, 
+such as <a href="http://www.winzip.com/">Winzip</a> under Windows or the <a
+ href="http://www.info-zip.org/pub/infozip/">unzip</a> command-line utility 
+on most Unix systems. Unzipping the archive creates a <b>ProActive</b> directory 
+and all the files contained in the archive go into this directory and its
+ subdirectories. </p>
+   
+<p class="textNormal"> Here is a quick overview of the directory structure 
+of the archive: </p>
+   
+<table cellpadding="4" cellspacing="0" border="1" align="center"
+ width="70%">
+      <tbody>
+     <tr>
+          <th class="navyCell">Directory or File</th>
+          <th class="navyCell">Description</th>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>ProActive.jar</code></b></td>
+          <td class="whiteCell">ProActive bytecode that you need to include 
+in the CLASSPATH in order to use ProActive</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>ProActive_examples.jar</code></b></td>
+          <td class="whiteCell">The bytecode and resources of all examples 
+included with ProActive. This jar file needs to be included in the CLASSPATH 
+only when trying to run the examples. All examples rely on ProActive and therefore
+the <code>ProActive.jar</code> file must be included in the CLASSPATH as
+well. This is done automatically by the scripts driving the examples. The
+source code is also included in the src directory (see below)</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>ic2d.jar</code></b></td>
+          <td class="whiteCell">The bytecode and resources of IC2D. This
+jar file needs to be included in the CLASSPATH only when trying to run the
+application IC2D. IC2D relies on ProActive and therefore the <code>ProActive.jar</code> 
+file must be included in the CLASSPATH. This is done automatically by the 
+scripts launching the application. The source code is also included in the 
+src directory (see below)</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>lib</code></b></td>
+          <td class="whiteCell">The external libraries used by ProActive</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>docs</code></b></td>
+          <td class="whiteCell">ProActive documentation including the full 
+api doc</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>scripts/unix</code></b></td>
+          <td class="whiteCell">Unix <i>sh</i> scripts for running the examples</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>scripts/windows</code></b></td>
+          <td class="whiteCell">Windows <i>.bat</i> batch files for running 
+the examples</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>src</code></b></td>
+          <td class="whiteCell">For source version only, the full source
+code of ProActive</td>
+      </tr>
+      <tr>
+          <td class="whiteCell"><b><code>compile</code></b></td>
+          <td class="whiteCell">For source version only, the scripts to compile 
+ProActive using Ant.</td>
+      </tr>
+     
+  </tbody> 
 </table>
-
-
+     
 <h2>Run a few examples for testing</h2>
-You can try to run the test applications provided with ProActive. Each example comes with a script for launching
-the application. Depending on you operating system, the script you need to launch is located either in <code>ProActive/scripts/unix</code>
-<code>ProActive/scripts/windows</code>.
-The source code of all examples can be found in the directory <code>ProActive/src/org/objectweb/proactive/examples</code>.
-
+  You can try to run the test applications provided with ProActive. Each
+example comes with a script for launching the application. Depending on you
+operating system, the script you need to launch is located either in <code>ProActive/scripts/unix</code>
+ <code>ProActive/scripts/windows</code>. The source code of all examples
+can be found in the directory <code>ProActive/src/org/objectweb/proactive/examples</code>.
+   
 <h3>Local Example 1: Hello world !</h3>
-<p class="textNormal">
-A simple example.
+   
+<p class="textNormal"> A simple example. </p>
+ 
 <ul class="listWithSpace">
-    <li class="textNormal">script : <code>hello.sh</code> or <code>hello.bat</code></li>
-    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/hello</code></li>
+      <li class="textNormal">script : <code>hello.sh</code> or <code>hello.bat</code></li>
+      <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/hello</code></li>
+   
 </ul>
-</p>
-
+   
+<p></p>
+    
 <h3>Local Example 2: Reader/Writer</h3>
-<p class="textNormal">
-This example is the ProActive version of the Readers/Writers canonical problem. To illustrate the ease-of-use of the
-ProActive model, different synchronization policies can be applied
-without even stopping the application. This example is based on a easy to use Swing GUI.
+   
+<p class="textNormal"> This example is the ProActive version of the Readers/Writers 
+canonical problem. To illustrate the ease-of-use of the ProActive model, different
+synchronization policies can be applied without even stopping the application.
+This example is based on a easy to use Swing GUI. </p>
+ 
 <ul class="listWithSpace">
-    <li class="textNormal">script : <code>readers.sh</code> or <code>readers.bat</code></li>
-    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/readers</code></li>
+      <li class="textNormal">script : <code>readers.sh</code> or <code>readers.bat</code></li>
+      <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/readers</code></li>
+   
 </ul>
-</p>
-
+   
+<p></p>
+    
 <h3>Local Example 3: The Dining Philosophers</h3>
-<p class="textNormal">
-This example is one possible implementation of the well-known <i>Dining Philosophers</i> synchronization problem.
-This example is based on a easy to use Swing GUI.
+   
+<p class="textNormal"> This example is one possible implementation of the 
+well-known <i>Dining Philosophers</i> synchronization problem. This example 
+is based on a easy to use Swing GUI. </p>
+ 
 <ul class="listWithSpace">
-    <li class="textNormal">script : <code>philosophers.sh</code> or <code>philosophers.bat</code></li>
-    <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/philosophers</code></li>
+      <li class="textNormal">script : <code>philosophers.sh</code> or <code>philosophers.bat</code></li>
+      <li class="textNormal">source : <code>ProActive/src/org/objectweb/proactive/examples/philosophers</code></li>
+   
 </ul>
-</p>
-
+   
+<p></p>
+    
 <h2>CLASSPATH to set when writing application using ProActive</h2>
-<i>Note that if you use the scripts provided with the distribution to run the examples you do not need to update your classpath.</i>
-<p class="textNormal">
-In order to use <b>ProActive</b> in your application you need to place in your <code>CLASSPATH</code> the following jars files :
+  <i>Note that if you use the scripts provided with the distribution to run 
+the examples you do not need to update your classpath.</i>  
+<p class="textNormal"> In order to use <b>ProActive</b> in your application 
+you need to place in your <code>CLASSPATH</code> the following jars files 
+: </p>
+ 
 <ol>
-    <li class="textNormal"><code><b>ProActive.jar</b></code> : the library itself</li>
-    <li class="textNormal"><code><b>bcel.jar</b></code> in <code>lib</code> directory : the Byte Code Engineering Library is used to dynamically generate the java bytecode of the Stubs</li>
+      <li class="textNormal"><code><b>ProActive.jar</b></code> : the library 
+itself</li>
+      <li class="textNormal"><code><b>asm.jar </b></code>in <code>lib</code> 
+directory : ASM the default bytecode manipulation framework used to dynamically 
+generate the java bytecode of the Stubs</li>
+   <li class="textNormal"><code><b>bcel.jar</b></code> in lib directory : 
+BCEL is also a bytecode manipulation framework that can be used optionnally 
+(adding the -DbyteCodeManipulator=BCEL argument to the JVM)<br>
+   </li>
+   
 </ol>
+   
+<p></p>
+   
+<p class="textNormal"> You do not need to modify your CLASSPATH permanently 
+as long as you include the two entries above using a Java IDE or a shell script.
 </p>
-<p class="textNormal">
-You do not need to modify your CLASSPATH permanently as long as you include the two entries above using a Java IDE or a shell script.
-</p>
-<p class="textNormal">
-In addition to the two jar files above you may want to add the following jar files. None of them are used directly by the core functionnalities of ProActive but only in part of the library. Their are needed to compile all the code but they are not needed at runtime if those specific functionnalities are not used. 
+   
+<p class="textNormal"> In addition to the two jar files above you may want 
+to add the following jar files. None of them are used directly by the core 
+functionnalities of ProActive but only in part of the library. Their are needed
+to compile all the code but they are not needed at runtime if those specific
+functionnalities are not used.  </p>
+ 
 <ol>
-    <li class="textNormal"><code>bouncycastle.jar, javaxCrypto.jar</code> : used in the security</li>
-    <li class="textNormal"><code>crimson.jar</code> : parser XML used in the descriptor</li>
-    <li class="textNormal"><code>jaxp.jar</code> : Java API for XML parsing used in the descriptor. Note that this API is included with JDK 1.4</li>
-    <li class="textNormal"><code>jini-core.jar, jini-ext.jar, reggie.jar, sun-util.jar</code> : used to interface with Jini</li>
-    <li class="textNormal"><code>globus.jar</code> : used to interface with Globus</li>
+      <li class="textNormal"><code>bouncycastle.jar, javaxCrypto.jar</code> 
+: used in the security</li>
+      <li class="textNormal"><code>crimson.jar</code> : parser XML used in 
+the descriptor</li>
+      <li class="textNormal"><code>jaxp.jar</code> : Java API for XML parsing 
+used in the descriptor. Note that this API is included with JDK 1.4</li>
+      <li class="textNormal"><code>jini-core.jar, jini-ext.jar, reggie.jar, 
+sun-util.jar</code> : used to interface with Jini</li>
+      <li class="textNormal"><code>globus.jar</code> : used to interface
+with Globus</li>
+   
 </ol>
-</p>
-
+   
+<p></p>
+    
 <h2>Create a java.policy file to set permissions</h2>
-<p class="textNormal">
-<i>If you use the scripts provided with the distribution to run the examples an existing policy file will be used by default</i>
-</p>
-<p class="textNormal">
-See <a href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions in the JavaTM 2 SDK</a> to learn more about Java permissions.
-As a first approximation to run your code you can create a simple policy file granted all for everything :
-</p>
-<pre>
-grant {
-    permission java.security.AllPermission;
-};
-</pre>
-
-
+   
+<p class="textNormal"> <i>If you use the scripts provided with the distribution 
+to run the examples an existing policy file will be used by default</i> </p>
+   
+<p class="textNormal"> See <a
+ href="http://java.sun.com/j2se/1.3/docs/guide/security/permissions.html">Permissions 
+in the JavaTM 2 SDK</a> to learn more about Java permissions. As a first approximation
+to run your code you can create a simple policy file granted all for everything
+: </p>
+   
+<pre>grant {<br>    permission java.security.AllPermission;<br>};<br></pre>
+     
 <h2>Troubleshooting and support</h2>
-If you encounter any problem with installing ProActive and running the
-examples, please make sure you correctly followed all the steps
-described above. If it doesn't help, here is a list of the most common
-mistakes:
-
+  If you encounter any problem with installing ProActive and running the
+examples, please make sure you correctly followed all the steps described
+above. If it doesn't help, here is a list of the most common mistakes:   
 <ul class="listWithSpace">
-
-<li class="textNormal">
-<b>Java complains about not being able to find ProActive's classes.</b>
-Your <code>CLASSPATH</code> environment variable does not contain the entry for the ProActive's or BCEL's classes. <code>ProActive.jar</code> and <code>bcel.jar</code> must be in your <code>CLASSPATH</code>.
-</li>
-
-<li class="textNormal">
-<b>Java complains about denial of access.</b>
-If you get the following exceptions, you probably didn't change the file java.policy as described in step 4.
-<pre>
-org.objectweb.proactive.NodeException:
-java.security.AccessControlException: access denied
-(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init>(RmiNode.java:17)
-                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode (RmiNodeFactory.java, Compiled Code)
-                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)
-                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)
-                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)
-                ...
-
-Exception in thread "main" java.lang.ExceptionInInitializerError:
-java.security.AccessControlException: access denied
-(java.util.PropertyPermission user.home re ad)
-                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)
-                at java.security.AccessController.checkPermission(AccessController.java:403)
-                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)
-                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)
-                at java.lang.System.getProperty(System.java:539)
-                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)
-                ...
-</pre>
-</li>
-
+   <li class="textNormal"> <b>Java complains about not being able to find 
+ProActive's classes.</b> Your <code>CLASSPATH</code> environment variable 
+does not contain the entry for the ProActive's or ASM's or BCEL's classes.
+    <code>ProActive.jar,     </code><code>bcel.jar and asm.jar</code> must
+be in your <code>CLASSPATH</code>.    </li>
+   <li class="textNormal"> <b>Java complains about denial of access.</b>
+If you get the following exceptions, you probably didn't change the file
+java.policy as described in step 4.      
+    <pre>org.objectweb.proactive.NodeException:<br>java.security.AccessControlException: access denied<br>(java.net.SocketPermission 127.0.0.1:1099 connect,resolve)<br>                at org.objectweb.proactive.core.node.rmi.RemoteNodeImpl.&lt;init&gt;(RmiNode.java:17)<br>                at org.objectweb.proactive.core.node.rmi.RemoteNodeFactory._createDefaultNode (RmiNodeFactory.java, Compiled Code)<br>                at org.objectweb.proactive.core.node.NodeFactory.createDefaultNode(NodeFactory.java:127)<br>                at org.objectweb.proactive.core.node.NodeFactory.getDefaultNode(NodeFactory.java:57)<br>                at org.objectweb.proactive.ProActive.newActive(ProActive.java:315)<br>                ...<br><br>Exception in thread "main" java.lang.ExceptionInInitializerError:<br>java.security.AccessControlException: access denied<br>(java.util.PropertyPermission user.home re ad)<br>                at java.security.AccessControlContext.checkPermission (AccessControlContext.java, Compiled Code)<br>                at java.security.AccessController.checkPermission(AccessController.java:403)<br>                at java.lang.SecurityManager.checkPermission(SecurityManager.java:549)<br>                at java.lang.SecurityManager.checkPropertyAccess(SecurityManager.java:1243)<br>                at java.lang.System.getProperty(System.java:539)<br>                at org.objectweb.proactive.mop.MOPProperties.createDefaultProperties (MOPProperties.java:190)<br>                ...<br></pre>
+  </li>
+    
 </ul>
-<p class="textNormal">
-If you cannot solve the problem, feel free to email us for support at: <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>.
-Make sure you include a precise description of your problem along with a full copy of the error message you get.
-</p>
-
-
-
-<!--
+   
+<p class="textNormal"> If you cannot solve the problem, feel free to email 
+us for support at: <a href="mailto:proactive-support@sophia.inria.fr">proactive-support@sophia.inria.fr</a>.
+ Make sure you include a precise description of your problem along with a 
+full copy of the error message you get. </p>
+     <!--
  Footer : start 
-~~~ -->
-<br><hr><div align="right" class="textSmall">Copyright &#169; June 2002 INRIA All Rights Reserved.</p>
-<!-- Footer : end -->
+~~~ --> <br>
+ 
+<hr> 
+<div align="right" class="textSmall">Copyright &copy; June 2002 INRIA All 
+Rights Reserved. 
+<p></p>
+  <!-- Footer : end --> </div>
+ <br>
+ <br>
 </body>
 </html>
