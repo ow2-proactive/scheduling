@@ -308,6 +308,25 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Create ProActive.jar
+      ==
+      ================================================================
+	-->
+	<target name="proActiveJar" depends="core">
+		<mkdir dir="${dist.dir}/ProActive"/>
+		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
+			<fileset dir="${classes.dir}">
+				<include name="${proactive.dir}/**"/>
+				<exclude name="${proactive.dir}/examples/**"/>
+				<exclude name="${proactive.dir}/ic2d/**"/>
+			</fileset>
+		</jar>
+	</target>
+
+
+	<!--
+	   ================================================================
+	   ==
       ==  Create distribution bin
       ==
       ================================================================
@@ -517,7 +536,7 @@
       ==
       ================================================================
 	-->
-	<target name="nonregressiontest" depends="testsuite">
+	<target name="nonregressiontest" depends="testsuite, proActiveJar">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="nonregressiontest/**" deprecation="on"  source="${source}"  debug="${debug}">
 			<classpath refid="test.classpath"/>
 		</javac>
