@@ -86,7 +86,7 @@
       ==
       ================================================================
 	-->
-	<target name="all" depends="ic2d, examples"/>
+	<target name="all" depends="ic2d, p2p, examples"/>
 	<!--
 	   ================================================================
 	   ==
@@ -155,6 +155,18 @@
 		<copy todir="${classes.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images" includeEmptyDirs="no">
 			<fileset dir="${src.dir}/${proactive.dir}/ic2d/gui/jobmonitor/images"/>
 		</copy>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Compile P2P
+      ==
+      ================================================================
+	-->
+	<target name="p2p" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/p2p/**/*.java" deprecation="on" debug="${debug}">
+			<classpath refid="project.classpath"/>
+		</javac>
 	</target>
 	<!--
 	   ================================================================
