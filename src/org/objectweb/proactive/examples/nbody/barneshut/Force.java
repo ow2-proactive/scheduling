@@ -1,8 +1,10 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.examples.nbody.common.TooCloseBodiesException;
 
-public class Force  {
+public class Force implements Serializable{
     
     double x=0,y=0;    
     final double G=9.81, RMIN = 1;

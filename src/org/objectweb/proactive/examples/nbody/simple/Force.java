@@ -1,9 +1,11 @@
 package org.objectweb.proactive.examples.nbody.simple;
 
+import java.io.Serializable;
+
 /**
  * The code for a physical gravitation force between bodies. 
  */
-public class Force {
+public class Force  implements Serializable{
     
     double x=0,y=0;    
     final double G=9.81;
