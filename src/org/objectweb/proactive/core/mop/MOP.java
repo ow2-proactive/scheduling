@@ -339,7 +339,8 @@ public abstract class MOP {
       //return Class.forName(Utils.convertClassNameToStubClassName(nameOfClass), true, singleton);
       return singleton.loadClass(Utils.convertClassNameToStubClassName(nameOfClass));
     } catch (ClassNotFoundException e) {
-      throw new GenerationOfStubClassFailedException("Cannot Stub class : " + Utils.convertClassNameToStubClassName(nameOfClass));
+      throw new GenerationOfStubClassFailedException("Cannot create the Stub class : " + Utils.convertClassNameToStubClassName(nameOfClass)
+      																			+ "\nThe class \"" + nameOfClass + "\" must have a public access !!!");
     }
   }
 
