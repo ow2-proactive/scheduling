@@ -60,14 +60,14 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     protected static Logger logger = Logger.getLogger(ServiceLocatorHelper.class.getName());
     protected static int MAX_RETRY = 8;
     protected static long MAX_WAIT = 10000L;
-    private static String policy = System.getProperty("user.dir") +
+    private static String DEFAULT_POLICY = System.getProperty("user.dir") +
         System.getProperty("file.separator") + "proactive.java.policy";
     private static final String FILE_SEPARATOR = System.getProperty(
             "file.separator");
+    private static String policy;
     private static String DEFAULT_RMID_LOCATION = System.getProperty(
             "java.home") + FILE_SEPARATOR + "bin" + FILE_SEPARATOR + "rmid";
-    private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy=" +
-        policy;
+    private static String DEFAULT_RMID_PARAMS = "-J-Djava.security.policy="; 
     protected static LookupLocator lookup = null;
     protected static ServiceRegistrar registrar = null;
 
@@ -82,6 +82,10 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     static {
         try {
             host = java.net.InetAddress.getLocalHost().getHostName();
+            String policyLocation = System.getProperty("proactive.java.policy");
+            if(policyLocation != null) policy = policyLocation;
+            else policy = DEFAULT_POLICY;
+            DEFAULT_RMID_PARAMS.concat(policy);
         } catch (java.net.UnknownHostException e) {
             logger.fatal("Lookup failed: " + e.getMessage());
             e.printStackTrace();
