@@ -36,8 +36,12 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Hashtable;
 
-public class MOPClassLoader extends URLClassLoader {
+import org.apache.log4j.Logger;
 
+public class MOPClassLoader extends URLClassLoader {
+	
+	static Logger logger = Logger.getLogger(MOPClassLoader.class.getName());
+	
 	// retreives the optionnal byteCodeManipulator JVM arg
 	// ASM is used by default
 	public static String BYTE_CODE_MANIPULATOR =
@@ -71,9 +75,9 @@ public class MOPClassLoader extends URLClassLoader {
 			Object[] mainArgs = { newArgs };
 			mainMethod.invoke(null, mainArgs);
 		} catch (ClassNotFoundException e) {
-			System.out.println("Launcher: cannot find class " + args[0]);
+			logger.error("Launcher: cannot find class " + args[0]);
 		} catch (NoSuchMethodException e) {
-			System.out.println(
+			logger.error(
 				"Launcher: class " + args[0] + " does not contain have method void 'public void main (String[])'");
 		} catch (InvocationTargetException e) {
 			throw e.getTargetException();
@@ -98,7 +102,7 @@ public class MOPClassLoader extends URLClassLoader {
 		if (currentClassLoader instanceof java.net.URLClassLoader) {
 			//      System.out.println ("Current classloader is of type "+currentClassLoader.getClass().getName()+", compatible with URLClassLoader");
 		} else {
-			System.out.println(
+			logger.error(
 				"Current classloader is of type "
 					+ currentClassLoader.getClass().getName()
 					+ ", which is not compatible with URLClassLoader. Cannot install MOPClassLoader");
@@ -141,7 +145,7 @@ public class MOPClassLoader extends URLClassLoader {
 			// Test if the name of the class is actually a request for
 			// a stub class to be created
 			if (Utils.isStubClassName(name)) {
-				System.out.println("Generating class: " + name);
+				logger.info("Generating class: " + name);
 
 				String classname = Utils.convertStubClassNameToClassName(name);
 				//ASM is now the default bytecode manipulator
@@ -158,9 +162,9 @@ public class MOPClassLoader extends URLClassLoader {
 					MOPClassLoader.classDataCache.put(name, data);
 				} else {
 					// that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
-					System.err.println(
+					logger.error(
 						"byteCodeManipulator argument is optionnal. If specified, it can only be set to BCEL.");
-					System.err.println(
+					logger.error(
 						"Any other setting will result in the use of ASM, the default bytecode manipulator framework");
 				}
 
@@ -196,7 +200,7 @@ public class MOPClassLoader extends URLClassLoader {
 					throw new ClassNotFoundException(ex.getMessage());
 				}
 			} else {
-				System.out.println("Cannot generate class " + name);
+				logger.error("Cannot generate class " + name);
 				throw e;
 			}
 		}

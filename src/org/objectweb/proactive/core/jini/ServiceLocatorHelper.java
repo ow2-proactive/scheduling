@@ -37,21 +37,13 @@ import net.jini.core.lookup.ServiceTemplate;
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
 
-/**
- * <p>
- * The <code>ServiceLocatorHelper</code> is a utility class, that takes care of creating or discovering the
- * Lookup Service when using JINI.
- * </p>
- *
- * @author  ProActive Team
- * @version 1.0,  2002/09/20
- * @since   ProActive 0.9.3
- *
- */
-
 public class ServiceLocatorHelper implements DiscoveryListener {
+
+protected static Logger logger = Logger.getLogger(ServiceLocatorHelper.class.getName());
+
 
   protected static int MAX_RETRY = 8;
   protected static long MAX_WAIT = 10000L;
@@ -80,7 +72,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     try {
       host = java.net.InetAddress.getLocalHost().getHostName();
     } catch (java.net.UnknownHostException e) {
-      System.err.println("Lookup failed: " + e.getMessage());
+      logger.fatal("Lookup failed: " + e.getMessage());
       e.printStackTrace();
       System.exit(1);
     }
@@ -99,7 +91,9 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   //
 
   public ServiceLocatorHelper() {
-    System.out.println("ServiceLocatorHelper() constructor");
+		if (logger.isDebugEnabled()) {
+    	logger.debug("ServiceLocatorHelper() constructor");
+		}
   }
 
   //
@@ -153,21 +147,29 @@ public class ServiceLocatorHelper implements DiscoveryListener {
    * for multicast discover
    */
   public void discovered(DiscoveryEvent evt) {
-    //System.out.println(">> Start discover ...");
+			//if (logger.isDebugEnabled()) {
+			//    //logger.debug(">> Start discover ...");
+			//}
     ServiceRegistrar[] registrars = evt.getRegistrars();
-    System.out.println(">> > " + registrars.length + " registrars : ");
+//			if (logger.isDebugEnabled()) {
+//			    logger.debug(">> > " + registrars.length + " registrars : ");
+//			}
     for (int n = 0; n < registrars.length; n++) {
       ServiceLocatorHelper.registrar = registrars[n];
       //displayServices(); // just for test
     }
-    //System.out.println(">> Stop  discover...");
+//if (logger.isDebugEnabled()) {
+//    //logger.debug(">> Stop  discover...");
+//}
   }
 
   /**
    * for multicast discover
    */
   public void discarded(DiscoveryEvent evt) {
-    //System.out.println(">> discarded ...");
+		//if (logger.isDebugEnabled()) {
+		//    //logger.debug(">> discarded ...");
+		//}
   }
 
 
@@ -187,11 +189,11 @@ public class ServiceLocatorHelper implements DiscoveryListener {
         delDirectory(files[i]);
       }
     }
-    System.out.println("deleting " + dir.getPath() + " ...");
+    logger.info("deleting " + dir.getPath() + " ...");
     dir.delete();
     if (dir.exists()) {
-      System.out.println("We cannot delete this file : " + dir.getPath());
-      System.out.println("... You should delete it before running a new ServiceLocator ...");
+      logger.warn("We cannot delete this file : " + dir.getPath());
+      logger.warn("... You should delete it before running a new ServiceLocator ...");
     }
   }
 
@@ -208,29 +210,43 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   private void displayServices() {
     try {
       // the code takes separate routes from here for client or service
-      System.out.println(">> found a service locator (registrar) : " + ServiceLocatorHelper.registrar);
-      System.out.println(">> >> ServiceID : " + ServiceLocatorHelper.registrar.getServiceID());
-  
-      System.out.println(">> >> >> Groups : ");
+
+      logger.info(">> found a service locator (registrar) : " + ServiceLocatorHelper.registrar);
+      logger.info(">> >> ServiceID : " + ServiceLocatorHelper.registrar.getServiceID());
+
+      logger.info(">> >> >> Groups : ");
+
       String[] groups = ServiceLocatorHelper.registrar.getGroups();
       for (int i = 0; i < groups.length; i++) {
-        System.out.println(">> >> >> >> " + i + ") " + groups[i]);
+
+        logger.info(">> >> >> >> " + i + ") " + groups[i]);
+
       }
-      System.out.println(">> >> >> Locator : " + ServiceLocatorHelper.registrar.getLocator());
+
+      logger.info(">> >> >> Locator : " + ServiceLocatorHelper.registrar.getLocator());
+
   
       ServiceTemplate template = new ServiceTemplate(null, new Class[] { JiniRuntime.class }, null);
       ServiceMatches matches = ServiceLocatorHelper.registrar.lookup(template, Integer.MAX_VALUE);
-      System.out.println(">> >> >> " + matches.items.length + " required ");
-      System.out.println(">> >> >> " + matches.totalMatches + " founded ");
+
+      logger.info(">> >> >> " + matches.items.length + " required ");
+      logger.info(">> >> >> " + matches.totalMatches + " founded ");
+
       for (int i = 0; i < matches.items.length; i++) {
-        System.out.println(">> >> >> >> Object (" + i + ") found : ");
-        System.out.println(">> >> >> >> >>        ID : " + matches.items[i].serviceID);
-        System.out.println(">> >> >> >> >>   Service : " + matches.items[i].service);
-        System.out.println(">> >> >> >> >> Attributs :");
+
+        logger.info(">> >> >> >> Object (" + i + ") found : ");
+        logger.info(">> >> >> >> >>        ID : " + matches.items[i].serviceID);
+        logger.info(">> >> >> >> >>   Service : " + matches.items[i].service);
+        logger.info(">> >> >> >> >> Attributs :");
+
         for (int j = 0; j < matches.items[i].attributeSets.length; j++) {
-          System.out.println(">> >> >> >> >> >> Attr : " + matches.items[i].attributeSets[j]);
+
+          logger.info(">> >> >> >> >> >> Attr : " + matches.items[i].attributeSets[j]);
+
         }
-        System.out.println("--------------------------------------------------------------------------------------");
+
+        logger.info("--------------------------------------------------------------------------------------");
+
       }
     } catch (java.rmi.RemoteException e) {
       e.printStackTrace();
@@ -242,10 +258,12 @@ public class ServiceLocatorHelper implements DiscoveryListener {
     try {
       java.io.File fTmp = java.io.File.createTempFile("proactive-", "-" + host);
       String tmpDirPath = fTmp.getAbsolutePath();
-      //System.out.println(">> TEMP directory = " + tmpDirPath);
+			//if (logger.isDebugEnabled()) {
+			//      //logger.debug(">> TEMP directory = " + tmpDirPath);
+			//}
       return tmpDirPath;
     } catch (Exception e) {
-      System.err.println("Cannot create the TEMP directory : " + e.toString());
+      logger.fatal("Cannot create the TEMP directory : " + e.toString());
       e.printStackTrace();
       System.exit(1);
       return null;
@@ -272,15 +290,16 @@ public class ServiceLocatorHelper implements DiscoveryListener {
 
     } else {
       // For unicast on `host`
-      System.out.println("Lookup : jini://" + host);
+		
+      logger.info("Lookup : jini://" + host);
       try {
         lookup = new LookupLocator("jini://" + host);
-        System.out.println("Lookup.getRegistrar() on " + host);
+        logger.info("Lookup.getRegistrar() on " + host);
         ServiceLocatorHelper.registrar = lookup.getRegistrar();
       } catch (java.net.MalformedURLException e) {
         throw new java.io.IOException("Lookup failed: " + e.getMessage() );
       } catch (java.io.IOException e) {
-        System.err.println("Registrar search failed: " + e.getMessage() );
+        logger.error("Registrar search failed: " + e.getMessage() );
         if (MAX_RETRY-- > 0) {
         	//-----------wont work everywhere---------------------------
         	
@@ -301,7 +320,8 @@ public class ServiceLocatorHelper implements DiscoveryListener {
       	if(jiniLockFile.exists()) jiniLockFile.delete();
         throw new java.io.IOException("Registrar search failed: " + e.toString());
       }
-      System.out.println("Registrar found on " + host);
+
+      logger.info("Registrar found on " + host);
       
       // Just for test
       //displayServices();
@@ -324,15 +344,17 @@ public class ServiceLocatorHelper implements DiscoveryListener {
   			}
   		return;
   	}
-  	System.out.println("creating lock file");
-    System.out.println("No ServiceLocator founded ...  we launch a ServiceLocator on " + host);
+  	logger.info("creating lock file");
+    logger.info("No ServiceLocator founded ...  we launch a ServiceLocator on " + host);
     String reggieTmpDir = tmpDir + System.getProperty("file.separator") + "reggie_log";
     delDirectory(new java.io.File(tmpDir));
     java.io.File directory = new java.io.File(tmpDir);
     directory.mkdirs();
 
-    //System.out.println("We use the ClassServer : "+httpserver);
-    System.out.println("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
+		if (logger.isDebugEnabled()) {
+    	//logger.debug("We use the ClassServer : "+httpserver);
+   	 logger.debug("We don't use a ClassServer for the service Locator (we use the CLASSPATH)");
+		}
 
     //String[] args = { httpserver , policy , reggieTmpDir,};
 //    String classpath = System.getProperty("java.class.path");
@@ -343,7 +365,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
 //    	e.printStackTrace();
 //    	
 //    }
-//	    System.out.println(classpath);
+
     String[] args = { "", policy, reggieTmpDir, };
     com.sun.jini.start.ServiceStarter.create(args, "com.sun.jini.reggie.CreateLookup", "com.sun.jini.reggie.RegistrarImpl", "lookup");
   }

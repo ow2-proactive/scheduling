@@ -30,6 +30,8 @@
 */ 
 package org.objectweb.proactive.core.event;
 
+import org.apache.log4j.Logger;
+
 /**
  * <p>
  * Provides support for adding, removing and notifying <code>ProActiveListener</code>. This class
@@ -63,6 +65,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
   //
   // -- PROTECTED MEMBERS -----------------------------------------------
   //
+  protected static Logger logger = Logger.getLogger(AbstractEventProducer.class.getName());
   
   /** flag specifying if the list of listeners should be serialized */
   protected boolean shouldSerializeListeners;
@@ -385,7 +388,9 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
         Object target = ref.get();
         if (target == null) {
           // object has been removed
-          //System.out.println("!!!!!!!!!!!! REMOVED A GARBAGED LISTENER");
+
+          //logger.debug("!!!!!!!!!!!! REMOVED A GARBAGED LISTENER");
+
           iterator.remove();
         } else {
           return target;

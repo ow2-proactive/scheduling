@@ -33,12 +33,10 @@ package org.objectweb.proactive.core.descriptor.xml;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
-/**
- *
- * Receives SAX event and pass them on
- *
- */
 public class ProcessReferenceHandler extends BasicUnmarshaller
+
+
+
 {
 	
       	
@@ -47,7 +45,9 @@ public class ProcessReferenceHandler extends BasicUnmarshaller
       	
   public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     String refid = attributes.getValue("refid");
-    //System.out.println("refid "+refid);
+if (logger.isDebugEnabled()) {
+    //logger.debug("refid "+refid);
+}
     if (checkNonEmpty(refid)) {
       setResultObject(refid);
    	}else throw new org.xml.sax.SAXException("The Id of the referenced process cannot be set to an empty string");

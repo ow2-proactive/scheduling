@@ -32,15 +32,10 @@ package org.objectweb.proactive.core.event;
 
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
-/**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
- */
 public class RuntimeRegistrationEventProducerImpl
+
+
+
 	extends AbstractEventProducer
 	implements RuntimeRegistrationEventProducer
 {
@@ -85,6 +80,11 @@ public class RuntimeRegistrationEventProducerImpl
   	if (hasListeners()){
       notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntimeName, creatorID, protocol));
   	}
-  	else System.out.println("no listener");
-  }
+
+  	else {
+  		if (logger.isDebugEnabled()) {
+  			logger.debug("no listener");
+			}
+ 	 	}
+	}
 }

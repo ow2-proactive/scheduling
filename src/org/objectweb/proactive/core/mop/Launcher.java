@@ -30,8 +30,13 @@
 */ 
 package org.objectweb.proactive.core.mop;
 
+import org.apache.log4j.Logger;
+
 public class Launcher
 {
+	
+	static Logger logger = Logger.getLogger(Launcher.class.getName());
+	
   public static void main (String[] args) throws Throwable
   {
     if (args.length == 0)
@@ -49,7 +54,7 @@ public class Launcher
 
   protected static void printUsage ()
   {
-    System.out.println ("Usage: java org.objectweb.proactive.core.mop <name of class>");
+    logger.error("Usage: java org.objectweb.proactive.core.mop <name of class>");
     return;
   }
 }
