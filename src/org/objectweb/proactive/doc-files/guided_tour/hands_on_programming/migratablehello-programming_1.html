@@ -16,7 +16,7 @@ to index</a>&nbsp;&nbsp;</td>
           <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
 href="migratablehello-requisites.html">prev</a>&nbsp;&nbsp;</td>
           <td class="smallLink2">&nbsp;&nbsp;<a class="smallLink2" 
-href="migratablehello-programming_2.html">next</a>&nbsp;&nbsp;</td>
+href="migratablehello-execution.html">next</a>&nbsp;&nbsp;</td>
         </tr>
       </table></td>
     <td  align="right" valign="top"> <a 
@@ -26,10 +26,10 @@ border="0"/></a> </td>
   </tr>
 </table>
 <hr>
-<h2>3. Programming</h2>
-<h3>3.1. the Hello class</h3>
+<h2>1.3.3. Programming</h2>
+<h3>a) the Hello class</h3>
 <p>You just have to reuse the Hello class from the previous example</p>
-<h3>3.2 write the migratable object : MigratableHello</h3>
+<h3>b) write the migratable object : MigratableHello</h3>
 <p>MigratableHello being the active object itself, it has to :</p>
 <p>- implement the Serializable interface</p>
 <p>- provide a no-arg constructor</p>
@@ -37,7 +37,7 @@ border="0"/></a> </td>
 <p>A new method getCurrentNodeLocation is added for the object to tell the node
 where it resides..</p>
 <p>A factory static method is added for ease of creation.</p>
-<blockquote> 
+<blockquote>
   <p>Here is the code for this class :</p>
   <pre><code>// the object that will be migrated active has to be Serializable
 public class MigratableHello extends InitializedHello implements Serializable {
@@ -48,7 +48,7 @@ public class MigratableHello extends InitializedHello implements Serializable {
 	}
 	/**
 	* Creates a new MigratableHello object.
-	* 
+	*
 	* @param name the name of the agent
 	*/
 	// ProActive requires the active object to explicitely define (or redefine)
@@ -97,8 +97,49 @@ public class MigratableHello extends InitializedHello implements Serializable {
 	}
 }</code>
 </pre>
-  <p>Note that the call to the ProActive primitive is the last one of the method 
+  <p>Note that the call to the ProActive primitive is the last one of the method
     moveTo. See the <a href="../../Migration.html">manual</a> for more information.</p>
-<h4>&nbsp;</h4>
-</blockquote></body>
+</blockquote>
+<h3>c) the main method</h3>
+<p>The entry point of the program is written in a separate class : MigrationTutorial.</p>
+<p>It takes as arguments the locations of the nodes the object will be migrated
+  to.</p>
+<p>The program calls the factory method of MigratableHello to create an instance of
+  an active object. It then moves it from node to node, pausing for a while between
+  the transfers.</p>
+<p>&nbsp;</p>
+<p>Here is the code for this main method :</p>
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <code>
+      <pre>/** entry point for the program<br>* @param args destination nodes<br>* for example :<br>* rmi://localhost/node1 jini://localhost/node2<br>*/    <br>public static void main(String[] args) {<br>    	<br>	// instanciation-based creation of the active object<br>	MigratableHello migratable_hello = MigratableHello.createMigratableHello(&quot;agent1&quot;);</pre>
+      <pre>	// check if the migratable_hello has been created
+   if (migratable_hello != null) {</pre>
+      <pre>		// say hello
+	   	migratable_hello.sayHello();</pre>
+      <pre>		// start moving the object around
+		for (int i = 0; i &lt; args.length; i++) {
+			migratable_hello.moveTo(args[i]);
+			migratable_hello.sayHello();</pre>
+      <pre>			// wait for a little while before next migration
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException ie) {
+				System.out.println(&quot;problem while pausing : &quot; + ie.toString());
+				ie.printStackTrace();
+			}
+		}
+		// possibly terminate the activity of the active object ...
+		migratable_hello.terminate();
+   } else {
+   	System.out.println(&quot;creation of the active object failed&quot;);
+   }
+}</pre>
+</code>
+    </blockquote>
+  </blockquote>
+</blockquote>
+</body>
 </html>
+
