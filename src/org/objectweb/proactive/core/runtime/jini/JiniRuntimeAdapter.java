@@ -466,7 +466,7 @@ public class JiniRuntimeAdapter implements ProActiveRuntime,
     }
 
     /**
-     * @see org.objectweb.proactive.Job#getJobId()
+     * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
         return vmInformation.getJobID();
