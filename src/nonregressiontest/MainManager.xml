@@ -57,6 +57,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.descriptor.fractaladl.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.nfe.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.nfe.servicecrash.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.ft.Test"/>
 			<!-- tests that run in a separate group -->
 			<unitTest exclude="yes" class="nonregressiontest.runtime.classloader.Test" />
 	</packageGroup>
