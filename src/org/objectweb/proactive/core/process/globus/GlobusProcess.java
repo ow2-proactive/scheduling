@@ -218,6 +218,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
 
   public void setId(String anId){
 	this.params=anId;
+	((JVMProcess)targetProcess).setParameters(anId);
   }
 
   public void setJobOutput(String output){
@@ -521,7 +522,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator{
   
   private String buildRSLCommand (){
   	String rslCommand = "&(executable=" + ((JVMProcess)targetProcess).getJavaPath()+")" + 
-  											"(arguments="+((JVMProcess)targetProcess).getClassname() + " " + getId() +")"+
+  											"(arguments="+((JVMProcess)targetProcess).getClassname() + " " + ((JVMProcess)targetProcess).getParameters() +")"+
   											"(environment=(CLASSPATH "+((JVMProcess)targetProcess).getClasspath()+"))";
 		return rslCommand;
   }
