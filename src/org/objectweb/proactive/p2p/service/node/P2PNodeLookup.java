@@ -264,6 +264,19 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         }
     }
 
+    /**
+     * Migrate the P2P node lookup tyo a new node.
+     *
+     * @param nodeUrl the URL of the destination node.
+     */
+    public void moveTo(String nodeUrl) {
+        try {
+            ProActive.migrateTo(nodeUrl);
+        } catch (Exception e) {
+            logger.fatal("Couldn't migrate the node lookup to " + nodeUrl, e);
+        }
+    }
+
     // -------------------------------------------------------------------------
     // ProActive methods
     // -------------------------------------------------------------------------
