@@ -34,7 +34,8 @@ import org.apache.log4j.Logger;
 
 import org.apache.xerces.parsers.SAXParser;
 
-import org.objectweb.proactive.core.util.ProActiveProperties;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+
 
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -73,7 +74,7 @@ public class StreamReader implements XMLReader {
         parser = new SAXParser();
         //parser = org.xml.sax.helpers.XMLReaderFactory.createXMLReader();
         parser.setContentHandler(adaptor);
-        if ("enable".equals(ProActiveProperties.getSchemaValidationState())) {
+        if ("enable".equals(ProActiveConfiguration.getSchemaValidationState())) {
             try {
                 parser.setErrorHandler(new SAXParserErrorHandler());
                 parser.setFeature("http://xml.org/sax/features/validation", true);
