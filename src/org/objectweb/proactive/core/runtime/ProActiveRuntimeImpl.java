@@ -240,11 +240,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         if ((vnName != null) && (vnName.equals("currentJVM"))) {
             // if Jvm has been started using the currentJVM tag
             // vnName = defaultNodeVirtualNode;
-            logger.info(
+            logger.debug(
                 "++++++++++++++++++++++++++++++++++++++++++++CurrentJVM Tag ! Local Node : " +
                 nodeName + " VN name : " + vnName + " policyserver " + ps);
         } else {
-            logger.info("----------------------------------------Local Node : " +
+            logger.debug("----------------------------------------Local Node : " +
                 nodeName + " VN name : " + vnName + " policyserver " + ps);
         }
 
