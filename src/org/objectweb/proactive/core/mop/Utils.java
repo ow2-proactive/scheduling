@@ -138,7 +138,7 @@ public abstract class Utils extends Object {
    * return what we are expecting, i-e the type definition that appears in
    * the source code (like <code>char[][]</code>).
    *
-   * @param tab A class object representing an array type.
+   * @param cl A class object representing an array type.
    * @return A String with the'source code representation' of that array type
    */
 

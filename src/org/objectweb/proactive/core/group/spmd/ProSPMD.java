@@ -69,9 +69,9 @@ import org.objectweb.proactive.core.node.NodeFactory;
 public class ProSPMD {
 	/**
 	 * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>nodeName</code> the name (String) of the node where the members are created.
+	 * @param className - the name of the (upper) class of the group's member.
+	 * @param params - the array that contain the parameters used to build the group's member.
+	 * @param nodeName - the name (String) of the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -89,9 +89,9 @@ public class ProSPMD {
 
 	/**
 	 * Creates an object representing a spmd group (a typed group) and creates members with params cycling on nodeList.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>nodeListString</code> the names of the nodes where the members are created.
+	 * @param className - the name of the (upper) class of the group's member.
+	 * @param params - the array that contain the parameters used to build the group's member.
+	 * @param nodeListString - the names of the nodes where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -108,9 +108,9 @@ public class ProSPMD {
 
 	/**
 	 * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>node</code> the node where the members are created.
+	 * @param className - the name of the (upper) class of the group's member.
+	 * @param params - the array that contain the parameters used to build the group's member.
+	 * @param node - the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -127,10 +127,10 @@ public class ProSPMD {
 
 	/**
 	 * Creates an object representing a spmd group (a typed group) and creates members with params cycling on nodeList.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className - the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group. 
-	 * @param <code>nodeList</code> the nodes where the members are created.
+	 * @param nodeList - the nodes where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -154,10 +154,10 @@ public class ProSPMD {
 
 	/**
 	 * Creates an object representing a spmd group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params - the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group. 
-	 * @param <code>virtualNode</code> the virtual where the members are created.
+	 * @param virtualNode - the virtual where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -214,8 +214,8 @@ public class ProSPMD {
 	/**
 	 * Strongly synchronizes all the members of the group.
 	 * Beware ! The caller object HAVE TO BE IN THE GROUP <code>group</code>
-	 * @param barrierName the name of the barrier (used as unique identifier)
-	 * @param group the typed group the barrier is invoked on 
+	 * @param barrierName - the name of the barrier (used as unique identifier)
+	 * @param group - the typed group the barrier is invoked on 
 	 */
 	public static void barrier (String barrierName, Object group) {
 		try {
@@ -228,7 +228,7 @@ public class ProSPMD {
 
 	/**
 	 * Stops the activity and wait for the methods to resume.
-	 * @param methodNames the name of the methods used to synchronize
+	 * @param methodNames - the name of the methods used to synchronize
 	 */
 	public static void barrier (String[] methodNames) {
 		try {

@@ -171,7 +171,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      *  The proxy's method : implements the semantic of communication. This method invokes the
      * method call <code>mc</code> on each members of the Group.
-     * @param <code>mc</code> the MethodCall to apply on each member of the Group.
+     * @param mc the MethodCall to apply on each member of the Group.
      * @return the result of the call : <b> the result of a method call on a typed group is a
      * typed group</b>.
      * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
@@ -219,7 +219,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Creates and initializes (and returns) the group of result, then launch threads for asynchronous call of each member.
-     * @param <code>mc</code> the MethodCall to be applied on each member of the Group.
+     * @param mc the MethodCall to be applied on each member of the Group.
      * @return the result of the call.
      */
     protected synchronized Object asynchronousCallOnGroup(MethodCall mc) {
@@ -282,9 +282,9 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Add the results (Future) into the typed group result at the correct poisition.
-     * @param <code>memberListOfResultGroup</code> the list of the typed group result.
-     * @param <code>result</code> the result of a call on member of a Group.
-     * @param <code>index</code> the rank of the result.
+     * @param memberListOfResultGroup the list of the typed group result.
+     * @param result the result of a call on member of a Group.
+     * @param index the rank of the result.
      */
     protected synchronized void addToListOfResult(
         Vector memberListOfResultGroup, Object result, int index) {
@@ -295,7 +295,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Launchs the threads for OneWay call of each member of the Group.
-     * @param <code>mc</code> the MethodCall to be applied on each member of the Group.
+     * @param mc the MethodCall to be applied on each member of the Group.
      */
     protected synchronized void oneWayCallOnGroup(MethodCall mc) {
         Body body = ProActive.getBodyOnThis();
@@ -388,7 +388,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Adds all of the elements in the specified Collection to this Group.
-     * @param <code>c</code> - the elements to be inserted into this Group.
+     * @param c - the elements to be inserted into this Group.
      * @return <code>true</code> if this collection changed as a result of the call.
      */
     public boolean addAll(Collection c) {
@@ -418,7 +418,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Checks if this Group contains all of the elements in the specified collection.
-     * @param <code>c</code> - the collection to be checked for containment in this Group.
+     * @param c - the collection to be checked for containment in this Group.
      * @return <code>true</code> if this Group contains all of the elements in the specified collection
      */
     public boolean containsAll(Collection c) {
@@ -435,7 +435,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Compares the specified object with this group for equality.
-     * @param <o> the Object for wich we test the equality.
+     * @param o the Object for wich we test the equality.
      * @return <code>true</code> if <code>o</code> is the same Group as <code>this</code>.
      */
     public boolean equals(Object o) {
@@ -473,7 +473,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Removes a single instance of the specified element from this Group, if it is present.
      * It removes the first occurence e where <code>o.equals(e)</code> returns <code>true</code>.
-     * @param <code>o</code> the element to be removed from this Group (if present).
+     * @param o the element to be removed from this Group (if present).
      * @return <code>true> if the Group contained the specified element.
      */
     public boolean remove(Object o) {
@@ -483,7 +483,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Removes all this Group's elements that are also contained in the specified collection.
      * After this call returns, this collection will contain no elements in common with the specified collection.
-     * @param <code>c</code> - elements to be removed from this Group.
+     * @param c - elements to be removed from this Group.
      * @return <code>true</code> if this Group changed as a result of the call
      */
     public boolean removeAll(Collection c) {
@@ -498,7 +498,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Retains only the elements in this Group that are contained in the specified collection.
      * It removes from this Group all of its elements that are not contained in the specified collection.
-     * @param <code>c</code> - elements to be retained in this Group.
+     * @param c - elements to be retained in this Group.
      * @return <code>true</code> if this Group changed as a result of the call.
      */
     public boolean retainAll(Collection c) {
@@ -532,7 +532,7 @@ public class ProxyForGroup extends AbstractProxy
     /**
      * Returns an array containing all of the elements in this collection;
      * the runtime type of the returned array is that of the specified array.
-     * @param <code>a</code> - the array into which the elements of this collection are to be stored, if it is big enough;
+     * @param a - the array into which the elements of this collection are to be stored, if it is big enough;
      * otherwise, a new array of the same runtime type is allocated for this purpose.
      * @return an array containing the elements of this collection.
      */
@@ -548,7 +548,7 @@ public class ProxyForGroup extends AbstractProxy
      * - a Group<br>
      * - a standard Object<br>
      * but it have to be (or to extend) the Class of the Group.
-     * @param <code>ogroup</code> the object(s) to merge into the Group.
+     * @param oGroup the object(s) to merge into the Group.
      */
     public void addMerge(Object oGroup) {
         try {
@@ -576,7 +576,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Returns the index of the first occurence of the specified Object <code>obj</code>.
-     * @param <code>obj</code> the obj tahat is searched in the Group.
+     * @param obj - the obj tahat is searched in the Group.
      * @return the rank of <code>obj</code> in the Group.
      * -1 if the list does not contain this object.
      */
@@ -594,7 +594,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Removes the element at the specified position.
-     * @param <code>index</code> the rank of the object to remove in the Group.
+     * @param index - the rank of the object to remove in the Group.
      */
     public void remove(int index) {
         this.memberList.remove(index);
@@ -602,7 +602,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Returns the i-th member of the group.
-     * @param <code>index</code> the rank of the object to return.
+     * @param i - the rank of the object to return.
      * @return the member of the Group at the specified rank.
      */
     public Object get(int i) {
@@ -839,7 +839,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Waits that the member at the specified rank is arrived.
-     * @param <code>index</code> the rank of the awaited member.
+     * @param n - the rank of the awaited member.
      */
     public void waitTheNth(int n) {
         ProActive.waitFor(this.memberList.get(n));
@@ -847,7 +847,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Waits that at least <code>n</code> members are arrived.
-     * @param <code>n</code> the number of awaited members.
+     * @param n - the number of awaited members.
      */
     public void waitN(int n) {
         for (int i = 0; i < n; i++) {
@@ -874,7 +874,7 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Waits that the member at the specified rank is arrived and returns it.
-     * @param <code>n</code> the rank of the wanted member.
+     * @param n - the rank of the wanted member.
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
     public Object waitAndGetTheNth(int n) {
@@ -971,9 +971,9 @@ public class ProxyForGroup extends AbstractProxy
 
     /**
      * Builds the members using the threads (of the threadpool).
-     * @param <code>className</code> the name of the Class of the members.
-     * @param <code>param</code> an array that contains the parameters for the constructor of member.
-     * @param <code>node</code> the node where the member will be created.
+     * @param className - the name of the Class of the members.
+     * @param params - an array that contains the parameters for the constructor of member.
+     * @param nodeList - the nodes where the member will be created.
      */
     protected void createMemberWithMultithread(String className,
         Object[][] params, String[] nodeList) {

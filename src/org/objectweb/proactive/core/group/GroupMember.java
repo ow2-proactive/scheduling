@@ -56,7 +56,7 @@ public abstract class GroupMember implements java.io.Serializable {
 	
 	/**
 	 * Specifies the group of the object.
-	 * @param <code>o</code> - a typed group 
+	 * @param o - a typed group 
 	 */
 	public void setMyGroup(Object o) {
 		this.myGroup = o;
@@ -72,7 +72,7 @@ public abstract class GroupMember implements java.io.Serializable {
 
 	/**
 	 * Specifies the rank (position) of the object in the Group
-	 * @param <code>index</code> - the index of the object
+	 * @param index - the index of the object
 	 */
 	public void setMyRank(int index) {
 		this.myRank = index;

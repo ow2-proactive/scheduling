@@ -60,7 +60,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
     /**
      * Effective constructor
      * @param reifiedConstructor the constructor object which is called
-     * @param the array holding the effective args
+     * @param effectiveArguments the array holding the effective args
      */
     public ConstructorCallImpl(Constructor reifiedConstructor,
         Object[] effectiveArguments) {

@@ -68,7 +68,7 @@ public class NodeException extends ProActiveException {
   * Constructs a <code>NodeException</code> with the specified
   * detail message and nested exception.
   * @param s the detail message
-  * @param ex the nested exception
+  * @param t the nested exception
   */
   public NodeException(String s, Throwable t) {
     super(s, t);
@@ -77,7 +77,7 @@ public class NodeException extends ProActiveException {
   /**
   * Constructs a <code>NodeException</code> with the specified
   * detail message and nested exception.
-  * @param ex the nested exception
+  * @param t the nested exception
   */
   public NodeException(Throwable t) {
     super(t);

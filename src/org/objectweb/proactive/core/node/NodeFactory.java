@@ -141,7 +141,7 @@ public class NodeFactory {
      * <li>//<i>&lt;hostname></i>/nodeName</li>
      * </ul>
      * where <i>&lt;hostname></i> is the name of the localhost.
-     * @param <code>nodeURL</code> the URL of the node to create
+     * @param nodeURL the URL of the node to create
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
@@ -159,8 +159,8 @@ public class NodeFactory {
      * <li>//<i>&lt;hostname></i>/nodeName</li>
      * </ul>
      * where <i>&lt;hostname></i> is the name of the localhost.
-     * @param <code>nodeURL</code> the URL of the node to create
-     * @param <code>replacePreviousBinding</code>
+     * @param url the URL of the node to create
+     * @param replacePreviousBinding
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
@@ -193,7 +193,7 @@ public class NodeFactory {
     /**
      * Returns the reference to the node located at the given url.
      * This url can be either local or remote.
-     * @param nodeURL. The url of the node
+     * @param nodeURL The url of the node
      * @return Node. The reference of the node
      * @throws NodeException if the node cannot be found
      */

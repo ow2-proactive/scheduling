@@ -65,8 +65,7 @@ public class Torus extends Ring { // implements Topology2D {
     /**
      * Construtor. The members of <code>g</code> are used to fill the topology group.
      * @param g - the group used a base for the new group (topology)
-     * @param height - the heigth of the two-dimensional topology group
-     * @param width - the width of the two-dimensional topology group
+     * @param nbMembers - the number of members of this Torus
      * @throws ConstructionOfReifiedObjectFailedException
      */
     protected Torus(Group g, int nbMembers)

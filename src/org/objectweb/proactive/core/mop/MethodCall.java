@@ -424,7 +424,7 @@ public class MethodCall implements java.io.Serializable {
 
     /**
      * setter for the functional name of the invoked Fractal interface
-     * @param the functional name of the invoked Fractal interface
+     * @param string the functional name of the invoked Fractal interface
      */
     public void setFcFunctionalInterfaceName(String string) {
         fcFunctionalInterfaceName = string;

@@ -65,7 +65,7 @@ public class ThreadPool {
     }
 
     /** Builds a ThreadPool, specifying the number of thread to create.
-     * @param <code>size<code> the number of thread in the thread pool.
+     * @param size - the number of thread in the thread pool.
      */
     public ThreadPool(int size) {
         this.threads = new ThreadInThePool[size];
@@ -78,7 +78,7 @@ public class ThreadPool {
 
     /**
      * Creates the needed threads for this ThreadPool
-     * @param <code> number </code> the number of threads needed
+     * @param number - the number of threads needed
      */
     protected void createThreads(int number) {
         this.threads = new ThreadInThePool[number];
@@ -91,7 +91,7 @@ public class ThreadPool {
     /**
      * Check wether the number of threads in this threadpool
      * is sufficient compared to the number of members in the group
-     * @param <code> members </code> the number of members in the group
+     * @param members - the number of members in the group
      */
     public void checkNumberOfThreads(int members) {
 		int i, f = ((int) Math.ceil(((float) members) / ((float) this.memberToThreadRatio))) + this.additionalThreads;

@@ -90,7 +90,7 @@ public class ProActiveGroup {
 
     /**
      * Returns the <code>Group</code> for typed group <code>o</code>. Returns null if <code>o</code> is not a typed group.
-     * @param <code>o</code> - the typed group.
+     * @param o - the typed group.
      * @return the <code>Group</code> corresponding to <code>o</code>. <code>null</code> if <code>o</code> is not a typed group.
      */
     public static Group getGroup(Object o) {
@@ -100,7 +100,7 @@ public class ProActiveGroup {
     /**
      * Returns the name class of the typed group.
      * If the parameter is not a typed group, returns the name of Class of the parameter.
-     * @param <code>o</code> the typed group for wich we want the name of the type (Class).
+     * @param o the typed group for wich we want the name of the type (Class).
      * @return the name class of the typed group 
      */
 	public static String getType (Object o) {
@@ -114,7 +114,7 @@ public class ProActiveGroup {
 
     /**
      * Creates an object representing an empty group specifying the upper class of member.
-     * @param the name of the (upper) class of the group's member. 
+     * @param className the name of the (upper) class of the group's member. 
      * @return an empty group of type <code>className</code>.  
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
@@ -148,8 +148,8 @@ public class ProActiveGroup {
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates members on the default node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group. 
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -168,9 +168,9 @@ public class ProActiveGroup {
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates all members with params on the node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>nodeName</code> the name (String) of the node where the members are created.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
+	 * @param nodeName the name (String) of the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -188,9 +188,9 @@ public class ProActiveGroup {
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>nodeListString</code> the names of the nodes where the members are created.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
+	 * @param nodeListString the names of the nodes where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -207,9 +207,9 @@ public class ProActiveGroup {
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates all members with params on the node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>node</code> the node where the members are created.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
+	 * @param node the node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -226,10 +226,10 @@ public class ProActiveGroup {
 
     /**
      * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
-     * @param <code>className</code> the name of the (upper) class of the group's member.
-     * @param <code>params</code> the array that contain the parameters used to build the group's member.
+     * @param className the name of the (upper) class of the group's member.
+     * @param params the array that contain the parameters used to build the group's member.
      * If <code>params</code> is <code>null</code>, builds an empty group. 
-     * @param <code>nodeList</code> the nodes where the members are created.
+     * @param nodeList the nodes where the members are created.
      * @return a typed group with its members.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -254,10 +254,10 @@ public class ProActiveGroup {
     }
 	/**
 	 * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the virtual node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group. 
-	 * @param <code>virtualNode</code> the virtual where the members are created.
+	 * @param virtualNode the virtual where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -273,7 +273,7 @@ public class ProActiveGroup {
 	/**
 	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a default
 	 * node in the local JVM.
-	 * @param <code>ogroup</code> the typed group to turn active. 
+	 * @param ogroup the typed group to turn active. 
 	 * @return a reference on the active object produced.
      * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -288,8 +288,8 @@ public class ProActiveGroup {
 
 	/**
 	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
-	 * @param <code>ogroup</code> the typed group to turn active.
-	 * @param <code>node</code> the node where to create the active object on. If <code>null</code>,
+	 * @param ogroup the typed group to turn active.
+	 * @param node the node where to create the active object on. If <code>null</code>,
 	 * the active object is created localy on a default node
 	 * @return a reference (possibly remote) on the active object produced.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -305,8 +305,8 @@ public class ProActiveGroup {
 
 	/**
 	 * Turns the target object (a typed group) into an ActiveObject (an active typed group) attached to a specified node.
-	 * @param <code>ogroup</code> the typed group to turn active.
-	 * @param <code>nodeName</code> the name of the node where to create the active object on.
+	 * @param ogroup the typed group to turn active.
+	 * @param nodeName the name of the node where to create the active object on.
 	 * @return a reference (possibly remote) on the active object produced.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -320,8 +320,8 @@ public class ProActiveGroup {
 
 	/**
 	 * Creates an object representing a group (a typed group) and creates members on the default node.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group. 
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
@@ -342,9 +342,9 @@ public class ProActiveGroup {
 	/**
 	 * Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
 	 * Threads are used to build the group's members. This methods returns when all members were created.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
-	 * @param <code>nodeList</code> the nodes where the members are created.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
+	 * @param nodeList the nodes where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -363,10 +363,10 @@ public class ProActiveGroup {
    /**
 	* Creates an object representing a group (a typed group) and creates members with params cycling on nodeList.
     * Threads are used to build the group's members. This methods returns when all members were created.
-	* @param <code>className</code> the name of the (upper) class of the group's member.
-	* @param <code>params</code> the array that contain the parameters used to build the group's member.
+	* @param className the name of the (upper) class of the group's member.
+	* @param params the array that contain the parameters used to build the group's member.
 	* If <code>params</code> is <code>null</code>, builds an empty group.
-	* @param <code>nodeList</code> the names of the nodes where the members are created.
+	* @param nodeList the names of the nodes where the members are created.
 	* @return a typed group with its members.
     * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
     * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -388,10 +388,10 @@ public class ProActiveGroup {
 	/**
 	 * Creates an object representing a group (a typed group) and creates members with params cycling on the nodes of the vitual node.
 	 * Threads are used to build the group's members. This methods returns when all members were created.
-	 * @param <code>className</code> the name of the (upper) class of the group's member.
-	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param className the name of the (upper) class of the group's member.
+	 * @param params the array that contain the parameters used to build the group's member.
 	 * If <code>params</code> is <code>null</code>, builds an empty group.
-	 * @param <code>virtualNode</code> the virtual node where the members are created.
+	 * @param virtualNode the virtual node where the members are created.
 	 * @return a typed group with its members.
 	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
 	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
@@ -435,7 +435,7 @@ public class ProActiveGroup {
    
     /**
      * Waits for all the futures are arrived.
-     * @param <code>o</code> a typed group.
+     * @param o a typed group.
      */
     public static void waitAll(Object o) {
 		if (MOP.isReifiedObject (o)) {
@@ -451,7 +451,7 @@ public class ProActiveGroup {
     
     /**
      * Waits for (at least) one future is arrived.
-     * @param <code>o</code> a typed group.
+     * @param o a typed group.
      */
     public static void waitOne(Object o) {
 		if (MOP.isReifiedObject (o)) {
@@ -467,8 +467,8 @@ public class ProActiveGroup {
     
 	/**
 	 * Waits n futures are arrived.
-	 * @param <code>o</code> a typed group.
-	 * @param <code>n</code> the number of awaited members. 
+	 * @param o a typed group.
+	 * @param n the number of awaited members. 
 	 */
     public static void waitN(Object o, int n) {
 		if (MOP.isReifiedObject (o)) {
@@ -485,7 +485,7 @@ public class ProActiveGroup {
     /**
      * Tests if all the members of the object <code>o</code> representing a group are awaited or not.
      * Always returns <code>false</code> if <code>o</code> is not a reified object (future or group).
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return <code>true</code> if all the members of <code>o</code> are awaited.
      */
     public static boolean allAwaited (Object o) {
@@ -507,7 +507,7 @@ public class ProActiveGroup {
     /**
      * Tests if all the member of the object <code>o</code> representing a group are arrived or not.
      * Always returns <code>true</code> if <code>o</code> is not a reified object (future or group).
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return <code>true</code> if all the members of <code>o</code> are arrived.
      */
     public static boolean allArrived (Object o) {
@@ -528,7 +528,7 @@ public class ProActiveGroup {
 
     /**
      * Waits one future is arrived and get it.
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return a member of <code>o</code>.
      */
     public static Object waitAndGetOne (Object o) {
@@ -549,7 +549,7 @@ public class ProActiveGroup {
 
 	/**
 	 * Waits one future is arrived and returns it (removes it from the typed group).
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return a member of <code>o</code>. (<code>o</code> is removed from the typed group)
 	 */
 	public static Object waitAndGetOneThenRemoveIt (Object o) {
@@ -572,7 +572,7 @@ public class ProActiveGroup {
 
     /**
      * Wait the N-th future in the list is arrived.
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
      */
     public static void waitTheNth (Object o, int n) {
 		if (MOP.isReifiedObject (o)) {
@@ -587,8 +587,8 @@ public class ProActiveGroup {
 
     /**
      * Wait the N-th future is arrived and get it.
-	 * @param <code>o</code> a typed group.
-	 * @param <code>n</code> the rank of the awaited member.
+	 * @param o a typed group.
+	 * @param n the rank of the awaited member.
 	 * @return the <code>n</code>-th member of th typed group <code>o</code>.
      */
     public static Object waitAndGetTheNth (Object o, int n) {
@@ -608,7 +608,7 @@ public class ProActiveGroup {
 
 	/**
 	 * Waits that at least one member is arrived and returns its index.
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return the index of a non-awaited member of the Group, -1 if <code>o</code> is not a reified object.
 	 */
 	public int waitOneAndGetIndex(Object o) {
@@ -630,7 +630,7 @@ public class ProActiveGroup {
     /**
      * Returns the number of members of the object representing a Group.
      * Throws an IllegalArgumentException if <code>o</code> doesn't represent a Group.
-	 * @param <code>o</code> a typed group.
+	 * @param o a typed group.
 	 * @return the number of member of the typed group <code>o</code>.
 	 * @throws IllegalArgumentException if the parameter doesn't represent a group
      */
@@ -646,8 +646,8 @@ public class ProActiveGroup {
     /**
      * Returns the member at the specified index of the object representing a Group.
      * Returns <code>null</code> if <code>obj</code> doesn't represent a Group.
-     * @param <code>o</code> a typed group.
-	 * @param <code>n</code> the rank of the wanted member.
+     * @param o a typed group.
+	 * @param n the rank of the wanted member.
 	 * @return the member of the typed group at the rank <code>n</code>
      */
     public static Object get (Object o, int n) {
@@ -663,7 +663,7 @@ public class ProActiveGroup {
 
     /**
      * Checks if the object <code>o</code> is an object representing a Group (future or not).
-     * @param <code>o</code> the Object to check.
+     * @param o the Object to check.
      * @return <code>true</code> if <code>o</code> is a typed group.  
      */  
     public static boolean isGroup (Object o) {	
@@ -672,7 +672,7 @@ public class ProActiveGroup {
     
     /**
      * Allows the typed group to dispatch parameters
-     * @param <code>ogroup</code> the typed group who will change his semantic of communication.
+     * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void setScatterGroup(Object ogroup) {
 		Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -682,7 +682,7 @@ public class ProActiveGroup {
     
     /**
      * Allows the typed group to broadcast parameters
-     * @param <code>ogroup</code> the typed group who will change his semantic of communication.
+     * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void unsetScatterGroup(Object ogroup) {
  		Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -692,7 +692,7 @@ public class ProActiveGroup {
 
    /**
 	* Allows the typed group to make an unique serialization of parameters when a broadcast call occurs.
-	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
+	* @param ogroup the typed group who will change his semantic of communication.
 	*/
    public static void setUniqueSerialization(Object ogroup) {
 	   Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -702,7 +702,7 @@ public class ProActiveGroup {
     
    /**
 	* Removes the ability of a typed group to make an unique serialization
-	* @param <code>ogroup</code> the typed group who will change his semantic of communication.
+	* @param ogroup the typed group who will change his semantic of communication.
 	*/
    public static void unsetUniqueSerialization(Object ogroup) {
 	   Proxy proxytmp = ProActiveGroup.findProxyForGroup(ogroup);
@@ -713,7 +713,7 @@ public class ProActiveGroup {
    
     /**
      * Checks the semantic of communication of the typed group <code>ogroup</code>.
-     * @param <code>ogroup</code> a typed group.
+     * @param ogroup a typed group.
      * @return <code>true</code> if the "scatter option" is enabled for the typed group <code>ogroup</code>.
      */
     public static boolean isScatterGroupOn (Object ogroup) {
@@ -725,7 +725,7 @@ public class ProActiveGroup {
 
     /**
      * Returns the ProxyForGroup of the typed group <code>ogroup</code>.
-     * @param <code>ogroup</code> the typed group. 
+     * @param ogroup the typed group. 
      * @return the <code>ProxyForGroup</code> of the typed group <code>ogroup</code>.
      * <code>null</code> if <code>ogroup</code> does not represent a Group.
      */

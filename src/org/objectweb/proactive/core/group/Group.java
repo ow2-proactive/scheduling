@@ -97,13 +97,13 @@ public interface Group extends Collection {
 
     /**
      * Waits that the member at the specified rank is arrived.
-     * @param <code>index</code> the rank of the awaited member.
+     * @param n the rank of the awaited member.
      */
     public void waitTheNth(int n);
 
     /**
      * Waits that at least <code>n</code> members are arrived.
-     * @param <code>n</code> the number of awaited members.
+     * @param n the number of awaited members.
      */
     public void waitN(int n);
 
@@ -121,7 +121,7 @@ public interface Group extends Collection {
 
     /**
      * Waits that the member at the specified rank is arrived and returns it.
-     * @param <code>n</code> the rank of the wanted member.
+     * @param n - the rank of the wanted member.
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
     public Object waitAndGetTheNth(int n);
