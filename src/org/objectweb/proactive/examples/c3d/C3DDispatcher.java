@@ -1146,7 +1146,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive
 	 */
 	public int registerConsumer(C3DUser c3duser, Scene newscene, String s_name)
 	{
-		System.out.println("User wan in: " + c3duser);
+		//System.out.println("User wan in: " + c3duser);
 		c3duser.log("-> Remote call-back: dispatcher found, user registered");
 
 		log("New user " + s_name + "(" + i_lastuser + ") has joined");
