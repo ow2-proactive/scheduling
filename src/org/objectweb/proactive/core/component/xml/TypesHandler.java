@@ -43,7 +43,6 @@ public class TypesHandler extends CollectionUnmarshaller {
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#getResultObject()
      */
     public Object getResultObject() throws SAXException {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -52,6 +51,5 @@ public class TypesHandler extends CollectionUnmarshaller {
      */
     public void startContextElement(String name, Attributes attributes)
         throws SAXException {
-        // TODO Auto-generated method stub
     }
 }
