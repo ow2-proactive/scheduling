@@ -193,7 +193,11 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public char[] getMessageInfo() {
-        return null;
+        if (!this.isArrived){
+            return null;
+        } else {
+            return wrappedRequest.getMessageInfo();
+        }
     }
 
     public void setIgnoreIt() {

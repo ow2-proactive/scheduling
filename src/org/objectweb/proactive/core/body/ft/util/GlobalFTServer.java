@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.internalmsg.GlobalStateCompletion;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
-import org.objectweb.proactive.core.body.ft.protocols.cic.CheckpointInfoCIC;
 import org.objectweb.proactive.core.body.ft.util.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.util.location.LocationServer;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
@@ -173,7 +172,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	public synchronized int storeCheckpoint(Checkpoint c, int inc){
 	    
 	    if (inc<this.globalIncarnation){
-	        logger.warn("Object with old incarnation " + inc + " is trying to store checkpoint");
+	        logger.warn("Object with incarnation " + inc + " is trying to store checkpoint");
 	        return 0;
 	    }
 	    
@@ -246,9 +245,9 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 
 
 	// set infos for the id-th checkpoints of id
-	public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int inc) throws RemoteException {	    
+	public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int inc) throws RemoteException {   
 	    if (inc < this.globalIncarnation){
-	        logger.warn("Object with old incarnation " + inc + " is trying to store checkpoint infos");
+	        logger.warn("Object with incarnation " + inc + " is trying to store checkpoint infos");
 	        return;
 	    }
 	    
@@ -369,7 +368,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	
 	private Hashtable locations; // id <-> adapter
 	private ArrayList freeNodes; // ProActiveRuntimes
-	
+	private int nodeCounter = 0; // number of asked free nodes
 	
 
 	public synchronized UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller) throws RemoteException {        
@@ -378,8 +377,8 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 	        logger.error("[LOCATION] **ERROR** " + id + " is not registered !");
 	        return null;
 	    } else if (currentLocation.equals(oldLocation)){
-	        this.forceDetection();
-	        return null;	        
+            this.forceDetection();
+            return null;
 	    } else {
 	        // send the new location of id
 	        logger.info("[LOCATION] Return the new location of " + id);
@@ -420,17 +419,25 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     }
 
 
-
-    private int nodeCounter = 0;
     
     public Node getFreeNode(){
         this.nodeCounter++;
         if (this.freeNodes.isEmpty()){
-            logger.error("[RESSOURCE] **ERROR** There is no free node !");
+            logger.error("[RESSOURCE] **ERROR** There is no resource nodes !");
             return null;
         } else {
             Node n = (Node)(this.freeNodes.get(nodeCounter%(this.freeNodes.size())));
-            logger.info("[RESSOURCE] Return a free node : " + n.getNodeInformation().getURL());
+            try {
+                // testing free node
+                n.getNumberOfActiveObjects();
+            } catch (NodeException e) {
+                // free node is unreachable !
+                logger.info("[RESSOURCE] An unreachable node is removed.");
+                this.freeNodes.remove(n);
+                this.nodeCounter = 0;
+                return getFreeNode();
+            }           
+            logger.info("[RESSOURCE] Return a node : " + n.getNodeInformation().getURL());
             return n;
         }
         
@@ -491,7 +498,7 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 		    // send checkpoints
 		    while(itBodies.hasMoreElements()){
 		        UniqueID current = (UniqueID)(itBodies.nextElement());
-		        Checkpoint toSend = (Checkpoint)((ArrayList)(storage.get(current))).get(globalState);
+		        Checkpoint toSend = (Checkpoint)((ArrayList)(storage.get(current))).get(globalState);		        
 		        if (current.equals(failed)){
 		            //look for a new Runtime for this oa
 		            Node node = this.getFreeNode();
@@ -646,12 +653,20 @@ public class GlobalFTServer extends UnicastRemoteObject implements
     
 
     public boolean isUnreachable(UniversalBody body) throws RemoteException {        
+        int res = 0;
         try {
-            int res = body.receiveFTMessage(this.hbe);
+            res = body.receiveFTMessage(this.hbe);
         } catch (IOException e) {
+            // object is unreachable
             return true;
         }
-        return false;
+        if (res == FaultDetector.OK){
+            // object is OK
+            return false;
+        }else{
+            // object is dead
+            return true;
+        }
     }
 
 
@@ -708,16 +723,18 @@ public class GlobalFTServer extends UnicastRemoteObject implements
 		public void run () {			
 		    while (true){
 		        try {
-		            ArrayList al = loc.getAllLocations();
-		            Iterator it = al.iterator();
-		            GlobalFTServer.logger.info("[FAULT DETECTOR] Scanning " + al.size() + " objects ...");
-		            while (it.hasNext()){
-		                UniversalBody current = (UniversalBody)(it.next());
-		                if (fdet.isUnreachable(current)){
-		                    rec.failureDetected(current.getID());
+		            synchronized (GlobalFTServer.this){
+		                ArrayList al = loc.getAllLocations();
+		                Iterator it = al.iterator();
+		                GlobalFTServer.logger.info("[FAULT DETECTOR] Scanning " + al.size() + " objects ...");
+		                while (it.hasNext()){
+		                    UniversalBody current = (UniversalBody)(it.next());
+		                    if (fdet.isUnreachable(current)){
+		                        rec.failureDetected(current.getID());
+		                    }
 		                }
+		                GlobalFTServer.logger.info("[FAULT DETECTOR] End scanning.");
 		            }
-		            GlobalFTServer.logger.info("[FAULT DETECTOR] End scanning.");
 		            this.pause();
 		        } catch (RemoteException e) {
 		            e.printStackTrace();

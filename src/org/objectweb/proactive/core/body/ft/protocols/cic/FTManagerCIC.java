@@ -30,8 +30,18 @@
  */
 package org.objectweb.proactive.core.body.ft.protocols.cic;
 
-import org.apache.log4j.Logger;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.rmi.RemoteException;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -46,6 +56,7 @@ import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.logging.MessageLog;
 import org.objectweb.proactive.core.body.ft.logging.ReplyLog;
 import org.objectweb.proactive.core.body.ft.logging.RequestLog;
+import org.objectweb.proactive.core.body.ft.util.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.util.recovery.RecoveryProcess;
 import org.objectweb.proactive.core.body.future.FutureResult;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -59,20 +70,6 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-import java.rmi.RemoteException;
-
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.Vector;
 
 
 /**
@@ -223,7 +220,7 @@ public class FTManagerCIC
             // udpate checkpoint index
             if (mi[CKPT_INDEX] > currentCheckpointIndex) {
                 this.nextMax = Math.max(this.nextMax, mi[CKPT_INDEX]);
-            }
+			}
         }
         return currentCheckpointIndex;
     }
@@ -257,7 +254,6 @@ public class FTManagerCIC
         return 0; //This value is not returned to the sender
     }
 
-    
     public synchronized int onDeliverRequest(Request request) {
         int currentCheckpointIndex = this.checkpointIndex;
         char[] mi = request.getMessageInfo();
@@ -279,7 +275,7 @@ public class FTManagerCIC
 
             //is there any corresponding awaited request ?	
             if (!(this.updateAwaitedRequests(request))) {
-                //if not, an awaited request is added to history
+                //if no, an awaited request is added to history
                 history.add(request.getSourceBodyID());
             } else {
                 //this request must be then ignored..
@@ -392,7 +388,7 @@ public class FTManagerCIC
             try {
                 //must make deep copy of paramteres
                 request.getMethodCall().makeDeepCopyOfArguments();
-                //must reset the send counter (this request has not been forrwarded)
+                //must reset the send counter (this request has not been forwarded)
                 request.resetSendCounter();
                 MessageLog log = new RequestLog(request, destination.getRemoteAdapter());
                 for (int i = currentCheckpointIndex + 1; i <= rdvValue; i++) {
@@ -445,12 +441,12 @@ public class FTManagerCIC
         if ((mic != null) && (mic[IS_ORPHAN_FOR] <= this.checkpointIndex)) {
             if (this.owner.getID().equals(pendingRequest.getSourceBodyID())) {
                 throw new ProtocolErrorException(
-                    "A self request is orphan for " + this.owner.getID());
+                        "A self request is orphan for " + this.owner.getID());
             }
             pendingRequest = new AwaitedRequest(cic.pendingRequest.getSourceBodyID());
             this.awaitedRequests.add(pendingRequest);
         }
-        queue.addToFront(pendingRequest);
+        queue.addToFront(pendingRequest);        
 
         // building history
         Iterator itHistory = cic.history.iterator();
@@ -584,11 +580,6 @@ public class FTManagerCIC
                 this.setCheckpointTag(true);
                 c = new Checkpoint((Body) owner, this.checkpointIndex,
                         this.additionalCodebase);
-                
-                // debug
-                if (!this.owner.isActive()){
-                    throw new ProtocolErrorException("Checkpointing a dead body");
-                }
                 
                 // send it to server
                 int resStorage = this.storage.storeCheckpoint(c, this.incarnation);
@@ -726,8 +717,12 @@ public class FTManagerCIC
         while (itQueue.hasNext()) {
             Request current = (Request) (itQueue.next());
             char[] mi = current.getMessageInfo();
-            if (mi[IS_ORPHAN_FOR] <= cic.checkpointIndex) {
-                //System.out.println("[CIC] Orphan request is replaced by an awaited request");
+            
+            if (mi==null){
+                // current is an awaited request that is not updated 
+                this.awaitedRequests.add(current); 
+            }else if (mi[IS_ORPHAN_FOR] <= cic.checkpointIndex) {
+                // current is an orpahn request 
                 toChange.add(current);
             }
         }
@@ -777,7 +772,7 @@ public class FTManagerCIC
     }
 
     public String toString() {
-        String ret = "Incarnation = ";
+        String ret = " Incarnation = ";
         ret += this.incarnation;
         return ret;
     }
@@ -800,6 +795,8 @@ public class FTManagerCIC
     public UniversalBody communicationFailed(UniqueID suspect,
         UniversalBody suspectLocation, Exception e) {
         try {
+            // send an adapter to suspectLocation: the suspected body could be local
+            suspectLocation = suspectLocation.getRemoteAdapter();
             UniversalBody newLocation = this.location.searchObject(suspect,
                     suspectLocation, this.owner.getID());
             if (newLocation == null) {
@@ -853,11 +850,15 @@ public class FTManagerCIC
     }
 
     /**
-     * Heartbeat message. Do nothing.
+     * Heartbeat message. Send state value to the fault detector.
      * @param fte heartbeat message.
-     * @return unused value.
+     * @return FaultDetector.OK if active object is alive, FaultDetector.IS_DEAD otherwise.
      */
     public int HandleHBEvent(Heartbeat fte) {
-        return 0;
+        if (this.owner.isAlive()){
+            return FaultDetector.OK;
+        } else {
+            return FaultDetector.IS_DEAD;
+        }
     }
 }
