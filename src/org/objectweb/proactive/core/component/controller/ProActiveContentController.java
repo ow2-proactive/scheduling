@@ -9,6 +9,8 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 
 import java.io.Serializable;
 
@@ -40,7 +42,9 @@ public class ProActiveContentController extends ProActiveController
      * in this implementation, the external interfaces are also internal interfaces
      */
     public Object[] getFcInternalInterfaces() {
-        return getFcItfOwner().getFcInterfaces();
+        logger.error(
+            "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
+        return null;
     }
 
     /**
@@ -50,7 +54,8 @@ public class ProActiveContentController extends ProActiveController
      *         */
     public Object getFcInternalInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        return getFcItfOwner().getFcInterface(interfaceName);
+        throw new NoSuchInterfaceException(
+            "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
     }
 
     /**
@@ -76,17 +81,18 @@ public class ProActiveContentController extends ProActiveController
         checkLifeCycleIsStopped();
 
         // check whether the subComponent is the component itself
-        // TODO check this!
-        //				if (((ProActiveComponent)subComponent).equals(getFcItfOwner())) {
-        //					try {
-        //					throw new IllegalArgumentException(
-        //						"cannot add "
-        //							+ Fractal.getComponentParametersController(getFcItfOwner()).getComponentParameters().getName()
-        //							+ " component into itself ");
-        //					} catch (NoSuchInterfaceException e) {
-        //						logger.error(e.getMessage());
-        //					}
-        //				}
+        // TODO to test
+        if (getFcItfOwner().equals((ProActiveComponent) subComponent)) {
+            try {
+                throw new IllegalArgumentException("cannot add " +
+                    Fractive.getComponentParametersController(getFcItfOwner())
+                           .getComponentParameters().getName() +
+                    " component into itself ");
+            } catch (NoSuchInterfaceException e) {
+                logger.error(e.getMessage());
+            }
+        }
+
         // check whether already a sub component
         // TODO check in the case of multiple references to the same component
         if (fcSubComponents.contains(subComponent)) {
@@ -105,7 +111,7 @@ public class ProActiveContentController extends ProActiveController
             fcSubComponents.addElement(subComponent);
         }
 
-        // FIXME : pb with component cycle checking
+        // FIXME : component cycle checking
         // we have a pb here : this should raise an exception if the subcomponent is primitive,
         // but proactive remote calls don't relay exception ; they stay in the body and lead to its termination
         //		// check whether current component is contained in subComponent
@@ -150,7 +156,6 @@ public class ProActiveContentController extends ProActiveController
     * NOT IMPLEMENTED YET !
     * @see org.objectweb.fractal.api.control.ContentController#checkFc()
     */
-	// TODO : To implement!
     public void checkFc() {
         throw new ProActiveRuntimeException("not yet implemented");
     }
