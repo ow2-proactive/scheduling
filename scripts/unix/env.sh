@@ -56,11 +56,30 @@ if [ -f $PROACTIVE/lib/jini-ext.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/lib/jini-ext.jar
 fi
-if [ -f $PROACTIVE/lib/reggie.jar ]
+if [ -f $PROACTIVE/lib/cog.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/reggie.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cog.jar
 fi
-
+if [ -f $PROACTIVE/lib/cryptix.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/cryptix.jar
+fi
+if [ -f $PROACTIVE/lib/iaik_jce_full.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/iaik_jce_full.jar
+fi
+if [ -f $PROACTIVE/lib/iaik_ssl.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/iaik_ssl.jar
+fi
+if [ -f $PROACTIVE/lib/javaxCrypto.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/javaxCrypto.jar
+fi
+if [ -f $PROACTIVE/lib/log4j-core.jar ]
+then
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/log4j-core.jar
+fi
 
 CLASSPATH=$CLASSPATH:$PROACTIVE/lib/asm.jar
 
