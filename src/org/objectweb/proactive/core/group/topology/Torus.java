@@ -248,7 +248,7 @@ public class Torus extends Ring { // implements Topology2D {
 	 */
 	public Object down(Object o) {
 		int pos = this.indexOf(o);
-		if (pos > ((this.getWidth()-1)*this.getHeight())-1) {
+		if (pos > ((this.getHeight()-1)*this.getWidth())-1) {
 			return this.get(pos - ((this.height-1)*this.width));
 		} else {
 			return this.get(pos + this.getWidth());
