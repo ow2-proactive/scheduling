@@ -42,6 +42,7 @@
 			<unitTest class="nonregressiontest.group.dynamicthreadpool.Test" />
 			<unitTest class="nonregressiontest.group.javaobject.Test" />
 			<unitTest class="nonregressiontest.group.barrier.Test" />
+			<unitTest class="nonregressiontest.group.accessbyname.Test" />
 			<unitTest class="nonregressiontest.component.creation.local.newactive.primitive.Test"/>
 			<unitTest class="nonregressiontest.component.creation.local.newactive.composite.Test"/>
 			<unitTest class="nonregressiontest.component.creation.remote.newactive.primitive.Test"/>
