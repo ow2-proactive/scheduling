@@ -1,16 +1,13 @@
 package org.objectweb.proactive.core.group;
 
 import org.apache.log4j.Logger;
-
-import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
-
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
-import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
@@ -25,15 +22,16 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
-import java.util.Hashtable;
-
 
 /**
- * A class for creating groups of components.
+ * 
+ *  // TODO : change class name (interfaces only are grouped)
+ * 
+ * A class for creating groups of interfaces
  * Indeed, the standard mechanism cannot be used here, as we are referencing components
- * through component representatives.
+ * through interfaces of component representatives.
  *
- *  It was moved in this package so it can see className attribute in ProxyForGroup
+ *  It was moved to this package so it can see className attribute in ProxyForGroup
  *
  * @author Matthieu Morel
  */
@@ -50,18 +48,18 @@ public class ProActiveComponentGroup {
         // MOP.checkClassIsReifiable(MOP.forName(Component.class.getName()));
         // instantiate the component metaobject factory with parameters of the component
         // first create a hashtable with the parameters
-        Hashtable factory_params = new Hashtable(1);
-        factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
-            componentParameters);
-        MetaObjectFactory factory = new ProActiveMetaObjectFactory(factory_params);
+//        Hashtable factory_params = new Hashtable(1);
+//        factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
+//            componentParameters);
+//        MetaObjectFactory factory = new ProActiveMetaObjectFactory(factory_params);
 
         // ComponentBody parameters part of general config or what?
         Object result = null;
 
         try {
-            result = MOP.newInstance(Component.class.getName(), null,
+            result = MOP.newInstance(ProActiveInterface.class.getName(), null,
                     ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME,
-                    new Object[] { null, null, factory });
+                    new Object[] { null, null, null });
         } catch (ClassNotReifiableException e) {
             System.err.println("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
@@ -74,7 +72,7 @@ public class ProActiveComponentGroup {
                 "**** ConstructionOfReifiedObjectFailedException ****");
         }
 
-        ((org.objectweb.proactive.core.group.ProxyForGroup) (((StubObject) result).getProxy())).className = Component.class.getName();
+        ((org.objectweb.proactive.core.group.ProxyForGroup) (((StubObject) result).getProxy())).className = Interface.class.getName();
 
         return ProActiveComponentRepresentativeFactory.instance()
                                                       .createComponentRepresentative(componentParameters,
@@ -94,34 +92,37 @@ public class ProActiveComponentGroup {
     public static ProActiveInterface newActiveComponentGroup(
         InterfaceType interfaceType)
         throws ClassNotFoundException, ClassNotReifiableException {
+        	try {
         // MOP.checkClassIsReifiable(MOP.forName(Component.class.getName()));
+        // PRIMITIVE parameter is given so that the calls are di
         ComponentParameters component_parameters = new ComponentParameters(interfaceType.getFcItfName(),
-                ComponentParameters.PRIMITIVE,
+                null,
                 ProActiveTypeFactory.instance().createFcType(new InterfaceType[] {
                         interfaceType
                     }));
 
         // instantiate the component metaobject factory with parameters of the component
         // first create a hashtable with the parameters
-        Hashtable factory_params = new Hashtable(1);
-        factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
-            component_parameters);
-        MetaObjectFactory factory = new ProActiveMetaObjectFactory(factory_params);
+//        Hashtable factory_params = new Hashtable(1);
+//        factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
+//            component_parameters);
+//        MetaObjectFactory factory = new ProActiveMetaObjectFactory(factory_params);
 
         // ComponentBody parameters part of general config or what?
         Object result = null;
 
-        try {
-            result = MOP.newInstance(Component.class.getName(), null,
-                    ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME,
-                    new Object[] { null, null, factory });
-
-            ((org.objectweb.proactive.core.group.ProxyForGroup) (((StubObject) result).getProxy())).className = Component.class.getName();
-
-            // return a reference on the generated interface reference corresponding to the interface type 
-            return (ProActiveInterface) ((Component) ProActiveComponentRepresentativeFactory.instance()
+            result = MOP.newInstance(ProActiveInterface.class.getName(), null,
+                    ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+                    //new Object[] { null, null, factory });
+			//new Object[] { null, null, null });
+			ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup)((StubObject)result).getProxy();
+            proxy.className = ProActiveInterface.class.getName();
+			//proxy.stub = (StubObject)result;
+			//return (ProActiveInterface)result;
+            //return a reference on the generated interface reference corresponding to the interface type 
+            return (ProActiveInterface) (ProActiveComponentRepresentativeFactory.instance()
                                                                                             .createComponentRepresentative(component_parameters,
-                ((StubObject) result).getProxy())).getFcInterface(interfaceType.getFcItfName());
+                proxy)).getFcInterface(interfaceType.getFcItfName());
         } catch (ClassNotReifiableException e) {
             logger.error("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
