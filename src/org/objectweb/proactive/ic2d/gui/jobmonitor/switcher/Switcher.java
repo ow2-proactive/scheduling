@@ -39,13 +39,17 @@ public class Switcher extends JPanel implements SwitchListener
 				public void mousePressed (MouseEvent e)
 				{
 					popupmenu.removeAll();
-					popupmenu.add (new AbstractAction ("Hide/Show '" + l.getText() + "'")
-					{
+					final JCheckBoxMenuItem hide = new JCheckBoxMenuItem("Hide '" + l.getText() + "'");
+					hide.setSelected(model.isHidden(l.getText()));
+					hide.addActionListener(new ActionListener () {
 						public void actionPerformed (ActionEvent e)
 						{
-							updateModel (l.getText());
+							model.toggleHidden(l.getText());
+							hide.setSelected(model.isHidden(l.getText()));
+							jtree.repaint();
 						}
 					});
+					popupmenu.add(hide);
 					
 					final JCheckBoxMenuItem highlight = new JCheckBoxMenuItem("Highlight '" + l.getText() + "'");
 					highlight.setSelected(model.isHighlighted(l.getText()));
@@ -57,12 +61,12 @@ public class Switcher extends JPanel implements SwitchListener
 							jtree.repaint();
 						}
 					});
-					
 					popupmenu.add(highlight);
-			        popupmenu.show (l, e.getX(), e.getY());
+
+					popupmenu.show (l, e.getX(), e.getY());
 				}
 			});
-			
+
 			performSwitch (l, true);
 			
 			add (l);

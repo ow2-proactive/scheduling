@@ -7,12 +7,15 @@ import org.objectweb.proactive.ic2d.gui.jobmonitor.JobMonitorConstants;
 public class DataModelTraversal implements JobMonitorConstants
 {
 	private List keys;
+	private boolean[] hidden;
 	
 	public DataModelTraversal (int [] _keys)
 	{
 		keys = new ArrayList();
 		for (int i = 0; i < _keys.length; i++)
 			keys.add(new Integer(_keys[i]));
+		
+		hidden = new boolean[_keys.length];
 	}
 	
 	private int indexOf(int key) {
@@ -21,24 +24,39 @@ public class DataModelTraversal implements JobMonitorConstants
 	
 	public boolean hasFollowingKey (int key)
 	{
-		if (key == NO_KEY)
-			return true;
-		else
-		{
-			int index = indexOf (key);
-			return (index >= 0 && index < keys.size() - 1);
-		}
+		return getFollowingKey(key) != NO_KEY;
 	}
 
 	public int getFollowingKey (int key)
 	{
-		// root
+		int newIndex, newKey;
 		if (key == NO_KEY)
-			return ((Integer) keys.get (0)).intValue();
-		else
-		{
+			// root
+			newIndex = 0;
+		else {
 			int index = indexOf (key);
-			return ((Integer) keys.get (indexOf (key) + 1)).intValue();
+			newIndex = index + 1;
 		}
+		
+		do {
+			if (newIndex == keys.size())
+				return NO_KEY;
+			newKey = ((Integer) keys.get(newIndex)).intValue();
+			newIndex++;
+		} while (isHidden(newKey));
+		
+		return newKey;
+	}
+	
+	public void toggleHidden(int key) {
+		if (key != NO_KEY)
+			hidden[key] = !hidden[key];
+	}
+	
+	public boolean isHidden(int key) {
+		if (key != NO_KEY)
+			return hidden[key];
+		
+		return false;
 	}
 }

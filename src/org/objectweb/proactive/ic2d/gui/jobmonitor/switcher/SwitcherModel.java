@@ -171,4 +171,14 @@ public class SwitcherModel implements JobMonitorConstants
 		int key = labelToKey(label);
 		return treeModel.isHighlighted(key);
 	}
+	
+	public void toggleHidden(String label) {
+		int key = labelToKey(label);
+		treeModel.toggleHidden(key);
+	}
+	
+	public boolean isHidden(String label) {
+		int key = labelToKey(label);
+		return treeModel.isHidden(key);
+	}
 }

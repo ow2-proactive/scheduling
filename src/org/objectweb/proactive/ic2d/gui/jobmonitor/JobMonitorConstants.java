@@ -11,7 +11,7 @@ public interface JobMonitorConstants
 	public static final int NODE   = 4;
 	public static final int AO     = 5;
 	
-	public static final String[] NAMES = new String[] {"Job", "VN", "Host", "JVM", "Node", "AO"};
+	public static final String[] NAMES = new String[] {"Job", "VN", "Host", "JVM", "Node", "Active Object"};
 	public static final int NB_KEYS = NAMES.length;
 	public static final int FIRST_KEY = 0;
 	public static final int LAST_KEY = NB_KEYS - 1;

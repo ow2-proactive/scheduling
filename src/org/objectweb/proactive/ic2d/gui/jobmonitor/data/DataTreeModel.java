@@ -70,4 +70,15 @@ public class DataTreeModel extends DefaultTreeModel implements JobMonitorConstan
 
 		return false;
 	}
+	
+	public void toggleHidden(int key) {
+		if (key != NO_KEY) {
+			traversal.toggleHidden(key);
+			rebuild();
+		}
+	}
+	
+	public boolean isHidden(int key) {
+		return traversal.isHidden(key);
+	}
 }
