@@ -30,6 +30,9 @@
 */ 
 package org.objectweb.proactive.core.rmi;
 
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+
 public class RegistryHelper {
 
   protected final static int DEFAULT_REGISTRY_PORT = 1099;
@@ -108,7 +111,7 @@ public class RegistryHelper {
       return null;
     }
   }
-  
+ 
   
   private static java.rmi.registry.Registry getOrCreateRegistry(int port) throws java.rmi.RemoteException {
     java.rmi.registry.Registry registry = detectRegistry(port);
