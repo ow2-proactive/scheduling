@@ -57,7 +57,8 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private IC2DGUIController controller;
     private JTabbedPane tabs;
     private Vector frames;
-    private DataAssociation asso = new DataAssociation();
+    private DataAssociation asso;
+    private NodeExploration explorator;
     private DataTreeModel jobViewModel;
     private DataTreeModel vnViewModel;
     private DataTreeModel hostViewModel;
@@ -71,6 +72,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     private int ttr = 60;
 
     public JobMonitorPanel(IC2DGUIController _controller) {
+    	asso = new DataAssociation();
+    	explorator = new NodeExploration(asso);
+    	
         setLayout(new GridLayout(1, 1));
 
         controller = _controller;
@@ -569,5 +573,9 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         customViewModel = new DataTreeModel(asso, traversal);
 
         return createPanel(customViewModel, true);
+    }
+    
+    public NodeExploration getNodeExploration() {
+    	return explorator;
     }
 }

@@ -35,7 +35,7 @@ public class JobMonitorFrame extends JFrame
 	    	    
 	    JMenu monitoringMenu = new JMenu("Monitoring");
 
-	    JMenuItem b = new JMenuItem("Monitor a new RMI host");
+	    JMenuItem b = new JMenuItem("Monitor a new RMI host...");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
@@ -68,7 +68,7 @@ public class JobMonitorFrame extends JFrame
 	    // control menu
 	    JMenu controlMenu = new JMenu ("Control");
 
-	    b = new JMenuItem ("Set Time-To-Refresh");
+	    b = new JMenuItem ("Set Time-To-Refresh...");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed (java.awt.event.ActionEvent e)
@@ -99,12 +99,35 @@ public class JobMonitorFrame extends JFrame
 	    });
 	    controlMenu.add(b);
 	    
-	    b = new JMenuItem ("Set Depth Control");
+	    b = new JMenuItem ("Set Depth Control...");
 	    b.addActionListener(new java.awt.event.ActionListener()
 	    {
 	        public void actionPerformed(java.awt.event.ActionEvent e)
 	        {
-//	        	System.out.println ("Set depth control asked");
+	        	NodeExploration explorator = panel.getNodeExploration();
+	        	String initialValue = "" + explorator.getMaxDepth();
+			    Object result = JOptionPane.showInputDialog(panel, // Component parentComponent,
+			        "Please enter the maximum exploration depth :", // Object message,
+			        "Setting the maximum depth", // String title,
+			        JOptionPane.PLAIN_MESSAGE, // int messageType,
+			        null, // Icon icon,
+			        null, // Object[] selectionValues,
+			        initialValue // Object initialSelectionValue)
+			      );
+			    if (result == null || (!(result instanceof String)))
+			      return;
+			    
+			    try
+				{
+					int depth = Integer.parseInt ((String) result);
+					explorator.setMaxDepth(depth);
+				}
+				catch (NumberFormatException exc)
+				{
+//					System.out.println ("The depth number is invalid !");
+					return;
+				}
+
 	        }
 	    });
 	    controlMenu.add(b);
