@@ -29,9 +29,9 @@
 * ################################################################
 */ 
 package org.objectweb.proactive.core.exceptions.handler;
-/*import org.objectweb.proactive.core.exceptions.*;*/
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.exceptions.service.*;
+
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.service.ProActiveServiceException;
 
 /**
  * Handle all service exceptions
@@ -41,24 +41,21 @@ import org.objectweb.proactive.core.exceptions.service.*;
  * @since   ProActive 0.9.3
  *
  */
-public class HandlerServiceException implements HandlerInterface {
+public class HandlerServiceException extends HandlerNonFunctionalException {
 
     /** 
-     * Is the exception handled by the handler ? 
+     * Is the exception reliable for the handler ?
+     * @param e The exception checked for handler reliability 
      */
-    public boolean isHandling(ProActiveException e) {
-	if (e instanceof ProActiveServiceException)
-	    return true;
-	else
-	    return false;
+    public boolean isHandling(NonFunctionalException e) {
+		return (e instanceof ProActiveServiceException);
     }
 
     /**
      * Provide a treatment for the handled exception(s) 
+     * @param e The exception to be handled
      */
-    public void handle(ProActiveException e) {
-	
-	System.out.println("*** Handle Service Exception ***");
-	e.printStackTrace();
+    public void handle(NonFunctionalException e) {
+		System.out.println("*** " + this.getClass().getName() + " HANDLE " + e.getDescription());
     }
 }

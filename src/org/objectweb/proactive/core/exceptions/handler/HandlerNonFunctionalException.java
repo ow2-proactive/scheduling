@@ -30,27 +30,29 @@
 */ 
 package org.objectweb.proactive.core.exceptions.handler;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
 
 /**
- * Handle all communication exceptions
+ * Handle ProActive exceptions
  *
  * @author  ProActive Team
  * @version 1.0,  2002/07/08
  * @since   ProActive 0.9.3
  *
  */
-public class HandlerCommunicationException extends HandlerNonFunctionalException {
+public class HandlerNonFunctionalException implements IHandler, Serializable {
+
 
     /** 
      * Is the exception reliable for the handler ? 
      * @param e The exception checked for handler reliability
      */
     public boolean isHandling(NonFunctionalException e) {
-		return (e instanceof ProActiveCommunicationException);
+		return (e instanceof NonFunctionalException);
     }
-    
+
     /**
      * Provide a treatment for the handled exception(s) 
      * @param e The exception to be handled

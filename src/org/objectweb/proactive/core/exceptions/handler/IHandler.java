@@ -31,31 +31,62 @@
 package org.objectweb.proactive.core.exceptions.handler;
 
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.ProActiveCommunicationException;
+
 
 /**
- * Handle all communication exceptions
+ * Interface for handlers of Non Functional Exceptions
  *
  * @author  ProActive Team
  * @version 1.0,  2002/07/08
  * @since   ProActive 0.9.3
  *
  */
-public class HandlerCommunicationException extends HandlerNonFunctionalException {
+public interface IHandler {
+
+	// Definition of different level ID used to classify handler
+	/**
+	 * Default level is static and initialized in core of applications. This level 
+	 * provide a basic handling strategy for every non-functional exception.
+	 */   
+	static public int ID_defaultLevel = 0;
+	/**
+	 * Virtual Machine level is the first level created dynamcally. It offers the 
+	 * possibility to define a general handling behavior for every virtual machine 
+	 * environment. In the scope of distributed application, it's pretty useful with 
+	 * client/server application which required different recovery mechanisms.
+	 */
+	static public int ID_VMLevel = 1;
+	/**
+	 * Remote and Mobile Object level gives the opportunity to associated more 
+	 * specific handlers to remote objects. Nevertheless, we have to take into 
+	 * account the mobility of such objects. Handlers should migrate along with 
+	 * their associated entity.
+	 */
+	static public int ID_activeObjectLevel = 2;
+	/**
+	 * Proxy level is used to define reliable strategies for references to active objects.
+	 */
+	static public int ID_proxyLevel = 3;
+	/**
+	 * Future level is highly used with asynchronous remote method calls. It appears 
+	 * indeed that most of the failure occur during such calls.
+	 */
+	static public int ID_futureLevel = 4;
+	/**
+	 * Code level allows temporary handlers in the code. We keep such a level to let 
+	 * some functional treatments of non functional exceptions possible.
+	 */
+	static public int ID_codeLevel = 5;
 
     /** 
      * Is the exception reliable for the handler ? 
      * @param e The exception checked for handler reliability
      */
-    public boolean isHandling(NonFunctionalException e) {
-		return (e instanceof ProActiveCommunicationException);
-    }
-    
+    public boolean isHandling(NonFunctionalException e);
+
     /**
      * Provide a treatment for the handled exception(s) 
      * @param e The exception to be handled
      */
-    public void handle(NonFunctionalException e) {
-		System.out.println("*** " + this.getClass().getName() + " HANDLE " + e.getDescription());
-    }
+    public void handle(NonFunctionalException e);
 }
