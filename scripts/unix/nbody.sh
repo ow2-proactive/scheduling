@@ -6,7 +6,7 @@ echo --- N-body with ProActive ---------------------------------
 if [ -z "$PROACTIVE" ]
 then
 workingDir=`dirname $0`
-PROACTIVE=$workingDir/../../../.
+PROACTIVE=$workingDir/../../.
 CLASSPATH=.
 fi
 . $PROACTIVE/scripts/unix/env.sh
