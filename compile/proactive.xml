@@ -420,12 +420,20 @@
       ==
       ================================================================
 	-->
-	
+	<!--
+	  we copy the proactive classfiles and unjar everything
+	-->
 	 <target name="rewrite">
 	 <mkdir dir="${classlibs.dir}"/>
 	 <copy todir="${classlibs.dir}">
-		<fileset dir="${classes.dir}" includes="**/*.class"/>
+	     <fileset dir="${classes.dir}" includes="**/*.class"/>
 	</copy> 
+	
+         <unjar dest="${classlibs.dir}">
+	    <fileset dir="${base}/lib">
+		<include name="*.jar"/>
+	    </fileset>
+	 </unjar>
        <!--
          then we call the iogenerator
        -->
