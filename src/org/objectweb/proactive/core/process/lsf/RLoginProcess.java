@@ -34,36 +34,81 @@ import org.objectweb.proactive.core.process.SimpleExternalProcess;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 
+/**
+ * <p>
+ * The RloginProcess class is able to start any class, of the ProActive library, 
+ * using rlogin command.
+ * </p><p>
+ * For instance:
+ * </p><pre>
+ * ...............
+ * LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * RLoginProcess p = new RLoginProcess(lsf, false);
+ * p.setHostname("cluster_front_end_name");
+ * p.startProcess();
+ * ...............
+ * </pre>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+
 public class RLoginProcess extends AbstractExternalProcessDecorator {
   
   private boolean exitAfterCommand;
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  
+  /**
+   * Creates a new RloginProcess
+   * Used with XML Descriptors
+   */
   public RLoginProcess() {
     super();
     setCompositionType(SEND_TO_OUTPUT_STREAM_COMPOSITION);
   }
   
+  /**
+   * Creates a new RloginProcess
+   * @param targetProcess The target process associated to this process. The target process 
+   * represents the process that will be launched after logging remote host with rlogin
+   */
   public RLoginProcess(ExternalProcess targetProcess) {
     this(targetProcess, false);
   }
   
+  
+  /**
+   * Creates a new RloginProcess
+   * @param targetProcess The target process associated to this process. The target process 
+   * represents the process that will be launched after logging remote host with rlogin
+   * @param exitAfterCommand If true the process will finished once rlogin command is performed. The default value is false
+   */
   public RLoginProcess(ExternalProcess targetProcess, boolean exitAfterCommand) {
     super(targetProcess, SEND_TO_OUTPUT_STREAM_COMPOSITION);
     this.exitAfterCommand = exitAfterCommand;
   }
 
     
+	
   //
   // -- PUBLIC METHODS -----------------------------------------------
   //
-  
+  /**
+	 * Method setExitAfterCommand
+	 * @param b If true the process will finished once rlogin command is performed. The default vaule is false
+	 */
   public void setExitAfterCommand(boolean b) {
     exitAfterCommand = b;
   }
     
+    
+	/**
+	 * Returns the value of the boolean telling that the process will finished after rlogin command or will wait
+	 * for another command to be pushed once logging on the remote host
+	 * @return boolean
+	 */
   public boolean getExitAfterCommand() {
     return exitAfterCommand;
   }

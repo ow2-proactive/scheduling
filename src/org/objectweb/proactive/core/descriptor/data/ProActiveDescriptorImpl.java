@@ -31,21 +31,24 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.ProActiveException;
 
 /**
- * @author rquilici
+ * <p>
+ * A <code>ProactiveDescriptor</code> is an internal representation of XML
+ * Descriptor. It offers a set of services to access/activate/desactivate
+ * <code>VirtualNode</code>.
+ * </p>
  *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ *
  */
 public class ProActiveDescriptorImpl implements ProActiveDescriptor
 {
@@ -71,7 +74,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   //
 
  /**
-  * Contructs a new intance of VirtualNode
+  * Contructs a new intance of ProActiveDescriptor
   */
   public ProActiveDescriptorImpl() {
     virtualNodeMapping = new java.util.HashMap();
@@ -96,6 +99,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
 		}
 		return virtualNodeArray;
   }
+  
   
   public VirtualNode getVirtualNode(String name) {
     return (VirtualNode) virtualNodeMapping.get(name);
@@ -187,12 +191,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   
   
   public void activateMappings(){
-//  	Collection collection = virtualNodeMapping.values();
-//  	for (Iterator iter = collection.iterator(); iter.hasNext();)
-//		{
-//			VirtualNode element = (VirtualNode) iter.next();
-//			element.activate();
-//		}
 			VirtualNode[] virtualNodeArray = getVirtualNodes();
 			for (int i = 0; i < virtualNodeArray.length; i++)
 			{
@@ -207,25 +205,19 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptor
   }
   
   
-  public void desactivateMapping(){
-  	VirtualNode[] virtualNodeArray = getVirtualNodes();
-			for (int i = 0; i < virtualNodeArray.length; i++)
-			{
-				virtualNodeArray[i].desactivate();
-			}
-//  	Collection collection = virtualNodeMapping.values();
-//  	for (Iterator iter = collection.iterator(); iter.hasNext();)
-//		{
-//			VirtualNode element = (VirtualNode) iter.next();
-//			element.descactivate();
-//		}
-  }
-  
-  
-  public void desactivateMapping(String virtualNodeName){
-  	VirtualNode virtualNode = getVirtualNode(virtualNodeName);
-  	virtualNode.desactivate();
-  }
+//  public void desactivateMapping(){
+//  	VirtualNode[] virtualNodeArray = getVirtualNodes();
+//			for (int i = 0; i < virtualNodeArray.length; i++)
+//			{
+//				virtualNodeArray[i].desactivate();
+//			}
+//  }
+//  
+//  
+//  public void desactivateMapping(String virtualNodeName){
+//  	VirtualNode virtualNode = getVirtualNode(virtualNodeName);
+//  	virtualNode.desactivate();
+//  }
   
 	/**
 	 * Returns the size of virualNodeMapping HashMap

@@ -34,6 +34,30 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.core.util.MessageLogger;
 
+/**
+ * <p>
+ * The JVMProcess class is able to start localy any class of the ProActive library by 
+ * creating a Java Virtual Machine.
+ * </p><p>
+ * For instance:
+ * </p>
+ * <pre>
+ * .............
+ * JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
+ * process.setClassname("org.objectweb.proactive.StartNode");
+ * process.setParameters("nodeName");
+ * process.startProcess();
+ * .............
+ * </pre>
+ * <p>
+ * This piece of code launches the ProActive java class org.objectweb.proactive.StartNode
+ * with nodeName as parameter.
+ * </p>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+
 public class JVMProcessImpl extends AbstractExternalProcess implements JVMProcess,Serializable {
   
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
@@ -52,18 +76,31 @@ public class JVMProcessImpl extends AbstractExternalProcess implements JVMProces
   protected String parameters;
     
   
+	
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  /**
+   * Creates a new JVMProcess
+   * Used with XML Descriptor
+   */
   public JVMProcessImpl() {
   }
 
+	/**
+   * Creates a new JVMProcess
+   * @param messageLogger The logger that handles input and error stream of this process
+   */
   public JVMProcessImpl(MessageLogger messageLogger) {
     super(messageLogger);
   }
   
-
+  
+  /**
+   * Creates a new JVMProcess
+   * @param inputMessageLogger The logger that handles input stream of this process
+   * @param errorMessageLogger The logger that handles error stream of this process
+   */
   public JVMProcessImpl(MessageLogger inputMessageLogger, MessageLogger errorMessageLogger) {
     super(inputMessageLogger, errorMessageLogger);
   }

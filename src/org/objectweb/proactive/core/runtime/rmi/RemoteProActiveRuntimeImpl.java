@@ -104,17 +104,17 @@ public class RemoteProActiveRuntimeImpl
 	}
 
 	
-	public void createLocalVM(JVMProcess jvmProcess)
-		throws IOException
-	{
-	proActiveRuntime.createLocalVM(jvmProcess);
-	}
+//	public void createLocalVM(JVMProcess jvmProcess)
+//		throws IOException
+//	{
+//	proActiveRuntime.createLocalVM(jvmProcess);
+//	}
 
 	
-	public void createRemoteVM(UniversalProcess remoteProcess)
+	public void createVM(UniversalProcess remoteProcess)
 		throws IOException
 	{
-	 proActiveRuntime.createRemoteVM(remoteProcess);
+	 proActiveRuntime.createVM(remoteProcess);
 	}
 
 	
@@ -130,16 +130,16 @@ public class RemoteProActiveRuntimeImpl
 	}
 
 	
-	public String getLocalNode(String nodeName)
-	{
-		return proActiveRuntime.getLocalNode(nodeName);
-	}
-
-	
-	public String getNode(String nodeName)
-	{
-		return proActiveRuntime.getNode(nodeName);
-	}
+//	public String getLocalNode(String nodeName)
+//	{
+//		return proActiveRuntime.getLocalNode(nodeName);
+//	}
+//
+//	
+//	public String getNode(String nodeName)
+//	{
+//		return proActiveRuntime.getNode(nodeName);
+//	}
 	
 	
 //	public String getDefaultNodeName(){

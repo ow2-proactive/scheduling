@@ -30,21 +30,89 @@
 */ 
 package org.objectweb.proactive.core.process;
 
+/**
+ * <p>
+ * The JVMProcess class is able to start localy any class of the ProActive library by 
+ * creating a Java Virtual Machine.
+ * </p>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+ 
+
 public interface JVMProcess extends ExternalProcess {
 
+	/**
+	 * Returns the classpath associated to this process
+	 * @return String
+	 */
   public String getClasspath();
+  
+  
+  
+	/**
+	 * Sets the classpath for this process
+	 * @param classpath The value of the classpath environment variable
+	 */
   public void setClasspath(String classpath);
 
+  
+  
+	/**
+	 * Returns the java path associated to this process.
+	 * @return String The path to the java command
+	 */
   public String getJavaPath();
+  
+  
+	/**
+	 * Sets the java path for this process
+	 * @param javaPath The value of the path to execute 'java' command
+	 */
   public void setJavaPath(String javaPath);
+  
 
+	/**
+	 * Returns the location (path) to the policy file
+	 * @return String The path to the policy file
+	 */
   public String getPolicyFile();
+  
+  
+	/**
+	 * Sets the location of the policy file
+	 * @param policyFilePath The value of the path to the policy file
+	 */
   public void setPolicyFile(String policyFilePath);
   
+  
+  
+	/**
+	 * Returns the class name that this process is about to start
+	 * @return String The value of the class that this process is going to start
+	 */
   public String getClassname();
+  
+  
+	/**
+	 * Sets the value of the class to start for this process
+	 * @param classname The name of the class to start
+	 */
   public void setClassname(String classname);
   
+  
+	/**
+	 * Returns parameters associated to the class that this process is going to start
+	 * @return String The value of the parameters of the class
+	 */
   public String getParameters();
+  
+  
+	/**
+	 * Sets the parameters of the class to start with the given value
+	 * @param parameters Paramaters to be given in order to start the class 
+	 */
   public void setParameters(String parameters);
 
 }

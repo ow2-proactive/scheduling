@@ -32,6 +32,25 @@ package org.objectweb.proactive.core.process;
 
 import org.objectweb.proactive.core.util.MessageLogger;
 
+/**
+ * <p>
+ * The SimpleExternalProcess class is able to start any command line
+ * </p>
+ * <p>
+ * For instance 
+ * </p><pre>
+ * ..............
+ * SimpleExternalProcess p = new SimpleExternalProcess("ls -la");
+ * ..............
+ * </pre>
+ * <p>
+ * The previous piece of code will run locally the command "ls -la"
+ * 
+ * @author  ProActive Team
+ * @version 1.0,  2002/06/20
+ * @since   ProActive 0.9.3
+ */
+
 public class SimpleExternalProcess extends AbstractExternalProcess {
   
   private String targetCommand;
@@ -39,16 +58,32 @@ public class SimpleExternalProcess extends AbstractExternalProcess {
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  
+  /**
+   * Creates a new SimpleExternalProcess
+   * @param targetCommand The command to run
+   */
   public SimpleExternalProcess(String targetCommand) {
     this(new StandardOutputMessageLogger(), targetCommand);
   }
   
+  
+  /**
+   * Creates a new SimpleExternalProcess
+   * @param messageLogger The logger that handles input and error stream of this process
+   * @param targetCommand The command to run
+   */
   public SimpleExternalProcess(MessageLogger messageLogger, String targetCommand) {
     this(messageLogger, messageLogger, targetCommand);
   }
   
-
+  
+  /**
+   * Creates a new SimpleExternalProcess
+   * @param inputMessageLogger The logger that handles input stream of this process
+   * @param errorMessageLogger The logger that handles error stream of this process
+   * @param targetCommand The command to run
+   */
   public SimpleExternalProcess(MessageLogger inputMessageLogger, MessageLogger errorMessageLogger, String targetCommand) {
     super(inputMessageLogger, errorMessageLogger);
     this.targetCommand = targetCommand;

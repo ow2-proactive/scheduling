@@ -149,18 +149,18 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
   }
   
 
-	/**
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalVM(JVMProcess)
-	 */
-  public void createLocalVM(JVMProcess jvmProcess) throws java.io.IOException {
-    jvmProcess.startProcess();
-  }
+//	/**
+//	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalVM(JVMProcess)
+//	 */
+//  public void createLocalVM(JVMProcess jvmProcess) throws java.io.IOException {
+//    jvmProcess.startProcess();
+//  }
   
 
 	/**
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createRemoteVM(UniversalProcess)
+	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createVM(UniversalProcess)
 	 */
-  public void createRemoteVM(UniversalProcess remoteProcess) throws java.io.IOException {
+  public void createVM(UniversalProcess remoteProcess) throws java.io.IOException {
     remoteProcess.startProcess();
   }
 
@@ -188,20 +188,20 @@ public class ProActiveRuntimeImpl extends AbstractProActiveRuntimeEventProducer 
   }
   
 	
-	/**
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getLocalNode(String)
-	 */
-  public String getLocalNode(String nodeName){
-    return null;
-  }
-  
-	
-	/**
-	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNode(String)
-	 */
-  public String getNode(String nodeName) {
-    return null;
-  }
+//	/**
+//	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getLocalNode(String)
+//	 */
+//  public String getLocalNode(String nodeName){
+//    return null;
+//  }
+//  
+//	
+//	/**
+//	 * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getNode(String)
+//	 */
+//  public String getNode(String nodeName) {
+//    return null;
+//  }
   
 //  public String getDefaultNodeName(){
 //  	return defaultNodeName;

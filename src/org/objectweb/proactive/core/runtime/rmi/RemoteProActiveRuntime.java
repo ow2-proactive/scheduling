@@ -64,11 +64,11 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote
   
   
   
-  public void createLocalVM(JVMProcess jvmProcess) throws java.rmi.RemoteException,java.io.IOException;
+  //public void createLocalVM(JVMProcess jvmProcess) throws java.rmi.RemoteException,java.io.IOException;
   
   
   
-  public void createRemoteVM(UniversalProcess remoteProcess) throws java.rmi.RemoteException,java.io.IOException;
+  public void createVM(UniversalProcess remoteProcess) throws java.rmi.RemoteException,java.io.IOException;
 
 
  
@@ -80,11 +80,11 @@ public interface RemoteProActiveRuntime extends java.rmi.Remote
   
 
   
-  public String getLocalNode(String nodeName) throws java.rmi.RemoteException;
+  //public String getLocalNode(String nodeName) throws java.rmi.RemoteException;
   
 
   
-  public String getNode(String nodeName) throws java.rmi.RemoteException;
+  //public String getNode(String nodeName) throws java.rmi.RemoteException;
   
 
   

@@ -64,7 +64,7 @@ public class RemoteProActiveRuntimeAdapter
 	protected RemoteProActiveRuntime remoteProActiveRuntime;
 	protected VMInformation vmInformation;
 	protected String proActiveRuntimeURL;
-	//protected String defaultNode;
+	
 	
   //
   // -- Constructors -----------------------------------------------
@@ -74,13 +74,11 @@ public class RemoteProActiveRuntimeAdapter
   
   public RemoteProActiveRuntimeAdapter() throws ProActiveException{
  	try{
- 		//ProActiveRuntimeImpl proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
-// 		this.remoteProActiveRuntime = createRemoteProActiveRuntime(proActiveRuntime,url,replacePreviousBinding);
+ 		
 		this.remoteProActiveRuntime = createRemoteProActiveRuntime();
 		//System.out.println(remoteProActiveRuntime.getClass().getName());
  		this.vmInformation = remoteProActiveRuntime.getVMInformation();
  		this.proActiveRuntimeURL=remoteProActiveRuntime.getURL();
- 		//this.defaultNodeName = remoteProActiveRuntime.getLocalNode(url).getName();
  	}catch(java.rmi.RemoteException e){
  		throw new ProActiveException("Cannot create the remoteProactiveRuntime or get the VMInformation from the RemoteProActiveRuntime",e);	
  	}
@@ -95,7 +93,7 @@ public class RemoteProActiveRuntimeAdapter
   	try{
   		this.vmInformation = remoteProActiveRuntime.getVMInformation();
   		this.proActiveRuntimeURL = remoteProActiveRuntime.getURL();
-  		//this.defaultNode = remoteProActiveRuntime.getLocalNode(DEFAULT_NODE_NAME);
+  		
   	}catch(java.rmi.RemoteException re){
   		throw new ProActiveException(re);
   	}
@@ -151,22 +149,22 @@ public class RemoteProActiveRuntimeAdapter
 	}
 
 	
-	public void createLocalVM(JVMProcess jvmProcess)
-		throws IOException,ProActiveException
-	{
-		try{
-		remoteProActiveRuntime.createLocalVM(jvmProcess);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-		}
-	}
+//	public void createLocalVM(JVMProcess jvmProcess)
+//		throws IOException,ProActiveException
+//	{
+//		try{
+//		remoteProActiveRuntime.createLocalVM(jvmProcess);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//		}
+//	}
 
 	
-	public void createRemoteVM(UniversalProcess remoteProcess)
+	public void createVM(UniversalProcess remoteProcess)
 		throws IOException,ProActiveException
 	{
 		try{
-		remoteProActiveRuntime.createRemoteVM(remoteProcess);
+		remoteProActiveRuntime.createVM(remoteProcess);
 		}catch(java.rmi.RemoteException re){
 			throw new ProActiveException(re);
 		}
@@ -195,26 +193,26 @@ public class RemoteProActiveRuntimeAdapter
 	}
 
 	
-	public String getLocalNode(String nodeName) throws ProActiveException
-	{
-		try{
-		return remoteProActiveRuntime.getLocalNode(nodeName);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-			// behavior to be defined
-		}
-	}
-
-	
-	public String getNode(String nodeName) throws ProActiveException
-	{
-		try{
-		return remoteProActiveRuntime.getNode(nodeName);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-			// behavior to be defined
-		}
-	}
+//	public String getLocalNode(String nodeName) throws ProActiveException
+//	{
+//		try{
+//		return remoteProActiveRuntime.getLocalNode(nodeName);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//			// behavior to be defined
+//		}
+//	}
+//
+//	
+//	public String getNode(String nodeName) throws ProActiveException
+//	{
+//		try{
+//		return remoteProActiveRuntime.getNode(nodeName);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//			// behavior to be defined
+//		}
+//	}
 	
 //	public String getDefaultNodeName() throws ProActiveException{
 //		try{

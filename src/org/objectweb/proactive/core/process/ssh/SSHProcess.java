@@ -34,16 +34,43 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.SimpleExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 
+/**
+ * <p>
+ * The SSHProcess class is able to start any class, of the ProActive library, 
+ * using ssh protocol.
+ * </p><p>
+ * For instance:
+ * </p><pre>
+ * .......
+ * SSHProcess ssh = new SSHProcess(new SimpleExternalProcess("ls -lsa"));
+ * ssh.setHostname("hostname.domain.fr");
+ * ssh.startProcess();
+ * .....
+ * </pre>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+
 public class SSHProcess extends AbstractExternalProcessDecorator {
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  
+  /**
+   * Creates a new SSHProcess
+   * Used with XML Descriptor
+   */
   public SSHProcess() {
     super();
   }
   
+  /**
+   * Creates a new SSHProcess
+   * @param targetProcess The target process associated to this process. The target process 
+   * represents the process that will be launched after logging remote host with ssh protocol
+   */
   public SSHProcess(ExternalProcess targetProcess) {
     super(targetProcess);
   }
@@ -55,9 +82,9 @@ public class SSHProcess extends AbstractExternalProcessDecorator {
     
   public static void main(String[] args) {
     try {
-      SSHProcess rsh = new SSHProcess(new SimpleExternalProcess("ls -lsa"));
-      rsh.setHostname("solida");
-      rsh.startProcess();
+      SSHProcess ssh = new SSHProcess(new SimpleExternalProcess("ls -lsa"));
+      ssh.setHostname("solida");
+      ssh.startProcess();
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -30,11 +30,9 @@
 */ 
 package org.objectweb.proactive.core.descriptor.data;
 
-import java.io.Serializable;
-
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
-import org.objectweb.proactive.core.ProActiveException;
 
 /**
  * <p>
@@ -44,9 +42,10 @@ import org.objectweb.proactive.core.ProActiveException;
  * </p>
  *
  * @author  ProActive Team
- * @version 1.0,  2002/06/20
+ * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.3
- *
+ * @see VirtualNode
+ * @see VirtualMachine
  */
 public interface ProActiveDescriptor extends java.io.Serializable{
 
@@ -98,11 +97,11 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   
   
   /**
-   * Creates an ExternalProcess with the specified ProcessID
+   * Creates an ExternalProcess of the given className with the specified ProcessID
    * @param processID
-   * @param processClassName
+   * @param processClassName.
    * @return ExternalProcess
-   * @throws ProActiveException
+   * @throws ProActiveException if a problem occurs during process creation
    */
   public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException;
   
@@ -111,7 +110,7 @@ public interface ProActiveDescriptor extends java.io.Serializable{
    * Returns a new instance of ExternalProcess from processClassName
    * @param processClassName
    * @return ExternalProcess
-   * @throws ProActiveException
+   * @throws ProActiveException if a problem occurs during process creation
    */
   public ExternalProcess createProcess(String processClassName) throws ProActiveException;
   
@@ -133,29 +132,29 @@ public interface ProActiveDescriptor extends java.io.Serializable{
   
   
   /**
-   * Creates all Nodes mapped to VirtualNodes in the XML Descriptor.
+   * Activates all VirtualNodes defined in the XML Descriptor.
    */
   public void activateMappings();
   
   
   /**
-   * Create Nodes mapped to the specified VirtualNode in the XML Descriptor
+   * Activates the specified VirtualNode defined in the XML Descriptor
    * @param virtualNodeName name of the VirtulNode to be activated
    */
   public void activateMapping(String virtualNodeName);
   
   
-  /**
-   * Kills all Nodes mapped to VirtualNodes in the XML Descriptor
-   */
-  public void desactivateMapping();
-  
-  
-  /**
-   * Kills all Nodes mapped to the specified VirutalNode in the XML Descriptor
-   * @param vitualNodeName name of the virtualNode to be desactivated
-   */
-  public void desactivateMapping(String virtualNodeName);
+//  /**
+//   * Kills all Nodes mapped to VirtualNodes in the XML Descriptor
+//   */
+//  public void desactivateMapping();
+//  
+//  
+//  /**
+//   * Kills all Nodes mapped to the specified VirutalNode in the XML Descriptor
+//   * @param vitualNodeName name of the virtualNode to be desactivated
+//   */
+//  public void desactivateMapping(String virtualNodeName);
   
 	/**
 	 * Returns the size of virualNodeMapping HashMap

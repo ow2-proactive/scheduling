@@ -30,9 +30,35 @@
 */ 
 package org.objectweb.proactive.core.process.ssh;
 
+
+
 import org.objectweb.proactive.core.util.MessageLogger;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.process.JVMProcess;
+
+/**
+ * <p>
+ * The SSHJVMProcess class is able to start any class, of the ProActive library, 
+ * using ssh protocol. The difference between this class and SSHProcess class is that the target process 
+ * for this class is automatically a JVMProcess, whereas for the SSHProcess, the target process has to be defined
+ * and can be any command and any process.
+ * </p><p>
+ * For instance:
+ * </p><pre>
+ * .......
+ * SSHProcess ssh = new SSHJVMProcess(new StandardOutputMessageLogger());
+ * ssh.setHostname("machine_name");
+ * ssh.startProcess();
+ * .....
+ * </pre>
+ * <p>
+ * This piece of code creates a new SSHJVMProcess. It allows to log on a remote machine with the ssh protocol and then,
+ * on this machine to create a Java Virtual Machine, by launching a ProActive java class.
+ * </p>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
 
 public class SSHJVMProcess extends SSHProcess implements JVMProcess {
 
@@ -41,15 +67,29 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  /**
+   * Creates a new SSHJVMProcess
+   * Used with XML Descriptor
+   */
   public SSHJVMProcess() {
     super();
   }
-    
+  
+  
+  /**
+   * Creates a new SSHJVMProcess
+   * @param messageLogger The logger that handles input and error stream of the target JVMProcess
+   */  
   public SSHJVMProcess(MessageLogger messageLogger) {
     this(messageLogger, messageLogger);
   }
-    
+  
+  
+  /**
+   * Creates a new SSHJVMProcess
+   * @param inputMessageLogger The logger that handles input stream of the target JVMProcess
+   * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
+   */  
   public SSHJVMProcess(MessageLogger inputMessageLogger, MessageLogger errorMessageLogger) {
     super(new JVMProcessImpl(inputMessageLogger, errorMessageLogger));
     jvmProcess = (JVMProcessImpl) targetProcess;
@@ -74,51 +114,96 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
   //
   // -- implements JVMProcess -----------------------------------------------
   //
-
+  
+  /**
+	 * Returns the classpath associated to the target JVMProcess
+	 * @return String
+	 */
   public String getClasspath() {
     return jvmProcess.getClasspath();
   }
   
+  
+  /**
+	 * Sets the classpath for the target JVMProcess
+	 * @param classpath The value of the classpath environment variable
+	 */
   public void setClasspath(String classpath) {
     checkStarted();
     jvmProcess.setClasspath(classpath);
   }
   
-
+  
+  /**
+	 * Returns the java path associated the target JVMProcess
+	 * @return String The path to the java command
+	 */
   public String getJavaPath() {
     return jvmProcess.getJavaPath();
   }
   
+  
+  /**
+	 * Sets the java path for the target JVMProcess
+	 * @param javaPath The value of the path to execute 'java' command
+	 */
   public void setJavaPath(String javaPath) {
     checkStarted();
     jvmProcess.setJavaPath(javaPath);
   }
 
-
+  
+  /**
+	 * Returns the location (path) to the policy file for the target JVMProcess
+	 * @return String The path to the policy file
+	 */
   public String getPolicyFile() {
     return jvmProcess.getPolicyFile();
   }
   
+  
+  /**
+	 * Sets the location of the policy file for the target JVMProcess
+	 * @param policyFilePath The value of the path to the policy file
+	 */
   public void setPolicyFile(String policyFile) {
     checkStarted();
     jvmProcess.setPolicyFile(policyFile);
   }
   
-
+  
+  /**
+	 * Returns the class name that the target JVMProcess is about to start
+	 * @return String The value of the class that the target JVMProcess is going to start
+	 */
   public String getClassname() {
     return jvmProcess.getClassname();
   }
   
+  
+  /**
+	 * Sets the value of the class to start for the target JVMProcess
+	 * @param classname The name of the class to start
+	 */
   public void setClassname(String classname) {
     checkStarted();
     jvmProcess.setClassname(classname);
   }
   
   
+  /**
+	 * Returns parameters associated to the class that the target JVMProcess is going to start
+	 * @return String The value of the parameters of the class
+	 */
   public String getParameters() {
     return jvmProcess.getParameters();
   }
   
+  
+  /**
+	 * Sets the parameters of the class to start with the given value for the target JVMProcess
+	 * @param parameters Paramaters to be given in order to start the class 
+	 */
   public void setParameters(String parameters) {
     checkStarted();
     jvmProcess.setParameters(parameters);

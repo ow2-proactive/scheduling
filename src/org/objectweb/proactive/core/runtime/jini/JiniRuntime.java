@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 
 
 /**
- *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
+ *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate JINI-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
  *   to anothe remote objects library.
  * 	 @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
@@ -64,11 +64,11 @@ public interface JiniRuntime extends java.rmi.Remote
   
   
   
-  public void createLocalVM(JVMProcess jvmProcess) throws java.rmi.RemoteException,java.io.IOException;
+  //public void createLocalVM(JVMProcess jvmProcess) throws java.rmi.RemoteException,java.io.IOException;
   
   
   
-  public void createRemoteVM(UniversalProcess remoteProcess) throws java.rmi.RemoteException,java.io.IOException;
+  public void createVM(UniversalProcess remoteProcess) throws java.rmi.RemoteException,java.io.IOException;
 
 
  
@@ -80,11 +80,11 @@ public interface JiniRuntime extends java.rmi.Remote
   
 
   
-  public String getLocalNode(String nodeName) throws java.rmi.RemoteException;
+  //public String getLocalNode(String nodeName) throws java.rmi.RemoteException;
   
 
   
-  public String getNode(String nodeName) throws java.rmi.RemoteException;
+  //public String getNode(String nodeName) throws java.rmi.RemoteException;
   
 
   

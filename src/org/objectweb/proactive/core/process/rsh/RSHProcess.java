@@ -34,16 +34,47 @@ import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.SimpleExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcess;
 
+/**
+ * <p>
+ * The RSHProcess class is able to start any class, of the ProActive library, 
+ * using rsh protocol.
+ * </p><p>
+ * For instance:
+ * </p><pre>
+ * ..........
+ * RSHProcess rsh = new RSHProcess(new SimpleExternalProcess("ls -lsa"));
+ * rsh.setHostname("hostname.domain.fr");
+ * rsh.startProcess();
+ * .......... or 
+ * RSHProcess rsh = new RSHProcess(new JVMProcessImpl(new StandardOutputMessageLogger()));
+ * ssh.setHostname("hostname.domain.fr");
+ * ssh.startProcess();
+ * .....
+ * </pre>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+ 
 public class RSHProcess extends AbstractExternalProcessDecorator {
   
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  /**
+   * Creates a new RSHProcess
+   * Used with XML Descriptors
+   */
   public RSHProcess() {
     super();
   }
   
+  
+  /**
+   * Creates a new RSHProcess
+   * @param targetProcess The target process associated to this process. The target process 
+   * represents the process that will be launched after logging remote host with rsh protocol
+   */
   public RSHProcess(ExternalProcess targetProcess) {
     super(targetProcess);
   }

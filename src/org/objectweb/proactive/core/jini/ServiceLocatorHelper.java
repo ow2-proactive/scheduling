@@ -39,6 +39,18 @@ import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
 
+/**
+ * <p>
+ * The <code>ServiceLocatorHelper</code> is a utility class, that takes care of creating or discovering the
+ * Lookup Service when using JINI.
+ * </p>
+ *
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.3
+ *
+ */
+
 public class ServiceLocatorHelper implements DiscoveryListener {
 
   protected static int MAX_RETRY = 8;

@@ -113,6 +113,7 @@ public class JiniRuntimeFactory extends RuntimeFactory {
     	// recherche unicast
     	try {
         	lookup = new LookupLocator("jini://" + host);
+        	System.out.println("Service lookup found ");
         	registrar = lookup.getRegistrar();
    	 	}catch (java.net.MalformedURLException e) {
         	throw new ProActiveException("Lookup failed: " + e.getMessage() );

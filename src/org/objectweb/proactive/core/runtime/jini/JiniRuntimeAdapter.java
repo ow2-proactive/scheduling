@@ -48,6 +48,13 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
+/**
+ *   An adapter for a JiniRuntime to be able to receive remote calls. This helps isolate JINI-specific
+ *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
+ *   to another remote objects library.
+ * 	 @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
+ */
+
 public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializable {
 
   protected JiniRuntime jiniRuntime;
@@ -133,22 +140,22 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 
 	
-	public void createLocalVM(JVMProcess jvmProcess)
-		throws IOException,ProActiveException
-	{
-		try{
-		jiniRuntime.createLocalVM(jvmProcess);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-		}
-	}
+//	public void createLocalVM(JVMProcess jvmProcess)
+//		throws IOException,ProActiveException
+//	{
+//		try{
+//		jiniRuntime.createLocalVM(jvmProcess);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//		}
+//	}
 
 	
-	public void createRemoteVM(UniversalProcess remoteProcess)
+	public void createVM(UniversalProcess remoteProcess)
 		throws IOException,ProActiveException
 	{
 		try{
-		jiniRuntime.createRemoteVM(remoteProcess);
+		jiniRuntime.createVM(remoteProcess);
 		}catch(java.rmi.RemoteException re){
 			throw new ProActiveException(re);
 		}
@@ -177,26 +184,26 @@ public class JiniRuntimeAdapter implements ProActiveRuntime, java.io.Serializabl
 	}
 
 	
-	public String getLocalNode(String nodeName) throws ProActiveException
-	{
-		try{
-		return jiniRuntime.getLocalNode(nodeName);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-			// behavior to be defined
-		}
-	}
-
-	
-	public String getNode(String nodeName) throws ProActiveException
-	{
-		try{
-		return jiniRuntime.getNode(nodeName);
-		}catch(java.rmi.RemoteException re){
-			throw new ProActiveException(re);
-			// behavior to be defined
-		}
-	}
+//	public String getLocalNode(String nodeName) throws ProActiveException
+//	{
+//		try{
+//		return jiniRuntime.getLocalNode(nodeName);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//			// behavior to be defined
+//		}
+//	}
+//
+//	
+//	public String getNode(String nodeName) throws ProActiveException
+//	{
+//		try{
+//		return jiniRuntime.getNode(nodeName);
+//		}catch(java.rmi.RemoteException re){
+//			throw new ProActiveException(re);
+//			// behavior to be defined
+//		}
+//	}
 	
 //	public String getDefaultNodeName() throws ProActiveException{
 //		try{

@@ -63,6 +63,13 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+/**
+ *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate JINI-specific
+ *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
+ *   to anothe remote objects library.
+ * 	 @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
+ */
+
 
 public class JiniRuntimeImpl
   extends java.rmi.server.UnicastRemoteObject
@@ -181,17 +188,17 @@ public class JiniRuntimeImpl
 	}
 
 	
-	public void createLocalVM(JVMProcess jvmProcess)
-		throws IOException
-	{
-	proActiveRuntime.createLocalVM(jvmProcess);
-	}
+//	public void createLocalVM(JVMProcess jvmProcess)
+//		throws IOException
+//	{
+//	proActiveRuntime.createLocalVM(jvmProcess);
+//	}
 
 	
-	public void createRemoteVM(UniversalProcess remoteProcess)
+	public void createVM(UniversalProcess remoteProcess)
 		throws IOException
 	{
-	 proActiveRuntime.createRemoteVM(remoteProcess);
+	 proActiveRuntime.createVM(remoteProcess);
 	}
 
 	
@@ -207,16 +214,16 @@ public class JiniRuntimeImpl
 	}
 
 	
-	public String getLocalNode(String nodeName)
-	{
-		return proActiveRuntime.getLocalNode(nodeName);
-	}
-
-	
-	public String getNode(String nodeName)
-	{
-		return proActiveRuntime.getNode(nodeName);
-	}
+//	public String getLocalNode(String nodeName)
+//	{
+//		return proActiveRuntime.getLocalNode(nodeName);
+//	}
+//
+//	
+//	public String getNode(String nodeName)
+//	{
+//		return proActiveRuntime.getNode(nodeName);
+//	}
 	
 	
 //	public String getDefaultNodeName(){

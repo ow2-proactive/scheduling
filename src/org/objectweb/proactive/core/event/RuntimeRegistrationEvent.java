@@ -9,7 +9,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
  * 
  * @author  ProActive Team
  * @version 1.0,  2002/08/06
- * @since   ProActive 0.9
+ * @since   ProActive 0.9.4
  *
  */
 public class RuntimeRegistrationEvent extends ProActiveEvent

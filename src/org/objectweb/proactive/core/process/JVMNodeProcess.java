@@ -1,9 +1,33 @@
-/**
- * Created on 8 juil. 2002
- *
- * To change this generated comment edit the template variable "filecomment":
- * Window>Preferences>Java>Templates.
- */
+/* 
+* ################################################################
+* 
+* ProActive: The Java(TM) library for Parallel, Distributed, 
+*            Concurrent computing with Security and Mobility
+* 
+* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+* Contact: proactive-support@inria.fr
+* 
+* This library is free software; you can redistribute it and/or
+* modify it under the terms of the GNU Lesser General Public
+* License as published by the Free Software Foundation; either
+* version 2.1 of the License, or any later version.
+*  
+* This library is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+* Lesser General Public License for more details.
+* 
+* You should have received a copy of the GNU Lesser General Public
+* License along with this library; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+* USA
+*  
+*  Initial developer(s):               The ProActive Team
+*                        http://www.inria.fr/oasis/ProActive/contacts.html
+*  Contributor(s): 
+* 
+* ################################################################
+*/ 
 package org.objectweb.proactive.core.process;
 
 import java.io.Serializable;
@@ -12,15 +36,20 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.MessageLogger; 
 
 /**
- * @author rquilici
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
+ * <p>
+ * This class has the same functionalities than JVMProcess, except that the class associated with this process
+ * ie the class that this process will start when the <code>startProcess()</code> is called, is set automatically to
+ * <code>org.objectweb.proactive.core.runtime.startRuntime</code>.This class is mainly used with XML deployment descriptor.
+ * </p>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
  */
+
 public class JVMNodeProcess extends JVMProcessImpl implements Serializable{ 
     
   /**
-   * Constructor for JVMNodeProcess.
+   * Creates a new instance of JVMNodeProcess.
    */
   public JVMNodeProcess() {
 	this(new StandardOutputMessageLogger());
@@ -28,34 +57,22 @@ public class JVMNodeProcess extends JVMProcessImpl implements Serializable{
   }
 
   /**
-   * Constructor for JVMNodeProcess.
-   * @param messageLogger
+   * Creates a new instance of JVMNodeProcess
+   * @param messageLogger The logger that handles input and error stream of this process
    */
   public JVMNodeProcess(MessageLogger messageLogger) {
     super(messageLogger);
+    setClassname("org.objectweb.proactive.core.runtime.StartRuntime"); 
   }
 
   /**
-   * Constructor for JVMNodeProcess.
-   * @param inputMessageLogger
-   * @param errorMessageLogger
+   * Creates a new instance of JVMNodeProcess
+   * @param inputMessageLogger The logger that handles input stream of this process
+   * @param errorMessageLogger The logger that handles error stream of this process
    */
   public JVMNodeProcess(MessageLogger inputMessageLogger, MessageLogger errorMessageLogger) {
     super(inputMessageLogger, errorMessageLogger);
+    setClassname("org.objectweb.proactive.core.runtime.StartRuntime"); 
   }
 
-//  protected void handleProcess(java.io.BufferedReader in, java.io.BufferedWriter out, java.io.BufferedReader err) {
-// String s = null;
-//  try {
-//////      //while ((s = in.readLine()) != null && (s.indexOf(NODEOK) == -1)) {
-//     while ((s = in.readLine()) != null && (s.indexOf(RUNTIMEOK) == -1)){
-//     	    //while ((s = in.readLine()) != null ) {
-//       System.out.println("-----------------"+s);
-//     }
-//     } catch (Exception e) {
-//     e.printStackTrace();
-//     System.out.println("exception in handle process");
-//      }
-////   super.handleProcess(in,out,err);
-//  }
 }

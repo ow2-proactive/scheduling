@@ -36,6 +36,28 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.MessageSink;
 import org.objectweb.proactive.core.util.MessageLogger;
 
+/**
+ * <p>
+ * The LSFBSubProcess class is able to start any class, of the ProActive library, 
+ * on a cluster managed by LSF prtocol. An istance of this class can be coupled for instance with
+ * RlLoginProcess or SSHProcess classes in order to log into the cluster's front end with rlogin or
+ * ssh and then to run a job with LSFBSubProcess.
+ * </p>
+ * <p>
+ * For instance:
+ * </p><pre>
+ * ..............
+ * LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
+ * RLoginProcess p = new RLoginProcess(lsf, false);
+ * p.setHostname("cluster_front_end_name");
+ * p.startProcess();
+ * ...............
+ * </pre>
+ * @author  ProActive Team
+ * @version 1.0,  2002/09/20
+ * @since   ProActive 0.9.4
+ */
+
 public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     
   private static final String FILE_SEPARATOR = System.getProperty("file.separator");
@@ -65,7 +87,10 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   //
   // -- CONSTRUCTORS -----------------------------------------------
   //
-
+  /**
+   * Creates a new LSFBsubProcess
+   * Used with XML Descriptors
+   */
   public LSFBSubProcess() {
     super();
     setCompositionType(GIVE_COMMAND_AS_PARAMETER);
@@ -73,6 +98,11 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   }
   
   
+  /**
+   * Creates a new LSFBsubProcess
+   * @param targetProcess The target process associated to this process. The target process 
+   * represents the process that will be launched with the bsub command
+   */
   public LSFBSubProcess(ExternalProcess targetProcess) {
     super(targetProcess);
     this.hostname = null;
@@ -94,7 +124,13 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
       super.setOutputMessageSink(outputMessageSink);
     }
   }
+  
 
+	/**
+	 * Builds bkill command and encapsulates it in a process
+	 * @param jobID The id of the job previously launched
+	 * @return ExternalProcess The process encapsulating the bkill command
+	 */
   public static ExternalProcess buildBKillProcess(int jobID) {
     return new SimpleExternalProcess("bkill "+jobID);
   }
@@ -110,30 +146,58 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   }
   
   
+	/**
+	 * Returns the id of the job associated to this process
+	 * @return int
+	 */
   public int getJobID() {
     return jobID;
   }
   
   
+	/**
+	 * Returns the name of the queue where the job was launched
+	 * @return String
+	 */
   public String getQueueName() {
     return queueName;
   }
   
+  
+	/**
+	 * Sets the value of the queue where the job will be launched. The default is 'normal'
+	 * @param queueName
+	 */
   public void setQueueName(String queueName) {
     checkStarted();
     if (queueName == null) throw new NullPointerException();
     this.queueName = queueName;
   }
   
+  
+	/**
+	 * Sets the value of the hostList parameter with the given value
+	 * @param hostList
+	 */
   public void setHostList(String hostList){
   	checkStarted();
   	this.hostList = hostList;
   }
-  
+   
+   
+	/**
+	 * Returns the hostList value of this process.
+	 * @return String
+	 */
   public String getHostList(){
   	return hostList;
   }
   
+  
+	/**
+	 * Sets the number of processor requested when running the job
+	 * @param processor
+	 */
   public void setProcessorNumber(String processor){
   	checkStarted();
   	if(processor != null){
@@ -141,6 +205,11 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
   	}
   }
   
+  
+	/**
+	 * Returns the number of processor requested for the job
+	 * @return String
+	 */
   public String getProcessorNumber(){
   	return processor;
   }
