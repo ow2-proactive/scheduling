@@ -69,7 +69,7 @@ public class ThreadPool {
 
 
 	/** Adds a job to the pending queue of the thread pool. */
-	public synchronized void assign(Runnable r) {
+	public synchronized void addAJob(Runnable r) {
 		this.controler.jobStart();
 		this.pendingJobs.add(r);
 		this.notify();
@@ -99,7 +99,7 @@ public class ThreadPool {
 	}
 
 	/** Cleanly destroys a ThreadPool object */
-	protected void finalize() {
+	public void finalize() {
 		this.controler.reset();
 		for (int i = 0; i < threads.length; i++) {
 			this.threads[i].interrupt();

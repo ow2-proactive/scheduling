@@ -42,6 +42,7 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
+import org.objectweb.proactive.core.group.threadpool.ThreadPool;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -67,6 +68,8 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	protected boolean uniqueSerialization = false;
 	/** The stub of the typed group */
 	protected StubObject stub;
+	/** A pool of thread to serve the request */
+	transient private ThreadPool threadpool;
 
 
 
@@ -75,22 +78,26 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		this.className = nameOfClass;
 		this.memberList = new Vector();
 		this.proxyForGroupID = new UniqueID();
+		this.threadpool = new ThreadPool();
 	}
 
 	public ProxyForGroup(String nameOfClass, Integer size) throws ConstructionOfReifiedObjectFailedException {
 		this.className = nameOfClass;
 		this.memberList = new Vector(size.intValue());
 		this.proxyForGroupID = new UniqueID();
+		this.threadpool = new ThreadPool();
 	}
 
 	public ProxyForGroup() throws ConstructionOfReifiedObjectFailedException {
 		this.memberList = new Vector();
 		this.proxyForGroupID = new UniqueID();
+		this.threadpool = new ThreadPool();
 	}
 
 	public ProxyForGroup(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
 		this.memberList = new Vector();
 		this.proxyForGroupID = new UniqueID();
+		this.threadpool = new ThreadPool();
 	}
 
 
@@ -182,36 +189,10 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 
 		/* A barrier of synchronisation to be sur that all calls are done before continuing the execution */
-		this.waitForAllCallsDone();
+		this.threadpool.complete();
 
 		return result;
 	}
-
-
-
-	/* -------------- METHOD FOR THREAD CREATION AND BARRIER OF SYNCHRONISATION ----------------- */
-
-	/**
-	 *  Waits until the method has been apply to all the members.
-	 */
-	protected synchronized void waitForAllCallsDone() {
-		while (this.waited != 0) {
-			try {
-				wait();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	/**
-	 * Decrements the awaited counter and notify that a result is arrived.
-	 */
-	protected synchronized void decrementWaitedAndNotifyAll() {
-		waited--;
-		notifyAll();
-	}
-
 
 
 
@@ -229,7 +210,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		// Creates a stub + ProxyForGroup for representing the result
 		try {
 			Object[] paramProxy = new Object[0];
-			result = MOP.newInstance(mc.getReifiedMethod().getReturnType().getName(), null, "org.objectweb.proactive.core.group.ProxyForGroup", paramProxy);
+			result = MOP.newInstance(mc.getReifiedMethod().getReturnType().getName(), null, ProxyForGroup.class.getName(), paramProxy);
 			((ProxyForGroup) ((StubObject) result).getProxy()).className = mc.getReifiedMethod().getReturnType().getName();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -248,7 +229,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			if (uniqueSerialization)
 				mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
-				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, mc,body);			
+				this.threadpool.addAJob(new ProcessForAsyncCall(this, this.memberList, memberListOfResultGroup, index, mc, body));
 		}
 		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
@@ -258,7 +239,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
-				this.createThreadForAsync(this.memberList, memberListOfResultGroup, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body);
+				this.threadpool.addAJob(new ProcessForAsyncCall(this, this.memberList, memberListOfResultGroup, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body));
 			}
 		}
 
@@ -267,18 +248,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		return result;
 	}
 
-	/**
-	 * Creates the threads to make all the calls in parallel.
-	 * @param <code>memberList</code> the list of member on wich we make the call.
-	 * @param <code>memberListOfResultGroup</code> the list where we store the results.
-	 * @param <code>index</code> the rank of the member we consider
-	 * @param <code>mc</code> the MethodCall object to transmit to the member
-	 * @param <code>body</code> the body who have initiate the call.
-	 */
-	private synchronized void createThreadForAsync(Vector memberList, Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
-		new Thread(new ProcessForAsyncCall(this,memberList, memberListOfResultGroup, index, mc, body)).start();
-		this.waited++;
-	}
 
 	/**
 	 * Add the results (Future) into the typed group result at the correct poisition.
@@ -288,7 +257,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 */
 	protected synchronized void addToListOfResult(Vector memberListOfResultGroup, Object result, int index) {
 		memberListOfResultGroup.set(index, result);
-		this.decrementWaitedAndNotifyAll();
 	}
 
 
@@ -307,7 +275,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			if (uniqueSerialization)
 				mc.transformEffectiveArgumentsIntoByteArray();
 			for (int index = 0; index < this.memberList.size(); index++)
-				this.createThreadForOneWay(this.memberList, index, mc, body, exceptionList);
+				this.threadpool.addAJob(new ProcessForOneWayCall(this, this.memberList, index, mc, body, exceptionList));
 		}
 		else { // isDispatchingCall == true
 			for (int index = 0; index < memberList.size(); index++) {
@@ -317,7 +285,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 						individualEffectiveArguments[i] = ProActiveGroup.get(mc.getParameter(i), index % ProActiveGroup.size(mc.getParameter(i)));
 					else
 						individualEffectiveArguments[i] = mc.getParameter(i);
-				this.createThreadForOneWay(this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body, exceptionList);
+				this.threadpool.addAJob(new ProcessForOneWayCall(this, this.memberList, index, new MethodCall(mc.getReifiedMethod(), individualEffectiveArguments), body, exceptionList));
 			}
 		}
 
@@ -328,19 +296,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		}
 	}
 	
-	/**
-	 * Creates the threads to make all the calls in parallel.
-	 * @param <code>memberList</code> the list of member on wich we make the call.
-	 * @param <code>index</code> the rank of the member we consider
-	 * @param <code>mc</code> the MethodCall object to transmit to the member
-	 * @param <code>body</code> the body who have initiate the call.
-	 */
-	private synchronized void createThreadForOneWay(Vector memberList, int index, MethodCall mc, Body body, ExceptionList exceptionList) {
-		new Thread(new ProcessForOneWayCall(this,memberList, index, mc, body, exceptionList)).start();
-		this.waited++;
-	}
-
-
 
 	/* ------------------- THE COLLECTION'S METHOD ------------------ */
 
@@ -371,7 +326,7 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 				else {
 					Object tmp = null;
 					try {
-						tmp = MOP.newInstance(o.getClass().getName(), null, "org.objectweb.proactive.core.body.future.FutureProxy", null);
+						tmp = MOP.newInstance(o.getClass().getName(), null, org.objectweb.proactive.core.body.future.FutureProxy.class.getName(), null);
 					} catch (Exception e) {
 						if (logger.isInfoEnabled())
 							logger.info("Unable to create a stub+proxy for the new member of the group");
@@ -610,7 +565,6 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 	 * @return the member of the Group at the specified rank.
 	 */
 	public Object get(int i) {
-		this.waitForAllCallsDone();
 		return this.memberList.get(i);
 	}
 
@@ -644,10 +598,11 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			e.printStackTrace();
 			return null;
 		}
-		((ProxyForGroup) ((StubObject) result).getProxy()).memberList = this.memberList;
-		((ProxyForGroup) ((StubObject) result).getProxy()).className = this.className;
-		((ProxyForGroup) ((StubObject) result).getProxy()).proxyForGroupID = this.proxyForGroupID;
-		((ProxyForGroup) ((StubObject) result).getProxy()).waited = this.waited;
+		ProxyForGroup proxy = (ProxyForGroup) ((StubObject) result).getProxy(); 
+		proxy.memberList = this.memberList;
+		proxy.className = this.className;
+		proxy.proxyForGroupID = this.proxyForGroupID;
+		proxy.waited = this.waited;
 		return result;
 	}
 	//  This is the best thing to do, but createStubObject has a private acces !!!! :
@@ -785,26 +740,26 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 			if ((element instanceof Throwable) || (element == null))
 			it.remove();
 		}
-//		for (int i = 0 ; i < this.memberList.size() ; i++) {
-//			if ((this.memberList.get(i) instanceof Throwable) || (this.memberList.get(i) == null)) {
-//				this.memberList.remove(i);
-//				i--;
-//			}
-//		}
 	}
 
 
 	/* ---------------------- METHOD FOR SYNCHRONOUS CREATION OF A TYPED GROUP ---------------------- */
 
 	/**
-	 * Creates the threads to build members in parallel.
+	 * Builds the members using the threads (of the threadpool).
 	 * @param <code>className</code> the name of the Class of the members.
 	 * @param <code>param</code> an array that contains the parameters for the constructor of member.
 	 * @param <code>node</code> the node where the member will be created.
 	 */
-	protected synchronized void createThreadCreation(String className, Object[] param, String node, int index) {
-		new Thread(new ProcessForGroupCreation(this, className, param, node, index)).start();
-		waited++;
+	protected void createMemberWithMultithread(String className, Object[][] params, String[] nodeList) {
+		// Initializes the Group to the correct size
+		for (int i = 0 ; i < params.length ; i++) {
+			this.memberList.add(null);
+		}
+		for (int i = 0 ; i < params.length ; i++) {
+			this.threadpool.addAJob(new ProcessForGroupCreation(this, className, params[i], nodeList[i % nodeList.length], i));
+		}
+		this.threadpool.complete();
 	}
 
 	/**
@@ -816,28 +771,19 @@ public class ProxyForGroup extends AbstractProxy implements org.objectweb.proact
 		this.memberList.set(index,o);
 	}
 	
-	/**
-	 * Initializes the Group to the correct size
-	 * @param size - the number of element the Group will contain
-	 */
-	protected void initSize(int size) {
-		for (int i = 0 ; i < size ; i++)
-			this.memberList.add(null);
-	}
 
 
 	/* ------------------------ PRIVATE METHODS FOR SERIALIZATION --------------------- */
 
 	private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-		this.waitForAllCallsDone();
-		// Now that all the results are available, we can copy the group (of future)
+		// this.threadpool.finalize();
 		out.defaultWriteObject();
 	}
 
-	//for the moment, we set the value of migration to false here
 	private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
 		in.defaultReadObject();
 		this.proxyForGroupID = new UniqueID();
+		this.threadpool = new ThreadPool();
 	}
 
 }

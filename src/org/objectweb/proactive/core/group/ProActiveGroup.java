@@ -70,7 +70,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 public class ProActiveGroup {
 
 	/** The logger for the Class */
-	protected static Logger logger = Logger.getLogger(ProxyForGroup.class.getName());
+	protected static Logger logger = Logger.getLogger(ProActiveGroup.class.getName());
 
 
 	/** The name of the default proxy for group communication */
@@ -82,6 +82,7 @@ public class ProActiveGroup {
 
 	/** This constructor with a private acces permits the javadoc to hide the default constructor method in the html file */  
 	private ProActiveGroup () {}
+
 
 
     /**
@@ -129,13 +130,13 @@ public class ProActiveGroup {
 		proxy.stub = (StubObject)result;
  	}
  	catch (ClassNotReifiableException e) {
- 		if (logger.isInfoEnabled()) logger.info("**** ClassNotReifiableException ****"); }
+ 		logger.error("**** ClassNotReifiableException ****"); }
  	catch (InvalidProxyClassException e) {
-		if (logger.isInfoEnabled()) logger.info("**** InvalidProxyClassException ****"); }
+		logger.error("**** InvalidProxyClassException ****"); }
  	catch (ConstructionOfProxyObjectFailedException e) {
-		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfProxyObjectFailedException ****"); }
+		logger.error("**** ConstructionOfProxyObjectFailedException ****"); }
  	catch (ConstructionOfReifiedObjectFailedException e) {
-		if (logger.isInfoEnabled()) logger.info("**** ConstructionOfReifiedObjectFailedException ****"); }
+		logger.error("**** ConstructionOfReifiedObjectFailedException ****"); }
 
 	return result;
     }
@@ -158,9 +159,29 @@ public class ProActiveGroup {
 
 	Node[] nodeList = new Node[1];
 	nodeList[0] = NodeFactory.getDefaultNode();
-
+	
 	return ProActiveGroup.newGroup(className, params, nodeList);
 	}
+
+
+	/**
+	 * Creates an object representing a group (a typed group) and creates all members with params on the node.
+	 * @param <code>className</code> the name of the (upper) class of the group's member.
+	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param <code>nodeName</code> the name (String) of the node where the members are created.
+	 * @return a typed group with its members.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object newGroup(String className, Object[][] params, String nodeName)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		Node[] nodeList = new Node[1]; 
+		nodeList[0] = NodeFactory.getNode(nodeName);
+		return ProActiveGroup.newGroup(className, params, nodeList);
+	}
+
 
 
 	/**
@@ -182,6 +203,23 @@ public class ProActiveGroup {
 		return ProActiveGroup.newGroup(className, params, nodeList);
 	}
 
+	/**
+	 * Creates an object representing a group (a typed group) and creates all members with params on the node.
+	 * @param <code>className</code> the name of the (upper) class of the group's member.
+	 * @param <code>params</code> the array that contain the parameters used to build the group's member.
+	 * @param <code>node</code> the node where the members are created.
+	 * @return a typed group with its members.
+	 * @throws ActiveObjectCreationException if a problem occur while creating the stub or the body
+	 * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
+	 * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
+	 * @throws NodeException if the node was null and that the DefaultNode cannot be created
+	 */
+	public static Object newGroup(String className, Object[][] params, Node node)
+	throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException, NodeException {
+		Node[] nodeList = new Node[1]; 
+		nodeList[0] = node;
+		return ProActiveGroup.newGroup(className, params, nodeList);
+	}
 
 
     /**
@@ -322,14 +360,7 @@ public class ProActiveGroup {
 	Object result = ProActiveGroup.newGroup(className);
 	ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ProActiveGroup.getGroup(result);
 
-	proxy.initSize(params.length);
-
-	if (params != null) {
-		for (int i = 0 ; i < params.length ; i++) {
-	    	proxy.createThreadCreation(className, params[i], nodeList[i % nodeList.length], i);
-		}
-		proxy.waitForAllCallsDone();
-	}
+	proxy.createMemberWithMultithread(className, params, nodeList);
 
 	return result;
     }
@@ -530,10 +561,12 @@ public class ProActiveGroup {
      */
     public static Object get (Object o, int n) {
     	org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
-		if (theProxy == null)
+		if (theProxy == null) {
 		    return null;
-		else 
+		}
+		else { 
 	    	return ((org.objectweb.proactive.core.group.ProxyForGroup)theProxy).get(n);
+		}
     }
 
 
@@ -543,7 +576,7 @@ public class ProActiveGroup {
      * @return <code>true</code> if <code>o</code> is a typed group.  
      */  
     public static boolean isGroup (Object o) {	
-	    return (findProxyForGroup(o) != null);
+	    return (ProActiveGroup.findProxyForGroup(o) != null);
     }
     
     /**

@@ -45,7 +45,7 @@ public class ProcessForAsyncCall implements Runnable {
 			}
 		}
 		else {
-			/* when there is a Throwable instead of an Object, a methos call is impossible, add null to the result group */
+			/* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */
 			this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,null,this.index);
 		}
 	}

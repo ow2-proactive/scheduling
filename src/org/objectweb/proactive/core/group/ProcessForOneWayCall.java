@@ -40,6 +40,6 @@ public class ProcessForOneWayCall implements Runnable {
 				this.exceptionList.add(new ExceptionInGroup(object,e));
 			}
 		}
-		this.proxyGroup.decrementWaitedAndNotifyAll();			
+//		this.proxyGroup.decrementWaitedAndNotifyAll();			
 	}
 }
