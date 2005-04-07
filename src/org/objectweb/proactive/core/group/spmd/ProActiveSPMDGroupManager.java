@@ -122,7 +122,7 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
     /**
      * Remove the informations (BarrierState and tag) of the specified barrier
      * (invoked when the barrier is over).
-     * @param barreirName the name of the barrier
+     * @param barrierName the name of the barrier
      */
     public void remove(String barrierName) {
         // stop tagging the outgoing message
