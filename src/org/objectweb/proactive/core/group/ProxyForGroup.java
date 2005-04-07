@@ -1069,7 +1069,7 @@ public class ProxyForGroup extends AbstractProxy
         }
         for (int i = 0; i < nodeList.length; i++) {
             this.threadpool.addAJob(new ProcessForGroupCreation(this,
-                    className, params, nodeList[i % nodeList.length], i));
+                    className, params, nodeList[i], i));
         }
         this.threadpool.complete();
     }
