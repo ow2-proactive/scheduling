@@ -485,7 +485,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
