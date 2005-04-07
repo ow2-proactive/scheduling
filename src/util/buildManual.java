@@ -43,13 +43,19 @@ import java.io.FileOutputStream;
 public class buildManual {
     static FileOutputStream all;
     static String parent;
+
     public static void main(String[] args) throws java.io.IOException {
         if (args.length == 0) {
             System.out.println("Missing target files");
             System.exit(-1);
         }
-         parent =  new File(args[0]).getParent();
-        File allFile = new File(parent,"Manual.html");
+        parent = new File(args[0]).getParent();
+        File allFile;
+        if (System.getProperty("proactive.guidedtour") != null) {
+            allFile = new File(parent, "GuidedTour.html");
+        } else {
+            allFile = new File(parent, "Manual.html");
+        }
         allFile.delete();
         all = new FileOutputStream(allFile, true);
 
@@ -64,17 +70,15 @@ public class buildManual {
         System.out.println("Processing " + file);
         byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
         String html = new String(b);
-        
+
         html = removeMarkedLine(html);
         html = html + ("\n <p class=\"print\"/>");
-        html = changeImagesPath(html);
-   
+        html = changeImagesPath(html, file.getParent());
+
         b = html.getBytes();
-        
-        
+
         all.write(b, 0, b.length);
         //all.flush();
-        
     }
 
     /**
@@ -97,7 +101,7 @@ public class buildManual {
         }
         return bytecodes;
     }
-    
+
     private static String removeMarkedLine(String html) {
         StringBuffer newHtml = new StringBuffer(html.length());
         int currentIndex = 0;
@@ -118,33 +122,49 @@ public class buildManual {
         }
         return newHtml.toString();
     }
-    
-    private static String changeImagesPath(String html) {
+
+    private static String changeImagesPath(String html, String path) {
         StringBuffer newHtml = new StringBuffer(html.length());
         int currentIndex = 0;
         while (true) {
             int srcimgIndex = html.indexOf("src=\"", currentIndex);
-            
+
             if (srcimgIndex == -1) {
                 break;
-                
             }
-            String image_path = html.substring(srcimgIndex+5, html.indexOf("\"",srcimgIndex+5));
-            //System.out.println(image_path);
-            String pathWithoutExtension = image_path.substring(0,image_path.lastIndexOf("."));
-            
-            String pdf_image_path = image_path.replaceFirst(pathWithoutExtension, pathWithoutExtension+"_pdf" );
+            String image_path = html.substring(srcimgIndex + 5,
+                    html.indexOf("\"", srcimgIndex + 5));
+            if (!new File(parent, image_path).exists() &&
+                    !image_path.startsWith("http")) {
+                //the path might have changed since the global file is created in the parent dir
+                if (path.length() < parent.length()) {
+                    //we guess that just one level below can occur
+                    image_path = "../"+image_path;
+                } else {
+                    String subpath = path.substring(parent.length() + 1);
+//                    String subdir = subpath.substring(0,
+//                            subpath.lastIndexOf("/"));
+                    image_path = subpath + "/" + image_path;
+                    //System.out.println(image_path);
+                }
+            }
+            String pathWithoutExtension = image_path.substring(0,
+                    image_path.lastIndexOf("."));
+
+            String pdf_image_path = image_path.replaceFirst(pathWithoutExtension,
+                    pathWithoutExtension + "_pdf");
+
             //System.out.println(pdf_image_path);
             //System.out.println(new File(parent, pdf_image_path).exists());
-            if (new File(parent, pdf_image_path).exists()){
-                newHtml.append(html.substring(currentIndex, srcimgIndex+5));
+            if (new File(parent, pdf_image_path).exists()) {
+                newHtml.append(html.substring(currentIndex, srcimgIndex + 5));
                 newHtml.append(pdf_image_path);
-            }else{
-                newHtml.append(html.substring(currentIndex, srcimgIndex+5));
+            } else {
+                newHtml.append(html.substring(currentIndex, srcimgIndex + 5));
                 newHtml.append(image_path);
             }
-            
-            currentIndex = html.indexOf("\"",srcimgIndex + 5);
+
+            currentIndex = html.indexOf("\"", srcimgIndex + 5);
         }
         if (currentIndex < html.length()) {
             newHtml.append(html.substring(currentIndex, html.length()));
