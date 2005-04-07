@@ -61,7 +61,7 @@ public class Test extends FunctionalTest {
         };
         this.typedGroup = (A) ProActiveGroup.newGroup(A.class.getName(),
                 params, nodes);
-        ProActiveGroup.getGroup(this.typedGroup).setRatioNemberToThread(1);
+        ProActiveGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
         boolean NoOnewayCallDone = true;
         Group group = ProActiveGroup.getGroup(this.typedGroup);

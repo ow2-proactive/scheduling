@@ -30,8 +30,16 @@
  */
 package org.objectweb.proactive.core.group;
 
-import org.apache.log4j.Logger;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.UniqueID;
@@ -44,24 +52,15 @@ import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedExcepti
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 
-import java.lang.reflect.InvocationTargetException;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-
 
 public class ProxyForGroup extends AbstractProxy
-    implements org.objectweb.proactive.core.mop.Proxy, Group,
+    implements Proxy, Group,
         java.io.Serializable {
 
     /** The logger for the Class */
@@ -893,21 +892,21 @@ public class ProxyForGroup extends AbstractProxy
     /* ------------------- SYNCHRONIZATION -------------------- */
 
     /**
-     * Waits that all the members are arrived.
+     * Waits for all members are arrived.
      */
     public void waitAll() {
         ProActive.waitForAll(this.memberList);
     }
 
     /**
-     * Waits that at least one member is arrived.
+     * Waits for at least one member is arrived.
      */
     public void waitOne() {
         ProActive.waitForAny(this.memberList);
     }
 
     /**
-     * Waits that the member at the specified rank is arrived.
+     * Waits for the member at the specified rank is arrived.
      * @param n - the rank of the awaited member.
      */
     public void waitTheNth(int n) {
@@ -915,7 +914,7 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Waits that at least <code>n</code> members are arrived.
+     * Waits for at least <code>n</code> members are arrived.
      * @param n - the number of awaited members.
      */
     public void waitN(int n) {
@@ -925,7 +924,7 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Waits that at least one member is arrived and returns it.
+     * Waits for at least one member is arrived and returns it.
      * @return a non-awaited member of the Group.
      */
     public Object waitAndGetOne() {
@@ -933,7 +932,7 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Waits one future is arrived and returns it (removes it from the group).
+     * Waits for one future is arrived and returns it (removes it from the group).
      * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
      */
     public Object waitAndGetOneThenRemoveIt() {
@@ -941,7 +940,7 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Waits that the member at the specified rank is arrived and returns it.
+     * Waits for the member at the specified rank is arrived and returns it.
      * @param n - the rank of the wanted member.
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
@@ -951,7 +950,7 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Waits that at least one member is arrived and returns its index.
+     * Waits for at least one member is arrived and returns its index.
      * @return the index of a non-awaited member of the Group.
      */
     public int waitOneAndGetIndex() {
@@ -1023,7 +1022,7 @@ public class ProxyForGroup extends AbstractProxy
      * Modifies the number of members served by one thread
      * @param i - the new ratio
      */
-    public void setRatioNemberToThread(int i) {
+    public void setRatioMemberToThread(int i) {
         this.threadpool.ratio(i);
     }
 

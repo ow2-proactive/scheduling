@@ -57,7 +57,7 @@ public class Test extends FunctionalTest {
         g.add(new A("Agent4"));
         g.add(new A("Agent5"));
 
-        g.setRatioNemberToThread(1);
+        g.setRatioMemberToThread(1);
 
         return (this.typedGroup != null);
     }

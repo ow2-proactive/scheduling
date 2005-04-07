@@ -438,14 +438,14 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getDefaultNode();
 
-        return ProActiveGroup.newGroupBuildWithMultithreading(className,
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
             params, nodeList);
     }
 
@@ -461,14 +461,14 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
         String[] nodeListString = new String[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupBuildWithMultithreading(className,
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
             params, nodeListString);
     }
 
@@ -510,11 +510,11 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[][] params, VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActiveGroup.newGroupBuildWithMultithreading(className,
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
             params, virtualNode.getNodes());
     }
 
@@ -531,7 +531,7 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, String[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
@@ -555,14 +555,14 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
         String[] nodeListString = new String[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = nodeList[i].getNodeInformation().getURL();
-        return ProActiveGroup.newGroupBuildWithMultithreading(className,
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
             params, nodeListString);
     }
 
@@ -579,11 +579,11 @@ public class ProActiveGroup {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newGroupBuildWithMultithreading(String className,
+    public static Object newGroupBuiltWithMultithreading(String className,
         Object[] params, VirtualNode virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, 
             ActiveObjectCreationException, NodeException {
-        return ProActiveGroup.newGroupBuildWithMultithreading(className,
+        return ProActiveGroup.newGroupBuiltWithMultithreading(className,
             params, virtualNode.getNodes());
     }
 
@@ -717,7 +717,7 @@ public class ProActiveGroup {
     }
 
     /**
-     * Waits one future is arrived and get it.
+     * Waits for one future is arrived and get it.
      * @param o a typed group.
      * @return a member of <code>o</code>.
      */
@@ -741,7 +741,7 @@ public class ProActiveGroup {
     }
 
     /**
-     * Waits one future is arrived and returns it (removes it from the typed group).
+     * Waits for one future is arrived and returns it (removes it from the typed group).
      * @param o a typed group.
      * @return a member of <code>o</code>. (<code>o</code> is removed from the typed group)
      */
@@ -765,7 +765,7 @@ public class ProActiveGroup {
     }
 
     /**
-     * Wait the N-th future in the list is arrived.
+     * Waitd for the N-th future in the list is arrived.
      * @param o a typed group.
      */
     public static void waitTheNth(Object o, int n) {
@@ -782,7 +782,7 @@ public class ProActiveGroup {
     }
 
     /**
-     * Wait the N-th future is arrived and get it.
+     * Waits for the N-th future is arrived and get it.
      * @param o a typed group.
      * @param n the rank of the awaited member.
      * @return the <code>n</code>-th member of th typed group <code>o</code>.

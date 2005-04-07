@@ -165,7 +165,7 @@ public interface Group extends Collection {
      * Modifies the number of members served by one thread
      * @param i - the new ratio
      */
-    public void setRatioNemberToThread(int i);
+    public void setRatioMemberToThread(int i);
 
     /**
      * Creates a new group with all members of the group and all the members of the group <code>g</code>
