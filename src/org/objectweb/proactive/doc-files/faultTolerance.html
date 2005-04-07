@@ -174,81 +174,91 @@ non-fault-tolerant active objects can communicate with fault-tolerant active
 objects as usual. TTC is set to 5 sec for all the application.
 </p>
 
-<pre>
-&lt;ProActiveDescriptor&gt;
- &lt;componentDefinition&gt;
-  &lt;virtualNodesDefinition&gt;
-   &lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;    
-   &lt;virtualNode name="FT-Workers" property="multiple" <b>ftServiceId="appli"</b>/&gt; 
-   &lt;virtualNode name="Failed" property="multiple" <b>ftServiceId="resource"</b>/&gt;
-  &lt;/virtualNodesDefinition&gt;
- &lt;/componentDefinition&gt;
- &lt;deployment&gt;
-  &lt;mapping&gt;
-   &lt;mapvirtualNode="NonFT-Workers"&gt;
-    &lt;jvmSet&gt;
-     &lt;vmNamevalue="Jvm1"/&gt;
-    &lt;/jvmSet&gt;
-   &lt;/map&gt;
-   &lt;mapvirtualNode="FT-Workers"&gt;
-    &lt;jvmSet&gt;
-     &lt;vmNamevalue="Jvm2"/&gt;
-    &lt;/jvmSet&gt;
-   &lt;/map&gt;
-   &lt;mapvirtualNode="Failed"&gt;
-    &lt;jvmSet&gt;
-     &lt;vmName value="JvmS1"/&gt;
-     &lt;vmName value="JvmS2"/&gt;
-    &lt;/jvmSet&gt;
-   &lt;/map&gt;
-  &lt;/mapping&gt;
- &lt;jvms&gt;
-  &lt;jvmname="Jvm1"&gt;
-   &lt;creation&gt;
-    &lt;processReferencerefid="linuxJVM"/&gt;
-   &lt;/creation&gt;
-  &lt;/jvm&gt;
-  &lt;jvmname="Jvm2"&gt;
-   &lt;creation&gt;
-    &lt;processReferencerefid="linuxJVM"/&gt;
-   &lt;/creation&gt;
-  &lt;/jvm&gt;
-  &lt;jvmname="JvmS1"&gt;
-   &lt;creation&gt;
-    &lt;processReferencerefid="linuxJVM"/&gt;
-   &lt;/creation&gt;
-  &lt;/jvm&gt;
-  &lt;jvmname="JvmS2"&gt;
-   &lt;creation&gt;
-    &lt;processReferencerefid="linuxJVM"/&gt;
-   &lt;/creation&gt;
-  &lt;/jvm&gt;
- &lt;/jvms&gt;
- &lt;/deployment&gt;
-&lt;infrastructure&gt;
- &lt;processes&gt;
-  &lt;processDefinitionid="linuxJVM"&gt;
-   &lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;
-  &lt;/processDefinition&gt;
- &lt;/processes&gt;
- &lt;services&gt;
-  &lt;<b>serviceDefinitionid="appli"</b>&gt;
-   &lt;faultTolerance&gt;
-    &lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;
-    &lt;ttc value="5"&gt;&lt;/ttc&gt;
-   &lt;/faultTolerance&gt;
-  &lt;/serviceDefinition&gt;
-  &lt;<b>serviceDefinitionid="resource"</b>&gt;
-   &lt;faultTolerance&gt;
-    &lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;
-    &lt;resourceServer url="rmi://localhost:1100/FTServer"&gt;&lt;/resourceServer&gt;
-    &lt;ttc value="5"&gt;&lt;/ttc&gt;
-   &lt;/faultTolerance&gt;
-  &lt;/serviceDefinition&gt;
- &lt;/services&gt;
-&lt;/infrastructure&gt;
-&lt;/ProActiveDescriptor&gt;
-</pre>
+<table width="100%">
+ <tr>
+	<td>
+<table class="xml" align="left">
+	<tr>
+	<td>
+    <p class="xml">
+&lt;ProActiveDescriptor&gt;<br>
+&nbsp;&lt;componentDefinition&gt;<br>
+&nbsp;&nbsp;&lt;virtualNodesDefinition&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;virtualNode name="NonFT-Workers" property="multiple"/&gt;<br>    
+&nbsp;&nbsp;&nbsp;&lt;virtualNode name="FT-Workers" property="multiple" <b>ftServiceId="appli"</b>/&gt; <br>
+&nbsp;&nbsp;&nbsp;&lt;virtualNode name="Failed" property="multiple" <b>ftServiceId="resource"</b>/&gt;<br>
+&nbsp;&nbsp;&lt;/virtualNodesDefinition&gt;<br>
+&nbsp;&lt;/componentDefinition&gt;<br>
+&nbsp;&lt;deployment&gt;<br>
+&nbsp;&nbsp;&lt;mapping&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;map virtualNode="NonFT-Workers"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="Jvm1"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/map&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;map virtualNode="FT-Workers"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="Jvm2"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/map&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;map virtualNode="Failed"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="JvmS1"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;vmName value="JvmS2"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/jvmSet&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/map&gt;<br>
+&nbsp;&nbsp;&lt;/mapping&gt;<br>
+&nbsp;&nbsp;&lt;jvms&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;jvm name="Jvm1"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="linuxJVM"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/jvm&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;jvm name="Jvm2"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="linuxJVM"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/jvm&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;jvm name="JvmS1"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="linuxJVM"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/jvm&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;jvm name="JvmS2"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="linuxJVM"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/creation&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/jvm&gt;<br>
+&nbsp;&nbsp;&lt;/jvms&gt;<br>
+&nbsp;&lt;/deployment&gt;<br>
+&nbsp;&lt;infrastructure&gt;<br>
+&nbsp;&nbsp;&lt;processes&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;processDefinition id="linuxJVM"&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;<br>
+&nbsp;&nbsp;&lt;/processes&gt;<br>
+&nbsp;&nbsp;&lt;services&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;<b>serviceDefinition id="appli"</b>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;<b>serviceDefinition id="resource"</b>&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://localhost:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://localhost:1100/FTServer"&gt;&lt;/resourceServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
+&nbsp;&nbsp;&lt;/services&gt;<br>
+&nbsp;&lt;/infrastructure&gt;<br>
+&lt;/ProActiveDescriptor&gt;<br>
+</td>
+	</tr>
+</table>
+</td></tr>
+</table>
 
 
 <BR><BR> 
@@ -423,15 +433,25 @@ Before starting the fault-tolerant body example, you have to edit the
 descriptor so as to deploy on your own hosts (<B>HOSTNAME</B>), as follow:
 </p>
 
-<pre>
-...
-&nbsp;&lt;processDefinition id="jvmAppli1"&gt;
-&nbsp;&nbsp;&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="<B>HOSTNAME</B>"&gt;
-&nbsp;&nbsp;&nbsp;&lt;processReference refid="jvmProcess"/&gt;
-&nbsp;&nbsp;&lt;/rshProcess&gt;
-&nbsp;&lt;/processDefinition&gt;
-...
-</pre>
+<table width="100%">
+ <tr>
+	<td>
+<table class="xml" align="left">
+	<tr>
+	<td>
+    <p class="xml">
+...<br>
+&nbsp;&lt;processDefinition id="jvmAppli1"&gt;<br>
+&nbsp;&nbsp;&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="<B>HOSTNAME</B>"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;processReference refid="jvmProcess"/&gt;<br>
+&nbsp;&nbsp;&lt;/rshProcess&gt;<br>
+&nbsp;&lt;/processDefinition&gt;<br>
+...<br>
+</td>
+	</tr>
+</table>
+</td></tr>
+</table>
 <p class="textNormal">
 Of course, more than one host is needed to run this example, as failure are
 triggered by killing all Java processes on the selected host.
@@ -441,25 +461,35 @@ follow, assuming that the script <code>startGlobalFTServer.sh</code> has been
 started on the host <B>SERVER_HOSTAME</B>:
 </p>
 
-<pre>
+<table width="100%">
+ <tr>
+	<td>
+<table class="xml" align="left">
+	<tr>
+	<td>
+    <p class="xml">
+...<br>
+&nbsp;&lt;services&gt;<br>
+&nbsp;&nbsp;&lt;serviceDefinition id="appli"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
+&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
+&nbsp;&nbsp;&lt;serviceDefinition id="ressource"&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/resourceServer&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;<br>
+&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;<br>
+&nbsp;&nbsp;&lt;/serviceDefinition&gt;<br>
+&nbsp;&lt;/services&gt;<br>
 ...
-&nbsp;&lt;services&gt;
-&nbsp;&nbsp;&lt;serviceDefinition id="appli"&gt;
-&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;
-&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;
-&nbsp;&nbsp;&lt;/serviceDefinition&gt;
-&nbsp;&nbsp;&lt;serviceDefinition id="ressource"&gt;
-&nbsp;&nbsp;&nbsp;&lt;faultTolerance&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;globalServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/globalServer&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;resourceServer url="rmi://<B>SERVER_HOSTAME</B>:1100/FTServer"&gt;&lt;/resourceServer&gt;
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;ttc value="5"&gt;&lt;/ttc&gt;
-&nbsp;&nbsp;&nbsp;&lt;/faultTolerance&gt;
-&nbsp;&nbsp;&lt;/serviceDefinition&gt;
-&nbsp;&lt;/services&gt;
-...
-</pre>
+</td>
+	</tr>
+</table>
+</td></tr>
+</table>
 
 <p class="textNormal">
 Finally, you can start the fault-tolerant ProActive NBody and choose the
