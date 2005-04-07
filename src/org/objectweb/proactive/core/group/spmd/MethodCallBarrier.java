@@ -86,18 +86,12 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
 
         // bs == null  =>  state not found  =>  first barrier encountered for ID name
         if (bs == null) {
-            // System.out.println("First barrier \"" + this.getIDName() + "\" encountered !");
-            // build and add infos about new barrier
             bs = new BarrierState();
             this.spmdManager.addToCurrentBarriers(this.getIDName(), bs);
         }
-
-        // if there is others waiting calls, decrement
-        if ((bs.getAwaitedCalls() - (bs.getReceivedCalls() + 1)) != 0) {
-            bs.incrementReceivedCalls();
-        }
-        // calls == 0  =>  this is the last awaited call to this barrier 
-        else {
+        bs.incrementReceivedCalls();
+        // if there is no others waiting calls, release the barrier
+        if ((bs.getAwaitedCalls() - bs.getReceivedCalls()) == 0) {
             this.spmdManager.remove(this.getIDName());
         }
         return null;
