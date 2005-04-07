@@ -77,7 +77,7 @@ public class BodyRequest extends ReflectRequest implements Serializable
         this.methodName = methodName;
         this.parameters = parameters;
         this.oaid = oaid;
-        this.body = ProActiveXMLUtils.getBody(this.oaid);
+   //     this.body = ProActiveXMLUtils.getBody(this.oaid);
     }
     
     /**
