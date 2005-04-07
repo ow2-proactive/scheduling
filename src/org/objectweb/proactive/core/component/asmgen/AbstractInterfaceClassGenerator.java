@@ -227,7 +227,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         }
 
         ClassWriter cw = new ClassWriter(true);
-        cw.visit(Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
+        cw.visit(Constants.V1_2, Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
             this.stubClassFullName, SUPER_CLASS_NAME, // Superclass
             interfaces, // declared interfaces
             "<generated>");

@@ -129,7 +129,7 @@ public class ASMBytecodeStubBuilder implements Constants {
 		}
 
 		ClassWriter cw = new ClassWriter(true);
-		cw.visit(Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
+		cw.visit(Constants.V1_2, Constants.ACC_PUBLIC | Constants.ACC_SUPER, // Same access modifiers as superclass or public ???
 		this.stubClassFullName.replace('.', '/'), // Fully-qualified class name
 		superclassName.replace('.', '/'), // Superclass
 		interfaces, // declared interfaces
