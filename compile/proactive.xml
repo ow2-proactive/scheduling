@@ -453,6 +453,7 @@
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/initializedhello.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehello.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehelloframe.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/capabilities-intro.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/synchronization.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/readers_writers.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/dining_philosophers.html"/>
