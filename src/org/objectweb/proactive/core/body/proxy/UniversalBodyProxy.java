@@ -296,7 +296,11 @@ public class UniversalBodyProxy extends AbstractBodyProxy
     //
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        out.writeObject(universalBody.getRemoteAdapter());
+        if (this.universalBody == null){
+            out.writeObject(null);
+        }else{
+            out.writeObject(universalBody.getRemoteAdapter());
+        }
     }
 
     private void readObject(java.io.ObjectInputStream in)
