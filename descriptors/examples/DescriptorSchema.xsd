@@ -162,12 +162,11 @@ The following element ProActiveDescriptor defines the root of the schema
 	</xs:simpleType>
 	<!--closeStreamType is defined as a global element, hence it can be referenced in all processes.-->
 	<xs:simpleType name="CloseStreamType">
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="yes"/>
-					<xs:enumeration value="no"/>
-				</xs:restriction>
-		</xs:simpleType>
-	
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="yes"/>
+			<xs:enumeration value="no"/>
+		</xs:restriction>
+	</xs:simpleType>
 	<!--ProActiveDescriptor element has three childs: componentDefinition element that must appear once and only once 																	deployment element thay must appear once and only once 																		infrastructure element that must appear once and only once -->
 	<xs:complexType name="ProActiveDescriptorType">
 		<xs:sequence>
@@ -346,7 +345,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="acquisition" type="AcquisitionType"/>
 		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="nodeNumber" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="askedNodes" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
 	<!--acquisition element has one element: serviceReference that identifies uniquely the service to use in order to acquire the jvm. -->
 	<xs:complexType name="AcquisitionType">
@@ -419,7 +418,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	-->
 	<xs:complexType name="P2PServiceType">
 		<xs:sequence>
-			<xs:element name="peerSet" minOccurs="0" maxOccurs="1" type="peerSetType"/>
+			<xs:element name="peerSet" type="peerSetType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="nodesAsked" use="required">
 			<xs:simpleType>
@@ -431,9 +430,9 @@ The following element ProActiveDescriptor defines the root of the schema
 		<xs:attribute name="TTL" type="xs:positiveInteger" use="optional"/>
 		<xs:attribute name="acq" type="xs:string" use="optional"/>
 		<xs:attribute name="port" type="xs:positiveInteger" use="optional"/>
-		<xs:attribute name="multi_proc_nodes" type="xs:boolean" use="optional" />
-		<xs:attribute name="xml_path" type="xs:string" use="optional" />
-		<xs:attribute name="booking_nodes" type="xs:boolean" use="optional" />
+		<xs:attribute name="multi_proc_nodes" type="xs:boolean" use="optional"/>
+		<xs:attribute name="xml_path" type="xs:string" use="optional"/>
+		<xs:attribute name="booking_nodes" type="xs:boolean" use="optional"/>
 	</xs:complexType>
 	<xs:simpleType name="MaxType">
 		<xs:restriction base="xs:string">
