@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="matrixNode" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="matrixNode">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
+					<vmName value="Jvm4"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="rsh_crusoe"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					<processReference refid="rsh_waha"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
+				<creation>
+					<processReference refid="rsh_amstel"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+			</processDefinition>
+			<processDefinition id="rsh_crusoe">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="crusoe.inria.fr">
+					<processReference refid="localJVM"></processReference>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_waha">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="waha.inria.fr">
+					<processReference refid="localJVM"></processReference>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_amstel">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="amstel.inria.fr">
+					<processReference refid="localJVM"></processReference>
+				</rshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
