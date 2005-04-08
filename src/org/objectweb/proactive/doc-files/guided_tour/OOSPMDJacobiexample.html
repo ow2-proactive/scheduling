@@ -241,7 +241,11 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <h3 class="textNormal">5. Execution on several machines and Clusters</h3>
 
 <h3 class="textNormal">5.1 Execution on several machines in the room</h3>
-<p class="textNormal">	<code>	ProActive/examples/descriptors/Matrix.xml</code> is the XML deployment file used in this tutorial to start 4 jvms on the local machine. This behavior is achieved by referencing in the creation part of <b>Jvm1, Jvm2, Jvm3, Jvm4</b> a <b>jvmProcess</b> named <b>localProcess</b>. To summarize briefly at least one <b>jvmProcess</b> must be defined in an xml deployment file. When this process is referenced directly in the creation part of the jvm definition (like the example below)</p>, the jvm will be created locally. On the other hand, if this process is referenced by another process(<b>rshProcess</b> for instance, this is the case in the next example), which in turn is referenced in the creation part of the jvm definition, the jvm will be created remotely using the related protocol (rsh in the next example).
+<ul>
+	<li><b>Explicit machine names</b></li>
+</ul>
+<p class="textNormal">	<code>	ProActive/examples/descriptors/Matrix.xml</code> is the XML deployment file used in this tutorial to start 4 jvms on the local machine. This behavior is achieved by referencing in the creation tag of <b>Jvm1, Jvm2, Jvm3, Jvm4</b> a <b>jvmProcess</b> named with the id <b>localProcess</b>. To summarize briefly at least one <b>jvmProcess</b> must be defined in an xml deployment file. When this process is referenced directly in the creation part of the jvm definition (like the example below), the jvm will be created locally. On the other hand, if this process is referenced by another process(<b>rshProcess</b> for instance, this is the case in the next example),  the jvm will be created remotely using the related protocol (rsh in the next example).</p>
+<p class="textNormal">Note that several <b>jvmProcess</b> can be defined, for instance in order to specify different jvm configurations (e.g classpath, java path,...). </p>
 
 <table width="100%">
  <tr>
@@ -307,7 +311,7 @@ to guided tour index</a>&nbsp;&nbsp;</td>
 <p class="textNormal">
 Modify your XML deployment file to use the current jvm (i.e the jvm reading the descriptor) and also to start 4 jvms on remote machines using <b>rsh protocol</b>.
 </p>
-<p class="textNormal">	You can use IC2D to visualize the machines and the JVMs being launched on them.</p>
+<p class="textNormal">Use IC2D to visualize the machines and the JVMs being launched on them.</p>
 
 <table width="100%">
  <tr>
@@ -443,7 +447,7 @@ Modify your XML deployment file to use the current jvm (i.e the jvm reading the 
 </table>
 </td></tr>
 </table>
-<p class="textNormal">Those processes as shown below are rsh processes. Note that it is <b>mandatory</b> for such processes to reference a <b>jvmProcess</b>, in this case the <b>localProcess</b>, to create, at deployment time, a jvm on machines titi, toto, tata, tutu, once connect to those machines with rsh.</p>
+<p class="textNormal">Those processes as shown below are rsh processes. Note that it is <b>mandatory</b> for such processes to reference a <b>jvmProcess</b>, in this case named with the id <b>localProcess</b>, to create, at deployment time, a jvm on machines titi, toto, tata, tutu, once connected to those machines with rsh.</p>
 <table width="100%">
  <tr>
 	<td>
@@ -479,6 +483,9 @@ Modify your XML deployment file to use the current jvm (i.e the jvm reading the 
 </table>
 </td></tr>
 </table>
+<ul>
+	<li><b>Using Lists of Processes</b></li>
+
 <p class="textNormal">You can also use the notion of <b>Process List</b>, which leads to the same result but often simplifies the xml. Two tags are provided:</p>
 <ul>
 	<li><b>processListbyHost</b></li>
@@ -533,6 +540,7 @@ Modify your XML deployment file to use the current jvm (i.e the jvm reading the 
 </table>
 </td></tr>
 </table>
+<br>
 <ul>
 	<li><b>processList</b></li>
 </ul>
@@ -576,7 +584,7 @@ Modify your XML deployment file to use the current jvm (i.e the jvm reading the 
 &nbsp;&nbsp;&nbsp;&lt;processDefinition id="<b>rsh_list_titi1_to_100</b>"&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&lt;<b>processList</b> class="org.objectweb.proactive.core.process.rsh.RSHProcessList" fixedName="titi" list="[1-100]" domain="titi_domain"&gt;<br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;processReference refid="<b>localProcess</b>"/&gt;<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&lt;/processListbyHost&gt;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/processList&gt;<br>
 &nbsp;&nbsp;&nbsp;&lt;/processDefinition&gt;<br>
 &nbsp;&nbsp;&lt;/processes&gt;<br>
 &nbsp;&lt;/infrastructure&gt;<br>
@@ -586,6 +594,7 @@ Modify your XML deployment file to use the current jvm (i.e the jvm reading the 
 </table>
 </td></tr>
 </table>
+</ul>
 <h3 class="textNormal">5.2 Execution on Clusters</h3>
 <p class="textNormal">If you have access to your own clusters, configure the XML descriptor
 	 to launch the Jacobi on them, using the appropriate protocol:</p>
