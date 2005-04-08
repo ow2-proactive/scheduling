@@ -214,19 +214,19 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
     public int receiveRequest(Request request)
         throws java.io.IOException, RenegotiateSessionException {
-        //System.out.println("  --> receiveRequest m="+request.getMethodName());
+        //System.out.println("" + this + "  --> receiveRequest m="+request.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
-            ftres = this.ftmanager.onReceiveRequest(request);
-            if (request.ignoreIt()) {
-                if (this.isDead){
-                    throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
-                }else{
-                    return ftres;
+            if (this.isDead){
+                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+            } else {
+                ftres = this.ftmanager.onReceiveRequest(request);
+                if (request.ignoreIt()) {
+                    return ftres;                
                 }
             }
-        }
+        }        
         try {
             this.enterInThreadStore();
             if (this.isDead) {
@@ -251,7 +251,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     // do nothing
                 }
             }
-            this.registerIncomingFutures();
+            this.registerIncomingFutures();           
             ftres = this.internalReceiveRequest(request);
         } finally {
             this.exitFromThreadStore();
@@ -264,12 +264,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
-            ftres = this.ftmanager.onReceiveReply(reply);
-            if (reply.ignoreIt()) {
-                if (this.isDead){
-                    throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
-                }else{
-                    return ftres;
+            if (this.isDead){
+                throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
+            } else {
+                ftres = this.ftmanager.onReceiveReply(reply);
+                if (reply.ignoreIt()) {
+                    return ftres;                
                 }
             }
         }
@@ -762,6 +762,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
         isDead = true;
         activityStopped();
+        this.remoteBody = null;
         // unblock is thread was block
         acceptCommunication();
     }
