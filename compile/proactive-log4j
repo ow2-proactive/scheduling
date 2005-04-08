@@ -1,34 +1,27 @@
-# This file represents the log4j config file for non regression tests.
-# It is given as property (in the proactive.xml) when starting nonregression tests
+# the default logging level is INFO
 
-# The default logging level is INFO
-# The root logger logs in the test.log file
 log4j.rootLogger=INFO, A1
 
 # NFE Logger
 log4j.logger.NFE = FATAL
 
-# Appender A1 writes to the file "tests.log".
-log4j.appender.A1=org.apache.log4j.FileAppender
-log4j.appender.A1.File=tests.log
-# Appender A1 uses the PatternLayout.
-log4j.appender.A1.layout=org.apache.log4j.PatternLayout
-log4j.appender.A1.layout.ConversionPattern=%-5p [%t]: %m%n
-
-########### Change here default logging level on a 
-########### per-logger basis
-########### usage is log4j.logger.className=Level, Appender
-
-#A2 uses PatternLayout
+#A1 uses PatternLayout
 #and displays the associated message (%m)
 #using the platform dependant separator (%n)
 #Use %M for method names
 #see log4j documentation for details
 
-#Both tests packages log on the console
-log4j.logger.nonregressiontest=INFO, A2
-log4j.logger.testsuite=INFO, A2
+log4j.appender.A1=org.apache.log4j.ConsoleAppender
+log4j.appender.A1.layout=org.apache.log4j.PatternLayout
+log4j.appender.A1.layout.ConversionPattern=%m %n
 
-log4j.appender.A2=org.apache.log4j.ConsoleAppender
-log4j.appender.A2.layout=org.apache.log4j.PatternLayout
-log4j.appender.A2.layout.ConversionPattern=%m %n
+#this appender displays : 
+# %c : name of logger,
+# %C : name of the class,
+# %M : method name,
+# %L : line number, and the message with the following pattern
+#log4j.appender.A1.layout.ConversionPattern=%c - %C{1}@%M,line %L :%n %m%n
+
+########### Change here default logging level on a 
+########### per-logger basis
+########### usage is log4j.logger.className=Level, Appender

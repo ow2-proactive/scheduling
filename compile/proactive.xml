@@ -412,6 +412,65 @@
       ==
       ================================================================
 	-->
+	<target name="manual" depends="util">
+		<java classname="util.buildManual" fork="true">
+			<classpath refid="project.classpath"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/index.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Principles.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Installation.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/HelloWorld.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/ProActiveBasis.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/ActiveObjectCreation.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/FutureObjectCreation.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Migration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/TypedGroupCommunication.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/OOSPMD.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Configuration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Descriptor.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/SSHTunneling.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/AC.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/intro.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/components/architecture.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/Security.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/faultTolerance.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/p2p.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/MOP.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/WSDoc.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/FAQ.html"/>
+		</java>
+	</target>
+	
+	<target name="guidedtour" depends="util">
+		<java classname="util.buildManual" fork="true">
+			<classpath refid="project.classpath"/>
+			<jvmarg value="-Dproactive.guidedtour=true"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/index.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/setup.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/clientserver.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/HelloWorld.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/initializedhello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehello.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming/migratablehelloframe.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/synchronization.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/readers_writers.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/dining_philosophers.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/parallel_processing.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/c3d.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/migration.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/mobile_agents.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/OOSPMDJacobiexample.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/nbody.html"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/conclusion.html"/>
+		</java>
+	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Create javadoc
+      ==
+      ================================================================
+	-->
 	<target name="docs">
 		<!-- Create the javadoc directory -->
 		<delete dir="${docs.dir}"/>
