@@ -100,6 +100,11 @@ public class BodyMap extends AbstractEventProducer implements Cloneable,
      * erase any previous entry
      */
     public synchronized void updateBody(UniqueID id, UniversalBody b) {
+        //remove old reference
+        if (idToBodyMap.get(id)!=null){
+            idToBodyMap.remove(id);
+        }
+        //add new reference
         idToBodyMap.put(id, b);
 
         if (hasListeners()) {
