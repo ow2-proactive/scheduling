@@ -45,12 +45,12 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 			<processDefinition id="rshProcess">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHJVMProcess" hostname="ornata.inria.fr">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="ornata.inria.fr">
 					<processReference refid="localJVM"/>
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="rloginProcess">
-				<rloginProcess class="org.objectweb.proactive.core.process.lsf.RLoginProcess" hostname="wapiti.inria.fr">
+				<rloginProcess class="org.objectweb.proactive.core.process.rlogin.RLoginProcess" hostname="wapiti.inria.fr">
 					<processReference refid="localJVM"/>
 				</rloginProcess>
 			</processDefinition>
