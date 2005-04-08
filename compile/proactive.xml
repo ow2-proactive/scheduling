@@ -444,6 +444,7 @@
 		<java classname="util.buildManual" fork="true">
 			<classpath refid="project.classpath"/>
 			<jvmarg value="-Dproactive.guidedtour=true"/>
+			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/Title.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/index.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/setup.html"/>
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/guided_tour/hands_on_programming.html"/>
