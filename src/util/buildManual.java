@@ -137,7 +137,7 @@ public class buildManual {
             if (!new File(parent, image_path).exists() &&
                     !image_path.startsWith("http")) {
                 //the path might have changed since the global file is created in the parent dir
-                if (path.length() < parent.length()) {
+                if (path.length() <= parent.length()) {
                     //we guess that just one level below can occur
                     image_path = "../"+image_path;
                 } else {
