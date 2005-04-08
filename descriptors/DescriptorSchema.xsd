@@ -345,7 +345,7 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="acquisition" type="AcquisitionType"/>
 		</xs:choice>
 		<xs:attribute name="name" type="xs:string" use="required"/>
-		<xs:attribute name="nodeNumber" type="xs:positiveInteger" use="optional"/>
+		<xs:attribute name="askedNodes" type="xs:positiveInteger" use="optional"/>
 	</xs:complexType>
 	<!--acquisition element has one element: serviceReference that identifies uniquely the service to use in order to acquire the jvm. -->
 	<xs:complexType name="AcquisitionType">
