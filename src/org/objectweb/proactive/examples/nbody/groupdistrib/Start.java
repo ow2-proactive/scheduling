@@ -1,33 +1,33 @@
-/* 
-* ################################################################
-* 
-* ProActive: The Java(TM) library for Parallel, Distributed, 
-*            Concurrent computing with Security and Mobility
-* 
-* Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
-* Contact: proactive-support@inria.fr
-* 
-* This library is free software; you can redistribute it and/or
-* modify it under the terms of the GNU Lesser General Public
-* License as published by the Free Software Foundation; either
-* version 2.1 of the License, or any later version.
-*  
-* This library is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-* Lesser General Public License for more details.
-* 
-* You should have received a copy of the GNU Lesser General Public
-* License along with this library; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
-* USA
-*  
-*  Initial developer(s):               The ProActive Team
-*                        http://www.inria.fr/oasis/ProActive/contacts.html
-*  Contributor(s): 
-* 
-* ################################################################
-*/
+/*
+ * ################################################################
+ *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
+ */
 package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -39,12 +39,13 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
 
+
 /**
  * <P>
  * This starts the nbody example, where communication uses Groups, and synchronization
  * is done through an odd-even scheme : if a value arrives with the wrong iteration number,
- * it gets postponed until the next iteration. This allows for a soft synchronization, where 
- * Domains do not have to wait for all the others before starting the following iteration. 
+ * it gets postponed until the next iteration. This allows for a soft synchronization, where
+ * Domains do not have to wait for all the others before starting the following iteration.
  * </P>
  *
  * @author  ProActive Team
@@ -52,45 +53,48 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
  * @since   ProActive 2.2
  */
 public class Start {
-    
     public static void main(String[] args) {
         // Set arguments as read on command line
-        org.objectweb.proactive.examples.nbody.common.Start.main(args) ; 
+        org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
-    
-    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
-            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+
+    public static void main(int totalNbBodies, int maxIter,
+        Displayer displayer, Node[] nodes,
+        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         System.out.println("RUNNING groupdistrib VERSION");
-        
-        Object [][] constructorParams = new Object [totalNbBodies][3] ;
-        
-        Rectangle universe = new Rectangle (-100 , -100 , 100 , 100);
-        for (int  i = 0 ; i < totalNbBodies ; i++) {
-            constructorParams[i][0] = new Integer(i);		      
+
+        Object[][] constructorParams = new Object[totalNbBodies][3];
+
+        Rectangle universe = new Rectangle(-100, -100, 200, 200);
+        for (int i = 0; i < totalNbBodies; i++) {
+            constructorParams[i][0] = new Integer(i);
             // coordinates between -100,-100 and 100,100
-            constructorParams[i][1] = new Planet (universe); 
+            constructorParams[i][1] = new Planet(universe);
             constructorParams[i][2] = killsupport;
         }
-        
+
         Domain domainGroup = null;
         try {
             // Create a group containing all the Domain in the simulation 
-            domainGroup = (Domain) ProActiveGroup.newGroup ( Domain.class.getName(), constructorParams, nodes);
+            domainGroup = (Domain) ProActiveGroup.newGroup(Domain.class.getName(),
+                    constructorParams, nodes);
+        } catch (ClassNotReifiableException e) {
+            killsupport.abort(e);
+        } catch (ClassNotFoundException e) {
+            killsupport.abort(e);
+        } catch (ActiveObjectCreationException e) {
+            killsupport.abort(e);
+        } catch (NodeException e) {
+            killsupport.abort(e);
         }
-        catch (ClassNotReifiableException e) { killsupport.abort(e); }
-        catch (ClassNotFoundException e) { killsupport.abort(e); }
-        catch (ActiveObjectCreationException e) { killsupport.abort(e); } 
-        catch (NodeException e) { killsupport.abort(e); } 
-        
-        System.out.println("[NBODY] " + totalNbBodies + " Planets are deployed");
-        
+
+        System.out.println("[NBODY] " + totalNbBodies +
+            " Planets are deployed");
+
         // init workers
         domainGroup.init(domainGroup, displayer, maxIter, killsupport);
-        
+
         // launch computation
         domainGroup.sendValueToNeighbours();
-        
     }
-    
-    
 }
