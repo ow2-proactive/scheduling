@@ -1,9 +1,36 @@
 /*
- * Created on Feb 2, 2005
+ * ################################################################
  *
+ * ProActive: The Java(TM) library for Parallel, Distributed,
+ *            Concurrent computing with Security and Mobility
+ *
+ * Copyright (C) 1997-2002 INRIA/University of Nice-Sophia Antipolis
+ * Contact: proactive-support@inria.fr
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://www.inria.fr/oasis/ProActive/contacts.html
+ *  Contributor(s):
+ *
+ * ################################################################
  */
 package org.objectweb.proactive.core.body.ft.protocols.cic;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -34,6 +61,10 @@ public class HalfFTManagerCIC extends FTManager {
     // message infos
     private char[] forSentMessage;
 
+
+    //logger
+    protected static Logger logger = Logger.getLogger(HalfFTManagerCIC.class.getName());
+    
     /**
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#init(org.objectweb.proactive.core.body.AbstractBody)
      */
@@ -67,9 +98,8 @@ public class HalfFTManagerCIC extends FTManager {
         UniversalBody destination) throws RenegotiateSessionException {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
-                System.out.println(
-                    "[CIC] Receiver is recovering : request is resent");
                 request.resetSendCounter();
+                request.setIgnoreIt(false);
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendRequest(request, destination);
                 return this.onSendRequestAfter(request, rdvValueBis, destination);
@@ -84,12 +114,9 @@ public class HalfFTManagerCIC extends FTManager {
 
     public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
         UniversalBody destination) {
-        //System.out.println("[CIC] onSendReplyAfter");
-        // if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
-                System.out.println(
-                    "[CIC] Receiver is recovering : reply is resent");
+                reply.setIgnoreIt(false);
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendReply(reply, destination);
                 return this.onSendReplyAfter(reply, rdvValueBis, destination);
@@ -109,7 +136,7 @@ public class HalfFTManagerCIC extends FTManager {
             this.onSendRequestAfter(r, res, destination);
             return res;
         } catch (IOException e) {
-            System.err.println("[FAULT] " + this.owner.getID() +
+            logger.info("[FAULT] " + this.owner.getID() +
                 " : FAILURE OF " + destination.getID() +
                 " SUSPECTED ON REQUEST SENDING : " + e.getMessage());
             UniversalBody newDestination = this.communicationFailed(destination.getID(),
@@ -127,7 +154,7 @@ public class HalfFTManagerCIC extends FTManager {
             this.onSendReplyAfter(r, res, destination);
             return res;
         } catch (IOException e) {
-            System.err.println("[FAULT] " + this.owner.getID() +
+            logger.info("[FAULT] " + this.owner.getID() +
                 " : FAILURE OF " + destination.getID() +
                 " SUSPECTED ON REPLY SENDING : " + e.getMessage());
             UniversalBody newDestination = this.communicationFailed(destination.getID(),
@@ -137,34 +164,37 @@ public class HalfFTManagerCIC extends FTManager {
     }
 
     public UniversalBody communicationFailed(UniqueID suspect,
-        UniversalBody suspectLocation, Exception e) {
-        try {
-            UniversalBody newLocation = this.location.searchObject(suspect,
-                    suspectLocation, this.owner.getID());
-            if (newLocation == null) {
-                while (newLocation == null) {
-                    try {
-                        // suspected is failed or is recovering
-                        System.out.println("[CIC] Waiting for recovery of " +
-                            suspect);
-                        Thread.sleep(FTManagerCIC.TIME_TO_RESEND); // TMP
-                    } catch (InterruptedException e2) {
-                        e2.printStackTrace();
+            UniversalBody suspectLocation, Exception e) {
+            try {
+                // send an adapter to suspectLocation: the suspected body could be local
+                UniversalBody newLocation = this.location.searchObject(suspect,
+                        suspectLocation.getRemoteAdapter(), this.owner.getID());
+                if (newLocation == null) {
+                    while (newLocation == null) {
+                        try {
+                            // suspected is failed or is recovering
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("[CIC] Waiting for recovery of " +
+                                    suspect);
+                            }
+                            Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
+                        } catch (InterruptedException e2) {
+                            e2.printStackTrace();
+                        }
+                        newLocation = this.location.searchObject(suspect,
+                                suspectLocation.getRemoteAdapter(), this.owner.getID());
                     }
-                    newLocation = this.location.searchObject(suspect,
-                            suspectLocation, this.owner.getID());
+                    return newLocation;
+                } else {
+                    // newLocation is the new location of suspect
+                    return newLocation;
                 }
-                return newLocation;
-            } else {
-                // newLocation is the new location of suspect
-                return newLocation;
+            } catch (RemoteException e1) {
+                logger.error("**ERROR** Location server unreachable");
+                e1.printStackTrace();
+                return null;
             }
-        } catch (RemoteException e1) {
-            System.err.println("[ERROR] Location server unreachable");
-            e1.printStackTrace();
-            return null;
         }
-    }
 
     ////////////////////////
     // UNCALLABLE METHODS //

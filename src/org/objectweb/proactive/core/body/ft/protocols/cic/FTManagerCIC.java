@@ -187,11 +187,11 @@ public class FTManagerCIC
             int localInc = this.incarnation;
             int inc = mi[INCARNATION];
             if (inc > localInc) {
-                reply.setIgnoreIt();
+                reply.setIgnoreIt(true);
                 //((AbstractBody)this.owner).terminate();
                 return FTManagerCIC.RESEND_MESSAGE;
             } else if (inc < localInc) {
-                reply.setIgnoreIt();
+                reply.setIgnoreIt(true);
                 return FTManagerCIC.RECOVER;
             }
         }
@@ -238,13 +238,13 @@ public class FTManagerCIC
             int localInt = this.incarnation;
             int inc = mi[INCARNATION];
             if (inc > localInt) {
-                request.setIgnoreIt();
+                request.setIgnoreIt(true);
                 //((AbstractBody)this.owner).terminate();
                 // this OA will be killed by the its new incarnation (see read() AbstractBody)
                 return FTManagerCIC.RESEND_MESSAGE;
             } else if (inc < localInt) {
                 // force the sender to recover and ignore this message
-                request.setIgnoreIt();
+                request.setIgnoreIt(true);
                 return FTManagerCIC.RECOVER;
             }
         } else {
@@ -279,7 +279,7 @@ public class FTManagerCIC
                 history.add(request.getSourceBodyID());
             } else {
                 //this request must be then ignored..
-                request.setIgnoreIt();
+                request.setIgnoreIt(true);
             }
 
             // udpate checkpoint index
@@ -311,7 +311,7 @@ public class FTManagerCIC
         // if return value is RESEDN, receiver have to recover --> resend the message
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
-                //System.out.println("[CIC] " + this.hostname +" :  Receiver is recovering : reply is resent");
+                reply.setIgnoreIt(false);
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendReply(reply, destination);
                 return this.onSendReplyAfter(reply, rdvValueBis, destination);
@@ -368,6 +368,7 @@ public class FTManagerCIC
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 request.resetSendCounter();
+                request.setIgnoreIt(false);
                 Thread.sleep(FTManagerCIC.TIME_TO_RESEND);
                 int rdvValueBis = sendRequest(request, destination);
                 return this.onSendRequestAfter(request, rdvValueBis, destination);
@@ -682,7 +683,7 @@ public class FTManagerCIC
         } catch (IOException e) {
             logger.info("[FAULT] " + this.owner.getID() + " : FAILURE OF " +
                 destination.getID() + " SUSPECTED ON REPLY SENDING : " +
-                e.getMessage());
+                e.getMessage());          
             UniversalBody newDestination = this.communicationFailed(destination.getID(),
                     destination, e);
             return this.sendReply(r, newDestination);
@@ -795,10 +796,9 @@ public class FTManagerCIC
     public UniversalBody communicationFailed(UniqueID suspect,
         UniversalBody suspectLocation, Exception e) {
         try {
-            // send an adapter to suspectLocation: the suspected body could be local
-            suspectLocation = suspectLocation.getRemoteAdapter();
+         	// send an adapter to suspectLocation: the suspected body could be local
             UniversalBody newLocation = this.location.searchObject(suspect,
-                    suspectLocation, this.owner.getID());
+                    suspectLocation.getRemoteAdapter(), this.owner.getID());        
             if (newLocation == null) {
                 while (newLocation == null) {
                     try {
@@ -807,13 +807,14 @@ public class FTManagerCIC
                             logger.debug("[CIC] Waiting for recovery of " +
                                 suspect);
                         }
-                        Thread.sleep(TIME_TO_RESEND);
+                        Thread.sleep(TIME_TO_RESEND);                  
                     } catch (InterruptedException e2) {
                         e2.printStackTrace();
                     }
                     newLocation = this.location.searchObject(suspect,
-                            suspectLocation, this.owner.getID());
-                }
+                            suspectLocation.getRemoteAdapter(), this.owner.getID());
+                }              
+           
                 return newLocation;
             } else {
                 // newLocation is the new location of suspect
@@ -843,7 +844,7 @@ public class FTManagerCIC
         try {
             this.closeHistories(fte.getIndex());
         } catch (RemoteException e) {
-            System.err.println("[ERROR] Checkpoint server unreachable");
+            logger.error("[ERROR] Checkpoint server unreachable");
             e.printStackTrace();
         }
         return this.historyIndex;

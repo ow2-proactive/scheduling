@@ -100,9 +100,10 @@ public interface Message {
     public boolean ignoreIt();
 
     /**
-     * Set the ignore bit: this message will be ignored by the receiver
+     * Set or unset the ignore tag.
+     * @param ignore true if this request must be ignored, false otherwise.
      */
-    public void setIgnoreIt();
+    public void setIgnoreIt(boolean ignore);
 
     /**
      * Set the FTManager that have to treat this message

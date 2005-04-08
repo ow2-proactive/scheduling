@@ -146,8 +146,8 @@ public class MessageImpl implements Message, java.io.Serializable {
         return this.ignoreIt;
     }
 
-    public void setIgnoreIt() {
-        this.ignoreIt = true;
+    public void setIgnoreIt(boolean ignore) {
+        this.ignoreIt = ignore;
     }
 
     public void setFTManager(FTManager ft) {

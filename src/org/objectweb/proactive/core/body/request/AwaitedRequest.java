@@ -84,7 +84,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
      * @param r the received request.
      */
     public synchronized void setAwaitedRequest(Request r) {
-        //System.err.println("[AWAITED] Request is updated by " + this.awaitedSender);
+        //System.err.println("[AWAITED] Request is updated by " + this.awaitedSender + " with " + r);
         //if(!(r.getSourceBodyID().equals(this.awaitedSender))){
         //    logger.error(" **ERROR** : update request is not from the awaited sender !");
         //}
@@ -200,8 +200,8 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         }
     }
 
-    public void setIgnoreIt() {
-        wrappedRequest.setIgnoreIt();
+    public void setIgnoreIt(boolean ignore) {
+        wrappedRequest.setIgnoreIt(ignore);
     }
 
     public boolean ignoreIt() {

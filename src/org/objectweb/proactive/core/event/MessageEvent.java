@@ -147,8 +147,8 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
       getMessage().setMessageInfo(mi);
   }
   
-  public void setIgnoreIt(){
-      getMessage().setIgnoreIt();
+  public void setIgnoreIt(boolean ignore){
+      getMessage().setIgnoreIt(ignore);
   }
   
   public boolean ignoreIt(){
@@ -170,5 +170,4 @@ public class MessageEvent extends ProActiveEvent implements Message, java.io.Ser
   private final Message getMessage() {
     return (Message) getSource();
   }
-
 }
