@@ -47,9 +47,6 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     /** The unique ID of the barrier */
     private String IDName;
 
-    /** the SPMDGroupManager in wich the barrier call have to operate (on the calle side) */
-    private ProActiveSPMDGroupManager spmdManager = null;
-
     /**
      * Constructor
      * @param idname - the id name of the barrier
@@ -81,27 +78,20 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      */
     public Object execute(Object target)
         throws InvocationTargetException, MethodCallExecutionFailedException {
-        this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
-        BarrierState bs = (BarrierState) this.spmdManager.getBarrierStateFor(this.getIDName());
+        ProActiveSPMDGroupManager spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
+        BarrierState bs = (BarrierState) spmdManager.getBarrierStateFor(this.getIDName());
 
         // bs == null  =>  state not found  =>  first barrier encountered for ID name
         if (bs == null) {
             bs = new BarrierState();
-            this.spmdManager.addToCurrentBarriers(this.getIDName(), bs);
+            spmdManager.addToCurrentBarriers(this.getIDName(), bs);
         }
         bs.incrementReceivedCalls();
         // if there is no others waiting calls, release the barrier
         if ((bs.getAwaitedCalls() - bs.getReceivedCalls()) == 0) {
-            this.spmdManager.remove(this.getIDName());
+            spmdManager.remove(this.getIDName());
         }
         return null;
     }
 
-    /**
-     *  Set the SPMDGroupManager in wich the barrier call have to operate
-     * @param spmdManager the ProActiveSPMDGroupManager in wich the barrier call have to operate
-     */
-    public void setSPMDManager(ProActiveSPMDGroupManager spmdManager) {
-        this.spmdManager = spmdManager;
-    }
 }
