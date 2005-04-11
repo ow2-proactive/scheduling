@@ -725,6 +725,14 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="oarOption" type="OarOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.oar.OARSubProcess"/>
+		<xs:attribute name="bookedNodesAccess" use="optional">
+		<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="rsh"/>
+					<xs:enumeration value="ssh"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="interactive" type="xs:boolean" use="optional"/>
 		<xs:attribute name="queue" type="xs:string" use="optional"/>

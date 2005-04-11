@@ -84,6 +84,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     protected int jobID;
     protected String queueName;
     protected String hostList;
+    protected String accessProtocol = "rsh";
 
     public OARSubProcess() {
         super();
@@ -164,6 +165,16 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         //     if (location != null) {
         this.scriptLocation = location;
         //    }
+    }
+    
+    /**
+     * Sets the protocol to access booked nodes.
+     * Two possibilities, rsh, ssh. Default is rsh.
+     * @param accessProtocol
+     */
+    public void setAccessProtocol(String accessProtocol) {
+        this.accessProtocol = accessProtocol;
+        
     }
 
     /**
@@ -307,7 +318,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     protected String buildCommand() {
         StringBuffer oarsubCommand = new StringBuffer();
         oarsubCommand.append(
-            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do rsh \\$i  ");
+            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do "+accessProtocol+" \\$i  ");
         oarsubCommand.append(targetProcess.getCommand());
         oarsubCommand.append(" \\&  done  \\; wait > ");
         oarsubCommand.append(scriptLocation).append(" ; ");
@@ -360,4 +371,6 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         oar.setHostsNumber("2");
         System.out.println(oar.buildCommand());
     }
+
+    
 }
