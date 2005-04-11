@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="plugtest" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="plugtest">
+				<jvmSet>
+					<vmName value="newJvm"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="newJvm">
+				<creation>
+					<processReference refid="sshimag"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="linuxJVM1">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/classes"/>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/lib/asm.jar"/>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/lib/log4j.jar"/>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/lib/xercesImpl.jar"/>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/lib/components/fractal.jar"/>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/lib/bouncycastle.jar"/>
+					</classpath>
+					<javaPath>
+						<absolutePath value="/user/rquilici/home/j2sdk1.4.2_05/bin/java"/>
+					</javaPath>
+					<policyFile>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/proactive.java.policy"/>
+					</policyFile>
+					<log4jpropertiesFile>
+						<absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/proactive-log4j"/>
+					</log4jpropertiesFile>
+				</jvmProcess>
+			</processDefinition>
+			<processDefinition id="oarCluster">
+				<oarProcess class="org.objectweb.proactive.core.process.oar.OARSubProcess" bookedNodesAccess="ssh">
+					<processReference refid="linuxJVM1"/>
+					<commandPath value="/usr/bin/oarsub"/>
+					<oarOption>
+						<hostsNumber>5</hostsNumber>
+						<bookingDuration>02:00:00</bookingDuration>
+						 <scriptPath>
+                                  <absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/cluster/oarStartRuntime.sh"/>
+                          </scriptPath>
+					</oarOption>
+				</oarProcess>
+			</processDefinition>
+			<processDefinition id="sshimag">
+				<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.sophia.grid5000.fr">
+					<processReference refid="oarCluster"/>
+				</sshProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>
