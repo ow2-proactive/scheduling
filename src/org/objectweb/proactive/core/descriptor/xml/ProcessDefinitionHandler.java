@@ -496,6 +496,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
             if (checkNonEmpty(queueName)) {
                 ((OARSubProcess) targetProcess).setQueueName(queueName);
             }
+            String accessProtocol = (attributes.getValue("bookedNodesAccess"));
+            if (checkNonEmpty(accessProtocol)) {
+                ((OARSubProcess) targetProcess).setAccessProtocol(accessProtocol);
+            }
         }
 
         protected class OAROptionHandler extends PassiveCompositeUnmarshaller {
