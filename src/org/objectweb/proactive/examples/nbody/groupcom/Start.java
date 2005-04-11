@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.examples.nbody.groupcom;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
@@ -53,6 +56,9 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
  * @since   ProActive 2.2
  */
 public class Start {
+
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
@@ -63,7 +69,7 @@ public class Start {
     public static void main(int totalNbBodies, int maxIter,
         Displayer displayer, Node[] nodes,
         org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        System.out.println("RUNNING groupcom VERSION");
+        logger.info("RUNNING groupcom VERSION");
 
         Rectangle universe = new Rectangle(-100, -100, 200, 200);
         Object[][] constructorParams = new Object[totalNbBodies][3];
@@ -88,7 +94,7 @@ public class Start {
             killsupport.abort(e);
         }
 
-        System.out.println("[NBODY] " + totalNbBodies +
+        logger.info("[NBODY] " + totalNbBodies +
             " Domains are deployed");
 
         Maestro maestro = null;

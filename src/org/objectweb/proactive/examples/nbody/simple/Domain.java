@@ -34,11 +34,16 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
 public class Domain implements Serializable{
+    
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     
     private int identification;       		// a unique number to differentiate this Domain from the others
     private Domain [] neighbours;     		// the list of all the Domains
@@ -129,7 +134,7 @@ public class Domain implements Serializable{
                 this.neighbours[i].setValue(this.info, this.identification);
         if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
             if (this.identification==0) 
-                System.out.println("Compute movement.");
+                logger.info("Compute movement.");
         }
         else 
             this.display.drawBody((int)this.info.x, (int)this.info.y, (int)this.info.vx, (int)this.info.vy, 

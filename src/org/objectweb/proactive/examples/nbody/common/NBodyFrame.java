@@ -239,7 +239,7 @@ public class NBodyFrame extends JFrame implements Serializable, ActionListener,
             }
         }
 
-        // else System.out.println("Event not caught : " + e);
+        // else logger.info("Event not caught : " + e);
     }
 
     public void stateChanged(ChangeEvent e) {

@@ -35,9 +35,12 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
@@ -46,6 +49,8 @@ import org.objectweb.proactive.examples.nbody.common.Planet;
  * Domains encapsulate one Planet, do their calculations, communicates with a Group, and synchronized by a master.
  */
 public class Domain implements Serializable{
+    
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     
     private int identification;					// unique domain identifier
     private Domain neighbours;					// The Group containing all the other Domains
@@ -105,7 +110,7 @@ public class Domain implements Serializable{
      * Move the Planet contained, applying the force computed. 
      */
     public void moveBody() {
-        // System.out.println("Domain " + identification + " starting mvt computation");
+        // logger.info("Domain " + identification + " starting mvt computation");
         Force force = new Force();  
         for (int i = 0 ; i < values.length ; i++) {
             force.add(info, values[i]); // adds the interaction of the distant body 
@@ -138,7 +143,7 @@ public class Domain implements Serializable{
         this.neighbours.setValue(info,identification);
         if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
             if (this.identification==0) 
-                System.out.println("Compute movement.");
+                logger.info("Compute movement.");
         }
         else 
             this.display.drawBody((int)this.info.x, (int)this.info.y, (int)this.info.vx, (int)this.info.vy, 

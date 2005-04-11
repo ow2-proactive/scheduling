@@ -35,14 +35,19 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
 public class Domain implements Serializable{
+    
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     
     private class Carrier implements Serializable{
         Planet planet;
@@ -139,7 +144,7 @@ public class Domain implements Serializable{
             neighbours.setValue(this.info, this.iter);
             if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
                 if (this.identification==0 && this.iter % 50 == 0 ) 
-                    System.out.println("Compute movement." + this.iter);
+                    logger.info("Compute movement." + this.iter);
             }
             else 
                 this.display.drawBody((int)this.info.x, (int)this.info.y, (int)this.info.vx, (int)this.info.vy, 

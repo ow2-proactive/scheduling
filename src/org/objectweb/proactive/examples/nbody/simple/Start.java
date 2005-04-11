@@ -30,10 +30,13 @@
  */
 package org.objectweb.proactive.examples.nbody.simple;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 import org.objectweb.proactive.examples.nbody.common.Rectangle;
@@ -52,6 +55,9 @@ import org.objectweb.proactive.examples.nbody.common.Rectangle;
  * @since   ProActive 2.2
  */
 public class Start {
+
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
+    
     public static void main(String[] args) {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
@@ -59,7 +65,7 @@ public class Start {
     public static void main(int totalNbBodies, int maxIter,
         Displayer displayer, Node[] nodes,
         org.objectweb.proactive.examples.nbody.common.Start killsupport) {
-        System.out.println("RUNNING simplest VERSION");
+        logger.info("RUNNING simplest VERSION");
 
         Rectangle universe = new Rectangle(-100, -100, 200, 200);
         Domain[] domainArray = new Domain[totalNbBodies];
@@ -78,7 +84,7 @@ public class Start {
             }
         }
 
-        System.out.println("[NBODY] " + totalNbBodies +
+        logger.info("[NBODY] " + totalNbBodies +
             " Planets are deployed");
 
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains

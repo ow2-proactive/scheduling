@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.examples.nbody.common;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
@@ -37,6 +39,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -59,6 +63,7 @@ import java.io.Serializable;
  * @since   ProActive 2.2
  */
 public class Start implements Serializable {
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private ProActiveDescriptor descriptorPad;
 
     /**
@@ -87,7 +92,7 @@ public class Start implements Serializable {
         switch (args.length) {
         case 0:
             usage();
-            System.out.println("No xml descriptor specified - aborting");
+            logger.info("No xml descriptor specified - aborting");
             quit();
         case 2:
             if (args[1].equals("-nodisplay")) {
@@ -118,17 +123,16 @@ public class Start implements Serializable {
         default:
             usage();
         }
-        System.out.println("        Running with options set to " +
-            totalNbBodies + " bodies, " + maxIter + " iterations, display " +
-            display);
+        logger.info("        Running with options set to " + totalNbBodies +
+            " bodies, " + maxIter + " iterations, display " + display);
         xmlFileName = args[0];
 
-        System.out.println(
+        logger.info(
             " 1 : Simplest version, one-to-one communication and master");
-        System.out.println(" 2 : group communication and master");
-        System.out.println(" 3 : group communication, odd-even-synchronization");
+        logger.info(" 2 : group communication and master");
+        logger.info(" 3 : group communication, odd-even-synchronization");
         if (displayft) {
-            System.out.print("Choose which version you want to run [123] : ");
+            logger.info("Choose which version you want to run [123] : ");
             try {
                 while (true) {
                     // Read a character from keyboard
@@ -141,10 +145,9 @@ public class Start implements Serializable {
                 abort(ioe);
             }
         } else {
-            System.out.println(
-                " 4 : group communication, oospmd synchronization");
-            System.out.println(" 5 : Barnes-Hut, and oospmd");
-            System.out.print("Choose which version you want to run [12345] : ");
+            logger.info(" 4 : group communication, oospmd synchronization");
+            logger.info(" 5 : Barnes-Hut, and oospmd");
+            logger.info("Choose which version you want to run [12345] : ");
             try {
                 while (true) {
                     // Read a character from keyboard
@@ -157,7 +160,7 @@ public class Start implements Serializable {
                 abort(ioe);
             }
         }
-        System.out.println("Thank you!");
+        logger.info("Thank you!");
 
         // Construct deployment-related variables: pad & nodes
         descriptorPad = null;
@@ -221,8 +224,8 @@ public class Start implements Serializable {
      */
     private void usage() {
         String options = "[-nodisplay | -displayft] totalNbBodies maxIter";
-        System.out.println("        Usage : nbody.[bat|sh] " + options);
-        System.out.println(
+        logger.info("        Usage : nbody.[bat|sh] " + options);
+        logger.info(
             "        from the command line, it would be   java Start xmlFile " +
             options);
     }
@@ -240,13 +243,13 @@ public class Start implements Serializable {
      * End the program, removing extra JVM that have been created with the deployment of the Domains
      */
     public void quit() {
-        System.out.println(" CLEANING UP DEPLOYMENT ");
+        logger.info(" CLEANING UP DEPLOYMENT ");
         try {
             descriptorPad.killall(true);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
-        System.out.println(" PROGRAM ENDS ");
+        logger.info(" PROGRAM ENDS ");
         System.exit(0);
     }
 }

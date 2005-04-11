@@ -36,11 +36,14 @@ import java.net.UnknownHostException;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 
 /**
@@ -50,6 +53,8 @@ import org.objectweb.proactive.examples.nbody.common.Displayer;
  * so that they cover the biggest area possible, without creating too big errors in computations. 
  */
 public class Domain implements Serializable{
+    
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     
     private class Carrier implements Serializable{
         Info inf;
@@ -317,7 +322,7 @@ public class Domain implements Serializable{
             this.neighbours.setValue(this.info, this.iter);
             if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
                 if (this.identification==0 && this.iter % 50 == 0) 
-                    System.out.println("Compute movement." + this.iter);
+                    logger.info("Compute movement." + this.iter);
             }
             else 
                 if (this.isLeaf) {  // only leaves contain enough information, concerning planets

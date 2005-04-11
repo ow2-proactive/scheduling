@@ -34,13 +34,18 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
 import org.objectweb.proactive.examples.nbody.common.Force;
 import org.objectweb.proactive.examples.nbody.common.Planet;
 
 public class Domain implements Serializable{
+    
+    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     
     /** If we want some graphical interface */
     private Displayer display;								 
@@ -134,7 +139,7 @@ public class Domain implements Serializable{
         // Display code
         if (this.display == null) {// if no display, only the first Domain outputs message to say recompute is going on
             if (this.identification==0 ) 
-                System.out.println("Compute movement. "+ iter);
+                logger.info("Compute movement. "+ iter);
         }
         else { 
             this.display.drawBody((int)this.info.x, (int)info.y, (int)info.vx, (int)info.vy, 
