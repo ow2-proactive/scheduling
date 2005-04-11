@@ -46,14 +46,6 @@ public class BarrierState implements Serializable {
     /** The number of calls already received */
     private int receivedCalls = 0;
 
-    /** The local call is arrived ? */
-    private boolean localyCalled = false;
-
-    /**
-     * Constructor
-     */
-    public BarrierState() {
-    }
 
     /**
      * Returns the number of awaited calls to finish the barrier
@@ -86,18 +78,4 @@ public class BarrierState implements Serializable {
         this.receivedCalls++;
     }
 
-    /**
-     * Set the localy call state to <code>true</code>
-     */
-    public void tagLocalyCalled() {
-        this.localyCalled = true;
-    }
-
-    /**
-     * Return <code>true</code> if the local barrier call was performed
-     * @return <code>true</code> if the local barrier call was performed, else return <code>false</code>
-     */
-    public boolean isLocalyCalled() {
-        return this.localyCalled;
-    }
 }
