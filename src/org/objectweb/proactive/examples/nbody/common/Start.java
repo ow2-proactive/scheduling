@@ -158,20 +158,6 @@ public class Start implements Serializable {
             }
         }
         System.out.println("Thank you!");
-        // If need be, create a displayer
-        Displayer displayer = null;
-        if (display) {
-            try {
-                displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
-                        new Object[] {
-                            new Integer(totalNbBodies), new Boolean(displayft)
-                        }));
-            } catch (ActiveObjectCreationException e) {
-                abort(e);
-            } catch (NodeException e) {
-                abort(e);
-            }
-        }
 
         // Construct deployment-related variables: pad & nodes
         descriptorPad = null;
@@ -189,6 +175,23 @@ public class Start implements Serializable {
         } catch (NodeException e) {
             abort(e);
         }
+
+        // If need be, create a displayer
+        Displayer displayer = null;
+        if (display) {
+            try {
+                displayer = (Displayer) (ProActive.newActive(Displayer.class.getName(),
+                        new Object[] {
+                            new Integer(totalNbBodies), new Boolean(displayft),
+                            this
+                        }));
+            } catch (ActiveObjectCreationException e) {
+                abort(e);
+            } catch (NodeException e) {
+                abort(e);
+            }
+        }
+
         switch (input) {
         case 49:
             org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies,
@@ -237,12 +240,13 @@ public class Start implements Serializable {
      * End the program, removing extra JVM that have been created with the deployment of the Domains
      */
     public void quit() {
-        System.out.println(" PROGRAM ENDS " + descriptorPad);
+        System.out.println(" CLEANING UP DEPLOYMENT ");
         try {
             descriptorPad.killall(true);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
+        System.out.println(" PROGRAM ENDS ");
         System.exit(0);
     }
 }

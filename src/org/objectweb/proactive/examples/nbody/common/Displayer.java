@@ -30,41 +30,28 @@
  */
 package org.objectweb.proactive.examples.nbody.common;
 
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.InitActive;
-
 import java.io.Serializable;
 
 
-public class Displayer implements Serializable, InitActive {
+public class Displayer implements Serializable {
     private transient NBodyFrame nbf;
     private boolean displayft;
     private int nbBodies;
-    
+
     public Displayer() {
     }
-    
-    public Displayer(Integer nbBodies, Boolean displayft) {
+
+    public Displayer(Integer nbBodies, Boolean displayft,
+        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.nbBodies = nbBodies.intValue();
         this.displayft = displayft.booleanValue();
+        this.nbf = new NBodyFrame("ProActive N-Body", this.nbBodies,
+                this.displayft, killsupport);
+        this.nbf.setVisible(true);
     }
-    
+
     public void drawBody(int x, int y, int vx, int vy, int weight, int d,
-            int id, String name) {
+        int id, String name) {
         this.nbf.drawBody(x, y, vx, vy, weight, d, id, name);
-    }
-    
-    /* @deprecated please replace these occurences by replaced by
-     *   drawBody(int, int, int, int, int, int, int, String).
-     */
-    public void drawBody(int x, int y, int vx, int vy, int weight, int d, int id) {
-        this.nbf.drawBody(x, y, vx, vy, weight, d, id, "");
-    }
-    
-    public void initActivity(Body body) {
-        nbf = new NBodyFrame("ProActive N-Body", nbBodies, displayft);
-        nbf.setVisible(true);
-        // this.w=nbf.getWidth();
-        // this.h=nbf.getHeight();
     }
 }
