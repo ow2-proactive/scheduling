@@ -146,12 +146,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
     }
 
     public synchronized Request blockingRemoveOldest() {
-        //System.out.println("BlockingRequestQueueImpl.blockingRemoveOldest()");
         if (this.spmdManager == null) {
             this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
         }
         return this.barrierBlockingRemove();
-        //return blockingRemove(true);
     }
 
     public synchronized Request blockingRemoveOldest(long timeout) {
@@ -289,7 +287,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemove() {
-        while (((this.isEmpty() && this.shouldWait) || this.suspended) &&
+        while (((this.isEmpty() && this.shouldWait) || this.suspended ||
+                (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
             if (this.hasListeners()) {
                 this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
@@ -307,39 +306,13 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
         return this.barrierRemoveOldest();
     }
 
-    public synchronized Request barrierRemoveOldest() {
-        if (this.requestQueue.isEmpty()) {
-            return null;
+    public Request barrierRemoveOldest() {
+        Request r = (Request) requestQueue.remove(this.indexOfRequestToServe());
+        if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+            this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
+                    RequestQueueEvent.REMOVE_REQUEST));
         }
-        int index = -1;
-        boolean found = false;
-
-        // if there is no barrier currently active, avoid the iteration
-        if (this.spmdManager.isCurrentBarriersEmpty()) {
-            index = 0;
-            found = true;
-        } else { // there is at least one active barrier
-            Iterator it = requestQueue.iterator();
-
-            // look for the first request in the queue we can serve
-            while (!found && it.hasNext()) {
-                index++;
-                MethodCall mc = ((Request) it.next()).getMethodCall();
-                found = this.spmdManager.checkExecution(mc.getBarrierTags());
-            }
-        }
-
-        // we found a method to serve (a method not blocked by a current barrier)
-        if (found) {
-            Request r = (Request) requestQueue.remove(index);
-            if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
-                        RequestQueueEvent.REMOVE_REQUEST));
-            }
-            return r;
-        } else {
-            return null;
-        }
+        return r;
     }
 
     /**
@@ -355,5 +328,28 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      */
     public void resume() {
         this.suspended = false;
+    }
+
+    /**
+     * Returns the index of the first servable request in the requestQueue
+     * @return the index of the first servable request in the requestQueue, -1 if there is no request to serve
+     */
+    public int indexOfRequestToServe() {
+        // if there is no barrier currently active, avoid the iteration
+        if (this.spmdManager.isCurrentBarriersEmpty()) {
+            return 0;
+        } else { // there is at least one active barrier
+            int index = -1;
+            boolean isServable = false;
+            Iterator it = this.requestQueue.iterator();
+
+            // look for the first request in the queue we can serve
+            while (!isServable && it.hasNext()) {
+                index++;
+                MethodCall mc = ((Request) it.next()).getMethodCall();
+                isServable = this.spmdManager.checkExecution(mc.getBarrierTags());
+            }
+            return isServable ? index : (-1);
+        }
     }
 }
