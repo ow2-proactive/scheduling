@@ -334,7 +334,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * Returns the index of the first servable request in the requestQueue
      * @return the index of the first servable request in the requestQueue, -1 if there is no request to serve
      */
-    public int indexOfRequestToServe() {
+    private int indexOfRequestToServe() {
         // if there is no barrier currently active, avoid the iteration
         if (this.spmdManager.isCurrentBarriersEmpty()) {
             return 0;
@@ -347,6 +347,10 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
             while (!isServable && it.hasNext()) {
                 index++;
                 MethodCall mc = ((Request) it.next()).getMethodCall();
+                // FT : mc could be an awaited request
+                if (mc==null){
+                    return -1;
+                }
                 isServable = this.spmdManager.checkExecution(mc.getBarrierTags());
             }
             return isServable ? index : (-1);

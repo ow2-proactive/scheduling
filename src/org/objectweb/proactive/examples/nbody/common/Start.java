@@ -126,40 +126,26 @@ public class Start implements Serializable {
         logger.info("        Running with options set to " + totalNbBodies +
             " bodies, " + maxIter + " iterations, display " + display);
         xmlFileName = args[0];
-
+        
         logger.info(
-            " 1 : Simplest version, one-to-one communication and master");
+        " 1 : Simplest version, one-to-one communication and master");
         logger.info(" 2 : group communication and master");
         logger.info(" 3 : group communication, odd-even-synchronization");
-        if (displayft) {
-            logger.info("Choose which version you want to run [123] : ");
-            try {
-                while (true) {
-                    // Read a character from keyboard
-                    input = System.in.read();
-                    if (((input >= 49) && (input <= 51)) || (input == -1)) {
-                        break;
-                    }
+        logger.info(" 4 : group communication, oospmd synchronization");
+        logger.info(" 5 : Barnes-Hut, and oospmd");
+        logger.info("Choose which version you want to run [12345] : ");
+        try {
+            while (true) {
+                // Read a character from keyboard
+                input = System.in.read();
+                if (((input >= 49) && (input <= 53)) || (input == -1)) {
+                    break;
                 }
-            } catch (IOException ioe) {
-                abort(ioe);
             }
-        } else {
-            logger.info(" 4 : group communication, oospmd synchronization");
-            logger.info(" 5 : Barnes-Hut, and oospmd");
-            logger.info("Choose which version you want to run [12345] : ");
-            try {
-                while (true) {
-                    // Read a character from keyboard
-                    input = System.in.read();
-                    if (((input >= 49) && (input <= 53)) || (input == -1)) {
-                        break;
-                    }
-                }
-            } catch (IOException ioe) {
-                abort(ioe);
-            }
+        } catch (IOException ioe) {
+            abort(ioe);
         }
+    
         logger.info("Thank you!");
 
         // Construct deployment-related variables: pad & nodes

@@ -129,7 +129,14 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
     //// WRAPPED METHODS
     public MethodCall getMethodCall() {
-        return wrappedRequest.getMethodCall();
+        if (this.isArrived){
+            return this.wrappedRequest.getMethodCall();
+        } else {
+            return null;
+        }
+        
+        
+        
     }
 
     public Object getParameter(int index) {

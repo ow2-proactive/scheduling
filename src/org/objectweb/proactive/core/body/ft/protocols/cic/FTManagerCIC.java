@@ -438,16 +438,19 @@ public class FTManagerCIC
 
         //	add pending request to reuqestQueue
         Request pendingRequest = cic.pendingRequest;
-        char[] mic = pendingRequest.getMessageInfo();
-        if ((mic != null) && (mic[IS_ORPHAN_FOR] <= this.checkpointIndex)) {
-            if (this.owner.getID().equals(pendingRequest.getSourceBodyID())) {
-                throw new ProtocolErrorException(
-                        "A self request is orphan for " + this.owner.getID());
+        // pending request could be null 
+        if (pendingRequest != null) {
+            char[] mic = pendingRequest.getMessageInfo();
+            if ((mic != null) && (mic[IS_ORPHAN_FOR] <= this.checkpointIndex)) {
+                if (this.owner.getID().equals(pendingRequest.getSourceBodyID())) {
+                    throw new ProtocolErrorException(
+                            "A self request is orphan for " + this.owner.getID());
+                }
+                pendingRequest = new AwaitedRequest(cic.pendingRequest.getSourceBodyID());
+                this.awaitedRequests.add(pendingRequest);
             }
-            pendingRequest = new AwaitedRequest(cic.pendingRequest.getSourceBodyID());
-            this.awaitedRequests.add(pendingRequest);
+            queue.addToFront(pendingRequest);   
         }
-        queue.addToFront(pendingRequest);        
 
         // building history
         Iterator itHistory = cic.history.iterator();

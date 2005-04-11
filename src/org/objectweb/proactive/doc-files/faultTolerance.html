@@ -386,8 +386,7 @@ Fault-tolerance in ProActive is still not compliant with the following
     features :
 <ul>
 <li> active objects exposed as <A href="WSDoc.html">Web services</A>, or reachable using http protocol,
-<li> <A href="OOSPMD.html">OO-SPMD barriers<A>,
-<li> and <A href="./Security.html">security</A>.
+<li> and <A href="./Security.html">security</A>, as fault-tolerance servers are implemented using standard RMI.
 </ul>
 </p>
 
@@ -505,10 +504,14 @@ Starting Fault-Tolerant version of ProActive NBody...
 
 --- N-body with ProActive ---------------------------------
  **WARNING** : $PROACTIVE/descriptors/FaultTolerantWorkers.xml MUST BE SET WITH EXISTING HOSTNAMES !
+        Running with options set to 4 bodies, 3000 iterations, display true
  1 : Simplest version, one-to-one communication and master
  2 : group communication and master
  3 : group communication, odd-even-synchronization
-Choose which version you want to run [123] : 3
+ 4 : group communication, oospmd synchronization
+ 5 : Barnes-Hut, and oospmd
+Choose which version you want to run [12345] :
+4
 Thank you!
  --> This ClassFileServer is reading resources from classpath
 Jini enabled
@@ -517,7 +520,6 @@ Created a new registry on port 1099
 //tranquility.inria.fr/Node-157559959 successfully bound in registry at //tranquility.inria.fr/Node-157559959
 Generating class : pa.stub.org.objectweb.proactive.examples.nbody.common.Stub_Displayer
 ************* Reading deployment descriptor: file:./../../.././descriptors/FaultTolerantWorkers.xml ********************
-
 <pre>
 
 <!--
