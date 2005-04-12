@@ -500,7 +500,7 @@
 			<group title="ProActive Core" packages="org.objectweb.proactive.core*"/>
 			<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*"/>
 			<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*"/>
-			<group title="ProActive Core : P2P infrastructure" packages="org.objectweb.proactive.p2p*"/>
+			<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*"/>
 			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*"/>
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>		
 		</javadoc>
