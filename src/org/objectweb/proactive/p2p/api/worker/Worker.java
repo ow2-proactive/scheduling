@@ -133,7 +133,7 @@ public class Worker implements Serializable, InitActive {
 
     /**
      * @param params
-     * @return
+     * @return Returns result
      */
     public Result executeDaughter(Object[] params) {
         ProActiveGroup.setScatterGroup(this.daughter);
