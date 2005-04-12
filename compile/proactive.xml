@@ -408,7 +408,7 @@
 	<!--
 	   ================================================================
 	   ==
-      ==  Create javadoc
+      ==  Create one html file for the Manual
       ==
       ================================================================
 	-->
@@ -439,6 +439,13 @@
 			<arg value="${base}/src/org/objectweb/proactive/doc-files/FAQ.html"/>
 		</java>
 	</target>
+	<!--
+	   ================================================================
+	   ==
+      ==  Create one html file for the Guided Tour
+      ==
+      ================================================================
+	-->
 	
 	<target name="guidedtour" depends="util">
 		<java classname="util.buildManual" fork="true">
@@ -484,7 +491,7 @@
     	  </fileset>
    		 </copy>
 		<mkdir dir="${docs.dir}/ic2d-api"/>
-		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" doctitle="ProActive 2.2&lt;br>&lt;a href='org/objectweb/proactive/doc-files/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; October 2004 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
+		<javadoc packagenames="org.objectweb.proactive,org.objectweb.proactive.core.*,org.objectweb.proactive.ext.*" sourcepath="${src.dir}" destdir="${docs.dir}/api" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" doctitle="ProActive 2.2&lt;br>&lt;a href='org/objectweb/proactive/doc-files/index.html'>(documentation is here)&lt;/a>&lt;br>" bottom="&lt;i>Copyright &#169; April 2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation">
 			<classpath refid="project.classpath"/>
 			<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/"/>
 			<group title="ProActive packages for end user" packages="org.objectweb.proactive"/>
@@ -494,7 +501,7 @@
 			<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*"/>
 			<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*"/>
 		</javadoc>
-		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 2.2 - IC2D" bottom="&lt;i>Copyright &#169; October 2004 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
+		<javadoc packagenames="org.objectweb.proactive.ic2d.*" sourcepath="${src.dir}" destdir="${docs.dir}/ic2d-api" author="true" version="true" use="true" windowtitle="IC2D API" doctitle="ProActive 2.2 - IC2D" bottom="&lt;i>Copyright &#169; April 2005 INRIA All Rights Reserved.&lt;/i>" breakiterator="yes">
 			<classpath refid="project.classpath"/>
 			<group title="IC2D Application : Interactive Control and Debugging of Distribution" packages="org.objectweb.proactive.ic2d*"/>
 		</javadoc>
