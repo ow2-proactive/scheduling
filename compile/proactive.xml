@@ -369,6 +369,8 @@
 				<include name="docs/api/**"/>
 				<!--include name="docs/ic2d-api/**"/-->
 				<include name="scripts/**"/>
+				<exclude  name="scripts/unix/grid5000/**"/>
+				<exclude  name="scripts/unix/gridexperiment/**"/>
 				<include name="src/org/**"/>
 				<include name="compile/**"/>
 				<include name="lib/**"/>
@@ -791,7 +793,7 @@
   <target name="testsCoverage" depends="coverage-init, all, proActiveJar, testsuite, nonregressiontest">
  	 <delete file="${base}/compile/tests.log"/>
 	  <!-- classloader test needs clover tasks as specified in deployment-coverage.xml file -->
-	  <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
+	 <move file="${classes.dir}/nonregressiontest/runtime/classloader/deployment-coverage.xml" tofile="${classes.dir}/nonregressiontest/runtime/classloader/deployment.xml"/>
 	  <java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="coverage.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
