@@ -375,6 +375,8 @@
 				<include name="descriptors/**"/>
 			</fileset>
 		</copy>
+		<chmod dir="${PAdist.dir}/scripts/unix" perm="755" includes="**/*.sh"/>
+		<chmod file="${PAdist.dir}/compile/build" perm="755"/>
 		<!-- 
 			create zip version of ProActive without source
 		-->
