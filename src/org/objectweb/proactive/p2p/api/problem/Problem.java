@@ -110,7 +110,7 @@ public abstract class Problem implements Serializable {
     }
 
     /**
-     * @param stubOnThis
+     * @param worker
      */
     public void setWorker(Worker worker) {
         this.worker = worker;

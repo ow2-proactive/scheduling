@@ -350,7 +350,6 @@ public class StartP2PService implements P2PConstants {
      *         <li><code>proactive.p2p.acq</code>: acquisition method.</li>
      *         <li><code>proactive.p2p.port</code>: port number.</li>
      * </ul>
-     * @param peerListFile a file with a list of peers.
      */
     public StartP2PService() {
         // nothing to do

@@ -217,7 +217,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param remoteService The original sender.
      * @param lookup The P2P nodes lookup.
      * @param vnName Virtual node name.
-     * @param Job ID.
+     * @param jobId.
      */
     public void askingNode(int ttl, UniversalUniqueID uuid,
         P2PService remoteService, P2PNodeLookup lookup, String vnName,
@@ -274,7 +274,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
      * @param vnName Virtual node name.
-     * @param Job ID of the vn.
+     * @param jobId of the vn.
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
@@ -317,7 +317,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * Put in a <code>P2PNodeLookup</code> all available nodes during all the
      * time where it is actived.
      * @param vnName Virtual node name.
-     * @param Job ID.
+     * @param jobId.
      * @return an active object where nodes are received.
      */
     public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
