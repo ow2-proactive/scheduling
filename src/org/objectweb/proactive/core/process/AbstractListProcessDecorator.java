@@ -374,7 +374,16 @@ public abstract class AbstractListProcessDecorator
             String[] listexclude = list.substring(list.lastIndexOf('[') + 1,
                     list.lastIndexOf(']')).split(",");
             for (int i = 0; i < listexclude.length; i++) {
-                excludeArray.add(listexclude[i]);
+                if(listexclude[i].indexOf("-")< 0){
+                    excludeArray.add(listexclude[i]);
+                }else{
+                    String init = listexclude[i].substring(0,listexclude[i].indexOf("-"));
+                    String end = listexclude[i].substring(listexclude[i].indexOf("-")+1, listexclude[i].length());
+                    for (int j = Integer.parseInt(init);j<=Integer.parseInt(end);j++ ){
+                        excludeArray.add(new Integer(j).toString());
+                    }
+                }
+                
             }
         }
     }
