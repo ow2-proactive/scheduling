@@ -98,7 +98,7 @@ public class MethodCall implements java.io.Serializable {
      * Initializes the recycling of MethodCall objects to be enabled by default.
      */
     static {
-        MethodCall.setRecycleMethodCallObject(false);
+        MethodCall.setRecycleMethodCallObject(true);
     }
 
     //
