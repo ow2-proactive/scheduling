@@ -1064,7 +1064,7 @@ public class ProxyForGroup extends AbstractProxy
     protected void createMemberWithMultithread(String className,
         Object[] params, String[] nodeList) {
         // Initializes the Group to the correct size
-        for (int i = 0; i < params.length; i++) {
+        for (int i = 0; i < nodeList.length; i++) {
             this.memberList.add(null);
         }
         for (int i = 0; i < nodeList.length; i++) {
