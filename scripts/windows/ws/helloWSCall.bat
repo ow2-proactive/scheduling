@@ -10,8 +10,9 @@ goto end
 
 
 :doit
-IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 SETLOCAL
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
+
 call %PROACTIVE%\scripts\windows\init.bat
 
 %JAVA_CMD% org.objectweb.proactive.examples.webservices.helloWorld.WSClient %1

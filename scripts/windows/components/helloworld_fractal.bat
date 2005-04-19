@@ -17,8 +17,8 @@ goto doit
 
 
 :doit
-IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 SETLOCAL
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 call %PROACTIVE%\scripts\windows\init.bat
 set JAVA_CMD=%JAVA_CMD% -Dfractal.provider=org.objectweb.proactive.core.component.Fractive
 %JAVA_CMD%  org.objectweb.proactive.examples.components.helloworld.HelloWorld %1 %2 %3 

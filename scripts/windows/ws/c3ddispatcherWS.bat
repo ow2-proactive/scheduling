@@ -10,8 +10,9 @@ goto end
 
 
 :doit
-IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
 SETLOCAL
+IF NOT DEFINED PROACTIVE set PROACTIVE=..\..\..\.
+
 call %PROACTIVE%\scripts\windows\init.bat
 
 set XMLDESCRIPTOR=..\..\..\descriptors\C3D_Dispatcher_Renderer.xml 
