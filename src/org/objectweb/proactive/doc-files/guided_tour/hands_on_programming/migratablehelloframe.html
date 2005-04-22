@@ -90,7 +90,11 @@ public void initActivity(Body body) {
   object. <a href="code/HelloFrame.java.html">Here</a> is the code.</p>
 <h2>Execution</h2>
 <p>
-<li>Similarly to the simple migration example (use the <a href="code/HelloFrameController.java.html">HelloFrameController</a> class), you will start remote nodes and 
+<li>Create a new class HelloFrameControllerClient: take the code of MigratableHelloClient used in the previous part, change the class declaration to  HelloFrameControllerClient and replace the line<br>
+<p><code>MigratableHello migratable_hello = MigratableHello.createMigratableHello("agent1");</code></p>
+<p class="textNormal">with</p>
+<p><code>MigratableHello migratable_hello = HelloFrameController.createHelloFrameController("agent1");</p></li>
+<li>Similarly to the simple migration example (use the HelloFrameControllerClient class), you will start remote nodes and 
   specify a migration path.</li>
 <li>you have 2 ways for handling the display of the graphical objects :</li>
 <ul>
