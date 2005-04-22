@@ -318,7 +318,7 @@ public class HttpRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
-        return runtimestrategyadapter.getJobID();
+        return vmInformation.getJobID();
     }
 
     /**
