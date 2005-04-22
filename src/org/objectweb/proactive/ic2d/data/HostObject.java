@@ -30,18 +30,18 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
-import java.util.Iterator;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredHost;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredNode;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 import org.objectweb.proactive.ic2d.util.HostRTFinder;
+
+import java.util.Iterator;
 
 
 /**
@@ -56,36 +56,31 @@ public class HostObject extends AbstractDataObject {
     protected String os;
     protected HostRTFinder nodeFinder;
     protected HostObjectListener listener;
-    protected DataAssociation asso;
+
+    //following represents the nodes found on this host
+    protected MonitoredObjectSet objectSet;
     protected BasicMonitoredObject monitoredHost;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public HostObject(WorldObject parent, BasicMonitoredObject monitoredHost, DataAssociation asso) {
+    public HostObject(WorldObject parent, BasicMonitoredObject monitoredHost,
+        MonitoredObjectSet objectSet) {
         super(parent);
-        this.asso = asso;
+        this.objectSet = objectSet;
+
         //	Test if there is port defined, then remove it to see if hostname exists
         try {
             this.hostname = monitoredHost.getFullName();
             String shortHostname = UrlBuilder.getHostNameorIP(java.net.InetAddress.getByName(
                         UrlBuilder.removePortFromHost(hostname)));
             this.monitoredHost = monitoredHost;
-            
 
             //controller.log("HostObject "+this.hostname+ " created");
         } catch (java.net.UnknownHostException e) {
             this.hostname = monitoredHost.getFullName();
             controller.warn("Hostname " + hostname + " failed reverse lookup.");
         }
-
-//        if ("ibis".equals(protocol)) {
-//            this.nodeFinder = new IbisHostNodeFinder(controller);
-//        } else if ("http".equals(protocol)) {
-//            this.nodeFinder = new HttpHostNodeFinder(controller);
-//        } else {
-//            this.nodeFinder = new RMIHostNodeFinder(controller);
-//        }
     }
 
     //
@@ -95,21 +90,23 @@ public class HostObject extends AbstractDataObject {
         return "Host: " + hostname + "\n" + super.toString();
     }
 
-//    public void createAllNodes() {
-//        RunnableProcessor.getInstance().processRunnable("Create nodes for " +
-//            hostname, new CreateNodeTask(), controller);
-//    }
-    
+    /**
+     * @return Returns the protocol used to monitor this host
+     */
+    public String getMonitoredProtocol() {
+        return ((MonitoredHost) monitoredHost).getMonitorProtocol();
+    }
+
     public void createAllNodes() {
-        MonitoredObjectSet objectSet = asso.getValues(monitoredHost, 2, null);
+        //MonitoredObjectSet objectSet = asso.getValues(monitoredHost, 2, null);
         Iterator iter = objectSet.iterator();
-        if ( ! iter.hasNext()) {
+        if (!iter.hasNext()) {
             //we check first if nodes were found
-            controller.warn("No Node objects were found on host " +
-                hostname + " !");
+            controller.warn("No Node objects were found on host " + hostname +
+                " !");
         }
-        while (iter.hasNext()){
-            MonitoredNode monitoredNode = (MonitoredNode)iter.next();
+        while (iter.hasNext()) {
+            MonitoredNode monitoredNode = (MonitoredNode) iter.next();
             Node node = monitoredNode.getNode();
             String nodeName = node.getNodeInformation().getName();
             VMObject vmObject = findVMObjectHavingExistingNode(nodeName);
@@ -126,11 +123,6 @@ public class HostObject extends AbstractDataObject {
         }
     }
 
-//    public void createOneNode(String nodeName) {
-//        RunnableProcessor.getInstance().processRunnable("Create one node for " +
-//            hostname, new CreateNodeTask(nodeName), controller);
-//    }
-
     //
     // accessor methods
     //
@@ -142,10 +134,6 @@ public class HostObject extends AbstractDataObject {
         return os;
     }
 
-    //  public boolean isGlobusEnabled() {
-    //  	if (this.hostname.indexOf("globus") != -1) return true;
-    //    return false;
-    //  }
     //
     // Event Listener
     //
@@ -267,68 +255,4 @@ public class HostObject extends AbstractDataObject {
             return false;
         }
     }
-
-    //
-    // -- INNER CLASSES -----------------------------------------------
-    //
-//    private class CreateNodeTask implements Runnable {
-//        private String targetNodeName;
-//
-//        public CreateNodeTask() {
-//        }
-//
-//        public CreateNodeTask(String targetNodeName) {
-//            this.targetNodeName = targetNodeName;
-//        }
-//
-//        public void run() {
-//            Node[] nodes;
-//
-//            try {
-//                nodes = nodeFinder.findNodes(hostname);
-//
-//                //  System.out.println("XXXXXXX");
-//            } catch (java.io.IOException e) {
-//                controller.log("There is no RMI Registry on host " + hostname, e);
-//
-//                return;
-//            }
-//
-//            if (nodes.length == 0) {
-//                controller.warn("A RMIRegistry has been found on host " +
-//                    hostname + " but no Node object are bound !");
-//            }
-//
-//            for (int i = 0; i < nodes.length; i++) {
-//                Node node = nodes[i];
-//
-//                //System.out.println("nodeURL "+node.getNodeInformation().getURL());
-//                String nodeName = node.getNodeInformation().getName();
-//
-//                if ((targetNodeName == null) ||
-//                        targetNodeName.equals(nodeName)) {
-//                    VMObject vmObject = findVMObjectHavingExistingNode(nodeName);
-//
-//                    if (vmObject == null) {
-//                        // new NodeObject
-//                        addVMObject(node);
-//                    } else {
-//                        controller.log("The node " + nodeName +
-//                            " is already known by host " + hostname +
-//                            " look for new objects");
-//                        vmObject.sendEventsForAllActiveObjects();
-//                    }
-//                }
-//            }
-//
-//            if ((targetNodeName != null) &&
-//                    (findVMObjectHavingExistingNode(targetNodeName) == null)) {
-//                controller.warn("The node " + targetNodeName +
-//                    " was not found on host " + hostname +
-//                    ". Check the name of the node");
-//            }
-//        }
-//    }
-
-    // end inner class CreateNodeTask
 }

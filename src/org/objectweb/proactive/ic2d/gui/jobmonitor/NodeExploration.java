@@ -50,19 +50,17 @@ public class NodeExploration implements JobMonitorConstants {
     private Set visitedVM;
     private Map runtimes;
     private IC2DMessageLogger controller;
-    private String protocol;
-    private HostRTFinder runtimeFinder;
+    
 
     public NodeExploration(DataAssociation asso,
-        DefaultListModel skippedObjects, IC2DMessageLogger controller,
-        String protocol) {
+        DefaultListModel skippedObjects, IC2DMessageLogger controller) {
         this.maxDepth = 3;
         this.asso = asso;
         this.skippedObjects = skippedObjects;
         this.aos = new HashMap();
         this.runtimes = new HashMap();
         this.controller = controller;
-        this.runtimeFinder = initiateFinder(protocol);
+        
     }
 
     public int getMaxDepth() {
@@ -143,10 +141,11 @@ public class NodeExploration implements JobMonitorConstants {
         return known;
     }
 
-    public void exploreHost(String hostname, int port) {
+    public void exploreHost(String hostname, int port, String protocol) {
         //Registry registry;
         //String[] list;
-        MonitoredHost hostObject = new MonitoredHost(hostname, port);
+        HostRTFinder runtimeFinder = initiateFinder(protocol);
+        MonitoredHost hostObject = new MonitoredHost(hostname, port, protocol);
         if (skippedObjects.contains(hostObject)) {
             return;
         }
@@ -208,9 +207,10 @@ public class NodeExploration implements JobMonitorConstants {
         }
 
         String hostname = UrlBuilder.getHostNameorIP(infos.getInetAddress());
+        String monitoredProtocol = UrlBuilder.getProtocol(url);
 
         MonitoredHost hostObject = new MonitoredHost(hostname,
-                jvmObject.getPort());
+                jvmObject.getPort(), monitoredProtocol);
         if (skippedObjects.contains(hostObject)) {
             return;
         }
@@ -402,7 +402,7 @@ public class NodeExploration implements JobMonitorConstants {
      * @return
      */
     private HostRTFinder initiateFinder(String protocol) {
-        if (protocol.equals("rmi:")) {
+        if (protocol.equals("rmi:") || protocol.equals("rmissh:")) {
             return new RMIHostRTFinder(controller);
         } else if (protocol.equals("http:")) {
             return new HttpHostRTFinder(controller);

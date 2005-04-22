@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d.data;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ic2d.event.WorldObjectListener;
 import org.objectweb.proactive.ic2d.gui.jobmonitor.data.BasicMonitoredObject;
-import org.objectweb.proactive.ic2d.gui.jobmonitor.data.DataAssociation;
+import org.objectweb.proactive.ic2d.gui.jobmonitor.data.MonitoredObjectSet;
 
 
 /**
@@ -64,12 +64,12 @@ public class WorldObject extends AbstractDataObject {
     //
     // Host related methods
     //
-    public HostObject addHostObject(BasicMonitoredObject monitoredHost, DataAssociation asso)
-        throws java.rmi.RemoteException {
-        return addHostObject(monitoredHost, asso, null);
-    }
+//    public HostObject addHostObject(BasicMonitoredObject monitoredHost, MonitoredObjectSet objectSet)
+//        throws java.rmi.RemoteException {
+//        return addHostObject(monitoredHost, objectSet, null);
+//    }
 
-    public HostObject addHostObject(BasicMonitoredObject monitoredHost, DataAssociation asso, String nodeName) throws java.rmi.RemoteException {
+    public HostObject addHostObject(BasicMonitoredObject monitoredHost, MonitoredObjectSet objectSet) throws java.rmi.RemoteException {
         String shortHostname = null;
         String hostname = monitoredHost.getFullName();
         try {
@@ -82,7 +82,7 @@ public class WorldObject extends AbstractDataObject {
         }
         HostObject host = getHostObject(hostname);
         if (host == null) {
-            host = new HostObject(this, monitoredHost, asso);
+            host = new HostObject(this, monitoredHost, objectSet);
             putChild(hostname, host);
             if (listener != null) {
                 listener.hostObjectAdded(host);
@@ -90,6 +90,7 @@ public class WorldObject extends AbstractDataObject {
         } else {
             controller.log("Hostname " + hostname +
                 " already monitored, check for new nodes.");
+            host.objectSet = objectSet;
         }
         host.createAllNodes();
 //        if (nodeName == null) {

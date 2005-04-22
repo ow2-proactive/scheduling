@@ -33,7 +33,9 @@ package org.objectweb.proactive.ic2d.gui.data;
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.VMObject;
+import org.objectweb.proactive.ic2d.data.WorldObject;
 import org.objectweb.proactive.ic2d.event.HostObjectListener;
+import org.objectweb.proactive.ic2d.util.MonitorThread;
 
 
 public class HostPanel extends AbstractDataObjectPanel
@@ -67,7 +69,9 @@ public class HostPanel extends AbstractDataObjectPanel
         popup.addGenericMenu();
         popup.add(new javax.swing.AbstractAction("Look for new nodes", null) {
                 public void actionPerformed(java.awt.event.ActionEvent e) {
-                    hostObject.createAllNodes();
+                    WorldObject worldObject = (WorldObject) hostObject.getParent();
+                    new MonitorThread(hostObject.getMonitoredProtocol(),
+                        hostObject.getHostName(), "1", worldObject, controller).start();
                 }
             });
         popup.addSeparator();

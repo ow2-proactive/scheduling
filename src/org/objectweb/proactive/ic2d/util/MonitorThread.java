@@ -64,6 +64,16 @@ public class MonitorThread extends Thread {
         this.logger = logger;
         this.worldObject = worldObject;
     }
+    
+//    public MonitorThread(DataAssociation association, String protocol, String host, String depth,
+//            WorldObject worldObject, IC2DMessageLogger logger) {
+//            this.asso = association;
+//            this.protocol = protocol;
+//            this.host = host;
+//            this.depth = depth;
+//            this.logger = logger;
+//            this.worldObject = worldObject;
+//        }
 
     public void run() {
         String hostname = null;
@@ -71,14 +81,14 @@ public class MonitorThread extends Thread {
         DefaultListModel skippedObjects = new DefaultListModel();
 
         NodeExploration explorator = new NodeExploration(asso,
-                skippedObjects, logger, protocol);
+                skippedObjects, logger);
         explorator.setMaxDepth(depth);
         explorator.startExploration();
         if (host != null) {
             hostname = UrlBuilder.removePortFromHost(host);
             port = UrlBuilder.getPortFromUrl(host);
         }
-        explorator.exploreHost(hostname, port);
+        explorator.exploreHost(hostname, port, protocol);
         explorator.endExploration();
         Iterator it = asso.getHosts().iterator(); // iterator de MonitoredHost
         while (it.hasNext()) {
@@ -86,7 +96,7 @@ public class MonitorThread extends Thread {
 
             //                String tmphost = monitoredhost.getFullName();
             try {
-                worldObject.addHostObject(monitoredhost, asso);
+                worldObject.addHostObject(monitoredhost, asso.getValues(monitoredhost, 2, null));
             } catch (RemoteException e) {
                 e.printStackTrace();
             }

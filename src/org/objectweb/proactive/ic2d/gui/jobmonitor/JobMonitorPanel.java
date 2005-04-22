@@ -84,7 +84,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
         tabs = new JTabbedPane();
         frames = new Vector();
 
-        explorator = new NodeExploration(asso, skippedObjects, _controller, "rmi:");
+        explorator = new NodeExploration(asso, skippedObjects, _controller);
 
         add(tabs);
 
@@ -187,7 +187,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
     }
 
     public void addMonitoredHost(String host, int port) {
-        MonitoredHost hostObject = new MonitoredHost(host, port);
+        MonitoredHost hostObject = new MonitoredHost(host, port,"rmi:");
         if (!monitoredHosts.contains(hostObject)) {
             monitoredHosts.addElement(hostObject);
             if (monitoredHosts.size() == 1) {
@@ -234,11 +234,12 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             explorator.startExploration();
 
             for (int i = 0, size = monitoredHosts.size(); i < size; ++i) {
-                BasicMonitoredObject hostObject = (BasicMonitoredObject) monitoredHosts.get(i);
+                MonitoredHost hostObject = (MonitoredHost) monitoredHosts.get(i);
                 String host = hostObject.getFullName();
+                String protocol = hostObject.getMonitorProtocol();
 
                 //				System.out.println ("\nMonitoring host " + (i + 1) + " / " + size + ": " + host);
-                handleHost(host);
+                handleHost(host, protocol);
             }
 
             explorator.exploreKnownJVM();
@@ -253,13 +254,13 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
                 public void run() {
                     asso.deleteItem(hostObject);
                     explorator.startExploration();
-                    handleHost(hostObject.getFullName());
+                    handleHost(hostObject.getFullName(),((MonitoredHost)hostObject).getMonitorProtocol());
                     explorator.endExploration();
                 }
             }).start();
     }
 
-    private void handleHost(String host) {
+    private void handleHost(String host, String protocol) {
         String hostname = host;
         int port = DEFAULT_RMI_PORT;
         int pos = host.lastIndexOf(":");
@@ -274,7 +275,7 @@ public class JobMonitorPanel extends JPanel implements JobMonitorConstants {
             hostname = host.substring(0, pos);
         }
 
-        explorator.exploreHost(hostname, port);
+        explorator.exploreHost(hostname, port, protocol);
     }
 
     private void dump(Object o) {
