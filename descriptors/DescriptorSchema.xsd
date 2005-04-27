@@ -157,7 +157,7 @@ The following element ProActiveDescriptor defines the root of the schema
 	<!--PatternType is defined as a global element, hence it can be referenced in many part of the document.-->
 	<xs:simpleType name="PatternType">
 		<xs:restriction base="xs:string">
-		<xs:pattern value="((\s)*[\[](\s)*[0-9]+(\s)*[\-](\s)*([0-9])+(\s)*([\]](\s)*|[;](\s)*[0-9](\s)*[\]](\s)*))((\s)*|(\s)*[\^](\s)*[\[](\s)*(([0-9]+|[0-9]+(\s)*[\-](\s)*[0-9]+)(\s)*[,]*(\s)*)+[\]](\s)*)"/>
+			<xs:pattern value="((\s)*[\[](\s)*[0-9]+(\s)*[\-](\s)*([0-9])+(\s)*([\]](\s)*|[;](\s)*[0-9](\s)*[\]](\s)*))((\s)*|(\s)*[\^](\s)*[\[](\s)*(([0-9]+|[0-9]+(\s)*[\-](\s)*[0-9]+)(\s)*[,]*(\s)*)+[\]](\s)*)"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<!--closeStreamType is defined as a global element, hence it can be referenced in all processes.-->
@@ -739,18 +739,11 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	</xs:complexType>
 	<!--oarOption-->
 	<xs:complexType name="OarOptionType">
-		<xs:complexContent>
-			<xs:extension base="prunOptionType">
-				<xs:sequence>
-					<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-				</xs:sequence>
-			</xs:extension>
-			<!--<xs:extension base="prunOptionType">
-			<xs:sequence>
+		<xs:sequence>
+			<xs:element name="resources" type="xs:string" minOccurs="0"/>
+			<!--<xs:element name="properties" type="xs:string" minOccurs="0"/>-->
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
-			</xs:sequence>
-			</xs:extension>  -->
-		</xs:complexContent>
+		</xs:sequence>
 	</xs:complexType>
 	<!--sge process -->
 	<xs:complexType name="sgeProcessType">

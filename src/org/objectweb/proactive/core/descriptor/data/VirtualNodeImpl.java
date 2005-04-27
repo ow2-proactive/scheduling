@@ -882,7 +882,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             if (minNumberOfNodes != 0) {
                 tempNodeCount = minNumberOfNodes;
             }
-            while (nbCreatedNodes != tempNodeCount) {
+            while (nbCreatedNodes < tempNodeCount) {
                 if (!timeoutExpired()) {
                     try {
                         wait(getTimeToSleep());

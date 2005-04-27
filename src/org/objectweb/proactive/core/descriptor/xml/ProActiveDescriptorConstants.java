@@ -97,6 +97,8 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_OUTPUT_FILE = "outputFile";
     public static final String PBS_OPTIONS_TAG = "pbsOption";
     public static final String OAR_OPTIONS_TAG="oarOption";
+    public static final String OAR_RESOURCE_TAG="resources";
+    //public static final String OAR_PROPERTY_TAG="properties";
     public static final String VARIABLE_TAG = "variable";
     public static final String CLASSPATH_TAG = "classpath";
     public static final String BOOT_CLASSPATH_TAG = "bootclasspath";

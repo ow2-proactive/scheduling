@@ -54,7 +54,7 @@ import java.util.regex.Pattern;
  * </p><pre>
  * ..............
  * OARSubProcess oar = new OARSubProcess(new SimpleExternalProcess("ls -lsa"));
- * SSHProcess ssh = new RLoginProcess(oar, false);
+ * SSHProcess ssh = new SSHProcess(oar, false);
  * ssh.setHostname("cluster_front_end_name");
  * ssh.startProcess();
  * ...............
@@ -73,19 +73,16 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
         FILE_SEPARATOR + "oarStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
-    protected static final String DEFAULT_BOOKING_DURATION = "00:01:00";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
+    protected String weight = "2";
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
-    protected String bookingDuration = DEFAULT_BOOKING_DURATION;
-
-    //Following options are not yet included in the command
     protected String interactive = "false";
-    protected String outputFile;
     protected int jobID;
     protected String queueName;
-    protected String hostList;
     protected String accessProtocol = "rsh";
+    protected String resources;
 
+    //protected String properties;
     public OARSubProcess() {
         super();
         setCompositionType(GIVE_COMMAND_AS_PARAMETER);
@@ -116,25 +113,6 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     }
 
     /**
-     * Returns the number of nodes requested when running the job
-     * @return the number of nodes requested when running the job
-     */
-    public String getHostsNumber() {
-        return this.hostNumber;
-    }
-
-    /**
-     * Sets the number of nodes requested when running the job
-     * @param hosts
-     */
-    public void setHostsNumber(String hosts) {
-        checkStarted();
-        if (hosts != null) {
-            this.hostNumber = hosts;
-        }
-    }
-
-    /**
      * @see org.objectweb.proactive.core.process.UniversalProcess#getProcessId()
      */
     public String getProcessId() {
@@ -145,7 +123,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        return (new Integer(getHostsNumber()).intValue());
+        return (new Integer(hostNumber).intValue() * new Integer(weight).intValue());
     }
 
     /**
@@ -166,7 +144,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         this.scriptLocation = location;
         //    }
     }
-    
+
     /**
      * Sets the protocol to access booked nodes.
      * Two possibilities, rsh, ssh. Default is rsh.
@@ -174,40 +152,31 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      */
     public void setAccessProtocol(String accessProtocol) {
         this.accessProtocol = accessProtocol;
-        
     }
 
     /**
-     *  Set the booking duration of the cluster's nodes. The default is 00:01:00
+     * Set the resource option in the OAR command.
+     * Represents the -l option of OAR
      * @param d duration
      */
-    public void setBookingDuration(String d) {
-        this.bookingDuration = d;
-    }
-
-    //Following methods are not used yet for the command
-
-    /**
-     * Sets the value of the hostList parameter with the given value
-     * Not yet included in the oar command
-     * @param hostList
-     */
-    public void setHostList(String hostList) {
+    public void setResources(String res) {
         checkStarted();
-        this.hostList = hostList;
+        if (res != null) {
+            this.resources = res;
+            parseRes(res);
+        }
     }
 
-    /**
-     * Returns the hostList value of this process.
-     * Not yet included in the oar command
-     * @return String
-     */
-    public String getHostList() {
-        return hostList;
-    }
-
-    //    public String getProcessorPerNodeNumber() {
-    //        return this.processorPerNode;
+    //    /**
+    //     * Sets the value of the hostList parameter with the given value
+    //     * Not yet included in the oar command
+    //     * @param hostList
+    //     */
+    //    public void setProperties(String props) {
+    //        checkStarted();
+    //        if (props != null) {
+    //            this.properties = checkProperties(props);
+    //        }
     //    }
 
     /**
@@ -218,25 +187,6 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     public void setInteractive(String interactive) {
         this.interactive = interactive;
     }
-
-    /** Set the output file to be passed to oar
-     * Not yet included in the oar command
-     * @param string
-     */
-    public void setOutputFile(String string) {
-        outputFile = string;
-    }
-
-    //    /**
-    //     * Sets the number of nodes requested when running the job
-    //     * @param processorPerNode processor per node
-    //     */
-    //    public void setProcessorPerNodeNumber(String processorPerNode) {
-    //        checkStarted();
-    //        if (processorPerNode != null) {
-    //            this.processorPerNode = processorPerNode;
-    //        }
-    //    }
 
     /**
      * Sets the value of the queue where the job will be launched. The default is 'normal'
@@ -272,10 +222,9 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         return result;
     }
 
-    protected String internalBuildCommand() {
-        return buildEnvironmentCommand(); // + buildPSubCommand();
-    }
-
+    //    protected String internalBuildCommand() {
+    //        return buildEnvironmentCommand(); // + buildPSubCommand();
+    //    }
     protected void internalStartProcess(String commandToExecute)
         throws java.io.IOException {
         ArrayList al = new ArrayList();
@@ -315,16 +264,24 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
      * we thus rely on the following trick, the command has the form
      * echo "real command" | qsub -I ...   oarStartRuntime.sh
      */
-    protected String buildCommand() {
+    protected String internalBuildCommand() {
         StringBuffer oarsubCommand = new StringBuffer();
         oarsubCommand.append(
-            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do "+accessProtocol+" \\$i  ");
+            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " +
+            accessProtocol + " \\$i  ");
         oarsubCommand.append(targetProcess.getCommand());
         oarsubCommand.append(" \\&  done  \\; wait > ");
         oarsubCommand.append(scriptLocation).append(" ; ");
         oarsubCommand.append(command_path);
         oarsubCommand.append(" ");
-        oarsubCommand.append(buildResourceString()).append(" ");
+        if (resources != null) {
+            oarsubCommand.append("-l " + resources).append(" ");
+        }
+
+        //To implement if needed
+        //        if(properties != null){
+        //            oarsubCommand.append("-p "+properties).append(" ");
+        //        }
         oarsubCommand.append(scriptLocation).append(" '");
         if (logger.isDebugEnabled()) {
             logger.debug("oarsub command is " + oarsubCommand.toString());
@@ -332,13 +289,21 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         return oarsubCommand.toString();
     }
 
-    protected StringBuffer buildResourceString() {
-        StringBuffer rs = new StringBuffer();
-        rs.append(" -l walltime=").append(bookingDuration).append(",");
-        //to specify nodes and processor per nodes, the syntax is different from
-        //other resources
-        rs.append("nodes=").append(hostNumber);
-        return rs;
+    /**
+     * @param res
+     */
+    private void parseRes(String res) {
+        String[] resTab = res.split(",");
+        for (int i = 0; i < resTab.length; i++) {
+            if (!(resTab[i].indexOf("nodes") < 0)) {
+                hostNumber = resTab[i].substring(resTab[i].indexOf("=") + 1,
+                        resTab[i].length());
+            }
+            if (!(resTab[i].indexOf("weight") < 0)) {
+                weight = resTab[i].substring(resTab[i].indexOf("=") + 1,
+                        resTab[i].length());
+            }
+        }
     }
 
     /**
@@ -368,9 +333,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         System.out.println("Testing OARSubProcess");
         JVMProcessImpl p = new JVMProcessImpl();
         OARSubProcess oar = new OARSubProcess(p);
-        oar.setHostsNumber("2");
+        oar.setResources("nodes=2");
         System.out.println(oar.buildCommand());
     }
-
-    
 }

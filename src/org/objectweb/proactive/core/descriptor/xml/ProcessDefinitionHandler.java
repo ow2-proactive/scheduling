@@ -269,7 +269,7 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 throw new org.xml.sax.SAXException(e.getMessage());
             }
             String closeStream = attributes.getValue("closeStream");
-            
+
             String fixedName = attributes.getValue("fixedName");
             String list = attributes.getValue("list");
             String domain = attributes.getValue("domain");
@@ -284,7 +284,8 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                     list, domain, padding);
             }
             if (checkNonEmpty(hostlist)) {
-                ((AbstractListProcessDecorator) targetProcess).setHostList(hostlist,domain);                                                                
+                ((AbstractListProcessDecorator) targetProcess).setHostList(hostlist,
+                    domain);
             }
             if (checkNonEmpty(closeStream) && closeStream.equals("yes")) {
                 targetProcess.closeStream();
@@ -492,6 +493,10 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         public void startContextElement(String name, Attributes attributes)
             throws org.xml.sax.SAXException {
             super.startContextElement(name, attributes);
+            String interactive = (attributes.getValue("interactive"));
+            if (checkNonEmpty(interactive)) {
+                ((OARSubProcess) targetProcess).setInteractive(interactive);
+            }
             String queueName = (attributes.getValue("queue"));
             if (checkNonEmpty(queueName)) {
                 ((OARSubProcess) targetProcess).setQueueName(queueName);
@@ -505,12 +510,11 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
         protected class OAROptionHandler extends PassiveCompositeUnmarshaller {
             public OAROptionHandler() {
                 UnmarshallerHandler pathHandler = new PathHandler();
-                this.addHandler(HOST_LIST_TAG, new SingleValueUnmarshaller());
-                this.addHandler(HOSTS_NUMBER_TAG, new SingleValueUnmarshaller());
-                //  this.addHandler(PROCESSOR_TAG, new SingleValueUnmarshaller());
-                this.addHandler(BOOKING_DURATION_TAG,
-                    new SingleValueUnmarshaller());
-                //   this.addHandler(PRUN_OUTPUT_FILE, new SingleValueUnmarshaller());
+
+                //not yet supported                
+                //this.addHandler(OAR_PROPERTY_TAG, new SingleValueUnmarshaller());
+                this.addHandler(OAR_RESOURCE_TAG, new SingleValueUnmarshaller());
+
                 BasicUnmarshallerDecorator bch = new BasicUnmarshallerDecorator();
                 bch.addHandler(ABS_PATH_TAG, pathHandler);
                 bch.addHandler(REL_PATH_TAG, pathHandler);
@@ -526,18 +530,15 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
                 throws org.xml.sax.SAXException {
                 OARSubProcess oarSubProcess = (OARSubProcess) targetProcess;
 
-                if (name.equals(HOST_LIST_TAG)) {
-                    oarSubProcess.setHostList((String) activeHandler.getResultObject());
-                } else if (name.equals(HOSTS_NUMBER_TAG)) {
-                    oarSubProcess.setHostsNumber((String) activeHandler.getResultObject());
-                    //  } else if (name.equals(PROCESSOR_PER_NODE_TAG)) {
-                    //       oarSubProcess.setProcessorPerNodeNumber((String) activeHandler.getResultObject());
-                } else if (name.equals(SCRIPT_PATH_TAG)) {
+                if (name.equals(OAR_RESOURCE_TAG)) {
+                    oarSubProcess.setResources((String) activeHandler.getResultObject());
+                }
+                //Not yet supported
+                //                else if (name.equals(OAR_PROPERTY_TAG)) {
+                //                    oarSubProcess.setProperties((String) activeHandler.getResultObject());
+                //                } 
+                else if (name.equals(SCRIPT_PATH_TAG)) {
                     oarSubProcess.setScriptLocation((String) activeHandler.getResultObject());
-                } else if (name.equals(BOOKING_DURATION_TAG)) {
-                    oarSubProcess.setBookingDuration((String) activeHandler.getResultObject());
-                } else if (name.equals(PRUN_OUTPUT_FILE)) {
-                    oarSubProcess.setOutputFile((String) activeHandler.getResultObject());
                 } else {
                     super.notifyEndActiveHandler(name, activeHandler);
                 }
