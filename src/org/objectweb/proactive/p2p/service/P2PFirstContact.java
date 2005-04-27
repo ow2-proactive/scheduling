@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import java.io.Serializable;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.core.node.Node;
@@ -41,6 +39,10 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.util.Vector;
 
 
 /**
@@ -109,10 +111,12 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants {
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
 
-                // Send a message to the remote peer to record me
-                peer.register(this.localP2pService);
-                // Add the peer in my group of acquaintances
-                this.acqGroup.add(peer);
+                if (!peer.equals(this.localP2pService)) {
+                    // Send a message to the remote peer to record me
+                    peer.register(this.localP2pService);
+                    // Add the peer in my group of acquaintances
+                    this.acqGroup.add(peer);
+                }
             } catch (Exception e) {
                 logger.debug("The peer at " + peerUrl +
                     " couldn't be contacted", e);
