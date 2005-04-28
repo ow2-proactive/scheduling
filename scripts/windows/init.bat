@@ -23,6 +23,7 @@ IF EXIST %PROACTIVE%\lib\log4j.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\log
 IF EXIST %PROACTIVE%\lib\bouncycastle.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bouncycastle.jar
 IF EXIST %PROACTIVE%\lib\xercesImpl.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\xercesImpl.jar
 IF EXIST %PROACTIVE%\lib\components\fractal.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\components\fractal.jar
+IF EXIST %PROACTIVE%\lib\jsch.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\jsch.jar
 IF EXIST %PROACTIVE%\ic2d.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ic2d.jar
 IF EXIST %PROACTIVE%\lib\bcel.jar set CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib\bcel.jar
 
