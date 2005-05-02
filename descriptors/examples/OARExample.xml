@@ -49,8 +49,7 @@
 					<processReference refid="linuxJVM1"/>
 					<commandPath value="/usr/bin/oarsub"/>
 					<oarOption>
-						<hostsNumber>5</hostsNumber>
-						<bookingDuration>02:00:00</bookingDuration>
+						<resources>node=2,weight=2</resources>
 						 <scriptPath>
                                   <absolutePath  value="/home/sophia/rquilici/ProActive/scripts/unix/cluster/oarStartRuntime.sh"/>
                           </scriptPath>
