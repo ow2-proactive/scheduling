@@ -295,6 +295,30 @@ public class Simulation implements RunActive {
 </pre>
 
 </p>
+<p class="textNormal"><b>Example3: Reactive Active Object</b>. Even when an AO is busy doing its own work, it can remain reactive to external 
+events (method calls). One just has to program non-blocking services to take 
+into account external inputs. </p>
+<pre>
+public class BusyButReactive implements RunActive {
+
+public void </b> runActivity(Body body) {
+Service service = new Service(body);
+while ( ! hasToTerminate ) {
+	...    // Do some activity on its own
+	...
+	...    // Non blocking service
+	...
+	service.serveOldest("changeParameters", "terminate");	... 
+      }
+    }
+public void changeParameters () {...   // change computation parameters}
+public void terminate (){ hasToTerminate=true;}
+}
+</pre>
+<p class="textNormal">It also allows one to specify explicit termination of AOs (there is currently 
+no Distributed Garbage Collector). Of course, the reactivity is up to the 
+length of going around the loop. 
+</p>
 <h3>Passing an object implementing the interfaces when creating the active object</h3>
 <p class="textNormal">
 This is the solution to use when you do not control the class that you make active or when you want to write generic activities policy and reused them with several active objects. Depending on which phase in the life of the active object you want to customize, you implement the corresponding interface (one or more) amongst <code><a href="../InitActive.html">InitActive</a></code>, <code><a href="../RunActive.html">RunActive</a></code> and <code><a href="../EndActive.html">EndActive</a></code>. Here an example that has a custom activity.
