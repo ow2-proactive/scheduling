@@ -121,9 +121,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the left of <code>o<code>. If there is no object at the left of <code>o</code>, return <code>null</code>
      */
     public Object left(Object o) {
-        int positionX = this.getX(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionX = this.getX(position);
         if (positionX != 0) {
-            return this.get(positionX - 1);
+            return this.get(position - 1);
         } else {
             return null;
         }
@@ -135,9 +136,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the right of <code>o<code>. If there is no object at the right of <code>o</code>, return <code>null</code>
      */
     public Object right(Object o) {
-        int positionX = this.getX(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionX = this.getX(position);
         if (positionX != this.getWidth()) {
-            return this.get(positionX + 1);
+            return this.get(position + 1);
         } else {
             return null;
         }
@@ -149,9 +151,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the up of <code>o<code>. If there is no object at the up of <code>o</code>, return <code>null</code>
      */
     public Object up(Object o) {
-        int positionY = this.getY(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionY = this.getY(position);
         if (positionY != 0) {
-            return this.get(positionY - this.getWidth());
+            return this.get(position - this.getWidth());
         } else {
             return null;
         }
@@ -163,9 +166,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
     public Object down(Object o) {
-        int positionY = this.getY(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionY = this.getY(position);
         if (positionY != this.getHeight()) {
-            return this.get(positionY + this.getWidth());
+            return this.get(position + this.getWidth());
         } else {
             return null;
         }
@@ -177,9 +181,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
     public Object ahead(Object o) {
-        int positionZ = this.getZ(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionZ = this.getZ(position);
         if (positionZ != 0) {
-            return this.get(positionZ - (this.getWidth() * this.getHeight()));
+            return this.get(position - (this.getWidth() * this.getHeight()));
         } else {
             return null;
         }
@@ -191,9 +196,10 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the object at the down of <code>o<code>. If there is no object at the down of <code>o</code>, return <code>null</code>
      */
     public Object behind(Object o) {
-        int positionZ = this.getZ(this.indexOf(o));
+    	int position = this.indexOf(o);
+        int positionZ = this.getZ(position);
         if (positionZ != this.getDepth()) {
-            return this.get(positionZ + (this.getWidth() * this.getHeight()));
+            return this.get(position + (this.getWidth() * this.getHeight()));
         } else {
             return null;
         }
