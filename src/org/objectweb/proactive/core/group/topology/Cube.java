@@ -103,7 +103,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @return the coordonate Y
      */
     private int getY(int position) {
-        return (position % (this.width * this.height)) % this.height;
+    	return (position / this.width) % this.height;
     }
 
     /**
@@ -138,7 +138,7 @@ public class Cube extends Plan { // implements Topology3D {
     public Object right(Object o) {
     	int position = this.indexOf(o);
         int positionX = this.getX(position);
-        if (positionX != this.getWidth()) {
+        if (positionX != (this.getWidth()-1)) {
             return this.get(position + 1);
         } else {
             return null;
@@ -168,7 +168,7 @@ public class Cube extends Plan { // implements Topology3D {
     public Object down(Object o) {
     	int position = this.indexOf(o);
         int positionY = this.getY(position);
-        if (positionY != this.getHeight()) {
+        if (positionY != (this.getHeight()-1)) {
             return this.get(position + this.getWidth());
         } else {
             return null;
@@ -198,7 +198,7 @@ public class Cube extends Plan { // implements Topology3D {
     public Object behind(Object o) {
     	int position = this.indexOf(o);
         int positionZ = this.getZ(position);
-        if (positionZ != this.getDepth()) {
+        if (positionZ != (this.getDepth()-1)) {
             return this.get(position + (this.getWidth() * this.getHeight()));
         } else {
             return null;
