@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.p2p.service;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Random;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
@@ -54,6 +50,12 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.node.P2PNodeManager;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.util.Random;
+import java.util.Vector;
 
 
 /**
@@ -227,6 +229,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     public void askingNode(int ttl, UniversalUniqueID uuid,
         P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
         String vnName, String jobId) {
+        boolean broadcast;
+        if (uuid != null) {
+            logger.debug("AskingNode message received with #" + uuid);
+            ttl--;
+            try {
+                broadcast = broadcaster(ttl, uuid, remoteService);
+            } catch (P2POldMessageException e) {
+                return;
+            }
+        } else {
+            broadcast = true;
+        }
+
         // Asking a node to the node manager
         P2PNode askedNode = this.nodeManager.askingNode();
 
@@ -238,7 +253,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
             // Waitng the ACK
             try {
-            	System.out.println(">>>>>>>>> Waiting ack");
                 ProActive.waitFor(nodeAck, ACK_TO);
             } catch (ProActiveException e1) {
                 logger.error("Couldn't wait the ack node", e1);
@@ -247,7 +261,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
             // Testing future is here or timeout expired??
             if (ProActive.isAwaited(nodeAck)) {
-            	System.out.println(">>>>>>>>>> Waiting ack timeout expired");
                 return;
             }
 
@@ -286,20 +299,6 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
         // My friend needs more nodes, so I'm broadcasting his request to my own
         // friends
-        boolean broadcast;
-        if (uuid != null) {
-            logger.debug("AskingNode message received with #" + uuid);
-            ttl--;
-            try {
-                broadcast = broadcaster(ttl, uuid, remoteService);
-            } catch (P2POldMessageException e) {
-                return;
-            }
-        } else {
-            broadcast = true;
-        }
-
-        // During asking node, forwards this message
         if (broadcast) {
             // Forwarding the message
             if (uuid == null) {
@@ -363,6 +362,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      */
     public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
         return this.getNodes(P2PConstants.MAX_NODE, vnName, jobId);
+    }
+
+    /**
+     * For load balancing.
+     * @return URL of the node where the P2P service is running.
+     */
+    public String getAddress() {
+        return this.p2pServiceNode.getNodeInformation().getURL();
     }
 
     /**

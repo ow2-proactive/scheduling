@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNode;
+import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 public class LoadBalancer {
 
@@ -94,18 +94,28 @@ public class LoadBalancer {
 		//    		if (neighbors[i].AreYouUnderloaded()) {
 		//    		// P2PNode p2pDestNode = neighbors[i].giveMeANode();
 		//		while (true) {
-		Object futureNode = p2pSer.getANode();
-		Node destNode = null;
-		ProActive.waitFor(futureNode);
-		if (futureNode != null) {
-			if (!ProActive.isException(futureNode)) {
-				P2PNode toto = (P2PNode) ProActive.getFutureValue(futureNode);
-				if (toto != null) {
-					destNode = toto.getNode();
-				} else {
-					System.err.println("alex null");
-					return;
-				}
+
+//		Object futureNode = p2pSer.getANode();
+//		Node destNode = null;
+//		ProActive.waitFor(futureNode);
+//		if (futureNode != null) {
+//			if (!ProActive.isException(futureNode)) {
+//				P2PNode toto = (P2PNode) ProActive.getFutureValue(futureNode);
+//				if (toto != null) {
+//					destNode = toto.getNode();
+//				} else {
+//					System.err.println("alex null");
+//					return;
+//				}
+		P2PNodeLookup lookup = p2pSer.getNodes(1, "javier","1");
+		while (! lookup.allArrived()){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
+		}
+		Node destNode = (Node) lookup.getAndRemoveNodes().get(0);
 				if (destNode == null)
 					return;
 				destNode.getNodeInformation().setJobID("1");
@@ -118,9 +128,9 @@ public class LoadBalancer {
 					e.printStackTrace();
 				}
 				P2PloadBalance(destNode);
-			} else {
-				((Exception) futureNode).printStackTrace();
-			}
+//			} else {
+//				((Exception) futureNode).printStackTrace();
+//			}
 			//				break;
 			//			} else {
 			//				try {
@@ -129,7 +139,7 @@ public class LoadBalancer {
 			//					// TODO Auto-generated catch block
 			//					e.printStackTrace();
 			//				}
-		}
+//		}
 
 	}
 
