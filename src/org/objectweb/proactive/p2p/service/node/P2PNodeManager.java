@@ -32,13 +32,10 @@ package org.objectweb.proactive.p2p.service.node;
 
 import org.apache.log4j.Logger;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -62,8 +59,8 @@ import java.util.Vector;
  *
  * Created on Jan 12, 2005
  */
-public class P2PNodeManager implements Serializable, InitActive, RunActive,
-    EndActive, P2PConstants {
+public class P2PNodeManager implements Serializable, InitActive, EndActive,
+    P2PConstants {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Object localService = null;
@@ -212,53 +209,53 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
         logger.debug("Exiting initActivity");
     }
 
-    /**
-     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
-     */
-    public void runActivity(Body body) {
-        Service service = new Service(body);
-        while (body.isActive()) {
-            long currentTime = System.currentTimeMillis();
-            int index = 0;
-            while (index < this.bookedNodes.size()) {
-                Booking bookedNode = (Booking) this.bookedNodes.get(index);
-                try {
-                    // Searching expired booking
-                    if ((bookedNode.getNode().getNumberOfActiveObjects() == 0) &&
-                            (currentTime > bookedNode.getExpirationTime())) {
-                        // Cancel booking
-                        this.bookedNodes.remove(bookedNode);
-                        String nodeUrl = bookedNode.getNode()
-                                                   .getNodeInformation().getURL();
-                        this.proactiveRuntime.killNode(nodeUrl);
-                        this.createNewNode();
-                        logger.info("Node at " + nodeUrl + " killed");
-                    } else if (bookedNode.getNode().getNumberOfActiveObjects() != 0) {
-                        // Move booked nodes to used nodes
-                        this.bookedNodes.remove(bookedNode);
-                        this.usingNodes.add(bookedNode.getNode());
-                    } else {
-                        index++;
-                    }
-                } catch (NodeException e) {
-                    logger.debug("Problem with a shared node: " +
-                        e.getMessage());
-                } catch (ActiveObjectCreationException e) {
-                    logger.debug("Problem with a shared node: " +
-                        e.getMessage());
-                } catch (ProActiveException e) {
-                    logger.debug("Problem with a shared node: " +
-                        e.getMessage());
-                }
-            }
-
-            // Serving request
-            service.blockingServeOldest(MAX_TIME);
-            while (service.hasRequestToServe()) {
-                service.serveOldest();
-            }
-        }
-    }
+    //    /**
+    //     * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
+    //     */
+    //    public void runActivity(Body body) {
+    //        Service service = new Service(body);
+    //        while (body.isActive()) {
+    //            long currentTime = System.currentTimeMillis();
+    //            int index = 0;
+    //            while (index < this.bookedNodes.size()) {
+    //                Booking bookedNode = (Booking) this.bookedNodes.get(index);
+    //                try {
+    //                    // Searching expired booking
+    //                    if ((bookedNode.getNode().getNumberOfActiveObjects() == 0) &&
+    //                            (currentTime > bookedNode.getExpirationTime())) {
+    //                        // Cancel booking
+    //                        this.bookedNodes.remove(bookedNode);
+    //                        String nodeUrl = bookedNode.getNode()
+    //                                                   .getNodeInformation().getURL();
+    //                        this.proactiveRuntime.killNode(nodeUrl);
+    //                        this.createNewNode();
+    //                        logger.info("Node at " + nodeUrl + " killed");
+    //                    } else if (bookedNode.getNode().getNumberOfActiveObjects() != 0) {
+    //                        // Move booked nodes to used nodes
+    //                        this.bookedNodes.remove(bookedNode);
+    //                        this.usingNodes.add(bookedNode.getNode());
+    //                    } else {
+    //                        index++;
+    //                    }
+    //                } catch (NodeException e) {
+    //                    logger.debug("Problem with a shared node: " +
+    //                        e.getMessage());
+    //                } catch (ActiveObjectCreationException e) {
+    //                    logger.debug("Problem with a shared node: " +
+    //                        e.getMessage());
+    //                } catch (ProActiveException e) {
+    //                    logger.debug("Problem with a shared node: " +
+    //                        e.getMessage());
+    //                }
+    //            }
+    //
+    //            // Serving request
+    //            service.blockingServeOldest(MAX_TIME);
+    //            while (service.hasRequestToServe()) {
+    //                service.serveOldest();
+    //            }
+    //        }
+    //    }
 
     /**
      * @see org.objectweb.proactive.EndActive#endActivity(org.objectweb.proactive.Body)
@@ -341,10 +338,11 @@ public class P2PNodeManager implements Serializable, InitActive, RunActive,
                 logger.warn("Problem with nodes for " + currentVn.getName(), e);
             }
         }
+
         // Killing deployed nodes at the JVM shutdown
         XmlNodeKiller killer = new XmlNodeKiller(pad);
         Runtime.getRuntime().addShutdownHook(new Thread(killer));
-        
+
         logger.info(this.availbaleNodes.size() + " shared nodes deployed");
     }
 

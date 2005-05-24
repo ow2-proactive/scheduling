@@ -103,4 +103,7 @@ public interface P2PConstants {
     
     /** With Xml Deployment, book all nodes. */
     public static final String PROPERTY_BOOKING_NODES = "proactive.p2p.booking_nodes";
+    
+    /** Timeout for waiting node ack. */
+    public static final String PROPERTY_NODE_ACK_TO = "proactive.p2p.ack_to";
 }

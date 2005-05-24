@@ -188,8 +188,10 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      *
      * @param givenNode the shared node.
      * @param remoteNodeManager the remote node manager for the given node.
+     * @return true if the given node is accepted by the P2PNodeLookup, false
+     * else.
      */
-    public void giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
+    public P2PNodeAck giveNode(Node givenNode, P2PNodeManager remoteNodeManager) {
         if (logger.isDebugEnabled()) {
             logger.debug("Given node received from " +
                 givenNode.getNodeInformation().getURL());
@@ -213,6 +215,9 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 logger.warn("Couldn't recgister the remote runtime", e);
             }
             logger.debug("Node at " + nodeUrl + " succefuly added");
+            return new P2PNodeAck(true);
+        } else {
+            return new P2PNodeAck(false);
         }
     }
 
@@ -248,6 +253,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      * @param nodesToBook nodes to book.
      */
     public void reservingNodes(Vector nodesToBook) {
+        // TODO Perhaps to remove with booking mechanism
         for (int i = 0; i < nodesToBook.size(); i++) {
             Node currentNode = (Node) nodesToBook.get(i);
             try {
@@ -307,7 +313,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
 
             // Send a message to everybody
             this.localP2pService.askingNode(TTL, null, this.localP2pService,
-                stub, this.vnName, this.jobId);
+                this.numberOfAskedNodes - this.acquiredNodes, stub,
+                this.vnName, this.jobId);
 
             // Serving request
             service.blockingServeOldest(LOOKUP_FREQ);

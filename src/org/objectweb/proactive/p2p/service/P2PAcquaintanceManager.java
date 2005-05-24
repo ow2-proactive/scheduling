@@ -190,6 +190,15 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         }
     }
 
+    public void remove(P2PService peer) {
+        boolean result = this.groupOfAcquaintances.remove(peer);
+        if (result) {
+            logger.debug("Peer successfully removed");
+        } else {
+            logger.debug("Peer not removed");
+        }
+    }
+
     /**
      * Returns the number of elements in this group.
      *
