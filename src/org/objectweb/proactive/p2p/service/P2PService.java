@@ -324,12 +324,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @return the number of asked nodes.
      */
     public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId) {
-        Object[] params = new Object[5];
+        Object[] params = new Object[4];
         params[0] = new Integer(numberOfNodes);
         params[1] = this.stubOnThis;
-        params[2] = this.acquaintanceManager;
-        params[3] = vnName;
-        params[4] = jobId;
+        params[2] = vnName;
+        params[3] = jobId;
 
         P2PNodeLookup lookup = null;
         try {

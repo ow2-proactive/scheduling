@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.service.P2PAcquaintanceManager;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.Dummy;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -79,7 +78,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private int numberOfAskedNodes;
     private int acquiredNodes = 0;
     private P2PService localP2pService;
-    private P2PAcquaintanceManager acquaintances;
     private String vnName;
     private VirtualNode vn;
     private String jobId;
@@ -94,8 +92,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     }
 
     public P2PNodeLookup(Integer numberOfAskedNodes,
-        P2PService localP2pService, P2PAcquaintanceManager acquaintances,
-        String vnName, String jobId) {
+        P2PService localP2pService, String vnName,
+        String jobId) {
         this.waitingNodesList = new Vector();
         this.nodesToKillList = new Vector();
         this.expirationTime = System.currentTimeMillis() + TIMEOUT;
@@ -106,7 +104,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             this.expirationTime = Long.MAX_VALUE;
         }
         this.localP2pService = localP2pService;
-        this.acquaintances = acquaintances;
         this.vnName = vnName;
         this.jobId = jobId;
     }
