@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.p2p.loadbalancer.LoadBalancer;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
@@ -110,6 +111,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     private Vector waitingNodesLookup = new Vector();
     private P2PService stubOnThis = null;
 
+    /** 
+     * The load balancer reference
+     */
+    private LoadBalancer p2pLoadBalancer;
+    
     //--------------------------------------------------------------------------
     // Class Constructors
     //--------------------------------------------------------------------------
@@ -518,6 +524,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
         this.stubOnThis = (P2PService) ProActive.getStubOnThis();
 
+        this.p2pLoadBalancer = new LoadBalancer(this.stubOnThis);
+        
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
         try {
