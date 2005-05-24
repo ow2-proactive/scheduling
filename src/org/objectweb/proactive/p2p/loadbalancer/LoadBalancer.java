@@ -21,8 +21,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  * 
  * Initial developer(s): The ProActive Team
- * http://www.inria.fr/oasis/ProActive/contacts.html Contributor(s): Javier
- * Bustos ################################################################
+ * http://www.inria.fr/oasis/ProActive/contacts.html 
+ * 
+ * Contributor(s): 				Javier Bustos 
+ * 
+ * ################################################################
  */
 
 package org.objectweb.proactive.p2p.loadbalancer;
@@ -56,7 +59,6 @@ public class LoadBalancer {
 	private double rank;
 
 	public LoadBalancer(P2PService p2pSer) {
-//		System.err.println("[LoadBalancer] Monitor and Balancer started.");
 		this.p2pSer = p2pSer;
 		underloaded = false;
 		lm = new LoadMonitor(this);
@@ -65,7 +67,7 @@ public class LoadBalancer {
 	}
 
 	public void register(long load) {
-		   	System.err.println("*** ["+p2pSer.getAddress()+"] reporting load = "+load+" ranking = "+rank);
+//		   	logger.info("*** ["+p2pSer.getAddress()+"] reporting load = "+load+" ranking = "+rank);
 		if ((double) load > 90.0) {
 			if (underloaded) {
 				underloaded = false;
@@ -85,29 +87,9 @@ public class LoadBalancer {
 	 **************************************************************************/
 
 	public void loadBalance() {
-		System.err.println("*** [" + p2pSer.getAddress()
-				+ "] asking for Load Balance");
-		//    	P2PService neighbors[] = p2pSer.getAquaintances();
-		//    	if (neighbors == null) return;
-		//    	
-		//    	for (int i = 0; i < neighbors.length; i++) {
-		//    		if (neighbors[i].AreYouUnderloaded()) {
-		//    		// P2PNode p2pDestNode = neighbors[i].giveMeANode();
-		//		while (true) {
+		logger.info("*** [" + p2pSer.getAddress()+ "] asking for Load Balance");
 
-//		Object futureNode = p2pSer.getANode();
-//		Node destNode = null;
-//		ProActive.waitFor(futureNode);
-//		if (futureNode != null) {
-//			if (!ProActive.isException(futureNode)) {
-//				P2PNode toto = (P2PNode) ProActive.getFutureValue(futureNode);
-//				if (toto != null) {
-//					destNode = toto.getNode();
-//				} else {
-//					System.err.println("alex null");
-//					return;
-//				}
-		P2PNodeLookup lookup = p2pSer.getNodes(1, "javier","1");
+		P2PNodeLookup lookup = p2pSer.getNodes(1, "p2pLoadBalancing","1");
 		while (! lookup.allArrived()){
 			try {
 				Thread.sleep(100);
@@ -124,28 +106,11 @@ public class LoadBalancer {
 					RuntimeFactory.getDefaultRuntime().addAcquaintance(
 							destNode.getProActiveRuntime().getURL());
 				} catch (ProActiveException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				P2PloadBalance(destNode);
-//			} else {
-//				((Exception) futureNode).printStackTrace();
-//			}
-			//				break;
-			//			} else {
-			//				try {
-			//					Thread.sleep(1000);
-			//				} catch (InterruptedException e) {
-			//					// TODO Auto-generated catch block
-			//					e.printStackTrace();
-			//				}
-//		}
 
 	}
-
-	//    		}
-	//    	
-	//    	}
 
 	public void P2PloadBalance(Node destNode) {
 		try {
@@ -186,13 +151,13 @@ public class LoadBalancer {
 				return;
 
 			if (minBody != null && minBody.isActive()) {
-				System.out.println("[Loadbalancer] Migrating from "
+				logger.info("[Loadbalancer] Migrating from "
 						+ minBody.getNodeURL() + " to "
 						+ destNode.getNodeInformation().getURL());
 				ProActive.migrateTo(minBody, destNode, true);
 			}
 		} catch (IllegalArgumentException e) {
-			System.err.println("[ERR] Argument not valid");
+			e.printStackTrace();
 		} catch (SecurityException e) {
 			e.printStackTrace();
 		} catch (MigrationException e) {

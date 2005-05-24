@@ -88,14 +88,11 @@ public class LoadMonitor extends Thread
         oldTotal  = user + nice + system + idle;
         oldUsed   = user + nice + system;
         
-        load = 0;
+        load = 1;
         calculateLoad();
 		} catch (FileNotFoundException e) {
-			System.err.println("[LoadMonitor] File not found Exception");
 		} catch (NumberFormatException e) {
-			System.err.println("[LoadMonitor] Number format Exception");
 		} catch (IOException e) {
-			System.err.println("[LoadMonitor] Input/Output Exception");
 		}
 		
     }
@@ -108,7 +105,7 @@ public class LoadMonitor extends Thread
 				statfile.seek(5);
 				cpuLine = statfile.readLine();
 			} catch (IOException e) {
-				e.printStackTrace();
+				return 1;
 			}
             // read "cpu x x x x"           
 			
