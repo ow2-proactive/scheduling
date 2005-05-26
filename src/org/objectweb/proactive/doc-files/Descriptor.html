@@ -1543,9 +1543,9 @@ These JVMs will be created locally since they reference directly the
 process defined by <b>jvmProcess</b>.
         <b>Jvm3</b>
 will be created on the cluster using <b>ssh</b>
-to log on galere1(cluster entry point). Two nodes will then be created
-on galere10.inria.fr since processor tag is set to 2, and the hoslist
-tag gives galere10.inria.fr as the only one candidate. At Last <b>Jvm4</b>
+to log on sea.inria.fr (cluster entry point). Two nodes will then be created
+on a machine that belongs to <b>cluster_group1 or cluster_group2</b> since processor tag is set to 2, and the hoslist
+tag gives cluster_group1 cluster_group2 as candidates. At Last <b>Jvm4</b>
 will be created using globus It will access cluster.inria.fr and
 request 10 processors. We can notice that two local processes were
 defined, the reason is that the first one <b>jvmProcess</b>
@@ -1563,9 +1563,7 @@ before. In this example, DISPLAY variable is defined for the globus
 process, that means that we want the penguin icon to appears on the
 local machine, be carefull to authorize your X server to display such
 icons by running the following command before launching the
-application: xhost +cluster.inria.fr. If you want to do the same for
-the cluster machine, that you plan to access with ssh you must run
-xhost +galere10.inria.fr, and on the cluster side you need to create
+application: xhost +cluster.inria.fr. On the cluster side you need to create
 under ~/.ssh a file called environment where you define the DISPLAY
 variable. If you are not familiar with ssh, see <a
  href="http://www.openssh.org">openSSH</a></p>
