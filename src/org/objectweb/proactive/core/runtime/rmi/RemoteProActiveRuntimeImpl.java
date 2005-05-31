@@ -122,6 +122,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             String url = (String) nodesArray.get(i);
             killNode(url);
         }
+        proActiveRuntime.killAllNodes();
     }
 
     public void killNode(String nodeName) throws java.rmi.RemoteException {
@@ -467,7 +468,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 url, e);
         } catch (java.rmi.NotBoundException e) {
             //No need to throw an exception if an object is already unregistered
-            logger.info("WARNING "+url + " is not bound in the registry ");
+            logger.info("WARNING " + url + " is not bound in the registry ");
         }
     }
 

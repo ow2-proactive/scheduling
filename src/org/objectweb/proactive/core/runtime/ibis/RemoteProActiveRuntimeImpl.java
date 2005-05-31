@@ -98,6 +98,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             String url = (String) nodesArray.get(i);
             killNode(url);
         }
+        proActiveRuntime.killAllNodes();
     }
 
     public void killNode(String nodeName) throws RemoteException {

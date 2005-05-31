@@ -174,6 +174,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             String nodeURL = (String) e.nextElement();
             killNode(nodeURL);
         }
+        proActiveRuntime.killAllNodes();
     }
 
     public void killNode(String nodeName) throws java.rmi.RemoteException {
