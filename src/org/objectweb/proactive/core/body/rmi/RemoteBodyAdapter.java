@@ -100,7 +100,7 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
         }
     }
 
-    private RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
+    protected RemoteBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
         construct(remoteBody);
     }
 

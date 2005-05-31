@@ -30,17 +30,14 @@
  */
 package org.objectweb.proactive;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -59,6 +56,7 @@ import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
+import org.objectweb.proactive.core.body.rmi.SshRemoteBodyAdapter;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -86,6 +84,13 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
+
+import java.io.IOException;
+
+import java.net.UnknownHostException;
+
+import java.util.HashMap;
+import java.util.Set;
 
 
 public class ProActive {
@@ -287,12 +292,12 @@ public class ProActive {
         }
     }
 
-     /**
+    /**
      * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter. 
+     * correspond to the classname parameter.
      * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter. 
-      * @param classname classname the name of the class to instanciate as active
+     * given as a parameter.
+     * @param classname classname the name of the class to instanciate as active
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
      * on each node mapped to the given virtualnode in XML deployment descriptor.
@@ -309,9 +314,9 @@ public class ProActive {
 
     /**
      * Creates a new group of Active Objects. The type of the group and the type of the active objects it contains
-     * correspond to the classname parameter. 
+     * correspond to the classname parameter.
      * This group will contain one active object per node mapped onto the virtual node
-     * given as a parameter. 
+     * given as a parameter.
      * @param classname classname the name of the class to instanciate as active
      * @param constructorParameters constructorParameters the parameters of the constructor.
      * @param virtualnode The virtualnode where to create active objects. Active objects will be created
@@ -603,8 +608,8 @@ public class ProActive {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActiveAsGroup(Object target, String nameOfTargetType,
-        VirtualNode virtualnode)
+    public static Object turnActiveAsGroup(Object target,
+        String nameOfTargetType, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
         if (virtualnode != null) {
             Node[] nodeTab = virtualnode.getNodes();
@@ -678,7 +683,6 @@ public class ProActive {
                 body.getClass().getName());
         }
 
-
         if (logger.isInfoEnabled()) {
             logger.info("Success at binding url " + url);
         }
@@ -716,15 +720,19 @@ public class ProActive {
         throws ActiveObjectCreationException, java.io.IOException {
         UniversalBody b = null;
 
+        String protocol = UrlBuilder.getProtocol(url);
 
         // First step towards Body factory, will be introduced after the release
-        if (UrlBuilder.getProtocol(url).equals("ibis:")) {
-            b = IbisRemoteBodyAdapter.lookup(url);
-        } else if (UrlBuilder.getProtocol(url).equals("http:")) {
-            b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
-        } else {
-
+        if (protocol.equals("rmi:")) {
             b = RemoteBodyAdapter.lookup(url);
+        } else if (protocol.equals("rmissh:")) {
+            b = SshRemoteBodyAdapter.lookup(url);
+        } else if (protocol.equals("http:")) {
+            b = org.objectweb.proactive.core.body.http.RemoteBodyAdapter.lookup(url);
+        } else if (protocol.equals("ibis:")) {
+            b = IbisRemoteBodyAdapter.lookup(url);
+        } else {
+            throw new IOException("Protocol " + protocol + " not defined");
         }
 
         try {
@@ -741,24 +749,24 @@ public class ProActive {
         }
     }
 
-	/**
-	 * Return the URL of the remote <code>activeObject</code>.
-	 * @param activeObject the remote active object.
-	 * @return the URL of <code>activeObject</code>.
-	 */
-	public static String getActiveObjectNodeUrl(Object activeObject) {
-		BodyProxy proxy = (BodyProxy)((StubObject)activeObject).getProxy();
-		UniversalBody body =  proxy.getBody();
-		return body.getNodeURL();
-	}
-	
-	/**
-	 * Find out if the object contains an exception that should be thrown
-	 * @param future the future object that is examinated
-	 * @return true iff an exception should be thrown when accessing the object
-	 */
-	public static boolean isException(Object future) {
-	    // If the object is not reified, it cannot be a future
+    /**
+     * Return the URL of the remote <code>activeObject</code>.
+     * @param activeObject the remote active object.
+     * @return the URL of <code>activeObject</code>.
+     */
+    public static String getActiveObjectNodeUrl(Object activeObject) {
+        BodyProxy proxy = (BodyProxy) ((StubObject) activeObject).getProxy();
+        UniversalBody body = proxy.getBody();
+        return body.getNodeURL();
+    }
+
+    /**
+     * Find out if the object contains an exception that should be thrown
+     * @param future the future object that is examinated
+     * @return true iff an exception should be thrown when accessing the object
+     */
+    public static boolean isException(Object future) {
+        // If the object is not reified, it cannot be a future
         if ((MOP.isReifiedObject(future)) == false) {
             return false;
         } else {
@@ -771,8 +779,8 @@ public class ProActive {
                 return ((Future) theProxy).getRaisedException() != null;
             }
         }
-	}
-	
+    }
+
     /**
      * Blocks the calling thread until the object <code>future</code>
      * is available. <code>future</code> must be the result object of an
@@ -1821,7 +1829,6 @@ public class ProActive {
         return handler;
     }
 
-    
     /**
      *  Expose an active object as a web service
      * @param o The object to expose as a web service
@@ -1829,20 +1836,20 @@ public class ProActive {
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionnalities
      */
-    public static  void exposeAsWebService (Object o, String url, String urn, String [] methods ) {
-    	ProActiveDeployer.deploy(urn, url, o, methods);
+    public static void exposeAsWebService(Object o, String url, String urn,
+        String[] methods) {
+        ProActiveDeployer.deploy(urn, url, o, methods);
     }
-    
+
     /**
      * Delete the service on a web server
      * @param urn The name of the object
      * @param url The url of the web server
      */
-    public static void unExposeAsWebService (String urn, String url) {
-    	ProActiveDeployer.undeploy(urn,url);
+    public static void unExposeAsWebService(String urn, String url) {
+        ProActiveDeployer.undeploy(urn, url);
     }
-    
-    
+
     /**
      *  Deploy a component as a webservice. Each interface of the component will be accessible by
      * the urn [componentName]_[interfaceName]in order to identify the component an interface belongs to.
@@ -1855,7 +1862,7 @@ public class ProActive {
         String url, String componentName) {
         ProActiveDeployer.deployComponent(componentName, url, component);
     }
-    
+
     /**
      * Undeploy component interfaces on a web server
      * @param componentName The name of the component
@@ -1866,6 +1873,7 @@ public class ProActive {
         String url, Component component) {
         ProActiveDeployer.undeployComponent(componentName, url, component);
     }
+
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
