@@ -36,7 +36,7 @@
 			</processes>
 		<services>
 			<serviceDefinition id="p2pservice">
-				<P2PService nodesAsked="2" acq="rmi" port="2410" NOA="10" TTU="60000" TTL="10">
+				<P2PService nodesAsked="2" port="2410" NOA="10" TTU="60000" TTL="10">
 					<peerSet>
 						<peer>rmi://localhost:3000</peer>
 					</peerSet>

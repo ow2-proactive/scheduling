@@ -68,12 +68,12 @@ public class Test extends FunctionalTest {
         process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
         process1.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
-        process1.setParameters("-acq rmi -port 2900");
+        process1.setParameters("-port 2900");
 
         process = new JVMProcessImpl(new StandardOutputMessageLogger());
         process.setClassname(
             "org.objectweb.proactive.p2p.service.StartP2PService");
-        process.setParameters("-acq rmi -port 3000 -s //localhost:2900");
+        process.setParameters("-port 3000 -s //localhost:2900");
 
         process1.startProcess();
         Thread.sleep(5000);
