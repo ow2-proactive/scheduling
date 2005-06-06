@@ -37,10 +37,9 @@
 		
 		
 		<!-- ***************************************************** -->
-		<!-- DO NOT EDIT P2P PROPERTIES VALUE IN THIS FILE -->
-		<!-- THESE ARE DEFAULT VALUE -->
+		<!-- P2P PROPERTIES VALUE -->
+		<!-- THESE ARE DEFAULT VALUES -->
 		
-		<!-- ProActive P2P Service properties -->
 		<!-- Acquisition method -->
 		<prop key="proactive.p2p.acq" value="rmi" />
 		<!-- Port number -->
