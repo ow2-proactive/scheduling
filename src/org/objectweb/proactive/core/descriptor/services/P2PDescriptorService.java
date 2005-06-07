@@ -200,15 +200,6 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
     public void setXmlPath(String xml_path) {
         System.setProperty(PROPERPY_XML_PATH, xml_path);
     }
-
-	/**
-	 * With Xml Deployment, book all nodes.
-	 * @param booking_nodes a boolean.
-	 */
-	public void setBookingNodes(String booking_nodes) {
-		System.setProperty(PROPERTY_BOOKING_NODES, booking_nodes);
-		
-	}
 	
     /**
      * @param peerList

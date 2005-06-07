@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Vector;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
@@ -42,20 +44,13 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.util.Dummy;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
-
-import java.io.Serializable;
-
-import java.util.HashMap;
-import java.util.Vector;
 
 
 /**
@@ -242,29 +237,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             this.nodesToKillList.add(((Node) elem).getNodeInformation().getURL());
         }
         return v;
-    }
-
-    /**
-     * <p>Reserve nodes for a later use.</p>
-     * <p>This method creates dummy active objects in the nodes.</p>
-     * @param nodesToBook nodes to book.
-     */
-    public void reservingNodes(Vector nodesToBook) {
-        // TODO Perhaps to remove with booking mechanism
-        for (int i = 0; i < nodesToBook.size(); i++) {
-            Node currentNode = (Node) nodesToBook.get(i);
-            try {
-                ProActive.newActive(Dummy.class.getName(), null, currentNode);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Node at " +
-                        currentNode.getNodeInformation().getURL() + " booked");
-                }
-            } catch (ActiveObjectCreationException e) {
-                logger.warn("Couldn't actived a Dummy class to book a node", e);
-            } catch (NodeException e) {
-                logger.warn("Problem with remote node to book", e);
-            }
-        }
     }
 
     /**

@@ -36,7 +36,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.group.ExceptionList;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -93,6 +96,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 P2PConstants.PROPERTY_TTL));
     private static final long ACK_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODE_ACK_TO));
+    private static final boolean WITH_BALANCE = Boolean.getBoolean(System.getProperty(
+                PROPERTY_LOAD_BAL));
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
@@ -111,11 +116,29 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     private Vector waitingNodesLookup = new Vector();
     private P2PService stubOnThis = null;
 
-    /** 
+    /**
      * The load balancer reference
      */
     private LoadBalancer p2pLoadBalancer;
-    
+
+    // For asking nodes
+    private Body body = null;
+    private Service service = null;
+    private RequestFilter filter = new RequestFilter() {
+
+            /**
+             * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
+             */
+            public boolean acceptRequest(Request request) {
+                String requestName = request.getMethodName();
+                if (requestName.compareToIgnoreCase("askingNode") == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        };
+
     //--------------------------------------------------------------------------
     // Class Constructors
     //--------------------------------------------------------------------------
@@ -248,59 +271,71 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             broadcast = true;
         }
 
-        // Asking a node to the node manager
-        P2PNode askedNode = this.nodeManager.askingNode();
+        // Do not give a local node to a local request
+        if (uuid != null) {
+            // Asking a node to the node manager
+            P2PNode askedNode = this.nodeManager.askingNode();
 
-        // Asking node available?
-        Node nodeAvailable = askedNode.getNode();
-        if (nodeAvailable != null) {
-            P2PNodeAck nodeAck = lookup.giveNode(nodeAvailable,
-                    askedNode.getNodeManager());
+            // Asking node available?
+            Node nodeAvailable = askedNode.getNode();
+            if (nodeAvailable != null) {
+                P2PNodeAck nodeAck = lookup.giveNode(nodeAvailable,
+                        askedNode.getNodeManager());
 
-            // Waitng the ACK
-            try {
-                ProActive.waitFor(nodeAck, ACK_TO);
-            } catch (ProActiveException e1) {
-                logger.error("Couldn't wait the ack node", e1);
-                return;
-            }
-
-            // Testing future is here or timeout expired??
-            if (ProActive.isAwaited(nodeAck)) {
-                return;
-            }
-
-            // Waiting ACK or NACK
-            if (nodeAck.ackValue()) {
-                // Setting vnInformation and JobId
-                if (vnName != null) {
-                    nodeAvailable.setVnName(vnName);
-                    try {
-                        nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName,
-                            true);
-                    } catch (ProActiveException e) {
-                        logger.warn("Couldn't register " + vnName +
-                            " in the PAR", e);
+                // Waitng the ACK
+                long endTime = System.currentTimeMillis() + ACK_TO;
+                while ((System.currentTimeMillis() < endTime) &&
+                        ProActive.isAwaited(nodeAck)) {
+                    if (this.service.hasRequestToServe()) {
+                        service.serveAll(this.filter);
+                    } else {
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            logger.debug(e);
+                        }
                     }
                 }
-                if (jobId != null) {
-                    nodeAvailable.getNodeInformation().setJobID(jobId);
-                }
-                numberOfNodes--;
-                logger.info("Giving 1 node to vn: " + vnName);
-            } else {
-                // It's a NACK node
-                this.nodeManager.noMoreNodeNeeded(nodeAvailable);
-                logger.info("NACK node received");
-                // No more nodes needed
-                return;
-            }
-        }
 
-        // Do we need more nodes?
-        if (numberOfNodes <= 0) {
-            logger.debug("No more nodes are needed");
-            return;
+                // Testing future is here or timeout is expired??
+                if (ProActive.isAwaited(nodeAck)) {
+                    // Do not forward the message
+                    // Prevent from deadlock
+                    return;
+                }
+
+                // Waiting ACK or NACK
+                if (nodeAck.ackValue()) {
+                    // Setting vnInformation and JobId
+                    if (vnName != null) {
+                        nodeAvailable.setVnName(vnName);
+                        try {
+                            nodeAvailable.getProActiveRuntime()
+                                         .registerVirtualNode(vnName, true);
+                        } catch (ProActiveException e) {
+                            logger.warn("Couldn't register " + vnName +
+                                " in the PAR", e);
+                        }
+                    }
+                    if (jobId != null) {
+                        nodeAvailable.getNodeInformation().setJobID(jobId);
+                    }
+                    numberOfNodes--;
+                    logger.info("Giving 1 node to vn: " + vnName);
+                } else {
+                    // It's a NACK node
+                    this.nodeManager.noMoreNodeNeeded(nodeAvailable);
+                    logger.debug("NACK node received");
+                    // No more nodes needed
+                    return;
+                }
+
+                // Do we need more nodes?
+                if (numberOfNodes <= 0) {
+                    logger.debug("No more nodes are needed");
+                    return;
+                }
+            }
         }
 
         // My friend needs more nodes, so I'm broadcasting his request to my own
@@ -511,6 +546,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     public void initActivity(Body body) {
         logger.debug("Entering initActivity");
 
+        this.body = body;
+        this.service = new Service(body);
+
         try {
             // Reference to my current p2pServiceNode
             this.p2pServiceNode = NodeFactory.getNode(body.getNodeURL());
@@ -523,8 +561,10 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
         this.stubOnThis = (P2PService) ProActive.getStubOnThis();
 
-        this.p2pLoadBalancer = new LoadBalancer(this.stubOnThis);
-        
+        if (WITH_BALANCE) {
+            this.p2pLoadBalancer = new LoadBalancer(this.stubOnThis);
+        }
+
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
         try {

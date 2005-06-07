@@ -94,16 +94,16 @@ public interface P2PConstants {
 
     /** Lookup frequency for nodes. */
     public static final String PROPERTY_LOOKUP_FREQ = "proactive.p2p.lookup_freq";
-    
+
     /** If true deploying one shared nodes by CPU, else only one node is shared. */
     public static final String PROPERTY_MULTI_PROC_NODES = "proactive.p2p.multi_proc_nodes";
-    
+
     /** Path of the xml deployment descriptor, for deploying shared nodes. */
     public static final String PROPERPY_XML_PATH = "proactive.p2p.xml_path";
-    
-    /** With Xml Deployment, book all nodes. */
-    public static final String PROPERTY_BOOKING_NODES = "proactive.p2p.booking_nodes";
-    
+
     /** Timeout for waiting node ack. */
     public static final String PROPERTY_NODE_ACK_TO = "proactive.p2p.ack_to";
+
+    /** Boolean for using or not p2p load balanced. */
+    public static final String PROPERTY_LOAD_BAL = "proactive.p2p.loadbalancing";
 }

@@ -105,16 +105,11 @@ public class ServiceThread extends Thread {
                     ((VirtualNodeImpl) vn).setTimeout(TIMEOUT, false);
                 }
 
-                boolean booking = new Boolean(System.getProperty(
-                            P2PConstants.PROPERTY_BOOKING_NODES)).booleanValue();
                 long step = 500;
                 while (askForNodes() &&
                         (System.currentTimeMillis() < this.expirationTime)) {
                     Vector future = p2pNodesLookup.getAndRemoveNodes();
                     Vector nodes = (Vector) ProActive.getFutureValue(future);
-                    if (booking) {
-                    	p2pNodesLookup.reservingNodes(nodes);
-                    }
                     for (int i = 0; i < nodes.size(); i++) {
                         Node node = (Node) nodes.get(i);
                         nodeCount++;
