@@ -30,6 +30,13 @@
  */
 package org.objectweb.proactive.ic2d.gui.data;
 
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
+import javax.swing.Timer;
+
 import org.objectweb.proactive.ic2d.data.AbstractDataObject;
 import org.objectweb.proactive.ic2d.data.HostObject;
 import org.objectweb.proactive.ic2d.data.WorldObject;
@@ -44,6 +51,11 @@ public class WorldPanel extends AbstractDataObjectPanel
     private ActiveObjectCommunicationRecorder communicationRecorder;
     private String alignLayout = "H"; //keep state of layout H or V
 
+    private Timer timer;
+    
+    private int w;
+    private int h;
+    
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -175,13 +187,44 @@ public class WorldPanel extends AbstractDataObjectPanel
     // -- PUBLIC METHODS -----------------------------------------------
     //
     public void paint(java.awt.Graphics g) {
-        super.paint(g);
-        if (communicationRecorder.isEnabled()) {
-            communicationRecorder.drawAllLinks(g, this.getLocationOnScreen());
+        Dimension dim = getSize();
+        int w2 = dim.width;
+        int h2 = dim.height;
+
+
+        //first time we are on display
+        if (w==0 && h ==0) {
+        	w =w2;
+        	h = h2;
+        	this.setDirty(true);
         }
+        //we have been moved since the last time, we need 
+        //to force a redraw of the arrows
+        if (w2!=w || h2 != h) {
+        	w=w2;
+        	h=h2;
+        	this.setDirty(true);
+        }
+       super.paint(g);
+       Graphics2D g2 = (Graphics2D)g;
+
+        if (communicationRecorder.isEnabled()) {
+            //we create a fully transparent image
+        	//we indicate to the communication recorder if we are dirty
+        	//which means the image would have to be redrawn
+            BufferedImage bi =  communicationRecorder.drawAllLinksOffScreen(w2,h2,this.getLocationOnScreen(), this.isDirty());
+            this.setDirty(false);
+            Graphics tempGraphics = bi.createGraphics();
+            g2.drawImage(bi, 0, 0, this);
+        }
+     
     }
 
-    // Set child Alignement H  / V 
+    /**
+     * Change the layout
+     * Set the dirty flag to true
+     * @param align
+     */
     public void alignLayoutChild(String align) {
         alignLayout = align;
         java.util.Iterator iterator = childsIterator();
@@ -192,6 +235,7 @@ public class WorldPanel extends AbstractDataObjectPanel
                 hostchild.switchAlignRb();
             }
         }
+        this.setDirty(true);
     }
 
     //

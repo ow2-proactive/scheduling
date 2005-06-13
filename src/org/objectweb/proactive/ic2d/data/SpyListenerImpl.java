@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.data;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ic2d.event.SpyEventListener;
@@ -37,8 +39,6 @@ import org.objectweb.proactive.ic2d.spy.BodyCreationSpyEvent;
 import org.objectweb.proactive.ic2d.spy.BodySpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyEvent;
 import org.objectweb.proactive.ic2d.spy.SpyListener;
-
-import java.io.IOException;
 
 
 public class SpyListenerImpl implements SpyListener {
@@ -85,7 +85,6 @@ public class SpyListenerImpl implements SpyListener {
      */
     public void observationsPerformed(SpyEvent[] spyEvents) {
         if (spyEvents.length > 0) {
-            //System.out.println("=> received spyEvents n="+spyEvents.length);
             for (int i = 0; i < spyEvents.length; i++) {
                 fireSpyEventInternal(spyEvents[i]);
             }
@@ -95,6 +94,7 @@ public class SpyListenerImpl implements SpyListener {
         }
     }
 
+  
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

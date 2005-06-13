@@ -33,9 +33,18 @@ package org.objectweb.proactive.ic2d.gui;
 import org.objectweb.proactive.ic2d.data.ActiveObject;
 import org.objectweb.proactive.ic2d.gui.data.ActiveObjectPanel;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 
-
+/**
+ * This class is responsible for drawing the communications in IC2D 
+ * using arrows. As a matter of efficiency the drawing is done in an offscreen buffer and
+ * we explicitely handle a dirty flag. If false, then no new image is computed, the previous one is simply
+ * handled to the caller. 
+ */
 public class ActiveObjectCommunicationRecorder {
     public static final int PROPORTIONAL_DRAWING_STYLE = 1;
     public static final int RATIO_DRAWING_STYLE = 2;
@@ -51,6 +60,10 @@ public class ActiveObjectCommunicationRecorder {
     private boolean enabled;
     private boolean antiAlias = true;
 
+    //used to avoid computing the arrows when no change has occured
+    private boolean dirty = true;
+    private BufferedImage bi;
+
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
@@ -61,37 +74,31 @@ public class ActiveObjectCommunicationRecorder {
         drawingStyle = FILAIRE_DRAWING_STYLE;
     }
 
-    //
-    // -- PUBLICS METHODS -----------------------------------------------
-    //
+  /**
+   * Record that a communication has occured between source and dest
+   * Set the dirty flag to true iff there was no such link before
+   */
     public void recordCommunication(ActiveObjectPanel source,
         ActiveObjectPanel dest) {
-        //System.out.println("ActiveObjectCommunicationRecorder.recordCommunication e="+enabled+" s="+source.isDestroyed()+" d="+dest.isDestroyed());
+//        System.out.println(
+//            "ActiveObjectCommunicationRecorder.recordCommunication e=" +
+//            enabled + " s=" + source.isDestroyed() + " d=" +
+//            dest.isDestroyed() + " dirty = " + dirty);
         if (!enabled) {
             return;
         }
+
         if (source.isDestroyed() || dest.isDestroyed()) {
             return;
         }
-
         // try to find a mapping source <-> dest
         java.util.HashMap destMap = (java.util.HashMap) panelToPanelsMap.get(source);
-
-        /*    if (destMap == null) { // leads to weird results???
-           // try to find a mapping dest <-> source
-           destMap = (java.util.HashMap) panelToPanelsMap.get(dest);
-           if (destMap != null) {
-             // if we did find a mapping dest <-> source we swap source and dest
-             ActiveObjectPanel temp = source;
-             source = dest;
-             dest = temp;
-           }
-           } */
         if (destMap == null) {
             // new association source <-> dest
             destMap = new java.util.HashMap();
             destMap.put(dest, new int[] { 1 });
             synchronized (panelToPanelsMap) {
+                dirty = true;
                 panelToPanelsMap.put(source, destMap);
                 activeObjectToPanelMap.put(source.getActiveObject(), source);
             }
@@ -104,6 +111,7 @@ public class ActiveObjectCommunicationRecorder {
                     destMap.put(dest, new int[] { 1 });
                 }
                 synchronized (panelToPanelsMap) {
+                    dirty = true;
                     activeObjectToPanelMap.put(dest.getActiveObject(), dest);
                 }
             } else {
@@ -145,7 +153,10 @@ public class ActiveObjectCommunicationRecorder {
             }
         }
     }
-
+/**
+* Change the drawing style
+* Set the current drawing to dirty
+*/
     public void setDrawingStyle(int drawingStyle) {
         switch (drawingStyle) {
         case PROPORTIONAL_DRAWING_STYLE:
@@ -161,21 +172,31 @@ public class ActiveObjectCommunicationRecorder {
             throw new IllegalArgumentException(
                 "The number passed is not a known drawing style");
         }
+        this.dirty=true;
     }
 
     public int getDrawingStyle() {
         return drawingStyle;
     }
 
+    /**
+     * Clear the recorder
+     * Set the current drawing to dirty
+     */
     public void clear() {
         //System.out.println("ActiveObjectCommunicationRecorder.clear");
         synchronized (panelToPanelsMap) {
             maxCommunicationCounter = 1;
             panelToPanelsMap.clear();
             activeObjectToPanelMap.clear();
+            this.dirty=true;
         }
     }
 
+    /**
+     * Enable the recording
+     * Set the current drawing to dirty
+     */
     public void setEnabled(boolean b) {
         if (b == enabled) {
             return;
@@ -184,6 +205,7 @@ public class ActiveObjectCommunicationRecorder {
         if (!enabled) {
             clear();
         }
+        this.dirty=true;
     }
 
     public boolean isEnabled() {
@@ -198,65 +220,76 @@ public class ActiveObjectCommunicationRecorder {
         return new SourceIterator();
     }
 
-    public void drawAllLinks(java.awt.Graphics g,
-        java.awt.Point topLeftCornerScreenCoordinate) {
-        //System.out.println("ActiveObjectCommunicationRecorder.drawAllLinks");
-        java.awt.Graphics2D g2 = (java.awt.Graphics2D) g;
-        java.awt.Stroke oldStroke = g2.getStroke();
-        float ratio = 0;
-        switch (drawingStyle) {
-        case PROPORTIONAL_DRAWING_STYLE:
-            // proportional link : we draw has tick as the number of communication registered
-            // up the the max tickness
-            if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL) {
-                ratio = ((float) MAX_STROKE_WIDTH_PROPORTIONAL) / maxCommunicationCounter;
-            } else {
-                ratio = 1;
+    /**
+     * Draw the corresponding image only if the current one is dirty
+     * or the caller has requested a redraw through <param>force</param>
+     */
+    public BufferedImage drawAllLinksOffScreen(int w, int h,
+        java.awt.Point topLeftCornerScreenCoordinate, boolean force) {
+        if (dirty || (bi == null) || force) {
+            dirty = false;
+            bi = new BufferedImage(w, h, Transparency.BITMASK);
+            Graphics temp = bi.createGraphics();
+            java.awt.Stroke oldStroke = ((Graphics2D) temp).getStroke();
+            float ratio = 0;
+            switch (drawingStyle) {
+            case PROPORTIONAL_DRAWING_STYLE:
+                // proportional link : we draw has tick as the number of communication registered
+                // up the the max tickness
+                if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL) {
+                    ratio = ((float) MAX_STROKE_WIDTH_PROPORTIONAL) / maxCommunicationCounter;
+                } else {
+                    ratio = 1;
+                }
+                break;
+            case RATIO_DRAWING_STYLE:
+                // the more numerous communication is the max tick. The others are smaller
+                ratio = ((float) MAX_STROKE_WIDTH_RATIO) / maxCommunicationCounter;
+                break;
+            case FILAIRE_DRAWING_STYLE:default:
+                // just draw 1 pixel tick line
+                ratio = -1;
+                break;
             }
-            break;
-        case RATIO_DRAWING_STYLE:
-            // the more numerous communication is the max tick. The others are smaller
-            ratio = ((float) MAX_STROKE_WIDTH_RATIO) / maxCommunicationCounter;
-            break;
-        case FILAIRE_DRAWING_STYLE:default:
-            // just draw 1 pixel tick line
-            ratio = -1;
-            break;
+
+            //anti alias added ebe 07/2004
+            if (antiAlias) {
+                ((Graphics2D) temp).setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+                ((Graphics2D) temp).setRenderingHint(RenderingHints.KEY_RENDERING,
+                    RenderingHints.VALUE_RENDER_QUALITY);
+            }
+
+            //System.out.println("ratio = "+ratio+"  proportionalLinks="+proportionalLinks+" maxCommunicationCounter="+maxCommunicationCounter);
+            java.util.Iterator sourceEntryIterator = panelToPanelsMap.entrySet()
+                                                                     .iterator();
+
+            // iterating on sources
+            synchronized (panelToPanelsMap) {
+                while (sourceEntryIterator.hasNext()) {
+                    java.util.Map.Entry sourceEntry = (java.util.Map.Entry) sourceEntryIterator.next();
+
+                    // source
+                    ActiveObjectPanel sourcePanel = (ActiveObjectPanel) sourceEntry.getKey();
+                    if (sourcePanel.isDestroyed() || !sourcePanel.isVisible()) {
+                        continue;
+                    }
+                    java.util.HashMap destMap = (java.util.HashMap) sourceEntry.getValue();
+                    java.util.Iterator destEntryIterator = destMap.entrySet()
+                                                                  .iterator();
+                    synchronized (destMap) {
+                        drawOneSourceLinks(destEntryIterator, (Graphics2D) temp,
+                            topLeftCornerScreenCoordinate, oldStroke, ratio,
+                            sourcePanel);
+                    }
+                } // end while
+            }
+        } else {
+//        	System.out
+//					.println("ActiveObjectCommunicationRecorder.drawAllLinksOffScreen() I am not dirty");
         }
-
-        //anti alias added ebe 07/2004
-        if (antiAlias) {
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        }
-
-        //System.out.println("ratio = "+ratio+"  proportionalLinks="+proportionalLinks+" maxCommunicationCounter="+maxCommunicationCounter);
-        java.util.Iterator sourceEntryIterator = panelToPanelsMap.entrySet()
-                                                                 .iterator();
-
-        // iterating on sources
-        synchronized (panelToPanelsMap) {
-            while (sourceEntryIterator.hasNext()) {
-                java.util.Map.Entry sourceEntry = (java.util.Map.Entry) sourceEntryIterator.next();
-
-                // source
-                ActiveObjectPanel sourcePanel = (ActiveObjectPanel) sourceEntry.getKey();
-                if (sourcePanel.isDestroyed() || !sourcePanel.isVisible()) {
-                    continue;
-                }
-                java.util.HashMap destMap = (java.util.HashMap) sourceEntry.getValue();
-                java.util.Iterator destEntryIterator = destMap.entrySet()
-                                                              .iterator();
-                synchronized (destMap) {
-                    drawOneSourceLinks(destEntryIterator, g2,
-                        topLeftCornerScreenCoordinate, oldStroke, ratio,
-                        sourcePanel);
-                }
-            } // end while
-        }
-    } // end method
+        return bi;
+    }
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
@@ -293,13 +326,14 @@ public class ActiveObjectCommunicationRecorder {
             }
             g2.setStroke(new java.awt.BasicStroke(strokeWidth));
             boolean sameNode = sourcePanel.getActiveObject().isInsideSameNode(destPanel.getActiveObject());
-//            System.out.println(nb + "------------------------------" );
-//            System.out.println("source: " + sourcePanel.getActiveObject().toString());
-//            System.out.println("dest: " + destPanel.getActiveObject().toString());
-//            System.out.println("Source x,y: " + xSource + ","  + ySource);
-//            System.out.println("Dest x,y: " + xDest + ","  + yDest);
-//            System.out.println("---");
-           if (sameNode) {
+
+            //            System.out.println(nb + "------------------------------" );
+            //            System.out.println("source: " + sourcePanel.getActiveObject().toString());
+            //            System.out.println("dest: " + destPanel.getActiveObject().toString());
+            //            System.out.println("Source x,y: " + xSource + ","  + ySource);
+            //            System.out.println("Dest x,y: " + xDest + ","  + yDest);
+            //            System.out.println("---");
+            if (sameNode) {
                 drawOneArcSameNode(xSource, ySource, sourceWidth, xDest, yDest,
                     destWidth, g2);
             } else {
@@ -314,6 +348,8 @@ public class ActiveObjectCommunicationRecorder {
 
     private void drawArrowHead(int xSource, int ySource, int xDest, int yDest,
         java.awt.Graphics2D g2, boolean alignVertic, boolean upWay) {
+        //System.out.println("ActiveObjectCommunicationRecorder.drawArrowHead()");
+        //Thread.dumpStack();
         double angle;
         if (xSource == xDest) {
             angle = Math.PI / 2;
@@ -376,7 +412,7 @@ public class ActiveObjectCommunicationRecorder {
         // draw a little black circle meaning : com point
         if (ySource > yDest) {
             //      g2.fillOval(xDest - 4 + destWidth, yDest + 9, 8, 8);
-        	// no longer a black circle but an outlined arrow
+            // no longer a black circle but an outlined arrow
             drawArrowHead(xDest + destWidth + 100, yDest + 13,
                 xDest + destWidth, yDest + 13, g2, false, false);
         } else {
@@ -433,22 +469,20 @@ public class ActiveObjectCommunicationRecorder {
     private void drawOneArcSameNode(int xSource, int ySource, int sourceWidth,
         int xDest, int yDest, int destWidth, java.awt.Graphics2D g2) {
         //Shape changing...
-    	int shape = Math.abs(ySource - yDest) / 3;
-    	  // ebe 13 sept 2004 AO can call themselves -> jacobi examples
-    	if ((xSource == xDest) && (ySource == yDest)) {
-    		g2.drawOval(xSource - shape -25, ySource+7 , 22, 15);
-    	
-		}
-    	else {
-    	   
-        if (ySource > yDest) {
-            g2.drawArc(xSource - shape + sourceWidth, yDest + 13, shape * 2,
-                Math.abs(ySource - yDest), 90, -180);
+        int shape = Math.abs(ySource - yDest) / 3;
+
+        // ebe 13 sept 2004 AO can call themselves -> jacobi examples
+        if ((xSource == xDest) && (ySource == yDest)) {
+            g2.drawOval(xSource - shape - 25, ySource + 7, 22, 15);
         } else {
-            g2.drawArc(xSource - shape, ySource + 13, shape * 2,
-                Math.abs(ySource - yDest), 90, 180);
+            if (ySource > yDest) {
+                g2.drawArc(xSource - shape + sourceWidth, yDest + 13,
+                    shape * 2, Math.abs(ySource - yDest), 90, -180);
+            } else {
+                g2.drawArc(xSource - shape, ySource + 13, shape * 2,
+                    Math.abs(ySource - yDest), 90, 180);
+            }
         }
-    	}
         drawCommunicationPointSameNode(xSource, ySource, sourceWidth, xDest,
             yDest, destWidth, g2);
     }
@@ -478,9 +512,11 @@ public class ActiveObjectCommunicationRecorder {
 
     /**
      * @param antiAlias The antiAlias to set.
+     * Set the current drawing to dirty
      */
     public void setAntiAlias(boolean antiAlias) {
         this.antiAlias = antiAlias;
+        this.dirty=true;
     }
 
     /**

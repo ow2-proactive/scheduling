@@ -126,11 +126,14 @@ public class HostPanel extends AbstractDataObjectPanel
                         return;
                     }
 
-                    //ebe repaint worlpanel on host drag
-                    HostPanel.this.parentDataObjectPanel.revalidate();
-                    HostPanel.this.parentDataObjectPanel.repaint();
+                 
                     e.translatePoint(getX(), getY());
                     setLocation(e.getX(), e.getY());
+                    //ebe repaint worlpanel on host drag
+                    HostPanel.this.parentDataObjectPanel.setDirty(true);
+                    HostPanel.this.parentDataObjectPanel.revalidate();
+                    HostPanel.this.parentDataObjectPanel.repaint();
+                  
                 }
             });
         addMouseListener(new java.awt.event.MouseAdapter() {
