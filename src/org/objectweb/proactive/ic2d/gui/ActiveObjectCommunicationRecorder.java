@@ -91,6 +91,14 @@ public class ActiveObjectCommunicationRecorder {
         if (source.isDestroyed() || dest.isDestroyed()) {
             return;
         }
+        
+        //whatever the event, if we are in proportinal or ratio, the
+        //screen will have to be redrawn because the size of the arrows
+        //will change
+        if (this.drawingStyle != FILAIRE_DRAWING_STYLE) {
+        	this.dirty=true;
+        }
+        
         // try to find a mapping source <-> dest
         java.util.HashMap destMap = (java.util.HashMap) panelToPanelsMap.get(source);
         if (destMap == null) {
