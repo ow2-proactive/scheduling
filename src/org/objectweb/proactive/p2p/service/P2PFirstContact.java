@@ -85,6 +85,7 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants {
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
+        this.peers = StartP2PService.checkingPeersUrl(this.peers);
         // First coontact
         connectingPeer();
         while (body.isAlive()) {

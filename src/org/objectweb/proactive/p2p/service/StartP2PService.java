@@ -414,10 +414,11 @@ public class StartP2PService implements P2PConstants {
     /**
      * Add acquisition method and port number to URL of peers.
      */
-    private void checkingPeersUrl() {
-        int nbUrls = this.peers.size();
+    public static Vector checkingPeersUrl(Vector peerList) {
+        int nbUrls = peerList.size();
+        Vector newPeerList = new Vector(nbUrls);
         for (int i = 0; i < nbUrls; i++) {
-            String url = (String) this.peers.get(i);
+            String url = (String) peerList.get(i);
             if (url.indexOf("//") < 0) {
                 url = System.getProperty(P2PConstants.PROPERTY_ACQUISITION) +
                     "://" + url;
@@ -425,8 +426,9 @@ public class StartP2PService implements P2PConstants {
             if (!url.matches(".*:[0-9]+$")) {
                 url += (":" + System.getProperty(P2PConstants.PROPERTY_PORT));
             }
-            this.peers.set(i, url);
+            newPeerList.add(url);
         }
+        return newPeerList;
     }
 
     /**
@@ -436,7 +438,7 @@ public class StartP2PService implements P2PConstants {
      */
     public void start() throws ProActiveException {
         // Cleanning peers URL
-        this.checkingPeersUrl();
+        this.peers = StartP2PService.checkingPeersUrl(this.peers);
 
         // Starting new Active P2P Service
         String acquisitionMethod = System.getProperty(P2PConstants.PROPERTY_ACQUISITION);
