@@ -30,12 +30,8 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StreamCorruptedException;
-import java.security.cert.X509Certificate;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -44,6 +40,7 @@ import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.group.ExceptionList;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
@@ -53,14 +50,19 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 import sun.rmi.server.MarshalInputStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StreamCorruptedException;
+
+import java.security.cert.X509Certificate;
+
 
 public class RequestImpl extends MessageImpl implements Request,
     java.io.Serializable {
     public static Logger logger = Logger.getLogger(RequestImpl.class.getName());
-	public static Logger loggerNFE = Logger.getLogger("NFE");
+    public static Logger loggerNFE = Logger.getLogger("NFE");
     protected MethodCall methodCall;
-    
-    
+
     /**
      * Indicates if the method has been sent through a forwarder
      */
@@ -108,39 +110,40 @@ public class RequestImpl extends MessageImpl implements Request,
         }
         FutureResult result = serveInternal(targetBody);
         if (logger.isDebugEnabled()) {
-        	logger.debug("result: " + result);
+            logger.debug("result: " + result);
         }
-        if (isOneWay){ // || (sender == null)) {
+        if (isOneWay) { // || (sender == null)) {
             return null;
         }
         return createReply(targetBody, result);
     }
 
-	public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
-		if (loggerNFE.isDebugEnabled()) {
-			loggerNFE.debug("*** Serving an alternate version of " + this.getMethodName());
-		}
-		if (loggerNFE.isDebugEnabled()) {
-			if (nfe != null) {
-				loggerNFE.debug("*** Result  " + nfe.getClass().getName());
-			} else {
-				loggerNFE.debug("*** Result null");
-			}
-		}
-		if (isOneWay){// || (sender == null)) {
-			return null;
-		}
-		return createReply(targetBody, new FutureResult(null, null, nfe));
-	}
+    public Reply serveAlternate(Body targetBody, NonFunctionalException nfe) {
+        if (loggerNFE.isDebugEnabled()) {
+            loggerNFE.debug("*** Serving an alternate version of " +
+                this.getMethodName());
+        }
+        if (loggerNFE.isDebugEnabled()) {
+            if (nfe != null) {
+                loggerNFE.debug("*** Result  " + nfe.getClass().getName());
+            } else {
+                loggerNFE.debug("*** Result null");
+            }
+        }
+        if (isOneWay) { // || (sender == null)) {
+            return null;
+        }
+        return createReply(targetBody, new FutureResult(null, null, nfe));
+    }
 
     public boolean hasBeenForwarded() {
         return sendCounter > 1;
     }
 
-    public void resetSendCounter(){
+    public void resetSendCounter() {
         this.sendCounter = 0;
     }
-    
+
     public Object getParameter(int index) {
         return methodCall.getParameter(index);
     }
@@ -167,11 +170,12 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected FutureResult serveInternal(Body targetBody) throws ServeException {
-    	Object result = null;
-    	Throwable exception = null;
+    protected FutureResult serveInternal(Body targetBody)
+        throws ServeException {
+        Object result = null;
+        Throwable exception = null;
         try {
-        	//loggerNFE.warn("CALL to " + targetBody);
+            //loggerNFE.warn("CALL to " + targetBody);
             result = methodCall.execute(targetBody.getReifiedObject());
         } catch (MethodCallExecutionFailedException e) {
             // e.printStackTrace();
@@ -182,12 +186,15 @@ public class RequestImpl extends MessageImpl implements Request,
 
             // t.printStackTrace();
             if (isOneWay) {
-                exception.printStackTrace();
+                if (!(exception instanceof ExceptionList)) {
+                    exception.printStackTrace();
+                }
                 throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed", exception);
+                    methodCall.getReifiedMethod().toString() + " failed",
+                    exception);
             }
         }
-        
+
         return new FutureResult(result, exception, null);
     }
 
@@ -245,7 +252,7 @@ public class RequestImpl extends MessageImpl implements Request,
         if (logger.isDebugEnabled()) {
             logger.debug(" sending request finished");
         }
-        
+
         return ftres;
     }
 
