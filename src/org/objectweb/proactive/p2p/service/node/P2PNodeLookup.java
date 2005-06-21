@@ -81,7 +81,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private String parUrl;
     private HashMap nodeManagerMap = new HashMap();
     private boolean killAllFlag = false;
-
+    private boolean onlyUnderloadedAnswer = false;
+    
     public P2PNodeLookup() {
         // the empty constructor
     }
@@ -102,6 +103,27 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         this.vnName = vnName;
         this.jobId = jobId;
     }
+
+    // new constructor, for a load balanced environment
+    
+    public P2PNodeLookup(Integer numberOfAskedNodes,
+            P2PService localP2pService, 
+            String vnName, String jobId, String onlyUnderloadedAnswer) {
+    		this.onlyUnderloadedAnswer = Boolean.getBoolean(onlyUnderloadedAnswer);
+            this.waitingNodesList = new Vector();
+            this.nodesToKillList = new Vector();
+            this.expirationTime = System.currentTimeMillis() + TIMEOUT;
+            this.numberOfAskedNodes = numberOfAskedNodes.intValue();
+            assert (this.numberOfAskedNodes > 0) ||
+            (this.numberOfAskedNodes == MAX_NODE) : "None authorized value for asked nodes";
+            if (this.numberOfAskedNodes == MAX_NODE) {
+                this.expirationTime = Long.MAX_VALUE;
+            }
+            this.localP2pService = localP2pService;
+            this.acquaintances = acquaintances;
+            this.vnName = vnName;
+            this.jobId = jobId;
+        }
 
     // -------------------------------------------------------------------------
     // Access methods
@@ -281,9 +303,15 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             logger.debug("Aksing nodes");
 
             // Send a message to everybody
-            this.localP2pService.askingNode(TTL, null, this.localP2pService,
+            if (onlyUnderloadedAnswer)  
+            	this.localP2pService.askingNode(1, null, this.localP2pService,
                 this.numberOfAskedNodes - this.acquiredNodes, stub,
-                this.vnName, this.jobId);
+                this.vnName, this.jobId
+				, onlyUnderloadedAnswer);  // Load balancer question
+            else
+            	this.localP2pService.askingNode(TTL, null, this.localP2pService,
+                        this.numberOfAskedNodes - this.acquiredNodes, stub,
+                        this.vnName, this.jobId);
 
             // Serving request
             service.blockingServeOldest(LOOKUP_FREQ);
