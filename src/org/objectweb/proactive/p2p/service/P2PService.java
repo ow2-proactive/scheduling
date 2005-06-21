@@ -352,6 +352,29 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         }
     }
 
+    /**
+     * <b>Method called on Load Balanced enviroments.</b>
+     * <p>Booking a free node.</p>
+     * @param ttl Time to live of the message, in number of hops.
+     * @param uuid UUID of the message.
+     * @param remoteService The original sender.
+     * @param numberOfNodes Number of asked nodes.
+     * @param lookup The P2P nodes lookup.
+     * @param vnName Virtual node name.
+     * @param jobId
+     * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
+     */
+
+    public void askingNode(int ttl, UniversalUniqueID uuid,
+            P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
+            String vnName, String jobId, boolean underloadedOnly) {
+
+    	if (!underloadedOnly || !amIUnderloaded()) return;
+    	
+    	this.askingNode(ttl,uuid,remoteService,numberOfNodes,lookup,vnName,jobId);
+    }
+    
+
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
      * @param vnName Virtual node name.
@@ -365,6 +388,42 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         params[2] = vnName;
         params[3] = jobId;
 
+        P2PNodeLookup lookup = null;
+        try {
+            lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
+                    params, this.p2pServiceNode);
+            ProActive.enableAC(lookup);
+            this.waitingNodesLookup.add(lookup);
+        } catch (ActiveObjectCreationException e) {
+            logger.fatal("Couldn't create an active lookup", e);
+            return null;
+        } catch (NodeException e) {
+            logger.fatal("Couldn't connect node to creat", e);
+            return null;
+        } catch (IOException e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Couldn't enable AC for a nodes lookup", e);
+            }
+        }
+
+        if (logger.isInfoEnabled()) {
+            if (numberOfNodes != MAX_NODE) {
+                logger.info("Asking for" + numberOfNodes + " nodes");
+            } else {
+                logger.info("Asking for maxinum nodes");
+            }
+        }
+        return lookup;
+    }
+
+    public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId, boolean onlyUnderloaded) {
+        Object[] params = new Object[5];
+        params[0] = new Integer(numberOfNodes);
+        params[1] = this.stubOnThis;
+        params[2] = vnName;
+        params[3] = jobId;
+        params[4] = String.valueOf(onlyUnderloaded);
+        
         P2PNodeLookup lookup = null;
         try {
             lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
@@ -589,4 +648,37 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
 
         logger.debug("Exiting initActivity");
     }
+
+    /*********************************
+     * LOAD BALANCIN METHODS
+     */
+    
+	/**
+	 * @Answer to remote machines if I'm underloaded.
+	 */
+    public boolean amIUnderloaded() {
+    	return p2pLoadBalancer.AreYouUnderloaded();
+    }
+
+    public void balanceWithMe(P2PService sender) {
+    	if (!amIUnderloaded()) return;
+    	
+    	P2PNode myNode = nodeManager.askingNode(true);
+    	
+    	if (myNode.getNode() != null) {
+    		sender.P2PloadBalance(myNode.getNode());
+    	}
+    }
+
+	public void P2PloadBalance(Node destNode) {
+		this.p2pLoadBalancer.P2PloadBalance(destNode);
+	}
+
+	/**
+	 * 
+	 */
+	public void tellToMyNeighborsThatIWantToShareActiveObjects() {
+
+		this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(3,this.stubOnThis);
+	}
 }

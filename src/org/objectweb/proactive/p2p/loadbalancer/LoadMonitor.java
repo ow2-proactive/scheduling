@@ -39,8 +39,11 @@ import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
+
 public class LoadMonitor extends Thread
 {
+	private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
 
     private double load,oldTotal,oldUsed;;
     private LoadBalancer lb;
@@ -147,8 +150,8 @@ public class LoadMonitor extends Thread
             	if (load == 0) sl = 10000;
             	else {
             		sl  = 30000 + Math.abs(r.nextGaussian())*15000;
-            		slreal = sl/1000;
-            		sl = sl / Math.log(1+load*100);
+//            		slreal = sl/1000;
+//            		sl = sl / Math.log(1+load*100);
             	}
                 Thread.sleep(Math.round(sl));
             }

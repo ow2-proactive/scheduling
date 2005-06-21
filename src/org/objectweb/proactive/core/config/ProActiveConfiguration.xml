@@ -35,7 +35,6 @@
 		<!-- <prop key="proactive.ssh.port" value="22"/> -->
 		<!-- <prop key="proactive.ssh.username" value="mlacage"/> -->
 		
-		
 		<!-- ***************************************************** -->
 		<!-- P2P PROPERTIES VALUE -->
 		<!-- THESE ARE DEFAULT VALUES -->
@@ -61,9 +60,11 @@
 		<!-- Lookup frequency for nodes -->
 		<prop key="proactive.p2p.lookup_freq" value="30000" />
 		<!-- If true deploying one shared nodes by CPU, else only one node is shared -->
-		<prop key="proactive.p2p.multi_proc_nodes" value="true" />
+		<prop key="proactive.p2p.multi_proc_nodes" value="false" />
 		<!-- Timeout for waiting node ack. -->
 		<prop key="proactive.p2p.ack_to" value="180000" />
+		<!-- Enable load balance -->
+		<prop key="proactive.p2p.loadbalancing" value="false" />
 		<!-- ***************************************************** -->
 	</properties>
 </ProActiveUserProperties>

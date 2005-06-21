@@ -120,7 +120,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 this.expirationTime = Long.MAX_VALUE;
             }
             this.localP2pService = localP2pService;
-            this.acquaintances = acquaintances;
             this.vnName = vnName;
             this.jobId = jobId;
         }

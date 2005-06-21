@@ -120,6 +120,32 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         }
     }
 
+    public P2PNode askingNode(boolean evenIfItIsShared) {
+    	if (!evenIfItIsShared) {
+    		return askingNode();
+    	}
+        logger.debug("Asking a node to the nodes manager");
+        if ((this.availbaleNodes.size() == 0) &&
+                (this.bookedNodes.size() == 0) &&
+                (this.usingNodes.size() == 0)) {
+            this.deployingDefaultSharedNodes();
+        } 
+        if (this.availbaleNodes.size() > 0) {
+            Node node = (Node) this.availbaleNodes.remove(0);
+            this.bookedNodes.add(new Booking(node));
+            logger.debug("Yes, the manager has an empty node");
+            return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+        } else if (this.bookedNodes.size() > 0) {
+        	Node node = ((Booking) this.bookedNodes.get(0)).getNode();
+        	logger.debug("Yes, the manager has a shared node");
+        	return new P2PNode(node, (P2PNodeManager) ProActive.getStubOnThis());
+        } else {
+            // All nodes is already assigned
+            logger.debug("Sorry no availbale node for the moment");
+            return new P2PNode(null, null);
+        }
+    }
+
     /**
      * Leave the specified node. The node is killed and new one is created and
      * ready for sharing.

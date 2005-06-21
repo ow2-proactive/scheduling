@@ -33,20 +33,17 @@ package org.objectweb.proactive.p2p.loadbalancer;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.p2p.service.P2PService;
-import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 
 public class LoadBalancer {
 
-	static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
+	private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
 
 	private P2PService p2pSer;
 
@@ -67,13 +64,12 @@ public class LoadBalancer {
 	}
 
 	public void register(long load) {
-//		   	logger.info("*** ["+p2pSer.getAddress()+"] reporting load = "+load+" ranking = "+rank);
 		if ((double) load > 90.0) {
 			if (underloaded) {
 				underloaded = false;
 			}
 			loadBalance();
-		} else if ((double) load >= 20.0 * rank) {
+		} else if ((double) load >= 40.0 * rank) {
 			if (underloaded) {
 				underloaded = false;
 			}
@@ -83,40 +79,49 @@ public class LoadBalancer {
 	}
 
 	/***************************************************************************
-	 * THIS IS THE METHOD CALLED BY THE MACHINE
+	 * THIS IS THE METHOD CALLED FOR BALANCING
 	 **************************************************************************/
 
 	public void loadBalance() {
-		logger.info("*** [" + p2pSer.getAddress()+ "] asking for Load Balance");
 
-		P2PNodeLookup lookup = p2pSer.getNodes(1, "p2pLoadBalancing","1");
-		while (! lookup.allArrived()){
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		}
-		Node destNode = (Node) lookup.getAndRemoveNodes().get(0);
-				if (destNode == null)
-					return;
-				destNode.getNodeInformation().setJobID("1");
-
-				try {
-					RuntimeFactory.getDefaultRuntime().addAcquaintance(
-							destNode.getProActiveRuntime().getURL());
-				} catch (ProActiveException e) {
-					e.printStackTrace();
-				}
-				P2PloadBalance(destNode);
-
+//		logger.info("*** [" + p2pSer.getAddress()+ "] asking for Load Balance");
+		p2pSer.tellToMyNeighborsThatIWantToShareActiveObjects();
 	}
 
+//	public void loadBalanceUsingLookup() {
+//		logger.info("*** [" + p2pSer.getAddress()+ "] asking for Load Balance");
+//
+//		P2PNodeLookup lookup = p2pSer.getNodes(1, "p2pLoadBalancing","1",true);
+//		while (! lookup.allArrived()){
+//			try {
+//				Thread.sleep(100);
+//			} catch (InterruptedException e1) {
+//			}
+//		}
+//		Node destNode = (Node) lookup.getAndRemoveNodes().get(0);
+//				if (destNode == null)
+//					return;
+//				destNode.getNodeInformation().setJobID("1");
+//
+//				try {
+//					RuntimeFactory.getDefaultRuntime().addAcquaintance(
+//							destNode.getProActiveRuntime().getURL());
+//				} catch (ProActiveException e) {
+//					e.printStackTrace();
+//				}
+//				P2PloadBalance(destNode);
+//
+//	}
+
 	public void P2PloadBalance(Node destNode) {
+//		logger.debug("****************** entering P2PloadBalance to "
+//				+ destNode.getNodeInformation().getURL());
+
+		if (NodeFactory.isNodeLocal(destNode))
+			return;
+
 		try {
 
-			logger.info("****************** entering P2PloadBalance to "
-					+ destNode.getNodeInformation().getURL());
 			BodyMap knownBodies = LocalBodyStore.getInstance().getLocalBodies();
 
 			if (knownBodies.size() < 1)
@@ -130,10 +135,12 @@ public class LoadBalancer {
 			int minLength = Integer.MAX_VALUE;
 			Body minBody = null;
 
-			/** ******** Choosing the shortest service queue ******** */
 			while (bodiesIterator.hasNext()) {
 				Body activeObjectBody = (Body) bodiesIterator.next();
 				Object testObject = activeObjectBody.getReifiedObject();
+
+			/********** Only some Active Objects can migrate *************/
+				
 				boolean testSerialization = testObject instanceof Migratable;
 
 				if (activeObjectBody.isAlive())
@@ -147,11 +154,10 @@ public class LoadBalancer {
 					}
 			}
 
-			if (NodeFactory.isNodeLocal(destNode))
-				return;
-
+			/***********  we have the Active Object with shortest queue, so we send the migration call ********/
+			
 			if (minBody != null && minBody.isActive()) {
-				logger.info("[Loadbalancer] Migrating from "
+				logger.debug("[Loadbalancer] Migrating from "
 						+ minBody.getNodeURL() + " to "
 						+ destNode.getNodeInformation().getURL());
 				ProActive.migrateTo(minBody, destNode, true);
