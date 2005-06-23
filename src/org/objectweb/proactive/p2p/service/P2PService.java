@@ -46,7 +46,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.p2p.loadbalancer.LoadBalancer;
+import org.objectweb.proactive.loadbalancing.LoadBalancingConstants;
+import org.objectweb.proactive.p2p.loadbalancer.P2PLoadBalancer;
 import org.objectweb.proactive.p2p.service.exception.P2POldMessageException;
 import org.objectweb.proactive.p2p.service.node.P2PNode;
 import org.objectweb.proactive.p2p.service.node.P2PNodeAck;
@@ -96,8 +97,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 P2PConstants.PROPERTY_TTL));
     private static final long ACK_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODE_ACK_TO));
-    private static final boolean WITH_BALANCE = Boolean.getBoolean(System.getProperty(
-                PROPERTY_LOAD_BAL));
+    private static final boolean WITH_BALANCE = Boolean.getBoolean(
+                P2PConstants.PROPERTY_LOAD_BAL);
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
@@ -119,7 +120,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     /**
      * The load balancer reference
      */
-    private LoadBalancer p2pLoadBalancer;
+    private P2PLoadBalancer p2pLoadBalancer;
 
     // For asking nodes
     private Body body = null;
@@ -369,7 +370,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
             String vnName, String jobId, boolean underloadedOnly) {
 
-    	if (!underloadedOnly || !amIUnderloaded()) return;
+    	if (!underloadedOnly || !amIUnderloaded(0)) return;
     	
     	this.askingNode(ttl,uuid,remoteService,numberOfNodes,lookup,vnName,jobId);
     }
@@ -621,7 +622,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         this.stubOnThis = (P2PService) ProActive.getStubOnThis();
 
         if (WITH_BALANCE) {
-            this.p2pLoadBalancer = new LoadBalancer(this.stubOnThis);
+            this.p2pLoadBalancer = new P2PLoadBalancer(this.stubOnThis);
         }
 
         Object[] params = new Object[1];
@@ -650,35 +651,55 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     }
 
     /*********************************
-     * LOAD BALANCIN METHODS
+     * LOAD BALANCING METHODS
      */
     
-	/**
-	 * @Answer to remote machines if I'm underloaded.
-	 */
-    public boolean amIUnderloaded() {
-    	return p2pLoadBalancer.AreYouUnderloaded();
+    /**
+     * Ask to the Load Balancer object if the state is underloaded
+     * @param none
+     * @return <code>true</code> if the state is underloaded, <code>false</code> else.
+     */
+    public boolean amIUnderloaded(double ranking) {
+    	if (ranking >= 0)
+    	return p2pLoadBalancer.AreYouUnderloaded(ranking);
+    	else return p2pLoadBalancer.AreYouUnderloaded();
     }
 
-    public void balanceWithMe(P2PService sender) {
-    	if (!amIUnderloaded()) return;
+    /**
+     * This method is remotely called by an overloaded peer, looking for a balance.
+     * @param <code>P2PService</code> the reference of the overloaded machine
+     * @return none
+     */
+    public void balanceWithMe(P2PService sender, double ranking) {
+    	
+    	// If I'm not underloaded, I will not reply
+    	if (!amIUnderloaded(ranking)) return;
     	
     	P2PNode myNode = nodeManager.askingNode(true);
-    	
+
+    	// If I don't have an available node, I will not reply
     	if (myNode.getNode() != null) {
     		sender.P2PloadBalance(myNode.getNode());
     	}
     }
 
+    /**
+     * This method is remotely called by an underloaded peer to start the load balancing.
+     * @param <code>Node</code> is the new place for the active objects
+     * @return none
+     */    
 	public void P2PloadBalance(Node destNode) {
-		this.p2pLoadBalancer.P2PloadBalance(destNode);
+		this.p2pLoadBalancer.sendActiveObjectsTo(destNode);
 	}
 
-	/**
-	 * 
-	 */
-	public void tellToMyNeighborsThatIWantToShareActiveObjects() {
+    /**
+     * This method is called by the LoadBalancer object in order to send the
+     * balance request to its neighbors 
+     * @param none
+     * @return none
+     */    
+	public void tellToMyNeighborsThatIWantToShareActiveObjects(double ranking) {
 
-		this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(3,this.stubOnThis);
+		this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(LoadBalancingConstants.SUBSET_SIZE,this.stubOnThis, ranking);
 	}
 }

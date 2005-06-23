@@ -29,74 +29,48 @@
  * ################################################################
  */
 
-package org.objectweb.proactive.p2p.loadbalancer;
+package org.objectweb.proactive.loadbalancing;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.util.Random;
 
-import org.apache.log4j.Logger;
-
-public class LoadMonitor extends Thread
+public class LoadMonitorLinux extends LoadMonitor
 {
-	private static Logger logger = Logger.getLogger(LoadBalancer.class.getName());
-
-    private double load,oldTotal,oldUsed;;
-    private LoadBalancer lb;
-    private Random r;
+    private double oldTotal,oldUsed;;
+    
     private int secLoad[];
-   private String name;
-    private double ranking;
     private RandomAccessFile statfile;
     
-    public synchronized double getRanking()
-    {
-    return ranking;	
-    }
-
-    public LoadMonitor(LoadBalancer lb)
+    public LoadMonitorLinux(LoadBalancer lb)
     {
         this.lb = lb;
         load = 0;
-        r = new Random();
 
-		BufferedReader br;
-		ranking = 1.0;
 		String line=null;
 		try {
-			br = new BufferedReader(new InputStreamReader(new FileInputStream("/proc/cpuinfo")));
 			statfile = new RandomAccessFile("/proc/stat","r");
-			while ((line = br.readLine()) != null) {
-				if (line.startsWith("bogomips")) {
-						String splited[] = line.split(":");
-						double bogomips = Double.parseDouble(splited[1]);   // obtaining the bogomips
-						double bmbase10 = Math.log(bogomips)/Math.log(10)-3;  // 3 is our zero reference
-						ranking = bmbase10+0.7;   // 1+atan(bmbase10)/1.3 => [0; oo)
-						}
-				}
-		statfile.seek(5);
-		line = statfile.readLine();
+			statfile.seek(5);
+			line = statfile.readLine();
 
-		long user, nice, system, idle;
-        java.util.StringTokenizer st = new java.util.StringTokenizer(line," ");
-        user   = Long.parseLong(st.nextToken());
-        nice   = Long.parseLong(st.nextToken());
-        system = Long.parseLong(st.nextToken());
-        idle   = Long.parseLong(st.nextToken());
+			long user, nice, system, idle;
+			java.util.StringTokenizer st = new java.util.StringTokenizer(line," ");
+			user   = Long.parseLong(st.nextToken());
+			nice   = Long.parseLong(st.nextToken());
+			system = Long.parseLong(st.nextToken());
+			idle   = Long.parseLong(st.nextToken());
 		
-        oldTotal  = user + nice + system + idle;
-        oldUsed   = user + nice + system;
+			oldTotal  = user + nice + system + idle;
+			oldUsed   = user + nice + system;
         
-        load = 1;
-        calculateLoad();
+			load = 1;
+			calculateLoad();
 		} catch (FileNotFoundException e) {
+			e.printStackTrace();
 		} catch (NumberFormatException e) {
-		} catch (IOException e) {
-		}
+			e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();}
 		
     }
     public synchronized double  getLoad() {
@@ -129,34 +103,12 @@ public class LoadMonitor extends Thread
             
     }
     
-	private synchronized void calculateLoad() {
+	protected synchronized void calculateLoad() {
 		double newload = getLoad();
 		
 		newload = (0.7*newload + 0.3*load);
 		load = newload;
 	}
 
-    public void run()
-    {
-        int i = 0;
-        do
-        {
-        	calculateLoad();
-            lb.register(Math.round(load*100));
-            try
-            {
-            	double sl, slreal;
-            	slreal=0;
-            	if (load == 0) sl = 10000;
-            	else {
-            		sl  = 30000 + Math.abs(r.nextGaussian())*15000;
-//            		slreal = sl/1000;
-//            		sl = sl / Math.log(1+load*100);
-            	}
-                Thread.sleep(Math.round(sl));
-            }
-            catch(InterruptedException interruptedexception) { }
-        } while(true);
-    }
 
 }

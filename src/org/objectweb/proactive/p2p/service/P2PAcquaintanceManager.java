@@ -186,7 +186,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         if (!this.groupOfAcquaintances.contains(peer)) {
             boolean result = this.groupOfAcquaintances.add(peer);
             String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
-            logger.debug("Acquaintance " + peerUrl + " " + result + " added");
+            logger.info("Acquaintance " + peerUrl + " " + result + " added");
         }
     }
 
@@ -225,7 +225,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
 	/**
 	 * @param n number of neighbors which receive the balance request
 	 */
-	public void chooseNneighborsAndSendTheBalanceRequest(int n, P2PService sender) {
+	public void chooseNneighborsAndSendTheBalanceRequest(int n, P2PService sender, double ranking) {
 		int size = this.size();
 		if (size <= 0) return;
 		if (n > size) n = size; 
@@ -235,6 +235,6 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
 		int high = (candidate+1 >= size)? size-1:candidate+1;
 		Group subGroupofAcquaintances = this.groupOfAcquaintances.range(low,high); 
 		
-		((P2PService) subGroupofAcquaintances.getGroupByType()).balanceWithMe(sender);
+		((P2PService) subGroupofAcquaintances.getGroupByType()).balanceWithMe(sender, ranking);
 	}
 }
