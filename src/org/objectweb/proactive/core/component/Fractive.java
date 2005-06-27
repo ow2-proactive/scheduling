@@ -63,10 +63,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class is used for creating components.
- * It acts as :<br>
- * 1. a bootstrap component<br>
- * 2. a GenericFactory for instantiating new components
- * 3. a utility class providing static methods to create collective interfaces and retreive references to ComponentParametersController<br>
+ * It acts as : <ol>
+ * <li> a bootstrap component</li>
+ * <li> a GenericFactory for instantiating new components</li>
+ * <li> a utility class providing static methods to create collective interfaces and retreive references to ComponentParametersController</li>
+ * </ol>
  */
 public class Fractive implements GenericFactory, Component, Factory {
     private static Fractive instance = null;

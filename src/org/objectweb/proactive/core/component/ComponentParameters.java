@@ -39,12 +39,13 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveComponentType;
 
 
-/** Contains the configuration of a component :
- * - type
- * - interfaces (server and client) --> in contained ControllerDescription object
- * - name --> in contained ControllerDescription object
- * - hierarchical type (primitive or composite) --> in contained ControllerDescription object
- * - a ref on the stub on the base object
+/** Contains the configuration of a component. <ul>
+ * <li> type</li>
+ * <li> interfaces (server and client) --> in contained ControllerDescription object</li>
+ * <li> name --> in contained ControllerDescription object</li>
+ * <li> hierarchical type (primitive or composite) --> in contained ControllerDescription object</li>
+ * <li> a ref on the stub on the base object</li>
+ * </ul>
  */
 public class ComponentParameters implements Serializable {
     protected static Logger logger = Logger.getLogger("components");
