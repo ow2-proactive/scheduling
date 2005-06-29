@@ -56,7 +56,7 @@ public class UnicorePasswordGUI extends JFrame implements ActionListener{
 		panel.add(ok, BorderLayout.SOUTH);
 		
 		this.pack();
-		this.show();
+		this.setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
