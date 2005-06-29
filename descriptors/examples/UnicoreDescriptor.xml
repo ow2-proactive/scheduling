@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+    <componentDefinition>
+        <virtualNodesDefinition>
+            <virtualNode name="Test" property="multiple"/>
+        </virtualNodesDefinition>
+    </componentDefinition>
+    <deployment>
+        <mapping>
+            <map virtualNode="Test">
+                <jvmSet>
+                    <vmName value="JvmUnicore"/>
+		    <!--vmName value="JvmSSH"/-->
+                </jvmSet>
+            </map>
+        </mapping>
+        <jvms>
+            <jvm name="JvmUnicore">
+                <creation>
+                    <processReference refid="unicoreProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="JvmSSH">
+                <creation>
+                    <processReference refid="sshProcess"/>
+                </creation>
+            </jvm>
+        </jvms>
+    </deployment>
+    <infrastructure>
+	<processes>
+		<processDefinition id="jvmProcess">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                    <classpath>
+			<absolutePath value="ProActive.jar"/>
+                        <absolutePath value="asm.jar"/>
+                        <absolutePath value="bouncycastle.jar"/>
+                        <absolutePath value="components/fractal.jar"/>
+                        <absolutePath value="jsch.jar"/>
+                        <absolutePath value="log4j.jar"/>
+                        <absolutePath value="xercesImpl.jar"/>
+                    </classpath>
+                    <javaPath>
+                        <absolutePath value="/opt/j2sdk1.4/bin/java"/>
+                    </javaPath>
+                    <policyFile>
+                        <absolutePath value="proactive.java.policy"/>
+                    </policyFile>
+                    <log4jpropertiesFile>
+                        <absolutePath value="proactive-log4j"/>
+                    </log4jpropertiesFile>
+                </jvmProcess>
+		</processDefinition>
+		<processDefinition id="unicoreProcess">
+			<unicoreProcess class="org.objectweb.proactive.core.process.unicore.UnicoreProcess" 
+				jobname="MyUnicoreTestJob" keypassword="testing" submitjob="true" savejob="false">
+				<processReference refid="jvmProcess"/>
+				<unicoreDirPath>
+                         		<relativePath origin="user.home" value=".unicore"/>
+                         		<!--absolutePath value="/home/sophia/mleyton/.unicore"/--> 
+                        	</unicoreDirPath>
+				<keyFilePath>
+					<relativePath origin="user.home" value=".unicore/keystore"/>
+					<!--absolutePath value="/home/sophia/mleyton/.unicore/keystore"/--> 
+				</keyFilePath>
+				<importFiles>
+					<relativePath origin="user.home" value="ProActive/lib/ProActive.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/asm.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/bouncycastle.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/jsch.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/log4j.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/xercesImpl.jar"/>
+					<relativePath origin="user.home" value="ProActive/lib/components/fractal.jar"/>
+					<relativePath origin="user.home" value="ProActive/scripts/proactive.java.policy"/>
+					<relativePath origin="user.home" value="ProActive/scripts/proactive-log4j"/>
+				</importFiles>
+				<unicoreOption>
+					<usite name="Gate Europe" type="CLASSIC" url="http://testgrid.unicorepro.com:4000"/>
+					<vsite name="SUPRENUM" nodes="1" processors="1" memory="256" runtime="600" priority="high"/>
+					
+					<!-- Units
+					
+					type: CLASSIC, REGISTRY
+					
+					Nodes: Number of nodes
+					Processors: Number of processors per node
+					Memory: RAM MB per node
+					Runtime: seconds
+					Priority: high, low, normal, development, whenever
+					-->
+				</unicoreOption>
+			</unicoreProcess>
+		</processDefinition>
+			
+		<processDefinition id="sshProcess">
+			<!-- Testing -->
+			<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost">
+			<!--sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.grenoble.grid5000.fr"-->
+			<processReference refid="unicoreProcess"/>
+			<!--processReference refid="JVMProcess"/-->
+			</sshProcess>
+		</processDefinition>
+		
+		<processDefinition id="JVMProcess">
+			<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+		</processDefinition>
+	  </processes>
+    </infrastructure>
+</ProActiveDescriptor>
