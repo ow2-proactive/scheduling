@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="DescriptorSchema.xsd">
+    <componentDefinition>
+        <virtualNodesDefinition>
+            <virtualNode name="Test" property="multiple"/>
+        </virtualNodesDefinition>
+    </componentDefinition>
+    <deployment>
+        <mapping>
+            <map virtualNode="Test">
+                <jvmSet>
+                    <!--vmName value="JvmOARGrid"/-->
+		    <vmName value="JvmSSH"/>
+                </jvmSet>
+            </map>
+        </mapping>
+        <jvms>
+            <jvm name="JvmOARGrid">
+                <creation>
+                    <processReference refid="oarGridProcess"/>
+                </creation>
+            </jvm>
+            <jvm name="JvmSSH">
+                <creation>
+                    <processReference refid="sshProcess"/>
+                </creation>
+            </jvm>
+        </jvms>
+    </deployment>
+    <infrastructure>
+	<processes>
+		<processDefinition id="jvmProcess">
+                <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+                    <classpath>
+                        <!--absolutePath value="/home/sophia/mleyton/ProActive/bin"/--> 	
+			<absolutePath value="/home/sophia/mleyton/ProActive/lib/ProActive.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/asm.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/bouncycastle.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/components/fractal.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/jsch.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/log4j.jar"/>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/lib/xercesImpl.jar"/>
+                    </classpath>
+                    <javaPath>
+                        <absolutePath value="/home/sophia/mleyton/bin/java"/>
+                    </javaPath>
+                    <policyFile>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/scripts/proactive.java.policy"/>
+                    </policyFile>
+                    <log4jpropertiesFile>
+                        <absolutePath value="/home/sophia/mleyton/ProActive/scripts/proactive-log4j"/>
+                    </log4jpropertiesFile>
+                </jvmProcess>
+		</processDefinition>
+		<processDefinition id="oarGridProcess">
+			<oarGridProcess class="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess" bookedNodesAccess="ssh"  queue="default">
+				<processReference refid="jvmProcess"/>
+				<commandPath value="/usr/local/bin/oargridsub"/>
+				<oarGridOption>
+					<!--Available clusters are:
+					| idpot       | caddo.imag.fr                  |
+					| gdx         | devgdx002.orsay.grid5000.fr    |
+					| toulouse    | oar.toulouse.grid5000.fr       |
+					| sophia      | oar.sophia.grid5000.fr         |
+					| lyon        | oar.lyon.grid5000.fr           |
+					| parasol     | oar.rennes.grid5000.fr         |
+					| tartopom    | dev-powerpc.rennes.grid5000.fr |
+					| paraci      | dev-xeon.rennes.grid5000.fr    |
+					| icluster2   | ita101.imag.fr                 |
+					-->
+					<resources>sophia:nodes=2,lyon:nodes=1</resources>
+					<walltime>00:03:00</walltime> <!-- hour:min:sec-->
+					 <scriptPath>
+                         		<!--relativePath origin="user.home" value="Proactive/scripts/unix/cluster/oarGridStartRuntime.sh"/-->
+                         		<absolutePath value="/home/sophia/mleyton/ProActive/scripts/unix/cluster/oarGridStartRuntime.sh"/> 
+                        		 </scriptPath>
+					</oarGridOption>
+			</oarGridProcess>
+		</processDefinition>
+			
+		<processDefinition id="sshProcess">
+			<!-- Testing -->
+			<!--sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="localhost"-->
+			<sshProcess class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="oar.grenoble.grid5000.fr">
+			<processReference refid="oarGridProcess"/>
+			<!--processReference refid="JVMProcess"/-->
+			</sshProcess>
+		</processDefinition>
+		
+		<processDefinition id="JVMProcess">
+			<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
+		</processDefinition>
+	  </processes>
+    </infrastructure>
+</ProActiveDescriptor>
