@@ -73,6 +73,7 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_PROCESS_TAG = "prunProcess";
     public static final String PBS_PROCESS_TAG = "pbsProcess";
     public static final String OAR_PROCESS_TAG = "oarProcess";
+    public static final String OARGRID_PROCESS_TAG = "oarGridProcess";
     public static final String GRID_ENGINE_PROCESS_TAG = "gridEngineProcess";
     public static final String GRID_ENGINE_OPTIONS_TAG="gridEngineOption";
     public static final String PROCESSES_TAG = "processes";
@@ -97,7 +98,9 @@ public interface ProActiveDescriptorConstants {
     public static final String PRUN_OUTPUT_FILE = "outputFile";
     public static final String PBS_OPTIONS_TAG = "pbsOption";
     public static final String OAR_OPTIONS_TAG="oarOption";
+    public static final String OARGRID_OPTIONS_TAG="oarGridOption";
     public static final String OAR_RESOURCE_TAG="resources";
+    public static final String OARGRID_WALLTIME_TAG="walltime";
     //public static final String OAR_PROPERTY_TAG="properties";
     public static final String VARIABLE_TAG = "variable";
     public static final String CLASSPATH_TAG = "classpath";
@@ -124,4 +127,11 @@ public interface ProActiveDescriptorConstants {
     public static final String FT_RESSERVER_TAG = "resourceServer";
     public static final String FT_GLOBALSERVER_TAG = "globalServer";
     public static final String FT_TTCVALUE_TAG = "ttc";
+    public static final String UNICORE_PROCESS_TAG = "unicoreProcess";
+    public static final String UNICORE_OPTIONS_TAG = "unicoreOption";
+    public static final String UNICORE_DIR_PATH_TAG = "unicoreDirPath";
+    public static final String UNICORE_KEYFILE_PATH_TAG = "keyFilePath";
+    public static final String UNICORE_USITE_TAG = "usite";
+    public static final String UNICORE_VSITE_TAG = "vsite";
+    public static final String UNICORE_IMPORTFILES_TAG = "importFiles";
 }
