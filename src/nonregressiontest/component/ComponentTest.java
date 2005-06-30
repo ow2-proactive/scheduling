@@ -20,7 +20,7 @@ public abstract class ComponentTest extends FunctionalTest {
      * @param name
      */
     public ComponentTest(String name) {
-        super("Components : " + name);
+        super("[COMPONENTS] " + name);
     }
 
     /**

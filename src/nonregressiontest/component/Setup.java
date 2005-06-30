@@ -143,12 +143,28 @@ public class Setup {
             new ContentDescription(PrimitiveComponentB.class.getName(),
                 new Object[] {  }, TestNodes.getLocalVMNode()));
     }
+    
+    public static Component createRemoteSlowPrimitiveB() throws Exception {
+        createTypeB();
+        return CF.newFcInstance(B_TYPE,
+            new ControllerDescription("slowPrimitiveB1", Constants.PRIMITIVE),
+            new ContentDescription(SlowPrimitiveComponentB.class.getName(),
+                new Object[] {  }, TestNodes.getLocalVMNode()));
+    }
 
     public static Component createPrimitiveA() throws Exception {
         createTypeA();
         return CF.newFcInstance(A_TYPE,
             new ControllerDescription("primitiveA", Constants.PRIMITIVE),
             new ContentDescription(PrimitiveComponentA.class.getName(),
+                new Object[] {  }));
+    }
+    
+    public static Component createSlowPrimitiveA() throws Exception {
+        createTypeA();
+        return CF.newFcInstance(A_TYPE,
+            new ControllerDescription("slowPrimitiveA", Constants.PRIMITIVE),
+            new ContentDescription(SlowPrimitiveComponentA.class.getName(),
                 new Object[] {  }));
     }
 
@@ -163,12 +179,45 @@ public class Setup {
     }
 
     public static Component createCompositeB1() throws Exception {
-        createTypeB();
-        Component compositeB1 = CF.newFcInstance(B_TYPE,
-                new ControllerDescription("compositeB1", Constants.COMPOSITE),
+        return createCompositeOfTypeB("compositeB1");
+    }
+
+    public static Component createCompositeOfTypeA(String name) throws Exception {
+        createTypeA();
+        Component composite = CF.newFcInstance(A_TYPE,
+                new ControllerDescription(name, Constants.COMPOSITE),
                 new ContentDescription(Composite.class.getName(),
                     new Object[] {  }));
-        return compositeB1;
+        return composite;
+    }
+
+    public static Component createCompositeOfTypeB(String name) throws Exception {
+        createTypeB();
+        Component composite = CF.newFcInstance(B_TYPE,
+                new ControllerDescription(name, Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }));
+        return composite;
+    }
+    
+
+
+    public static Component createSynchronousCompositeOfTypeB(String name) throws Exception {
+        createTypeB();
+        Component composite = CF.newFcInstance(B_TYPE,
+                new ControllerDescription(name, Constants.COMPOSITE, Constants.SYNCHRONOUS),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }));
+        return composite;
+    }
+
+    public static Component createSynchronousCompositeOfTypeA(String name) throws Exception {
+        createTypeA();
+        Component composite = CF.newFcInstance(A_TYPE,
+                new ControllerDescription(name, Constants.COMPOSITE, Constants.SYNCHRONOUS),
+                new ContentDescription(Composite.class.getName(),
+                    new Object[] {  }));
+        return composite;
     }
 
     public static Component createRemoteCompositeB1() throws Exception {
