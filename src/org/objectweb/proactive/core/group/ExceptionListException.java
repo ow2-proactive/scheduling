@@ -35,11 +35,11 @@ import java.util.Vector;
 
 
 /**
- * A list of the ExceptionInGroup occured in a group.
+ * An exception that contains a list of the ExceptionInGroup occured in a group.
  *
  * @author Laurent Baduel
  */
-public class ExceptionList extends RuntimeException {
+public class ExceptionListException extends RuntimeException {
 
     /** A vector implements the list */
     private Vector list;
@@ -47,7 +47,7 @@ public class ExceptionList extends RuntimeException {
     /**
      * Builds a new empty list of exception
      */
-    public ExceptionList() {
+    public ExceptionListException() {
         this.list = new Vector();
     }
 
@@ -83,7 +83,7 @@ public class ExceptionList extends RuntimeException {
     }
 
     /**
-     * Tests if this ExceptionList has no ExceptionInGroup.
+     * Tests if this ExceptionListException has no ExceptionInGroup.
      * @return <code>true</code> if and only if this list has no components, that is, its size is zero; <code>false otherwise.
      */
     public boolean isEmpty() {

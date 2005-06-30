@@ -40,7 +40,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.group.ExceptionList;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -232,7 +232,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             try {
                 this.acquaintances.exploring(ttl, uuid, remoteService);
                 logger.debug("Broadcast exploring message with #" + uuid);
-            } catch (ExceptionList e) {
+            } catch (ExceptionListException e) {
                 // nothing to do
             }
         }

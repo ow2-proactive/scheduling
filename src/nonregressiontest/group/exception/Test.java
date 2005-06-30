@@ -7,7 +7,7 @@ import nonregressiontest.descriptor.defaultnodes.TestNodes;
 
 import nonregressiontest.group.A;
 
-import org.objectweb.proactive.core.group.ExceptionList;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
@@ -80,10 +80,10 @@ public class Test extends FunctionalTest {
             return false;
         }
 
-        // has the ExceptionList the correct size ?
-        ExceptionList el = groupOfResult.getExceptionList();
+        // has the ExceptionListException the correct size ?
+        ExceptionListException el = groupOfResult.getExceptionList();
         if (el.size() != groupOfResult.size()) {
-            System.err.println("the ExceptionList hasn't the right size");
+            System.err.println("the ExceptionListException hasn't the right size");
             return false;
         }
 

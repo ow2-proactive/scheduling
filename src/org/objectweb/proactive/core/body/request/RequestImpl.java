@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.group.ExceptionList;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.ext.security.ProActiveSecurity;
@@ -186,7 +186,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
             // t.printStackTrace();
             if (isOneWay) {
-                if (!(exception instanceof ExceptionList)) {
+                if (!(exception instanceof ExceptionListException)) {
                     exception.printStackTrace();
                 }
                 throw new ServeException("serve method " +

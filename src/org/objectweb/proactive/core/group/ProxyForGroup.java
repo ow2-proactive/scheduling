@@ -188,7 +188,7 @@ public class ProxyForGroup extends AbstractProxy
     public synchronized Object reify(MethodCall mc)
         throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
-        ExceptionList exceptionList = null;
+        ExceptionListException exceptionList = null;
 
         /* if the method called is toString, apply it to the proxy, not to the members */
         if ("toString".equals(mc.getName())) {
@@ -212,12 +212,12 @@ public class ProxyForGroup extends AbstractProxy
 
         /* if OneWay : do not construct result */
         if (mc.isOneWayCall()) {
-            exceptionList = new ExceptionList();
+            exceptionList = new ExceptionListException();
             this.oneWayCallOnGroup(mc, exceptionList);
         }
         /* Special case : the method returns void but is Synchronous because it throws Exception */
         else if (mc.getReifiedMethod().getReturnType() == Void.TYPE) {
-            exceptionList = new ExceptionList();
+            exceptionList = new ExceptionListException();
             this.oneWayCallOnGroup(mc, exceptionList);
         }
         /* if the call is asynchronous the group of result will be a group a future */
@@ -329,7 +329,7 @@ public class ProxyForGroup extends AbstractProxy
      * Launchs the threads for OneWay call of each member of the Group.
      * @param mc the MethodCall to be applied on each member of the Group.
      */
-    protected void oneWayCallOnGroup(MethodCall mc, ExceptionList exceptionList) {
+    protected void oneWayCallOnGroup(MethodCall mc, ExceptionListException exceptionList) {
         Body body = ProActive.getBodyOnThis();
         if (Profiling.GROUP) {
             timer.setTimer("oneWayCallOnGroup." + mc.getName());
@@ -987,12 +987,12 @@ public class ProxyForGroup extends AbstractProxy
     }
 
     /**
-     * Returns an ExceptionList containing all the throwables (exceptions and errors) occured
+     * Returns an ExceptionListException containing all the throwables (exceptions and errors) occured
      * when this group was built
-     * @return an ExceptionList
+     * @return an ExceptionListException
      */
-    public ExceptionList getExceptionList() {
-        ExceptionList exceptionList = new ExceptionList();
+    public ExceptionListException getExceptionList() {
+        ExceptionListException exceptionList = new ExceptionListException();
         for (int i = 0; i < this.memberList.size(); i++) {
             if (this.memberList.get(i) instanceof Throwable) {
                 exceptionList.add(new ExceptionInGroup(null, i,

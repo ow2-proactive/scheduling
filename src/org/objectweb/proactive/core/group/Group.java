@@ -147,11 +147,11 @@ public interface Group extends Collection {
     public boolean allArrived();
 
     /**
-     * Returns an ExceptionList containing all the throwables (exceptions and errors) occured
+     * Returns an ExceptionListException containing all the throwables (exceptions and errors) occured
      * when this group was built
-     * @return an ExceptionList
+     * @return an ExceptionListException
      */
-    public ExceptionList getExceptionList();
+    public ExceptionListException getExceptionList();
 
     /**
      * Removes all exceptions and null references contained in the Group.

@@ -21,10 +21,10 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
     private int index;
     private MethodCall mc;
     private Body body;
-    private ExceptionList exceptionList;
+    private ExceptionListException exceptionList;
 
     public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList,
-        int index, MethodCall mc, Body body, ExceptionList exceptionList) {
+        int index, MethodCall mc, Body body, ExceptionListException exceptionList) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
         this.index = index;

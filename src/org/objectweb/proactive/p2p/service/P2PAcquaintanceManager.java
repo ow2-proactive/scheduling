@@ -40,7 +40,7 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.group.ExceptionInGroup;
-import org.objectweb.proactive.core.group.ExceptionList;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -156,7 +156,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                     }
                 }
                 logger.debug("End waiting");
-            } catch (ExceptionList e) {
+            } catch (ExceptionListException e) {
                 // Removing bad peers
                 logger.debug("Some peers to remove from group");
                 Iterator it = e.iterator();
