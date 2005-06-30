@@ -55,7 +55,14 @@ public class ClassDataCache {
      * @param classData bytecode of the class
      */
     public void addClassData(String fullname, byte[] classData) {
-        debug("ClassDataCache caching class " + fullname);
+        if (logger.isDebugEnabled()) {
+            try {
+                logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
+                    " --> " + ("ClassDataCache caching class " + fullname));
+            } catch (ProActiveException e) {
+                logger.debug("[unresolved runtime url] -- > " + ("ClassDataCache caching class " + fullname));
+            }
+        }
         classStorage.put(fullname, classData);
     }
 
@@ -64,18 +71,14 @@ public class ClassDataCache {
      * @param fullname the name of the class
      */
     public byte[] getClassData(String fullname) {
-        debug("ClassDataCache was asked for class " + fullname);
-        return (byte[]) classStorage.get(fullname);
-    }
-
-    private void debug(String message) {
         if (logger.isDebugEnabled()) {
             try {
                 logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
-                    " --> " + message);
+                    " --> " + ("ClassDataCache was asked for class " + fullname));
             } catch (ProActiveException e) {
-                logger.debug("[unresolved runtime url] -- > " + message);
+                logger.debug("[unresolved runtime url] -- > " + ("ClassDataCache was asked for class " + fullname));
             }
         }
+        return (byte[]) classStorage.get(fullname);
     }
 }
