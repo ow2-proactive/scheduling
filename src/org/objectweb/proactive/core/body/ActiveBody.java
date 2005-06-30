@@ -50,12 +50,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.core.body.migration.MigratableBody;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.component.body.ComponentActivity;
+import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 
 
-public class ActiveBody extends MigratableBody implements Runnable,
+public class ActiveBody extends ComponentBodyImpl implements Runnable,
     java.io.Serializable {
     protected static Logger logger = Logger.getLogger(ActiveBody.class.getName());
 
@@ -83,17 +85,24 @@ public class ActiveBody extends MigratableBody implements Runnable,
     }
 
     /**
-     * Build the body object, then fires its service thread
+     * Builds the body object, then fires its service thread
      */
     public ActiveBody(ConstructorCall c, String nodeURL, Active activity,
         MetaObjectFactory factory, String jobID)
         throws java.lang.reflect.InvocationTargetException, 
             ConstructorCallExecutionFailedException {
         // Creates the reified object
-        super(c.execute(), nodeURL, factory, jobID);
+        super(c.execute(), nodeURL, activity, factory, jobID);
 
-        // InitActive
         Object reifiedObject = localBodyStrategy.getReifiedObject();
+        
+        // when building a component, encapsulate the functional activity
+        // TODO_M read some flag before doing this?
+        if (getProActiveComponent() != null) {
+            activity = new ComponentActivity(activity, reifiedObject);
+        }
+        
+        // InitActive
         if ((activity != null) && activity instanceof InitActive) {
             initActive = (InitActive) activity;
         } else if (reifiedObject instanceof InitActive) {
@@ -237,9 +246,7 @@ public class ActiveBody extends MigratableBody implements Runnable,
     //
     private class FIFORunActive implements RunActive, java.io.Serializable {
         public void runActivity(Body body) {
-            while (isActive()) {
-                serve(localBodyStrategy.getRequestQueue().blockingRemoveOldest());
-            }
+            new Service(body).fifoServing();
         }
     }
 }

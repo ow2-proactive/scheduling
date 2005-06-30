@@ -31,6 +31,7 @@
 package org.objectweb.proactive;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
 import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
@@ -115,6 +116,13 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      * @return the last known version of the body of id uniqueID or null if not known
      */
     public UniversalBody checkNewLocation(UniqueID uniqueID);
+
+    /**
+     * Returns the body that is the target of this shortcut for this component interface
+     * @param functionalItfID the id of the interface on which the shortcut is available
+     * @return the body that is the target of this shortcut for this interface
+     */
+    public UniversalBody getShortcutTargetBody(FunctionalInterfaceID functionalItfID);
 
     /**
      * set the policy server of the active object

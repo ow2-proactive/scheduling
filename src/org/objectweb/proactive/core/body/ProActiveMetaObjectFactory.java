@@ -30,7 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.util.Hashtable;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -51,10 +52,10 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
-import org.objectweb.proactive.core.component.request.ComponentRequestQueueImpl;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
 import org.objectweb.proactive.core.util.ThreadStore;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
@@ -102,6 +103,7 @@ import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     java.io.Serializable {
     public static final String COMPONENT_PARAMETERS_KEY = "component-parameters";
+    public static final String SYNCHRONOUS_COMPOSITE_COMPONENT_KEY = "synchronous-composite";
     protected static Logger logger = Logger.getLogger(ProActiveMetaObjectFactory.class.getName());
 
     //
@@ -109,7 +111,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     //
     // private static final MetaObjectFactory instance = new ProActiveMetaObjectFactory();
     private static MetaObjectFactory instance = new ProActiveMetaObjectFactory();
-    public Hashtable parameters;
+    public Map parameters=new HashMap();
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -144,7 +146,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
      * It is used for per-active-object configurations of ProActive factories
      * @param parameters the parameters of the factories; these parameters can be of any type
      */
-    public ProActiveMetaObjectFactory(Hashtable parameters) {
+    public ProActiveMetaObjectFactory(Map parameters) {
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
             ComponentParameters initialComponentParameters = (ComponentParameters) parameters.get(COMPONENT_PARAMETERS_KEY);
@@ -175,7 +177,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
      * getter for the parameters of the factory (per-active-object config)
      * @return the parameters of the factory
      */
-    public Hashtable getParameters() {
+    public Map getParameters() {
         return parameters;
     }
 
@@ -285,9 +287,13 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // end inner class ReplyReceiverFactoryImpl
-    protected static class RequestReceiverFactoryImpl
+    protected class RequestReceiverFactoryImpl
         implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
+            if (parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
+                ((Boolean)parameters.get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
+                return new SynchronousComponentRequestReceiver();
+            }
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
         }
     }
@@ -296,13 +302,16 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     protected class RequestQueueFactoryImpl implements RequestQueueFactory,
         java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-            if (componentFactoryInstance != null) {
+            if ("true".equals(parameters.get(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY))) {
+                return null;
+            }
+            //if (componentFactoryInstance != null) {
                 // COMPONENTS
                 // we need a request queue for components
-                return new ComponentRequestQueueImpl(ownerID);
-            } else {
+                //return new ComponentRequestQueueImpl(ownerID);
+            //} else {
                 return new org.objectweb.proactive.core.body.request.BlockingRequestQueueImpl(ownerID);
-            }
+            //}
         }
     }
 

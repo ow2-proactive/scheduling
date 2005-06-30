@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.util.ThreadStoreFactory;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 
-import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -126,8 +126,8 @@ public interface MetaObjectFactory {
      */
 
     // COMPONENTS
-    public Hashtable getParameters();
-
+    public Map getParameters();
+    
     //SECURITY
 
     /**

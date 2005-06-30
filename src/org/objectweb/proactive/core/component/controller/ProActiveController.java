@@ -51,7 +51,7 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public abstract class ProActiveController implements Interface, Serializable {
+public abstract class ProActiveController extends AbstractRequestHandler implements Interface, Serializable {
     private Component owner;
     private boolean isInternal = true;
     private InterfaceType interfaceType;
@@ -136,15 +136,5 @@ public abstract class ProActiveController implements Interface, Serializable {
         this.interfaceType = itfType;
     }
 
-    //	// -------------------------------------------------------------------------
-    //	// Implementation of the Name interface
-    //	// -------------------------------------------------------------------------
-    //
-    //	public NamingContext getNamingContext() {
-    //		return null;
-    //	}
-    //
-    //	public byte[] encode() throws NamingException {
-    //		throw new NamingException("Unsupported operation");
-    //	}
+ 
 }

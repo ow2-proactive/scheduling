@@ -107,9 +107,9 @@ public class MetaObjectInterfaceClassGenerator
         return generatedClassesCache;
     }
 
-    public ProActiveInterface generateInterface(final String fcInterfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal,
-        boolean isPrimitive) throws InterfaceGenerationFailedException {
+    protected ProActiveInterface generateInterface(final String interfaceName,
+            Component owner, InterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger("components.bytecodegeneration")
                                    .isDebugEnabled()) {
@@ -132,7 +132,7 @@ public class MetaObjectInterfaceClassGenerator
             // add Serializable interface
             interfacesToImplement.add(Serializable.class);
 
-            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectClassName(fcInterfaceName,
+            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectClassName(interfaceName,
                     interfaceType.getFcItfSignature());
 
             Class generated_class;
@@ -143,7 +143,7 @@ public class MetaObjectInterfaceClassGenerator
             } catch (ClassNotFoundException cnfe) {
                 byte[] bytes;
                 setInfos();
-                bytes = create();
+                bytes = create(isFunctionalInterface, interfaceName);
                 getGeneratedClassesCache().put(stubClassFullName, bytes);
                 if (ProActiveLogger.getLogger("components.bytecodegeneration")
                                        .isDebugEnabled()) {
@@ -172,8 +172,8 @@ public class MetaObjectInterfaceClassGenerator
             }
 
             ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
-            reference.setFcItfName(fcInterfaceName);
-            reference.setFcOwner(owner);
+            reference.setFcItfName(interfaceName);
+            reference.setFcItfOwner(owner);
             reference.setFcType(interfaceType);
             reference.setFcIsInternal(isInternal);
 
@@ -225,7 +225,7 @@ public class MetaObjectInterfaceClassGenerator
         return;
     }
 
-    protected CodeVisitor createMethod(int methodIndex, Method m) {
+    protected CodeVisitor createMethod(int methodIndex, Method m, boolean isFunctional) {
         String itf = Type.getInternalName(m.getDeclaringClass());
         String method_name = m.getName();
         String method_descriptor = Type.getMethodDescriptor(m);
@@ -267,8 +267,12 @@ public class MetaObjectInterfaceClassGenerator
             OBJECT_TYPE, null, null);
     }
 
-    protected void createStaticVariables() {
-        // no static variables
+    protected void createStaticVariables(boolean isFunctionalInterface, String interfaceName) {
+        // creates and set the field that points to the interface name
+        this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
+            INTERFACE_NAME_FIELD_NAME,
+            INTERFACE_NAME_TYPE, interfaceName, null);
+
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {

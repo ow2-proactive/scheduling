@@ -11,6 +11,11 @@ public interface Loggers {
     static final public String COMPONENTS = "proactive.components";
     static final public String CLASSLOADER = "proactive.classloader";
     
+    static final public String COMPONENTS_REQUEST = COMPONENTS+".request";
+    static final public String COMPONENTS_ACTIVITY = COMPONENTS+".activity";
+    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS+".bytecodegeneration";
+    
+    
     /** Logger for ProActive Examples. **/
     public static final String EXAMPLES = "proactive.examples";
 

@@ -35,6 +35,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -456,6 +457,15 @@ public class IbisRemoteBodyAdapter implements BodyAdapter, java.io.Serializable 
     	}
     }
 
+    /*
+     * 
+     * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
+     */
+    public void createShortcut(Shortcut shortcut) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("shortcuts are currently not implemented for ibis rmi communications");
+        }
+    }
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

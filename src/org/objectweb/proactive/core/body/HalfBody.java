@@ -252,10 +252,8 @@ public class HalfBody extends AbstractBody {
                     HalfBody.this, future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
-            if (methodCall.getTag() != null) {
-                if (methodCall.getTag().equals(MethodCall.COMPONENT_TAG)) {
-                    request = new ComponentRequestImpl((RequestImpl) request);
-                }
+            if (methodCall.isComponentMethodCall()) {
+                request = new ComponentRequestImpl((RequestImpl) request);
             }
             if (future != null) {
                 future.setID(sequenceID);

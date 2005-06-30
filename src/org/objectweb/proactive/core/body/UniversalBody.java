@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
@@ -111,6 +112,13 @@ public interface UniversalBody extends Handlerizable, Job {
      */
     public void updateLocation(UniqueID id, UniversalBody body)
         throws java.io.IOException;
+
+    /**
+     * similar to the {@link UniversalBody#updateLocation(org.objectweb.proactive.core.UniqueID, UniversalBody)} method,
+     * it allows direct communication to the target of a functional call, accross membranes of composite components.
+     * @param shortcut the shortcut to create
+     */ 
+    public void createShortcut(Shortcut shortcut) throws java.io.IOException;
 
     /**
      * Returns the remote friendly version of this body

@@ -35,10 +35,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -52,7 +52,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
-public class MigratableBody extends ComponentBodyImpl implements Migratable,
+public class MigratableBody extends BodyImpl implements Migratable,
     java.io.Serializable {
     protected static Logger logger = Logger.getLogger(MigratableBody.class.getName());
 

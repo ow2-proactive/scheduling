@@ -30,21 +30,32 @@
  */
 package org.objectweb.proactive.core.component.body;
 
-import org.objectweb.proactive.core.body.BodyImpl;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.util.Fractal;
+
+import org.objectweb.proactive.Active;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /** This class has been inserted into the bodies hierarchy in order to instantiate the
  * component metaobject (ProActiveComponent).
  */
-public class ComponentBodyImpl extends BodyImpl implements ComponentBody {
-
+public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
     private ProActiveComponent componentIdentity = null;
+    private Map shortcutsOnThis = null; // key = functionalItfName, value = shortcut
+
+    //    private RequestFilter filterOnNFRequests;
+    private boolean insideFunctionalActivity = false;
 
     /**
      * Constructor for ComponentBodyImpl.
@@ -56,21 +67,26 @@ public class ComponentBodyImpl extends BodyImpl implements ComponentBody {
     /** Constructor for ComponentBodyImpl.
      *
      * It creates the component metaobject only if the MetaObjectFactory is parameterized
-     * with ComponentParameters (thus implicitely constructing components)
+     * with ComponentParameters (thus implicitely constructing components).
+     *
+     * It may also modifiy the activity to be compatible with the life cycle of the component and
+     * the management of non functional invocations.
      * @param reifiedObject a reference on the reified object
      * @param nodeURL node url
      * @param factory factory for the corresponding metaobjects
      */
     public ComponentBodyImpl(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory, String jobID) {
+        Active activity, MetaObjectFactory factory, String jobID)
+        throws java.lang.reflect.InvocationTargetException, 
+            ConstructorCallExecutionFailedException {
         super(reifiedObject, nodeURL, factory, jobID);
-
+        //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
         // create the component metaobject if necessary
         // --> check the value of the "parameters" field
-        Hashtable factory_parameters = factory.getParameters();
-        if ((factory_parameters != null)) {
-            if (factory_parameters.get(
-                        ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) != null) {
+        Map factory_parameters = factory.getParameters();
+        if ((null != factory_parameters)) {
+            if (null != factory_parameters.get(
+                        ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
                 if (factory_parameters.get(
                             ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
                     if (logger.isDebugEnabled()) {
@@ -78,6 +94,9 @@ public class ComponentBodyImpl extends BodyImpl implements ComponentBody {
                     }
                     componentIdentity = factory.newComponentFactory()
                                                .newProActiveComponent(this);
+
+                    // change activity into a component activity
+                    // activity = new ComponentActivity(activity, reifiedObject);
                 } else {
                     logger.error(
                         "component parameters for the components factory are not of type ComponentParameters");
@@ -93,4 +112,85 @@ public class ComponentBodyImpl extends BodyImpl implements ComponentBody {
     public ProActiveComponent getProActiveComponent() {
         return componentIdentity;
     }
+
+    /**
+     * overrides the @link{Body#isActive()} method :
+     * when the process flow is inside a functional activity of a component,
+     * isActive corresponds to the started state in the lifecycle of the component, while
+     * !isActive corresponds to the stopped state.
+     * If the process flow is outside of the functional activity of a component, then return the
+     * default result for isActive() (unoverriden)
+     *
+     */
+    public boolean isActive() {
+        if (insideFunctionalActivity) {
+            try {
+                return LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
+                        getProActiveComponent()));
+            } catch (NoSuchInterfaceException e) {
+                logger.error(
+                    "could not find the life cycle controller of this component");
+                return false;
+            }
+        } else {
+            return super.isActive();
+        }
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.body.ComponentBody#isComponent()
+     */
+    public boolean isComponent() {
+        return (getProActiveComponent() != null);
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.body.ComponentBody#finishedFunctionalActivity()
+     */
+    public void finishedFunctionalActivity() {
+        insideFunctionalActivity = false;
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.body.ComponentBody#startingFunctionalActivity()
+     */
+    public void startingFunctionalActivity() {
+        insideFunctionalActivity = true;
+    }
+
+    public void keepShortcut(Shortcut shortcut) {
+        if (shortcutsOnThis == null) {
+            shortcutsOnThis = new HashMap();
+        }
+        shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
+    }
+
+    //    public void serve(ComponentRequest request) {
+    //            // handle FT
+    //        if (request.isControllerRequest()) {
+    //            super.serve(request);
+    //            return;
+    //        }
+    //        
+    //        ComponentRequest nextNFRequest = (ComponentRequest)getRequestQueue().getOldest(filterOnNFRequests);
+    //        if (nextNFRequest != null) {
+    //           }
+    //                
+    //            //TODO handle prioritized NF requests
+    //        }
+    //        
+    //    }
+    //    public void createShortcut(UniqueID id, UniversalBody body, String functionalInterfaceName) {
+    //          // TODO get or create a new proxy
+    //          location.putBody(id, body);
+    //        try {
+    //            FunctionalInterfaceProxy proxy = (FunctionalInterfaceProxy)((StubObject)getProActiveComponent().getFcInterface(functionalInterfaceName)).getProxy();
+    ////            /proxy.setRefOnBody(body, id);
+    //            System.out.println();
+    //        } catch (NoSuchInterfaceException e) {
+    //            e.printStackTrace();
+    //        }
+    //
+    //          throw new ProActiveRuntimeException("create shortcut method not implemented yet");
+    //      }
 }

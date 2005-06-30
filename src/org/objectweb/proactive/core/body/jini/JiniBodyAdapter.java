@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.jini;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -399,6 +400,13 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
         this.proxiedJiniBody.changeProxiedBody(newBody);
     }
 
+    /*
+     * 
+     * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
+     */
+    public void createShortcut(Shortcut shortcut) throws IOException {
+         // shortcuts are currently not implemented for jini
+    }
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

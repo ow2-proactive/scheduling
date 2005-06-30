@@ -30,13 +30,8 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -49,12 +44,12 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Binding;
 import org.objectweb.proactive.core.component.Bindings;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
@@ -63,6 +58,13 @@ import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.io.Serializable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -82,7 +84,7 @@ public class ProActiveBindingControllerImpl extends ProActiveController
         super(owner);
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.BINDING_CONTROLLER,
-                    ProActiveContentController.class.getName(),
+                    ProActiveBindingController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -100,7 +102,7 @@ public class ProActiveBindingControllerImpl extends ProActiveController
     protected void checkBindability(String clientItfName, Interface serverItf)
         throws NoSuchInterfaceException, IllegalBindingException, 
             IllegalLifeCycleException {
-        // TODO handle internal interfaces
+        // TODO_M handle internal interfaces
         //        if (server_itf_type.isFcClientItf()) {
         //            throw new IllegalBindingException("cannot bind client interface " + clientItfName + " to other client interface " +server_itf_type.getFcItfName() );
         //        }
@@ -120,12 +122,18 @@ public class ProActiveBindingControllerImpl extends ProActiveController
                 if (!((ProActiveInterfaceType) ((Interface) getFcItfOwner()
                                                                     .getFcInterface(clientItfName)).getFcItfType()).isFcCollectionItf()) {
                     // binding from a single client interface : only 1 binding is allowed
-                    logger.warn(Fractive.getComponentParametersController(
-                            getFcItfOwner()).getComponentParameters().getName() +
-                        "." + clientItfName + " is already bound");
+                    // except for parallell components
+                    if (!(isParallel() &&
+                            ProActiveGroup.isGroup(
+                                ((ProActiveInterface) getFcItfOwner()
+                                                              .getFcInterface(clientItfName)).getFcItfImpl()))) {
+                        logger.warn(Fractal.getNameController(getFcItfOwner())
+                                           .getFcName() + "." + clientItfName +
+                            " is already bound");
 
-                    throw new IllegalBindingException(clientItfName +
-                        " is already bound");
+                        throw new IllegalBindingException(clientItfName +
+                            " is already bound");
+                    }
                 } else {
                     // binding from a collective interface
                     if (((InterfaceType) serverItf.getFcItfType()).isFcClientItf()) {
@@ -137,12 +145,12 @@ public class ProActiveBindingControllerImpl extends ProActiveController
             }
         }
 
-        // TODO : check bindings between external client interfaces   
+        // TODO_M : check bindings between external client interfaces   
         // see next, but need to consider internal interfaces (i.e. valid if server AND internal)
         //		if (((InterfaceType) serverItf.getFcItfType()).isFcClientItf()) {
         //			throw new IllegalBindingException(serverItf.getFcItfName() + " is not a server interface");
         //		}
-        // TODO : other checks are to be performed (viability of the bindings)
+        // TODO_M : other checks are to be performed (viability of the bindings)
     }
 
     protected void checkUnbindability(String clientItfName)
@@ -201,6 +209,8 @@ public class ProActiveBindingControllerImpl extends ProActiveController
             IllegalLifeCycleException {
         checkBindability(clientItfName, (Interface) serverItf);
 
+        //ProActiveInterface proxied_server_itf = (ProActiveInterface)ProActiveInterfaceInterceptor.newInstance((ProActiveInterface)serverItf, getFcItfOwner());
+        //TODO : clone the server itf, change the impl of the clone to point to the original, pass the clone as a parameter, and store the original? 
         if (isPrimitive()) {
             // binding operation is delegated
             primitiveBindFc(clientItfName, (Interface) serverItf);
@@ -265,8 +275,7 @@ public class ProActiveBindingControllerImpl extends ProActiveController
                 throw new IllegalBindingException(
                     "illegal binding : server interface " + clientItfName +
                     " of parallel component " +
-                    Fractive.getComponentParametersController(getFcItfOwner())
-                            .getComponentParameters().getName() +
+                    Fractal.getNameController(getFcItfOwner()).getFcName() +
                     " should be a collective interface");
             }
             addBinding(new Binding(clientItf, clientItfName, serverItf));
@@ -276,8 +285,7 @@ public class ProActiveBindingControllerImpl extends ProActiveController
             compositeBindFc(clientItfName, clientItfType, serverItf);
         } else {
             throw new IllegalBindingException("illegal binding of " +
-                Fractive.getComponentParametersController(getFcItfOwner())
-                        .getComponentParameters().getName() + '.' +
+                Fractal.getNameController(getFcItfOwner()).getFcName() + '.' +
                 clientItfName);
         }
     }
@@ -447,9 +455,6 @@ public class ProActiveBindingControllerImpl extends ProActiveController
         return singleInterfacesNames;
     }
 
-    /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveBindingController#hasBindingsOnClientInterfaces()
-     */
     public Boolean isBound() {
         String[] client_itf_names = listFc();
         for (int i = 0; i < client_itf_names.length; i++) {

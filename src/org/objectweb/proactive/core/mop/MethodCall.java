@@ -31,13 +31,16 @@
 package org.objectweb.proactive.core.mop;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.util.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
+import org.objectweb.proactive.core.component.request.Shortcut;
 
 import sun.rmi.server.MarshalInputStream;
 
 import java.io.ByteArrayInputStream;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -52,15 +55,20 @@ import java.util.LinkedList;
  *
  * @author Julien Vayssi&egrave;re
  */
-public class MethodCall implements java.io.Serializable {
-    // COMPONENTS added a tag for identification of component requests
-    private String tag;
-
+public class MethodCall implements java.io.Serializable, Cloneable {
+   
+    
     // COMPONENTS added a field for the Fractal interface name 
     // (the name of the interface containing the method called)
-    private String fcFunctionalInterfaceName;
-
-    //
+    private String componentInterfaceName=null;
+    private boolean isFunctionalComponentMethodCall = false;
+    private boolean isComponentMethodCall;
+    protected static Logger componentLogger = null;
+    // shortcuts have to be put in the method call, as only the method call is transferred 
+    // when crossing membranesof composite components
+    protected Shortcut shortcut = null;
+    protected short priority; // non functional component requests priority
+  //
     // --- STATIC MEMBERS -----------------------------------------------------------------------
     //
 
@@ -90,9 +98,6 @@ public class MethodCall implements java.io.Serializable {
     /**        Indicates if the recycling of MethodCall object is on. */
     private static boolean recycleMethodCallObject;
     private static java.util.Hashtable reifiedMethodsTable = new java.util.Hashtable();
-
-    //tag for component calls
-    public static final String COMPONENT_TAG = "component-methodCall";
 
     /**
      * Initializes the recycling of MethodCall objects to be enabled by default.
@@ -126,7 +131,7 @@ public class MethodCall implements java.io.Serializable {
     private long methodCallID;
     private String key;
 
-    /**
+      /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
      * in some case (such as group communication) or to create a stronger
      * asynchronism (serialization of parameters then return to the thread of
@@ -232,21 +237,33 @@ public class MethodCall implements java.io.Serializable {
      * possible name of the functional interface invoked).
      * @param reifiedMethod
      * @param effectiveArguments
-     * @param fcFunctionalInterfaceName fractal interface name, whose value is :
+     * @param componentInterfaceName fractal interface name, whose value is :
      *  - null if the call is non-functional
      *  - the name of the functional interface otherwise
+     * @param priority TODO
      * @return MethodCall
      */
     public synchronized static MethodCall getComponentMethodCall(
-        Method reifiedMethod, Object[] effectiveArguments,
-        String fcFunctionalInterfaceName) {
-        // COMPONENTS
-        MethodCall mc = MethodCall.getMethodCall(reifiedMethod,
-                effectiveArguments);
-        mc.setTag(COMPONENT_TAG);
-        mc.setFcFunctionalInterfaceName(fcFunctionalInterfaceName);
-        return mc;
-    }
+            Method reifiedMethod, Object[] effectiveArguments,
+            String interfaceName, boolean isFunctional, short priority) {
+            MethodCall mc = getMethodCall(reifiedMethod, effectiveArguments);
+            if (MethodCall.componentLogger == null) {
+                MethodCall.componentLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST);
+            }
+            mc.isComponentMethodCall = true;
+            mc.isFunctionalComponentMethodCall = isFunctional;
+            mc.componentInterfaceName = interfaceName;
+            mc.priority = priority;
+            mc.shortcut = null;
+            return mc;
+        }
+
+    public synchronized static MethodCall getComponentMethodCall(
+            Method reifiedMethod, Object[] effectiveArguments,
+            String interfaceName, boolean isFunctional) {
+            return MethodCall.getComponentMethodCall(reifiedMethod, effectiveArguments, interfaceName, isFunctional, ComponentRequest.STRICT_FIFO_PRIORITY);
+        }
+    
 
     /**
      *        Tells the recyclying process that the MethodCall object passed as parameter
@@ -261,8 +278,9 @@ public class MethodCall implements java.io.Serializable {
                 // It is prefereable to do it here rather than at the moment
                 // the object is picked out of the pool, because it allows
                 // garbage-collecting the objects referenced in here
-                mc.fcFunctionalInterfaceName = null;
-                mc.tag = null;
+                mc.componentInterfaceName = null;
+                mc.isComponentMethodCall = false;
+                mc.isFunctionalComponentMethodCall = false;
                 mc.reifiedMethod = null;
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
@@ -301,9 +319,9 @@ public class MethodCall implements java.io.Serializable {
      */
     public MethodCall(MethodCall mc) {
         try {
-            this.fcFunctionalInterfaceName = mc.getFcFunctionalInterfaceName();
+            this.componentInterfaceName = mc.getComponentInterfaceName();
             this.reifiedMethod = mc.getReifiedMethod();
-            this.tag = mc.getTag();
+            this.isComponentMethodCall = mc.isComponentMethodCall;
             if (mc.serializedEffectiveArguments == null) {
                 serializedEffectiveArguments = null;
             } else {
@@ -390,10 +408,11 @@ public class MethodCall implements java.io.Serializable {
                 "Arguments for the method " + this.getName() +
                 " are invalids: " + e);
         } /*catch (InvocationTargetException e) {
-           throw new MethodCallExecutionFailedException(
-               "Target for invocation of " + this.getName() +
-               " is invalid: " + e);
-           }*/}
+            throw new MethodCallExecutionFailedException(
+                "Target for invocation of " + this.getName() +
+                " is invalid: " + e);
+        }*/
+    }
 
     protected void finalize() {
         MethodCall.setMethodCall(this);
@@ -434,31 +453,16 @@ public class MethodCall implements java.io.Serializable {
      * accessor for the functional name ot the invoked Fractal interface
      * @return the functional name of the invoked Fractal interface
      */
-    public String getFcFunctionalInterfaceName() {
-        return fcFunctionalInterfaceName;
+    public String getComponentInterfaceName() {
+        return componentInterfaceName;
     }
 
     /**
      * setter for the functional name of the invoked Fractal interface
      * @param string the functional name of the invoked Fractal interface
      */
-    public void setFcFunctionalInterfaceName(String string) {
-        fcFunctionalInterfaceName = string;
-    }
-
-    /**
-     * setter for the tag of the method call
-     */
-    public void setTag(String string) {
-        tag = string;
-    }
-
-    /**
-     * accessor for the tag of the method call
-     * @return the tag of the method call
-     */
-    public String getTag() {
-        return tag;
+    public void setComponentInterfaceName(String string) {
+        componentInterfaceName = string;
     }
 
     //
@@ -712,6 +716,40 @@ public class MethodCall implements java.io.Serializable {
         public String toString() {
             return "FixWrapper: " + encapsulated.toString();
         }
+    }
+        
+        
+ 
+    public Shortcut getShortcut() {
+        return shortcut;
+    }
+
+    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
+        if (shortcut == null) {
+            // store only first sender?
+            shortcut = new Shortcut(getComponentInterfaceName(), sender, intermediate);
+        } else {
+            shortcut.updateDestination(intermediate);
+            if (componentLogger.isDebugEnabled()) {
+                componentLogger.debug("added shortcut : shortcutCounter is now " + shortcut.length());
+            }
+        }
+    }
+    
+    public boolean isComponentMethodCall() {
+        return isComponentMethodCall;
+    }
+    
+    public boolean isComponentControllerMethodCall() {
+        return (isComponentMethodCall() && (!isFunctionalComponentMethodCall) && (componentInterfaceName!=null));
+    }
+    
+    public boolean isComponentMethodCallOnComponent() {
+        return (isComponentMethodCall && (componentInterfaceName==null));
+    }
+    
+    public short getPriority() {
+        return priority;
     }
 
     // end inner class FixWrapper

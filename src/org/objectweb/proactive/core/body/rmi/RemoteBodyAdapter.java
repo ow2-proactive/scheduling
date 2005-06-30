@@ -35,6 +35,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -448,7 +450,12 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
     }
 
-    //
+
+    public void createShortcut(Shortcut shortcut) throws IOException {
+        // TODO implement
+        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
+        
+    }    //
     // -- PRIVATE METHODS -----------------------------------------------
     //
 }

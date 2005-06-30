@@ -34,8 +34,12 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Constants;
 import org.objectweb.asm.Type;
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.type.InterfaceType;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,9 +63,12 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
     protected static final String OBJECT_ARRAY_TYPE = "[Ljava/lang/Object;";
     protected static final String METHOD_TYPE = "Ljava/lang/reflect/Method;";
     protected static final String METHOD_ARRAY_TYPE = "[Ljava/lang/reflect/Method;";
-    protected static final String FUNCTIONAL_INTERFACE_NAME_TYPE = "Ljava/lang/String;";
-    protected static final String FUNCTIONAL_INTERFACE_NAME_FIELD_NAME = "fcFunctionalInterfaceName";
-    protected static final String SUPER_CLASS_NAME = "org/objectweb/proactive/core/component/ProActiveInterface";
+    protected static final String INTERFACE_NAME_TYPE = "Ljava/lang/String;";
+    protected static final String INTERFACE_NAME_FIELD_NAME = "interfaceName";
+    protected static final String BOOLEAN_TYPE = "Z";
+//    protected static final String PRIORITY_TYPE = "S";
+//    protected static final String PRIORITY_FIELD_NAME = "priority";
+    protected static final String SUPER_CLASS_NAME = "org/objectweb/proactive/core/component/ProActiveInterfaceImpl";
 
     // Those fields contain information about the class
     // for which we are building a wrapper
@@ -100,12 +107,13 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
      * @param method
      * @return CodeVisitor
      */
-    protected abstract CodeVisitor createMethod(int i, Method method);
+    protected abstract CodeVisitor createMethod(int i, Method method, boolean isFunctional);
 
     /**
      * Method createStaticVariables.
+     * @param interfaceName TODO
      */
-    protected abstract void createStaticVariables();
+    protected abstract void createStaticVariables(boolean functionalInterface, String interfaceName);
 
     // ASM : added utility methods
     static void pushInt(CodeVisitor cv, int i) {
@@ -186,7 +194,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
      * @throws ClassNotFoundException
      * @return the bytecode corresponding to the generated class
      */
-    public byte[] create() throws ClassNotFoundException {
+    public byte[] create(boolean isFunctionalInterface, String interfaceName) throws ClassNotFoundException {
         // Creates the class generator
         this.classGenerator = this.createClassGenerator();
 
@@ -198,7 +206,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
             // walkaround (NOT CLEAN) to avoid generating reified calls for the proxy methods
             if (!(methods[i].getName().equals("getProxy") ||
                     methods[i].getName().equals("setProxy"))) {
-                CodeVisitor mg = this.createMethod(i, this.methods[i]);
+                CodeVisitor mg = this.createMethod(i, this.methods[i], isFunctionalInterface);
             }
         }
 
@@ -208,7 +216,7 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
         this.createFields();
 
         // Create the static fields
-        this.createStaticVariables();
+        this.createStaticVariables(isFunctionalInterface, interfaceName);
 
         // Creates the static initializer
         this.createStaticInitializer();
@@ -477,4 +485,16 @@ public abstract class AbstractInterfaceClassGenerator implements Constants {
 
         return;
     }
+
+    public ProActiveInterface generateControllerInterface(final String controllerInterfaceName, Component owner, InterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        return generateInterface(controllerInterfaceName, owner, interfaceType, false, false);
+    }
+
+    public ProActiveInterface generateFunctionalInterface(final String functionalInterfaceName, Component owner, InterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        return generateInterface(functionalInterfaceName, owner, interfaceType, false, true);
+    }
+    
+    protected abstract ProActiveInterface generateInterface(final String interfaceName,
+            Component owner, InterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException;
 }

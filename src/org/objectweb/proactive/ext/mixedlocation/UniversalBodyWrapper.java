@@ -8,11 +8,13 @@
  */
 package org.objectweb.proactive.ext.mixedlocation;
 
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -319,5 +321,11 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
      */
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return this.wrappedBody.receiveFTMessage(ev);
+    }
+
+    public void createShortcut(Shortcut shortcut) throws IOException {
+        // TODO implement
+        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
+        
     }
 }

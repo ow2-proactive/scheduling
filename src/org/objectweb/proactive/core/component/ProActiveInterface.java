@@ -40,109 +40,47 @@ import org.objectweb.fractal.api.Type;
  * instantiation time (bytecode generation), by subclassing this class.
  * 
  * @author Matthieu Morel
+ *
  */
-public abstract class ProActiveInterface implements Interface, java.io.Serializable {
-	private Component owner;
-	private String name;
-	private Type type;
-	private boolean isInternal;
+public interface ProActiveInterface extends Interface {
 
-	public ProActiveInterface() {
-	}
+    /**
+     * Sets the isInternal.
+     * @param isInternal The isInternal to set
+     */
+    public abstract void setFcIsInternal(boolean isInternal);
 
-	/**
-	 * see {@link Interface#getFcItfOwner()}
-	 */
-	public Component getFcItfOwner() {
-		return owner;
-	}
+    /**
+     * Sets the name.
+     * @param name The name to set
+     */
+    public abstract void setFcItfName(String name);
 
-	/**
-	 * see {@link Interface#getFcItfName()}
-	 */
-	public String getFcItfName() {
-		return name;
-	}
+    /**
+     * Sets the owner.
+     * @param owner The owner to set
+     */
+    public abstract void setFcItfOwner(Component owner);
 
-	/**
-	 * see {@link Interface#getFcItfType()}
-	 */
-	public Type getFcItfType() {
-		return type;
-	}
+    /**
+     * Sets the type.
+     * @param type The type to set
+     */
+    public abstract void setFcType(Type type);
 
-	/**
-	 * see {@link org.objectweb.fractal.api.Interface#isFcInternalItf()}
-	 */
-	public boolean isFcInternalItf() {
-		return isInternal;
-	}
+    /**
+     * getter
+     * @return the delegatee
+     */
+    public abstract Object getFcItfImpl();
 
-	/**
-	 * Sets the isInternal.
-	 * @param isInternal The isInternal to set
-	 */
-	public void setFcIsInternal(boolean isInternal) {
-		this.isInternal = isInternal;
-	}
-
-	/**
-	 * Sets the name.
-	 * @param name The name to set
-	 */
-	public void setFcItfName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Sets the owner.
-	 * @param owner The owner to set
-	 */
-	public void setFcOwner(Component owner) {
-		this.owner = owner;
-	}
-
-	/**
-	 * Sets the type.
-	 * @param type The type to set
-	 */
-	public void setFcType(Type type) {
-		this.type = type;
-	}
-
-	/**
-	 * getter
-	 * @return the delegatee
-	 */
-	public abstract Object getFcItfImpl();
-
-	/**
-	 * Sets the object to which this interface reference object should delegate
-	 * method calls.
-	 *
-	 * @param impl the object to which this interface reference object should
-	 *      delegate method calls.
-	 * @see #getFcItfImpl getFcItfImpl
-	 */
-	public abstract void setFcItfImpl(final Object impl);
-
-	
-	public String toString() {
-		String string =
-			"name : "
-				+ getFcItfName()
-				+ "\n"
-				+ "componentIdentity : "
-				+ getFcItfOwner()
-				+ "\n"
-				+ "type : "
-				+ getFcItfType()
-				+ "\n"
-				+ "isInternal : "
-				+ isFcInternalItf()
-				+ "\n";
-		return string;
-	}
-	
-
+    /**
+     * Sets the object to which this interface reference object should delegate
+     * method calls.
+     *
+     * @param impl the object to which this interface reference object should
+     *      delegate method calls.
+     * @see #getFcItfImpl getFcItfImpl
+     */
+    public abstract void setFcItfImpl(final Object impl);
 }

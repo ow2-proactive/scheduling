@@ -30,11 +30,6 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -46,13 +41,17 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -65,6 +64,7 @@ public class ProActiveContentController extends ProActiveController
     implements ContentController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     List fcSubComponents;
+ 
 
     /**
      * Constructor for ProActiveContentController.
@@ -73,7 +73,7 @@ public class ProActiveContentController extends ProActiveController
         super(owner);
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
-                    ProActiveContentController.class.getName(),
+                    ContentController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -101,8 +101,7 @@ public class ProActiveContentController extends ProActiveController
      *         */
     public Object getFcInternalInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        throw new NoSuchInterfaceException(
-            "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
+        return ((ProActiveComponent)getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
     }
 
     /*
@@ -162,12 +161,14 @@ public class ProActiveContentController extends ProActiveController
             }
         }
 
+        ProActiveComponent this_component = ((ProActiveComponent) getFcItfOwner());
+        Component ref_on_this_component = this_component.getRepresentativeOnThis();
+
         // check whether the subComponent is the component itself
-        if (getFcItfOwner().equals(subComponent)) {
+        if (ref_on_this_component.equals(subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
-                    Fractive.getComponentParametersController(getFcItfOwner())
-                            .getComponentParameters().getName() +
+                    Fractal.getNameController(getFcItfOwner()).getFcName() +
                     " component into itself ");
             } catch (NoSuchInterfaceException e) {
                 logger.error(e.getMessage());
@@ -175,13 +176,10 @@ public class ProActiveContentController extends ProActiveController
         }
 
         // check whether already a sub component
-        ProActiveComponent this_component = ((ProActiveComponent) getFcItfOwner());
-        Component ref_on_this_component = this_component.getRepresentativeOnThis();
         if (getAllSubComponents(this_component).contains(ref_on_this_component)) {
             String name;
             try {
-                name = Fractive.getComponentParametersController(subComponent)
-                               .getComponentParameters().getName();
+                name = Fractal.getNameController(subComponent).getFcName();
             } catch (NoSuchInterfaceException nsie) {
                 throw new ProActiveRuntimeException("cannot access the component parameters controller",
                     nsie);

@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
+import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
@@ -218,15 +220,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
-            if (this.isDead){
+            if (this.isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             } else {
                 ftres = this.ftmanager.onReceiveRequest(request);
                 if (request.ignoreIt()) {
-                    return ftres;                
+                    return ftres;
                 }
             }
-        }        
+        }
         try {
             this.enterInThreadStore();
             if (this.isDead) {
@@ -251,7 +253,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     // do nothing
                 }
             }
-            this.registerIncomingFutures();           
+            this.registerIncomingFutures();
             ftres = this.internalReceiveRequest(request);
         } finally {
             this.exitFromThreadStore();
@@ -264,12 +266,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
         if (this.ftmanager != null) {
-            if (this.isDead){
+            if (this.isDead) {
                 throw new java.io.IOException(TERMINATED_BODY_EXCEPTION_MESSAGE);
             } else {
                 ftres = this.ftmanager.onReceiveReply(reply);
                 if (reply.ignoreIt()) {
-                    return ftres;                
+                    return ftres;
                 }
             }
         }
@@ -801,6 +803,22 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         } else {
             //it was not found in this vm let's try the location table
             return location.getBody(bodyID);
+        }
+    }
+
+    /*
+     * 
+     * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.FunctionalInterfaceID)
+     */
+    public UniversalBody getShortcutTargetBody(FunctionalInterfaceID functionalItfID) {
+        if (shortcuts == null) {
+            return null;
+        } else {
+            if (shortcuts.containsKey(functionalItfID)) {
+                return ((Shortcut) shortcuts.get(functionalItfID)).getShortcutTargetBody();
+            } else {
+                return null;
+            }
         }
     }
 

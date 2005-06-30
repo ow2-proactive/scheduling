@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.apache.log4j.Logger;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -40,8 +38,6 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.util.log.Loggers;
-
 import java.io.Serializable;
 
 
@@ -54,7 +50,6 @@ import java.io.Serializable;
  */
 public class ProActiveComponentParametersController extends ProActiveController
     implements Serializable, ComponentParametersController {
-    protected static Logger logger = Logger.getLogger(Loggers.COMPONENTS);
     private ComponentParameters componentParameters;
 
     /**
@@ -65,7 +60,7 @@ public class ProActiveComponentParametersController extends ProActiveController
         super(owner);
         try {
             setItfType(ProActiveTypeFactory.instance().createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                    ProActiveContentController.class.getName(),
+                    ComponentParametersController.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

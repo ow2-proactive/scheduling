@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.group;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
+import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -42,9 +43,20 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
         if (!(object instanceof Throwable)) {
             try {
                 if (object instanceof ProActiveComponentRepresentative) {
-                    // component stubs can handle some method invocations
+                    // delegate to the corresponding interface
+                    Object target;
+                    if (mc.getComponentInterfaceName() == null) {
+                        // a call on the Component interface
+                        target = object;
+                    } else {
+                        target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                    }
                     this.proxyGroup.addToListOfResult(memberListOfResultGroup,
-                        this.mc.execute(object), this.index);
+                        this.mc.execute(target), this.index);
+                } else if (object instanceof ProActiveInterface) {
+                    this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
+                            this.mc.execute(object),
+                            this.index);
                 } else {
                     Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
                     if (lastProxy instanceof UniversalBodyProxy) {

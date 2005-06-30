@@ -46,7 +46,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
     protected CircularArrayList requestQueue;
     protected UniqueID ownerID;
-    private RequestFilterOnMethodName requestFilterOnMethodName;
+    protected RequestFilterOnMethodName requestFilterOnMethodName;
 
     protected static final boolean SEND_ADD_REMOVE_EVENT = false;
 
@@ -316,7 +316,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     // -- INNER CLASSES -----------------------------------------------
     //
 
-    private class RequestFilterOnMethodName implements RequestFilter, java.io.Serializable {
+    protected class RequestFilterOnMethodName implements RequestFilter, java.io.Serializable {
 
         private String methodName;
 

@@ -44,15 +44,17 @@ import java.util.Map;
 
 
 /**
- * A bindings container.
- * This class stores the following bindings for a given component :
- * - thisComponent.clientInterface --> serverComponent.serverInterface
- *         (it also takes in charge collective bindings, ie 1 client to serveral servers)
- * - thisParallelComponent.serverInterface --> serverComponents.serverInterface
- *         (in the case of a parallel component, requests on a server port are forwarded to
- *         the inner components)
- *
- *
+ * A bindings container. This class stores the following bindings for a given
+ * component :
+ * <ul>
+ * <li>thisComponent.clientInterface --> serverComponent.serverInterface (it
+ * also takes in charge collective bindings, ie 1 client to serveral servers)
+ * </li>
+ * <li>thisParallelComponent.serverInterface -->
+ * serverComponents.serverInterface (in the case of a parallel component,
+ * requests on a server port are forwarded to the inner components)</li>
+ * </ul>
+ * 
  * @author Matthieu Morel
  */
 public class Bindings implements Serializable {
@@ -66,7 +68,7 @@ public class Bindings implements Serializable {
     // if collective binding : key = interfaceName ; value = Vector (Binding objects)
     public Bindings() {
         normalBindings = new HashMap();
-        exportBindings=new HashMap();
+        exportBindings = new HashMap();
     }
 
     /**
@@ -85,8 +87,7 @@ public class Bindings implements Serializable {
                                 .equals(Constants.PARALLEL)) {
                     addCollectiveBindingOnInternalClientItf(binding);
                 } else {
-                    exportBindings.put(client_itf_type.getFcItfName(),
-                        binding);
+                    exportBindings.put(client_itf_type.getFcItfName(), binding);
                 }
             } else {
                 // normal bindings
@@ -108,11 +109,23 @@ public class Bindings implements Serializable {
      * removes the binding on the given client interface
      */
     public Object remove(String clientItfName) {
-        return normalBindings.remove(clientItfName);
+        if (normalBindings.containsKey(clientItfName)) {
+            return normalBindings.remove(clientItfName);
+        }
+        if (exportBindings.containsKey(clientItfName)) {
+            return exportBindings.remove(clientItfName);
+        }
+        return null;
     }
 
     public Object get(String clientItfName) {
-        return normalBindings.get(clientItfName);
+        if (normalBindings.containsKey(clientItfName)) {
+            return normalBindings.get(clientItfName);
+        }
+        if (exportBindings.containsKey(clientItfName)) {
+            return exportBindings.get(clientItfName);
+        }
+        return null;
     }
 
     /**
@@ -121,7 +134,7 @@ public class Bindings implements Serializable {
      * @return true if binding exists
      */
     public boolean containsBindingOn(String clientItfName) {
-        return normalBindings.containsKey(clientItfName);
+        return (normalBindings.containsKey(clientItfName) || exportBindings.containsKey(clientItfName));
     }
 
     //	/**
@@ -158,7 +171,7 @@ public class Bindings implements Serializable {
                                                                                    .size()]);
     }
 
-    private void addCollectiveBinding(Map bindingsTable, Binding binding) {
+    private static void addCollectiveBinding(Map bindingsTable, Binding binding) {
         String client_itf_name = binding.getClientInterfaceName();
         if (binding.getClientInterface().getFcItfName().equals(client_itf_name)) {
             if (bindingsTable.containsKey(client_itf_name)) {

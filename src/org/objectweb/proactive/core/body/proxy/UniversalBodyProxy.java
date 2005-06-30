@@ -242,6 +242,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy
 
     protected void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody) throws java.io.IOException, RenegotiateSessionException {
+        // TODO if component request and shortcut : update body ref
+        
+
         // Now we check whether the reference to the remoteBody has changed i.e the body has migrated
         // Maybe we could use some optimisation here
         UniversalBody newBody = sourceBody.checkNewLocation(universalBody.getID());

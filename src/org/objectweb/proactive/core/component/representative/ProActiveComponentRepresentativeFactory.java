@@ -34,6 +34,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 
 import org.objectweb.proactive.core.mop.Proxy;
 
+import java.io.File;
+
 
 /**
  * This is a factory for component representatives.
@@ -62,15 +64,18 @@ public class ProActiveComponentRepresentativeFactory {
     /**
      * Creates a component representative according to the type of the component
      * (it also generates the required functional interfaces), and connects the representative to
-     * the given proxy
+     * the given proxy. It also takes into account a controller config file for generating references to 
+     * the implementations of the controllers of this component.
      * @param componentType the type of the component
      * @param proxy the proxy to the active object
+     * @param controllerConfigFile a file that contains the description of the controllers for this component
      * @return a corresponding component representative
      */
     public ProActiveComponentRepresentative createComponentRepresentative(
-        ComponentType componentType, String hierarchicalType, Proxy proxy) {
+        ComponentType componentType, String hierarchicalType, Proxy proxy,
+        File controllerConfigFile) {
         ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType,
-                hierarchicalType);
+                hierarchicalType, controllerConfigFile);
         representative.setProxy(proxy);
         return representative;
     }

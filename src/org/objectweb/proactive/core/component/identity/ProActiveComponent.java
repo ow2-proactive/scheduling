@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.component.identity;
 import org.objectweb.fractal.api.Component;
 
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
 
 import java.io.Serializable;
 
@@ -62,12 +61,6 @@ public interface ProActiveComponent extends Component, Serializable {
      * - if called from the meta-object, it returns a representative on itself
      */
     public Component getRepresentativeOnThis();
-
-    /**
-     * This method's implementation is only valid in the component meta-objects.
-     * @return a reference to the queue of request of this active object
-     */
-    public ComponentRequestQueue getRequestQueue();
 
     /**
      * comparison between components

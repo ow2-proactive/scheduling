@@ -30,38 +30,75 @@
  */
 package org.objectweb.proactive.core.component.asmgen;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.objectweb.asm.CodeVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.mop.Utils;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
  * Generates Interface implementations for the functional interfaces of the
- * component representative.
- *<br>
- * This class :<br>
- * - implements the java interface corresponding to the functional
- * interface of the component.<br>
- * - implements StubObject, like the standard ProActive stub<br>
- * - is linked to the ProActive proxy (corresponding to the actual active object)
- *<br>
- * Method calls are reified as MethodCall objects, that contain :<br>
- * - a tag signaling component requests<br>
- * - the name given to the component functional interface.<br>
- *
+ * component representative. <br>
+ * This class :<br>- implements the java interface corresponding to the
+ * functional (or control since version 1.10) interface of the component. <br>-
+ * implements StubObject, like the standard ProActive stub <br>- is linked to
+ * the ProActive proxy (corresponding to the actual active object) <br>
+ * Method calls are reified as MethodCall objects, that contain :<br>- has a
+ * <code> String </code> attribute which corresponds to the name given to the
+ * component functional or control interface. <br>- has a
+ * <code> boolean </code> attribute that indicates whether the invocation is a
+ * functional or a non functional (i.e. invocation on a controller interface)
+ * <br>
+ * <p>
+ * Here is an example of the generated method for reifying the bindFc method of
+ * the BindingController interface
+ * 
+ * <pre>
+ * public void bindFc(String s, Object obj) {
+ *     myProxy.reify(MethodCall.getComponentMethodCall(methods[3], new Object[] {
+ *             s, obj }, interfaceName, false));
+ * }
+ * </pre>
+ * 
+ * where <code> methods[3]  </code> corresponds to the <code> Method  </code>
+ * object that matches <code> bindFc  </code>, s and <code> obj  </code> are the
+ * parameters of the invocation, <code> interfaceName  </code> is added
+ * automatically, it is "binding-controller" for this generated class as it
+ * represents a reference to a binding controller. The last argument,
+ * <code> false  </code>, indicates that the invocation is a non functional
+ * (control) one.
+ * <p>
+ * Here is an example of the generated method for reifying a foo metho of a
+ * functional interface :
+ * 
+ * <pre>
+ * public Object foo(Object parameter) {
+ *     return myProxy.reify(MethodCall.getComponentMethodCall(methods[0],
+ *             new Object[] { parameter }, interfaceName, true));
+ * }
+ * 
+ * 
+ * </pre>
+ * 
+ * where <code> methods[0]  </code> corresponds to the <code> Method  </code>
+ * object that matches the <code> foo  </code> method, and
+ * <code> parameter  </code> is the parameter of the invocation.
+ * <code> interfaceName  </code> is added automatically, here it is for instance
+ * "myFunctionalInterface". The last argument is <code> true  </code>, which
+ * significates that the invocation is a functional one.
+ * 
  * @author Matthieu Morel
  */
 public class RepresentativeInterfaceClassGenerator
@@ -70,7 +107,7 @@ public class RepresentativeInterfaceClassGenerator
     protected static final String PROXY_TYPE = "Lorg/objectweb/proactive/core/mop/Proxy;";
     protected static final String STUB_INTERFACE_NAME = "org/objectweb/proactive/core/mop/StubObject";
     protected static final String PROXY_FIELD_NAME = "myProxy";
-    private static final Logger logger = ProActiveLogger.getLogger("components.bytecodegeneration");
+    private static final Logger logger = Logger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION);
 
     // generatedClassesCache that contains all the generated classes according to their name
     private static Hashtable generatedClassesCache = new Hashtable();
@@ -78,13 +115,14 @@ public class RepresentativeInterfaceClassGenerator
 
     // this boolean for deciding of a possible indirection for the functionnal calls
     protected boolean isPrimitive = false;
-    private String fcInterfaceName = null;
+//    private String fcInterfaceName = null;
+//    private String controllerInterfaceName = null;
 
     public RepresentativeInterfaceClassGenerator() {
         // Obtains the object that represents the type we want to create
         // a wrapper class for. This call may fail with a ClassNotFoundException
         // if the class corresponding to this type cannot be found.
-        this.cl = ProActiveInterface.class;
+        this.cl = ProActiveInterfaceImpl.class;
 
         // Keep this info at hand for performance purpose
         this.className = cl.getName();
@@ -115,11 +153,11 @@ public class RepresentativeInterfaceClassGenerator
         return generatedClassesCache;
     }
 
-    public ProActiveInterface generateInterface(final String fcInterfaceName,
-        Component owner, InterfaceType interfaceType, boolean isInternal)
+    protected ProActiveInterface generateInterface(final String interfaceName,
+        Component owner, InterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
         throws InterfaceGenerationFailedException {
         try {
-            this.fcInterfaceName = fcInterfaceName;
+            //this.fcInterfaceName = fcInterfaceName;
 
             //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
             //                                                    .equals(ComponentParameters.PRIMITIVE);
@@ -128,20 +166,19 @@ public class RepresentativeInterfaceClassGenerator
             // add functional interface
             Class functional_itf = Class.forName(interfaceType.getFcItfSignature());
             interfacesToImplement.add(functional_itf);
-            
+
             // add super-interfaces of the functional interface
             //Utils.addSuperInterfaces(functional_itf, interfacesToImplement);
-
             // add Serializable interface
             interfacesToImplement.add(Serializable.class);
 
             // add StubObject, so we can set the proxy
             interfacesToImplement.add(StubObject.class);
-            
+
             interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
             Utils.addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
 
-            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(fcInterfaceName,
+            this.stubClassFullName = org.objectweb.proactive.core.component.asmgen.Utils.getMetaObjectComponentRepresentativeClassName(interfaceName,
                     interfaceType.getFcItfSignature());
             //}
             Class generated_class;
@@ -152,7 +189,7 @@ public class RepresentativeInterfaceClassGenerator
             } catch (ClassNotFoundException cnfe) {
                 byte[] bytes;
                 setInfos();
-                bytes = create();
+                bytes = create(isFunctionalInterface, interfaceName);
                 RepresentativeInterfaceClassGenerator.generatedClassesCache.put(stubClassFullName,
                     bytes);
                 if (logger.isDebugEnabled()) {
@@ -164,31 +201,30 @@ public class RepresentativeInterfaceClassGenerator
                 }
 
                 //                // Next few lines for debugging only
-                //                try {
-                //                    java.io.File file = new java.io.File(System.getProperty(
-                //                                "user.home") + "/ProActive/generated/" +
-                //                            stubClassFullName + ".class");
-                //
-                //                    if (ProActiveLogger.getLogger(
-                //                                "components.bytecodegeneration").isDebugEnabled()) {
-                //                        //logger.debug("writing down the generated class : " + file.getAbsolutePath());
-                //                    }
-                //
-                //                    java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
-                //                    fos.write(bytes);
-                //                    fos.close();
-                //                } catch (Exception e) {
-                //                    // e.printStackTrace();
-                //                    logger.info(
-                //                        "if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
-                //                }
+//                try {
+//                    java.io.File file = new java.io.File("generated/" +
+//                            stubClassFullName + ".class");
+//
+//                    if (Logger.getLogger(Loggers.COMPONENTS_BYTECODE_GENERATION).isDebugEnabled()) {
+//                        logger.debug("writing down the generated component representative class : " + file.getAbsolutePath());
+//                    }
+//
+//                    java.io.FileOutputStream fos = new java.io.FileOutputStream(file);
+//                    fos.write(bytes);
+//                    fos.close();
+//                } catch (Exception e) {
+//                    // e.printStackTrace();
+//                    logger.info(
+//                        "if you want a dump of the generated classes, you need to create a /generated folder at the root of you command");
+//                }
+
                 // convert the bytes into a Class
                 generated_class = defineClass(stubClassFullName, bytes);
             }
 
-            ProActiveInterface reference = (ProActiveInterface) generated_class.newInstance();
-            reference.setFcItfName(fcInterfaceName);
-            reference.setFcOwner(owner);
+            ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
+            reference.setFcItfName(interfaceName);
+            reference.setFcItfOwner(owner);
             reference.setFcType(interfaceType);
             reference.setFcIsInternal(isInternal);
 
@@ -202,11 +238,11 @@ public class RepresentativeInterfaceClassGenerator
         } catch (InstantiationException e) {
             throw new InterfaceGenerationFailedException("constructor belongs to an abstract class?",
                 e);
-            // TODO : check this
+            // TODO_M : check this
         }
     }
 
-    protected CodeVisitor createMethod(int methodIndex, Method m) {
+    protected CodeVisitor createMethod(int methodIndex, Method m, boolean isFunctional) {
         CodeVisitor cv = createMethodGenerator(m);
 
         // Pushes on the stack the reference to the proxy object
@@ -292,15 +328,22 @@ public class RepresentativeInterfaceClassGenerator
         }
 
         // So now we have the Method object and the array of objects on the stack,
-        // Pushes on the stack the reference to the functional interface name
-        cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
-            FUNCTIONAL_INTERFACE_NAME_FIELD_NAME, FUNCTIONAL_INTERFACE_NAME_TYPE);
+        // Pushes on the stack the reference to the interface name
+        
+            cv.visitFieldInsn(GETSTATIC, this.stubClassFullName.replace('.', '/'),
+             INTERFACE_NAME_FIELD_NAME, INTERFACE_NAME_TYPE);
+            if (isFunctional) {
+                cv.visitInsn(ICONST_1);
+            } else {
+                cv.visitInsn(ICONST_0);
+            }
+            cv.visitMethodInsn(INVOKESTATIC,
+                    "org/objectweb/proactive/core/mop/MethodCall",
+                    "getComponentMethodCall",
+                    "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE +
+                    INTERFACE_NAME_TYPE + BOOLEAN_TYPE +")" + METHODCALL_TYPE);
+            
 
-        cv.visitMethodInsn(INVOKESTATIC,
-            "org/objectweb/proactive/core/mop/MethodCall",
-            "getComponentMethodCall",
-            "(" + METHOD_TYPE + OBJECT_ARRAY_TYPE +
-            FUNCTIONAL_INTERFACE_NAME_TYPE + ")" + METHODCALL_TYPE);
         //        }
         // Now, call 'reify' on the proxy object
         cv.visitMethodInsn(INVOKEINTERFACE,
@@ -328,16 +371,17 @@ public class RepresentativeInterfaceClassGenerator
             PROXY_TYPE, null, null);
     }
 
-    protected void createStaticVariables() {
+    protected void createStaticVariables(boolean functionalInterface, String interfaceName) {
         // Creates fields that contains the array of Method objects
         // that represent the reified methods of this class
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC, "methods",
             METHOD_ARRAY_TYPE, null, null);
 
-        // creates and set the field that points to the functional interface name
+        // creates and set the field that points to the interface name
         this.classGenerator.visitField(ACC_PROTECTED | ACC_STATIC,
-            FUNCTIONAL_INTERFACE_NAME_FIELD_NAME,
-            FUNCTIONAL_INTERFACE_NAME_TYPE, fcInterfaceName, null);
+            INTERFACE_NAME_FIELD_NAME,
+            INTERFACE_NAME_TYPE, interfaceName, null);
+        
     }
 
     protected void createStaticInitializer() throws ClassNotFoundException {
@@ -368,7 +412,8 @@ public class RepresentativeInterfaceClassGenerator
 
         // Make as many calls to Class.forName as is needed to fill in the array
         //for (int i = 0; i < interfacesToImplement.size(); i++) {
-        for (int i = 0; i < interfacesToImplementAndSuperInterfaces.size(); i++) {
+        for (int i = 0; i < interfacesToImplementAndSuperInterfaces.size();
+                i++) {
             // Load onto the stack a pointer to the array
             cv.visitVarInsn(ALOAD, 1);
 
@@ -400,17 +445,17 @@ public class RepresentativeInterfaceClassGenerator
             // Now, we load onto the stack a pointer to the class that contains the method
             int indexInClassArray = interfacesToImplementAndSuperInterfaces.indexOf(this.methods[i].getDeclaringClass());
             if (indexInClassArray == -1) {
-//                // declaring class is a super interface of the functional interface
-//                Class super_itf = this.methods[i].getDeclaringClass();
-//                Iterator iter = interfacesToImplement.iterator();
-//                while (iter.hasNext()) {
-//                    Class itf = (Class)iter.next();
-//                    if (super_itf.isAssignableFrom(itf)) {
-//                        indexInClassArray = interfacesToImplement.indexOf(itf);
-//                        System.out.println("indexInClassArray == -1");
-//                        break;
-//                    }
-//                }
+                //                // declaring class is a super interface of the functional interface
+                //                Class super_itf = this.methods[i].getDeclaringClass();
+                //                Iterator iter = interfacesToImplement.iterator();
+                //                while (iter.hasNext()) {
+                //                    Class itf = (Class)iter.next();
+                //                    if (super_itf.isAssignableFrom(itf)) {
+                //                        indexInClassArray = interfacesToImplement.indexOf(itf);
+                //                        System.out.println("indexInClassArray == -1");
+                //                        break;
+                //                    }
+                //                }
             }
 
             // Load a pointer to the Class array (local variable number 1)

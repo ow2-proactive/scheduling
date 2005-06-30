@@ -54,16 +54,23 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                                 this.mc));
                     } else {
                         if (object instanceof ProActiveComponentRepresentative) {
-                            // component stubs can handle some method invocations  
-                            this.mc.execute(object);
+                            // delegate to the corresponding interface
+                            Object target;
+                            if (mc.isComponentMethodCallOnComponent()) {
+                                target = object;
+                            } else {
+                                target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                            }
+                            this.mc.execute(target);
                         } else {
                             ((StubObject) object).getProxy().reify(this.mc);
                         }
                     }
                 } else {
                     if (object instanceof ProActiveComponentRepresentative) {
-                        // component stubs can handle some method invocations	
-                        this.mc.execute(object);
+                        // delegate to the corresponding interface
+                        Object target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                        this.mc.execute(target);
                     } else {
                         ((StubObject) object).getProxy().reify(this.mc);
                     }

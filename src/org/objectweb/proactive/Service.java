@@ -30,10 +30,15 @@
  */
 package org.objectweb.proactive;
 
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.body.request.RequestProcessor;
+import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.component.body.PrioritizedComponentRequestFilter;
 
 
 /**
@@ -80,6 +85,11 @@ public class Service {
     //
     protected Body body;
     protected BlockingRequestQueue requestQueue;
+    //protected ComponentRequestQueue componentRequestQueue;
+    protected RequestFilter nfRequestsFilter;
+    protected RequestFilter prioritizedNfRequestFilter;
+    protected LifeCycleController lifeCycleController = null;
+    //protected RequestFilterOnMethodName requestFilterOnMethodName = null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -92,6 +102,16 @@ public class Service {
     public Service(Body body) {
         this.body = body;
         this.requestQueue = body.getRequestQueue();
+        if (((ComponentBody)body).isComponent()) {
+            //componentRequestQueue = (ComponentRequestQueue) requestQueue;
+            nfRequestsFilter = new org.objectweb.proactive.core.component.body.RequestFilterOnComponentControllerClasses();
+            prioritizedNfRequestFilter = new PrioritizedComponentRequestFilter();
+            try {
+                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody)body).getProActiveComponent());
+            } catch (NoSuchInterfaceException e) {
+                //logger.error("could not find the life cycle controller for this component");
+            }
+        }
     }
 
     //
@@ -116,8 +136,14 @@ public class Service {
      * an infinite loop for processing the request in the FIFO order.
      */
     public void fifoServing() {
-        while (body.isActive()) {
-            blockingServeOldest();
+        if (((ComponentBody)body).isComponent()) {
+            while (LifeCycleController.STARTED.equals(lifeCycleController.getFcState())) {
+                blockingServeOldest();
+            }
+        } else {
+            while (body.isActive()) {
+                blockingServeOldest();
+            }
         }
     }
 
@@ -140,7 +166,7 @@ public class Service {
      * received or until the body terminates.
      */
     public void blockingServeOldest() {
-        body.serve(requestQueue.blockingRemoveOldest());
+        blockingServeOldest(null, 0);
     }
 
     /**
@@ -151,7 +177,27 @@ public class Service {
      * @param timeout how long the thread can be blocked for.
      */
     public void blockingServeOldest(long timeout) {
-        body.serve(requestQueue.blockingRemoveOldest(timeout));
+        blockingServeOldest(null, timeout);
+    }
+   
+    /**
+    * Serves the oldest request matching the criteria given be the filter.
+    * The method blocks if there is no matching request until one
+    * matching request is received or until the body terminates. The method does not block
+     * more than the given timeout.
+    * @param requestFilter The request filter accepting the request
+    * @param timeout the timeout in ms
+    */
+    public void blockingServeOldest(RequestFilter requestFilter, long timeout) {
+        if (((ComponentBody)body).isComponent()) {
+            // serve prioritized NF requests first 
+            Request prioritizedNF = requestQueue.removeOldest(nfRequestsFilter);
+            while (prioritizedNF != null) {
+                serve(prioritizedNF);
+                prioritizedNF = requestQueue.removeOldest(nfRequestsFilter);
+            }
+        }
+        body.serve(requestQueue.blockingRemoveOldest(requestFilter, timeout));
     }
 
     /**
@@ -161,7 +207,7 @@ public class Service {
      * @param methodName The name of the request to serve
      */
     public void blockingServeOldest(String methodName) {
-        body.serve(requestQueue.blockingRemoveOldest(methodName));
+        blockingServeOldest(new RequestFilterOnMethodName(methodName));
     }
 
     /**
@@ -171,7 +217,7 @@ public class Service {
      * @param requestFilter The request filter accepting the request
      */
     public void blockingServeOldest(RequestFilter requestFilter) {
-        body.serve(requestQueue.blockingRemoveOldest(requestFilter));
+        blockingServeOldest(requestFilter, 0);
     }
 
     /**
@@ -208,7 +254,7 @@ public class Service {
      * received or until the body terminates.
      */
     public void blockingServeYoungest() {
-        body.serve(requestQueue.blockingRemoveYoungest());
+        blockingServeYoungest(null, 0);
     }
 
     /**
@@ -216,10 +262,10 @@ public class Service {
      * The method blocks if there is no request until one request is
      * received or until the body terminates. The method does not block
      * more than the given timeout.
-     * @param timeout how long the thread can be blocked for.
+     * @param timeout : for how long the thread can be blocked.
      */
     public void blockingServeYoungest(long timeout) {
-        body.serve(requestQueue.blockingRemoveYoungest(timeout));
+        blockingServeYoungest(null, timeout);
     }
 
     /**
@@ -229,7 +275,7 @@ public class Service {
      * @param methodName The name of the request to serve
      */
     public void blockingServeYoungest(String methodName) {
-        body.serve(requestQueue.blockingRemoveYoungest(methodName));
+        blockingServeYoungest(new RequestFilterOnMethodName(methodName));
     }
 
     /**
@@ -239,8 +285,22 @@ public class Service {
      * @param requestFilter The request filter accepting the request
      */
     public void blockingServeYoungest(RequestFilter requestFilter) {
-        body.serve(requestQueue.blockingRemoveYoungest(requestFilter));
+        blockingServeYoungest(requestFilter, 0);
     }
+    
+    /**
+     * Serves the youngest request matching the criteria given be the filter.
+     * The method blocks if there is no matching request until one
+     * matching request is received or until the body terminates. The method does not block
+     * more than the given timeout.
+     * @param requestFilter The request filter accepting the request
+     * @param timeout : for how long the thread can be blocked.
+     */
+    public void blockingServeYoungest(RequestFilter requestFilter, long timeout) {
+        body.serve(requestQueue.blockingRemoveYoungest(requestFilter, timeout));
+    }
+    
+    
 
     /**
      * Serves the youngest request in the request queue. If there is no
@@ -518,7 +578,20 @@ public class Service {
      * @return the oldest request found in the queue that is accepted by the filter.
      */
     public Request blockingRemoveOldest(RequestFilter requestFilter) {
-        return requestQueue.blockingRemoveOldest(requestFilter);
+        return blockingRemoveOldest(requestFilter, 0);
+    }
+    
+    /**
+     * Blocks the calling thread until there is a request that can be accepted
+     * be the given RequestFilter, but tries to limit the time the thread is blocked to timeout.
+     * Returns immediately if there is already one. The request returned is non
+     * null unless the thread has been asked not to wait anymore.
+     * @param requestFilter the request filter that select the request to be returned
+     * @param timeout : for how long the thread can be blocked.
+     * @return the oldest request found in the queue that is accepted by the filter.
+     */
+    public Request blockingRemoveOldest(RequestFilter requestFilter, long timeout) {
+        return requestQueue.blockingRemoveOldest(requestFilter, timeout);
     }
 
     /**
@@ -529,7 +602,7 @@ public class Service {
      * @return the oldest request of name methodName found in the queue.
      */
     public Request blockingRemoveOldest(String methodName) {
-        return requestQueue.blockingRemoveOldest(methodName);
+        return blockingRemoveOldest(new RequestFilterOnMethodName(methodName), 0);
     }
 
     /**
@@ -539,7 +612,7 @@ public class Service {
      * @return the oldest request found in the queue.
      */
     public Request blockingRemoveOldest() {
-        return requestQueue.blockingRemoveOldest();
+        return blockingRemoveOldest(null, 0);
     }
 
     /**
@@ -547,10 +620,11 @@ public class Service {
      * to limit the time the thread is blocked to timeout.
      * Returns immediately if there is already one. The request returned is non
      * null if a request has been found during the given time.
+     * @param timeout : for how long the thread can be blocked.
      * @return the oldest request found in the queue or null.
      */
     public Request blockingRemoveOldest(long timeout) {
-        return requestQueue.blockingRemoveOldest(timeout);
+        return blockingRemoveOldest(null, timeout);
     }
 
     //
@@ -566,7 +640,21 @@ public class Service {
      * @return the youngest request found in the queue that is accepted by the filter.
      */
     public Request blockingRemoveYoungest(RequestFilter requestFilter) {
-        return requestQueue.blockingRemoveYoungest(requestFilter);
+        return blockingRemoveYoungest(requestFilter, 0);
+    }
+    
+    /**
+     * Blocks the calling thread until there is a request that can be accepted
+     * be the given RequestFilter, but tries
+     * to limit the time the thread is blocked to the timeout.
+     * Returns immediately if there is already one. The request returned is non
+     * null unless the thread has been asked not to wait anymore.
+     * @param requestFilter the request filter that select the request to be returned
+     * @param timeout : for how long the thread can be blocked.
+     * @return the youngest request found in the queue that is accepted by the filter.
+     */
+    public Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout) {
+        return requestQueue.blockingRemoveYoungest(requestFilter, timeout);
     }
 
     /**
@@ -577,7 +665,7 @@ public class Service {
      * @return the youngest request of name methodName found in the queue.
      */
     public Request blockingRemoveYoungest(String methodName) {
-        return requestQueue.blockingRemoveYoungest(methodName);
+        return blockingRemoveYoungest(new RequestFilterOnMethodName(methodName), 0);
     }
 
     /**
@@ -587,7 +675,7 @@ public class Service {
      * @return the youngest request found in the queue.
      */
     public Request blockingRemoveYoungest() {
-        return requestQueue.blockingRemoveYoungest();
+        return blockingRemoveYoungest(null, 0);
     }
 
     /**
@@ -595,10 +683,11 @@ public class Service {
      * to limit the time the thread is blocked to timeout.
      * Returns immediately if there is already one. The request returned is non
      * null if a request has been found during the given time.
+     * @param timeout : for how long the thread can be blocked.
      * @return the youngest request found in the queue or null.
      */
     public Request blockingRemoveYoungest(long timeout) {
-        return requestQueue.blockingRemoveYoungest(timeout);
+        return blockingRemoveYoungest(null, timeout);
     }
 
     //
@@ -745,23 +834,19 @@ public class Service {
      * @see RequestFilter
      *
      */
-    protected class RequestFilterOnMethodName implements RequestFilter {
+    protected class RequestFilterOnMethodName implements RequestFilter, java.io.Serializable {
+
         private String methodName;
 
         public RequestFilterOnMethodName(String methodName) {
             this.methodName = methodName;
         }
 
-        /**
-         * Returns true if and only if the given request can be accepted.
-         * @param request the request to test
-         * @return true if the request can be accepted, false else.
-         */
         public boolean acceptRequest(Request request) {
             return methodName.equals(request.getMethodName());
         }
-    } // end inner class RequestFilterOnMethodName
 
+    }
     /**
      * AcceptAllRequestFilter is a RequestFilter that matches any request
      *

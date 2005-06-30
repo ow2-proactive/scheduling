@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body.http;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -578,5 +579,15 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public int receiveFTMessage(FTMessage ev) throws IOException {
         return FTManager.NON_FT;
+    }
+
+    /*
+     * 
+     * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
+     */
+    public void createShortcut(Shortcut shortcut) throws IOException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("shortcuts are currently not implemented for http communications");
+        }
     }
 }

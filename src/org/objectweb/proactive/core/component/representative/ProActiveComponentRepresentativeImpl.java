@@ -30,74 +30,88 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
-import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.api.control.NameController;
-import org.objectweb.fractal.api.control.SuperController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
-import org.objectweb.proactive.core.component.controller.ProActiveSuperController;
-import org.objectweb.proactive.core.component.request.ComponentRequestQueue;
+import org.objectweb.proactive.core.component.controller.ProActiveController;
+import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+import java.io.File;
+import java.io.Serializable;
+
+import java.lang.reflect.Constructor;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Properties;
+
 
 /**
- * A remote reference on a component. <br>
- *
- * // TODO finish doc
- *
- * Control interfaces are also implemented by this representative, which saves
- * remote calls. In case the component is a primitive, access to content controller
- * is disallowed.
- *
- * // TODO access to binding controller for primitive component? ->check client itfs
+ * An object of type <code> Component  </code> which is a remote reference on a
+ * component. <br>
+ * When creating an active object of type <code> A  </code>, you get a reference
+ * on the active object through a dynamically generated stub of type
+ * <code> A  </code>. Similarly, when creating a component, you get a reference
+ * on an object of type <code> Component  </code>, in other words an instance of
+ * this class.
+ * <p>
+ * During the construction of an instance of this class, references to
+ * interfaces of the component are also dynamically generated : references to
+ * functional interfaces corresponding to the server interfaces of the
+ * component, and references to control interfaces. The idea is to save remote
+ * invocations : when requesting a controller or an interface, the generated
+ * corresponding interface is directly returned. Then, invocations on this
+ * interface are reified and transferred to the actual component. <br>
  *
  * @author Matthieu Morel
- *
  */
 public class ProActiveComponentRepresentativeImpl
-    implements ProActiveComponentRepresentative, ProActiveBindingController,
-        LifeCycleController, ContentController, ComponentParametersController,
-        ProActiveSuperController, Interface, Serializable {
+    implements ProActiveComponentRepresentative, Serializable {
     private static Logger logger = ProActiveLogger.getLogger("components");
-    private Interface[] interfaceReferences;
+
+    //private Interface[] interfaceReferences;
+    private Map fcInterfaceReferences;
+    private Map nfInterfaceReferences;
     private Proxy proxy;
 
     //private ComponentParameters componentParameters;
     private ComponentType componentType = null; // immutable
     private StubObject stubOnBaseObject = null;
     private String hierarchicalType = null;
-    private Boolean hasBindingController = null;
-    private String currentControllerInterface=null;
-    
+    private String currentControllerInterface = null;
+    private boolean useShortcuts;
 
     public ProActiveComponentRepresentativeImpl(ComponentType componentType,
-        String hierarchicalType) {
+        String hierarchicalType, File controllersConfigFile) {
         this.componentType = componentType;
         this.hierarchicalType = hierarchicalType;
+        Properties controllersConfiguration = ProActiveComponentImpl.loadControllersConfiguration(controllersConfigFile);
+
+        useShortcuts = ("true".equals(System.getProperty(
+                    "proactive.components.use_shortcuts")));
 
         // create the interface references tables
         // the size is the addition of :  
@@ -105,27 +119,83 @@ public class ProActiveComponentRepresentativeImpl
         // content controller and name controller
         // - the number of client functional interfaces
         // - the number of server functional interfaces
-        interfaceReferences = new Interface[1 +
-            componentType.getFcInterfaceTypes().length];
+        //ArrayList interface_references_list = new ArrayList(1 +componentType.getFcInterfaceTypes().length+controllersConfiguration.size());
+        nfInterfaceReferences = new HashMap(1 +
+                controllersConfiguration.size());
 
+        //        interfaceReferences = new Interface[1 +
+        //            componentType.getFcInterfaceTypes().length+controllersConfiguration.size()];
         int i = 0;
 
         // add controllers
-        interfaceReferences[i] = (Interface) this;
-        i++;
+        Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
+        Class controllerClass = null;
+        ProActiveController currentController;
+        ProActiveInterface currentInterface = null;
+        Class controllerItf;
+        while (controllersInterfaces.hasMoreElements()) {
+            String controllerItfName = (String) controllersInterfaces.nextElement();
+            try {
+                controllerItf = Class.forName(controllerItfName);
+                controllerClass = Class.forName(controllersConfiguration.getProperty(
+                            controllerItf.getName()));
+                Constructor[] constructors = controllerClass.getConstructors();
+                Constructor controllerClassConstructor = controllerClass.getConstructor(new Class[] {
+                            Component.class
+                        });
+                currentController = (ProActiveController) controllerClassConstructor.newInstance(new Object[] {
+                            this
+                        });
+                currentInterface = RepresentativeInterfaceClassGenerator.instance()
+                                                                        .generateControllerInterface(currentController.getFcItfName(),
+                        this, (InterfaceType) currentController.getFcItfType());
+            } catch (Exception e) {
+                logger.error("could not create controller " +
+                    controllersConfiguration.getProperty(controllerItfName) +
+                    " : " + e.getMessage());
+                continue;
+            }
+
+            if (BindingController.class.isAssignableFrom(controllerClass)) {
+                if ((hierarchicalType.equals(Constants.PRIMITIVE) &&
+                        (Fractive.getClientInterfaceTypes(
+                            componentType).length == 0))) {
+                    //bindingController = null;
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(
+                            "user component class of this component does not have any client interface. It will have no BindingController");
+                    }
+                    continue;
+                }
+            }
+            if (ContentController.class.isAssignableFrom(controllerClass)) {
+                if (hierarchicalType.equals(Constants.PRIMITIVE)) {
+                    // no content controller here
+                    continue;
+                }
+            }
+            if (currentInterface != null) {
+                nfInterfaceReferences.put(currentController.getFcItfName(),
+                    currentInterface);
+
+                i++;
+            }
+        }
 
         // add functional interfaces
         // functional interfaces are proxies on the corresponding meta-objects
         // 3. external functional interfaces
+        fcInterfaceReferences = new HashMap(componentType.getFcInterfaceTypes().length);
         InterfaceType[] interface_types = componentType.getFcInterfaceTypes();
         try {
             for (int j = 0; j < interface_types.length; j++) {
                 Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
-                                                                                     .generateInterface(interface_types[j].getFcItfName(),
-                        this, interface_types[j], false);
+                                                                                     .generateFunctionalInterface(interface_types[j].getFcItfName(),
+                        this, interface_types[j]);
 
                 // all calls are to be reified
-                interfaceReferences[i] = interface_reference;
+                fcInterfaceReferences.put(interface_reference.getFcItfName(),
+                    interface_reference);
                 i++;
             }
         } catch (Exception e) {
@@ -135,132 +205,13 @@ public class ProActiveComponentRepresentativeImpl
         }
     }
 
-    /*
-     *implements  org.objectweb.fractal.api.control.BindingController#lookupFc(String)}
-     */
-    public Object lookupFc(String clientItfName) {
-        return (Interface) reifyCall(BindingController.class.getName(),
-            "lookupFc", new Class[] { String.class },
-            new Object[] { clientItfName });
-    }
-
-    /*
-     *implements  BindingController#bindFc(java.lang.String, java.lang.Object)}
-     */
-    public void bindFc(String clientItfName, Object serverItf) {
-        reifyCall(BindingController.class.getName(), "bindFc",
-            new Class[] { String.class, Object.class },
-            new Object[] { clientItfName, serverItf });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.BindingController#unbindFc(String)}
-     */
-    public void unbindFc(String clientItfName) {
-        reifyCall(BindingController.class.getName(), "unbindFc",
-            new Class[] { String.class }, new Object[] { clientItfName });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.LifeCycleController#getFcState()}
-     */
-    public String getFcState() {
-        return (String) reifyCall(LifeCycleController.class.getName(),
-            "getFcState", new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.LifeCycleController#startFc()}
-     */
-    public void startFc() {
-        reifyCall(LifeCycleController.class.getName(), "startFc",
-            new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.LifeCycleController#stopFc()}
-     */
-    public void stopFc() {
-        reifyCall(LifeCycleController.class.getName(), "stopFc",
-            new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()}
-     */
-    public Object[] getFcInternalInterfaces() {
-        return (Object[]) reifyCall(ContentController.class.getName(),
-            "getFcInternalInterfaces", new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     * in this implementation, internal interfaces are also external interfaces.
-     *implements  org.objectweb.fractal.api.control.ContentController#getFcInternalInterface(String)}
-     */
-    public Object getFcInternalInterface(String interfaceName)
-        throws NoSuchInterfaceException {
-        return getFcInterface(interfaceName);
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.ContentController#getFcSubComponents()}
-     */
-    public Component[] getFcSubComponents() {
-        return (Component[]) reifyCall(ContentController.class.getName(),
-            "getFcSubComponents", new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.ContentController#addFcSubComponent(Component)}
-     */
-    public void addFcSubComponent(Component subComponent) {
-        reifyCall(ContentController.class.getName(), "addFcSubComponent",
-            new Class[] { Component.class }, new Object[] { subComponent });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)}
-     */
-    public void removeFcSubComponent(Component subComponent) {
-        reifyCall(ContentController.class.getName(), "removeFcSubComponent",
-            new Class[] { Component.class }, new Object[] { subComponent });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.Interface#getFcItfOwner()}
-     */
-    public Component getFcItfOwner() {
-        return this;
-    }
-
-    /**
-     * implements  {@link org.objectweb.fractal.api.Interface#getFcItfName()}
-     * @return the name of the last retreived controller interface 
-     */
-    public String getFcItfName() {
-        return currentControllerInterface;
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.Interface#getFcItfType()}
-     */
-    public Type getFcItfType() {
-        return getFcType();
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.Interface#isFcInternalItf()}
-     */
-    public boolean isFcInternalItf() {
-        return false;
-    }
-
     protected Object reifyCall(String className, String methodName,
-        Class[] parameterTypes, Object[] effectiveParameters) {
+        Class[] parameterTypes, Object[] effectiveParameters, short priority) {
         try {
             return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
                     Class.forName(className).getDeclaredMethod(methodName,
-                        parameterTypes), effectiveParameters, null));
+                        parameterTypes), effectiveParameters, (String) null,
+                    false, priority));
 
             // functional interface name is null
         } catch (NoSuchMethodException e) {
@@ -284,43 +235,44 @@ public class ProActiveComponentRepresentativeImpl
                 throw new NoSuchInterfaceException(
                     "there is no content controller in this component");
             }
-            currentControllerInterface = interfaceName;
-            return this;
+            return nfInterfaceReferences.get(interfaceName);
         }
-        for (int i = 0; i < interfaceReferences.length; i++) {
-            if (interfaceReferences[i].getFcItfName() != null) {
-                if (interfaceReferences[i].getFcItfName().equals(interfaceName) ||
-                        interfaceName.startsWith(
-                            interfaceReferences[i].getFcItfName())) {
-                    if (getProxy() instanceof ProxyForGroup) {
-                        //create a new group of called functional interfaces 
-                        try {
-                            StubObject stub_on_group_of_itfs = (StubObject) reifyCall(Component.class.getName(),
-                                    "getFcInterface",
-                                    new Class[] { String.class },
-                                    new Object[] { interfaceName });
 
-                            // create a component stub and affect the proxy containing the group resulting from the previous call
-                            ProActiveInterface result = (ProActiveInterface) interfaceReferences[i].getClass()
-                                                                                                   .newInstance();
+        Iterator iterator = fcInterfaceReferences.keySet().iterator();
+        while (iterator.hasNext()) {
+            String itfName = (String) iterator.next();
+            ProActiveInterface itf = (ProActiveInterface) fcInterfaceReferences.get(itfName);
+            if (interfaceName.startsWith(itfName) ||
+                    interfaceName.startsWith(itfName)) {
+                if (getProxy() instanceof ProxyForGroup) {
+                    //create a new group of called functional interfaces 
+                    try {
+                        StubObject stub_on_group_of_itfs = (StubObject) reifyCall(Component.class.getName(),
+                                "getFcInterface", new Class[] { String.class },
+                                new Object[] { interfaceName },
+                                ComponentRequest.STRICT_FIFO_PRIORITY);
 
-                            // fill in data
-                            result.setFcItfName(interfaceReferences[i].getFcItfName());
-                            result.setFcOwner(interfaceReferences[i].getFcItfOwner());
-                            result.setFcType(interfaceReferences[i].getFcItfType());
-                            // set proxy
-                            ((StubObject) result).setProxy(stub_on_group_of_itfs.getProxy());
-                            return result;
-                        } catch (Exception e) {
-                            throw new NoSuchInterfaceException(
-                                "could not generate a group of interfaces");
-                        }
-                    } else {
-                        return interfaceReferences[i];
+                        // create a component stub and affect the proxy containing the group resulting from the previous call
+                        ProActiveInterface result = (ProActiveInterface) itf.getClass()
+                                                                            .newInstance();
+
+                        // fill in data
+                        result.setFcItfName(itf.getFcItfName());
+                        result.setFcItfOwner(itf.getFcItfOwner());
+                        result.setFcType(itf.getFcItfType());
+                        // set proxy
+                        ((StubObject) result).setProxy(stub_on_group_of_itfs.getProxy());
+                        return result;
+                    } catch (Exception e) {
+                        throw new NoSuchInterfaceException(
+                            "could not generate a group of interfaces");
                     }
+                } else {
+                    return itf;
                 }
             }
         }
+
         throw new NoSuchInterfaceException(interfaceName);
     }
 
@@ -328,7 +280,16 @@ public class ProActiveComponentRepresentativeImpl
      *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        return interfaceReferences;
+        Interface[] nfInterfaces = (Interface[]) (nfInterfaceReferences.values()
+                                                                       .toArray(new Interface[nfInterfaceReferences.size()]));
+        Interface[] fcInterfaces = (Interface[]) (fcInterfaceReferences.values()
+                                                                       .toArray(new Interface[fcInterfaceReferences.size()]));
+        Interface[] result = new Interface[nfInterfaces.length +
+            fcInterfaces.length];
+        System.arraycopy(nfInterfaces, 0, result, 0, nfInterfaces.length);
+        System.arraycopy(fcInterfaces, 0, result, nfInterfaces.length,
+            fcInterfaces.length);
+        return result;
     }
 
     /*
@@ -349,10 +310,25 @@ public class ProActiveComponentRepresentativeImpl
      *implements  org.objectweb.proactive.core.mop.StubObject#setProxy(Proxy)}
      */
     public void setProxy(Proxy proxy) {
+        // sets proxy for non functional interfaces
         this.proxy = proxy;
-        for (int i = 0; i < interfaceReferences.length; i++) {
-            if (interfaceReferences[i] != this) {
-                ((StubObject) interfaceReferences[i]).setProxy(proxy);
+        // sets the same proxy for all interfaces of this component
+        Object[] interfaces = getFcInterfaces();
+        ProActiveInterface[] interface_references = new ProActiveInterface[interfaces.length];
+        for (int i = 0; i < interfaces.length; i++) {
+            interface_references[i] = (ProActiveInterface) interfaces[i];
+        }
+        for (int i = 0; i < interface_references.length; i++) {
+            if (useShortcuts) {
+                // adds an intermediate FunctionalInterfaceProxy for functional interfaces, to manage shortcutting
+                ((StubObject) interface_references[i]).setProxy(new FunctionalInterfaceProxyImpl(
+                        proxy, interface_references[i].getFcItfName()));
+            } else {
+                try {
+                    ((StubObject) interface_references[i]).setProxy(proxy);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -363,13 +339,15 @@ public class ProActiveComponentRepresentativeImpl
      */
     public boolean equals(Object component) {
         Object result = reifyCall(Object.class.getName(), "equals",
-                new Class[] { Object.class }, new Object[] { component });
+                new Class[] { Object.class }, new Object[] { component },
+                ComponentRequest.STRICT_FIFO_PRIORITY);
         return ((Boolean) result).booleanValue();
     }
 
     public int hashCode() {
         Object result = reifyCall(Object.class.getName(), "hashCode",
-                new Class[] {  }, new Object[] {  });
+                new Class[] {  }, new Object[] {  },
+                ComponentRequest.STRICT_FIFO_PRIORITY);
         return ((Integer) result).intValue();
     }
 
@@ -385,95 +363,19 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     *implements  ComponentParametersController#setComponentParameters(ComponentParameters)}
-     */
-    public void setComponentParameters(ComponentParameters componentParameters) {
-        logger.error("setComponentParameters method is not available in component representatives");
-    }
-
-    /*
-     *implements  ComponentParametersController#getComponentParameters()}
-     */
-    public ComponentParameters getComponentParameters() {
-        return (ComponentParameters) reifyCall(ComponentParametersController.class.getName(),
-            "getComponentParameters", new Class[] {  }, new Object[] {  });
-    }
-
-    /*
-     *implements  org.objectweb.fractal.api.control.BindingController#listFc()}
-     */
-    public String[] listFc() {
-        InterfaceType[] itfs_types = componentType.getFcInterfaceTypes();
-        List client_itfs = new ArrayList();
-        for (int i = 0; i < itfs_types.length; i++) {
-            if (itfs_types[i].isFcClientItf()) {
-                client_itfs.add(itfs_types[i].getFcItfName());
-            }
-        }
-        return (String[]) client_itfs.toArray(new String[client_itfs.size()]);
-    }
-
-    /*
-     * implements org.objectweb.fractal.api.control.NameController#setFcName(String name)}
-     */
-    public void setFcName(String componentName) {
-        reifyCall(NameController.class.getName(), "setFcName",
-            new Class[] { String.class }, new Object[] { componentName });
-    }
-
-    /*
-     * implements org.objectweb.fractal.api.control.NameController#getFcName()}
-     */
-    public String getFcName() {
-        return (String) reifyCall(NameController.class.getName(), "getFcName",
-            new Class[] {  }, new Object[] {  });
-    }
-
-    /*
      * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
      */
     public Object getReferenceOnBaseObject() {
-        logger.error("getReferenceOnBaseObject() method is not available in component representatives");
+        logger.error(
+            "getReferenceOnBaseObject() method is not available in component representatives");
         return null;
     }
 
-    /** 
-     * only available in the meta-objects
-     */
-    public ComponentRequestQueue getRequestQueue() {
-        logger.error("getRequestQueue() is not available in component representatives");
-        return null;
-    }
-
-    /* 
+    /*
      * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
      */
     public Component getRepresentativeOnThis() {
         return this;
-    }
-
-    /* 
-     * @see org.objectweb.fractal.api.control.SuperController#getFcSuperComponents()
-     */
-    public Component[] getFcSuperComponents() {
-        return (Component[]) reifyCall(SuperController.class.getName(),
-            "getFcSuperComponents", new Class[] {  }, new Object[] {  });
-    }
-
-    /* 
-     * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#addParent(org.objectweb.fractal.api.Component)
-     */
-    public void addParent(Component parent) {
-        reifyCall(ProActiveSuperController.class.getName(), "addParent",
-            new Class[] { Component.class }, new Object[] { parent });
-    }
-
-    /* 
-     * @see org.objectweb.proactive.core.component.controller.ProActiveSuperController#removed(org.objectweb.fractal.api.Component)
-     */
-    public void removeParent(Component parent) {
-        reifyCall(ProActiveSuperController.class.getName(), "removeParent",
-            new Class[] { Component.class }, new Object[] { parent });
     }
 
     /*
@@ -483,35 +385,24 @@ public class ProActiveComponentRepresentativeImpl
         return stubOnBaseObject;
     }
 
-    /* 
+    /*
      * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
      */
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;
     }
 
-    /* 
-     * @see org.objectweb.proactive.core.component.controller.ProActiveBindingController#hasBindingsOnClientInterfaces()
-     */
-    public Boolean isBound() {
-        return (Boolean) reifyCall(ProActiveBindingController.class.getName(),
-            "hasBindingsOnClientInterfaces", new Class[] {  }, new Object[] {  });
-    }
-
     protected boolean isControllerInterface(String interfaceName)
         throws NoSuchInterfaceException {
-        if (interfaceName.equals(Constants.BINDING_CONTROLLER) ||
-                interfaceName.equals(Constants.LIFECYCLE_CONTROLLER) ||
-                interfaceName.equals(Constants.COMPONENT_PARAMETERS_CONTROLLER) ||
-                interfaceName.equals(Constants.NAME_CONTROLLER) ||
-                interfaceName.equals(Constants.SUPER_CONTROLLER)) {
-            return true;
-        } else if (interfaceName.equals(Constants.CONTENT_CONTROLLER)) {
-            if (Constants.PRIMITIVE.equals(hierarchicalType)) {
-                throw new NoSuchInterfaceException(interfaceName);
-            } else {
-                return true;
+        if (nfInterfaceReferences.keySet().contains(interfaceName)) {
+            if (interfaceName.equals(Constants.CONTENT_CONTROLLER)) {
+                if (Constants.PRIMITIVE.equals(hierarchicalType)) {
+                    throw new NoSuchInterfaceException(interfaceName);
+                } else {
+                    return true;
+                }
             }
+            return true;
         } else {
             return false;
         }

@@ -4,9 +4,17 @@
 </head>
 <body bgcolor="white">
 <p>
-Requests addressed to components are extensions of standard ProActive requests, and
-are processed by the component request queue, an extension of the standard ProActive request queue.
+This package contains classes related to component requests. Component requests are requests 
+addressed to components and are extensions of standard ProActive requests.
+</p>
+<p>
+This package also holds classes to help optimize the transfer of requests thanks to a shortcutting 
+mechanism.
+</p>
 
+<p>This package used to hold the code for a custom request queue for components, that was used
+for managing the lifecycle of the components. This has now been replaced by a more generic mechanism
+in the org.objectweb.proactive.core.Service class.
 </p>
 
   @author  Matthieu Morel

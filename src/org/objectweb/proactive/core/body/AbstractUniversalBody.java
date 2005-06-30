@@ -31,6 +31,11 @@
 package org.objectweb.proactive.core.body;
 
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -67,6 +72,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     protected transient UniversalBody remoteBody;
     protected RemoteBodyFactory remoteBodyFactory;
     protected String jobID;
+
+    protected Map shortcuts = null; // key = functionalItfID, value=shortcut
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -147,5 +154,16 @@ public abstract class AbstractUniversalBody implements UniversalBody,
 
         // remoteBody is transient so we recreate it here
         this.remoteBody = remoteBodyFactory.newRemoteBody(this);
+    }
+
+    /*
+     * 
+     * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
+     */
+    public void createShortcut(Shortcut shortcut) throws IOException {
+        if (shortcuts == null) {
+            shortcuts = new HashMap();
+        }
+        shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
 }

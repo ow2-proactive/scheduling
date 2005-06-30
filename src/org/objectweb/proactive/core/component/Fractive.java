@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.component;
 
-import java.util.Hashtable;
-import java.util.Map;
-
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -42,6 +39,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -59,6 +57,10 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -105,18 +107,26 @@ public class Fractive implements GenericFactory, Component, Factory {
      * It is able to handle multiple bindings
      */
     public static ProActiveInterface createCollectiveClientInterface(
-        String itfName, String itfSignature) throws ProActiveRuntimeException {
+        String itfName, String itfSignature, Component owner)
+        throws ProActiveRuntimeException {
         try {
             InterfaceType itf_type = ProActiveTypeFactory.instance()
                                                          .createFcItfType(itfName,
                     itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
                     TypeFactory.COLLECTION);
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type);
+            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
+                    owner);
             return itf_ref_group;
         } catch (Exception e) {
             throw new ProActiveRuntimeException("Impossible to create a collective client interface ",
                 e);
         }
+    }
+
+    public static ProActiveInterface createCollectiveClientInterface(
+        String itfName, String itfSignature) throws ProActiveRuntimeException {
+        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
+            null);
     }
 
     private static Component newFcInstance(ContentDescription contentDesc,
@@ -129,11 +139,21 @@ public class Fractive implements GenericFactory, Component, Factory {
                 Hashtable factory_params = new Hashtable(1);
                 factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY,
                     componentParameters);
+                if (componentParameters.getControllerDescription()
+                                           .isSynchronous() &&
+                        (Constants.COMPOSITE.equals(
+                            componentParameters.getHierarchicalType()) ||
+                        Constants.PARALLEL.equals(
+                            componentParameters.getHierarchicalType()))) {
+                    factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
+                        new Boolean(Constants.SYNCHRONOUS));
+                }
                 contentDesc.setFactory(new ProActiveMetaObjectFactory(
                         factory_params));
                 //		   factory = ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
             }
 
+            // TODO_M : add controllers in the component metaobject factory?
             Object ao = null;
 
             // 2 possibilities : either the component is created on a node (or null), or it is created on a virtual node
@@ -153,9 +173,8 @@ public class Fractive implements GenericFactory, Component, Factory {
                 Node[] nodes = contentDesc.getVirtualNode().getNodes();
                 if ((nodes.length > 1) && !contentDesc.uniqueInstance()) { // cyclic node + 1 instance per node
                     //Component components = (Component) ProActiveGroup.newGroup(Component.class.getName());
-                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters.getComponentType(), componentParameters.getHierarchicalType());
+                    Component components = ProActiveComponentGroup.newComponentRepresentativeGroup(componentParameters);
                     Group group_of_components = ProActiveGroup.getGroup(components);
-                    
 
                     if (componentParameters.getHierarchicalType().equals(Constants.PRIMITIVE)) {
                         // task = instantiate a component with a different name 
@@ -202,8 +221,9 @@ public class Fractive implements GenericFactory, Component, Factory {
             }
             ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
                                                                                                      .createComponentRepresentative(componentParameters.getComponentType(),
-                                                                                                             componentParameters.getHierarchicalType(),
-                    myProxy);
+                    componentParameters.getHierarchicalType(), myProxy,
+                    componentParameters.getControllerDescription()
+                                       .getControllerConfigFile());
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;
         } catch (ActiveObjectCreationException e) {
@@ -352,5 +372,21 @@ public class Fractive implements GenericFactory, Component, Factory {
      */
     public Component newFcInstance() throws InstantiationException {
         return this;
+    }
+
+    /**
+     * Helper method for extracting the types of client interfaces from the type of a component
+     * @return the types of client interfacess
+     */
+    public static InterfaceType[] getClientInterfaceTypes(
+        ComponentType componentType) {
+        ArrayList client_interfaces = new ArrayList();
+        InterfaceType[] interfaceTypes = componentType.getFcInterfaceTypes();
+        for (int i = 0; i < interfaceTypes.length; i++) {
+            if (interfaceTypes[i].isFcClientItf()) {
+                client_interfaces.add(interfaceTypes[i]);
+            }
+        }
+        return (InterfaceType[]) client_interfaces.toArray(new InterfaceType[client_interfaces.size()]);
     }
 }
