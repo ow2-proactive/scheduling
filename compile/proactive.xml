@@ -122,6 +122,7 @@
 			<fileset dir="${src.dir}">
 				<include name="**/*.xml"/>
 				<include name="**/*.fractal"/>
+				<include name="**/*.properties"/>
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd"/>
 			</fileset>
 		</copy>
