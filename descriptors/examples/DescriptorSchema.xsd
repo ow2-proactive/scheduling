@@ -464,9 +464,11 @@ The following element ProActiveDescriptor defines the root of the schema
 			<xs:element name="bsubProcess" type="BsubProcessType"/>
 			<xs:element name="pbsProcess" type="PbsProcessType"/>
 			<xs:element name="oarProcess" type="oarProcessType"/>
+			<xs:element name="oarGridProcess" type="oarGridProcessType"/>
 			<xs:element name="globusProcess" type="GlobusProcessType"/>
 			<xs:element name="prunProcess" type="prunProcessType"/>
 			<xs:element name="gridEngineProcess" type="sgeProcessType"/>
+			<xs:element name="unicoreProcess" type="unicoreProcessType"/>
 		</xs:choice>
 		<xs:attribute name="id" type="xs:string" use="required"/>
 	</xs:complexType>
@@ -745,6 +747,33 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
+	<!--oarGridProcess-->
+	<xs:complexType name="oarGridProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element ref="commandPath" minOccurs="0"/>
+			<xs:element name="oarGridOption" type="OarGridOptionType"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
+		<xs:attribute name="bookedNodesAccess" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="rsh"/>
+					<xs:enumeration value="ssh"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+	</xs:complexType>
+	<!--oarGridOption-->
+	<xs:complexType name="OarGridOptionType">
+		<xs:sequence>
+			<xs:element name="resources" type="xs:string"/>
+			<xs:element name="walltime" type="xs:string" minOccurs="0"/>
+			<xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
 	<!--sge process -->
 	<xs:complexType name="sgeProcessType">
 		<xs:sequence>
@@ -781,5 +810,69 @@ by hostlist which is a list of hostname and domain if all the host specified are
 	</xs:complexType>
 	<xs:complexType name="SecurityType">
 		<xs:attribute name="file" type="xs:string"/>
+	</xs:complexType>
+	
+	<!--unicoreProcess element has 4 childs: processReference element which represents a process defined elsewhere, unicoreDirPath
+	which represents the unicore client configuration directory, keyFilePath which represnets de unicore cliente certificate file and
+	the unicoreOption which represent a unicore site options-->
+	<xs:complexType name="unicoreProcessType">
+		<xs:sequence>
+			<xs:element ref="processReference"/>
+			<xs:element name="unicoreDirPath" type="FilePathType" minOccurs="0"/>
+			<xs:element name="keyFilePath" type="FilePathType" minOccurs="0"/>
+			<xs:element name="importFiles" type="unicoreImportFilesType" minOccurs="0"/>
+			<xs:element name="unicoreOption" type="unicoreOptionType" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.unicore.UnicoreProcess"/>
+		<xs:attribute name="keypassword" type="xs:string" use="optional"/>
+		<xs:attribute name="jobname" type="xs:string" use="optional" default="ProActiveUnicoreJob"/>
+		<xs:attribute name="submitjob" type="xs:boolean" use="optional" default="true"/>
+		<xs:attribute name="savejob" type="xs:boolean" use="optional" default="false"/>
+		<!--xs:attribute name="closeStream" type="CloseStreamType" use="optional"/-->
+	</xs:complexType>
+	<!--unicoreImportFilesType element has two child: absolutePath and relativePath.  One of the child must appear once or more. Both element can be present in the import file definition. For instance an absolutePath element followed by a relativePath element-->
+	<xs:complexType name="unicoreImportFilesType">
+		<xs:choice maxOccurs="unbounded">
+			<xs:element name="absolutePath" type="AbsolutePathType"/>
+			<xs:element name="relativePath" type="RelativePathType"/>
+		</xs:choice>
+	</xs:complexType>
+	<!--unicoreOption has 2 childs: unicoreUsiteType represents the Unicore site, unicoreVsiteType represents the virtual site
+	within the Unicore site. Notice that not all unicore features are supported. -->
+	<xs:complexType name="unicoreOptionType">
+		<xs:sequence>
+			<xs:element name="usite" type="unicoreUsiteType" minOccurs="0"/>
+			<xs:element name="vsite" type="unicoreVsiteType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="unicoreUsiteType">	
+		<xs:attribute name="name" type="xs:string" use="optional"/>
+		<xs:attribute name="url" type="xs:string" use="required"/>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="CLASSIC"/>
+					<xs:enumeration value="REGISTRY"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="unicoreVsiteType">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="nodes" type="xs:string" use="optional"/>
+		<xs:attribute name="processors" type="xs:string" use="optional"/>
+		<xs:attribute name="memory" type="xs:string" use="optional"/>
+		<xs:attribute name="runtime" type="xs:string" use="optional"/>
+		<xs:attribute name="priority" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="normal"/>
+					<xs:enumeration value="high"/>
+					<xs:enumeration value="low"/>
+					<xs:enumeration value="development"/>
+					<xs:enumeration value="whenever"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 </xs:schema>
