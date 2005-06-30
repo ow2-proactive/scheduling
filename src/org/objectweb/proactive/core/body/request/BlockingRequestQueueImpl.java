@@ -138,27 +138,34 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
 
     public synchronized Request blockingRemoveOldest(
         RequestFilter requestFilter) {
-        return blockingRemove(requestFilter, true);
+        return blockingRemove(requestFilter, true, 0);
+    }
+    
+    public synchronized Request blockingRemoveOldest(
+            RequestFilter requestFilter, long timeout) {
+            return blockingRemove(requestFilter, true, timeout);
     }
 
     public synchronized Request blockingRemoveOldest(String methodName) {
-        return blockingRemove(methodName, true);
+        requestFilterOnMethodName.setMethodName(methodName);
+        return blockingRemove(requestFilterOnMethodName, true, 0);
     }
 
     public synchronized Request blockingRemoveOldest() {
-        if (this.spmdManager == null) {
-            this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
-        }
-        return this.barrierBlockingRemove();
+        return blockingRemove(null, true, 0);
     }
 
     public synchronized Request blockingRemoveOldest(long timeout) {
-        return blockingRemove(timeout, true);
+        return blockingRemove(null, true, timeout);
     }
-
+    
     public synchronized Request blockingRemoveYoungest(
         RequestFilter requestFilter) {
         return blockingRemove(requestFilter, false);
+    }
+    
+    public synchronized Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout) {
+        return blockingRemove(requestFilter, false, timeout);
     }
 
     public synchronized Request blockingRemoveYoungest(String methodName) {
@@ -190,19 +197,36 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
     // -- PRIVATE METHODS -----------------------------------------------
     //
     protected Request blockingRemove(RequestFilter requestFilter, boolean oldest) {
-        Request r = oldest ? removeOldest(requestFilter)
-                           : removeYoungest(requestFilter);
+        return blockingRemove(requestFilter, oldest, 0);
+    }
+
+    protected Request blockingRemove(RequestFilter requestFilter, boolean oldest, long timeout) {
+        if (oldest && (requestFilter == null)) {
+            if (this.spmdManager == null) {
+                this.spmdManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSPMDGroupManager();
+            }
+            return this.barrierBlockingRemoveOldest(timeout);
+        }
+
+        long timeStartWaiting=0;
+        if (timeout>0) {
+             timeStartWaiting = System.currentTimeMillis();
+        }
+        Request r = oldest ? ((requestFilter == null)?removeOldest() : removeOldest(requestFilter))
+                           : ((requestFilter==null)?removeYoungest():removeYoungest(requestFilter));
         while ((r == null) && shouldWait) {
             if (hasListeners()) {
                 notifyAllListeners(new RequestQueueEvent(ownerID,
                         RequestQueueEvent.WAIT_FOR_REQUEST));
             }
             try {
-                this.wait();
+                this.wait(timeout);
             } catch (InterruptedException e) {
             }
-            r = oldest ? removeOldest(requestFilter)
-                       : removeYoungest(requestFilter);
+            if ((timeout ==0 ) || ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
+                r = oldest ? ((requestFilter==null)?removeOldest() :removeOldest(requestFilter))
+                        : ((requestFilter==null)?removeYoungest():removeYoungest(requestFilter));
+            }
         }
         return r;
     }
@@ -216,19 +240,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * @return the request of name methodName found in the queue.
      */
     protected Request blockingRemove(String methodName, boolean oldest) {
-        Request r = oldest ? removeOldest(methodName) : removeYoungest(methodName);
-        while ((r == null) && shouldWait) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-            }
-            r = oldest ? removeOldest(methodName) : removeYoungest(methodName);
-        }
-        return r;
+        requestFilterOnMethodName.setMethodName(methodName);
+        return blockingRemove(requestFilterOnMethodName, oldest, 0);
     }
 
     /**
@@ -239,18 +252,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * @return the request found in the queue.
      */
     protected Request blockingRemove(boolean oldest) {
-        while (isEmpty() && shouldWait) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        return oldest ? removeOldest() : removeYoungest();
+        return blockingRemove(null, oldest, 0);
     }
 
     /**
@@ -263,21 +265,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * @return the request found in the queue or null.
      */
     protected Request blockingRemove(long timeout, boolean oldest) {
-        long timeStartWaiting = System.currentTimeMillis();
-        while (isEmpty() && shouldWait) {
-            if (hasListeners()) {
-                notifyAllListeners(new RequestQueueEvent(ownerID,
-                        RequestQueueEvent.WAIT_FOR_REQUEST));
-            }
-            try {
-                this.wait(timeout);
-            } catch (InterruptedException e) {
-            }
-            if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
-                return oldest ? removeOldest() : removeYoungest();
-            }
-        }
-        return oldest ? removeOldest() : removeYoungest();
+        return blockingRemove(null, oldest, timeout);
     }
 
     /**
@@ -286,30 +274,38 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl
      * null unless the thread has been asked not to wait anymore.
      * @return the request found in the queue.
      */
-    protected Request barrierBlockingRemove() {
+    protected Request barrierBlockingRemoveOldest(long timeout) {
+        long timeStartWaiting=0;
+        if (timeout>0) {
+             timeStartWaiting = System.currentTimeMillis();
+        }
         while (((this.isEmpty() && this.shouldWait) || this.suspended ||
                 (this.indexOfRequestToServe() == -1)) &&
                 !this.specialExecution) {
-            if (this.hasListeners()) {
-                this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
+            if (hasListeners()) {
+                notifyAllListeners(new RequestQueueEvent(ownerID,
                         RequestQueueEvent.WAIT_FOR_REQUEST));
             }
             try {
-                this.wait();
+                wait(timeout);
             } catch (InterruptedException e) {
             }
-        }
-        if (this.specialExecution) {
-            this.specialExecution = false;
-            return this.blockingRemoveOldest(this.specialMethod);
-        }
-        return this.barrierRemoveOldest();
-    }
+            if ((System.currentTimeMillis() - timeStartWaiting) > timeout) {
+                return removeOldest();
+            }
 
-    public Request barrierRemoveOldest() {
-        Request r = (Request) requestQueue.remove(this.indexOfRequestToServe());
+        }
+        if (specialExecution) {
+            specialExecution = false;
+            return blockingRemoveOldest(specialMethod);
+        }
+        return barrierRemoveOldest();
+    }
+    
+    protected Request barrierRemoveOldest() {
+        Request r = (Request) requestQueue.remove(indexOfRequestToServe());
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            this.notifyAllListeners(new RequestQueueEvent(this.ownerID,
+            notifyAllListeners(new RequestQueueEvent(ownerID,
                     RequestQueueEvent.REMOVE_REQUEST));
         }
         return r;
