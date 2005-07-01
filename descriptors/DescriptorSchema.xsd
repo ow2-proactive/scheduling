@@ -795,23 +795,25 @@ by hostlist which is a list of hostname and domain if all the host specified are
 		<xs:sequence>
 			<xs:element ref="environment" minOccurs="0"/>
 			<xs:element ref="processReference"/>
-			<xs:element ref="commandPath" minOccurs="0"/>
+		<!--	<xs:element ref="commandPath" minOccurs="0"/>-->
 			<xs:element name="globusOption" type="GlobusOptionType" minOccurs="0"/>
 		</xs:sequence>
 		<xs:attribute name="class" type="xs:string" use="required" fixed="org.objectweb.proactive.core.process.globus.GlobusProcess"/>
 		<xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
 		<xs:attribute name="hostname" type="xs:string" use="required"/>
+		<xs:attribute name="queue" type="xs:string" use="optional"/>
 	</xs:complexType>
 	<!--globusOption element has one child count element-->
 	<xs:complexType name="GlobusOptionType">
 		<xs:sequence>
 			<xs:element name="count" type="xs:positiveInteger" minOccurs="0"/>
+			<xs:element name="outputFile" type="xs:string" minOccurs="0"/>
+			<xs:element name="errorFile" type="xs:string" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="SecurityType">
 		<xs:attribute name="file" type="xs:string"/>
 	</xs:complexType>
-	
 	<!--unicoreProcess element has 4 childs: processReference element which represents a process defined elsewhere, unicoreDirPath
 	which represents the unicore client configuration directory, keyFilePath which represnets de unicore cliente certificate file and
 	the unicoreOption which represent a unicore site options-->
@@ -845,7 +847,7 @@ by hostlist which is a list of hostname and domain if all the host specified are
 			<xs:element name="vsite" type="unicoreVsiteType" minOccurs="0"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="unicoreUsiteType">	
+	<xs:complexType name="unicoreUsiteType">
 		<xs:attribute name="name" type="xs:string" use="optional"/>
 		<xs:attribute name="url" type="xs:string" use="required"/>
 		<xs:attribute name="type" use="required">
