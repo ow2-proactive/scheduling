@@ -49,14 +49,10 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class GlobusProcess extends AbstractExternalProcessDecorator {
     protected JVMProcessImpl jvmProcess;
-    private static final String FILE_SEPARATOR = System.getProperty(
-            "file.separator");
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + FILE_SEPARATOR + "ProActive" + FILE_SEPARATOR +
-        "scripts" + FILE_SEPARATOR + "unix" + FILE_SEPARATOR + "cluster" +
-        FILE_SEPARATOR + "startRuntime.sh ";
-    private String count = "1";
-    private String scriptLocation = DEFAULT_SCRIPT_LOCATION;
+    protected String count = "1";
+    protected String stderr = null;
+    protected String stdout = null;
+    protected String queue = null;
 
     //===========================================================
     // Constructor
@@ -88,22 +84,21 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     }
 
     public static void main(String[] args) {
-        //String RSL = "& (executable = /bin/ls)(directory=/net/home/rquilici)(arguments=-l)";
-        String RSL = "& (executable = " + DEFAULT_SCRIPT_LOCATION +
-            ")(count=5)";
-        GridJob Job1 = new GridJob("cluster.inria.fr", false);
+        String RSL = "& (executable = /nfs/software/java/j2sdk1.4.2_07/bin/java )(count=5)";
 
-        String jobOut = Job1.GlobusRun(RSL);
+        // String RSL = "& (executable = /user/rquilici/home/ProActive/scripts/unix/cluster/startRuntime.sh )(arguments='/user/rquilici/home/j2sdk1.4.2_05/bin/java -Dproactive.jobid=JOB-986939693  -cp /user/rquilici/home/ProActive/classes:/user/rquilici/home/ProActive/lib/asm.jar:/user/rquilici/home/ProActive/lib/log4j.jar:/user/rquilici/home/ProActive/lib/components/fractal.jar:/user/rquilici/home/ProActive/lib/xercesImpl.jar:/user/rquilici/home/ProActive/lib/bouncycastle.jar -Djava.security.policy=/user/rquilici/home/ProActive/scripts/proactive.java.policy -Dlog4j.configuration=file:/user/rquilici/home/ProActive/scripts/proactive-log4j org.objectweb.proactive.core.runtime.StartRuntime Renderer //sea.inria.fr/PA_JVM986939693_sea.inria.fr 1 globus_jvm Jvm4')(jobType=multiple)(count=5)";
+        GridJob Job1 = new GridJob("viz-login.isi.edu/jobmanager-pbs", false);
 
-        System.out.println(jobOut);
+        //GridJob Job1 = new GridJob("cluster.inria.fr", false);
+        Job1.GlobusRun(RSL);
+        //String jobOut = 
+        //System.out.println(jobOut);
     }
 
     protected void internalStartProcess(String rslCommand)
         throws java.io.IOException {
-        GridJob Job1 = new GridJob(hostname, true);
+        GridJob Job1 = new GridJob(hostname, false);
         String jobOut = Job1.GlobusRun(getCommand());
-
-        //Job1.GlobusRun(getCommand());
         logger.info(jobOut);
     }
 
@@ -112,23 +107,37 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
      * @return String
      */
     private String buildRSLCommand() {
-        String RSLCommand = "& (executable = " + scriptLocation +
-            ")(arguments='" + getTargetProcess().getCommand() + "')(count=" +
-            count + ")(jobType=single)";
+        //here we guess that the process behind globus is a java process. Indeed it makes no sense to
+        //run a globus process foloowed by something else, since we target direclty the globus frontend
+        String java_command = ((JVMProcess) getTargetProcess()).getJavaPath();
+        String initial_args = ((JVMProcess) getTargetProcess()).getCommand()
+                               .substring(java_command.length() + 1);
 
-        //		if (count != null) RSLCommand = RSLCommand+"(count="+count+")";
-        //		RSLCommand = RSLCommand+"(jobType=single)";
+        //This is because the GT2 provider doesn't support the = in the RSL command,
+        //we surround the whole arg with \. This has to be removed for GT4 if one day 
+        // we include the notion of provider, since GT4 supports =.
+        String args = checkSyntax(initial_args);
+
+        String RSLCommand = "& (executable = " + java_command + ")(arguments=" +
+            args + ")(count=" + count + ")";
+
+        if (stdout != null) {
+            RSLCommand = RSLCommand + "(stdout=" + stdout + ")";
+        }
+
+        if (stderr != null) {
+            RSLCommand = RSLCommand + "(stderr=" + stderr + ")";
+        }
+
+        if (queue != null) {
+            RSLCommand = RSLCommand + "(queue=" + queue + ")";
+        }
+
         if (environment != null) {
             RSLCommand = RSLCommand + "(environment=" +
                 buildEnvironmentCommand() + ")";
         }
         return RSLCommand;
-        //		String rslCommand ="&(executable=" + ((JVMProcess)targetProcess).getJavaPath()+")" + 
-        //												"(arguments='-Djava.security.policy="+((JVMProcess)targetProcess).getPolicyFile()+"' '-Dlog4j.configuration="+((JVMProcess)targetProcess).getLog4jFile()+"' "+((JVMProcess)targetProcess).getClassname() + " " + ((JVMProcess)targetProcess).getParameters() +")"+
-        //												"(environment=(CLASSPATH "+((JVMProcess)targetProcess).getClasspath()+")"+buildEnvironmentCommand()+")";
-        //		if (count != null) rslCommand = rslCommand+"(count="+count+")(jobType=single)";
-        //		System.out.println(rslCommand);
-        //				return rslCommand;
     }
 
     protected String buildEnvironmentCommand() {
@@ -185,18 +194,60 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     }
 
     /**
-     * Returns the scriptLocation.
-     * @return String
+     * @param string
      */
-    public String getScriptLocation() {
-        return scriptLocation;
+    private String checkSyntax(String args) {
+        String formatted_args = "";
+        String[] splitted_args = args.split("\\s");
+        for (int i = 0; i < splitted_args.length; i++) {
+            if (!(splitted_args[i].indexOf("=") < 0)) {
+                splitted_args[i] = "\"" + splitted_args[i] + "\"";
+            }
+            formatted_args = formatted_args + " " + splitted_args[i];
+        }
+        System.out.println(formatted_args);
+        return formatted_args;
     }
 
     /**
-     * Sets the scriptLocation.
-     * @param scriptLocation The scriptLocation to set
+     * @return Returns the stderr.
      */
-    public void setScriptLocation(String scriptLocation) {
-        this.scriptLocation = scriptLocation;
+    public String getStderr() {
+        return stderr;
+    }
+
+    /**
+     * @param stderr The stderr to set.
+     */
+    public void setStderr(String stderr) {
+        this.stderr = stderr;
+    }
+
+    /**
+     * @return Returns the stdout.
+     */
+    public String getStdout() {
+        return stdout;
+    }
+
+    /**
+     * @param stdout The stdout to set.
+     */
+    public void setStdout(String stdout) {
+        this.stdout = stdout;
+    }
+
+    /**
+     * @return Returns the queue.
+     */
+    public String getQueue() {
+        return queue;
+    }
+
+    /**
+     * @param queue The queue to set.
+     */
+    public void setQueue(String queue) {
+        this.queue = queue;
     }
 }
