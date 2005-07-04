@@ -205,7 +205,6 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
             }
             formatted_args = formatted_args + " " + splitted_args[i];
         }
-        System.out.println(formatted_args);
         return formatted_args;
     }
 
