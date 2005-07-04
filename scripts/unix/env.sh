@@ -94,9 +94,9 @@ fi
 
 #--------------------------------------------------
 # jars to set when using Globus
-if [ -f $PROACTIVE/lib/globus/cog-jglobus.jar ]
+if [ -f $PROACTIVE/lib/globus/cog-jglobus-1.2.jar ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cog-jglobus.jar
+    CLASSPATH=$CLASSPATH:$PROACTIVE/lib/globus/cog-jglobus-1.2.jar
 fi
 if [ -f $PROACTIVE/lib/globus/cryptix.jar ]
 then
