@@ -811,7 +811,7 @@ public class ProActiveGroup {
      * @param o a typed group.
      * @return the index of a non-awaited member of the Group, -1 if <code>o</code> is not a reified object.
      */
-    public int waitOneAndGetIndex(Object o) {
+    public static int waitOneAndGetIndex(Object o) {
         if (MOP.isReifiedObject(o)) {
             org.objectweb.proactive.core.mop.Proxy theProxy = ProActiveGroup.findProxyForGroup(o);
 
