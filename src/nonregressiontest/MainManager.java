@@ -111,7 +111,7 @@ public class MainManager extends FunctionalTestManager {
         // Launch all unit tests and interlinked tests
         manager.execute();
         logger.info(
-            "You can see results in test.hmtl file in your ProActive directory.");
+            "You can see the results in the test.html file in your ProActive directory.");
         System.exit(0);
     }
     

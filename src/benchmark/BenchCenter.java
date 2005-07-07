@@ -345,7 +345,7 @@ public class BenchCenter extends ProActiveBenchManager {
             center = new BenchCenter(xml);
             center.execute();
             System.out.println(
-                "You can see results in benchmark.hmtl file in your ProActive directory.");
+                "You can see the results in the benchmark.html file in your ProActive directory.");
         } catch (Exception e) {
             e.printStackTrace();
         }
