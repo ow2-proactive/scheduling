@@ -188,6 +188,18 @@
 	<!--
 	   ================================================================
 	   ==
+      ==  Compile LoadBalancing
+      ==
+      ================================================================
+	-->
+	<target name="loadbalancing" depends="ext">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" includes="${proactive.dir}/loadbalancing/*.java" deprecation="on"  source="${source}"  debug="${debug}">
+			<classpath refid="project.classpath"/>
+		</javac>
+	</target>
+	<!--
+	   ================================================================
+	   ==
       ==  Compile P2P
       ==
       ================================================================
