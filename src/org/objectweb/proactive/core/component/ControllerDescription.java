@@ -30,8 +30,16 @@
  */
 package org.objectweb.proactive.core.component;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -49,21 +57,22 @@ import java.io.Serializable;
  * requests targetting a control interface visit the different controllers until
  * they find the suitable controller, and then the request is executed on this
  * controller.
- * 
+ *
  * @author Matthieu Morel
  */
 public class ControllerDescription implements Serializable {
     private String hierarchicalType;
     private String name;
-    private boolean synchronous=false;
-    public static final String DEFAULT_CONTROLLER_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/controller/controllers-config.properties";
-    private File controllerConfigFile;
+    private boolean synchronous = false;
+    public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
+    private File controllersConfigFile;
+
     /**
      * a no-arg constructor (used in the ProActive parser)
      *
      */
     public ControllerDescription() {
-        this((String)null, (String)null, (String)null, false);
+        this((String) null, (String) null, (String) null, false);
     }
 
     /**
@@ -75,27 +84,35 @@ public class ControllerDescription implements Serializable {
         this(name, hierarchicalType, null, false);
     }
 
-    public ControllerDescription(String name, String hierarchicalType, boolean synchronous) {
+    public ControllerDescription(String name, String hierarchicalType,
+        boolean synchronous) {
         this(name, hierarchicalType, null, synchronous);
     }
-    
-    public ControllerDescription(String name, String hierarchicalType, String configFileLocation) {
-        this(name, hierarchicalType, configFileLocation, false);
+
+    public ControllerDescription(String name, String hierarchicalType,
+        String controllersConfigFileLocation) {
+        this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
-    public ControllerDescription(String name, String hierarchicalType, String configFileLocation, boolean synchronous) {
+    public ControllerDescription(String name, String hierarchicalType,
+        String controllersConfigFileLocation,
+        String interceptorsConfigFileLocation) {
+        this(name, hierarchicalType, controllersConfigFileLocation, false);
+    }
+
+    public ControllerDescription(String name, String hierarchicalType,
+        String controllersConfigFileLocation, boolean synchronous) {
         this.hierarchicalType = hierarchicalType;
         this.name = name;
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
-            this.synchronous =synchronous;
+            this.synchronous = synchronous;
         }
-        if (configFileLocation!=null) {
-            controllerConfigFile = new File(configFileLocation);
+        if (controllersConfigFileLocation != null) {
+            controllersConfigFile = new File(controllersConfigFileLocation);
         } else {
-            controllerConfigFile = new File(DEFAULT_CONTROLLER_CONFIG_FILE_LOCATION);
+            controllersConfigFile = new File(DEFAULT_COMPONENT_CONFIG_FILE_LOCATION);
         }
     }
-
 
     /**
      * copy constructor (clones the object)
@@ -142,8 +159,7 @@ public class ControllerDescription implements Serializable {
         return synchronous;
     }
 
-    public File getControllerConfigFile() {
-        return controllerConfigFile;
+    public File getControllersConfigFile() {
+        return controllersConfigFile;
     }
-
 }

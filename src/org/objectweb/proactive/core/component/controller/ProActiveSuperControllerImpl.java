@@ -46,7 +46,7 @@ import java.io.Serializable;
  * 
  * @author Matthieu Morel
  */
-public class ProActiveSuperControllerImpl extends ProActiveController
+public class ProActiveSuperControllerImpl extends AbstractProActiveController
     implements Serializable, ProActiveSuperController {
     public ProActiveSuperControllerImpl(Component owner) {
         super(owner);

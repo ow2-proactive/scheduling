@@ -73,7 +73,7 @@ import java.util.List;
  * @author Matthieu Morel
  *
  */
-public class ProActiveBindingControllerImpl extends ProActiveController
+public class ProActiveBindingControllerImpl extends AbstractProActiveController
     implements ProActiveBindingController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private Bindings bindings; // key = clientInterfaceName ; value = Binding

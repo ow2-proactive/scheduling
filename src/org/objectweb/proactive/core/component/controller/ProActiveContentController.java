@@ -60,7 +60,7 @@ import java.util.List;
  * @author Matthieu Morel
  *
  */
-public class ProActiveContentController extends ProActiveController
+public class ProActiveContentController extends AbstractProActiveController
     implements ContentController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     List fcSubComponents;

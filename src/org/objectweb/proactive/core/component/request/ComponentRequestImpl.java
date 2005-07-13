@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.interception.Interceptor;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -56,13 +57,19 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+
 
 /**
- * Method calls to components are actually reified calls, and ComponentRequest contains
- * a reification of the call.
- * <p/>
- * This class allows for the tagging of the call (a component call), and the redispatching
- * to the targeted component metaobject, interface reference, or base object.
+ * Method calls to components are actually reified calls, and ComponentRequest
+ * contains a reification of the call.
+ * <p>
+ * This class handles the tagging of the call (a component call), and the
+ * redispatching to the targeted component metaobject, interface reference, base
+ * object. It also allows pre and post processing of functional invocations with
+ * interceptors.
  *
  * @author Matthieu Morel
  */
@@ -93,7 +100,7 @@ public class ComponentRequestImpl extends RequestImpl
 
     /**
      * redirects the call to the adequate component metaobject : either to a controller, through the chain of controllers, to
-     * a functional interface in the case of a composite (no preprocessing in that case), or directly executes the invocation 
+     * a functional interface in the case of a composite (no preprocessing in that case), or directly executes the invocation
      * on the base object if this component is a primitive component and the invocation is a functional invocation.
      */
     protected FutureResult serveInternal(Body targetBody)
@@ -108,6 +115,8 @@ public class ComponentRequestImpl extends RequestImpl
                           .handleRequest(this);
             } else {
                 if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
+                    interceptBeforeInvocation(targetBody);
+
                     String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponent())
                                                        .getComponentParameters()
                                                        .getHierarchicalType();
@@ -153,6 +162,7 @@ public class ComponentRequestImpl extends RequestImpl
                         }
                         result = methodCall.execute(targetBody.getReifiedObject());
                     }
+                    interceptAfterInvocation(targetBody);
                 } else {
                     throw new ServeException(
                         "trying to execute a component method on an object that is not a component");
@@ -177,6 +187,35 @@ public class ComponentRequestImpl extends RequestImpl
         }
 
         return new FutureResult(result, exception, null);
+    }
+
+    // intercept and delegate for preprocessing from the interceptors 
+    private void interceptBeforeInvocation(Body targetBody) {
+        List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+                             .getInterceptors();
+        Iterator it = interceptors.iterator();
+        while (it.hasNext()) {
+            ((Interceptor) it.next()).beforeMethodInvocation();
+        }
+    }
+
+    // intercept and delegate for postprocessing from the interceptors 
+    private void interceptAfterInvocation(Body targetBody) {
+        if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
+            List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+                                 .getInterceptors();
+
+            // use interceptors in reverse order after invocation
+            ListIterator it = interceptors.listIterator();
+
+            // go to the end of the list first
+            while (it.hasNext()) {
+                it.next();
+            }
+            while (it.hasPrevious()) {
+                ((Interceptor) it.previous()).afterMethodInvocation();
+            }
+        }
     }
 
     /*

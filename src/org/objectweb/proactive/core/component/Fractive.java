@@ -223,7 +223,7 @@ public class Fractive implements GenericFactory, Component, Factory {
                                                                                                      .createComponentRepresentative(componentParameters.getComponentType(),
                     componentParameters.getHierarchicalType(), myProxy,
                     componentParameters.getControllerDescription()
-                                       .getControllerConfigFile());
+                                       .getControllersConfigFile());
             representative.setStubOnBaseObject((StubObject) ao);
             return representative;
         } catch (ActiveObjectCreationException e) {

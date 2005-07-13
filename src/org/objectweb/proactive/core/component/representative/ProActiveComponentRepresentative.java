@@ -30,6 +30,7 @@
  */ 
 package org.objectweb.proactive.core.component.representative;
 
+import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -40,7 +41,7 @@ import org.objectweb.proactive.core.mop.StubObject;
  * @author Matthieu Morel
  *
  */
-public interface ProActiveComponentRepresentative extends ProActiveComponent, StubObject {
+public interface ProActiveComponentRepresentative extends Component, StubObject {
 	
 	public StubObject getStubOnBaseObject();
 	

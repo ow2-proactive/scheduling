@@ -48,7 +48,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.controller.ProActiveController;
+import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
+import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.group.ProxyForGroup;
@@ -108,7 +109,8 @@ public class ProActiveComponentRepresentativeImpl
         String hierarchicalType, File controllersConfigFile) {
         this.componentType = componentType;
         this.hierarchicalType = hierarchicalType;
-        Properties controllersConfiguration = ProActiveComponentImpl.loadControllersConfiguration(controllersConfigFile);
+        ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadComponentConfiguration(controllersConfigFile);
+        Map controllersConfiguration = componentConfiguration.getControllers();
 
         useShortcuts = ("true".equals(System.getProperty(
                     "proactive.components.use_shortcuts")));
@@ -128,22 +130,22 @@ public class ProActiveComponentRepresentativeImpl
         int i = 0;
 
         // add controllers
-        Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
+        //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
+        Iterator iteratorOnControllers = controllersConfiguration.keySet().iterator(); 
         Class controllerClass = null;
-        ProActiveController currentController;
+        AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
         Class controllerItf;
-        while (controllersInterfaces.hasMoreElements()) {
-            String controllerItfName = (String) controllersInterfaces.nextElement();
+        while (iteratorOnControllers.hasNext()) {
+            String controllerItfName = (String) iteratorOnControllers.next();
             try {
                 controllerItf = Class.forName(controllerItfName);
-                controllerClass = Class.forName(controllersConfiguration.getProperty(
+                controllerClass = Class.forName((String)controllersConfiguration.get(
                             controllerItf.getName()));
-                Constructor[] constructors = controllerClass.getConstructors();
                 Constructor controllerClassConstructor = controllerClass.getConstructor(new Class[] {
                             Component.class
                         });
-                currentController = (ProActiveController) controllerClassConstructor.newInstance(new Object[] {
+                currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
                             this
                         });
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
@@ -151,7 +153,7 @@ public class ProActiveComponentRepresentativeImpl
                         this, (InterfaceType) currentController.getFcItfType());
             } catch (Exception e) {
                 logger.error("could not create controller " +
-                    controllersConfiguration.getProperty(controllerItfName) +
+                    controllersConfiguration.get(controllerItfName) +
                     " : " + e.getMessage());
                 continue;
             }

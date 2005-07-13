@@ -48,7 +48,7 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentParametersController extends ProActiveController
+public class ProActiveComponentParametersController extends AbstractProActiveController
     implements Serializable, ComponentParametersController {
     private ComponentParameters componentParameters;
 

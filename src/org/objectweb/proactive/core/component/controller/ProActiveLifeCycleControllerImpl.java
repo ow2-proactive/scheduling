@@ -59,7 +59,7 @@ import java.io.Serializable;
  * @author Matthieu Morel
  *
  */
-public class ProActiveLifeCycleControllerImpl extends ProActiveController
+public class ProActiveLifeCycleControllerImpl extends AbstractProActiveController
     implements ProActiveLifeCycleController, Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     

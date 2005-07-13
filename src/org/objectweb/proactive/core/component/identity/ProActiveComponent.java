@@ -35,6 +35,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.UniqueID;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -74,4 +75,7 @@ public interface ProActiveComponent extends Component, Serializable {
      * @return a unique identifier of the component (of the active object) accross virtual machines
      */
     public UniqueID getID();
+    
+    
+    public List getInterceptors();
 }

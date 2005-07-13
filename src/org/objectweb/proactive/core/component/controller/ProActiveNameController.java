@@ -12,7 +12,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  * @author Matthieu Morel
  *
  */
-public class ProActiveNameController extends ProActiveController implements NameController {
+public class ProActiveNameController extends AbstractProActiveController implements NameController {
     
     // FIXME coherency between this value and the one in component parameters controller
     String name;
