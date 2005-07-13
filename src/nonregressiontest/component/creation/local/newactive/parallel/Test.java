@@ -166,14 +166,14 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        String p1_name = Fractive.getComponentParametersController(p1)
-                                 .getComponentParameters().getName();
-        String p2_name = Fractive.getComponentParametersController(p2)
-                                 .getComponentParameters().getName();
-        String p3_name = Fractive.getComponentParametersController(p3)
-                                 .getComponentParameters().getName();
-        String pr1_name = Fractive.getComponentParametersController(pr1)
-                                  .getComponentParameters().getName();
+        String p1_name = Fractal.getNameController(p1).
+                                 getFcName();
+        String p2_name = Fractal.getNameController(p2).
+                                 getFcName();
+        String p3_name = Fractal.getNameController(p3).
+                                 getFcName();
+        String pr1_name = Fractal.getNameController(pr1).
+                                  getFcName();
         return (p1_name.equals(P1_NAME) && p2_name.equals(P2_NAME) &&
         p3_name.equals(P3_NAME) && pr1_name.equals(PR1_NAME));
     }

@@ -156,16 +156,12 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        String parallelizedComponent_1_name = Fractive.getComponentParametersController((Component) ProActiveGroup.getGroup(
-                    parallelizedComponents).get(0)).getComponentParameters()
-                                                      .getName();
-        String parallelizedComponent_2_name = Fractive.getComponentParametersController((Component) ProActiveGroup.getGroup(
-                    parallelizedComponents).get(1)).getComponentParameters()
-                                                      .getName();
-        String p3_name = Fractive.getComponentParametersController(p3)
-                                 .getComponentParameters().getName();
-        String pr1_name = Fractive.getComponentParametersController(parallelComponent)
-                                  .getComponentParameters().getName();
+        String parallelizedComponent_1_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                    parallelizedComponents).get(0)).getFcName();
+        String parallelizedComponent_2_name = Fractal.getNameController((Component) ProActiveGroup.getGroup(
+                    parallelizedComponents).get(1)).getFcName();
+        String p3_name = Fractal.getNameController(p3).getFcName();
+        String pr1_name = Fractal.getNameController(parallelComponent).getFcName();
         return (parallelizedComponent_1_name.equals(P1_NAME +
             Constants.CYCLIC_NODE_SUFFIX + 0) &&
         parallelizedComponent_2_name.equals(P1_NAME +
