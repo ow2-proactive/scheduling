@@ -74,7 +74,7 @@ public class Test extends ComponentTest {
                             ComponentInfo.class.getName(), TypeFactory.SERVER,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE),
                     }),
-                new ControllerDescription("componentA", Constants.PRIMITIVE, getClass().getResource("/nonregressiontest/component/controller/controllers-config.properties").getPath()),
+                new ControllerDescription("componentA", Constants.PRIMITIVE, getClass().getResource("/nonregressiontest/component/controller/config.xml").getPath()),
                 new ContentDescription(ComponentA.class.getName(),
                     new Object[] { "toto" }));
         //logger.debug("OK, instantiated the component");

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="file:../../../org/objectweb/proactive/core/component/config/controllers-config.xsd" name="interception">
+    <controllers>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ComponentParametersController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveComponentParametersController</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.fractal.api.control.ContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentController</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.fractal.api.control.ContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentController</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.fractal.api.control.NameController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
+        </controller>
+        <!-- specific controllers & interceptors -->
+        <controller>
+            <interface>nonregressiontest.component.controller.DummyController</interface>
+            <implementation>nonregressiontest.component.controller.DummyControllerImpl</implementation>
+        </controller>
+    </controllers>
+    
+</componentConfiguration>
+    
+
