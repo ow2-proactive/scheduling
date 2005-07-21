@@ -30,26 +30,29 @@
  */
 package org.objectweb.proactive.core.config.xml;
 
-import java.io.IOException;
-
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
+
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+
 
 public class MasterFileHandler extends AbstractUnmarshallerDecorator
     implements MasterFileConstants {
-
-//    static {
-//        BasicConfigurator.configure();
-//    }
-
+    //    static {
+    //        BasicConfigurator.configure();
+    //    }
     protected static ProActiveConfiguration config;
 
     public MasterFileHandler() {
-        addHandler(PROPERTIES_TAG, new PropertiesHandler(MasterFileHandler.config));
-		//addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
+        addHandler(PROPERTIES_TAG,
+            new PropertiesHandler(MasterFileHandler.config));
+
+        //addHandler(LOG4J_FILE_TAG, new Log4jConfigurationHandler());
     }
 
     /**
@@ -58,12 +61,26 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
      */
     public static void createMasterFileHandler(String filename,
         ProActiveConfiguration config) {
-			MasterFileHandler.config = config;
+        MasterFileHandler.config = config;
+
         InitialHandler h = new InitialHandler();
         org.objectweb.proactive.core.xml.io.StreamReader sr;
+
         try {
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        filename), h);
+            InputSource source = null;
+
+            //System.out.println("FILENAME = " + filename);
+            if (filename.startsWith("bundle://")) {
+
+                /* osgi mode, get the ProActiveConfiguration in the jar root */
+                filename = "/ProActiveConfiguration.xml";
+                //filename = "/org/objectweb/proactive/core/config/ProActiveConfiguration.xml";
+                source = new InputSource(MasterFileHandler.class.getResourceAsStream(
+                            filename));
+            } else {
+                source = new org.xml.sax.InputSource(filename);
+            }
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source, h);
             sr.read();
         } catch (IOException e) {
             e.printStackTrace();
@@ -72,11 +89,11 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
 
     protected void notifyEndActiveHandler(String name,
         UnmarshallerHandler activeHandler) throws SAXException {
-     //   System.out.println("End active handler");
+        //   System.out.println("End active handler");
     }
 
     public Object getResultObject() throws SAXException {
-      //  System.out.println("get result object");
+        //  System.out.println("get result object");
         return null;
     }
 
@@ -94,6 +111,7 @@ public class MasterFileHandler extends AbstractUnmarshallerDecorator
         private InitialHandler() {
             super();
             masterFileHandler = new MasterFileHandler();
+
             //			  managerDescriptorHandler = new ManagerDescriptorHandler(manager);
             this.addHandler(MASTER_TAG, masterFileHandler);
         }
