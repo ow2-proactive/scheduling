@@ -30,13 +30,11 @@
  */
 package org.objectweb.proactive.core.rmi;
 
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpMessage;
+
 import java.io.DataInputStream;
 import java.io.IOException;
-
-import org.objectweb.proactive.core.body.http.HttpMessage;
-import org.objectweb.proactive.core.runtime.http.RuntimeReply;
-import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 
 /**
@@ -56,44 +54,60 @@ public class HTTPProcess {
         this.in = in;
     }
 
+    //    private void  test () {
+    //        
+    //        int b;
+    //        try {
+    //            b = in.read ();
+    //            int count = 0;
+    //            while (b != -1) {
+    //                b = in.read ();
+    //                count ++;
+    //            }
+    ////            System.out.println("TEST = " + count);
+    //        } catch (IOException e) {
+    //            // TODO Auto-generated catch block
+    //            e.printStackTrace();
+    //        }
+    //       
+    //        
+    //    }
+
     /**
      *
      */
-    public MSG getBytes() {
+    public Object getBytes() {
+        //        System.out.println("GET ByTES");
+        //        test ();
         Object result = null;
         byte[] replyMessage = null;
         String action = null;
+
+        //            System.out.println(" -- " + info.getContentLength());
+        byte[] source = new byte[info.getContentLength()];
+        int b;
+
         try {
-            byte[] source = new byte[info.getContentLength()];
             in.readFully(source);
-            
-            /* Get what is in the  request */
-            result = ProActiveXMLUtils.unwrapp(source, info.getAction());
-            Object returnedObject = null;
-            if (result instanceof HttpMessage ) {
-                returnedObject = ( (HttpMessage) result).processMessage();
-                if (returnedObject != null) {
-                	replyMessage = ProActiveXMLUtils.getMessage(returnedObject);//, ProActiveXMLUtils.MESSAGE);
-                	action = ProActiveXMLUtils.MESSAGE;
-                }
-            } else if (result instanceof RuntimeReply) {
-                
-                replyMessage = ProActiveXMLUtils.getMessage(result);//, ProActiveXMLUtils.RUNTIME_REPLY);
-                action = ProActiveXMLUtils.RUNTIME_REPLY;
-            }
-            if (replyMessage == null) {
-             
-                replyMessage = ProActiveXMLUtils.getMessage("");//, ProActiveXMLUtils.OK);
-                action = ProActiveXMLUtils.OK;
-            }
+            //               System.out.println("SOURCE :");
+            //               for (int i=0; i< source.length ; i++) {
+            //                   System.out.print((char)source[i]);
+            //               }
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Thread.currentThread().setContextClassLoader(this.getClass()
+                                                             .getClassLoader());
+            HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(source);
+            result = message.processMessage();
+            Thread.currentThread().setContextClassLoader(cl);
+            return result;
         } catch (IOException e) {
-        	replyMessage = ProActiveXMLUtils.getMessage(new HTTPRemoteException("Error before calling the remove method", e));
-        	action = ProActiveXMLUtils.ACTION_EXCEPTION;
+            e.printStackTrace();
         } catch (Exception e) {
-        	replyMessage = ProActiveXMLUtils.getMessage(e);
-        	action = ProActiveXMLUtils.ACTION_EXCEPTION;
+            // catch the exception and returns it
+            //  e.printStackTrace();
+            result = e;
         }
-        
-        return new MSG(replyMessage, action);
+
+        return result;
     }
 }

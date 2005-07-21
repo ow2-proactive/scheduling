@@ -1,3 +1,6 @@
+package org.objectweb.proactive.core.rmi;
+
+
 /*
  * ################################################################
  *
@@ -28,8 +31,6 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.rmi;
-
 import org.apache.log4j.Logger;
 
 
@@ -94,7 +95,6 @@ public class RegistryHelper {
         }
     }
 
-   
     public static java.rmi.registry.Registry getRegistry() {
         return registry;
     }
@@ -109,7 +109,7 @@ public class RegistryHelper {
     private static java.rmi.registry.Registry createRegistry(int port)
         throws java.rmi.RemoteException {
         registry = java.rmi.registry.LocateRegistry.createRegistry(port);
-		registryCreator = true;
+        registryCreator = true;
         return registry;
     }
 

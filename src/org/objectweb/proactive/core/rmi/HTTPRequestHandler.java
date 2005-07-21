@@ -31,13 +31,20 @@
 package org.objectweb.proactive.core.rmi;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.osgi.OsgiParameters;
 
 import java.io.BufferedInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import java.net.Socket;
+
+import javax.servlet.http.HttpServletResponse;
 
 
 /**
@@ -50,97 +57,131 @@ import java.net.Socket;
  */
 public class HTTPRequestHandler extends Thread {
     protected static Logger logger = Logger.getLogger(ClassServer.class.getName());
-    private final Socket socket;
+    private Socket socket;
     private String paths;
+    private InputStream in;
+    private OutputStream out;
+    private RequestInfo reqInfo;
+    private HttpServletResponse response;
 
-    public HTTPRequestHandler(Socket socket, String paths) {
+    public HTTPRequestHandler(Socket socket, String paths)
+        throws IOException {
+        this(socket.getInputStream(), socket.getOutputStream());
         this.socket = socket;
         this.paths = paths;
     }
 
-    public void run() {
-        HTTPInputStream in = null;
-        DataOutputStream out = null;
-        RequestInfo info = new RequestInfo();
+    public HTTPRequestHandler(InputStream in, OutputStream out,
+        RequestInfo reqInfo, HttpServletResponse response) {
+        this(in, out, reqInfo);
+        this.response = response;
+    }
 
+    public HTTPRequestHandler(InputStream in, OutputStream out,
+        RequestInfo reqInfo) {
+        this(in, out);
+        this.reqInfo = reqInfo;
+    }
+
+    public HTTPRequestHandler(InputStream in, OutputStream out) {
+        this.in = in;
+        this.out = out;
+    }
+
+    //    public void test () {
+    //        
+    //        /* -------------------------------------------------------------------------- */
+    ////      byte[] source = new byte[reqInfo.getContentLength()];
+    ////      
+    ////      System.out.println("HTTP Request Handler    TEST  Content - Length ");
+    //      int b;
+    //      try {
+    //          
+    //          b = in.read();
+    //          
+    //          System.out.println("B = " + b);
+    //          int count = 0;
+    //          while (b != -1 ) {
+    //              System.out.print((char)b);
+    //              b = (byte)in.read();
+    //              count++;
+    //          }
+    //          System.out.println("==> count = " + count);
+    //      } catch (IOException e1) {
+    //          // TODO Auto-generated catch block
+    //          e1.printStackTrace();
+    //      }
+    //    }
+    public void run() {
+        HTTPInputStream httpIn = null;
+        DataOutputStream dOut = null;
         String responseHeaders = "";
         String statusLine = null;
         String contentType;
         byte[] bytes = null;
 
         try {
-            out = new java.io.DataOutputStream(socket.getOutputStream());
+            dOut = new java.io.DataOutputStream(this.out);
 
             // Get the headers information in order to determine what is the requested service
-            in = new HTTPInputStream(new BufferedInputStream(
-                        socket.getInputStream()));
+            httpIn = new HTTPInputStream(new BufferedInputStream(this.in));
 
+            try {
 
-// Process several requests in a row if needed (HTTP/1.1 persistent connection)
-process_request: 
-            while (true) {
-                try {
-                    info.read(in);
-
-                    if (!info.isBegun()) {
-                        break process_request; // connection was closed by the client
-                    }
-                    // else we successfully read the request information
-                    
-                    // If  there is no field ClassFileName then it is a call to the
-                    // ProActive Request via HTTP
-                    if (info.getClassFileName() == null) {
-                        HTTPProcess process = new HTTPProcess(in, info);
-                        MSG msg = process.getBytes();
-                        String actionType = msg.getAction();
-                        bytes = msg.getMessage();
-
-                        statusLine = "HTTP/1.1 200 OK";
-                        contentType = ProActiveXMLUtils.SERVICE_REQUEST_CONTENT_TYPE ;
-                        responseHeaders = "ProActive-Action: " + actionType +
-                            "\r\n";
-                    } else {
-                        // ClassServer request
-                        FileProcess fp = new FileProcess(paths, info);
-                        bytes = fp.getBytes();
-                        statusLine = "HTTP/1.1 200 OK";
-                        contentType = "application/java";
-                    }
-                } catch (ClassNotFoundException e) {
-                    logger.info("ClassServer failed to load class " +
-                        info.getClassFileName());
-                    statusLine = "HTTP/1.1 404 " + e.getMessage();
-                    contentType = "text/plain";
-                    bytes = new byte[0];
-                } catch (IOException e) { // Including HTTPRemoteException & co
-                    statusLine = "HTTP/1.1 500 " + e.getMessage();
-                    contentType = "text/plain";
-
-                    // Time-consuming and not very useful:
-                    // StringBuffer buf = new StringBuffer();
-                    // StackTraceElement[] trace = e.getStackTrace();
-                    // for (int i = 0; i < trace.length; i++) {
-                    // 	buf.append(trace[i].toString());
-                    // 	buf.append("\n");
-                    // }
-                    // bytes = buf.toString().getBytes();
-                    bytes = new byte[0];
+                /* ----------------- Here we get the request headers  */
+                if (this.reqInfo == null) {
+                    //                        System.out.println("--> Lecture des headers !!!!!");
+                    this.reqInfo = new RequestInfo();
+                    reqInfo.read(httpIn);
                 }
 
-                out.writeBytes(statusLine + "\r\n");
-                out.writeBytes("Content-Length: " + bytes.length + "\r\n");
+                // If  there is no field ClassFileName then it is a call to the
+                // ProActive Request via HTTP
+                if (this.reqInfo.getClassFileName() == null) {
+                    HTTPProcess process = new HTTPProcess(httpIn, this.reqInfo);
 
-                int a = bytes.length;
-                String b = "Content-Length: " + bytes.length + "\r\n";
-                out.writeBytes("Content-Type: " + contentType + "\r\n");
-                out.writeBytes(responseHeaders);
-                out.writeBytes("\r\n");
-                out.write(bytes);
-                out.flush();
-                
-                if (info.getClassFileName() != null) {
-                	logger.info("ClassServer sent class " + info.getClassFileName() + " successfully");
+                    Object o = process.getBytes();
+                    bytes = HttpMarshaller.marshallObject(o);
+
+                    /////////////////////////////////
+                    statusLine = "HTTP/1.1 200 OK";
+                    contentType = HttpUtils.SERVICE_REQUEST_CONTENT_TYPE;
+                } else {
+                    // ClassServer request
+                    FileProcess fp = new FileProcess(paths, this.reqInfo);
+                    bytes = fp.getBytes();
+                    statusLine = "HTTP/1.1 200 OK";
+                    contentType = "application/java";
                 }
+            } catch (ClassNotFoundException e) {
+                logger.info("ClassServer failed to load class " +
+                    this.reqInfo.getClassFileName());
+                statusLine = "HTTP/1.1 404 " + e.getMessage();
+                contentType = "text/plain";
+                bytes = new byte[0];
+            } catch (IOException e) { // Including HTTPRemoteException & co
+                statusLine = "HTTP/1.1 500 " + e.getMessage();
+                contentType = "text/plain";
+                bytes = new byte[0];
+            }
+
+            //                System.out.println("ecriture sur le dOut " + out + " -- " + contentType);
+            if (!OsgiParameters.servletEnabled()) {
+                dOut.writeBytes(statusLine + "\r\n");
+                dOut.writeBytes("Content-Length: " + bytes.length + "\r\n");
+                dOut.writeBytes("Content-Type: " + contentType + "\r\n");
+                dOut.writeBytes(responseHeaders);
+                dOut.writeBytes("\r\n");
+            } else {
+                response.setContentLength(bytes.length);
+                response.setContentType(contentType);
+            }
+            dOut.write(bytes);
+            dOut.flush();
+
+            if (reqInfo.getClassFileName() != null) {
+                logger.info("ClassServer sent class " +
+                    reqInfo.getClassFileName() + " successfully");
             }
         } catch (IOException e) {
             // If there is an error when writing the reply,
@@ -151,10 +192,12 @@ process_request:
                 if (logger.isDebugEnabled()) {
                     logger.debug("Closing socket " + this.socket);
                 }
-
+                dOut.close();
                 out.close();
-                in.close();
-                socket.close();
+
+                if (socket != null) {
+                    socket.close();
+                }
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }

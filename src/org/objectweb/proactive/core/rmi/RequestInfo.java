@@ -30,16 +30,18 @@
  */
 package org.objectweb.proactive.core.rmi;
 
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
 
 import java.io.IOException;
 
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
 
 public class RequestInfo {
+
     /* Reusable variables */
-    
     private static Pattern pSpace = Pattern.compile(" ");
     private static final String METHOD_GET = "GET";
     private static final String METHOD_POST = "POST";
@@ -48,6 +50,12 @@ public class RequestInfo {
     private String classFileName;
     private String action;
     private boolean begun;
+
+    public void read(HttpServletRequest request) {
+        this.contentType = request.getContentType();
+        this.contentLength = request.getContentLength();
+        this.action = request.getHeader("Proactive-action");
+    }
 
     public String getContentType() {
         return contentType;
@@ -59,10 +67,6 @@ public class RequestInfo {
 
     public String getClassFileName() {
         return classFileName;
-    }
-
-    public String getAction() {
-        return action;
     }
 
     public boolean isBegun() {
@@ -88,9 +92,9 @@ public class RequestInfo {
             begun = false;
             return;
         } else {
-        	begun = true;
+            begun = true;
         }
-        
+
         String[] triplet = pSpace.split(line, 3);
         String method = null;
         String requestURI = null;
@@ -126,29 +130,27 @@ public class RequestInfo {
                 }
             } while (line.length() > 0); // empty line, end of headers
         } else if (method.equals(METHOD_POST)) {
-            if (!requestURI.equals(ProActiveXMLUtils.SERVICE_REQUEST_URI)) {
+            if (!requestURI.equals(HttpUtils.SERVICE_REQUEST_URI)) {
                 throw new java.io.IOException(
                     "Malformed Request Line, expected " +
-                    ProActiveXMLUtils.SERVICE_REQUEST_URI + " as path: " +
-                    line);
+                    HttpUtils.SERVICE_REQUEST_URI + " as path: " + line);
             }
 
             /* Read message headers */
             in.parseHeaders();
-            
+
             // ProActive specific processing
             this.contentLength = Integer.parseInt(in.getHeader("Content-Length"));
             this.contentType = in.getHeader("Content-Type");
 
-            if (!contentType.equals(
-                        ProActiveXMLUtils.SERVICE_REQUEST_CONTENT_TYPE)) {
+            if (!contentType.equals(HttpUtils.SERVICE_REQUEST_CONTENT_TYPE)) {
                 throw new java.io.IOException(
                     "Malformed header, expected Content-Type = " +
-                    ProActiveXMLUtils.SERVICE_REQUEST_CONTENT_TYPE + ": " +
+                    HttpUtils.SERVICE_REQUEST_CONTENT_TYPE + ": " +
                     contentType);
             }
 
-            this.action = in.getHeader("ProActive-Action");
+            //            this.action = in.getHeader("ProActive-Action");
         } else {
             throw new java.io.IOException(
                 "Malformed Request Line, expected method GET or POST: " + line);

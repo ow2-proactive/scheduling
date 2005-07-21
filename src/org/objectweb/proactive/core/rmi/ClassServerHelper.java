@@ -31,6 +31,8 @@
 package org.objectweb.proactive.core.rmi;
 
 import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.osgi.OsgiParameters;
+
 
 public class ClassServerHelper {
 
@@ -48,6 +50,9 @@ public class ClassServerHelper {
         if ((System.getSecurityManager() == null) &&
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
+        }
+        if (OsgiParameters.servletEnabled()) {
+            this.shouldCreateClassServer = false;
         }
     }
 
@@ -77,7 +82,8 @@ public class ClassServerHelper {
         shouldCreateClassServer = v;
     }
 
-    public synchronized String initializeClassServer() throws java.io.IOException {
+    public synchronized String initializeClassServer()
+        throws java.io.IOException {
         if (!shouldCreateClassServer) {
             return null; // don't bother
         }
@@ -89,25 +95,26 @@ public class ClassServerHelper {
         } else {
             currentClassServer = new ClassServer(classpath);
         }
-        String codebase = this.getCodebase();       
+        String codebase = this.getCodebase();
         System.setProperty("java.rmi.server.codebase", codebase);
-        
+
         return codebase;
     }
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
     // 
-
-    private String getCodebase(){
+    private String getCodebase() {
         String codebase;
-        if (SshParameters.getSshTunneling ()) {
-    		codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
-            	ClassServer.getServerSocketPort() + "/"; 
-    	} else {
-    		codebase = "http://" + currentClassServer.getHostname() + ":" +
-            	ClassServer.getServerSocketPort() + "/";
-    	}
+        if (SshParameters.getSshTunneling()) {
+            codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
+                ClassServer.getServerSocketPort() + "/";
+        } else if (OsgiParameters.servletEnabled()) {
+            codebase = ClassServerServlet.getUrl();
+        } else {
+            codebase = "http://" + currentClassServer.getHostname() + ":" +
+                ClassServer.getServerSocketPort() + "/";
+        }
         return codebase;
     }
 }
