@@ -22,7 +22,7 @@
 		<prop key="ibis.name_server.key" value="12"/>
 		<prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive"/>
 		<prop key="ibis.name" value="tcp"/>
-		
+		<prop key="proactive.http.servlet" value="disabled" />
 		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
 
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
