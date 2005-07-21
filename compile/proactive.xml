@@ -14,7 +14,10 @@
 	<property name="name" value="ProActive"/>
 	<property name="debug" value="on"/>
     <property name="source" value="1.4"/>
-    
+	   <property name="manifest.dir" value="${src.dir}/org/objectweb/proactive/osgi/Manifest/"/>
+	<property name="config.dir" value="${classes.dir}/${proactive.core.dir}/config/" />
+	<property name="bundle.dir" value="${base}/dist/bundle"/>
+		
 	<!-- define the classpath -->
 	<path id="project.classpath">
 		<pathelement location="${base}/classes"/>
@@ -23,6 +26,7 @@
 			<include name="jini/*.jar"/>
 			<include name="globus/*.jar"/>
 			<include name="ws/*.jar"/>
+			<include name="osgi/*.jar"/>
 			<include name="components/*.jar"/>
 			<include name="ibis/*.jar"/>
 			<include name="unicore/*.jar"/>
@@ -134,6 +138,7 @@
 			<include name="*.java"/>
 			<include name="${proactive.dir}/*.java"/>
 			<include name="${proactive.dir}/jini/*.java"/>
+			<include name="${proactive.dir}/osgi/*.java"/>
 			<include name="${proactive.dir}/rmi/*.java"/>
 			<include name="${proactive.core.dir}/**/*.java"/>
 		</javac>
@@ -350,8 +355,37 @@
 			</fileset>
 		</jar>
 	</target>
-
-
+	<!--
+	   ================================================================
+	   ==
+	   ==  Create ProActiveBundle.jar
+	   ==
+	   ================================================================
+		-->
+	<target name="proActiveBundle" depends="proActiveJar">
+				<mkdir dir="${bundle.dir}"/>
+				<jar 
+					manifest="${manifest.dir}/Manifest.mf" 
+					jarfile="${bundle.dir}/proactiveBundle.jar"
+				>
+					<fileset dir="${classes.dir}">
+						<include name="${proactive.dir}/**"/>
+						</fileset>
+							<fileset dir="${base}/lib/">
+						<include name="asm.jar"/>
+						<include name="log4j.jar"/>
+						<include name="xercesImpl.jar"/>
+						<include name="bouncycastle.jar"/>
+						<include name="components/fractal.jar"/>
+		 			</fileset>
+					
+					<fileset dir="${config.dir}" >
+						<include name="ProActiveConfiguration.xml" />
+					</fileset>
+					
+					
+				</jar>
+			</target>
 	<!--
 	   ================================================================
 	   ==
