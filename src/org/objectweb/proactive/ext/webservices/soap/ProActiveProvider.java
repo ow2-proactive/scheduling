@@ -30,6 +30,13 @@
 */
 package org.objectweb.proactive.ext.webservices.soap;
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Hashtable;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSession;
+
 import org.apache.soap.Constants;
 import org.apache.soap.Envelope;
 import org.apache.soap.SOAPException;
@@ -39,21 +46,11 @@ import org.apache.soap.rpc.SOAPContext;
 import org.apache.soap.server.DeploymentDescriptor;
 import org.apache.soap.server.RPCRouter;
 import org.apache.soap.util.Provider;
-
 import org.objectweb.fractal.api.Component;
-
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.ext.webservices.WSConstants;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
-
-import java.io.StringWriter;
-
-import java.util.HashMap;
-import java.util.Hashtable;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpSession;
 
 
 /**
@@ -125,10 +122,10 @@ public class ProActiveProvider extends WSConstants implements Provider {
         //System.out.println("");
         try {
             if (!isInterfaceComponent) {
-                targetObject = ProActiveXMLUtils.deserializeObject(serObj);
+                targetObject =HttpMarshaller.unmarshallObject(serObj);
             } else {
                 //Component c = (Component)ProActiveXMLUtils.deserializeObject(serObj);
-                Object o = ProActiveXMLUtils.deserializeObject(serObj);
+                Object o = HttpMarshaller.unmarshallObject(serObj);
                 Component c = (Component) o;
                 targetObject = c.getFcInterface(targetObjectURI);
             }

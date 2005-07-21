@@ -46,9 +46,9 @@ import org.apache.soap.util.xml.QName;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.ext.webservices.WSConstants;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 import org.objectweb.proactive.ext.webservices.wsdl.WSDLGenerator;
 
 
@@ -211,10 +211,10 @@ public class ProActiveDeployer extends WSConstants {
 
         if (componentInterface) {
             props.put(COMPONENT_INTERFACE, "true");
-            props.put(PROACTIVE_STUB, ProActiveXMLUtils.serializeObject(c));
+            props.put(PROACTIVE_STUB, HttpMarshaller.marshallObject(c));
         } else {
             props.put(COMPONENT_INTERFACE, "false");
-            props.put(PROACTIVE_STUB, ProActiveXMLUtils.serializeObject(o));
+            props.put(PROACTIVE_STUB, HttpMarshaller.marshallObject(o));
         }
 
         dd.setProps(props);

@@ -30,20 +30,16 @@
  */
 package org.objectweb.proactive.ext.webservices.wsdl;
 
-import org.apache.axis.wsdl.fromJava.Emitter;
-
-import org.objectweb.proactive.ext.webservices.WSConstants;
-
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.io.StringWriter;
-
 import java.util.Vector;
 
 import javax.wsdl.WSDLException;
-
 import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.axis.wsdl.fromJava.Emitter;
+import org.objectweb.proactive.ext.webservices.WSConstants;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -51,7 +47,7 @@ import javax.xml.parsers.ParserConfigurationException;
  */
 public class WSDLGenerator extends WSConstants {
     /**
-     * Generate the WSDL document associate with an  active object exposed as a web service
+     * Generates the WSDL document associate with an  active object exposed as a web service
      * @param c The class object that we want to obtain WSDL
      * @param serviceName The name of the service (urn)
      * @param urlRouter   The url where the service can be accessed
@@ -76,7 +72,10 @@ public class WSDLGenerator extends WSConstants {
                 }
                 emitter.setAllowedMethods(allowedMethods);
             }
-
+            
+//            TypeMappingRegistryImpl tmr = new TypeMappin gRegistryImpl();
+//            emitter.setTypeMappingRegistry(tmr);
+             
             emitter.setLocationUrl(urlRouter);
             emitter.setIntfNamespace(namespace);
             emitter.setImplNamespace(namespace);
@@ -85,7 +84,7 @@ public class WSDLGenerator extends WSConstants {
            
             
             String wsdl = emitter.emitToString(Emitter.MODE_ALL);
-
+            System.out.println(wsdl);
             return wsdl;
         } catch (WSDLException e) {
             e.printStackTrace();

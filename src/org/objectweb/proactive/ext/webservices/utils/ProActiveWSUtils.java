@@ -31,9 +31,12 @@
 package org.objectweb.proactive.ext.webservices.utils;
 
 import java.io.File;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import javax.activation.DataHandler;
+
 import javax.xml.messaging.URLEndpoint;
 import javax.xml.soap.AttachmentPart;
 import javax.xml.soap.MessageFactory;
@@ -84,7 +87,6 @@ public class ProActiveWSUtils {
         }
     }
 
-   
     /**
      *
      * @param message
@@ -94,6 +96,7 @@ public class ProActiveWSUtils {
         init();
 
         SOAPMessage reponse = null;
+
         try {
             URLEndpoint destination = new URLEndpoint(url);
 
@@ -126,19 +129,19 @@ public class ProActiveWSUtils {
             message.addAttachmentPart(attachment);
         } catch (MalformedURLException e) {
             e.printStackTrace();
+
             return null;
         }
 
         return message;
     }
 
-   
-
     /**
      *
      */
     public static SOAPMessage createMessage() throws SOAPException {
         init();
+
         SOAPMessage message = messageFactory.createMessage();
 
         //message. 
@@ -150,6 +153,7 @@ public class ProActiveWSUtils {
      */
     public static Name createName(String string) throws SOAPException {
         init();
+
         return soapFactory.createName(string);
     }
 }
