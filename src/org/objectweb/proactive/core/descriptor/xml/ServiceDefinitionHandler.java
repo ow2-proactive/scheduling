@@ -38,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -156,12 +157,6 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
             return p2pDescriptorService;
         }
 
-        private class SingleValueUnmarshaller extends BasicUnmarshaller {
-            public void readValue(String value) throws org.xml.sax.SAXException {
-                //System.out.println("SingleValueUnmarshaller.readValue() " + value);
-                setResultObject(value);
-            }
-        }
     } // end of inner class P2PLookupHandler
 
     protected class FaultToleranceHandler extends PassiveCompositeUnmarshaller {

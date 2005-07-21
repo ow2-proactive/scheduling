@@ -39,8 +39,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
-import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 import org.objectweb.proactive.core.xml.io.StreamReader;
@@ -139,18 +139,7 @@ public class ComponentConfigurationHandler
 
 	}
 
-	//-----------------------------------------------------------------------------------------------------------
-	private class SingleValueUnmarshaller extends BasicUnmarshaller {
-		public void readValue(String value) throws org.xml.sax.SAXException {
-			setResultObject(value);
-		}
-	}
-	
-	
-
-
-
-    /******************************************************************************************************************/
+	/******************************************************************************************************************/
     
     private class ControllersHandler extends CollectionUnmarshaller {
 
@@ -190,8 +179,9 @@ public class ComponentConfigurationHandler
             boolean interception = false;
             
             public ControllerHandler() {
-                addHandler(INTERFACE_ELEMENT, new SingleValueUnmarshaller());
-                addHandler(IMPLEMENTATION_ELEMENT, new SingleValueUnmarshaller());
+                UnmarshallerHandler singleValueHandler = new SingleValueUnmarshaller();
+                addHandler(INTERFACE_ELEMENT, singleValueHandler);
+                addHandler(IMPLEMENTATION_ELEMENT, singleValueHandler);
             }
             
             public void startContextElement(String name, Attributes attributes)

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -425,13 +426,6 @@ public class ProActiveSecurityDescriptorHandler
     }
 
     // end inner class CommunicationHandler
-    private class SingleValueUnmarshaller extends BasicUnmarshaller {
-        public void readValue(String value) throws org.xml.sax.SAXException {
-            setResultObject(value);
-        }
-    }
-
-    //end of inner class SingleValueUnmarshaller
 
     /**
      * Creates ProActiveDescriptor object from XML Descriptor

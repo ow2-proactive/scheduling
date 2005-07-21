@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshallerDecorator;
 import org.objectweb.proactive.core.xml.handler.CollectionUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller;
+import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
 
@@ -1106,14 +1107,6 @@ public class ProcessDefinitionHandler extends AbstractUnmarshallerDecorator
 	}
 
 	//end of Unicore Process Handler
-
-	private class SingleValueUnmarshaller extends BasicUnmarshaller {
-		public void readValue(String value) throws org.xml.sax.SAXException {
-			//System.out.println("SingleValueUnmarshaller.readValue() " +
-			// value);
-			setResultObject(value);
-		}
-	}
 
 	private class SimpleValueHandler extends BasicUnmarshaller {
 		public void startContextElement(String name, Attributes attributes)
