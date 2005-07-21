@@ -28,8 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http;
-
+package org.objectweb.proactive.core.body.http.util.messages;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -40,10 +39,8 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.runtime.http.RuntimeReply;
-import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
-import org.objectweb.proactive.ext.webservices.utils.ReflectRequest;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
+import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
 
 /**
@@ -52,61 +49,81 @@ import org.objectweb.proactive.ext.webservices.utils.ReflectRequest;
  * @see java.io.Serializable
  * @see org.objectweb.proactive.ext.webservices.utils.ReflectRequest
  */
-public class BodyRequest extends ReflectRequest implements Serializable
-{
+public class BodyRequest extends ReflectRequest implements Serializable {
     private static Logger logger = Logger.getLogger("XML_HTTP");
+    private static HashMap hMapMethods;
+
+    static {
+        hMapMethods = getHashMapReflect(Body.class);
+    }
+
     private String methodName;
     private ArrayList parameters = new ArrayList();
     private UniqueID oaid;
     private Body body = null;
 
-    private static HashMap hMapMethods;
-    
-    static {
-     	hMapMethods = getHashMapReflect(Body.class);
-    	
-    }
-    
     /**
      * Construct a request to send to the Active object identified by the UniqueID
-     * @param methodName The method name contained in the request 
+     * @param methodName The method name contained in the request
      * @param parameters The parameters associated with the method
-     * @param oaid The unique ID of targeted active object 
+     * @param oaid The unique ID of targeted active object
      */
-    public BodyRequest(String methodName, ArrayList parameters, UniqueID oaid) {
-        this.methodName = methodName;
+    public BodyRequest(String methodName, ArrayList parameters, UniqueID oaid, String url) {
+        super (url);
+        this.methodName = methodName;        
         this.parameters = parameters;
         this.oaid = oaid;
-   //     this.body = ProActiveXMLUtils.getBody(this.oaid);
     }
-    
+     
+    public String getMethodName () {
+        return this.methodName;
+    }
+
+    public Object getReturnedObject() throws Exception    {
+        if (this.returnedObject instanceof Exception) {
+//            System.out.println("J'ai choppe une exception ( " + ClassServer.getUrl() + ")");
+            throw (Exception)this.returnedObject;
+        }
+        return this.returnedObject;
+    }
+
     /**
      *  This method process the request. Generally it is executed when the request is sent and unmarshalled.
      * @return a RuntimeReply containing the result of the method call
-     * @throws Exception
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
      */
-    public RuntimeReply process() throws Exception {
-       
-        		Object result = null;
- 
-        		
-        		if(body == null )
-        		     this.body = ProActiveXMLUtils.getBody(this.oaid);
-        		
-        		Method m = getProActiveRuntimeMethod(methodName,parameters, hMapMethods.get(methodName));
-    			try {
-					result = m.invoke(body, parameters.toArray());
-				} catch (IllegalArgumentException e) {
-					throw new HTTPRemoteException("Error during reflexion", e);
-				} catch (IllegalAccessException e) {
-					throw new HTTPRemoteException("Error during reflexion", e);
-				} catch (InvocationTargetException e) {
-					throw (Exception) e.getCause();	
-					//throw new HTTPRemoteException("Error during reflexion", e);
-				}
+    public Object processMessage()  throws Exception  {
+        Object result = null;
+
+            if (body == null) {
+                this.body = HttpUtils.getBody(this.oaid);
+            }            
+            //System.out.println("invocation de la methode");
+            Method m = getProActiveRuntimeMethod(methodName, parameters,
+                    hMapMethods.get(methodName));
             
-            return new RuntimeReply(result);
-      
-     
-    }  
+            try {
+                
+                result = m.invoke(body, parameters.toArray());
+            } catch (IllegalArgumentException e) {
+//               e.printStackTrace();
+                throw e;
+            } catch (IllegalAccessException e) {
+//                e.printStackTrace();
+                throw e;
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block 
+//                e.printStackTrace();
+                
+                throw new SecurityNotAvailableException(e.getCause());
+            } catch (Exception e) {
+                System.out.println("----------------------- Exception : "  + e.getClass());
+                throw e ;
+            }
+
+
+        return result;
+    }
 }

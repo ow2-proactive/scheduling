@@ -28,71 +28,63 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http;
+package org.objectweb.proactive.core.body.http.util.messages;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
-import java.io.IOException;
 
-public class HttpRequest implements HttpMessage {
+public class HttpRequest extends HttpMessage implements Serializable {
     private Request request;
     private UniqueID IdBody;
- 
 
-    public HttpRequest(Request request, UniqueID idBody) {
+    public HttpRequest(Request request, UniqueID idBody, String url) {        
+        super(url);        
         this.request = request;
         this.IdBody = idBody;
     }
 
-
-/**
- * 
- */
-    public Object  processMessage() {
- 
-    	if (this.request != null) { 	
-    		try {
-        	Body body = ProActiveXMLUtils.getBody(IdBody);
-
-        	///////////// multyiple migrastion bug
-//        	for(int i=0;i<100;i++){
-        	
-			
-        	//if(body == null){
-        		//body = ProActiveXMLUtils.getBody(IdBody);
-        	//}
-//        		else
-//        			break;
-//        			
-//        		if( (i%3) == 0)
-		
-//        		
-//        	}
-        	
-        	if (body == null) {
-     		   try {
-     			Thread.sleep(1000);
-     			body = ProActiveXMLUtils.getBody(IdBody);
-     		} catch (InterruptedException e1) {
-     			e1.printStackTrace();
-     		} 
-     	}
-        		
-        	
-            body.receiveRequest(this.request);
-          
-        } catch (IOException e) {
-         
-            e.printStackTrace();
-        } catch (RenegotiateSessionException e) {
-       
-            e.printStackTrace();
+    public int getReturnedObject()  {
+      
+        if (this.returnedObject != null) {
+            return ((Integer) this.returnedObject).intValue();
         }
-    	}
+
+        return 0; // or throws an exception ...
+    }
+
+    /**
+     *
+     */
+    public Object processMessage() {
+        if (this.request != null) {
+            try {
+                Body body = HttpUtils.getBody(IdBody);
+
+                //TODO 
+                        	if (body == null) {
+                     		   try {
+                     			Thread.sleep(1000);
+                     			body = HttpUtils.getBody(IdBody);
+                     		} catch (InterruptedException e1) {
+                     			e1.printStackTrace();
+                     		}  
+                     	}
+                return new Integer(body.receiveRequest(this.request));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (RenegotiateSessionException e) {
+                e.printStackTrace();
+            }
+        }
+
         return null;
     }
 }

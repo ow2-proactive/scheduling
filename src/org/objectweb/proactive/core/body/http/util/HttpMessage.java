@@ -28,20 +28,41 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http;
+package org.objectweb.proactive.core.body.http.util;
+
+import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 
 import java.io.Serializable;
+
 
 /**
  * This interface is used to encapsulate any kind of HTTP message.
  * @author vlegrand
  * @see java.io.Serializable
  */
-public interface HttpMessage extends Serializable{
-	
-	/**
-	 * Processes the message.
-	 * @return an object as a result of the execution of the message
-	 */
-		public Object  processMessage ();
+public abstract class HttpMessage implements Serializable {
+    protected Object returnedObject;
+    private String url;
+//    private int port;
+
+    public HttpMessage(String url) {
+        this.url = url;
+//        this.port = port;
+    }
+
+    /**
+     * Processes the message.
+     * @return an object as a result of the execution of the message
+     */
+    public abstract Object processMessage() throws Exception;
+
+    /**
+     *
+     * @param url
+     * @throws HTTPRemoteException
+     */
+    public final void send() throws HTTPRemoteException {
+        HttpMessageSender hms = new HttpMessageSender(this.url);     
+        this.returnedObject = hms.sendMessage(this);
+    }
 }

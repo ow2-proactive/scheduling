@@ -28,54 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http;
+package org.objectweb.proactive.core.body.http.util.exceptions;
 
-import org.objectweb.proactive.core.body.UniversalBody;
+import java.io.IOException;
 
 
 /**
- * This classes represents a HTTPMessage. When processed, this message performs a lookup thanks to the urn.
- * @author vlegrand
- * @see HttpMessage
+ * Exception raised when problems occur in HTTP communications
+ * @author sbeucler
+ * @see java.rmi.RemoteException
  */
-public class HttpLookupMessage implements HttpMessage {
+public class HTTPRemoteException extends IOException {
+    public HTTPRemoteException() {
+        super();
+    }
 
-	private String urn;
-	private Object returnedObject;  
-	 
-	/**
-	 * Constructs an HTTP Message
-	 * @param urn The urn of the Object (it can be an active object or a runtime).
-	 */
-	public HttpLookupMessage (String urn) {    
-		this.urn = urn;
-	}
+    public HTTPRemoteException(String s) {
+        super(s);
+    }
 
-	/**
-	 * Performs the lookup 
-	 * @return The Object associated with the urn
-	 */
-	public Object processMessage() {
-		if (this.urn != null) {
-			UniversalBody ub = RemoteBodyAdapter.getBodyFromUrn(urn);
-			if (ub != null)		
-				this.returnedObject = ub;
-		/*	else {	// urn body is not found in http we search in rmi 	
-				try {
-					this.returnedObject = org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter.lookup(urn);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				if (this.returnedObject == null) // urn body is no found
-					this.returnedObject = ProActiveXMLUtils.NO_SUCH_OBJECT;	
-			}	*/	
-	
-		this.urn = null;
-		return this;
-		}
-		else { 
-			return this.returnedObject;
-		}
-	}
-
+    public HTTPRemoteException(String s, Throwable ex) {
+        super(s);
+        initCause(ex);
+    }
 }

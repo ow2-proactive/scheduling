@@ -28,21 +28,23 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http;
+package org.objectweb.proactive.core.body.http.util.messages;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.body.http.util.HttpUtils;
 import org.objectweb.proactive.core.body.reply.Reply;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
 /**
  * This kind of HTTP message isusefull to receive and send replies. 
  * @author vlegrand
  * @see HttpMessage
  */
-public class HttpReply implements HttpMessage{
+public class HttpReply extends HttpMessage  implements Serializable {
 	
 	  private Reply reply;
 	    private UniqueID  idBody;
@@ -52,19 +54,26 @@ public class HttpReply implements HttpMessage{
  * @param reply The ProActive Reply to encapsulate
  * @param idBody The unique id of the targeted active object 
  */
-	    public HttpReply(Reply reply , UniqueID idBody) {
+	    public HttpReply(Reply reply , UniqueID idBody, String url) {
+	        super(url);
 	        this.reply = reply;
 	        this.idBody= idBody;
 	    }
 
 
+	    public int getReturnedObject () {
+	  
+	        if (this.returnedObject != null)
+	            return ((Integer)this.returnedObject).intValue();
+	        return 0; // or throws an exception ...
+	    }
 	 
 	    public Object  processMessage() {
 	 
 	    	try {
-	        	Body body = ProActiveXMLUtils.getBody(idBody);
+	        	Body body = HttpUtils.getBody(idBody);
 	            if (this.reply != null) 
-	                body.receiveReply(this.reply);
+	                return new Integer(body.receiveReply(this.reply));
 	          
 	        } catch (IOException e) {
 	         

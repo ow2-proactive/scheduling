@@ -30,8 +30,15 @@
  */
 package org.objectweb.proactive.core.body.http;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -40,6 +47,8 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
+import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
+import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -55,18 +64,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.webservices.utils.HTTPUnexpectedException;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
 
 
 public class RemoteBodyAdapter implements BodyAdapter, Serializable {
@@ -94,10 +91,10 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
      */
     protected String url;
 
-    /**
-     * The port of the Runntime where the body is located
-     */
-    protected int port;
+//    /**
+//     * The port of the Runtime where the body is located
+//     */
+//    protected int port;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -108,10 +105,10 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
     public RemoteBodyAdapter(UniversalBody body) throws ProActiveException {
         //distant
         this.bodyID = body.getID();
-        this.url = ClassServer.getUrl();
-        this.port = ClassServer.getServerSocketPort();
+        this.url = ClassServer.getUrl();        
+//        this.port = ClassServer.getServerSocketPort();
         remoteBodyStrategy = body;
-        jobID = remoteBodyStrategy.getJobID();
+        jobID = remoteBodyStrategy.getJobID();        
     }
 
     //
@@ -126,12 +123,17 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
      */
     public static void register(RemoteBodyAdapter paBody, String urn)
         throws java.io.IOException {
+        
         int port = UrlBuilder.getPortFromUrl(urn);
+//        System.out.println("port = " + port);
+//        System.out.println("port config = " + ClassServer.getServerSocketPort());
         if (port != ClassServer.getServerSocketPort()) {
             throw new IOException(
                 "Bad registering port. You have to register on the same port as the runtime");
         }
 
+       
+        
         urn = urn.substring(urn.lastIndexOf('/') + 1);
 
         urnBodys.put(urn, paBody);
@@ -158,28 +160,31 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
     public static UniversalBody lookup(String urn) throws java.io.IOException {
         try {
             String url;
-            int port = Integer.parseInt(System.getProperty(
-                        "proactive.http.port"));
+            int port = ClassServer.getServerSocketPort();    
             url = urn;
-
             if (urn.lastIndexOf(":") > 4) {
                 port = UrlBuilder.getPortFromUrl(urn);
 
-                //				port = Integer.parseInt(urn.substring(urn.lastIndexOf(':'),
-                //                          urn.lastIndexOf(':') + 5));
-            }
+                port = Integer.parseInt(urn.substring(urn.lastIndexOf(':') +1,
+                                         urn.lastIndexOf(':') + 5));
+            } 
 
             urn = urn.substring(urn.lastIndexOf('/') + 1);
 
-            HttpLookupMessage message = new HttpLookupMessage(urn);
-            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
-                    port, message, ProActiveXMLUtils.MESSAGE);
 
-            UniversalBody result = (UniversalBody) message.processMessage();
+            HttpLookupMessage message = new HttpLookupMessage(urn, url, port);
+            message.send();
+//            message = (HttpLookupMessage) ProActiveXMLUtils.sendMessage(url,
+//                    port, message, ProActiveXMLUtils.MESSAGE);
+            //UniversalBody result = (UniversalBody) message.processMessage();
+            UniversalBody result = message.getReturnedObject();
+            //System.out.println("result = " + result );
             if (result == null) {
                 throw new java.io.IOException("The url " + url +
                     " is not bound to any known object");
             } else {
+                
+
                 return result;
             }
         } catch (IOException e) {
@@ -190,6 +195,9 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
     }
 
     // ------------------------------------------
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
     public boolean equals(Object o) {
         if (!(o instanceof RemoteBodyAdapter)) {
             return false;
@@ -200,6 +208,9 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         //(port == rba.getPort());       
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#receiveRequest(org.objectweb.proactive.core.body.request.Request)
+     */
     public int receiveRequest(Request request)
         throws IOException, RenegotiateSessionException {
         return remoteBodyStrategy.receiveRequest(request);
@@ -216,44 +227,69 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         remoteBodyStrategy.terminate();
     }
 
-    public String getURL() {
-        return this.url;
-    }
-
-    public static synchronized UniversalBody getBodyFromUrn(String urn) {
+    /**
+     * Gets a body from an urn in the table that mps urns and bodies
+     * @param urn The urn of the body 
+     * @return the body mapping the urn
+     */
+     public static synchronized UniversalBody getBodyFromUrn(String urn) {
         return (UniversalBody) urnBodys.get(urn);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getNodeURL()
+     */
     public String getNodeURL() {
         return remoteBodyStrategy.getNodeURL();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getID()
+     */
     public UniqueID getID() {
         return remoteBodyStrategy.getID();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#updateLocation(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
+     */
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
         remoteBodyStrategy.updateLocation(id, body);
     }
 
-    public UniversalBody getRemoteAdapter() {
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getRemoteAdapter()
+     */
+    public UniversalBody getRemoteAdapter() {        
         return this;
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#enableAC()
+     */
     public void enableAC() throws IOException {
         remoteBodyStrategy.enableAC();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#disableAC()
+     */
     public void disableAC() throws IOException {
         remoteBodyStrategy.disableAC();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#setImmediateService(java.lang.String)
+     */
     public void setImmediateService(String methodName)
         throws IOException {
         remoteBodyStrategy.setImmediateService(methodName);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)
+     */
     public void initiateSession(int type, UniversalBody body)
         throws IOException, CommunicationForbiddenException, 
             AuthenticationException, RenegotiateSessionException, 
@@ -261,27 +297,43 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         remoteBodyStrategy.initiateSession(type, body);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#terminateSession(long)
+     */
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
         remoteBodyStrategy.terminateSession(sessionID);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificate()
+     */
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        return remoteBodyStrategy.getCertificate();
+
+        return  remoteBodyStrategy.getCertificate();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyFrom(java.security.cert.X509Certificate)
+     */
     public Policy getPolicyFrom(X509Certificate certificate)
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getPolicyFrom(certificate);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
+     */
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, IOException, 
             RenegotiateSessionException {
         return remoteBodyStrategy.startNewSession(policy);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#negociateKeyReceiverSide(org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket, long)
+     */
     public ConfidentialityTicket negociateKeyReceiverSide(
         ConfidentialityTicket confidentialityTicket, long sessionID)
         throws SecurityNotAvailableException, KeyExchangeException, IOException {
@@ -289,16 +341,25 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
             sessionID);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPublicKey()
+     */
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getPublicKey();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#randomValue(long, byte[])
+     */
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, Exception {
         return remoteBodyStrategy.randomValue(sessionID, cl_rand);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
+     */
     public byte[][] publicKeyExchange(long sessionID,
         UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
         byte[] sig_code) throws SecurityNotAvailableException, Exception {
@@ -306,6 +367,9 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
             my_pub, my_cert, sig_code);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
+     */
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws SecurityNotAvailableException, Exception {
@@ -313,35 +377,56 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
             tmp3, tmp4);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getPolicyTo(java.lang.String, java.lang.String, java.lang.String)
+     */
     public Communication getPolicyTo(String type, String from, String to)
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getPolicyTo(type, from, to);
     }
 
+    /**
+     *      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getPolicy(securityContext);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
+     */
     public String getVNName() throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getVNName();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
+     */
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getCertificateEncoded();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
+     */
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getEntities();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#getProActiveSecurityManager()
+     */
     public ProActiveSecurityManager getProActiveSecurityManager()
         throws SecurityNotAvailableException, IOException {
         return remoteBodyStrategy.getProActiveSecurityManager();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
+     */
     public HashMap getHandlersLevel() throws java.io.IOException {
         return remoteBodyStrategy.getHandlersLevel();
     }
@@ -353,22 +438,33 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
                //        remoteBodyStrategy.setExceptionHandler(handler, exception);
        }
      */
+    
+    /**
+     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
+     */
     public Handler unsetExceptionHandler(Class exception)
         throws IOException {
         return remoteBodyStrategy.unsetExceptionHandler(exception);
     }
 
+    /**
+     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
+     */
     public void setExceptionHandler(Handler handler, Class exception)
         throws IOException {
         remoteBodyStrategy.setExceptionHandler(handler, exception);
     }
 
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
     public String getJobID() {
         return jobID;
     }
 
     /**
      * Clear the local map of handlers
+     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
      */
     public void clearHandlersLevel() throws java.io.IOException {
         remoteBodyStrategy.clearHandlersLevel();
@@ -381,10 +477,7 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         return remoteBodyStrategy.getHandlerizableInfo();
     }
 
-    public UniqueID getBodyID() {
-        return this.bodyID;
-    }
-
+   
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -392,6 +485,9 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
                 this.jobID);
     }
 
+    /**
+     * @see java.lang.Object#hashCode()
+     */
     public int hashCode() {
         //return bodyID.hashCode();//jobID
         return remoteBodyStrategy.hashCode();
@@ -410,15 +506,18 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
 
     /**
      * This method must be called only locally.
+    * @see org.objectweb.proactive.core.body.BodyAdapter#changeProxiedBody(org.objectweb.proactive.Body)
      */
     public void changeProxiedBody(Body newBody) {
         this.remoteBodyStrategy = newBody;
     }
 
 
+    /**
+     * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
+     */
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
-        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
-        
+        throw new ProActiveRuntimeException("create shortcut method not implemented yet");        
     }
 }
