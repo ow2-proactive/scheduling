@@ -82,7 +82,7 @@ public class ClassServer implements Runnable {
         }
 
         hostname = java.net.InetAddress.getLocalHost().getHostAddress();
-        System.out.println("URL du classServer : " + hostname + ":" + port);
+//        System.out.println("URL du classServer : " + hostname + ":" + port);
         newListener();
         //        if (logger.isInfoEnabled()) {
         //            logger.info("communication protocol = " +System.getProperty("proactive.communication.protocol")+", http server port = " + port);
