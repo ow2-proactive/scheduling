@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime.http;
+package org.objectweb.proactive.core.runtime.http.messages;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -37,9 +37,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.http.util.messages.ReflectRequest;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
-import org.objectweb.proactive.ext.webservices.utils.ReflectRequest;
+ 
+
 
 /**
  * @author vlegrand
@@ -55,7 +56,7 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
 
     private static HashMap hMapMethods;
     private static ProActiveRuntimeImpl runtime;
-    
+     
     static {
    
     	// init the hashmap, that contains all the methods of  ProActiveRuntimeImpl 
@@ -66,39 +67,59 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
         
     }
     
-    public RuntimeRequest(String newmethodName) {
-        this.methodName = newmethodName;   	
+    public RuntimeRequest(String newmethodName, String url) {
+        super (url);
+            this.methodName = newmethodName;   	
     }
     
+    
+    public Object getReturnedObject ()  throws Exception{
+        if (this.returnedObject instanceof Exception)           
+            throw (Exception)this.returnedObject;
+        return this.returnedObject;
+    }
    
-    public RuntimeRequest(String newmethodName, ArrayList newparameters) {
-        this(newmethodName);
-        this.parameters = newparameters;
+    public RuntimeRequest(String newmethodName, ArrayList newparameters, String url) {
+        
+        this(newmethodName , url);
+            this.parameters = newparameters;
     }
-
+ 
     public RuntimeRequest(String newmethodName, ArrayList newparameters,
-        ArrayList newparamsTypes) {
-        this(newmethodName,newparameters);
-        this.paramsTypes = newparamsTypes;
+        ArrayList newparamsTypes, String url) {
+        this(newmethodName,newparameters, url);
+            this.paramsTypes = newparamsTypes;
     }
 
-    public RuntimeReply process() throws Exception {
-       
+    public Object  processMessage () throws Exception{
+            
         		Object[] params = parameters.toArray();
         		Object result = null;
             
         			Method m = getProActiveRuntimeMethod(methodName,parameters, hMapMethods.get(methodName));
         			try {
 						result = m.invoke(runtime, parameters.toArray());
-					} catch (IllegalArgumentException e) {
-						throw new HTTPRemoteException("Error during reflexion", e);
-					} catch (IllegalAccessException e) {
-						throw new HTTPRemoteException("Error during reflexion", e);
-					} catch (InvocationTargetException e) {
-						throw (Exception) e.getCause();	
+                        					} catch (IllegalArgumentException e) {
 						//throw new HTTPRemoteException("Error during reflexion", e);
+					    //e.printStackTrace();
+					    //esult =e;
+					    throw e;
+					} catch (IllegalAccessException e) {
+						//throw new HTTPRemoteException("Error during reflexion", e);
+					    //.e.printStackTrace();
+					    //result = e;
+					    throw e;
+					} catch (InvocationTargetException e) {
+						//throw (Exception) e.getCause();	
+						//throw new HTTPRemoteException("Error during reflexion", e);
+//					    e.printStackTrace();
+//					    result = e;
+					    throw (Exception)e.getCause ();
+					} catch (Exception e) {
+//					    result = e;
+					    throw e;
 					}
-            return new RuntimeReply(result);
+            return result ;
     }
 
     public String getMethodName() {
@@ -107,6 +128,10 @@ public class RuntimeRequest extends ReflectRequest implements Serializable {
 
     public ArrayList getParameters() {
         return this.parameters;
+    }
+    
+    public String toString() {
+        return "[ " +  methodName + " ( " + parameters + " )" + " ]";
     }
        
 }

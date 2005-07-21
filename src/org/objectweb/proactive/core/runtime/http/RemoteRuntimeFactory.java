@@ -41,7 +41,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
     private static ProActiveRuntime defaultRuntime = null;
 
     public RemoteRuntimeFactory() {
-    }
+    }  
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.RuntimeFactory#getProtocolSpecificRuntimeImpl()
@@ -62,6 +62,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         //registered at the url given in parameter.
         //In fact it oly consists with the creation of an adapter 
         //with the specified url;
+        System.out.println(s);
         ProActiveRuntime remoteProActiveRuntime = new HttpRuntimeAdapter(s);
 //      remote
         return remoteProActiveRuntime;

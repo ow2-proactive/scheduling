@@ -30,12 +30,17 @@
  */
 package org.objectweb.proactive.core.runtime.http;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
+import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -43,23 +48,13 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.runtime.http.messages.RuntimeRequest;
 import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.ext.webservices.utils.HTTPRemoteException;
-import org.objectweb.proactive.ext.webservices.utils.ProActiveXMLUtils;
 
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-
-
+ 
 /**
  *   An adapter for a ProActiveRuntime to be able to receive remote calls usinfg HTTP. This helps isolate HTTP-specific
  *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
@@ -69,21 +64,23 @@ import java.util.ArrayList;
 public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     private static transient Logger logger = Logger.getLogger("XML_HTTP");
     private String url;
-    private int port;
+//    private int port;
 
     //this boolean is used when killing the runtime. Indeed in case of co-allocation, we avoid a second call to the runtime
     // which is already dead
     protected boolean alreadykilled = false;
 
     /**
-     *
+     * 
      */
     public HttpRemoteRuntimeAdapterImpl(HttpRuntimeAdapter newruntimeadapter,
         String newurl) {
+    //    System.out.println("------------------------ >>>>>>>>>>>>>>>>>> Adapter URL = " + newurl );
         logger.debug("Adapter URL = " + newurl);
         this.url = newurl;
-        this.port = UrlBuilder.getPortFromUrl(newurl);
-        logger.debug("New Remote XML Adapter : " + url + " port = " + port);
+       
+//        this.port = UrlBuilder.getPortFromUrl(newurl);
+        logger.debug("New Remote XML Adapter : " + url );
     }
 
     //
@@ -92,7 +89,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vname,
         String jobId) throws NodeException {
-        try {
+   
             ArrayList paramsList = new ArrayList();
             paramsList.add(nodeName);
             paramsList.add(new Boolean(replacePreviousBinding));
@@ -100,98 +97,85 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             paramsList.add(vname);
             paramsList.add(jobId);
 
+            
             RuntimeRequest req = new RuntimeRequest("createLocalNode",
-                    paramsList);
+                    paramsList, this.url);
 
-            Object result = sendRequest(req);
+ 
 
-            return nodeName;
-        } catch (NodeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new NodeException(e);
-        }
-    }
-
-    /**
-     *
-     * @param req
-     * @return
-     * @throws ProActiveException
-     */
-    private Object sendRequest(RuntimeRequest req) throws Exception {
-        logger.debug("Send request to : " + url + ":" + port);
-
-        if (req.getMethodName() == null) {
-            throw new ProActiveException("Null request");
-        }
-
-        RuntimeReply reply = (RuntimeReply) ProActiveXMLUtils.sendMessage(url,
-                port, req, ProActiveXMLUtils.RUNTIME_REQUEST);
-
-        if (reply != null) {
-            return reply.getReturnedObject();
-        }
-
-        return null;
+    
+            try {
+                req.send ();
+                return (String) req.getReturnedObject();
+                }  
+            	catch (Exception e) {
+                  throw new NodeException(e);
+                }
+            
     }
 
     public void killAllNodes() throws ProActiveException {
+
         try {
-            Object o = sendRequest(new RuntimeRequest("killAllNodes"));
-        } catch (Exception re) {
-            throw new ProActiveException(re);
+            new RuntimeRequest("killAllNodes", this.url).send ();
+        } catch (HTTPRemoteException e) {            
+            e.printStackTrace();
         }
+
     }
 
-    public void killNode(String nodeName) throws ProActiveException {
+    public void killNode(String nodeName) throws ProActiveException{
         ArrayList params = new ArrayList();
         params.add(nodeName);
-
         try {
-            Object o = sendRequest(new RuntimeRequest("killNode", params));
-        } catch (Exception re) {
-            throw new ProActiveException(re);
+            new RuntimeRequest("killNode", params, this.url).send();
+        } catch (HTTPRemoteException e) {        
+            e.printStackTrace();
         }
     }
 
     public void createVM(UniversalProcess remoteProcess)
         throws IOException, ProActiveException {
+
         ArrayList params = new ArrayList();
         params.add(remoteProcess);
 
-        try {
-            Object o = sendRequest(new RuntimeRequest("createVM", params));
-        } catch (Exception re) {
-            throw new ProActiveException(re);
-        }
+        new RuntimeRequest("createVM", params, this.url).send();
+        
     }
 
     public String[] getLocalNodeNames() throws ProActiveException {
-        try {
-            return (String[]) sendRequest(new RuntimeRequest(
-                    "getLocalNodeNames"));
-        } catch (Exception re) {
-            throw new ProActiveException(re);
-        }
+        	RuntimeRequest req = new RuntimeRequest(
+            "getLocalNodeNames", this.url);
+        	
+          
+                try {
+                    req.send ();
+                    return (String[]) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw new ProActiveException(e);
+                }
+                
     }
 
     public VMInformation getVMInformation() {
-        try {
-            return (VMInformation) sendRequest(new RuntimeRequest(
-                    "getVMInformation"));
-        } catch (Exception re) {
-            //throw new ProActiveException(re);
-            re.printStackTrace();
-        }
-
+        	RuntimeRequest req = new RuntimeRequest(
+            "getVMInformation", this.url);
+    
+          
+                try {
+                	req.send ();
+                    return (VMInformation) req.getReturnedObject();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         return null;
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
         String vmName) {
-        try {
+        	
             ArrayList params = new ArrayList();
             ArrayList paramsTypes = new ArrayList();
 
@@ -205,16 +189,15 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             paramsTypes.add(String.class);
             params.add(vmName);
             paramsTypes.add(String.class);
-
-            RuntimeRequest req = new RuntimeRequest("register", params,
-                    paramsTypes);
-
-            Object o = sendRequest(req);
-
-            //runtimeadapter.register(proActiveRuntimeDist, proActiveRuntimeName, creatorID, creationProtocol, vmName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+       
+             try {
+                new RuntimeRequest("register", params,
+                        paramsTypes, this.url).send();
+            } catch (HTTPRemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            
     }
 
     /**
@@ -223,7 +206,7 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) {
-        try {
+      
             ArrayList params = new ArrayList();
             ArrayList paramsTypes = new ArrayList();
 
@@ -237,49 +220,59 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
             paramsTypes.add(String.class);
             params.add(vmName);
             paramsTypes.add(String.class);
-            RuntimeRequest req = new RuntimeRequest("unregister", params,
-                    paramsTypes);
-
-            Object o = sendRequest(req);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                new RuntimeRequest("unregister", params,
+                        paramsTypes, this.url).send ();
+            } catch (HTTPRemoteException e) {                
+                e.printStackTrace();
+            }
+      
     }
 
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
-        try {
-            return (ProActiveRuntime[]) sendRequest(new RuntimeRequest(
-                    "getProActiveRuntimes"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
-    }
+        	RuntimeRequest req = new RuntimeRequest(
+            "getProActiveRuntimes", this.url);
+      
+        	
+                try {
+                  	req.send ();
+                    return (ProActiveRuntime[]) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw new ProActiveException(e);
+                }
+            
+          }
 
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
-        try {
-            return (ProActiveRuntime) sendRequest(new RuntimeRequest(
-                    "getProActiveRuntime", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getProActiveRuntime", params, this.url);
+    
+        
+                try {
+                    req.send ();
+                    return (ProActiveRuntime) req.getReturnedObject();
+                } catch (Exception e) {
+          throw new ProActiveException(e);
+                }
+        
+        
     }
 
-    public void killRT(boolean softly) throws Exception {
+    public void killRT(boolean softly)  {
         if (!alreadykilled) {
             ArrayList params = new ArrayList();
             params.add(new Boolean(softly));
 
-            try {
-                sendRequest(new RuntimeRequest("killRT", params));
+             try {
+                new RuntimeRequest("killRT", params, this.url).send ();
             } catch (HTTPRemoteException e) {
-                // do nothing (results from distant System.exit(0))
-            } catch (Exception e) {
-                throw new ProActiveException(e);
-            }
+                // TODO Auto-generated catch block
+                //e.printStackTrace();
+            } 
         }
 
         alreadykilled = true;
@@ -296,12 +289,17 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(nodeName);
 
-        try {
-            return (ArrayList) sendRequest(new RuntimeRequest(
-                    "getActiveObjects", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getActiveObjects", params, this.url);
+     
+      
+                try {
+                    req.send ();
+                    return (ArrayList) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw new ProActiveException(e);
+                }
+         
     }
 
     public ArrayList getActiveObjects(String nodeName, String objectName)
@@ -310,25 +308,34 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         params.add(nodeName);
         params.add(objectName);
 
-        try {
-            return (ArrayList) sendRequest(new RuntimeRequest(
-                    "getActiveObjects", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+      RuntimeRequest req = new RuntimeRequest(
+              "getActiveObjects", params, this.url);
+   
+          
+            try {
+                req.send ();
+                return (ArrayList) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+      
     }
 
     public VirtualNode getVirtualNode(String virtualNodeName)
         throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
-
-        try {
-            return (VirtualNode) sendRequest(new RuntimeRequest(
-                    "getVirtualNode", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getVirtualNode", params, this.url);
+  
+            
+                try {
+                    req.send ();
+                    return (VirtualNode) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
+            
     }
 
     public void registerVirtualNode(String virtualNodeName,
@@ -337,11 +344,14 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         params.add(virtualNodeName);
         params.add(new Boolean(replacePreviousBinding));
 
-        try {
-            sendRequest(new RuntimeRequest("registerVirtualNode", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+      
+      try {
+        new RuntimeRequest("registerVirtualNode", params, this.url).send();
+    } catch (HTTPRemoteException e) {
+
+        e.printStackTrace();
+    }
+      
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
@@ -349,19 +359,23 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
 
-        try {
-            sendRequest(new RuntimeRequest("unregisterVirtualNode", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+      
+      try {
+        new RuntimeRequest("unregisterVirtualNode", params, this.url).send();
+    } catch (HTTPRemoteException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+      
     }
 
     public void unregisterAllVirtualNodes() throws ProActiveException {
-        try {
-            sendRequest(new RuntimeRequest("unregisterAllVirtualNodes"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+            try {
+                new RuntimeRequest("unregisterAllVirtualNodes", this.url).send();
+            } catch (HTTPRemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }      
     }
 
     public UniversalBody createBody(String nodeName,
@@ -372,17 +386,22 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         params.add(nodeName);
         params.add(bodyConstructorCall);
         params.add(new Boolean(isNodeLocal));
-
-        try {
-            return (UniversalBody) sendRequest(new RuntimeRequest(
-                    "createBody", params));
-        } catch (ConstructorCallExecutionFailedException e) {
-            throw e;
-        } catch (InvocationTargetException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        
+        RuntimeRequest req = new RuntimeRequest(
+                "createBody", params, this.url);
+  
+    
+            try {
+                req.send ();    
+                return  (UniversalBody) req.getReturnedObject();
+            } catch (ConstructorCallExecutionFailedException e){
+                throw e;
+            } catch ( InvocationTargetException e) {
+                throw e;
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+       
     }
 
     public UniversalBody receiveBody(String nodeName, Body body)
@@ -391,22 +410,33 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         params.add(nodeName);
         params.add(body);
 
-        try {
-            return (UniversalBody) sendRequest(new RuntimeRequest(
-                    "receiveBody", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        	RuntimeRequest req = new RuntimeRequest(
+                    "receiveBody", params, this.url);
+       
+       
+                try {
+                 	req.send ();
+                    return (UniversalBody)req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
+           
     }
 
     // SECURITY 
     public PolicyServer getPolicyServer() throws ProActiveException {
-        try {
-            return (PolicyServer) sendRequest(new RuntimeRequest(
-                    "getPolicyServer"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+    
+        RuntimeRequest req = new RuntimeRequest(
+        "getPolicyServer", this.url);
+    
+        
+            try {
+                req.send ();
+                return (PolicyServer) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+        
     }
 
     public void setProActiveSecurityManager(ProActiveSecurityManager ps)
@@ -414,34 +444,49 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(ps);
 
+        
         try {
-            sendRequest(new RuntimeRequest("setProActiveSecurityManager", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
+            new RuntimeRequest("setProActiveSecurityManager", params, this.url).send ();
+        } catch (HTTPRemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCreatorCertificate()
      */
     public X509Certificate getCreatorCertificate() throws ProActiveException {
-        try {
-            return (X509Certificate) sendRequest(new RuntimeRequest(
-                    "getCreatorCertificate"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+        "getCreatorCertificate", this.url);
+   
+          
+                try {
+                    req.send ();
+                    return (X509Certificate) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
+            
     }
 
     public String getVNName(String nodename) throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(nodename);
 
-        try {
-            return (String) sendRequest(new RuntimeRequest("getVNName", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        	RuntimeRequest req = new RuntimeRequest("getVNName", params, this.url);
+    
+        	
+            
+                try {
+                	req.send ();
+                    return (String) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
+           
+        
     }
 
     /* (non-Javadoc)
@@ -451,13 +496,14 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(s);
-
         try {
-            sendRequest(new RuntimeRequest("setDefaultNodeVirtualNodeName",
-                    params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
+            new RuntimeRequest("setDefaultNodeVirtualNodeName",
+                        params, this.url).send ();
+        } catch (HTTPRemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+      
     }
 
     /* (non-Javadoc)
@@ -468,23 +514,32 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(nodeName);
 
-        try {
-            return (PolicyServer) sendRequest(new RuntimeRequest(
-                    "getNodePolicyServer", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        	RuntimeRequest req = new RuntimeRequest(
+                    "getNodePolicyServer", params, this.url);
+
+       
+                try {
+                	req.send ();
+                    return (PolicyServer) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
     }
+           
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#enableSecurityIfNeeded()
      */
     public void enableSecurityIfNeeded() throws ProActiveException {
+        
         try {
-            sendRequest(new RuntimeRequest("enableSecurityIfNeeded"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
+            new RuntimeRequest("enableSecurityIfNeeded", this.url).send ();
+        } catch (HTTPRemoteException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        
+        
     }
 
     /* (non-Javadoc)
@@ -495,12 +550,18 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(nodeName);
 
-        try {
-            return (X509Certificate) sendRequest(new RuntimeRequest(
-                    "getNodeCertificate", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getNodeCertificate", params, this.url);
+        
+          
+            try {
+                req.send ();	
+                return (X509Certificate) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+     
+    
     }
 
     /**
@@ -510,13 +571,17 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     public ArrayList getEntities(String nodeName) throws ProActiveException {
         ArrayList params = new ArrayList();
         params.add(nodeName);
-
-        try {
-            return (ArrayList) sendRequest(new RuntimeRequest("getEntities",
-                    params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest("getEntities",
+                params, this.url);
+  
+       
+            try {
+                req.send ();      
+                return (ArrayList) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+      
     }
 
     /**
@@ -527,23 +592,33 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(uBody);
 
-        try {
-            return (ArrayList) sendRequest(new RuntimeRequest("getEntities",
-                    params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+      RuntimeRequest req = new RuntimeRequest("getEntities",
+              params, this.url);
+      
+         
+                try {
+                    req.send ();
+                    return (ArrayList) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw  new ProActiveException(e);
+                }
+       
     }
 
     /**
      * @return returns all entities associated to this runtime
      */
     public ArrayList getEntities() throws ProActiveException {
-        try {
-            return (ArrayList) sendRequest(new RuntimeRequest("getEntities"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest("getEntities", this.url);
+      
+     
+            try {
+                req.send ();
+                return (ArrayList) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+     
     }
 
     /**
@@ -553,58 +628,81 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(nodeUrl);
 
-        try {
-            return (String) sendRequest(new RuntimeRequest("getJobID", params));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest("getJobID", params, this.url);
+   
+         
+            try {
+                req.send ();
+                return (String) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+    
     }
 
     public String[] getNodesNames() throws ProActiveException {
-        try {
-            return (String[]) sendRequest(new RuntimeRequest("getNodesNames"));
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        
+        RuntimeRequest req = new RuntimeRequest("getNodesNames", this.url);
+    
+      
+            try {
+                req.send ();
+                return (String[]) req.getReturnedObject();
+            } catch (Exception e) {
+                throw  new ProActiveException(e);
+            }
+        
     }
 
     /**
      * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
-        String methodName = "getJobID";
-        RuntimeRequest req = new RuntimeRequest(methodName);
-        Object o = null;
-
-        try {
-            o = sendRequest(req);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return (String) o;
+        
+        RuntimeRequest req = new RuntimeRequest("getJobID", this.url);
+    
+        
+        
+            try {
+                req.send ();
+                return (String)req.getReturnedObject();
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+     
+       
     }
 
-    ///////////////
+    
     public void addAcquaintance(String proActiveRuntimeName) {
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
 
+        
         try {
-            sendRequest(new RuntimeRequest("addAcquaintance", params));
-        } catch (Exception e) {
+            new RuntimeRequest("addAcquaintance", params, this.url).send ();
+        } catch (HTTPRemoteException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    
     }
 
     public String[] getAcquaintances() {
-        try {
-            return (String[]) sendRequest(new RuntimeRequest("getAcquaintances"));
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return null;
-        }
+        RuntimeRequest req = new RuntimeRequest("getAcquaintances", this.url);
+      
+        
+       
+                try {
+                    req.send ();
+                    return (String[]) req.getReturnedObject();
+                } catch (Exception e) {
+                   
+                    e.printStackTrace();
+                    return null;
+                }
+                
     }
 
     /**
@@ -613,12 +711,13 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
     public void rmAcquaintance(String proActiveRuntimeName) {
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
-
         try {
-            sendRequest(new RuntimeRequest("rmAcquaintance", params));
-        } catch (Exception e) {
+            new RuntimeRequest("rmAcquaintance", params, this.url).send ();
+        } catch (HTTPRemoteException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
     }
 
     public SecurityContext getPolicy(SecurityContext sc)
@@ -626,14 +725,22 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(sc);
 
-        try {
-            return (SecurityContext) sendRequest(new RuntimeRequest(
-                    "getPolicy", params));
-        } catch (SecurityNotAvailableException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new ProActiveException(e);
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getPolicy", params, this.url);
+   
+        
+
+    
+                try {
+                    req.send ();
+                    return (SecurityContext) req.getReturnedObject();
+                } catch ( SecurityNotAvailableException e) {
+                    throw e;
+                }
+                catch (Exception e) {
+                    throw new ProActiveException(e);
+                }
+           
     }
 
     public byte[] getClassDataFromParentRuntime(String className)
@@ -641,45 +748,60 @@ public class HttpRemoteRuntimeAdapterImpl implements ProActiveRuntime {
         ArrayList params = new ArrayList();
         params.add(className);
 
-        try {
-            return (byte[]) sendRequest(new RuntimeRequest(
-                    "getClassDataFromParentRuntime", params));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+        RuntimeRequest req = new RuntimeRequest(
+                "getClassDataFromParentRuntime", params, this.url);
+      
+            
+                try {
+                    req.send ();
+                    return (byte[]) req.getReturnedObject();
+                } catch (Exception e) {
+                    throw new ProActiveException(e);
+                }
+            
     }
 
     public byte[] getClassDataFromThisRuntime(String className) {
         ArrayList params = new ArrayList();
         params.add(className);
 
-        try {
-            return (byte[]) sendRequest(new RuntimeRequest(
-                    "getClassDataFromThisRuntime", params));
-        } catch (Exception e) {
+        RuntimeRequest req = new RuntimeRequest(
+                "getClassDataFromThisRuntime", params, this.url);
+       
+          
+                try {
+                    req.send ();
+                    return (byte[]) req.getReturnedObject();
+                } catch (Exception e) {
             e.printStackTrace();
             return null;
-        }
+                }
+          
+
     }
 
     public void setParent(String parentRuntimeName) {
         ArrayList params = new ArrayList();
         params.add(parentRuntimeName);
-        try {
-            sendRequest(new RuntimeRequest("setParent", params));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
+        	try {
+                new RuntimeRequest("setParent", params, this.url).send ();
+            } catch (HTTPRemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
     }
 
     public void listVirtualNodes() throws ProActiveException {
-        try {
-            //  remoteProActiveRuntime.updateLocalNodeVirtualName();
-            sendRequest(new RuntimeRequest("listVirtualNodes"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        
+            try {
+                new RuntimeRequest("listVirtualNodes", this.url).send ();
+            } catch (HTTPRemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        
     }
 
     /* (non-Javadoc)

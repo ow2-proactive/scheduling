@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.runtime.http;
+package org.objectweb.proactive.core.runtime.http.messages;
 
 /**
  * @author vlegrand
