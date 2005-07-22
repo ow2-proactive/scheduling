@@ -62,7 +62,7 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         //registered at the url given in parameter.
         //In fact it oly consists with the creation of an adapter 
         //with the specified url;
-        System.out.println(s);
+//        System.out.println(s);
         ProActiveRuntime remoteProActiveRuntime = new HttpRuntimeAdapter(s);
 //      remote
         return remoteProActiveRuntime;
