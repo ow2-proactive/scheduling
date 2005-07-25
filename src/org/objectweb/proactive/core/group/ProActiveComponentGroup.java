@@ -85,11 +85,6 @@ public class ProActiveComponentGroup {
         InterfaceType interfaceType, Component owner)
         throws ClassNotFoundException, ClassNotReifiableException {
         try {
-            ComponentType component_type = ProActiveTypeFactory.instance()
-                                                               .createFcType(new InterfaceType[] {
-                        interfaceType
-                    });
-
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
                     null, ProActiveGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
 
@@ -114,10 +109,7 @@ public class ProActiveComponentGroup {
         } catch (InterfaceGenerationFailedException e) {
             logger.error("**** Interface could not be generated **** " +
                 e.getMessage());
-        } catch (InstantiationException e) {
-            logger.error("**** Cannot create component type **** " +
-                e.getMessage());
-        }
+        } 
         return null;
     }
 
