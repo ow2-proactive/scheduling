@@ -249,6 +249,14 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
         proxiedJiniBody.setImmediateService(methodName);
     }
 
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedJiniBody.removeImmediateService(methodName, parametersTypes);
+    }
+
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedJiniBody.setImmediateService(methodName, parametersTypes);
+    }
+
     // SECURITY
     public void initiateSession(int type, UniversalBody body)
         throws RemoteException, IOException, CommunicationForbiddenException, 

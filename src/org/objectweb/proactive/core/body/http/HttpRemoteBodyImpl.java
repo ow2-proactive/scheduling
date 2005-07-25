@@ -205,6 +205,36 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
                     bodyID, this.url)).send ();
        
     }
+    
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(methodName);
+            paramsList.add(parametersTypes);
+            new BodyRequest("setImmediateService", paramsList,
+                    bodyID, this.url).send();
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
+    }
+    
+
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        try {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(methodName);
+            paramsList.add(parametersTypes);
+            new BodyRequest("removeImmediateService", paramsList,
+                    bodyID, this.url).send();
+        } catch (IOException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new HTTPUnexpectedException("Unexpected exception", e);
+        }
+    }
+
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)

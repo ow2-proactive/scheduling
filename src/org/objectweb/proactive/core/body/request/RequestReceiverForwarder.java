@@ -30,6 +30,8 @@
 */
 package org.objectweb.proactive.core.body.request;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
@@ -49,5 +51,15 @@ public class RequestReceiverForwarder implements RequestReceiver {
 
   public void setImmediateService(String methodName) throws java.io.IOException {
   	remoteBody.setImmediateService(methodName);
-  }	
+  }
+
+
+public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    remoteBody.removeImmediateService(methodName, parametersTypes);
+}
+
+
+public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+    remoteBody.setImmediateService(methodName, parametersTypes);
+}	
 }

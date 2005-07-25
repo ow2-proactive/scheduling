@@ -160,8 +160,15 @@ public class RemoteBodyImpl extends java.rmi.server.UnicastRemoteObject
         body.setImmediateService(methodName);
     }
 
-    // implements Handlerizable
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        body.removeImmediateService(methodName, parametersTypes);
+    }
 
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        body.setImmediateService(methodName, parametersTypes);
+    }
+
+    // implements Handlerizable
     /**
      * Get information about the handlerizable object
      */

@@ -148,6 +148,24 @@ public interface UniversalBody extends Handlerizable, Job {
      */
     public void setImmediateService(String methodName)
         throws IOException;
+    
+    /**
+     * Adds an immediate service for this body 
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     * @throws IOException
+     */
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException;
+    
+    /**
+     * Removes an immediate service for this body 
+     * An immediate service is a method that will bw excecuted by the calling thread.
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     * @throws IOException
+     */
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException;
 
     // SECURITY
     public void initiateSession(int type, UniversalBody body)

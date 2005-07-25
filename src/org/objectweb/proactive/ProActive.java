@@ -216,7 +216,7 @@ public class ProActive {
      * @param activity the possibly null activity object defining the different step in the activity of the object.
      *               see the definition of the activity in the javadoc of this classe for more information.
      * @param factory the possibly null meta factory giving all factories for creating the meta-objects part of the
-     *                body associated to the reified object. If null the default ProActive MataObject factory is used.
+     *                body associated to the reified object. If null the default ProActive MetaObject factory is used.
      * @return a reference (possibly remote) on a Stub of the newly created active object
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
@@ -1374,13 +1374,54 @@ public class ProActive {
     }
 
     /**
-     * Set an immmediate execution for the active object obj, ie request of name methodName
-     * will be executed by the calling thread, and not add in the request queue.
-     * BE CAREFULL : for the first release of this method, do not make use of getCurrentThreadBody nor
+     * Set an immmediate execution for the active object obj, i.e. requests of name methodName
+     * will be executed by the calling thread, and not added in the request queue.
+     * BE CAREFUL : for the first release of this method, do not make use of getCurrentThreadBody nor
      * getStubOnThis in the method defined by methodName !!
      */
     public static void setImmediateService(Object obj, String methodName)
         throws java.io.IOException {
+        UniversalBody body = getRemoteBody(obj);
+        body.setImmediateService(methodName);
+    }
+    
+    /**
+     * Set an immmediate execution for the active object obj, i.e. requests corresponding to the name and types of parameters
+     * will be executed by the calling thread, and not added in the request queue.
+     * BE CAREFUL : for the first release of this method, do not make use of getCurrentThreadBody nor
+     * getStubOnThis in the method defined by methodName !!
+     * @param obj the object on which to set this immediate service
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     * @throws IOException
+     */
+    public static void setImmediateService(Object obj, String methodName, Class[] parametersTypes) throws IOException {
+        UniversalBody body = getRemoteBody(obj);
+        body.setImmediateService(methodName, parametersTypes);
+    }
+ 
+    /**
+     * Removes an immmediate execution for the active object obj, i.e. requests corresponding to the name and types of parameters
+     * will be executed by the calling thread, and not added in the request queue.
+     * BE CAREFUL : for the first release of this method, do not make use of getCurrentThreadBody nor
+     * getStubOnThis in the method defined by methodName !!
+     * 
+     * @param obj the object from which to remove this immediate service
+     * @param methodName the name of the method
+     * @param parametersTypes the types of the parameters of the method
+     * @throws IOException
+     */
+    public static void removeImmediateService(Object obj, String methodName, Class[] parametersTypes) throws IOException {
+        UniversalBody body = getRemoteBody(obj);
+        body.removeImmediateService(methodName, parametersTypes);
+    }
+
+
+    /**
+     * @param obj
+     * @return
+     */
+    private static UniversalBody getRemoteBody(Object obj) {
         // Check if obj is really a reified object
         if (!(MOP.isReifiedObject(obj))) {
             throw new ProActiveRuntimeException("The given object " + obj +
@@ -1397,8 +1438,9 @@ public class ProActive {
 
         BodyProxy myBodyProxy = (BodyProxy) myProxy;
         UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
-        body.setImmediateService(methodName);
+        return body;
     }
+    
 
     /**
      * @return the jobId associated with the object calling this method

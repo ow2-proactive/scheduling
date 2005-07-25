@@ -38,5 +38,10 @@ public interface RequestReceiver {
   public int receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException, RenegotiateSessionException;
   
   public void setImmediateService(String methodName) throws java.io.IOException ;
+  
+  public void setImmediateService(String methodName, Class[] parametersTypes) throws java.io.IOException;
+  
+  public void removeImmediateService(String methodName, Class[] parametersTypes) throws java.io.IOException;
+  
 
 }

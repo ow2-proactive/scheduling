@@ -143,6 +143,14 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
         body.setImmediateService(methodName);
     }
 
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        body.removeImmediateService(methodName, parametersTypes);
+    }
+
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        body.setImmediateService(methodName, parametersTypes);
+    }
+
     public void unreferenced() {
         logger.info("JiniBodyImpl: unreferenced()");
        // System.gc();

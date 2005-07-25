@@ -136,6 +136,11 @@ public interface JiniBody extends java.rmi.Remote {
      */
     public void setImmediateService(String methodName)
         throws java.io.IOException;
+    
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException;
+    
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException;
+
 
     // SECURITY
     public void initiateSession(int type, UniversalBody body)

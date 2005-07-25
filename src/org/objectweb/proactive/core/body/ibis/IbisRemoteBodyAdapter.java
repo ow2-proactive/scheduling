@@ -259,6 +259,16 @@ public class IbisRemoteBodyAdapter implements BodyAdapter, java.io.Serializable 
         throws java.io.IOException {
         proxiedRemoteBody.setImmediateService(methodName);
     }
+    
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedRemoteBody.removeImmediateService(methodName, parametersTypes);
+    }
+
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedRemoteBody.setImmediateService(methodName, parametersTypes);
+    }
+
+    
 
     // SECURITY
 

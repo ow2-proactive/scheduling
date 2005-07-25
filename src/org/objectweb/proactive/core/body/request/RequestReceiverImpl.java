@@ -35,23 +35,35 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+
 
 public class RequestReceiverImpl implements RequestReceiver,
     java.io.Serializable {
     public static Logger logger = Logger.getLogger(RequestReceiverImpl.class.getName());
+    private static final String ANY_PARAMETERS = "any-parameters";
 
-    //list of immediate services (method names)
-    private java.util.Vector immediateServices;
+    //private java.util.Vector immediateServices;
+    // refactored : keys are method names, and values are arrays of parameters types
+    // map of immediate services (method names +lists of method parameters)
+    private java.util.Map immediateServices;
 
     public RequestReceiverImpl() {
-        this.immediateServices = new java.util.Vector(2);
-        this.immediateServices.add("toString");
-        this.immediateServices.add("hashCode");
+        immediateServices = new Hashtable(2);
+        immediateServices.put("toString", ANY_PARAMETERS);
+        immediateServices.put("hashCode", ANY_PARAMETERS);
     }
 
     public int receiveRequest(Request request, Body bodyReceiver)
         throws java.io.IOException {
-        if (immediateExecution(request.getMethodName())) {
+        try {
+        if (immediateExecution(request)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("immediately serving " + request.getMethodName());
             }
@@ -59,29 +71,88 @@ public class RequestReceiverImpl implements RequestReceiver,
             if (logger.isDebugEnabled()) {
                 logger.debug("end of service for " + request.getMethodName());
             }
+
             //Dummy value for immediate services...
             return FTManager.IMMEDIATE_SERVICE;
         } else {
             request.notifyReception(bodyReceiver);
             return bodyReceiver.getRequestQueue().add(request);
         }
-    }
-
-    private boolean immediateExecution(String methodName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("immediateExecution for methode " + methodName +
-                " is " + immediateServices.contains(methodName));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
-
-        //        if (immediateServices.contains(methodName)) {
-        //            return true;
-        //        } else {
-        //            return false;
-        //        }
-        return immediateServices.contains(methodName);
     }
 
+    private boolean immediateExecution(Request request) {
+        if (request == null || request.getMethodCall() == null || request.getMethodCall().getReifiedMethod() == null) {
+            return false;
+        } else {
+            String methodName = request.getMethodName();
+            if (immediateServices.containsKey(methodName)) {
+                if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
+                    // method was registered using method name only
+                    return true;
+                } else {
+                    Iterator it = ((List) immediateServices.get(methodName)).iterator();
+                    while (it.hasNext()) {
+                        Class[] next = (Class[]) it.next();
+                        if (Arrays.equals(next, request.getMethodCall().getReifiedMethod().getParameterTypes())) {
+                            return true;
+                        }
+                    }
+                    // not found
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+    }
     public void setImmediateService(String methodName) {
-        this.immediateServices.add(methodName);
+        this.immediateServices.put(methodName, ANY_PARAMETERS);
+    }
+
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException {
+        if (immediateServices.containsKey(methodName)) {
+            if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
+                List list = (List) immediateServices.get(methodName);
+                List elementsToRemove = new ArrayList(list.size());
+                Iterator it = list.iterator();
+                while (it.hasNext()) {
+                    Class[] element = (Class[]) it.next();
+                    if (Arrays.equals(element, parametersTypes)) {
+                        // cannot modify a list while iterating over it => keep reference of 
+                        // the elements to remove
+                        elementsToRemove.add(element);
+                    }
+                }
+                it = elementsToRemove.iterator();
+                while (it.hasNext()) {
+                    list.remove(it.next());
+                }
+            } else {
+                immediateServices.remove(methodName);
+            }
+        } else {
+            // methodName not registered
+        }
+    }
+
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException {
+        if (immediateServices.containsKey(methodName)) {
+            if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
+                // there is already a filter on all methods with that name, whatever the parameters
+                return;
+            } else {
+                ((List) immediateServices.get(methodName)).add(parametersTypes);
+            }
+        } else {
+            List list = new ArrayList();
+            list.add(parametersTypes);
+            immediateServices.put(methodName, list);
+        }
     }
 }

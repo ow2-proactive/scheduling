@@ -290,6 +290,14 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
         proxiedRemoteBody.setImmediateService(methodName);
     }
 
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedRemoteBody.removeImmediateService(methodName, parametersTypes);
+    }
+
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        proxiedRemoteBody.setImmediateService(methodName, parametersTypes);
+    }
+
     // SECURITY
     public void initiateSession(int type, UniversalBody body)
         throws IOException, CommunicationForbiddenException, 

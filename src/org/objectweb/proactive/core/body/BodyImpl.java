@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import org.objectweb.proactive.ProActive;
@@ -258,6 +259,14 @@ public abstract class BodyImpl extends AbstractBody
     public void setImmediateService(String methodName)
         throws java.io.IOException {
         this.requestReceiver.setImmediateService(methodName);
+    }
+    
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        this.requestReceiver.setImmediateService(methodName, parametersTypes);
+    }
+    
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        this.requestReceiver.removeImmediateService(methodName, parametersTypes);
     }
 
     public void updateNodeURL(String newNodeURL) {

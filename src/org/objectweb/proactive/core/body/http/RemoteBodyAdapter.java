@@ -286,8 +286,16 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         throws IOException {
         remoteBodyStrategy.setImmediateService(methodName);
     }
+    
+    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        remoteBodyStrategy.setImmediateService(methodName, parametersTypes);
+    }
 
-    /**
+    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+        remoteBodyStrategy.removeImmediateService(methodName, parametersTypes);
+    }
+
+	/**
      * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)
      */
     public void initiateSession(int type, UniversalBody body)
