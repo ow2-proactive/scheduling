@@ -195,7 +195,7 @@ public class ComponentRequestImpl extends RequestImpl
                              .getInterceptors();
         Iterator it = interceptors.iterator();
         while (it.hasNext()) {
-            ((Interceptor) it.next()).beforeMethodInvocation();
+            ((Interceptor) it.next()).beforeMethodInvocation(methodCall);
         }
     }
 
@@ -213,7 +213,7 @@ public class ComponentRequestImpl extends RequestImpl
                 it.next();
             }
             while (it.hasPrevious()) {
-                ((Interceptor) it.previous()).afterMethodInvocation();
+                ((Interceptor) it.previous()).afterMethodInvocation(methodCall);
             }
         }
     }

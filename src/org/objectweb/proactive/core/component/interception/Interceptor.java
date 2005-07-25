@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.component.interception;
 
 import org.objectweb.proactive.core.component.controller.ProActiveController;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 /**
  * This interface must be implemented by controllers that need to intercept
@@ -23,8 +24,8 @@ import org.objectweb.proactive.core.component.controller.ProActiveController;
  */
 public interface Interceptor extends ProActiveController {
     
-    public void beforeMethodInvocation();
+    public void beforeMethodInvocation(MethodCall methodCall);
     
-    public void afterMethodInvocation();
+    public void afterMethodInvocation(MethodCall methodCall);
 
 }

@@ -186,7 +186,7 @@ public class ComponentConfigurationHandler
             
             public void startContextElement(String name, Attributes attributes)
             throws SAXException {
-                String interceptor = attributes.getValue(INTERCEPTOR_ATTRIBUTE);
+                String interceptor = attributes.getValue(INPUT_INTERCEPTOR_ATTRIBUTE);
                 if ("true".equals(interceptor)) {
                     interception = true;
                 }

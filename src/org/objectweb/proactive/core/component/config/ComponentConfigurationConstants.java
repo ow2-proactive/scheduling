@@ -7,7 +7,7 @@ public interface ComponentConfigurationConstants {
     public static final String CONTROLLER_ELEMENT = "controller";
     public static final String INTERFACE_ELEMENT = "interface";
     public static final String IMPLEMENTATION_ELEMENT = "implementation";
-    public static final String INTERCEPTOR_ATTRIBUTE= "interceptor";
+    public static final String INPUT_INTERCEPTOR_ATTRIBUTE= "input-interceptor";
     
     
 

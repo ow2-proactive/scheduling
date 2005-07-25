@@ -11,6 +11,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.interception.Interceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
@@ -54,13 +55,13 @@ public class Interceptor2Impl extends AbstractProActiveController
         }
     }
 
-    public void afterMethodInvocation() {
+    public void afterMethodInvocation(MethodCall methodCall) {
         //System.out.println("after method invocation");
         setDummyValue(getDummyValue() + Test.SEPARATOR + Test.AFTER_2);
         afterInvocationCounter++;
     }
 
-    public void beforeMethodInvocation() {
+    public void beforeMethodInvocation(MethodCall methodCall) {
         //        System.out.println("before method invocation");
         setDummyValue(getDummyValue() + Test.SEPARATOR + Test.BEFORE_2);
         beforeInvocationCounter++;

@@ -21,7 +21,8 @@
         <xs:element ref="interface"/>
         <xs:element ref="implementation"/>
       </xs:sequence>
-      <xs:attribute name="interceptor" use="optional" default="false" type="xs:boolean"/>
+      <xs:attribute name="input-interceptor" use="optional" default="false" type="xs:boolean"/>
+      <xs:attribute name="output-interceptor" use="optional" default="false" type="xs:boolean"/>
     </xs:complexType>
   </xs:element>
   <xs:element name="interface" type="xs:string"/>

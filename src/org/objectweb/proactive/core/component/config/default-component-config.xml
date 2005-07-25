@@ -16,10 +16,6 @@
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentController</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.fractal.api.control.ContentController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentController</implementation>
-        </controller>
-        <controller>
             <interface>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl</implementation>
         </controller>
