@@ -437,6 +437,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     public Object getParameter(int index) {
         return this.effectiveArguments[index];
     }
+    
+    public Object[] getParameters() {
+        return this.effectiveArguments;
+    }
 
     public void setEffectiveArguments(Object[] o) {
         effectiveArguments = o;

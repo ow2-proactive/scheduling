@@ -55,7 +55,8 @@ public class ComponentConfigurationHandler
 	implements ComponentConfigurationConstants {
     
     Map controllers = new HashMap();
-    List interceptors = new ArrayList();
+    List inputInterceptors = new ArrayList();
+    List outputInterceptors = new ArrayList();
 
 
 	public static Logger logger = Logger.getLogger(ComponentConfigurationHandler.class.getName());
@@ -69,8 +70,12 @@ public class ComponentConfigurationHandler
 	}
 
 
-	public List getInterceptors() {
-        return interceptors;
+	public List getInputInterceptors() {
+        return inputInterceptors;
+    }
+    
+    public List getOutputInterceptors() {
+        return outputInterceptors;
     }
 
 
@@ -176,7 +181,8 @@ public class ComponentConfigurationHandler
             
             String interfaceSignature=null;
             String implementationSignature=null;
-            boolean interception = false;
+            boolean inputInterception = false;
+            boolean outputInterception = false;
             
             public ControllerHandler() {
                 UnmarshallerHandler singleValueHandler = new SingleValueUnmarshaller();
@@ -186,9 +192,11 @@ public class ComponentConfigurationHandler
             
             public void startContextElement(String name, Attributes attributes)
             throws SAXException {
-                String interceptor = attributes.getValue(INPUT_INTERCEPTOR_ATTRIBUTE);
-                if ("true".equals(interceptor)) {
-                    interception = true;
+                if ("true".equals(attributes.getValue(INPUT_INTERCEPTOR_ATTRIBUTE))) {
+                    inputInterception = true;
+                }
+                if ("true".equals(attributes.getValue(OUTPUT_INTERCEPTOR_ATTRIBUTE))) {
+                    outputInterception = true;
                 }
             }
 
@@ -203,12 +211,16 @@ public class ComponentConfigurationHandler
 
             public Object getResultObject() throws SAXException {
                 controllers.put(interfaceSignature, implementationSignature);
-                if (interception) {
-                    interceptors.add(implementationSignature);
+                if (inputInterception) {
+                    inputInterceptors.add(implementationSignature);
+                }
+                if (outputInterception) {
+                    outputInterceptors.add(implementationSignature);
                 }
                 interfaceSignature=null;
                 implementationSignature=null;
-                interception=false;
+                inputInterception=false;
+                outputInterception = false;
                 return null;
             }
             

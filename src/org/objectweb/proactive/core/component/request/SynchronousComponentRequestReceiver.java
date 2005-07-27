@@ -38,7 +38,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
             if (!((ComponentRequest) r).isControllerRequest()) {
 
                 if ("true".equals(System.getProperty("proactive.components.use_shortcuts"))) {
-                    if (!((ComponentBody)bodyReceiver).getProActiveComponent().getInterceptors().isEmpty()) {
+                    if (!((ComponentBody)bodyReceiver).getProActiveComponent().getInputInterceptors().isEmpty()) {
                         if (logger.isDebugEnabled()) {
                             logger.debug("shortcut is stopped in this component, because functional invocations are intercepted");
                         }

@@ -76,6 +76,15 @@ public interface ProActiveComponent extends Component, Serializable {
      */
     public UniqueID getID();
     
+    /**
+     * getter
+     * @return the list of interceptors on input invocations for this component 
+     */    
+    public List getInputInterceptors();
     
-    public List getInterceptors();
+    /**
+     * getter
+     * @return the list of interceptors on output invocations for this component 
+     */    
+    public List getOutputInterceptors();
 }

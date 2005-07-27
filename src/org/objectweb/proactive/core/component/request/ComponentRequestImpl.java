@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.interception.Interceptor;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -69,7 +70,7 @@ import java.util.ListIterator;
  * This class handles the tagging of the call (a component call), and the
  * redispatching to the targeted component metaobject, interface reference, base
  * object. It also allows pre and post processing of functional invocations with
- * interceptors.
+ * inputInterceptors.
  *
  * @author Matthieu Morel
  */
@@ -189,23 +190,32 @@ public class ComponentRequestImpl extends RequestImpl
         return new FutureResult(result, exception, null);
     }
 
-    // intercept and delegate for preprocessing from the interceptors 
+    // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
-        List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
-                             .getInterceptors();
-        Iterator it = interceptors.iterator();
-        while (it.hasNext()) {
-            ((Interceptor) it.next()).beforeMethodInvocation(methodCall);
+        if (methodCall.getReifiedMethod() != null) {
+            List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
+            .getInputInterceptors();
+            Iterator it = inputInterceptors.iterator();
+            while (it.hasNext()) {
+                try {
+                    InputInterceptor interceptor = (InputInterceptor)it.next();
+                    interceptor.beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
+                    //((InputInterceptor) it.next()).beforeInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
-    // intercept and delegate for postprocessing from the interceptors 
+    // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
+        if (methodCall.getReifiedMethod() != null) {
         if (((ComponentBodyImpl) targetBody).getProActiveComponent() != null) {
             List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponent()
-                                 .getInterceptors();
+                                 .getInputInterceptors();
 
-            // use interceptors in reverse order after invocation
+            // use inputInterceptors in reverse order after invocation
             ListIterator it = interceptors.listIterator();
 
             // go to the end of the list first
@@ -213,8 +223,9 @@ public class ComponentRequestImpl extends RequestImpl
                 it.next();
             }
             while (it.hasPrevious()) {
-                ((Interceptor) it.previous()).afterMethodInvocation(methodCall);
+                ((InputInterceptor) it.previous()).afterInputMethodInvocation(methodCall.getReifiedMethod(), methodCall.getParameters());
             }
+        }
         }
     }
 
