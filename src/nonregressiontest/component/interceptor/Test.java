@@ -48,22 +48,21 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 /**
  *
  * Checks that interception of functional invocations works, and that the
- * order of the interceptors is the same than this of the controllers config file.
+ * order of the inputInterceptors is the same than this of the controllers config file.
+ * 
+ * Interceptors are only placed around the "A" component
+ *
  *
  * @author Matthieu Morel
  *
  */
 public class Test extends ComponentTest {
     Component componentA;
+    Component componentB;
     String name;
     String nodeUrl;
     String result = null;
     public static final String DUMMY_VALUE = "dummy-value";
-    public static final String BEFORE_1 = "before-invocation-1";
-    public static final String BEFORE_2 = "before-invocation-2";
-    public static final String AFTER_1 = "after-invocation-1";
-    public static final String AFTER_2 = "after-invocation-2";
-    public static final String SEPARATOR = " ; ";
 
     public Test() {
         super("Components : interception of functional invocations",
@@ -80,22 +79,38 @@ public class Test extends ComponentTest {
 
         componentA = cf.newFcInstance(type_factory.createFcType(
                     new InterfaceType[] {
-                        type_factory.createFcItfType("fooItf",
+                        type_factory.createFcItfType(FooItf.SERVER_ITF_NAME,
                             FooItf.class.getName(), TypeFactory.SERVER,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        type_factory.createFcItfType(FooItf.CLIENT_ITF_NAME,
+                            FooItf.class.getName(), TypeFactory.CLIENT,
+                            TypeFactory.MANDATORY, TypeFactory.SINGLE)
                     }),
                 new ControllerDescription("A", Constants.PRIMITIVE,
                     getClass()
                         .getResource("/nonregressiontest/component/interceptor/config.xml")
                         .getPath()),
                 new ContentDescription(A.class.getName(), new Object[] {  }));
+
+        componentB = cf.newFcInstance(type_factory.createFcType(
+                    new InterfaceType[] {
+                        type_factory.createFcItfType(FooItf.SERVER_ITF_NAME,
+                            FooItf.class.getName(), TypeFactory.SERVER,
+                            TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                    }), new ControllerDescription("B", Constants.PRIMITIVE),
+                new ContentDescription(B.class.getName(), new Object[] {  }));
+
+        Fractal.getBindingController(componentA).bindFc(FooItf.CLIENT_ITF_NAME,
+            componentB.getFcInterface(FooItf.SERVER_ITF_NAME));
+
         //logger.debug("OK, instantiated the component");
         ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(Test.DUMMY_VALUE);
 
         Fractal.getLifeCycleController(componentA).startFc();
+        Fractal.getLifeCycleController(componentB).startFc();
         // invoke functional methods on A
         // each invocation actually triggers a modification of the dummy value of the dummy controller
-        ((FooItf) componentA.getFcInterface("fooItf")).foo();
+        ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).foo();
         //((FooItf) componentA.getFcInterface("fooItf")).foo();
         result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
     }
@@ -113,8 +128,18 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        String expectedResult = DUMMY_VALUE + SEPARATOR + BEFORE_1 + SEPARATOR +
-            BEFORE_2 + SEPARATOR + AFTER_2 + SEPARATOR + AFTER_1;
+        String expectedResult = DUMMY_VALUE +
+            InputInterceptor1.BEFORE_INTERCEPTION +
+            InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION +
+            // starting invocation, which performs an output invocation, hence the following
+            InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION +
+            OutputInterceptor1.BEFORE_INTERCEPTION +
+            InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION +
+            OutputInterceptor1.AFTER_INTERCEPTION +
+            // invocation now finished
+            InputOutputInterceptor.AFTER_INPUT_INTERCEPTION +
+            InputInterceptor1.AFTER_INTERCEPTION;
+        ;
         return expectedResult.equals(result);
     }
 

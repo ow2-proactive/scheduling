@@ -1,43 +1,32 @@
 package nonregressiontest.component.interceptor;
 
+import java.lang.reflect.Method;
+
 import nonregressiontest.component.controller.DummyController;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.interception.Interceptor;
+import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.mop.MethodCall;
 
-
-/**
- * @author Matthieu Morel
- *
- */
-public class Interceptor1Impl extends AbstractProActiveController
-    implements Interceptor1, Interceptor {
-    private int beforeInvocationCounter = 0;
-    private int afterInvocationCounter = 0;
-
-    /**
-     * @param owner
-     */
-    public Interceptor1Impl(Component owner) {
+public class OutputInterceptor1Impl extends AbstractProActiveController implements OutputInterceptor1, OutputInterceptor  {
+    
+    public OutputInterceptor1Impl(Component owner) {
         super(owner);
         try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Interceptor1.INTERCEPTOR1_NAME,
-                    Interceptor1.class.getName(), TypeFactory.SERVER,
+            setItfType(ProActiveTypeFactory.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
+                    OutputInterceptor1.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
                 this.getClass().getName());
         }
     }
-
+    
     public void setDummyValue(String value) {
         try {
             ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
@@ -55,15 +44,14 @@ public class Interceptor1Impl extends AbstractProActiveController
         }
     }
 
-    public void afterMethodInvocation(MethodCall methodCall) {
-        //System.out.println("after method invocation");
-        setDummyValue(getDummyValue() + Test.SEPARATOR + Test.AFTER_1);
-        afterInvocationCounter++;
+
+    public void afterOutputMethodInvocation(Method method, Object[] args) {
+        setDummyValue(getDummyValue() + OutputInterceptor1.AFTER_INTERCEPTION);
     }
 
-    public void beforeMethodInvocation(MethodCall methodCall) {
-        //        System.out.println("before method invocation");
-        setDummyValue(getDummyValue() + Test.SEPARATOR + Test.BEFORE_1);
-        beforeInvocationCounter++;
+    public void beforeOutputMethodInvocation(Method method, Object[] args) {
+        setDummyValue(getDummyValue() + OutputInterceptor1.BEFORE_INTERCEPTION);
     }
+
+
 }

@@ -1,36 +1,33 @@
 package nonregressiontest.component.interceptor;
 
+import java.lang.reflect.Method;
+
 import nonregressiontest.component.controller.DummyController;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.interception.Interceptor;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
  * @author Matthieu Morel
  *
  */
-public class Interceptor2Impl extends AbstractProActiveController
-    implements Interceptor1, Interceptor {
-    private int beforeInvocationCounter = 0;
-    private int afterInvocationCounter = 0;
+public class InputOutputInterceptorImpl extends AbstractProActiveController
+    implements InputOutputInterceptor{
 
     /**
      * @param owner
      */
-    public Interceptor2Impl(Component owner) {
+    public InputOutputInterceptorImpl(Component owner) {
         super(owner);
         try {
-            setItfType(ProActiveTypeFactory.instance().createFcItfType(Interceptor2.INTERCEPTOR2_NAME,
-                    Interceptor2.class.getName(), TypeFactory.SERVER,
+            setItfType(ProActiveTypeFactory.instance().createFcItfType(InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
+                    InputOutputInterceptor.class.getName(), TypeFactory.SERVER,
                     TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " +
@@ -55,15 +52,22 @@ public class Interceptor2Impl extends AbstractProActiveController
         }
     }
 
-    public void afterMethodInvocation(MethodCall methodCall) {
+    public void afterInputMethodInvocation(Method method, Object[] args) {
         //System.out.println("after method invocation");
-        setDummyValue(getDummyValue() + Test.SEPARATOR + Test.AFTER_2);
-        afterInvocationCounter++;
+        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
     }
 
-    public void beforeMethodInvocation(MethodCall methodCall) {
+    public void beforeInputMethodInvocation(Method method, Object[] args) {
         //        System.out.println("before method invocation");
-        setDummyValue(getDummyValue() + Test.SEPARATOR + Test.BEFORE_2);
-        beforeInvocationCounter++;
+        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
     }
+    
+    public void afterOutputMethodInvocation(Method method, Object[] args) {
+        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
+    }
+
+    public void beforeOutputMethodInvocation(Method method, Object[] args) {
+        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
+    }
+
 }

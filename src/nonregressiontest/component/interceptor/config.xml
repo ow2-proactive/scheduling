@@ -32,12 +32,16 @@
             <implementation>nonregressiontest.component.controller.DummyControllerImpl</implementation>
         </controller>
         <controller input-interceptor="true">
-            <interface>nonregressiontest.component.interceptor.Interceptor1</interface>
-            <implementation>nonregressiontest.component.interceptor.Interceptor1Impl</implementation>
+            <interface>nonregressiontest.component.interceptor.InputInterceptor1</interface>
+            <implementation>nonregressiontest.component.interceptor.InputInterceptor1Impl</implementation>
         </controller>
-        <controller input-interceptor="true">
-            <interface>nonregressiontest.component.interceptor.Interceptor2</interface>
-            <implementation>nonregressiontest.component.interceptor.Interceptor2Impl</implementation>
+        <controller input-interceptor="true" output-interceptor="true">
+            <interface>nonregressiontest.component.interceptor.InputOutputInterceptor</interface>
+            <implementation>nonregressiontest.component.interceptor.InputOutputInterceptorImpl</implementation>
+        </controller>
+        <controller output-interceptor="true">
+            <interface>nonregressiontest.component.interceptor.OutputInterceptor1</interface>
+            <implementation>nonregressiontest.component.interceptor.OutputInterceptor1Impl</implementation>
         </controller>
     </controllers>
     
