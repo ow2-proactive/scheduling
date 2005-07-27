@@ -16,6 +16,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 
 /**
@@ -78,11 +79,24 @@ public class ProActiveOutputInterfaceInterceptor implements InvocationHandler {
         try {
             if (!nonFunctionalInterfaces.contains(method.getDeclaringClass()
                                                             .getName())) {
+                // TODO_M use a reference on the owner component to check the state of the lifecycle?
+                //                try {
+                //                    if ((LifeCycleController.STOPPED).equals(
+                //                                Fractal.getLifeCycleController(
+                //                                    delegatee.getFcItfOwner()).getFcState())) {
+                //                        throw new IllegalLifeCycleException(
+                //                            "cannot invoke method " + method.getName() +
+                //                            " when component is not stopped");
+                //                    }
+                //                } catch (NoSuchInterfaceException e) {
+                //                    // could not find any life cycle controller?
+                //                    e.printStackTrace();
+                //                }
                 if (!outputInterceptors.isEmpty()) {
                     Iterator it = outputInterceptors.iterator();
                     while (it.hasNext()) {
-                        OutputInterceptor interceptor = (OutputInterceptor) it.next();
-                        interceptor.beforeOutputMethodInvocation(method, args);
+                        ((OutputInterceptor) it.next()).beforeOutputMethodInvocation(method,
+                            args);
                     }
                 }
             }
@@ -90,33 +104,22 @@ public class ProActiveOutputInterfaceInterceptor implements InvocationHandler {
             if (!nonFunctionalInterfaces.contains(method.getDeclaringClass()
                                                             .getName())) {
                 if (!outputInterceptors.isEmpty()) {
-                    Iterator it = outputInterceptors.iterator();
+                    // use output interceptors in reverse order after invocation
+                    ListIterator it = outputInterceptors.listIterator();
+
+                    // go to the end of the list first
                     while (it.hasNext()) {
-                        OutputInterceptor interceptor = (OutputInterceptor) it.next();
-                        interceptor.afterOutputMethodInvocation(method, args);
+                        it.next();
+                    }
+                    while (it.hasPrevious()) {
+                        ((OutputInterceptor) it.previous()).afterOutputMethodInvocation(method,
+                            args);
                     }
                 }
             }
         } catch (Exception e) {
             throw e;
-        } finally {
-            System.out.println("after method " + method.getName());
         }
         return result;
     }
-
-    //    private void beforeMethodInvocation(Method method, Object[] args)
-    //        throws Throwable {
-    //        try {
-    //            if (!(LifeCycleController.STOPPED).equals(
-    //                        Fractal.getLifeCycleController(componentIdentity)
-    //                                   .getFcState())) {
-    //                throw new IllegalLifeCycleException("cannot invoke method " +
-    //                    method.getName() + " when component is not stopped");
-    //            }
-    //        } catch (NoSuchInterfaceException e) {
-    //            // no life cycle controller? 
-    //            // TODO log me!
-    //        }
-    //    }
 }

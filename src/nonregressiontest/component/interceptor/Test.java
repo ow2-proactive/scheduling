@@ -134,8 +134,8 @@ public class Test extends ComponentTest {
             // starting invocation, which performs an output invocation, hence the following
             InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION +
             OutputInterceptor1.BEFORE_INTERCEPTION +
-            InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION +
             OutputInterceptor1.AFTER_INTERCEPTION +
+            InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION +
             // invocation now finished
             InputOutputInterceptor.AFTER_INPUT_INTERCEPTION +
             InputInterceptor1.AFTER_INTERCEPTION;
