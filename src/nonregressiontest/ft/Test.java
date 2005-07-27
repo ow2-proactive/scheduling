@@ -24,7 +24,7 @@ public class Test extends FunctionalTest {
      * 
      */
     public Test() {
-        super("Active Object failure and recovery","AO fails during the computation, and is restarted. " +
+        super("Active Object failure and recovery. (This test can be quite long ...)","AO fails during the computation, and is restarted. " +
         		"Communications between passive object, non-ft active object and ft active object.");
     }
 
