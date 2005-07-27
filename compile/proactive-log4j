@@ -3,32 +3,34 @@
 
 # The default logging level is INFO
 # The root logger logs in the test.log file
-log4j.rootLogger=INFO, A1
+log4j.rootLogger=INFO, FILE
 
 # NFE Logger
 log4j.logger.NFE = FATAL
 
-# Appender A1 writes to the file "tests.log".
-log4j.appender.A1=org.apache.log4j.FileAppender
-log4j.appender.A1.File=tests.log
-# Appender A1 uses the PatternLayout.
-log4j.appender.A1.layout=org.apache.log4j.PatternLayout
-log4j.appender.A1.layout.ConversionPattern=%-5p [%t]: %m%n
+# Appender FILE writes to the file "tests.log".
+log4j.appender.FILE=org.apache.log4j.FileAppender
+log4j.appender.FILE.File=tests.log
+# the following recreates a file for each run
+log4j.appender.FILE.Append=false
+# Appender FILE uses the PatternLayout.
+log4j.appender.FILE.layout=org.apache.log4j.PatternLayout
+log4j.appender.FILE.layout.ConversionPattern=%-5p [%t]: %m%n
 
 ########### Change here default logging level on a 
 ########### per-logger basis
 ########### usage is log4j.logger.className=Level, Appender
 
-#A2 uses PatternLayout
+#CONSOLE uses PatternLayout
 #and displays the associated message (%m)
 #using the platform dependant separator (%n)
 #Use %M for method names
 #see log4j documentation for details
 
 #Both tests packages log on the console
-log4j.logger.nonregressiontest=INFO, A2
-log4j.logger.testsuite=INFO, A2
+log4j.logger.nonregressiontest=INFO, CONSOLE
+log4j.logger.testsuite=INFO, CONSOLE
 
-log4j.appender.A2=org.apache.log4j.ConsoleAppender
-log4j.appender.A2.layout=org.apache.log4j.PatternLayout
-log4j.appender.A2.layout.ConversionPattern=%m %n
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%m %n

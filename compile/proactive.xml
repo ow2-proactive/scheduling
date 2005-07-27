@@ -691,7 +691,6 @@
       ================================================================
 	-->
 	<target name="runTests" depends="testsuite, nonregressiontest, proActiveJar">
-		<delete file="${base}/compile/tests.log"/>
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
 			<jvmarg value="-Djava.security.policy=${base}/compile/proactive.java.policy"/>
@@ -699,7 +698,6 @@
 		</java>
 	</target>
 	<target name="runTestsLocal" depends="testsuite, nonregressiontest, proActiveJar">
-		<delete file="${base}/compile/tests.log"/>
 		<delete dir="${base}/compile/log"/>
 		<java classname="nonregressiontest.MainManager" fork="true">
 			<classpath refid="test.classpath"/>
@@ -719,7 +717,7 @@
 			<jvmarg value="-Dibis.name_server.pool=rutget"/>
 			<jvmarg value="-Dibis.pool_host_number=1"/>
 			<jvmarg value="-Dibis.name_server.key=12"/>
-			 <jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties"/>
+			<jvmarg value="-Dibis.property.file=/home1/fabrice/workIbis/Ibis/properties"/>
 			<jvmarg value="-Dnonregressiontest.descriptor.defaultnodes.file=/nonregressiontest/descriptor/defaultnodes/NodesLocalIbis.xml"/>
 		</java>
 	</target>
