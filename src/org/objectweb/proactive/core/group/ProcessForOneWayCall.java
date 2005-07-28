@@ -24,7 +24,8 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
     private ExceptionListException exceptionList;
 
     public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList,
-        int index, MethodCall mc, Body body, ExceptionListException exceptionList) {
+        int index, MethodCall mc, Body body,
+        ExceptionListException exceptionList) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
         this.index = index;
@@ -35,7 +36,14 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
 
     public void run() {
         LocalBodyStore.getInstance().setCurrentThreadBody(body);
-        Object object = this.memberList.get(this.index);
+        Object object = null;
+
+        // try-catch block added by AdC for P2P
+        try {
+            object = this.memberList.get(this.index);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return;
+        }
         boolean objectIsLocal = false;
 
         /* only do the communication (reify) if the object is not an error nor an exception */
@@ -59,7 +67,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                             if (mc.isComponentMethodCallOnComponent()) {
                                 target = object;
                             } else {
-                                target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                                target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
                             }
                             this.mc.execute(target);
                         } else {
@@ -69,7 +77,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                 } else {
                     if (object instanceof ProActiveComponentRepresentative) {
                         // delegate to the corresponding interface
-                        Object target = ((ProActiveComponentRepresentative)object).getFcInterface(mc.getComponentInterfaceName());
+                        Object target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentInterfaceName());
                         this.mc.execute(target);
                     } else {
                         ((StubObject) object).getProxy().reify(this.mc);
