@@ -10,12 +10,11 @@ package org.objectweb.proactive.core.util.log;
 public interface Loggers {
     static final public String COMPONENTS = "proactive.components";
     static final public String CLASSLOADER = "proactive.classloader";
-    
-    static final public String COMPONENTS_REQUEST = COMPONENTS+".request";
-    static final public String COMPONENTS_ACTIVITY = COMPONENTS+".activity";
-    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS+".bytecodegeneration";
-    
-    
+    static final public String COMPONENTS_REQUEST = COMPONENTS + ".request";
+    static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
+    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS +
+        ".bytecodegeneration";
+
     /** Logger for ProActive Examples. **/
     public static final String EXAMPLES = "proactive.examples";
 
@@ -45,6 +44,17 @@ public interface Loggers {
 
     /** First contact logging. */
     public static final String P2P_FIRST_CONTACT = P2P + ".first_contact";
+
+    /** Sekeltons logging. */
+    public static final String P2P_SKELETONS = P2P + ".skeletons";
+
+    /** P2P framework workers logging. */
+    public static final String P2P_SKELETONS_WORKER = P2P_SKELETONS +
+        ".worker";
+
+    /**P2P framework managers logging. */
+    public static final String P2P_SKELETONS_MANAGER = P2P_SKELETONS +
+        ".manager";
 
     // -------------------------------------------------------------------------
 }
