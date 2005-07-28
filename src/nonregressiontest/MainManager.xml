@@ -31,6 +31,7 @@
 			<unitTest exclude="no" class="nonregressiontest.activeobject.locationserver.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.loopmixedlocation.Test" />
 			<unitTest exclude="no" class="nonregressiontest.activeobject.acontinuation.Test" /> 
+			<unitTest exclude="no" class="nonregressiontest.activeobject.wrapper.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.exception.Test" /> 
 			<unitTest exclude="no" class="nonregressiontest.descriptor.lookupregister.Test" />
 			<unitTest exclude="no" class="nonregressiontest.descriptor.coallocation.Test" />
