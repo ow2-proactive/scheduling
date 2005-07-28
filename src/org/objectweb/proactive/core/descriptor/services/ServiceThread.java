@@ -107,15 +107,27 @@ public class ServiceThread extends Thread {
 
                 long step = 500;
                 while (askForNodes() &&
-                        (System.currentTimeMillis() < this.expirationTime)) {
-                    Vector future = p2pNodesLookup.getAndRemoveNodes();
-                    Vector nodes = (Vector) ProActive.getFutureValue(future);
+                        ((nodeRequested == MAX_NODE) ? true
+                                                         : (System.currentTimeMillis() < this.expirationTime))) {
+                    Vector nodes;
+                    try {
+                        Vector future = p2pNodesLookup.getAndRemoveNodes();
+                        nodes = (Vector) ProActive.getFutureValue(future);
+                    } catch (Exception e) {
+                        loggerDeployment.debug("Couldn't contact the lookup", e);
+                        continue;
+                    }
                     for (int i = 0; i < nodes.size(); i++) {
                         Node node = (Node) nodes.get(i);
                         nodeCount++;
                         ((VirtualNodeImpl) vn).nodeCreated(new NodeCreationEvent(
                                 vn, NodeCreationEvent.NODE_CREATED, node,
                                 nodeCount));
+                        if (loggerDeployment.isInfoEnabled()) {
+                            loggerDeployment.info(
+                                "Service thread just created event for node: " +
+                                node.getNodeInformation().getURL());
+                        }
                     }
 
                     // Sleeping with FastStart algo
@@ -167,7 +179,7 @@ public class ServiceThread extends Thread {
      * @return true if there are still nodes expected
      */
     private boolean askForNodes() {
-        if (nodeRequested == ((P2PDescriptorService) service).getMAX()) {
+        if (nodeRequested == MAX_NODE) {
             // nodeRequested = -1 means try to get the max number of nodes
             return true;
         } else {
