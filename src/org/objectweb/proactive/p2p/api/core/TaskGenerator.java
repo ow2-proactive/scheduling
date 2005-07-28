@@ -47,7 +47,7 @@ public abstract class TaskGenerator implements Serializable{
 	private List results;
 	
 	public void addResult(Result result) {
-		this.pendingTasks.remove(result.getTaskIndex());
+		// TODO this.pendingTasks.remove(result.getTaskIndex());
 		this.results.add(result);
 		this.generateTaskFromResult(result);
 	}
