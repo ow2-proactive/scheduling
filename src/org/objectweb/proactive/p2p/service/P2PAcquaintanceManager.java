@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 import java.io.Serializable;
@@ -161,11 +163,17 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 logger.debug("Some peers to remove from group");
                 Iterator it = e.iterator();
                 while (it.hasNext()) {
-                    // Remove bad peers
-                    ExceptionInGroup ex = (ExceptionInGroup) it.next();
-                    Object peer = ex.getObject();
-                    this.groupOfAcquaintances.remove(peer);
-                    logger.debug("Peer removed");
+                    try {
+                        // Remove bad peers
+                        ExceptionInGroup ex = (ExceptionInGroup) it.next();
+                        Object peer = ex.getObject();
+                        this.groupOfAcquaintances.remove(peer);
+                        logger.debug("Peer removed");
+                    } catch (Exception concEx) {
+                        // NullPointer or ConcurrentModification
+                        // No peer localized for the excpetion => nothing to do
+                        logger.debug(concEx);
+                    }
                 }
             }
         }
@@ -183,10 +191,18 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @param peer the peer to add.
      */
     public void add(P2PService peer) {
-        if (!this.groupOfAcquaintances.contains(peer)) {
-            boolean result = this.groupOfAcquaintances.add(peer);
-            String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
-            logger.info("Acquaintance " + peerUrl + " " + result + " added");
+        try {
+            if (!this.groupOfAcquaintances.contains(peer)) {
+                boolean result = this.groupOfAcquaintances.add(peer);
+                if (logger.isInfoEnabled()) {
+                    String peerUrl = ProActive.getActiveObjectNodeUrl(peer);
+                    logger.info("Acquaintance " + peerUrl + " " + result +
+                        " added");
+                }
+            }
+        } catch (Exception e) {
+            this.groupOfAcquaintances.remove(peer);
+            logger.debug("Problem while adding peer", e);
         }
     }
 
@@ -204,8 +220,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      *
      * @return the number of elements in this group.
      */
-    public int size() {
-        return this.groupOfAcquaintances.size();
+    public IntWrapper size() {
+        return new IntWrapper(this.groupOfAcquaintances.size());
     }
 
     /**
@@ -218,23 +234,30 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return <tt>true</tt> if this collection contains the specified
      *         element.
      */
-    public boolean contains(P2PService service) {
-        return this.groupOfAcquaintances.contains(service);
+    public BooleanWrapper contains(P2PService service) {
+        return new BooleanWrapper(this.groupOfAcquaintances.contains(service));
     }
 
-	/**
-	 * @param n number of neighbors which receive the balance request
-	 */
-	public void chooseNneighborsAndSendTheBalanceRequest(int n, P2PService sender, double ranking) {
-		int size = this.size();
-		if (size <= 0) return;
-		if (n > size) n = size; 
-		
-		int candidate = (int) (Math.random()*size);
-		int low = (candidate - 1 < 0)? 0:candidate-1;
-		int high = (candidate+1 >= size)? size-1:candidate+1;
-		Group subGroupofAcquaintances = this.groupOfAcquaintances.range(low,high); 
-		
-		((P2PService) subGroupofAcquaintances.getGroupByType()).balanceWithMe(sender, ranking);
-	}
+    /**
+     * @param n number of neighbors which receive the balance request
+     */
+    public void chooseNneighborsAndSendTheBalanceRequest(int n,
+        P2PService sender, double ranking) {
+        int size = this.groupOfAcquaintances.size();
+        if (size <= 0) {
+            return;
+        }
+        if (n > size) {
+            n = size;
+        }
+
+        int candidate = (int) (Math.random() * size);
+        int low = ((candidate - 1) < 0) ? 0 : (candidate - 1);
+        int high = ((candidate + 1) >= size) ? (size - 1) : (candidate + 1);
+        Group subGroupofAcquaintances = this.groupOfAcquaintances.range(low,
+                high);
+
+        ((P2PService) subGroupofAcquaintances.getGroupByType()).balanceWithMe(sender,
+            ranking);
+    }
 }

@@ -40,6 +40,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -59,6 +60,7 @@ import org.objectweb.proactive.p2p.service.util.UniversalUniqueID;
 import java.io.IOException;
 import java.io.Serializable;
 
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Vector;
 
@@ -97,8 +99,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 P2PConstants.PROPERTY_TTL));
     private static final long ACK_TO = Long.parseLong(System.getProperty(
                 P2PConstants.PROPERTY_NODE_ACK_TO));
-    private static final boolean WITH_BALANCE = Boolean.getBoolean(
-                P2PConstants.PROPERTY_LOAD_BAL);
+    private static final boolean WITH_BALANCE = Boolean.getBoolean(P2PConstants.PROPERTY_LOAD_BAL);
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
@@ -223,7 +224,18 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         } catch (P2POldMessageException e) {
             return;
         }
-        if (broadcast) {
+
+        // Method code ---------------------------------------------------------
+        // This should be register
+        if (this.shouldBeAcquaintance(remoteService)) {
+            this.register(remoteService);
+            try {
+                remoteService.register((P2PService) this.stubOnThis);
+            } catch (Exception e) {
+                logger.debug("Trouble with registering remote peer", e);
+                this.acquaintanceManager.remove(remoteService);
+            }
+        } else if (broadcast) {
             // Forwarding the message
             if (uuid == null) {
                 logger.debug("Generating uuid for exploring message");
@@ -232,16 +244,17 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             try {
                 this.acquaintances.exploring(ttl, uuid, remoteService);
                 logger.debug("Broadcast exploring message with #" + uuid);
+                uuid = null;
             } catch (ExceptionListException e) {
-                // nothing to do
+                logger.debug("Some peers to remove from exploring");
+                Iterator it = e.iterator();
+                while (it.hasNext()) {
+                    // Remove bad peers
+                    ExceptionInGroup ex = (ExceptionInGroup) it.next();
+                    Object peer = ex.getObject();
+                    this.acquaintanceManager.remove((P2PService) peer);
+                }
             }
-        }
-
-        // Method code ---------------------------------------------------------
-        // This should be register
-        if (this.shouldBeAcquaintance(remoteService)) {
-            this.register(remoteService);
-            remoteService.register((P2PService) this.stubOnThis);
         }
     }
 
@@ -280,8 +293,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
             // Asking node available?
             Node nodeAvailable = askedNode.getNode();
             if (nodeAvailable != null) {
-                P2PNodeAck nodeAck = lookup.giveNode(nodeAvailable,
-                        askedNode.getNodeManager());
+                P2PNodeAck nodeAck = null;
+                try {
+                    nodeAck = lookup.giveNode(nodeAvailable,
+                            askedNode.getNodeManager());
+                } catch (Exception lookupExcption) {
+                    logger.info("Cannot contact the remote lookup",
+                        lookupExcption);
+                    this.nodeManager.noMoreNodeNeeded(nodeAvailable);
+                    return;
+                }
 
                 // Waitng the ACK
                 long endTime = System.currentTimeMillis() + ACK_TO;
@@ -351,6 +372,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
                 numberOfNodes, lookup, vnName, jobId);
             logger.debug("Broadcast askingNode message with #" + uuid);
         }
+        uuid = null;
     }
 
     /**
@@ -365,16 +387,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @param jobId
      * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
      */
-
     public void askingNode(int ttl, UniversalUniqueID uuid,
-            P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-            String vnName, String jobId, boolean underloadedOnly) {
+        P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
+        String vnName, String jobId, boolean underloadedOnly) {
+        if (!underloadedOnly || !amIUnderloaded(0)) {
+            return;
+        }
 
-    	if (!underloadedOnly || !amIUnderloaded(0)) return;
-    	
-    	this.askingNode(ttl,uuid,remoteService,numberOfNodes,lookup,vnName,jobId);
+        this.askingNode(ttl, uuid, remoteService, numberOfNodes, lookup,
+            vnName, jobId);
     }
-    
 
     /** Put in a <code>P2PNodeLookup</code>, the number of asked nodes.
      * @param numberOfNodes the number of asked nodes.
@@ -417,14 +439,15 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
         return lookup;
     }
 
-    public P2PNodeLookup getNodes(int numberOfNodes, String vnName, String jobId, boolean onlyUnderloaded) {
+    public P2PNodeLookup getNodes(int numberOfNodes, String vnName,
+        String jobId, boolean onlyUnderloaded) {
         Object[] params = new Object[5];
         params[0] = new Integer(numberOfNodes);
         params[1] = this.stubOnThis;
         params[2] = vnName;
         params[3] = jobId;
         params[4] = String.valueOf(onlyUnderloaded);
-        
+
         P2PNodeLookup lookup = null;
         try {
             lookup = (P2PNodeLookup) ProActive.newActive(P2PNodeLookup.class.getName(),
@@ -513,12 +536,18 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      */
     private boolean broadcaster(int ttl, UniversalUniqueID uuid,
         P2PService remoteService) throws P2POldMessageException {
-        String remoteNodeUrl = ProActive.getActiveObjectNodeUrl(remoteService);
+        // is it an old message?
+        boolean isAnOldMessage = this.isAnOldMessage(uuid);
+
+        String remoteNodeUrl = null;
+        try {
+            remoteNodeUrl = ProActive.getActiveObjectNodeUrl(remoteService);
+        } catch (Exception e) {
+            isAnOldMessage = true;
+        }
 
         String thisNodeUrl = this.p2pServiceNode.getNodeInformation().getURL();
 
-        // is it an old message?
-        boolean isAnOldMessage = this.isAnOldMessage(uuid);
         if (!isAnOldMessage && !remoteNodeUrl.equals(thisNodeUrl)) {
             if (ttl > 0) {
                 logger.debug("Forwarding message request");
@@ -548,11 +577,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * <code>false</code>.
      */
     private boolean shouldBeAcquaintance(P2PService remoteService) {
-        if (this.acquaintanceManager.contains(remoteService)) {
+        if (this.acquaintanceManager.contains(remoteService).booleanValue()) {
             logger.debug("The remote peer is already known");
             return false;
         }
-        if (this.acquaintanceManager.size() < NOA) {
+        if (this.acquaintanceManager.size().intValue() < NOA) {
             logger.debug("NOA not reached: I should be an acquaintance");
             return true;
         } else {
@@ -653,16 +682,24 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
     /*********************************
      * LOAD BALANCING METHODS
      */
-    
+    /**
+     * @Answer to remote machines if I'm underloaded.
+     */
+    public boolean amIUnderloaded() {
+        return p2pLoadBalancer.AreYouUnderloaded();
+    }
+
     /**
      * Ask to the Load Balancer object if the state is underloaded
      * @param none
      * @return <code>true</code> if the state is underloaded, <code>false</code> else.
      */
     public boolean amIUnderloaded(double ranking) {
-    	if (ranking >= 0)
-    	return p2pLoadBalancer.AreYouUnderloaded(ranking);
-    	else return p2pLoadBalancer.AreYouUnderloaded();
+        if (ranking >= 0) {
+            return p2pLoadBalancer.AreYouUnderloaded(ranking);
+        } else {
+            return p2pLoadBalancer.AreYouUnderloaded();
+        }
     }
 
     /**
@@ -671,35 +708,36 @@ public class P2PService implements InitActive, P2PConstants, Serializable {
      * @return none
      */
     public void balanceWithMe(P2PService sender, double ranking) {
-    	
-    	// If I'm not underloaded, I will not reply
-    	if (!amIUnderloaded(ranking)) return;
-    	
-    	P2PNode myNode = nodeManager.askingNode(true);
+        // If I'm not underloaded, I will not reply
+        if (!amIUnderloaded(ranking)) {
+            return;
+        }
 
-    	// If I don't have an available node, I will not reply
-    	if (myNode.getNode() != null) {
-    		sender.P2PloadBalance(myNode.getNode());
-    	}
+        P2PNode myNode = nodeManager.askingNode(true);
+
+        // If I don't have an available node, I will not reply
+        if (myNode.getNode() != null) {
+            sender.P2PloadBalance(myNode.getNode());
+        }
     }
 
     /**
      * This method is remotely called by an underloaded peer to start the load balancing.
      * @param <code>Node</code> is the new place for the active objects
      * @return none
-     */    
-	public void P2PloadBalance(Node destNode) {
-		this.p2pLoadBalancer.sendActiveObjectsTo(destNode);
-	}
+     */
+    public void P2PloadBalance(Node destNode) {
+        this.p2pLoadBalancer.sendActiveObjectsTo(destNode);
+    }
 
     /**
      * This method is called by the LoadBalancer object in order to send the
-     * balance request to its neighbors 
+     * balance request to its neighbors
      * @param none
      * @return none
-     */    
-	public void tellToMyNeighborsThatIWantToShareActiveObjects(double ranking) {
-
-		this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(LoadBalancingConstants.SUBSET_SIZE,this.stubOnThis, ranking);
-	}
+     */
+    public void tellToMyNeighborsThatIWantToShareActiveObjects(double ranking) {
+        this.acquaintanceManager.chooseNneighborsAndSendTheBalanceRequest(LoadBalancingConstants.SUBSET_SIZE,
+            this.stubOnThis, ranking);
+    }
 }

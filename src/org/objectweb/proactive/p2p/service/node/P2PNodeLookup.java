@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.p2p.service.node;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Vector;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
@@ -51,6 +48,11 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
+
+import java.io.Serializable;
+
+import java.util.HashMap;
+import java.util.Vector;
 
 
 /**
@@ -82,14 +84,33 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     private HashMap nodeManagerMap = new HashMap();
     private boolean killAllFlag = false;
     private boolean onlyUnderloadedAnswer = false;
-    
+
     public P2PNodeLookup() {
         // the empty constructor
     }
 
     public P2PNodeLookup(Integer numberOfAskedNodes,
-        P2PService localP2pService, String vnName,
-        String jobId) {
+        P2PService localP2pService, String vnName, String jobId) {
+        this.waitingNodesList = new Vector();
+        this.nodesToKillList = new Vector();
+        this.expirationTime = System.currentTimeMillis() + TIMEOUT;
+        this.numberOfAskedNodes = numberOfAskedNodes.intValue();
+        assert (this.numberOfAskedNodes > 0) ||
+        (this.numberOfAskedNodes == MAX_NODE) : "None authorized value for asked nodes";
+        // Use special case: do not check TO
+        //        if (this.numberOfAskedNodes == MAX_NODE) {
+        //            this.expirationTime = Long.MAX_VALUE;
+        //        }
+        this.localP2pService = localP2pService;
+        this.vnName = vnName;
+        this.jobId = jobId;
+    }
+
+    // new constructor, for a load balanced environment
+    public P2PNodeLookup(Integer numberOfAskedNodes,
+        P2PService localP2pService, String vnName, String jobId,
+        String onlyUnderloadedAnswer) {
+        this.onlyUnderloadedAnswer = Boolean.getBoolean(onlyUnderloadedAnswer);
         this.waitingNodesList = new Vector();
         this.nodesToKillList = new Vector();
         this.expirationTime = System.currentTimeMillis() + TIMEOUT;
@@ -103,26 +124,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         this.vnName = vnName;
         this.jobId = jobId;
     }
-
-    // new constructor, for a load balanced environment
-    
-    public P2PNodeLookup(Integer numberOfAskedNodes,
-            P2PService localP2pService, 
-            String vnName, String jobId, String onlyUnderloadedAnswer) {
-    		this.onlyUnderloadedAnswer = Boolean.getBoolean(onlyUnderloadedAnswer);
-            this.waitingNodesList = new Vector();
-            this.nodesToKillList = new Vector();
-            this.expirationTime = System.currentTimeMillis() + TIMEOUT;
-            this.numberOfAskedNodes = numberOfAskedNodes.intValue();
-            assert (this.numberOfAskedNodes > 0) ||
-            (this.numberOfAskedNodes == MAX_NODE) : "None authorized value for asked nodes";
-            if (this.numberOfAskedNodes == MAX_NODE) {
-                this.expirationTime = Long.MAX_VALUE;
-            }
-            this.localP2pService = localP2pService;
-            this.vnName = vnName;
-            this.jobId = jobId;
-        }
 
     // -------------------------------------------------------------------------
     // Access methods
@@ -216,7 +217,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             String nodeUrl = givenNode.getNodeInformation().getURL();
             this.nodeManagerMap.put(nodeUrl, remoteNodeManager);
             this.acquiredNodes++;
-            logger.info("Lookup got " + this.acquiredNodes + " nodes");
             ProActiveRuntime remoteRt = givenNode.getProActiveRuntime();
             try {
                 remoteRt.addAcquaintance(this.parUrl);
@@ -227,7 +227,8 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             } catch (ProActiveException e) {
                 logger.warn("Couldn't recgister the remote runtime", e);
             }
-            logger.debug("Node at " + nodeUrl + " succefuly added");
+            logger.info("Node at " + nodeUrl + " succefuly added");
+            logger.info("Lookup got " + this.acquiredNodes + " nodes");
             return new P2PNodeAck(true);
         } else {
             return new P2PNodeAck(false);
@@ -294,23 +295,28 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      * @see org.objectweb.proactive.RunActive#runActivity(org.objectweb.proactive.Body)
      */
     public void runActivity(Body body) {
-        logger.info("Looking for " + this.numberOfAskedNodes + " nodes");
+        logger.info("Looking for " +
+            ((this.numberOfAskedNodes == MAX_NODE) ? "MAX"
+                                                   : (this.numberOfAskedNodes +
+            "")) + " nodes");
         Service service = new Service(body);
         while (!this.allArrived() &&
-                (System.currentTimeMillis() < this.expirationTime) &&
+                ((this.numberOfAskedNodes != MAX_NODE)
+                ? (System.currentTimeMillis() < this.expirationTime) : true) &&
                 !this.killAllFlag) {
             logger.debug("Aksing nodes");
 
             // Send a message to everybody
-            if (onlyUnderloadedAnswer)  
-            	this.localP2pService.askingNode(1, null, this.localP2pService,
-                this.numberOfAskedNodes - this.acquiredNodes, stub,
-                this.vnName, this.jobId
-				, onlyUnderloadedAnswer);  // Load balancer question
-            else
-            	this.localP2pService.askingNode(TTL, null, this.localP2pService,
-                        this.numberOfAskedNodes - this.acquiredNodes, stub,
-                        this.vnName, this.jobId);
+            if (onlyUnderloadedAnswer) {
+                this.localP2pService.askingNode(1, null, this.localP2pService,
+                    this.numberOfAskedNodes - this.acquiredNodes, stub,
+                    this.vnName, this.jobId, onlyUnderloadedAnswer); // Load balancer question
+            } else {
+                this.localP2pService.askingNode(TTL, null,
+                    this.localP2pService,
+                    this.numberOfAskedNodes - this.acquiredNodes, stub,
+                    this.vnName, this.jobId);
+            }
 
             // Serving request
             service.blockingServeOldest(LOOKUP_FREQ);
@@ -318,6 +324,18 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                 service.serveOldest();
             }
         }
+        String reason;
+        if (this.allArrived()) {
+            reason = "all nodes are arrived";
+        } else if ((this.numberOfAskedNodes != MAX_NODE) &&
+                (System.currentTimeMillis() < this.expirationTime)) {
+            reason = "timeout is expired";
+        } else if (this.killAllFlag) {
+            reason = "killing nodes request";
+        } else {
+            reason = "Houston. We have a problem...";
+        }
+        logger.info("Ending loop activity because: " + reason);
     }
 
     /**
@@ -327,7 +345,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
      */
     public void endActivity(Body body) {
         Service service = new Service(body);
-        logger.info("All nodes (" + this.acquiredNodes +
+        logger.info("Nodes (" + this.acquiredNodes +
             ") arrived ending activity");
         this.localP2pService.removeWaitingAccessor(this.stub);
         while ((this.waitingNodesList.size() > 0) ||
