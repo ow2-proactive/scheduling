@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.ssh;
 
+import org.objectweb.proactive.core.util.HostsInfos;
+
 
 /**
  * This class contains all the parameters used by the ssh code.
@@ -62,12 +64,8 @@ public class SshParameters {
     	}
     }
     
-    static public String getSshUsername () {
-    	String username = System.getProperty ("proactive.ssh.username");
-	    if (username == null) {
-		    username = System.getProperty ("user.name");
-	    }
-	    return username;
+    static public String getSshUsername (String hostname) {
+    	return HostsInfos.getUserName(hostname);
     }
 
     static public String getSshPort () {

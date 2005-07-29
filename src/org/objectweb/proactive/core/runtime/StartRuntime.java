@@ -30,17 +30,17 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.util.UrlBuilder;
-
 import java.io.File;
 import java.io.IOException;
-
 import java.net.URL;
+import java.net.UnknownHostException;
+
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**
@@ -62,7 +62,7 @@ public class StartRuntime {
     //private static final String DefaultRuntimeName = "PART_DEFAULT";
     //Name of the runtime's host that launched this class reading the ProActiveDescriptor
     static Logger logger = Logger.getLogger(StartRuntime.class.getName());
-    protected String DefaultRuntimeURL;
+    protected String defaultRuntimeURL;
     protected String nodeURL;
     protected String creatorID;
     protected ProActiveRuntime proActiveRuntime;
@@ -81,7 +81,8 @@ public class StartRuntime {
             this.nodeURL = args[0];
             this.creatorID = args[0].trim();
             //System.out.println(creatorID);
-            this.DefaultRuntimeURL = args[1];
+            //this.defaultRuntimeURL = args[1];
+            this.defaultRuntimeURL = parse(args[1]);
             //this.acquisitionMethod = args[2];
             this.nodeNumber = args[2];
             //   this.portNumber = Integer.parseInt(args[4]);
@@ -92,11 +93,12 @@ public class StartRuntime {
     }
 
     public static void main(String[] args) {
-        
-        if ("true".equals(System.getProperty("log4j.defaultInitOverride")) && System.getProperty("log4j.configuration") != null) {
+        if ("true".equals(System.getProperty("log4j.defaultInitOverride")) &&
+                (System.getProperty("log4j.configuration") != null)) {
             // configure log4j here to avoid classloading problems with log4j classes
             try {
-                String log4jConfiguration = System.getProperty("log4j.configuration");
+                String log4jConfiguration = System.getProperty(
+                        "log4j.configuration");
                 File f = new File(log4jConfiguration);
                 PropertyConfigurator.configure(new URL(f.getPath()));
             } catch (IOException e) {
@@ -134,18 +136,15 @@ public class StartRuntime {
                         //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
                 "proactive.communication.protocol") + ":");
 
-
             //            logger.info("Runtime started at " + comProtocol+ ":" +
             //                proActiveRuntime.getURL());
             proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
-
-            
         } catch (ProActiveException e) {
             e.printStackTrace();
             //we can still try to register if for instance an Alreadybound exception occurs
         }
-        if (DefaultRuntimeURL != null) {
-            register(DefaultRuntimeURL);
+        if (defaultRuntimeURL != null) {
+            register(defaultRuntimeURL);
         }
     }
 
@@ -156,17 +155,35 @@ public class StartRuntime {
      */
     private void register(String hostName) {
         try {
-            ProActiveRuntime PART = RuntimeFactory.getRuntime(DefaultRuntimeURL,
-                    UrlBuilder.getProtocol(DefaultRuntimeURL));
+            ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
+                    UrlBuilder.getProtocol(defaultRuntimeURL));
+
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 creatorID,
                 System.getProperty("proactive.communication.protocol") + ":",
                 vmName);
-            proActiveRuntime.setParent(DefaultRuntimeURL);
+            proActiveRuntime.setParent(defaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
             // if we cannot register, this jvm is useless
             System.exit(0);
         }
+    }
+
+    private String parse(String url) {
+        //this method is used to extract the username, that might be necessary for the callback
+        //it updates the hostable.
+        int index = url.indexOf("@");
+        if (index >= 0) {
+            String username = url.substring(0, index);
+            url = url.substring(index + 1, url.length());
+            try {
+                HostsInfos.setUserName(UrlBuilder.getHostNameFromUrl(
+                        url), username);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+            }
+        }
+        return url;
     }
 }

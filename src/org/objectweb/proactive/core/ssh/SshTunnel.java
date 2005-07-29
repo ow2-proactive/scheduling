@@ -65,14 +65,14 @@ public class SshTunnel {
 	public SshTunnel (String distantHost, int distantPort) throws IOException {
 		JSchSingleton.acquireLock ();
 		try {
-			String username = SshParameters.getSshUsername ();
+			String username = SshParameters.getSshUsername (distantHost);
 			String sshPort = SshParameters.getSshPort ();		
 			Session session;
 			try {
 				session = JSchSingleton.getSession(username, distantHost, sshPort);
 			} catch (IOException e) {
 				throw new IOException ("SSH tunnel failed: 127.0.0.1 -->"
-						+ distantHost + ":" + distantPort);
+						+ distantHost + ":" + distantPort+ "for "+ username);
 			}
 			int lport = 0;
 			int i = 0;
