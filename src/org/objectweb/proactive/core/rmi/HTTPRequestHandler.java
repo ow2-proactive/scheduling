@@ -134,6 +134,9 @@ public class HTTPRequestHandler extends Thread {
                     this.reqInfo = new RequestInfo();
                     reqInfo.read(httpIn);
                 }
+                if (!reqInfo.hasInfos()) {
+                    return;
+                }
 
                 // If  there is no field ClassFileName then it is a call to the
                 // ProActive Request via HTTP

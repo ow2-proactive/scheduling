@@ -49,7 +49,7 @@ public class RequestInfo {
     private int contentLength;
     private String classFileName;
     private String action;
-    private boolean begun;
+    private boolean hasInfo;
 
     public void read(HttpServletRequest request) {
         this.contentType = request.getContentType();
@@ -69,8 +69,8 @@ public class RequestInfo {
         return classFileName;
     }
 
-    public boolean isBegun() {
-        return begun;
+    public boolean hasInfos() {
+        return hasInfo;
     }
 
     /**
@@ -88,11 +88,10 @@ public class RequestInfo {
 
         /* Read request line */
         if ((line = in.getLine()) == null) {
-            // Reused connection must have been closed by the client
-            begun = false;
+            hasInfo = false;
             return;
         } else {
-            begun = true;
+            hasInfo = true;
         }
 
         String[] triplet = pSpace.split(line, 3);
