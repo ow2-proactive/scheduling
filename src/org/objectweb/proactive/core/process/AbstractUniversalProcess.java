@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.core.process;
 
+import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+
 
 
 public abstract class AbstractUniversalProcess implements UniversalProcess {
@@ -106,6 +109,9 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     public void startProcess() throws java.io.IOException {
         checkStarted();
         isStarted = true;
+        if(username != null){
+            HostsInfos.setUserName(hostname,username);
+        }
         if (logger.isDebugEnabled()) {
             logger.debug(getCommand());
         }
