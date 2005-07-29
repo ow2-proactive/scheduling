@@ -183,9 +183,10 @@ code are listed below. All these properties are client-side properties:
 	<li class="textNormal"><b>proactive.ssh.port</b>: the port number on which all the ssh daemons to
     which this JVM must connect to are expected to listen. If this property 
     is not set, the default is 22.</li>
-     <li class="textNormal"><b>proactive.ssh.username</b>: the username which will be used during
-    authentication with all the ssh daemons to which this JVM will need to
-    connect to. If this property is not set, the default is the user.name 
+     <li class="textNormal"><b>proactive.ssh.username</b>: Two possible syntaxes: username alone .e.g. <b>proactive.ssh.username=jsmith</b>, it represents the username which will be used during
+  authentication with all the ssh daemons to which this JVM will need to connect to. <br>
+  Or you can use the form <b>proactive.ssh.username=username1@machine1;username2@machine2;...;usernameN@machineN</b>. Note that several usernames without machine's names is not allowed and won't be parsed properly.<br>
+    If this property is not set, the default is the user.name 
     java property.</li>
      <li class="textNormal"><b>proactive.ssh.known_hosts</b>: a filename which identifies the file
     which contains the traditional ssh known_hosts list. This list of hosts
