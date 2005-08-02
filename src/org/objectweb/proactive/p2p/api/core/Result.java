@@ -51,10 +51,11 @@ public class Result implements Serializable {
     }
 
     /**
-     * Construct a new result with an attached value.
+     * Construct a new result with an attached value. The value must implement Comparable.
      * @param theResult the value of the result.
      */
     public Result(Object theResult) {
+        assert theResult instanceof Comparable;
         this.theResult = theResult;
     }
 
@@ -75,10 +76,45 @@ public class Result implements Serializable {
     }
 
     /**
-     * Attach a value to this result.
+     * Attach a value to this result. The value must implement Comparable.
      * @param theResult the value.
      */
     public void setResult(Object theResult) {
+        assert theResult instanceof Comparable;
         this.theResult = theResult;
+    }
+
+    /**
+     * Compare 2 results and return which is the best. Use compareTo from java.lang.Comparable.
+     * The least is returned.
+     * @param other the other result.
+     * @return the best result.
+     */
+    public Result returnTheBest(Result other) {
+        if (((Comparable) this.theResult).compareTo(other.theResult) == -1) {
+            return this;
+        } else {
+            return other;
+        }
+    }
+
+    /**
+     * Compare 2 results.
+     * @param other the other result.
+     * @return <code>true</code> this is better than the other, else returns <code>false</code>.
+     */
+    public boolean isBetterThan(Result other) {
+        if (((Comparable) this.theResult).compareTo(other.theResult) == -1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return <code>true</code> if this result contains an exception, else <code>false</code>.
+     */
+    public boolean isAnException() {
+        return this.exception != null;
     }
 }

@@ -38,10 +38,11 @@ import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.ServeException;
+import org.objectweb.proactive.core.group.Group;
+import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.p2p.api.exception.IsAlreadyComputingException;
 
 import java.io.Serializable;
@@ -54,8 +55,10 @@ import java.io.Serializable;
  */
 public class Worker implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
-    private String name = null;
     private boolean isComputing = false;
+    private Manager manager = null;
+    private Worker workerGroup = null;
+    private Result bestCurrentResult = null;
 
     /**
      * The active object empty constructor
@@ -68,9 +71,9 @@ public class Worker implements Serializable {
      * Construct a new Worker with its name.
      * @param name the Worker's name.
      */
-    public Worker(String name) {
-        this.name = name;
-        logger.debug("Worker " + this.name + " successfully created");
+    public Worker(Manager manager) {
+        this.manager = manager;
+        logger.debug("Worker successfully created");
     }
 
     /**
@@ -89,6 +92,7 @@ public class Worker implements Serializable {
         Service serviceQueue = new Service(body);
         try {
             activedTask = (Task) ProActive.turnActive(task);
+            activedTask.setWorker((Worker) ProActive.getStubOnThis());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Couldn't actived the task", e);
             exception = e;
@@ -97,16 +101,21 @@ public class Worker implements Serializable {
             exception = e;
         }
         if (activedTask != null) {
+            activedTask.initialization();
             Result result = activedTask.execute();
             while (ProActive.isAwaited(result)) {
                 Request r = serviceQueue.blockingRemoveOldest(100);
-                try {
-                    r.serve(body);
-                } catch (ServeException e) {
-                    logger.warn("Problem with serving a request", e);
+                if (r != null) {
+                    try {
+                        r.serve(body);
+                    } catch (ServeException e) {
+                        logger.warn("Problem with serving a request", e);
+                    }
                 }
             }
+            activedTask.finalization();
             this.isComputing = false;
+
             return result;
         } else {
             logger.fatal("The task was not actived");
@@ -115,10 +124,43 @@ public class Worker implements Serializable {
         }
     }
 
+    public void setWorkerGroup(Worker workerGroup) {
+        Group group = ProActiveGroup.getGroup(workerGroup);
+        group.remove(ProActive.getStubOnThis());
+        this.workerGroup = workerGroup;
+    }
+
     /**
-     * @return
+     * Update the best local result with the new one. If the new best result is no the best,
+     * nothing is did.
+     * @param newBest a new best result.
      */
-    public StringWrapper getName() {
-        return new StringWrapper(this.name);
+    public void setBestCurrentResult(Result newBest) {
+        if (this.bestCurrentResult == null) {
+            this.bestCurrentResult = newBest;
+            this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            logger.info("A new best result was localy found: " +
+                this.bestCurrentResult);
+        } else if (newBest.isBetterThan(this.bestCurrentResult)) {
+            this.bestCurrentResult = newBest;
+            this.workerGroup.informNewBestResult(this.bestCurrentResult);
+            logger.info("A new best result was localy found: " +
+                this.bestCurrentResult);
+        }
+    }
+
+    /**
+     * @return the local best result.
+     */
+    public Result getBestCurrentResult() {
+        return this.bestCurrentResult;
+    }
+
+    public void informNewBestResult(Result newBest) {
+        if (newBest.isBetterThan(this.bestCurrentResult)) {
+            this.bestCurrentResult = newBest;
+            logger.info("I was informed from a new remote best result: " +
+                this.bestCurrentResult);
+        }
     }
 }

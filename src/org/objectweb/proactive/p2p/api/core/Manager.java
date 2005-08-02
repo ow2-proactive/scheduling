@@ -36,6 +36,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import java.io.Serializable;
 
+import java.util.Iterator;
 import java.util.Vector;
 
 
@@ -60,6 +62,12 @@ public class Manager implements Serializable, InitActive {
     private Node[] nodes = null;
     private Worker workerGroup;
     private Vector tasks;
+    private boolean isComputing = false;
+    private Vector futureTaskList = new Vector();
+    private Vector pendingTaskList = new Vector();
+    private Vector unresolveTaskList = new Vector();
+    private Vector allResults = new Vector();
+    private Result finalResult = null;
 
     /**
      * The no args constructor for ProActive.
@@ -92,7 +100,8 @@ public class Manager implements Serializable, InitActive {
             args[i][0] = ProActive.getStubOnThis();
         }
         try {
-            ProActiveGroup.newGroup(Worker.class.getName(), args, this.nodes);
+            this.workerGroup = (Worker) ProActiveGroup.newGroup(Worker.class.getName(),
+                    args, this.nodes);
         } catch (ClassNotReifiableException e) {
             logger.fatal("The Worker is not reifiable", e);
         } catch (ActiveObjectCreationException e) {
@@ -103,52 +112,68 @@ public class Manager implements Serializable, InitActive {
             logger.fatal("The class for worker was not found", e);
         }
 
-        // Creating tasks
-        int split = (this.rootTask.shouldISplit()).intValue();
-        if ((split >= Task.SPLIT_CODE_MIN) && (split <= Task.SPLIT_CODE_MAX)) {
-            switch (split) {
-            case 1:
-                this.tasks = this.rootTask.split();
-                logger.info("split called");
-                break;
-            case 2:
-                this.tasks = this.rootTask.splitInN(this.rootTask.getNForSplit()
-                                                                 .intValue());
-                logger.info("split in n called");
-                break;
-            case 3:
-                this.tasks = this.rootTask.splitAtMost(this.rootTask.getNForSplit()
-                                                                    .intValue());
-                logger.info("split at most called");
-                break;
-            case 4:
-                this.tasks = this.rootTask.splitAtLeast(this.rootTask.getNForSplit()
-                                                                     .intValue());
-                logger.info("split at least called");
-                break;
-            default:
-                logger.fatal("A split method not handled by the manager: " +
-                    split);
-                throw new RuntimeException(
-                    "A split method not handled by the manager");
-            }
-        } else {
-            logger.info("No first split to do: not yet implemented :(");
-            // TODO What can we do?
-        }
+        this.workerGroup.setWorkerGroup(this.workerGroup);
+
+        // Spliting
+        logger.info("Compute the lower bound for the root task");
+        this.rootTask.initLowerBound();
+        logger.info("Compute the upper bound for the root task");
+        this.rootTask.initUpperBound();
+        logger.info("Calling for the first time split on the root task");
+        this.tasks = this.rootTask.split();
     }
-    
+
     public void start() {
-    	// TODO if is active
+        Body body = ProActive.getBodyOnThis();
+        if (!body.isActive()) {
+            logger.fatal("The manager is not active");
+            throw new RuntimeException("The manager is not active");
+        }
+
+        if (this.isComputing) {
+            // nothing to do
+            logger.info("The manager is already started");
+            return;
+        }
+
+        this.isComputing = true;
+
+        Iterator taskIt = this.tasks.iterator();
+        Group group = ProActiveGroup.getGroup(this.workerGroup);
+        Iterator workerIt = group.iterator();
+        while ((workerIt.hasNext()) && taskIt.hasNext()) {
+            this.assignTaskToWorker((Worker) workerIt.next(),
+                (Task) taskIt.next());
+        }
+
+        while (taskIt.hasNext()) {
+        	
+            // TODO if all is awaited ???
+        }
+
+        // TODO Serve request
+        
+        // Set the final result
+        this.finalResult = this.rootTask.gather((Result[]) this.allResults.toArray(
+                    new Result[this.allResults.size()]));
+        this.isComputing = false;
     }
-    
+
+    /**
+     * Assign a task to a worker.
+     * @param worker the worker.
+     * @param task the task.
+     */
+    private void assignTaskToWorker(Worker worker, Task task) {
+        this.futureTaskList.add(worker.execute(task));
+        this.pendingTaskList.add(task);
+    }
+
     public BooleanWrapper isFinish() {
-    	// TODO check is computation start
-    	return null;
+        return new BooleanWrapper(!this.isComputing);
     }
-    
+
     public Result getFinalResult() {
-    	// TODO check is finish before
-    	return null;
+        return this.finalResult;
     }
 }

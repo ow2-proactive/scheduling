@@ -301,10 +301,6 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             "")) + " nodes");
         Service service = new Service(body);
 
-        //        while (!this.allArrived() &&
-        //                ((this.numberOfAskedNodes != MAX_NODE)
-        //                ? (System.currentTimeMillis() < this.expirationTime) : true) &&
-        //                !this.killAllFlag) {
         String reason = null;
         while (true) {
             logger.debug("Aksing nodes");
