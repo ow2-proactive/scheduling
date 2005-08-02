@@ -30,22 +30,22 @@
  */
 package org.objectweb.proactive.core.mop;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.ObjectToByteConverter;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.component.request.Shortcut;
-
-import sun.rmi.server.MarshalInputStream;
-
 import java.io.ByteArrayInputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
+import org.objectweb.proactive.core.util.ObjectToByteConverter;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
+import sun.rmi.server.MarshalInputStream;
 
 
 /**
@@ -76,8 +76,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * The hashtable that caches Method/isAsynchronousCall
      * This dramatically improves performances, since we do not have to call
      * isAsynchronousCall for every call, but only once for a given method
-     */
-    private static transient java.util.Hashtable ASYNORNOT = new java.util.Hashtable();
+     */ 
+    private static transient java.util.Hashtable REIF_AND_EXCEP = new java.util.Hashtable();
     private static Logger logger = Logger.getLogger(MethodCall.class.getName());
 
     /**
@@ -131,7 +131,12 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     private long methodCallID;
     private String key;
 
-      /**
+    /**
+     * Actually only used for exceptions. 
+     */
+    private MethodCallMetadata metadata;
+
+    /**
      * byte[] to store effectiveArguments. Requiered to optimize multiple serialization
      * in some case (such as group communication) or to create a stronger
      * asynchronism (serialization of parameters then return to the thread of
@@ -210,7 +215,10 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *        <code>reifiedMethod</code> with arguments <code>effectiveArguments</code>
      */
     public synchronized static MethodCall getMethodCall(Method reifiedMethod,
-        Object[] effectiveArguments) {
+        Object[] effectiveArguments, MethodCallMetadata metadata) {
+
+        metadata = MethodCallMetadata.optimize(metadata);
+
         if (MethodCall.getRecycleMethodCallObject()) {
             // Finds a recycled MethodCall object in the pool, cleans it and
             // eventually returns it
@@ -223,13 +231,17 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 result.reifiedMethod = reifiedMethod;
                 result.effectiveArguments = effectiveArguments;
                 result.key = buildKey(reifiedMethod);
+                result.metadata = metadata;
                 return result;
-            } else {
-                return new MethodCall(reifiedMethod, effectiveArguments);
             }
-        } else {
-            return new MethodCall(reifiedMethod, effectiveArguments);
         }
+        return new MethodCall(reifiedMethod, effectiveArguments, metadata);
+    }
+    
+    public synchronized static MethodCall getMethodCall(Method reifiedMethod, Object[] effectiveArguments) {
+        MethodCallMetadata metadata = ExceptionHandler.getMetadataForCall(reifiedMethod);
+        return getMethodCall(reifiedMethod, effectiveArguments, metadata);
+        
     }
 
     /**
@@ -285,6 +297,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 mc.effectiveArguments = null;
                 mc.tagsForBarrier = null;
                 mc.key = null;
+                mc.metadata = null;
                 // Inserts the object in the pool
                 MethodCall.recyclePool[MethodCall.index] = mc;
                 MethodCall.index++;
@@ -304,10 +317,17 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     // This constructor is private to this class
     // because we want to enforce the use of factory methods for getting fresh
     // instances of this class (see <I>Factory</I> pattern in GoF).
-    public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
+    public MethodCall(Method reifiedMethod, Object[] effectiveArguments, MethodCallMetadata metadata) {
         this.reifiedMethod = reifiedMethod;
         this.effectiveArguments = effectiveArguments;
         this.key = buildKey(reifiedMethod);
+        this.metadata = MethodCallMetadata.optimize(metadata);
+        
+    }
+
+    public MethodCall(Method reifiedMethod, Object[] effectiveArguments) {
+        this(reifiedMethod, effectiveArguments, null);
+        
     }
 
     /**
@@ -338,6 +358,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 effectiveArguments = (Object[]) Utils.makeDeepCopy(mc.effectiveArguments);
             }
             this.key = MethodCall.buildKey(mc.getReifiedMethod());
+            this.metadata = mc.metadata;
             // methodcallID?
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -351,6 +372,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         this.reifiedMethod = null;
         this.effectiveArguments = null;
         this.serializedEffectiveArguments = null;
+        this.metadata = null;
     }
 
     /**
@@ -504,6 +526,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     //
     // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
     //
+
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
         this.writeTheObject(out);
@@ -567,14 +590,22 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      * Returns a boolean saying whether the method is one-way or not.
      * Being one-way method is equivalent to <UL>
      * <LI>having <code>void</code> as return type
-     * <LI>and not throwing any checked exceptions</UL>
+     * <LI>and not throwing any checked exceptions</UL>. If the caller asks
+     * for a RuntimeException or a NFE, then the call is not one way.
      * @return true if and only if the method call is one way
      */
     public boolean isOneWayCall() {
-        return (this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE)) &&
-        (this.getReifiedMethod().getExceptionTypes().length == 0);
+        return 	this.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE) &&
+        		this.getReifiedMethod().getExceptionTypes().length == 0 &&
+        		!this.getMetadata().isRuntimeExceptionHandled();
     }
 
+    /* Used in the REIF_AND_EXCEP cache */
+    static class ReifiableAndExceptions {
+        boolean reifiable; // Is the method return type reifiable ?
+        boolean exceptions; // Does the method throws exceptions ? 
+    }
+    
     /**
      * Checks if the <code>Call</code> object can be
      * processed with a future semantics, i-e if its returned object
@@ -582,46 +613,33 @@ public class MethodCall implements java.io.Serializable, Cloneable {
      *
      * Two conditions must be met : <UL>
      * <LI> The returned object is reifiable
-     * <LI> The invoked method does not throw any exceptions
+     * <LI> The invoked method does not throw any exceptions or they are catched asynchronously
      * </UL>
      * @return true if and only if the method call is asynchronous
      */
     public boolean isAsynchronousWayCall() {
         Method m = this.getReifiedMethod();
-
-        // Is the result cached ?
-        Boolean b = (Boolean) MethodCall.ASYNORNOT.get(m);
-        if (b != null) {
-            return b.booleanValue();
-        } else // Computes the result
-         {
-            boolean result;
-
-            // A Method that returns void is the only case where a method that returns
-            // a non-reifiable type is asynchronous
-            if (this.isOneWayCall()) {
-                result = true;
-            } else {
+        ReifiableAndExceptions cached = (ReifiableAndExceptions) REIF_AND_EXCEP.get(m);
+        if (cached == null) {
+            /* void is reifiable even though the check by the MOP would tell otherwise */
+            boolean reifiable = m.getReturnType().equals(java.lang.Void.TYPE);
+            if (!reifiable) {
                 try {
                     MOP.checkClassIsReifiable(m.getReturnType());
-                    // If the method can throw exceptions, then the result if false
-                    if (m.getExceptionTypes().length > 0) {
-                        //System.out.println(" ------ isAsynchronousCall() The method can throw exceptions ");
-                        result = false;
-                    } else {
-                        result = true;
-                    }
+                    reifiable = true;
                 } catch (ClassNotReifiableException e) {
-                    //System.out.println(" ------ isAsynchronousCall() The class " + m.getReturnType() + " is not reifiable ");
-                    result = false;
+                    /* Not reifiable, we already know :) */
                 }
-
-                // Now that we have computed the result, let's cache it
-                //System.out.println(" ------ isAsynchronousCall() method " + m + " ===> "+result);
-                MethodCall.ASYNORNOT.put(m, new Boolean(result));
             }
-            return result;
+            
+            boolean exceptions = m.getExceptionTypes().length != 0;
+            cached = new ReifiableAndExceptions();
+            cached.reifiable = reifiable;
+            cached.exceptions = exceptions;
+            REIF_AND_EXCEP.put(m, cached);
         }
+
+        return cached.reifiable && (!cached.exceptions || getMetadata().isExceptionAsynchronously());
     }
 
     /**
@@ -644,6 +662,13 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         return this.tagsForBarrier;
     }
 
+    public MethodCallMetadata getMetadata() {
+        if (metadata == null)
+            return MethodCallMetadata.DEFAULT;
+
+        return metadata;
+    }
+    
     //
     // --- INNER CLASSES -----------------------------------------------------------------------
     //

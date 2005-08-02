@@ -40,6 +40,8 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.Future;
+import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
@@ -238,6 +240,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
         // can be accessed by using a static methode has this information.
         sendRequest(methodCall, future,
             LocalBodyStore.getInstance().getCurrentThreadBody());
+        ExceptionHandler.addRequest(methodCall, (FutureProxy) future);
     }
 
     protected void sendRequest(MethodCall methodCall, Future future,

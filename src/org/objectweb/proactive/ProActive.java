@@ -30,14 +30,17 @@
  */
 package org.objectweb.proactive;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
-
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -65,6 +68,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.descriptor.xml.ProActiveDescriptorHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
@@ -84,13 +88,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
-
-import java.io.IOException;
-
-import java.net.UnknownHostException;
-
-import java.util.HashMap;
-import java.util.Set;
 
 
 public class ProActive {
@@ -2000,5 +1997,54 @@ public class ProActive {
             throw new ConstructionOfProxyObjectFailedException(
                 "Class can't be found e=" + e);
         }
+    }
+    
+    /*** <Exceptions> See ExceptionHandler.java for the documentation ***/
+    
+    /**
+     * This has to be called just before a try block for a single exception.
+     * The parameter is the caught exception type.
+     */
+    public static void tryWithCatch(Class c) {
+        tryWithCatch(new Class[] {c});
+    }
+    
+    /**
+     * This has to be called just before a try block for many exceptions.
+     * The parameter is the array of the caught exception types.
+     */
+    public static void tryWithCatch(Class[] c) {
+        ExceptionHandler.tryWithCatch(c);
+    }
+
+    /**
+     * This has to be called at the end of the try block.
+     */
+    public static void endTryWithCatch() {
+        ExceptionHandler.endTryWithCatch();
+    }
+
+    /**
+     * This has to be called at the beginning of the finally block, so
+     * it requires one.
+     */
+    public static void removeTryWithCatch() {
+        ExceptionHandler.removeTryWithCatch();
+    }
+    
+    /**
+     * This can be used to query a potential returned exception, and
+     * throw it if it exists.
+     */
+    public static void throwArrivedException() {
+        ExceptionHandler.throwArrivedException();
+    }
+
+    /**
+     * This is used to wait for the return of every call, so that we know
+     * the execution can continue safely with no pending exception.
+     */
+    public static void waitForPotentialException() {
+        ExceptionHandler.waitForPotentialException();
     }
 }

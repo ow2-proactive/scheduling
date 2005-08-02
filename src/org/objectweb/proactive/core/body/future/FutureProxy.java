@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.FutureEvent;
+import org.objectweb.proactive.core.exceptions.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -124,6 +126,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     protected HashMap futureLevel = null;
 
+    /**
+     * The exception level in the stack in which this future is
+     * registered
+     */
+    private ExceptionMaskLevel exceptionLevel;
+    
     /**
      * Get NFE logger
      */
@@ -225,7 +233,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             throw new java.io.IOException(
                 "FutureProxy receives a reply and this target field is not null");
         }
-        target = obj; 
+        target = obj;
+        ExceptionHandler.addResult(this);
         NonFunctionalException nfe = target.getNFE();
         if (nfe != null) {
             Handler handler = ProActive.searchExceptionHandler(nfe, this);
@@ -251,6 +260,10 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public boolean isAvailable() {
     	return target != null;
+    }
+    
+    public FutureResult getFutureResult() {
+        return target;
     }
     
     /**
@@ -658,6 +671,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             // the object is picked out of the pool, because it allows
             // garbage-collecting the objects referenced in here
             futureProxy.target = null;
+            futureProxy.exceptionLevel = null;
 
             // Inserts the object in the pool
             recyclePool[index] = futureProxy;
@@ -666,6 +680,20 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 index = RECYCLE_POOL_SIZE - 1;
             }
         }
+    }
+
+    /**
+     * @return Returns the exceptionLevel.
+     */
+    public ExceptionMaskLevel getExceptionLevel() {
+        return exceptionLevel;
+    }
+
+    /**
+     * @param exceptionLevel The exceptionLevel to set.
+     */
+    public void setExceptionLevel(ExceptionMaskLevel exceptionLevel) {
+        this.exceptionLevel = exceptionLevel;
     }
 
     //////////////////////////

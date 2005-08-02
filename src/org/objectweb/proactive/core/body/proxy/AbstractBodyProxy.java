@@ -180,15 +180,28 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         }
     }
 
+    /* 
+     * Dummy Future used to reply to a one-way method call with exceptions
+     * Declared as public to accomodate the MOP 
+     */
+    public static class VoidFuture {public VoidFuture() {}}
+    
     protected Object reifyAsAsynchronous(MethodCall methodCall)
         throws Exception, RenegotiateSessionException {
         StubObject futureobject = null;
 
         // Creates a stub + FutureProxy for representing the result
         try {
-            futureobject = (StubObject) MOP.newInstance(methodCall.getReifiedMethod()
-                                                                  .getReturnType(),
-                    null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+            Class returnType = methodCall.getReifiedMethod().getReturnType();
+        	
+        	if (returnType.equals(java.lang.Void.TYPE)) {
+        		/* A future for a void call is used to put the potential exception inside */
+        		futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
+        				null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+        	} else {
+        		futureobject = (StubObject) MOP.newInstance(returnType,
+        				null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+        	}
         } catch (MOPException e) {
             // Create a non functional exception encapsulating the network exception
             NonFunctionalException nfe = new FutureCreationException(

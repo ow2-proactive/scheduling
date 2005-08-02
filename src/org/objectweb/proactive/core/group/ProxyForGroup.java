@@ -301,7 +301,7 @@ public class ProxyForGroup extends AbstractProxy
                 this.threadpool.addAJob(new ProcessForAsyncCall(this,
                         this.memberList, memberListOfResultGroup, index,
                         new MethodCall(mc.getReifiedMethod(),
-                            individualEffectiveArguments), body));
+                            individualEffectiveArguments, mc.getMetadata()), body));
             }
         }
 
@@ -359,7 +359,7 @@ public class ProxyForGroup extends AbstractProxy
                 this.threadpool.addAJob(new ProcessForOneWayCall(this,
                         this.memberList, index,
                         new MethodCall(mc.getReifiedMethod(),
-                            individualEffectiveArguments), body, exceptionList));
+                            individualEffectiveArguments, mc.getMetadata()), body, exceptionList));
             }
         }
 

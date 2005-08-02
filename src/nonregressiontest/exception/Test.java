@@ -30,6 +30,8 @@
  */
 package nonregressiontest.exception;
 
+import org.objectweb.proactive.ProActive;
+
 import testsuite.test.FunctionalTest;
 
 
@@ -45,9 +47,103 @@ public class Test extends FunctionalTest {
     public Test() {
         super("Exception", "Test exceptions");
     }
+    
     public boolean postConditions() throws Exception {
-        return counter == 3;
+        if (counter == 11) {
+        	return true;
+        } else {
+        	System.out.println("counter == " + counter);
+        	return false;
+        }
     }
+    
+    private void good() {
+    	counter++;
+    }
+    
+    private void bad() {
+    	counter = 1000;
+    	new Exception("Exception error").printStackTrace();
+    }
+    
+    public void testMechanism(Exc r) throws Exception {
+    	ProActive.tryWithCatch(Exception.class);
+    	try {
+    		/* voidRT() */
+    		r.voidRT();
+    		ProActive.endTryWithCatch();
+    		bad();
+    	} catch (Exception e) {
+    		good();
+    	} finally {
+    		ProActive.removeTryWithCatch();
+    	}
+
+        /* futureRT() */
+    	ProActive.tryWithCatch(RuntimeException.class);
+    	try {
+    		Exc res = r.futureRT();
+    		good();
+            res.nothing();
+            bad();
+            ProActive.endTryWithCatch();
+        } catch (RuntimeException re) {
+            good();
+        } finally {
+        	ProActive.removeTryWithCatch();
+        }
+
+        /* voidExc() */
+        ProActive.tryWithCatch(Exception.class);
+        try {
+            r.voidExc();
+            good();
+            ProActive.waitForPotentialException();
+            bad();
+            ProActive.endTryWithCatch();
+        } catch (Exception e) {
+            if (e.getMessage().startsWith("Test")) {
+                good();
+            } else {
+            	bad();
+            }
+        } finally {
+        	ProActive.removeTryWithCatch();
+        }
+
+        /* futureExc() */
+        ProActive.tryWithCatch(Exception.class);
+        try {
+            r.futureExc();
+            good();
+            ProActive.endTryWithCatch();
+            bad();
+        } catch (Exception e) {
+            if (e.getMessage().startsWith("Test")) {
+                good();
+            } else {
+            	bad();
+            }
+        } finally {
+        	ProActive.removeTryWithCatch();
+        }
+        
+        ProActive.tryWithCatch(Exception.class);
+        Exc res = r.futureExc();
+        try {
+        	ProActive.tryWithCatch(Exception.class);
+        } catch (Exception e) {
+        	if (e.getMessage().startsWith("Test")) {
+                good();
+            } else {
+            	bad();
+            }
+        } finally {
+        	ProActive.removeTryWithCatch();
+        	ProActive.removeTryWithCatch();
+        }
+    }
+    
     public void action() throws Exception {
 
         /* Server */
@@ -62,27 +158,36 @@ public class Test extends FunctionalTest {
         Exc res = r.futureRT();
         try {
             res.nothing();
+            bad();
         } catch (RuntimeException re) {
-            counter++;
+            good();
         }
 
         /* voidExc() */
         try {
             r.voidExc();
+            bad();
         } catch (Exception e) {
             if (e.getMessage().startsWith("Test")) {
-                counter++;
+                good();
+            } else {
+            	bad();
             }
         }
 
         /* futureExc() */
         try {
             r.futureExc();
+            bad();
         } catch (Exception e) {
             if (e.getMessage().startsWith("Test")) {
-                counter++;
+                good();
+            } else {
+            	bad();
             }
         }
+        
+        testMechanism(r);
     }
 
     public void initTest() throws Exception {

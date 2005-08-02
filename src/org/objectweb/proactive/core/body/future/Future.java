@@ -67,6 +67,11 @@ public interface Future extends LocalFuture {
     public Object getResult();
 
     /**
+     * Get the encapsulation of the result and the potential exception.
+     */
+    public FutureResult getFutureResult();
+    
+    /**
      * To set the sequence id of this future.
      */
     public void setID(long id);
