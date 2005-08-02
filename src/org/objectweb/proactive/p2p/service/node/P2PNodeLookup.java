@@ -300,10 +300,13 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
                                                    : (this.numberOfAskedNodes +
             "")) + " nodes");
         Service service = new Service(body);
-        while (!this.allArrived() &&
-                ((this.numberOfAskedNodes != MAX_NODE)
-                ? (System.currentTimeMillis() < this.expirationTime) : true) &&
-                !this.killAllFlag) {
+
+        //        while (!this.allArrived() &&
+        //                ((this.numberOfAskedNodes != MAX_NODE)
+        //                ? (System.currentTimeMillis() < this.expirationTime) : true) &&
+        //                !this.killAllFlag) {
+        String reason = null;
+        while (true) {
             logger.debug("Aksing nodes");
 
             // Send a message to everybody
@@ -323,16 +326,27 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             while (service.hasRequestToServe()) {
                 service.serveOldest();
             }
+
+            // Test conditions to go out of the loop
+            if (this.killAllFlag) {
+                reason = "killing nodes request";
+                break;
+            } else if (this.numberOfAskedNodes == MAX_NODE) {
+                reason = "Max node asked";
+                continue;
+            } else if (this.allArrived()) {
+                reason = "all nodes are arrived";
+                break;
+            } else if ((System.currentTimeMillis() > this.expirationTime)) {
+                reason = "timeout is expired";
+                break;
+            } else {
+                reason = "Normal case continue";
+                continue;
+            }
         }
-        String reason;
-        if (this.allArrived()) {
-            reason = "all nodes are arrived";
-        } else if ((this.numberOfAskedNodes != MAX_NODE) &&
-                (System.currentTimeMillis() < this.expirationTime)) {
-            reason = "timeout is expired";
-        } else if (this.killAllFlag) {
-            reason = "killing nodes request";
-        } else {
+
+        if (reason == null) {
             reason = "Houston. We have a problem...";
         }
         logger.info("Ending loop activity because: " + reason);
