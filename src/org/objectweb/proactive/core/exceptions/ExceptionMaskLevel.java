@@ -92,6 +92,7 @@ public class ExceptionMaskLevel {
     }
 
     synchronized void waitForPotentialException() {
+    	parent.throwArrivedException();
         while (nbFutures != 0) {
             try {
                 wait();
@@ -99,8 +100,9 @@ public class ExceptionMaskLevel {
                 ie.printStackTrace();
                 break;
             }
+            parent.throwArrivedException();
         }
-        parent.throwArrivedException();
+        
     }
 
     boolean catchRuntimeException() {
