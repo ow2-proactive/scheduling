@@ -36,6 +36,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -65,7 +67,7 @@ public class Manager implements Serializable, InitActive {
     private boolean isComputing = false;
     private Vector futureTaskList = new Vector();
     private Vector pendingTaskList = new Vector();
-    private Vector unresolveTaskList = new Vector();
+    private Vector workingWorkerList = new Vector();
     private Vector allResults = new Vector();
     private Result finalResult = null;
 
@@ -147,12 +149,29 @@ public class Manager implements Serializable, InitActive {
         }
 
         while (taskIt.hasNext()) {
-        	
-            // TODO if all is awaited ???
+            // wait for a free worker
+            int index = ProActive.waitForAny(this.futureTaskList);
+            this.allResults.add(this.futureTaskList.get(index));
+            this.pendingTaskList.remove(index);
+            Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
+            this.assignTaskToWorker(freeWorker, (Task) taskIt.next());
         }
 
-        // TODO Serve request
-        
+        // Serving requests and waiting for results
+        Service service = new Service(body);
+        while (this.allResults.size() != this.tasks.size()) {
+            try {
+                int index = ProActive.waitForAny(this.futureTaskList, 1000);
+                this.allResults.add(this.futureTaskList.get(index));
+                this.pendingTaskList.remove(index);
+            } catch (ProActiveException e) {
+                while (service.getRequestCount() > 0) {
+                    service.serveOldest();
+                }
+                continue;
+            }
+        }
+
         // Set the final result
         this.finalResult = this.rootTask.gather((Result[]) this.allResults.toArray(
                     new Result[this.allResults.size()]));
@@ -167,6 +186,7 @@ public class Manager implements Serializable, InitActive {
     private void assignTaskToWorker(Worker worker, Task task) {
         this.futureTaskList.add(worker.execute(task));
         this.pendingTaskList.add(task);
+        this.workingWorkerList.add(worker);
     }
 
     public BooleanWrapper isFinish() {
