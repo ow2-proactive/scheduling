@@ -138,6 +138,7 @@ public class ServiceThread extends Thread {
                     } else if (askForNodes() && (this.nodeCount == 0)) {
                         // still no node
                         Thread.sleep(step);
+                        step += 500;
                     } else if (askForNodes()) {
                         // normal waiting
                         if (step == LOOK_UP_FREQ) {
