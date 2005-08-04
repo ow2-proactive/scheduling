@@ -99,6 +99,13 @@ public class Result implements Serializable {
     }
 
     /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        return this.theResult.toString();
+    }
+
+    /**
      * Compare 2 results.
      * @param other the other result.
      * @return <code>true</code> this is better than the other, else returns <code>false</code>.

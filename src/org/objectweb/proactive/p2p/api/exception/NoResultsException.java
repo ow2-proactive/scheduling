@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.p2p.api.exception;
 
-public class NoResultsException extends Exception {
+import java.io.Serializable;
 
+
+public class NoResultsException extends Exception implements Serializable {
 }

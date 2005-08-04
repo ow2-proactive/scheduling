@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.p2p.api.exception;
 
-public class IsAlreadyComputingException extends Exception {
+import java.io.Serializable;
 
+
+public class IsAlreadyComputingException extends Exception
+    implements Serializable {
 }
