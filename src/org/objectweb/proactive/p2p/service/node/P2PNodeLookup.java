@@ -318,8 +318,13 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
             }
 
             // Serving request
+            logger.debug("Waiting for requests");
             service.blockingServeOldest(LOOKUP_FREQ);
             while (service.hasRequestToServe()) {
+                if (logger.isDebugEnabled()) {
+                    logger.info("Serving request: " +
+                        service.getOldest().getMethodName());
+                }
                 service.serveOldest();
             }
 
