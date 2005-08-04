@@ -51,12 +51,6 @@ public class RequestInfo {
     private String action;
     private boolean hasInfo;
 
-    public void read(HttpServletRequest request) {
-        this.contentType = request.getContentType();
-        this.contentLength = request.getContentLength();
-        this.action = request.getHeader("Proactive-action");
-    }
-
     public String getContentType() {
         return contentType;
     }
@@ -71,6 +65,18 @@ public class RequestInfo {
 
     public boolean hasInfos() {
         return hasInfo;
+    }
+
+    /**
+     * Extract the http request fields and fill the RequestInfo fields. 
+     * @param request The HttpServletRequest to read 
+     */
+
+    public void read(HttpServletRequest request) {
+        this.contentType = request.getContentType();
+        this.contentLength = request.getContentLength();
+        this.action = request.getHeader("Proactive-action");
+        this.hasInfo = true;
     }
 
     /**
