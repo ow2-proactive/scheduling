@@ -128,7 +128,7 @@ public abstract class FunctionalTestManager extends AbstractManager {
                 while (itTest.hasNext()) {
                     FunctionalTest test = (FunctionalTest) itTest.next();
                     if (logger.isInfoEnabled()) {
-                        logger.info(" -----  Launching test: " + test.getName());
+                        logger.info(" -------  Launching test: " + test.getName());
                     }
                     AbstractResult result = test.runTest();
                     if (result != null) {
