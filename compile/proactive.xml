@@ -855,5 +855,30 @@
       </clover-report>
  </target>
  
+	  <!-- ==================================================================== -->
+	  <!-- Formats the project sources                                          -->
+	  <!-- ==================================================================== -->
+	  <target name="format">
 
+	    <!-- declare the Jalopy task -->
+	    <taskdef name="jalopy"
+	             classname="de.hunsicker.jalopy.plugin.ant.AntPlugin">
+	    	 <classpath>
+	    	    <fileset dir="${base}/dev/lib">
+	    	      <include name="*.jar" />
+	    	    </fileset>
+	    	 	<fileset dir="${base}/lib">
+	    	 		<include name="log4j.jar" />
+	    	    </fileset>
+	    	  </classpath>
+	    </taskdef>
+
+	    <jalopy classpathref="project.classpath"
+	            style="proactiveJalopy.xml">
+	      <fileset dir="${src.dir}">
+	        <include name="**/*.java" />
+	      </fileset>
+	    	
+	    </jalopy>
+	  </target>
 </project>
