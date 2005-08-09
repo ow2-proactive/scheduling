@@ -66,6 +66,9 @@
 		<!-- Enable load balance -->
 		<prop key="proactive.p2p.loadbalancing" value="false" />
 		<!-- ***************************************************** -->
+
+		<!-- Workaround to fix rmissh/unicore conflict -->
+		<prop key="proactive.unicore.forkclient" value="true" />
 	</properties>
 </ProActiveUserProperties>
  
