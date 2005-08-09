@@ -345,13 +345,15 @@
       ==
       ================================================================
 	-->
-	<target name="proActiveJar" depends="core">
+	<target name="proActiveJar" depends="core,ext">
 		<mkdir dir="${dist.dir}/ProActive"/>
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
+				<exclude name="${proactive.dir}/ext/**"/>
+				<include name="${proactive.dir}/ext/security/**"/>
 			</fileset>
 		</jar>
 	</target>
