@@ -13,10 +13,9 @@ import org.unicore.resources.PriorityValue;
 import com.pallas.unicore.extensions.Usite.Type;
 
 /**
- * @author mleyton
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * @author ProActive Team (06 / 2005)
+ * This class contains all the parameters supported for the
+ * UnicoreProActiveClient.
  */
 public class UnicoreParameters implements java.io.Serializable{
 	
@@ -341,29 +340,43 @@ public class UnicoreParameters implements java.io.Serializable{
 		else if(name.equalsIgnoreCase("vsitememory")) setVsiteMemory(value);
 		else if(name.equalsIgnoreCase("vsiteruntime")) setVsiteRuntime(value);
 		else if(name.equalsIgnoreCase("vsitepriority")) setVsitePriority(value);
+		else System.err.println("Skipping unkown parameter: -"+name+" "+value);
 	}
 	
 	public String getCommandString(){
 		
-		String s;
-		s =	"java org.objectweb.proactive.core.process.unicore.UnicoreProActiveClient "+
-			"-jobname "+jobName+" "+
-			"-keypassword "+keyPassword+" "+
-			"-submitjob "+submitJob+" "+
-			"-saveJob "+saveJob+" "+
-			"-unicoreDir "+unicoreDir+" "+
-			"-keyFilePath "+keyFilePath+" "+
-			"-usiteName "+usiteName+" "+
-			"-usiteType "+usiteType+" "+
-			"-usiteUrl "+usiteUrl+" "+
-			"-vsiteName "+vsiteName+" "+
-			"-vsiteNodes "+vsiteNodes+" "+
-			"-vsiteProcessors "+vsiteProcessors+" "+
-			"-vsiteMemory "+vsiteMemory+" "+
-			"-vsiteRuntime "+vsiteRuntime+" "+
-			"-vsitePriority "+vsitePriority+" "+
-			scriptContent;
-		return s;
+		StringBuffer sb = new StringBuffer();
+
+		sb.append("java org.objectweb.proactive.core.process.unicore.UnicoreProActiveClient ");
+		sb.append("-jobname "+quoteIfNeeded(jobName)+" ");
+		if(keyPassword != null && keyPassword.length()>0)
+			sb.append("-keypassword "+quoteIfNeeded(keyPassword)+" ");
+		sb.append("-submitjob ").append(submitJob).append(" ");
+		sb.append("-saveJob ").append(saveJob).append(" ");
+		sb.append("-unicoreDir ").append(quoteIfNeeded(unicoreDir)).append(" ");
+		sb.append("-keyFilePath ").append(quoteIfNeeded(keyFilePath)).append(" ");
+		sb.append("-usiteName ").append(quoteIfNeeded(usiteName)).append(" ");
+		sb.append("-usiteType ").append(quoteIfNeeded(usiteType)).append(" ");
+		sb.append("-usiteUrl ").append(quoteIfNeeded(usiteUrl)).append(" ");
+		sb.append("-vsiteName ").append(quoteIfNeeded(vsiteName)).append(" ");
+		sb.append("-vsiteNodes ").append(vsiteNodes).append(" ");
+		sb.append("-vsiteProcessors ").append(vsiteProcessors).append(" ");
+		sb.append("-vsiteMemory ").append(vsiteMemory).append(" ");
+		sb.append("-vsiteRuntime ").append(vsiteRuntime).append(" ");
+		sb.append("-vsitePriority ").append(vsitePriority).append(" ");
+		sb.append(scriptContent);
+		
+		return sb.toString();
+	}
+	
+	private String quoteIfNeeded(String s){
+		
+		//if(s.indexOf(" ")>=0)
+		//	return "\""+s+"\"";
+		
+		//return s;
+		
+		return s.replaceAll(" ", "_");
 	}
 	
 	public UnicoreParameters() {

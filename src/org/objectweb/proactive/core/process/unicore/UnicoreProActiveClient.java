@@ -62,12 +62,19 @@ public class UnicoreProActiveClient {
 	"-unicoredir UnicoreDir -submitJob [true|false] -saveJob [true|false] " +
 	"-usitename Name -usitetype [CLASSIC|REGISTRY] -usiteurl Url "+
 	"-vsitename Name -vsitenodes Nodes -vsiteprocessors Processors "+
-	"-vsitememory Memory -vsiteruntiem Runtime " +
+	"-vsitememory Memory -vsiteruntime Runtime " +
 	"-vsitepriority [high|low|normal|development|whenever]";
 	
 	public UnicoreProActiveClient(UnicoreParameters uParam) {
 
 		this.uParam = uParam;
+		
+		//Prompt the user for a keypassword if not
+		//specified in the descriptor file
+		if(uParam.getKeyPassword()==null || uParam.getKeyPassword().length()<=0){
+			UnicorePasswordGUI upGUI= new UnicorePasswordGUI();
+			uParam.setKeyPassword(upGUI.getKeyPassword());
+		}
 	}
 
 	/**
@@ -103,7 +110,7 @@ public class UnicoreProActiveClient {
 			fUnicoreDir.set(null, unicoreDir);
 			fTestGrid.set(null, testGrid);
 		} catch (Exception e) {
-			System.out.println("Erro in getField");
+			System.err.println("Error in getField");
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -263,7 +270,7 @@ public class UnicoreProActiveClient {
 		setCapResDefaultMaxMin(cr);
 		cr.setRequest(request);
 		if (!checkCapacityResource(cr)) {
-			System.out.println("Using default " + cr.getClass().getName()
+			System.err.println("Using default " + cr.getClass().getName()
 					+ " request: " + cr.getDefaultRequest());
 			cr.setRequest(cr.getDefaultRequest());
 		}
@@ -582,18 +589,26 @@ public class UnicoreProActiveClient {
 				System.exit(1);
 			}
 			uParam.setParameter(arg, args[i++]);
+
+		}//while		
+		
+		if(i < args.length) {
+			StringBuffer sb = new StringBuffer();
+			while(i< args.length)
+				sb.append(args[i++]).append(" ");
 			
-		}//while
-		
-		
-		if(i < args.length) uParam.setScriptContent(args[i]);
+			uParam.setScriptContent(sb.toString());
+		}
 		else{
 			System.err.println("Missing command");
 			System.err.println(CLIENTUSAGE);
 			System.exit(1);
 		}
 		
-		System.out.println(uParam);
+		//debug
+		//System.out.println("UNICORE PROACTIVE CLIENT");
+		//System.out.println(uParam);
+		
 		return uParam;
 	}//parseArgs
 }

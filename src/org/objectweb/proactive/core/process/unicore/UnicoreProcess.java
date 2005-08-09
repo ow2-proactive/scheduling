@@ -13,17 +13,13 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 
 
 /**
- * @author mleyton
+ * @author ProActive Team
  * 
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ * 
  */
 public class UnicoreProcess extends AbstractExternalProcessDecorator{
 
 	public UnicoreParameters uParam;
-	
-	//see internalBuildCommand(); for initialization
-	private UnicoreProActiveClient uProClient; 
 	
 	public UnicoreProcess(){
 		
@@ -43,29 +39,51 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator{
 	protected void internalStartProcess(String commandToExecute)
 	throws java.io.IOException {
 		
-		//Debug
-		//System.out.println(uParam);
+		logger.debug(commandToExecute);
 		
-		//commandToExecute is dismissed. Execution
-		//is done directly from this process.
-		uProClient.build();
-		uProClient.saveJob();
-		uProClient.submitJob();
+		/* Depending on the system property UnicoreProActiveClient
+		 * can be forked or called directly.
+		 */
+		String forkclient=System.getProperty("proactive.unicore.forkclient");
+		
+		if(forkclient.equals("false")){
+			logger.debug("Not Forking UnicoreProActiveClient");
+			UnicoreProActiveClient uProClient;
+			
+			//Build a UnicoreProActive client with this parameters
+			uProClient= new UnicoreProActiveClient(uParam);
+			
+			uProClient.build();
+			uProClient.saveJob();
+			uProClient.submitJob();
+		}
+		else{
+			
+			logger.debug("Forking UnicoreProActiveClient");
+			
+			try {
+				externalProcess = Runtime.getRuntime().exec(command);
+				java.io.BufferedReader in = new java.io.BufferedReader(
+						new java.io.InputStreamReader(externalProcess
+								.getInputStream()));
+				java.io.BufferedReader err = new java.io.BufferedReader(
+						new java.io.InputStreamReader(externalProcess
+								.getErrorStream()));
+				java.io.BufferedWriter out = new java.io.BufferedWriter(
+						new java.io.OutputStreamWriter(externalProcess
+								.getOutputStream()));
+				handleProcess(in, out, err);
+			} catch (java.io.IOException e) {
+				isFinished = true;
+				//throw e;
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	protected String internalBuildCommand() {
 		uParam.setScriptContent(targetProcess.getCommand());
 		
-		//Prompt the user for a keypassword if not
-		//specified in the descriptor file
-		if(uParam.getKeyPassword().length()<=0){
-			UnicorePasswordGUI upGUI= new UnicorePasswordGUI();
-			uParam.setKeyPassword(upGUI.getKeyPassword());
-		}
-		
-		//Build a UnicoreProActive client with this parameters
-		uProClient= new UnicoreProActiveClient(uParam);
-	
 		//return command for parent to execute
 		return uParam.getCommandString();
 	}
