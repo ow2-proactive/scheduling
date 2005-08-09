@@ -10,11 +10,16 @@ package org.objectweb.proactive.core.util.log;
 public interface Loggers {
     static final public String COMPONENTS = "proactive.components";
     static final public String CLASSLOADER = "proactive.classloader";
-    static final public String COMPONENTS_REQUEST = COMPONENTS + ".request";
-    static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
-    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS +
-        ".bytecodegeneration";
-
+    
+    static final public String COMPONENTS_REQUEST = COMPONENTS+".request";
+    static final public String COMPONENTS_ACTIVITY = COMPONENTS+".activity";
+    static final public String COMPONENTS_BYTECODE_GENERATION = COMPONENTS+".bytecodegeneration";
+    
+    static final public String DEPLOYMENT = "proactive.deployment";
+    static final public String DEPLOYMENT_PROCESS = DEPLOYMENT+".process";
+    
+    static final public String FILETRANSFER = "proactive.filetransfer";
+   
     /** Logger for ProActive Examples. **/
     public static final String EXAMPLES = "proactive.examples";
 
