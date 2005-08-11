@@ -880,7 +880,7 @@ public class ProActive {
      * At this time RMI, JINI, HTTP, IBIS are supported. If set to null, the registration protocol will be set to the system property:
      * proactive.communication.protocol
      * @param replacePreviousBinding
-     * @throws ProActiveException If the VirtualNode with the given name does not exist on the local runtime
+     * @throws ProActiveException If the VirtualNode with the given name has not been yet activated or does not exist on the local runtime
      */
     public static void registerVirtualNode(VirtualNode virtualNode,
         String registrationProtocol, boolean replacePreviousBinding)
@@ -898,7 +898,7 @@ public class ProActive {
         VirtualNode vn = part.getVirtualNode(virtualnodeName);
         if (vn == null) {
             throw new ProActiveException("VirtualNode " + virtualnodeName +
-                " does not exist !");
+                " has not been yet activated or does not exist! Try to activate it first !");
         }
         part.registerVirtualNode(UrlBuilder.appendVnSuffix(virtualnodeName),
             replacePreviousBinding);
