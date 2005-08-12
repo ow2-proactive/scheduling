@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.descriptor.data;
 import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
@@ -181,8 +180,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
         }
-        proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
-        proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
+        
         // SECURITY
         this.creatorCertificate = creatorCertificate;
         this.policyServer = policyServer;
@@ -262,6 +260,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      */
     public void activate() {
         if (!isActivated) {
+            proActiveRuntimeImpl.addRuntimeRegistrationEventListener(this);
+            proActiveRuntimeImpl.registerLocalVirtualNode(this, this.name);
             for (int i = 0; i < virtualMachines.size(); i++) {
                 VirtualMachine vm = getVirtualMachine();
 
@@ -603,7 +603,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         String url;
         int port = 0;
         VirtualMachine virtualMachine = null;
-
         for (int i = 0; i < virtualMachines.size(); i++) {
             if (((VirtualMachine) virtualMachines.get(i)).getName().equals(event.getVmName())) {
                 virtualMachine = (VirtualMachine) virtualMachines.get(i);
@@ -975,8 +974,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             String localruntimeURL = null;
             try {
                 localruntimeURL = RuntimeFactory.getDefaultRuntime().getURL();
-                if(process.getUsername() != null){
-                    localruntimeURL = System.getProperty("user.name")+"@"+localruntimeURL;
+                if (process.getUsername() != null) {
+                    localruntimeURL = System.getProperty("user.name") + "@" +
+                        localruntimeURL;
                 }
             } catch (ProActiveException e) {
                 e.printStackTrace();
