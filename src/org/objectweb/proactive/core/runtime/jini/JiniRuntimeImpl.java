@@ -30,49 +30,28 @@
  */
 package org.objectweb.proactive.core.runtime.jini;
 
+import java.rmi.RemoteException;
+import java.security.SecureRandom;
+import java.util.Hashtable;
+import java.util.Vector;
+
 import net.jini.core.entry.Entry;
 import net.jini.core.lease.Lease;
 import net.jini.core.lookup.ServiceID;
 import net.jini.core.lookup.ServiceItem;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceRegistration;
-
 import net.jini.discovery.DiscoveryEvent;
-
 import net.jini.lease.LeaseRenewalEvent;
-
 import net.jini.lookup.entry.Name;
 
-import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.mop.ConstructorCall;
-import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.process.UniversalProcess;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.runtime.VMInformation;
+import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntime;
+import org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
-import org.objectweb.proactive.ext.security.SecurityContext;
-import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.rmi.RemoteException;
-
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Vector;
 
 
 /**
@@ -81,12 +60,11 @@ import java.util.Vector;
  *   to anothe remote objects library.
  *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
-    implements JiniRuntime, java.io.Serializable,
-        net.jini.discovery.DiscoveryListener, net.jini.lease.LeaseListener {
-    protected transient ProActiveRuntimeImpl proActiveRuntime;
-    protected String proActiveRuntimeURL;
-
+public class JiniRuntimeImpl extends RmiProActiveRuntimeImpl
+    implements java.io.Serializable, net.jini.discovery.DiscoveryListener,
+        net.jini.lease.LeaseListener, RmiProActiveRuntime {
+    //    protected transient ProActiveRuntimeImpl proActiveRuntime;
+    //    protected String proActiveRuntimeURL;
     //ServiceRegistar table used afterwards to register node service
     //Vector is used because the size is unknown and this class is synchronized
     protected java.util.Vector registrarsTable;
@@ -111,7 +89,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     // -- Constructors -----------------------------------------------
     //
     public JiniRuntimeImpl() throws java.rmi.RemoteException {
-        this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        super(true);
+        this.proActiveRuntime =  ProActiveRuntimeImpl.getProActiveRuntime();
         this.proActiveRuntimeURL = buildRuntimeURL();
         this.jiniRuntimeMap = new java.util.Hashtable();
         jiniRuntimeMap.put(proActiveRuntimeURL, new java.util.Vector());
@@ -124,7 +103,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             // stay around long enough to receice replies
             //Thread.currentThread().sleep(10000L);
         } catch (Exception e) {
-            logger.error(e.toString());
+            runtimeLogger.error(e.toString());
         }
 
         discover.addDiscoveryListener(this);
@@ -138,7 +117,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     //
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding, PolicyServer ps, String vnname,
-        String jobId) throws java.rmi.RemoteException, NodeException {
+        String jobId) throws RemoteException, NodeException {
         //counter used to check that the node has been registered at 
         //least once as jini service
         //int counter = 0;
@@ -169,7 +148,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return nodeURL;
     }
 
-    public void killAllNodes() throws java.rmi.RemoteException {
+    public void killAllNodes() throws RemoteException, ProActiveException {
         for (java.util.Enumeration e = jiniNodeMap.keys(); e.hasMoreElements();) {
             String nodeURL = (String) e.nextElement();
             killNode(nodeURL);
@@ -177,7 +156,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         proActiveRuntime.killAllNodes();
     }
 
-    public void killNode(String nodeName) throws java.rmi.RemoteException {
+    public void killNode(String nodeName) throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
         try {
@@ -190,57 +169,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         proActiveRuntime.killNode(name);
     }
 
-    public void createVM(UniversalProcess remoteProcess)
-        throws IOException {
-        proActiveRuntime.createVM(remoteProcess);
-    }
-
-    public String[] getLocalNodeNames() {
-        return proActiveRuntime.getLocalNodeNames();
-    }
-
-    public VMInformation getVMInformation() {
-        return proActiveRuntime.getVMInformation();
-    }
-
-    public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) {
-        proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeName,
-            creatorID, creationProtocol, vmName);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
-     */
-    public void unregister(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) throws RemoteException {
-        this.proActiveRuntime.unregister(proActiveRuntimeDist,
-            proActiveRuntimeURL, creatorID, creationProtocol, vmName);
-    }
-
-    public ProActiveRuntime[] getProActiveRuntimes() {
-        return proActiveRuntime.getProActiveRuntimes();
-    }
-
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
-        return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
-    }
-
-    public void addAcquaintance(String proActiveRuntimeName) {
-        proActiveRuntime.addAcquaintance(proActiveRuntimeName);
-    }
-
-    public String[] getAcquaintances() {
-        return proActiveRuntime.getAcquaintances();
-    }
-
-    public void rmAcquaintance(String proActiveRuntimeName) {
-        proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
-    }
-
-    public void killRT(boolean softly) throws java.rmi.RemoteException {
+    public void killRT(boolean softly) throws Exception {
         killAllNodes();
         unregisterAllVirtualNodes();
         unregisterService(proActiveRuntimeURL, jiniRuntimeMap);
@@ -251,20 +180,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return proActiveRuntimeURL;
     }
 
-    public ArrayList getActiveObjects(String nodeName) {
-        return proActiveRuntime.getActiveObjects(nodeName);
-    }
-
-    public ArrayList getActiveObjects(String nodeName, String objectName) {
-        return proActiveRuntime.getActiveObjects(nodeName, objectName);
-    }
-
-    public VirtualNode getVirtualNode(String virtualNodeName) {
-        return proActiveRuntime.getVirtualNode(virtualNodeName);
-    }
-
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws java.rmi.RemoteException {
+        boolean replacePreviousBinding) throws RemoteException {
         String virtualNodeURL = null;
 
         //first we build a well-formed url
@@ -290,9 +207,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void unregisterVirtualNode(String virtualNodeName)
-        throws java.rmi.RemoteException {
-        proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
-                virtualNodeName));
+        throws RemoteException, ProActiveException {
+        
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualNodeName));
@@ -306,29 +222,12 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         }
     }
 
-    public void unregisterAllVirtualNodes() throws RemoteException {
+    public void unregisterAllVirtualNodes() throws RemoteException, ProActiveException {
         for (java.util.Enumeration e = jiniVirtualNodeMap.keys();
                 e.hasMoreElements();) {
             String vnNodeURL = (String) e.nextElement();
             unregisterVirtualNode(vnNodeURL);
         }
-    }
-
-    public UniversalBody createBody(String nodeName,
-        ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ConstructorCallExecutionFailedException, 
-            InvocationTargetException {
-        return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
-            isNodeLocal);
-    }
-
-    public UniversalBody receiveBody(String nodeName, Body body) {
-        return proActiveRuntime.receiveBody(nodeName, body);
-    }
-
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
-        int inc) {
-        return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
 
     //
@@ -351,7 +250,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
                 reg = registrar.register(item, Lease.FOREVER);
             } catch (Exception e) {
                 //e.printStackTrace();
-                logger.error("register exception " + e.toString());
+                runtimeLogger.error("register exception " + e.toString());
                 continue;
             }
             ((Vector) jiniRuntimeMap.get(proActiveRuntimeURL)).add(reg);
@@ -376,8 +275,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
     }
 
     public void notify(LeaseRenewalEvent evt) {
-        logger.info("Lease expired " + evt.toString());
-        logger.info(evt.getException().getMessage());
+        runtimeLogger.info("Lease expired " + evt.toString());
+        runtimeLogger.info(evt.getException().getMessage());
     }
 
     //
@@ -411,129 +310,6 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
         return new ServiceID(mostSig, leastSig);
     }
 
-    // SECURITY
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getCreatorCertificate()
-     */
-    public X509Certificate getCreatorCertificate()
-        throws java.rmi.RemoteException {
-        return proActiveRuntime.getCreatorCertificate();
-    }
-
-    public PolicyServer getPolicyServer() throws java.rmi.RemoteException {
-        return proActiveRuntime.getPolicyServer();
-    }
-
-    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-        throws java.rmi.RemoteException {
-        proActiveRuntime.setProActiveSecurityManager(ps);
-    }
-
-    public String getVNName(String Nodename) throws java.rmi.RemoteException {
-        return proActiveRuntime.getVNName(Nodename);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#setDefaultNodeVirtualNodeName(java.lang.String)
-     */
-    public void setDefaultNodeVirtualNodeName(String s)
-        throws RemoteException {
-        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#updateLocalNodeVirtualName()
-     */
-    public void updateLocalNodeVirtualName() throws RemoteException {
-        //proActiveRuntime.updateLocalNodeVirtualName();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodePolicyServer(java.lang.String)
-     */
-    public PolicyServer getNodePolicyServer(String nodeName)
-        throws RemoteException {
-        return proActiveRuntime.getNodePolicyServer(nodeName);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#enableSecurityIfNeeded()
-     */
-    public void enableSecurityIfNeeded() throws RemoteException {
-        proActiveRuntime.enableSecurityIfNeeded();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getNodeCertificate(java.lang.String)
-     */
-    public X509Certificate getNodeCertificate(String nodeName)
-        throws RemoteException {
-        return proActiveRuntime.getNodeCertificate(nodeName);
-    }
-
-    /**
-     * @param nodeName
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(String nodeName) throws RemoteException {
-        return proActiveRuntime.getEntities(nodeName);
-    }
-
-    /**
-     * @param uBody
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
-        return proActiveRuntime.getEntities(uBody);
-    }
-
-    /**
-     * @return returns all entities associated to this runtime
-     */
-    public ArrayList getEntities() throws RemoteException {
-        return proActiveRuntime.getEntities();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
-     */
-    public SecurityContext getPolicy(SecurityContext sc)
-        throws SecurityNotAvailableException {
-        return proActiveRuntime.getPolicy(sc);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.jini.JiniRuntime#getJobID(java.lang.String)
-     */
-    public String getJobID(String nodeUrl) throws RemoteException {
-        return proActiveRuntime.getJobID(nodeUrl);
-    }
-
-    public byte[] getClassDataFromParentRuntime(String className)
-        throws RemoteException {
-        try {
-            return proActiveRuntime.getClassDataFromParentRuntime(className);
-        } catch (ProActiveException e) {
-            throw new RemoteException("class data not found for class " +
-                className, e);
-        }
-    }
-
-    public byte[] getClassDataFromThisRuntime(String className)
-        throws RemoteException {
-        try {
-            return proActiveRuntime.getClassDataFromThisRuntime(className);
-        } catch (ProActiveException e) {
-            throw new RemoteException("class data not found for class " +
-                className, e);
-        }
-    }
-
-    public void setParent(String parentRuntimeName) throws RemoteException {
-        proActiveRuntime.setParent(parentRuntimeName);
-    }
-
     //
     // ---PRIVATE METHODS--------------------------------------
     //
@@ -560,10 +336,11 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
                     try {
                         reg = registrar.register(item, Lease.FOREVER);
                     } catch (Exception ex) {
-                        logger.info("register exception " + ex.toString());
+                        runtimeLogger.info("register exception " +
+                            ex.toString());
                         continue;
                     }
-                    logger.info(" Service Registered " + objectURL);
+                    runtimeLogger.info(" Service Registered " + objectURL);
 
                     // on lance le lease manager pour que l'objet puisse se reenregistrer
                     leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
@@ -611,7 +388,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
                 reg = registrar.register(item, Lease.FOREVER);
                 counter++;
             } catch (Exception e) {
-                logger.info("register exception " + e.toString());
+                runtimeLogger.info("register exception " + e.toString());
                 continue;
             }
 
@@ -619,7 +396,7 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
             if (counter == 0) {
                 throw new java.rmi.RemoteException("register exception ");
             }
-            logger.info("Service registered " + objectUrl);
+            runtimeLogger.info("Service registered " + objectUrl);
             //System.out.println("Registrar "+registrar.getLocator().getHost());
             // on lance le lease manager pour que l'objet puisse se reenregistrer
             leaseManager.renewUntil(reg.getLease(), Lease.FOREVER, this);
@@ -641,7 +418,8 @@ public class JiniRuntimeImpl extends java.rmi.server.UnicastRemoteObject
                             reg.getLease().cancel();
                         }
                         if (objectUrl.indexOf("PA_JVM") < 0) {
-                            logger.info("Lease cancelled for " + objectUrl);
+                            runtimeLogger.info("Lease cancelled for " +
+                                objectUrl);
                         }
                     }
                 } catch (net.jini.core.lease.UnknownLeaseException e) {

@@ -30,17 +30,19 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.net.UnknownHostException;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.HostsInfos;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.net.URL;
+import java.net.UnknownHostException;
 
 
 /**
@@ -131,20 +133,12 @@ public class StartRuntime {
      * node once the creation is completed.
      */
     private void run() {
-        try {
-            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
-                        //proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(acquisitionMethod);
-                "proactive.communication.protocol") + ":");
+        ProActiveRuntimeImpl impl = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        impl.getVMInformation().setCreationProtocolID(protocolId);
 
-            //            logger.info("Runtime started at " + comProtocol+ ":" +
-            //                proActiveRuntime.getURL());
-            proActiveRuntime.getVMInformation().setCreationProtocolID(protocolId);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-            //we can still try to register if for instance an Alreadybound exception occurs
-        }
         if (defaultRuntimeURL != null) {
             register(defaultRuntimeURL);
+            impl.setParent(defaultRuntimeURL);
         }
     }
 
@@ -155,6 +149,8 @@ public class StartRuntime {
      */
     private void register(String hostName) {
         try {
+            proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(System.getProperty(
+                        "proactive.communication.protocol") + ":");
             ProActiveRuntime PART = RuntimeFactory.getRuntime(defaultRuntimeURL,
                     UrlBuilder.getProtocol(defaultRuntimeURL));
 
@@ -162,7 +158,6 @@ public class StartRuntime {
                 creatorID,
                 System.getProperty("proactive.communication.protocol") + ":",
                 vmName);
-            proActiveRuntime.setParent(defaultRuntimeURL);
         } catch (ProActiveException e) {
             e.printStackTrace();
             // if we cannot register, this jvm is useless
@@ -178,8 +173,8 @@ public class StartRuntime {
             String username = url.substring(0, index);
             url = url.substring(index + 1, url.length());
             try {
-                HostsInfos.setUserName(UrlBuilder.getHostNameFromUrl(
-                        url), username);
+                HostsInfos.setUserName(UrlBuilder.getHostNameFromUrl(url),
+                    username);
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             }

@@ -7,8 +7,8 @@ import java.rmi.server.RMIServerSocketFactory;
  * @author mlacage
  *
  */
-public class SshRemoteProActiveRuntimeImpl extends RemoteProActiveRuntimeImpl {
-	public SshRemoteProActiveRuntimeImpl(RMIClientSocketFactory csf, 
+public class SshRmiProActiveRuntimeImpl extends RmiProActiveRuntimeImpl {
+	public SshRmiProActiveRuntimeImpl(RMIClientSocketFactory csf, 
 			RMIServerSocketFactory ssf) 
 			throws java.rmi.RemoteException, java.rmi.AlreadyBoundException {
 		super (csf, ssf);

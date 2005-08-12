@@ -30,8 +30,9 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
@@ -42,14 +43,11 @@ import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -77,7 +75,7 @@ import java.util.ArrayList;
  *
  */
 public interface ProActiveRuntime extends Job {
-    static Logger runtimeLogger = Logger.getLogger(ProActiveRuntime.class.getName());
+    static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     /**
      * Creates a new Node in the same VM as this ProActiveRuntime
@@ -134,7 +132,7 @@ public interface ProActiveRuntime extends Job {
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName);
+        String vmName) throws ProActiveException;
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -147,7 +145,7 @@ public interface ProActiveRuntime extends Job {
      */
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName);
+        String vmName) throws ProActiveException;
 
     /**
      * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM
@@ -170,20 +168,20 @@ public interface ProActiveRuntime extends Job {
      * Tells this runtime that it's registered in another one
      * @param proActiveRuntimeName the name of the remote ProActiveRuntime in which this runtime is registered
      */
-    void addAcquaintance(String proActiveRuntimeName);
+    void addAcquaintance(String proActiveRuntimeName) throws ProActiveException;
 
     /**
      * Returns all the ProActiveRuntime URL in which this runtime is registered
      * @return all the ProActiveRuntime URL in which this runtime is registered
      */
-    public String[] getAcquaintances();
-    
-	/**
-	 * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>.
-	 * Tell to this runtime that is no more registered in <code>proActiveRuntimeName</code>.
-	 * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
-	 */
-	public void rmAcquaintance(String proActiveRuntimeName);
+    public String[] getAcquaintances() throws ProActiveException;
+
+    /**
+     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>.
+     * Tell to this runtime that is no more registered in <code>proActiveRuntimeName</code>.
+     * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
+     */
+    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException;
 
     /**
      * Kills this ProActiveRuntime and this VM
@@ -309,38 +307,11 @@ public interface ProActiveRuntime extends Job {
     // SECURITY
 
     /**
-     * @return creator's certificate if exists
-     */
-    public X509Certificate getCreatorCertificate() throws ProActiveException;
-
-    /**
      * @return Policy server
      */
     public PolicyServer getPolicyServer() throws ProActiveException;
 
-    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-        throws ProActiveException;
-
     public String getVNName(String Nodename) throws ProActiveException;
-
-    public void setDefaultNodeVirtualNodeName(String s)
-        throws ProActiveException;
-
-    public PolicyServer getNodePolicyServer(String nodeName)
-        throws ProActiveException;
-
-    /**
-     *  sets all needed modifications to enable security components
-     * MUST be called when the descriptor is ready
-     */
-    public void enableSecurityIfNeeded() throws ProActiveException;
-
-    /**
-     * @param nodeName
-     * @return return certificate associated to the node designed by nodeName
-     */
-    public X509Certificate getNodeCertificate(String nodeName)
-        throws ProActiveException;
 
     /**
      * @param nodeName
@@ -349,21 +320,56 @@ public interface ProActiveRuntime extends Job {
     public ArrayList getEntities(String nodeName) throws ProActiveException;
 
     /**
-     * @param uBody
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException;
-
-    /**
-     * @return returns all entities associated to this runtime
-     */
-    public ArrayList getEntities() throws ProActiveException;
-
-    /**
      * @param sc
      */
     public SecurityContext getPolicy(SecurityContext sc)
         throws ProActiveException, SecurityNotAvailableException;
+
+    //-----------------------------------------
+    //	Security: methods not used 
+    //-----------------------------------------
+    //    /**
+    //     * @return creator's certificate if exists
+    //     */
+    //    public X509Certificate getCreatorCertificate() throws ProActiveException;
+    //
+    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+    //        throws ProActiveException;
+    //    
+    //
+    //    
+    //
+    //    public void setDefaultNodeVirtualNodeName(String s)
+    //        throws ProActiveException;
+    //
+    //    public PolicyServer getNodePolicyServer(String nodeName)
+    //        throws ProActiveException;
+    //
+    //    /**
+    //     *  sets all needed modifications to enable security components
+    //     * MUST be called when the descriptor is ready
+    //     */
+    //    public void enableSecurityIfNeeded() throws ProActiveException;
+    //
+    //    /**
+    //     * @param nodeName
+    //     * @return return certificate associated to the node designed by nodeName
+    //     */
+    //    public X509Certificate getNodeCertificate(String nodeName)
+    //        throws ProActiveException;
+    //
+    //    
+    //
+    //    /**
+    //     * @param uBody
+    //     * @return returns all entities associated to the node
+    //     */
+    //    public ArrayList getEntities(UniversalBody uBody) throws ProActiveException;
+    //
+    //    /**
+    //     * @return returns all entities associated to this runtime
+    //     */
+    //    public ArrayList getEntities() throws ProActiveException;
 
     /**
      * Looks for class bytecode in the current runtime.
@@ -383,12 +389,4 @@ public interface ProActiveRuntime extends Job {
      */
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException;
-
-    /**
-     * This method adds a reference to the runtime that created this runtime.
-     * It is called when a new runtime is created from another one.
-     * @param parentRuntimeName the name of the creator of this runtime
-     */
-    public void setParent(String parentRuntimeName) throws ProActiveException;
-
 }

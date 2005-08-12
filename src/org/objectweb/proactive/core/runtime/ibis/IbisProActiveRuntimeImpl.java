@@ -4,8 +4,12 @@ import ibis.rmi.AlreadyBoundException;
 import ibis.rmi.Naming;
 import ibis.rmi.NotBoundException;
 import ibis.rmi.RemoteException;
-
 import ibis.rmi.server.UnicastRemoteObject;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
@@ -19,22 +23,10 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.VMInformation;
-import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.PolicyServer;
-import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.lang.reflect.InvocationTargetException;
-
-import java.net.UnknownHostException;
-
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -43,9 +35,9 @@ import java.util.ArrayList;
  *   to anothe remote objects library.
  *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
-    implements RemoteProActiveRuntime {
-    protected transient ProActiveRuntimeImpl proActiveRuntime;
+public class IbisProActiveRuntimeImpl extends UnicastRemoteObject
+    implements IbisProActiveRuntime {
+    protected transient ProActiveRuntime proActiveRuntime;
     protected String proActiveRuntimeURL;
 
     //	stores nodes urls to be able to unregister nodes
@@ -57,10 +49,10 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     //	
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RemoteProActiveRuntimeImpl()
+    public IbisProActiveRuntimeImpl()
         throws RemoteException, AlreadyBoundException {
         //System.out.println("toto");
-        this.proActiveRuntime = (ProActiveRuntimeImpl) ProActiveRuntimeImpl.getProActiveRuntime();
+        this.proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
         this.nodesArray = new java.util.ArrayList();
         this.vnNodesArray = new java.util.ArrayList();
         this.proActiveRuntimeURL = buildRuntimeURL();
@@ -93,7 +85,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return nodeURL;
     }
 
-    public void killAllNodes() throws RemoteException {
+    public void killAllNodes() throws RemoteException, ProActiveException {
         for (int i = 0; i < nodesArray.size(); i++) {
             String url = (String) nodesArray.get(i);
             killNode(url);
@@ -101,7 +93,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.killAllNodes();
     }
 
-    public void killNode(String nodeName) throws RemoteException {
+    public void killNode(String nodeName) throws RemoteException, ProActiveException {
         String nodeUrl = null;
         String name = null;
         try {
@@ -114,79 +106,63 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         proActiveRuntime.killNode(name);
     }
 
-    //	public void createLocalVM(JVMProcess jvmProcess)
-    //		throws IOException
-    //	{
-    //	proActiveRuntime.createLocalVM(jvmProcess);
-    //	}
     public void createVM(UniversalProcess remoteProcess)
-        throws IOException {
+        throws IOException, ProActiveException {
         proActiveRuntime.createVM(remoteProcess);
     }
 
-    //	public Node[] getLocalNodes()
-    //	{
-    //		return proActiveRuntime.getLocalNodes(); 
-    //	}
-    public String[] getLocalNodeNames() {
+    public String[] getLocalNodeNames() throws RemoteException, ProActiveException {
         return proActiveRuntime.getLocalNodeNames();
     }
 
-    //	public String getLocalNode(String nodeName)
-    //	{
-    //		return proActiveRuntime.getLocalNode(nodeName);
-    //	}
-    //
-    //	
-    //	public String getNode(String nodeName)
-    //	{
-    //		return proActiveRuntime.getNode(nodeName);
-    //	}
-    //	public String getDefaultNodeName(){
-    //		return proActiveRuntime.getDefaultNodeName();
-    //	}
     public VMInformation getVMInformation() {
-        return proActiveRuntime.getVMInformation();
+        //      we can cast because for sure the runtime is a runtimeImpl
+        // and we avoid throwing an exception
+        return ((ProActiveRuntimeImpl) proActiveRuntime).getVMInformation();
     }
 
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) {
+        String vmName) throws RemoteException, ProActiveException {
         proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeName,
             creatorID, creationProtocol, vmName);
     }
 
     /**
+     * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#unregister(org.objectweb.proactive.core.runtime.ProActiveRuntime, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) throws RemoteException {
+        String vmName) throws RemoteException, ProActiveException {
         this.proActiveRuntime.unregister(proActiveRuntimeDist,
             proActiveRuntimeURL, creatorID, creationProtocol, vmName);
     }
 
-    public ProActiveRuntime[] getProActiveRuntimes() {
+    public ProActiveRuntime[] getProActiveRuntimes() throws RemoteException, ProActiveException {
         return proActiveRuntime.getProActiveRuntimes();
     }
 
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) {
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    public void addAcquaintance(String proActiveRuntimeName) {
+    public void addAcquaintance(String proActiveRuntimeName)
+        throws RemoteException, ProActiveException {
         proActiveRuntime.addAcquaintance(proActiveRuntimeName);
     }
 
-    public String[] getAcquaintances() {
+    public String[] getAcquaintances() throws RemoteException, ProActiveException {
         return proActiveRuntime.getAcquaintances();
     }
 
-    public void rmAcquaintance(String proActiveRuntimeName) {
+    public void rmAcquaintance(String proActiveRuntimeName)
+        throws RemoteException, ProActiveException {
         proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
     }
 
-    public void killRT(boolean softly) throws RemoteException {
+    public void killRT(boolean softly) throws Exception {
         killAllNodes();
         unregisterAllVirtualNodes();
         unregister(proActiveRuntimeURL);
@@ -197,20 +173,23 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         return proActiveRuntimeURL;
     }
 
-    public ArrayList getActiveObjects(String nodeName) {
+    public ArrayList getActiveObjects(String nodeName)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getActiveObjects(nodeName);
     }
 
-    public ArrayList getActiveObjects(String nodeName, String objectName) {
+    public ArrayList getActiveObjects(String nodeName, String objectName)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getActiveObjects(nodeName, objectName);
     }
 
-    public VirtualNode getVirtualNode(String virtualNodeName) {
+    public VirtualNode getVirtualNode(String virtualNodeName)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.getVirtualNode(virtualNodeName);
     }
 
     public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws RemoteException {
+        boolean replacePreviousBinding) throws IOException {
         String virtualNodeURL = null;
 
         try {
@@ -225,7 +204,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
     }
 
     public void unregisterVirtualNode(String virtualnodeName)
-        throws RemoteException {
+        throws RemoteException, ProActiveException {
         String virtualNodeURL = null;
         proActiveRuntime.unregisterVirtualNode(UrlBuilder.removeVnSuffix(
                 virtualnodeName));
@@ -239,7 +218,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         vnNodesArray.remove(virtualNodeURL);
     }
 
-    public void unregisterAllVirtualNodes() throws RemoteException {
+    public void unregisterAllVirtualNodes() throws RemoteException, ProActiveException {
         for (int i = 0; i < vnNodesArray.size(); i++) {
             String url = (String) vnNodesArray.get(i);
             unregisterVirtualNode(url);
@@ -248,146 +227,153 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
 
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ConstructorCallExecutionFailedException, 
-            InvocationTargetException {
+        throws RemoteException, ConstructorCallExecutionFailedException, ProActiveException, InvocationTargetException {
         return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
             isNodeLocal);
     }
 
-    public UniversalBody receiveBody(String nodeName, Body body) {
+    public UniversalBody receiveBody(String nodeName, Body body)
+        throws RemoteException, ProActiveException {
         return proActiveRuntime.receiveBody(nodeName, body);
     }
 
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
-        int inc) {
+        int inc) throws RemoteException, ProActiveException {
         return proActiveRuntime.receiveCheckpoint(nodeName, ckpt, inc);
     }
 
     // SECURITY
 
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
-     */
-    public X509Certificate getCreatorCertificate() throws RemoteException {
-        return proActiveRuntime.getCreatorCertificate();
-    }
-
     /**
      * @return policy server
+     * @throws ProActiveException
      */
-    public PolicyServer getPolicyServer() throws RemoteException {
+    public PolicyServer getPolicyServer() throws RemoteException, ProActiveException {
         return proActiveRuntime.getPolicyServer();
     }
 
-    public String getVNName(String nodename) throws RemoteException {
+    public String getVNName(String nodename) throws RemoteException, ProActiveException {
         return proActiveRuntime.getVNName(nodename);
-    }
-
-    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
-        throws RemoteException {
-        proActiveRuntime.setProActiveSecurityManager(ps);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
-     */
-    public void setDefaultNodeVirtualNodeName(String s)
-        throws RemoteException {
-        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
-     */
-    public void updateLocalNodeVirtualName() throws RemoteException {
-        //   proActiveRuntime.updateLocalNodeVirtualName();
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
-     */
-    public PolicyServer getNodePolicyServer(String nodeName)
-        throws RemoteException {
-        return null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#enableSecurityIfNeeded()
-     */
-    public void enableSecurityIfNeeded() throws RemoteException {
-        // TODOremove this function
-    }
-
-    /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
-     */
-    public X509Certificate getNodeCertificate(String nodeName)
-        throws RemoteException {
-        return proActiveRuntime.getNodeCertificate(nodeName);
     }
 
     /**
      * @param nodeName
      * @return returns all entities associated to the node
+     * @throws ProActiveException
      */
-    public ArrayList getEntities(String nodeName) throws RemoteException {
+    public ArrayList getEntities(String nodeName) throws RemoteException, ProActiveException {
         return proActiveRuntime.getEntities(nodeName);
     }
 
     /**
-     * @param uBody
-     * @return returns all entities associated to the node
-     */
-    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
-        return proActiveRuntime.getEntities(uBody);
-    }
-
-    /**
      * @return returns all entities associated to this runtime
-     */
-    public ArrayList getEntities() throws RemoteException {
-        return proActiveRuntime.getEntities();
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getJobID(java.lang.String)
-     */
-    public String getJobID(String nodeUrl) throws RemoteException {
-        return proActiveRuntime.getJobID(nodeUrl);
-    }
-
-    /**
-     * @return returns all entities associated to this runtime
+     * @throws SecurityNotAvailableException
+     * @throws ProActiveException
      */
     public SecurityContext getPolicy(SecurityContext sc)
-        throws RemoteException, SecurityNotAvailableException {
+        throws RemoteException, ProActiveException, SecurityNotAvailableException {
         return proActiveRuntime.getPolicy(sc);
     }
 
+    //  -----------------------------------------
+    //	Security: methods not used 
+    //-----------------------------------------
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#getCreatorCertificate()
+    //     */
+    //    public X509Certificate getCreatorCertificate() throws RemoteException {
+    //        return proActiveRuntime.getCreatorCertificate();
+    //    }
+    //
+    //    
+    //
+    //    public void setProActiveSecurityManager(ProActiveSecurityManager ps)
+    //        throws RemoteException {
+    //        proActiveRuntime.setProActiveSecurityManager(ps);
+    //    }
+    //
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#setDefaultNodeVirtualNodeNAme(java.lang.String)
+    //     */
+    //    public void setDefaultNodeVirtualNodeName(String s)
+    //        throws RemoteException {
+    //        proActiveRuntime.setDefaultNodeVirtualNodeName(s);
+    //    }
+    //
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime#updateLocalNodeVirtualName()
+    //     */
+    //    public void updateLocalNodeVirtualName() throws RemoteException {
+    //        //   proActiveRuntime.updateLocalNodeVirtualName();
+    //    }
+    //
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodePolicyServer(java.lang.String)
+    //     */
+    //    public PolicyServer getNodePolicyServer(String nodeName)
+    //        throws RemoteException {
+    //        return null;
+    //    }
+    //
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#enableSecurityIfNeeded()
+    //     */
+    //    public void enableSecurityIfNeeded() throws RemoteException {
+    //        // TODOremove this function
+    //    }
+    //
+    //    /* (non-Javadoc)
+    //     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getNodeCertificate(java.lang.String)
+    //     */
+    //    public X509Certificate getNodeCertificate(String nodeName)
+    //        throws RemoteException {
+    //        return proActiveRuntime.getNodeCertificate(nodeName);
+    //    }
+    //
+    //    
+    //
+    //    /**
+    //     * @param uBody
+    //     * @return returns all entities associated to the node
+    //     */
+    //    public ArrayList getEntities(UniversalBody uBody) throws RemoteException {
+    //        return proActiveRuntime.getEntities(uBody);
+    //    }
+    //
+    //    /**
+    //     * @return returns all entities associated to this runtime
+    //     */
+    //    public ArrayList getEntities() throws RemoteException {
+    //        return proActiveRuntime.getEntities();
+    //    }
+
+    /**
+     * @throws ProActiveException
+     * @see org.objectweb.proactive.core.runtime.ibis.RemoteProActiveRuntime#getJobID(java.lang.String)
+     */
+    public String getJobID(String nodeUrl) throws RemoteException, ProActiveException {
+        return proActiveRuntime.getJobID(nodeUrl);
+    }
+
     public byte[] getClassDataFromParentRuntime(String className)
-        throws RemoteException {
+        throws IOException, ProActiveException {
         try {
             return proActiveRuntime.getClassDataFromParentRuntime(className);
         } catch (ProActiveException e) {
-            throw new RemoteException("class not found : " + className, e);
+            throw new ProActiveException("class not found : " + className, e);
         }
     }
 
     public byte[] getClassDataFromThisRuntime(String className)
-        throws RemoteException {
-        try {
-            return proActiveRuntime.getClassDataFromThisRuntime(className);
-        } catch (ProActiveException e) {
-            throw new RemoteException("class not found : " + className, e);
-        }
+        throws IOException, ProActiveException {
+        return proActiveRuntime.getClassDataFromThisRuntime(className);
     }
 
-    public void setParent(String fatherRuntimeName) throws RemoteException {
-        //        try {
-        proActiveRuntime.setParent(fatherRuntimeName);
-        //        } catch (ProActiveException e) {
-        //            throw new RemoteException("cannot set runtime father : " + fatherRuntimeName, e);
-        //        }
+    /**
+     * @see org.objectweb.proactive.Job#getJobID()
+     */
+    public String getJobID() {
+        return proActiveRuntime.getJobID();
     }
 
     //
@@ -402,10 +388,12 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
                 Naming.bind(UrlBuilder.removeProtocol(url, "ibis:"), this);
             }
             if (url.indexOf("PA_JVM") < 0) {
-                logger.info(url + " successfully bound in registry at " + url);
+                runtimeLogger.info(url + " successfully bound in registry at " +
+                    url);
             }
         } catch (AlreadyBoundException e) {
-            logger.warn("WARNING " + url + " already bound in registry", e);
+            runtimeLogger.warn("WARNING " + url + " already bound in registry",
+                e);
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("cannot bind in registry at " + url, e);
         }
@@ -415,18 +403,19 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
         try {
             Naming.unbind(UrlBuilder.removeProtocol(url, "ibis:"));
             if (url.indexOf("PA_JVM") < 0) {
-                logger.info(url + " unbound in registry");
+                runtimeLogger.info(url + " unbound in registry");
             }
         } catch (java.net.MalformedURLException e) {
             throw new RemoteException("cannot unbind in registry at " + url, e);
         } catch (NotBoundException e) {
-//          No need to throw an exception if an object is already unregistered
-            logger.info("WARNING "+url + " is not bound in the registry ");
+            //          No need to throw an exception if an object is already unregistered
+            runtimeLogger.info("WARNING " + url +
+                " is not bound in the registry ");
         }
     }
 
     private String buildRuntimeURL() {
-        int port = RemoteRuntimeFactory.getRegistryHelper()
+        int port = IbisRuntimeFactory.getRegistryHelper()
                                        .getRegistryPortNumber();
         String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                      .getInetAddress());
@@ -443,7 +432,7 @@ public class RemoteProActiveRuntimeImpl extends UnicastRemoteObject
             //it is an url given by a descriptor
             String host = UrlBuilder.getHostNameorIP(getVMInformation()
                                                          .getInetAddress());
-            int port = RemoteRuntimeFactory.getRegistryHelper()
+            int port = IbisRuntimeFactory.getRegistryHelper()
                                            .getRegistryPortNumber();
             return UrlBuilder.buildUrl(host, url, "ibis:", port);
         } else {

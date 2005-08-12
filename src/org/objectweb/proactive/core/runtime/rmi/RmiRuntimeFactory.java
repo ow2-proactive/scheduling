@@ -30,31 +30,34 @@
  */
 package org.objectweb.proactive.core.runtime.rmi;
 
-import java.rmi.RemoteException;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
+import java.rmi.RemoteException;
 
-public class RemoteRuntimeFactory extends RuntimeFactory {
+
+public class RmiRuntimeFactory extends RuntimeFactory {
     //protected final static int MAX_RETRY = 5;
     //protected java.util.Random random;
     protected static RegistryHelper registryHelper = new RegistryHelper();
     protected static ClassServerHelper classServerHelper = new ClassServerHelper();
-    private static ProActiveRuntime defaultRmiRuntime = null;
+    protected static ProActiveRuntime defaultRmiRuntime = null;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public RemoteRuntimeFactory() throws java.io.IOException {
+    public RmiRuntimeFactory() throws java.io.IOException {
         if ((System.getSecurityManager() == null) &&
                 !("false".equals(System.getProperty("proactive.securitymanager")))) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
+
         //registryHelper.initializeRegistry();
     }
 
@@ -87,11 +90,11 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         throws ProActiveException {
         //return createRuntimeAdapter(s,false);
         if (defaultRmiRuntime == null) {
-			try {
-				registryHelper.initializeRegistry();
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+            try {
+                registryHelper.initializeRegistry();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             defaultRmiRuntime = createRuntimeAdapter();
         }
 
@@ -102,9 +105,9 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         throws ProActiveException {
         //if (s == null) return null;
         try {
-        	RemoteProActiveRuntime remoteProActiveRuntime;
-        	String URL = UrlBuilder.removeProtocol(s, "rmi:");
-        	remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(URL);
+            RemoteProActiveRuntime remoteProActiveRuntime;
+            String URL = UrlBuilder.removeProtocol(s, "rmi:");
+            remoteProActiveRuntime = (RemoteProActiveRuntime) java.rmi.Naming.lookup(URL);
             //System.out.println(remoteProActiveRuntime.getClass().getName());
             return createRuntimeAdapter(remoteProActiveRuntime);
         } catch (java.rmi.RemoteException e) {
@@ -116,24 +119,20 @@ public class RemoteRuntimeFactory extends RuntimeFactory {
         }
     }
 
-    protected RemoteProActiveRuntimeAdapter createRuntimeAdapter(
-        RemoteProActiveRuntime remoteProActiveRuntime)
-        throws ProActiveException {
-        return new RemoteProActiveRuntimeAdapter(remoteProActiveRuntime);
-    }
+    
 
-    protected RemoteProActiveRuntimeAdapter createRuntimeAdapter()
+    protected ProActiveRuntimeAdapter createRuntimeAdapter()
         throws ProActiveException {
-    	RemoteProActiveRuntimeImpl impl;
+        RmiProActiveRuntimeImpl impl;
         try {
-        	impl = new RemoteProActiveRuntimeImpl ();
+            impl = new RmiProActiveRuntimeImpl();
         } catch (java.rmi.RemoteException e) {
-            throw new ProActiveException("Cannot create the RemoteProActiveRuntimeImpl", e);
+            throw new ProActiveException("Cannot create the RemoteProActiveRuntimeImpl",
+                e);
         } catch (java.rmi.AlreadyBoundException e) {
-            throw new ProActiveException(
-                "Cannot bind remoteProactiveRuntime", e);
+            throw new ProActiveException("Cannot bind remoteProactiveRuntime", e);
         }
-        return new RemoteProActiveRuntimeAdapter (impl);
+        return new ProActiveRuntimeAdapter(impl);
     }
 
     public static RegistryHelper getRegistryHelper() {

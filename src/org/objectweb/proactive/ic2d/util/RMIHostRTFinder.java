@@ -30,16 +30,14 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
-import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntime;
-import org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeAdapter;
-
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
 import java.util.ArrayList;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
 
@@ -90,7 +88,7 @@ public class RMIHostRTFinder implements HostRTFinder {
 
                 try {
                     RemoteProActiveRuntime r = (RemoteProActiveRuntime) registry.lookup(id);
-                    part = new RemoteProActiveRuntimeAdapter(r);
+                    part = new ProActiveRuntimeAdapter(r);
                     runtimeArray.add(part);
                 } catch (Exception e) {
                     log(e.getMessage(), e);

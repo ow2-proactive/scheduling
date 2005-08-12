@@ -28,42 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.util;
+package org.objectweb.proactive.core.runtime.rmi;
 
-
-import java.io.IOException;
-import java.util.ArrayList;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
-import org.objectweb.proactive.core.runtime.http.HttpProActiveRuntime;
-import org.objectweb.proactive.core.util.UrlBuilder;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
 
-public class HttpHostRTFinder implements HostRTFinder {
-    private IC2DMessageLogger logger;
-
-    public HttpHostRTFinder(IC2DMessageLogger logger) {
-        this.logger = logger;
-    }
-
-    /**
-     * @see org.objectweb.proactive.ic2d.util.HostRTFinder#findPARuntimes(java.lang.String, int)
-     */
-    public ArrayList findPARuntimes(String host, int port)
-        throws IOException {
-        logger.log("Exploring " + host + " with HTTP on port " + port);
-        ArrayList runtimeArray = new ArrayList();
-        ProActiveRuntimeAdapter adapter;
-        try {
-            adapter = new ProActiveRuntimeAdapter(new HttpProActiveRuntime(UrlBuilder.buildUrl(
-                        host, "", "http:", port)));
-            runtimeArray.add(adapter);
-        } catch (ProActiveException e) {
-            logger.log(e.getMessage(), e);
-        }
-        
-        return runtimeArray;
-    }
+/**
+ *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
+ *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
+ *   to anothe remote objects library.
+ *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
+ */
+public interface RmiProActiveRuntime extends java.rmi.Remote, RemoteProActiveRuntime {
+    
 }

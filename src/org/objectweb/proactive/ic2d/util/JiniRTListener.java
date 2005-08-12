@@ -30,24 +30,22 @@
  */
 package org.objectweb.proactive.ic2d.util;
 
+import java.rmi.ConnectException;
+import java.rmi.RMISecurityManager;
+
 import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
-
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
 
 import org.apache.log4j.Logger;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
-import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
-import org.objectweb.proactive.core.runtime.jini.JiniRuntimeAdapter;
-
-import java.rmi.ConnectException;
-import java.rmi.RMISecurityManager;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeAdapter;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
 public class JiniRTListener implements DiscoveryListener {
@@ -74,8 +72,8 @@ public class JiniRTListener implements DiscoveryListener {
                 lookup = new LookupLocator("jini://" + host);
                 // System.out.println("Lookup.getRegistrar() on " + host);
                 ServiceRegistrar registrar = lookup.getRegistrar();
-                Class[] classes = new Class[] { JiniRuntime.class };
-                JiniRuntime runtime = null;
+                Class[] classes = new Class[] { RemoteProActiveRuntime.class };
+                RemoteProActiveRuntime runtime = null;
                 ServiceMatches matches = null;
 
                 ServiceTemplate template = new ServiceTemplate(null, classes,
@@ -101,8 +99,8 @@ public class JiniRTListener implements DiscoveryListener {
                                 if (matches.items[i].service == null) {
                                     log4jlogger.warn("Service : NULL !!!");
                                 } else {
-                                    runtime = (JiniRuntime) matches.items[i].service;
-                                    ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
+                                    runtime = (RemoteProActiveRuntime) matches.items[i].service;
+                                    ProActiveRuntime part = new ProActiveRuntimeAdapter(runtime);
                                     runtimes.add(part);
                                 }
                             } catch (ProActiveException e) {
@@ -138,8 +136,8 @@ public class JiniRTListener implements DiscoveryListener {
         ServiceRegistrar[] registrars = evt.getRegistrars();
 
         //System.out.println("registar lenght :"+registrars.length);
-        Class[] classes = new Class[] { JiniRuntime.class };
-        JiniRuntime runtime = null;
+        Class[] classes = new Class[] { RemoteProActiveRuntime.class };
+        RemoteProActiveRuntime runtime = null;
         ServiceMatches matches = null;
         ServiceTemplate template = new ServiceTemplate(null, classes, null);
 
@@ -167,8 +165,8 @@ public class JiniRTListener implements DiscoveryListener {
                             if (matches.items[i].service == null) {
                                 log4jlogger.warn("Service : NULL !!!");
                             } else {
-                                runtime = (JiniRuntime) matches.items[i].service;
-                                ProActiveRuntime part = new JiniRuntimeAdapter(runtime);
+                                runtime = (RemoteProActiveRuntime) matches.items[i].service;
+                                ProActiveRuntime part = new ProActiveRuntimeAdapter(runtime);
                                 runtimes.add(part);
                             }
                         }

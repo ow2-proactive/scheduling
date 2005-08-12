@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.rmi.ClassServerHelper;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -67,7 +69,7 @@ import org.objectweb.proactive.core.rmi.ClassServerHelper;
  *
  */
 public abstract class RuntimeFactory {
-    protected static Logger logger = Logger.getLogger(RuntimeFactory.class.getName());
+    public static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
     // test with class loader
     //private static final ClassLoader myClassLoader = new NodeClassLoader();
@@ -105,8 +107,8 @@ public abstract class RuntimeFactory {
      */
     public static synchronized void setFactory(String protocol,
         String factoryClassName) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("protocol =  " + protocol + " " + factoryClassName);
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug("protocol =  " + protocol + " " + factoryClassName);
         }
         protocolFactoryMapping.put(protocol, factoryClassName);
     }
@@ -143,16 +145,15 @@ public abstract class RuntimeFactory {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
-            
-        	defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
+            defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
-            if (logger.isDebugEnabled()) {
-                logger.debug("default runtime = " + defaultRuntime.getURL());
+            if (runtimeLogger.isDebugEnabled()) {
+                runtimeLogger.debug("default runtime = " + defaultRuntime.getURL());
             }
         } catch (ProActiveException e) {
             //e.printStackTrace();
-            if (logger.isDebugEnabled()) {
-                logger.debug("Error with the default ProActiveRuntime");
+            if (runtimeLogger.isDebugEnabled()) {
+                runtimeLogger.debug("Error with the default ProActiveRuntime");
             }
             throw new ProActiveException("Error when getting the default ProActiveRuntime",
                 e);
@@ -170,7 +171,6 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getProtocolSpecificRuntime(String protocol)
         throws ProActiveException {
-
         RuntimeFactory factory = getFactory(protocol);
         ProActiveRuntime proActiveRuntime = factory.getProtocolSpecificRuntimeImpl();
         if (proActiveRuntime == null) {
@@ -190,7 +190,7 @@ public abstract class RuntimeFactory {
      */
     public static ProActiveRuntime getRuntime(String proActiveRuntimeURL,
         String protocol) throws ProActiveException {
-        logger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
+        runtimeLogger.debug("proActiveRunTimeURL " + proActiveRuntimeURL + " " +
             protocol);
 
         //do we have any association for this node?
@@ -198,8 +198,8 @@ public abstract class RuntimeFactory {
         RuntimeFactory factory = getFactory(protocol);
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
-        if (logger.isDebugEnabled()) {
-            logger.debug("factory = " + factory);
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug("factory = " + factory);
         }
         return factory.getRemoteRuntimeImpl(proActiveRuntimeURL);
     }
@@ -207,6 +207,11 @@ public abstract class RuntimeFactory {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+    protected ProActiveRuntimeAdapter createRuntimeAdapter(
+        RemoteProActiveRuntime remoteProActiveRuntime)
+        throws ProActiveException {
+        return new ProActiveRuntimeAdapter(remoteProActiveRuntime);
+    }
 
     /**
      * Returns the reference of the only one instance of the ProActiveRuntime
@@ -224,6 +229,9 @@ public abstract class RuntimeFactory {
     protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException;
 
+    protected abstract ProActiveRuntimeAdapter createRuntimeAdapter()
+        throws ProActiveException;
+
     //
     // -- PRIVATE METHODS - STATIC -----------------------------------------------
     //
@@ -231,8 +239,8 @@ public abstract class RuntimeFactory {
         try {
             new ClassServerHelper().initializeClassServer();
         } catch (Exception e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Error with the ClassServer : " + e.getMessage());
+            if (runtimeLogger.isInfoEnabled()) {
+                runtimeLogger.info("Error with the ClassServer : " + e.getMessage());
             }
         }
     }
@@ -244,30 +252,30 @@ public abstract class RuntimeFactory {
         }
         if (IBIS_ENABLED) {
             setFactory(Constants.IBIS_PROTOCOL_IDENTIFIER,
-                "org.objectweb.proactive.core.runtime.ibis.RemoteRuntimeFactory");
+                "org.objectweb.proactive.core.runtime.ibis.IbisRuntimeFactory");
         }
 
         setFactory(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.http.RemoteRuntimeFactory");
-        
+            "org.objectweb.proactive.core.runtime.http.HttpRuntimeFactory");
+
         setFactory(Constants.RMISSH_PROTOCOL_IDENTIFIER,
-        "org.objectweb.proactive.core.runtime.rmi.SshRemoteRuntimeFactory");
+            "org.objectweb.proactive.core.runtime.rmi.SshRmiRuntimeFactory");
 
         setFactory(Constants.RMI_PROTOCOL_IDENTIFIER,
-            "org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory");
+            "org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory");
     }
 
     private static boolean isJiniEnabled() {
         try {
             // test if Jini is available
             Class.forName("net.jini.discovery.DiscoveryManagement");
-            if (logger.isInfoEnabled()) {
-                logger.info("Jini enabled");
+            if (runtimeLogger.isInfoEnabled()) {
+                runtimeLogger.info("Jini enabled");
             }
             return true;
         } catch (ClassNotFoundException e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Jini disabled");
+            if (runtimeLogger.isInfoEnabled()) {
+                runtimeLogger.info("Jini disabled");
             }
             return false;
         }
@@ -277,13 +285,13 @@ public abstract class RuntimeFactory {
         try {
             // test if Ibis is available
             Class.forName("ibis.rmi.server.UnicastRemoteObject");
-            if (logger.isInfoEnabled()) {
-                logger.info("Ibis enabled");
+            if (runtimeLogger.isInfoEnabled()) {
+                runtimeLogger.info("Ibis enabled");
             }
             return true;
         } catch (ClassNotFoundException e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("Ibis disabled");
+            if (runtimeLogger.isInfoEnabled()) {
+                runtimeLogger.info("Ibis disabled");
             }
             return false;
         }
@@ -309,8 +317,8 @@ public abstract class RuntimeFactory {
     private static RuntimeFactory createRuntimeFactory(
         String factoryClassName, String protocol) throws ProActiveException {
         Class factoryClass = null;
-        if (logger.isDebugEnabled()) {
-            logger.debug("factoryClassName " + factoryClassName);
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug("factoryClassName " + factoryClassName);
         }
         try {
             factoryClass = Class.forName(factoryClassName);
@@ -325,8 +333,8 @@ public abstract class RuntimeFactory {
 
     private static synchronized RuntimeFactory getFactory(String protocol)
         throws ProActiveException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("protocol = " + protocol);
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug("protocol = " + protocol);
         }
 
         RuntimeFactory factory = (RuntimeFactory) instanceFactoryMapping.get(protocol);
@@ -335,8 +343,8 @@ public abstract class RuntimeFactory {
         }
 
         String factoryClassName = (String) protocolFactoryMapping.get(protocol);
-        if (logger.isDebugEnabled()) {
-            logger.debug("factoryClassName  = " + factoryClassName);
+        if (runtimeLogger.isDebugEnabled()) {
+            runtimeLogger.debug("factoryClassName  = " + factoryClassName);
         }
         if (factoryClassName != null) {
             return createRuntimeFactory(factoryClassName, protocol);
