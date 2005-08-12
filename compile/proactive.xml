@@ -148,7 +148,7 @@
 		<rmic classname="org.objectweb.proactive.core.body.rmi.RemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
-		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RemoteProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.jini.JiniRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
@@ -345,15 +345,13 @@
       ==
       ================================================================
 	-->
-	<target name="proActiveJar" depends="core,ext">
+	<target name="proActiveJar" depends="ext">
 		<mkdir dir="${dist.dir}/ProActive"/>
 		<jar jarfile="${dist.dir}/ProActive/ProActive.jar">
 			<fileset dir="${classes.dir}">
 				<include name="${proactive.dir}/**"/>
 				<exclude name="${proactive.dir}/examples/**"/>
 				<exclude name="${proactive.dir}/ic2d/**"/>
-				<exclude name="${proactive.dir}/ext/**"/>
-				<include name="${proactive.dir}/ext/security/**"/>
 			</fileset>
 		</jar>
 	</target>
