@@ -37,14 +37,12 @@ import net.jini.core.discovery.LookupLocator;
 import net.jini.core.lookup.ServiceMatches;
 import net.jini.core.lookup.ServiceRegistrar;
 import net.jini.core.lookup.ServiceTemplate;
-
 import net.jini.discovery.DiscoveryEvent;
 import net.jini.discovery.DiscoveryListener;
 import net.jini.discovery.LookupDiscovery;
 
 import org.apache.log4j.Logger;
-
-import org.objectweb.proactive.core.runtime.jini.JiniRuntime;
+import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 import org.objectweb.proactive.core.util.UrlBuilder;
 
 
@@ -248,7 +246,7 @@ public class ServiceLocatorHelper implements DiscoveryListener {
                 ServiceLocatorHelper.registrar.getLocator());
 
             ServiceTemplate template = new ServiceTemplate(null,
-                    new Class[] { JiniRuntime.class }, null);
+                    new Class[] { RemoteProActiveRuntime.class }, null);
             ServiceMatches matches = ServiceLocatorHelper.registrar.lookup(template,
                     Integer.MAX_VALUE);
 

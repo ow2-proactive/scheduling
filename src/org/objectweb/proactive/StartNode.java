@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.runtime.jini.JiniRuntimeFactory;
-import org.objectweb.proactive.core.runtime.rmi.RemoteRuntimeFactory;
+import org.objectweb.proactive.core.runtime.rmi.RmiRuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -247,9 +247,9 @@ public class StartNode {
     protected void run() throws java.io.IOException, NodeException {
         //setProperties();
         // set options on node factory
-        RemoteRuntimeFactory.setShouldCreateClassServer(!noClassServer);
-        RemoteRuntimeFactory.setShouldCreateRegistry(!noRegistry);
-        RemoteRuntimeFactory.setRegistryPortNumber(registryPortNumber);
+        RmiRuntimeFactory.setShouldCreateClassServer(!noClassServer);
+        RmiRuntimeFactory.setShouldCreateRegistry(!noRegistry);
+        RmiRuntimeFactory.setRegistryPortNumber(registryPortNumber);
         if (RuntimeFactory.JINI_ENABLED) {
             JiniRuntimeFactory.setMulticastLocator(multicastLocator);
         }
