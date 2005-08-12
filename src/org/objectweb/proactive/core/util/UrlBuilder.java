@@ -385,31 +385,33 @@ public class UrlBuilder {
      * @return port number or 0 if there is no  port
      */
     private static int getPortNumber(String url) {
-//        System.out.println("URL === " + url);
-        int portNumber;
-        if (System.getProperty("proactive.communication.protocol").equals("http"))
-            portNumber = Integer.parseInt(System.getProperty("proactive.http.port"));
-        else
-            portNumber = DEFAULT_REGISTRY_PORT;
+        //        System.out.println("URL === " + url);
+        int portNumber = DEFAULT_REGISTRY_PORT;
         int index = url.lastIndexOf(":");
-//       System.out.println("*/** " + OsgiParameters.servletEnabled() + " -- " + index + " -- " + url );
-//                
-//        
-        if (OsgiParameters.servletEnabled()) {
-            if (index != -1) {
-            String suite = url.substring(index);
-//            System.out.println("----------- suite = " + suite );
-            int portLength = suite.indexOf('/');
-//            System.out.println(portLength);
-            if (portLength != -1 ) {
-            String portString = suite.substring(1, portLength);
-//            System.out.println("PORT = " + portString);
-            return Integer.parseInt(portString);
-            } }
-        }
         if (index > -1) {
             portNumber = Integer.parseInt(url.substring(index + 1, url.length()));
         }
+
+        //       System.out.println("*/** " + OsgiParameters.servletEnabled() + " -- " + index + " -- " + url );
+        //                
+        //        
+        if (OsgiParameters.servletEnabled()) {
+            if (index != -1) {
+                String suite = url.substring(index);
+
+                //            System.out.println("----------- suite = " + suite );
+                int portLength = suite.indexOf('/');
+
+                //            System.out.println(portLength);
+                if (portLength != -1) {
+                    String portString = suite.substring(1, portLength);
+
+                    //            System.out.println("PORT = " + portString);
+                    return Integer.parseInt(portString);
+                }
+            }
+        }
+
         return portNumber;
     }
 
