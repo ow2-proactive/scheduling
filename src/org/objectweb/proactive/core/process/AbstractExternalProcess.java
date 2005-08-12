@@ -184,7 +184,6 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         java.io.BufferedWriter out, java.io.BufferedReader err) {
         if (closeStream) {
             try {
-                
                 //the sleep might be needed for processes that fail if
                 // we close the in/err too early
                 Thread.sleep(200);
@@ -252,6 +251,16 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             } catch (InterruptedException e) {
             }
         } while (errThreadMonitor.isActive() || inThreadMonitor.isActive());
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out)
+        throws java.io.IOException {
+        if (isStarted) {
+            //if the process is started, we have to remove the external process
+            // which is now not Serializable:UnixProcess or WindowsProcess
+            externalProcess = null;
+        }
+        out.defaultWriteObject();
     }
 
     //
