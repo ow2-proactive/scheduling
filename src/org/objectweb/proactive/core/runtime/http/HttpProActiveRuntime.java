@@ -238,6 +238,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (isLocal) {
             localruntime.unregister(proActiveRuntimeDist, proActiveRuntimeUrl,
                 creatorID, creationProtocol, vmName);
+            return;
         }
         ArrayList params = new ArrayList();
         ArrayList paramsTypes = new ArrayList();
@@ -260,7 +261,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         RuntimeRequest req = new RuntimeRequest("getProActiveRuntimes", this.url);
         if (isLocal) {
-            localruntime.getProActiveRuntimes();
+           return  localruntime.getProActiveRuntimes();
         }
         req.send();
         try {
@@ -273,7 +274,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getProActiveRuntime(proActiveRuntimeName);
+           return localruntime.getProActiveRuntime(proActiveRuntimeName);
         }
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
@@ -292,11 +293,12 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         if (!alreadykilled) {
             if (isLocal) {
                 localruntime.killRT(softly);
-            }
+            } else {
             ArrayList params = new ArrayList();
             params.add(new Boolean(softly));
 
             new RuntimeRequest("killRT", params, this.url).send();
+            }
         }
 
         alreadykilled = true;
@@ -309,7 +311,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ArrayList getActiveObjects(String nodeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getActiveObjects(nodeName);
+            return localruntime.getActiveObjects(nodeName);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -327,7 +329,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ArrayList getActiveObjects(String nodeName, String objectName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getActiveObjects(nodeName, objectName);
+            return localruntime.getActiveObjects(nodeName, objectName);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -346,7 +348,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public VirtualNode getVirtualNode(String virtualNodeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getVirtualNode(virtualNodeName);
+            return localruntime.getVirtualNode(virtualNodeName);
         }
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
@@ -363,6 +365,19 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding)
         throws ProActiveException, HTTPRemoteException {
+    	 if (isLocal) {
+    	  localruntime.registerVirtualNode(virtualNodeName,
+    	            replacePreviousBinding);
+    	  
+    	 } else {
+    		 ArrayList params = new ArrayList();
+    		 params.add(virtualNodeName);
+    		 params.add(new Boolean(replacePreviousBinding));
+    		 RuntimeRequest req = new RuntimeRequest("registerVirtualNode", params, this.url);
+    		 req.send();
+    		 
+    	 }
+    	 
         String vn_url;
         try {
             vn_url = buildNodeURL(virtualNodeName);
@@ -378,6 +393,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.unregisterVirtualNode(virtualNodeName);
+            return;
         }
         ArrayList params = new ArrayList();
         params.add(virtualNodeName);
@@ -386,6 +402,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     }
 
     public void unregisterAllVirtualNodes() throws ProActiveException {
+        if (isLocal) {
+            localruntime.unregisterAllVirtualNodes();
+            return;
+        }
         try {
             new RuntimeRequest("unregisterAllVirtualNodes", this.url).send();
         } catch (HTTPRemoteException e) {
@@ -399,7 +419,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, ConstructorCallExecutionFailedException, 
             InvocationTargetException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.createBody(nodeName, bodyConstructorCall, isNodeLocal);
+            return localruntime.createBody(nodeName, bodyConstructorCall, isNodeLocal);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -422,7 +442,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.receiveBody(nodeName, body);
+           return  localruntime.receiveBody(nodeName, body);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -441,7 +461,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public PolicyServer getPolicyServer()
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getPolicyServer();
+            return localruntime.getPolicyServer();
         }
         RuntimeRequest req = new RuntimeRequest("getPolicyServer", this.url);
         req.send();
@@ -455,7 +475,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public String getVNName(String nodename)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getVNName(nodename);
+            return localruntime.getVNName(nodename);
         }
         ArrayList params = new ArrayList();
         params.add(nodename);
@@ -477,7 +497,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ArrayList getEntities(String nodeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getEntities(nodeName);
+            return localruntime.getEntities(nodeName);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -494,7 +514,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, SecurityNotAvailableException, 
             HTTPRemoteException {
         if (isLocal) {
-            localruntime.getPolicy(sc);
+            return localruntime.getPolicy(sc);
         }
         ArrayList params = new ArrayList();
         params.add(sc);
@@ -650,7 +670,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public String getJobID(String nodeUrl)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getJobID(nodeUrl);
+            return localruntime.getJobID(nodeUrl);
         }
         ArrayList params = new ArrayList();
         params.add(nodeUrl);
@@ -668,6 +688,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.addAcquaintance(proActiveRuntimeName);
+            return;
         }
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
@@ -678,7 +699,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public String[] getAcquaintances()
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getAcquaintances();
+           return localruntime.getAcquaintances();
         }
         RuntimeRequest req = new RuntimeRequest("getAcquaintances", this.url);
         req.send();
@@ -698,6 +719,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
             localruntime.rmAcquaintance(proActiveRuntimeName);
+            return;
         }
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
@@ -708,7 +730,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getClassDataFromParentRuntime(className);
+            return localruntime.getClassDataFromParentRuntime(className);
         }
         ArrayList params = new ArrayList();
         params.add(className);
@@ -726,7 +748,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public byte[] getClassDataFromThisRuntime(String className)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.getClassDataFromThisRuntime(className);
+           return localruntime.getClassDataFromThisRuntime(className);
         }
         ArrayList params = new ArrayList();
         params.add(className);
@@ -748,7 +770,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-            localruntime.receiveCheckpoint(nodeName, ckpt, inc);
+            return localruntime.receiveCheckpoint(nodeName, ckpt, inc);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
