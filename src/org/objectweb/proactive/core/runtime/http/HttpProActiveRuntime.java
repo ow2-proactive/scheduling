@@ -365,6 +365,9 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding)
         throws ProActiveException, HTTPRemoteException {
+        //here we don't send the request to the remote runtime,
+        //indeed the local registration occured when the vn was created.
+        // It is the same behavior(for this method) in all remote parts
         String vn_url;
         try {
             vn_url = buildNodeURL(virtualNodeName);
