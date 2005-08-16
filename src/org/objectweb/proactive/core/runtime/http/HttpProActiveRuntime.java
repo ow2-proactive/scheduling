@@ -261,7 +261,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, HTTPRemoteException {
         RuntimeRequest req = new RuntimeRequest("getProActiveRuntimes", this.url);
         if (isLocal) {
-           return  localruntime.getProActiveRuntimes();
+            return localruntime.getProActiveRuntimes();
         }
         req.send();
         try {
@@ -274,7 +274,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-           return localruntime.getProActiveRuntime(proActiveRuntimeName);
+            return localruntime.getProActiveRuntime(proActiveRuntimeName);
         }
         ArrayList params = new ArrayList();
         params.add(proActiveRuntimeName);
@@ -294,10 +294,10 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
             if (isLocal) {
                 localruntime.killRT(softly);
             } else {
-            ArrayList params = new ArrayList();
-            params.add(new Boolean(softly));
+                ArrayList params = new ArrayList();
+                params.add(new Boolean(softly));
 
-            new RuntimeRequest("killRT", params, this.url).send();
+                new RuntimeRequest("killRT", params, this.url).send();
             }
         }
 
@@ -365,19 +365,6 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding)
         throws ProActiveException, HTTPRemoteException {
-    	 if (isLocal) {
-    	  localruntime.registerVirtualNode(virtualNodeName,
-    	            replacePreviousBinding);
-    	  
-    	 } else {
-    		 ArrayList params = new ArrayList();
-    		 params.add(virtualNodeName);
-    		 params.add(new Boolean(replacePreviousBinding));
-    		 RuntimeRequest req = new RuntimeRequest("registerVirtualNode", params, this.url);
-    		 req.send();
-    		 
-    	 }
-    	 
         String vn_url;
         try {
             vn_url = buildNodeURL(virtualNodeName);
@@ -419,7 +406,8 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
         throws ProActiveException, ConstructorCallExecutionFailedException, 
             InvocationTargetException, HTTPRemoteException {
         if (isLocal) {
-            return localruntime.createBody(nodeName, bodyConstructorCall, isNodeLocal);
+            return localruntime.createBody(nodeName, bodyConstructorCall,
+                isNodeLocal);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -442,7 +430,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-           return  localruntime.receiveBody(nodeName, body);
+            return localruntime.receiveBody(nodeName, body);
         }
         ArrayList params = new ArrayList();
         params.add(nodeName);
@@ -699,7 +687,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public String[] getAcquaintances()
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-           return localruntime.getAcquaintances();
+            return localruntime.getAcquaintances();
         }
         RuntimeRequest req = new RuntimeRequest("getAcquaintances", this.url);
         req.send();
@@ -748,7 +736,7 @@ public class HttpProActiveRuntime implements RemoteProActiveRuntime {
     public byte[] getClassDataFromThisRuntime(String className)
         throws ProActiveException, HTTPRemoteException {
         if (isLocal) {
-           return localruntime.getClassDataFromThisRuntime(className);
+            return localruntime.getClassDataFromThisRuntime(className);
         }
         ArrayList params = new ArrayList();
         params.add(className);
