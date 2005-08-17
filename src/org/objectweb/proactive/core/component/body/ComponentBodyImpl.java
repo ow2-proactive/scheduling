@@ -126,7 +126,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         if (insideFunctionalActivity) {
             try {
                 return LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
-                        getProActiveComponent()));
+                        getProActiveComponent()).getFcState());
             } catch (NoSuchInterfaceException e) {
                 logger.error(
                     "could not find the life cycle controller of this component");
