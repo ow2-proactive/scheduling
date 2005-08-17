@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -41,10 +43,14 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
+import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
@@ -56,6 +62,7 @@ import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 import java.util.ArrayList;
@@ -75,6 +82,7 @@ public class Fractive implements GenericFactory, Component, Factory {
     private static Fractive instance = null;
     private TypeFactory typeFactory = (TypeFactory) ProActiveTypeFactory.instance();
     private Type type = null;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
      * no-arg constructor (used by Fractal to get a bootstrap component)
@@ -388,5 +396,23 @@ public class Fractive implements GenericFactory, Component, Factory {
             }
         }
         return (InterfaceType[]) client_interfaces.toArray(new InterfaceType[client_interfaces.size()]);
+    }
+
+     /**
+     * Returns a component representative pointing to the component associated to the component
+     * whose active thread is calling this method. It can be used for a component to pass callback references to itself.
+     * @return a component representative for the component in which the current thread is running
+     */
+    public static Component getComponentRepresentativeOnThis() {
+        ComponentBody componentBody;
+        try {
+            componentBody = (ComponentBody) ProActive.getBodyOnThis();
+        } catch (ClassCastException e) {
+            logger.error(
+                "Cannot get a component representative from the current object, because this object is not a component");
+            return null;
+        }
+        ProActiveComponent currentComponent = componentBody.getProActiveComponent();
+        return currentComponent.getRepresentativeOnThis();
     }
 }
