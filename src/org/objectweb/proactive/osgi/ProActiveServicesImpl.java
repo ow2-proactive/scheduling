@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.osgi;
 
-import org.objectweb.fractal.api.Component;
+import java.io.IOException;
+import java.util.Vector;
 
+import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -42,15 +44,9 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-
-import java.io.IOException;
-
-import java.util.Vector;
 
 
 public class ProActiveServicesImpl implements ProActiveService {
@@ -431,29 +427,29 @@ public class ProActiveServicesImpl implements ProActiveService {
         return ProActive.getJobId();
     }
 
-    /**
-     * @see org.objectweb.proactive.osgi.ProActiveService#searchExceptionHandler(org.objectweb.proactive.core.exceptions.NonFunctionalException, java.lang.Object)
-     */
-    public Handler searchExceptionHandler(NonFunctionalException ex,
-        Object target) {
-        return ProActive.searchExceptionHandler(ex, target);
-    }
-
-    /**
-     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class, int, java.lang.Object)
-     */
-    public void setExceptionHandler(Handler h, Class exception, int levelID,
-        Object target) {
-        ProActive.setExceptionHandler(h, exception, levelID, target);
-    }
-
-    /**
-     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(java.lang.Class, java.lang.Class, int, java.lang.Object)
-     */
-    public void setExceptionHandler(Class handler, Class exception,
-        int levelID, Object target) {
-        ProActive.setExceptionHandler(handler, exception, levelID, target);
-    }
+//    /**
+//     * @see org.objectweb.proactive.osgi.ProActiveService#searchExceptionHandler(org.objectweb.proactive.core.exceptions.NonFunctionalException, java.lang.Object)
+//     */
+//    public Handler searchExceptionHandler(NonFunctionalException ex,
+//        Object target) {
+//        return ProActive.searchExceptionHandler(ex, target);
+//    }
+//
+//    /**
+//     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class, int, java.lang.Object)
+//     */
+//    public void setExceptionHandler(Handler h, Class exception, int levelID,
+//        Object target) {
+//        ProActive.setExceptionHandler(h, exception, levelID, target);
+//    }
+//
+//    /**
+//     * @see org.objectweb.proactive.osgi.ProActiveService#setExceptionHandler(java.lang.Class, java.lang.Class, int, java.lang.Object)
+//     */
+//    public void setExceptionHandler(Class handler, Class exception,
+//        int levelID, Object target) {
+//        ProActive.setExceptionHandler(handler, exception, levelID, target);
+//    }
 
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.String, java.lang.String[])

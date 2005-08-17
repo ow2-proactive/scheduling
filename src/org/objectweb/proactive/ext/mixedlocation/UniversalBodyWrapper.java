@@ -8,6 +8,11 @@
  */
 package org.objectweb.proactive.ext.mixedlocation;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -15,7 +20,8 @@ import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -26,14 +32,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
@@ -185,44 +183,55 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //        System.gc();
     }
 
-    /**
-     * Get information about the handlerizable object
-     * @return information about the handlerizable object
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        return this.wrappedBody.getHandlerizableInfo();
+//    /**
+//     * Get information about the handlerizable object
+//     * @return information about the handlerizable object
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        return this.wrappedBody.getHandlerizableInfo();
+//    }
+//
+//    /** Give a reference to a local map of handlers
+//     * @return A reference to a map of handlers
+//     */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        return this.wrappedBody.getHandlersLevel();
+//    }
+//
+//    /**
+//     * Clear the local map of handlers
+//     */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//        this.wrappedBody.clearHandlersLevel();
+//    }
+//
+//    /** Set a new handler within the table of the Handlerizable Object
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     * @param handler A class of handler associated with a class of non functional exception.
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws java.io.IOException {
+//        this.wrappedBody.setExceptionHandler(handler, exception);
+//    }
+//
+//    /** Remove a handler from the table of the Handlerizable Object
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     * @return The removed handler or null
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws java.io.IOException {
+//        return this.wrappedBody.unsetExceptionHandler(exception);
+//    }
+    
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+        wrappedBody.addNFEListener(listener);
     }
-
-    /** Give a reference to a local map of handlers
-     * @return A reference to a map of handlers
-     */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        return this.wrappedBody.getHandlersLevel();
+    public void removeNFEListener(NFEListener listener) {
+    	wrappedBody.removeNFEListener(listener);
     }
-
-    /**
-     * Clear the local map of handlers
-     */
-    public void clearHandlersLevel() throws java.io.IOException {
-        this.wrappedBody.clearHandlersLevel();
-    }
-
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @param handler A class of handler associated with a class of non functional exception.
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
-        this.wrappedBody.setExceptionHandler(handler, exception);
-    }
-
-    /** Remove a handler from the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @return The removed handler or null
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
-        return this.wrappedBody.unsetExceptionHandler(exception);
+    public int fireNFE(NonFunctionalException e) {
+        return wrappedBody.fireNFE(e);
     }
 
     // SECURITY

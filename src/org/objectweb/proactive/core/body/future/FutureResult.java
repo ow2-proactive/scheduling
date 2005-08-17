@@ -1,7 +1,7 @@
 package org.objectweb.proactive.core.body.future;
 
-import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
 
 import java.io.Serializable;
 
@@ -24,11 +24,7 @@ public class FutureResult implements Serializable {
     public FutureResult(Object result, Throwable exception,
         NonFunctionalException nfe) {
         this.result = result;
-        if (exception != null) {
-            this.exception = exception;
-        } else {
-            this.exception = nfe;
-        }
+        this.exception = exception;
         this.nfe = nfe;
     }
 

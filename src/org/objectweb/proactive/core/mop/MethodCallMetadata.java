@@ -13,13 +13,6 @@ public class MethodCallMetadata implements Serializable {
     private boolean runtimeExceptionHandled;
 
     /**
-     * If the caller asks to catch the NFE (which is a RuntimeException btw), we
-     * won't trigger the NFE mechanism but simply throw the exception back to the caller.
-     * This flag implies runtimeExceptionHandled.
-     */
-    private boolean NFEHandled;
-
-    /**
      * If the caller told ProActive to catch all the thrown exceptions, we can
      * make the call asynchronous.
      */
@@ -29,7 +22,7 @@ public class MethodCallMetadata implements Serializable {
      * The default parameters, when the exception mechanism is not used.
      */
     public static final MethodCallMetadata DEFAULT = new MethodCallMetadata(false,
-            false, false);
+            false);
 
     /**
      * @param runtimeExceptionHandled
@@ -37,9 +30,8 @@ public class MethodCallMetadata implements Serializable {
      * @param asynchronousException
      */
     public MethodCallMetadata(boolean runtimeExceptionHandled,
-        boolean NFEHandled, boolean exceptionAsynchronously) {
+        boolean exceptionAsynchronously) {
         this.runtimeExceptionHandled = runtimeExceptionHandled;
-        this.NFEHandled = NFEHandled;
         this.exceptionAsynchronously = exceptionAsynchronously;
     }
 
@@ -48,13 +40,6 @@ public class MethodCallMetadata implements Serializable {
      */
     public boolean isExceptionAsynchronously() {
         return exceptionAsynchronously;
-    }
-
-    /**
-     * @return Returns the nFEHandled.
-     */
-    public boolean isNFEHandled() {
-        return NFEHandled;
     }
 
     /**
@@ -71,8 +56,9 @@ public class MethodCallMetadata implements Serializable {
 
         return metadata;
     }
-    
+
     public String toString() {
-    	return "[rt:" + runtimeExceptionHandled + ", async:" + exceptionAsynchronously + ", nfe:" + NFEHandled + "]";
+        return "[rt:" + runtimeExceptionHandled + ", async:" +
+        exceptionAsynchronously + "]";
     }
 }

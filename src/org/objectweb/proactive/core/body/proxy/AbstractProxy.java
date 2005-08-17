@@ -33,12 +33,15 @@ package org.objectweb.proactive.core.body.proxy;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
+import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 
 
-public abstract class AbstractProxy implements Proxy, java.io.Serializable {
+public abstract class AbstractProxy implements Proxy, java.io.Serializable, NFEProducer {
     // Get logger
     protected static Logger logger = Logger.getLogger("NFE");
 
@@ -81,57 +84,76 @@ public abstract class AbstractProxy implements Proxy, java.io.Serializable {
         return mc.isOneWayCall();
     }
 
-	/**
-	 * Get information about the handlerizable object
-	 * @return information about the handlerizable object
-	 */
-	public String getHandlerizableInfo()  throws java.io.IOException {
-		return "PROXY of CLASS ["+ this.getClass()  +"]";
-	}
-	
-    /** Give a reference to a local map of handlers
-    * @return A reference to a map of handlers
-    */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        return proxyLevel;
-    }
-
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-		 proxyLevel.clear();
-	}
-
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
-        // add handler to proxy level
-        if (proxyLevel == null) {
-            proxyLevel = new HashMap();
+//	/**
+//	 * Get information about the handlerizable object
+//	 * @return information about the handlerizable object
+//	 */
+//	public String getHandlerizableInfo()  throws java.io.IOException {
+//		return "PROXY of CLASS ["+ this.getClass()  +"]";
+//	}
+//	
+//    /** Give a reference to a local map of handlers
+//    * @return A reference to a map of handlers
+//    */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        return proxyLevel;
+//    }
+//
+//	/** 
+//	 * Clear the local map of handlers
+//	 */
+//	public void clearHandlersLevel() throws java.io.IOException {
+//		 proxyLevel.clear();
+//	}
+//
+//    /** Set a new handler within the table of the Handlerizable Object
+//     * @param handler A handler associated with a class of non functional exception.
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws java.io.IOException {
+//        // add handler to proxy level
+//        if (proxyLevel == null) {
+//            proxyLevel = new HashMap();
+//        }
+//        proxyLevel.put(exception, handler);
+//    }
+//
+//    /** Remove a handler from the table of the Handlerizable Object
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     * @return The removed handler or null
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws java.io.IOException {
+//        // remove handler from proxy level
+//        if (proxyLevel != null) {
+//            Handler handler = (Handler) proxyLevel.remove(exception);
+//            return handler;
+//        } else {
+//            if (logger.isDebugEnabled()) {
+//                logger.debug("[NFE_WARNING] No handler for [" +
+//                    exception.getName() + "] can be removed from PROXY level");
+//            }
+//            return null;
+//        }
+//    }
+    // NFEProducer implementation
+    private NFEListenerList nfeListeners = null;
+    public void addNFEListener(NFEListener listener) {
+        if (nfeListeners == null) {
+            nfeListeners = new NFEListenerList();
         }
-        proxyLevel.put(exception, handler);
+        nfeListeners.addNFEListener(listener);
     }
-
-    /** Remove a handler from the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @return The removed handler or null
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
-        // remove handler from proxy level
-        if (proxyLevel != null) {
-            Handler handler = (Handler) proxyLevel.remove(exception);
-            return handler;
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_WARNING] No handler for [" +
-                    exception.getName() + "] can be removed from PROXY level");
-            }
-            return null;
+    public void removeNFEListener(NFEListener listener) {
+        if (nfeListeners != null) {
+            nfeListeners.removeNFEListener(listener);
         }
+    }
+    public int fireNFE(NonFunctionalException e) {
+    	if (nfeListeners != null) {
+    		return nfeListeners.fireNFE(e);
+    	}
+    	return 0;
     }
 }

@@ -30,13 +30,18 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.Handlerizable;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -47,13 +52,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -68,7 +66,7 @@ import java.util.ArrayList;
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter
  */
-public interface UniversalBody extends Handlerizable, Job {
+public interface UniversalBody extends NFEProducer, Job {
 
     /**
      * Receives a request for later processing. The call to this method is non blocking

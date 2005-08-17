@@ -43,10 +43,11 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.event.FutureEvent;
-import org.objectweb.proactive.core.exceptions.ExceptionHandler;
-import org.objectweb.proactive.core.exceptions.ExceptionMaskLevel;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.exceptions.manager.ExceptionHandler;
+import org.objectweb.proactive.core.exceptions.manager.ExceptionMaskLevel;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.proxy.FutureTimeoutException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MOP;
@@ -237,9 +238,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         ExceptionHandler.addResult(this);
         NonFunctionalException nfe = target.getNFE();
         if (nfe != null) {
-            Handler handler = ProActive.searchExceptionHandler(nfe, this);
-            handler.handle(nfe, ProActive.getBodyOnThis().getNodeURL());
-            //throw ((InvocationTargetException) this.target);
+            NFEManager.fireNFE(nfe);
         }
 
         this.notifyAll();
@@ -340,7 +339,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         try {
             waitFor(futureMaxDelay);
         } catch (ProActiveException e) {
-            e.printStackTrace();
+        	NonFunctionalException nfe = new FutureTimeoutException("Exception after waiting for " + futureMaxDelay + "ms", e);
+            
+            /* TODO: mettre une NFE a la place */
             target = new FutureResult(null, e, null);
             notifyAll();
         }
@@ -475,60 +476,60 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         return result;
     }
 
-    /**
-     * Get information about the handlerizable object
-     * @return information about the handlerizable object
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        return "FUTURE (ID=" + this.ID + ") of CLASS [" + this.getClass() +
-        "]";
-    }
-
-    /** Give a reference to a local map of handlers
-    * @return A reference to a map of handlers
-    */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        return futureLevel;
-    }
-
-    /**
-         * Clear the local map of handlers
-         */
-    public void clearHandlersLevel() throws java.io.IOException {
-        futureLevel.clear();
-    }
-
-    /** Set a new handler within the table of the Handlerizable Object
-         * @param handler A handler associated with a class of non functional exception.
-         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-         */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
-        // add handler to future level
-        if (futureLevel == null) {
-            futureLevel = new HashMap();
-        }
-        futureLevel.put(exception, handler);
-    }
-
-    /** Remove a handler from the table of the Handlerizable Object
-         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-         * @return The removed handler or null
-         */
-    public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
-        // remove handler from future level
-        if (futureLevel != null) {
-            Handler handler = (Handler) futureLevel.remove(exception);
-            return handler;
-        } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("[NFE_WARNING] No handler for [" +
-                    exception.getName() + "] can be removed from FUTURE level");
-            }
-            return null;
-        }
-    }
+//    /**
+//     * Get information about the handlerizable object
+//     * @return information about the handlerizable object
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        return "FUTURE (ID=" + this.ID + ") of CLASS [" + this.getClass() +
+//        "]";
+//    }
+//
+//    /** Give a reference to a local map of handlers
+//    * @return A reference to a map of handlers
+//    */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        return futureLevel;
+//    }
+//
+//    /**
+//         * Clear the local map of handlers
+//         */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//        futureLevel.clear();
+//    }
+//
+//    /** Set a new handler within the table of the Handlerizable Object
+//         * @param handler A handler associated with a class of non functional exception.
+//         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//         */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws java.io.IOException {
+//        // add handler to future level
+//        if (futureLevel == null) {
+//            futureLevel = new HashMap();
+//        }
+//        futureLevel.put(exception, handler);
+//    }
+//
+//    /** Remove a handler from the table of the Handlerizable Object
+//         * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//         * @return The removed handler or null
+//         */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws java.io.IOException {
+//        // remove handler from future level
+//        if (futureLevel != null) {
+//            Handler handler = (Handler) futureLevel.remove(exception);
+//            return handler;
+//        } else {
+//            if (logger.isDebugEnabled()) {
+//                logger.debug("[NFE_WARNING] No handler for [" +
+//                    exception.getName() + "] can be removed from FUTURE level");
+//            }
+//            return null;
+//        }
+//    }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------

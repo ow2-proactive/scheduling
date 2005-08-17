@@ -30,16 +30,24 @@
  */
 package org.objectweb.proactive.core.body.jini;
 
+import java.io.IOException;
+import java.rmi.RemoteException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -50,16 +58,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.rmi.RemoteException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /**
@@ -356,43 +354,43 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
         return proxiedJiniBody.getEntities();
     }
 
-    /**
-     * Get information about the handlerizable object
-     * @return information about the handlerizable object
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        return "BODY of CLASS [" + this.getClass() + "]";
-    }
-
-    /** Give a reference to a local map of handlers
-     * @return A reference to a map of handlers
-     */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        return null;
-    }
-
-    /**
-     * Clear the local map of handlers
-     */
-    public void clearHandlersLevel() throws java.io.IOException {
-    }
-
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
-    }
-
-    /** Remove a handler from the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @return The removed handler or null
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
-        return null;
-    }
+//    /**
+//     * Get information about the handlerizable object
+//     * @return information about the handlerizable object
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        return "BODY of CLASS [" + this.getClass() + "]";
+//    }
+//
+//    /** Give a reference to a local map of handlers
+//     * @return A reference to a map of handlers
+//     */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        return null;
+//    }
+//
+//    /**
+//     * Clear the local map of handlers
+//     */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//    }
+//
+//    /** Set a new handler within the table of the Handlerizable Object
+//     * @param handler A handler associated with a class of non functional exception.
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws java.io.IOException {
+//    }
+//
+//    /** Remove a handler from the table of the Handlerizable Object
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     * @return The removed handler or null
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws java.io.IOException {
+//        return null;
+//    }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTMessage(org.objectweb.proactive.core.body.ft.internalmsg.FTMessage)
@@ -414,6 +412,33 @@ public class JiniBodyAdapter implements BodyAdapter, java.io.Serializable {
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
          // shortcuts are currently not implemented for jini
+    }
+
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+    	try {
+			proxiedJiniBody.addNFEListener(listener);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public void removeNFEListener(NFEListener listener) {
+    	try {
+			proxiedJiniBody.removeNFEListener(listener);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public int fireNFE(NonFunctionalException e) {
+    	try {
+			return proxiedJiniBody.fireNFE(e);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return 0;
+		}
     }
     //
     // -- PRIVATE METHODS -----------------------------------------------

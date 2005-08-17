@@ -32,14 +32,20 @@ package org.objectweb.proactive.core.body.ibis;
 
 import ibis.rmi.RemoteException;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -51,13 +57,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
@@ -297,4 +296,14 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
        in.defaultReadObject();
        }
      */
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+        body.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+    	body.removeNFEListener(listener);
+    }
+    public int fireNFE(NonFunctionalException e) {
+        return body.fireNFE(e);
+    }
 }

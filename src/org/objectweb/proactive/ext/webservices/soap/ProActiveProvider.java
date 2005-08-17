@@ -49,7 +49,6 @@ import org.apache.soap.util.Provider;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.http.util.HttpMarshaller;
-import org.objectweb.proactive.core.exceptions.HandlerManager;
 import org.objectweb.proactive.ext.webservices.WSConstants;
 
 
@@ -63,7 +62,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
 
         // Creation of the default level which contains standard exception handlers
         ProActive.defaultLevel = new HashMap();
-        HandlerManager.initialize();
+//        HandlerManager.initialize();
     }
 
     private DeploymentDescriptor dd;

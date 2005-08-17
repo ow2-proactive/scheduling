@@ -1,6 +1,8 @@
-package org.objectweb.proactive.core.exceptions;
+package org.objectweb.proactive.core.exceptions.manager;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.future.FutureResult;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,21 +11,21 @@ import java.util.LinkedList;
 
 
 public class ExceptionMaskLevel {
-	/* Exception types in the catch blocks */
+
+    /* Exception types in the catch blocks */
     private Collection caughtExceptions;
-    
+
     /* Pending futures */
     private int nbFutures;
-    
+
     /* The stack this level belongs to */
     private ExceptionMaskStack parent;
-    
+
     /* Do we catch a subtype of RuntimeException */
     private boolean catchRuntimeException;
 
     /* Do we catch a Non Functional Exception */
     /* TODO: private boolean catchNFE; */
-    
     ExceptionMaskLevel(ExceptionMaskStack parent, Class[] exceptions) {
         for (int i = 0; i < exceptions.length; i++) {
             if (!Throwable.class.isAssignableFrom(exceptions[i])) {
@@ -92,7 +94,7 @@ public class ExceptionMaskLevel {
     }
 
     synchronized void waitForPotentialException() {
-    	parent.throwArrivedException();
+        parent.throwArrivedException();
         while (nbFutures != 0) {
             try {
                 wait();
@@ -102,7 +104,6 @@ public class ExceptionMaskLevel {
             }
             parent.throwArrivedException();
         }
-        
     }
 
     boolean catchRuntimeException() {
@@ -120,6 +121,13 @@ public class ExceptionMaskLevel {
     /* A future has returned */
     synchronized void removeFuture(FutureProxy f) {
         nbFutures--;
+        FutureResult res = f.getFutureResult();
+
+        NonFunctionalException nfe = res.getNFE();
+        if ((nfe != null) && parent.isCaught(nfe.getClass())) {
+            parent.setException(nfe);
+        }
+
         Throwable exception = f.getFutureResult().getExceptionToRaise();
         if (exception != null) {
             parent.setException(exception);

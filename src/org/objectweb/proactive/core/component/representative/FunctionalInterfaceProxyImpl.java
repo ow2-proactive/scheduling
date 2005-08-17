@@ -1,20 +1,17 @@
 package org.objectweb.proactive.core.component.representative;
 
+import java.io.Serializable;
+import java.lang.reflect.Field;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.HashMap;
 
 /**
  * This class acts as a proxy between a representative interface and the actual
@@ -106,24 +103,21 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, S
         return bodyProxyDelegatee;
     }
 
-    public String getHandlerizableInfo() throws IOException {
-        return null;
-    }
-
-    public HashMap getHandlersLevel() throws IOException {
-        return null;
-    }
-
-    public void clearHandlersLevel() throws IOException {
-    }
-
-    public void setExceptionHandler(Handler handler, Class exception) throws IOException {
-    }
-
-    public Handler unsetExceptionHandler(Class exception) throws IOException {
-        return null;
-    }
-
-
-
+//    public String getHandlerizableInfo() throws IOException {
+//        return null;
+//    }
+//
+//    public HashMap getHandlersLevel() throws IOException {
+//        return null;
+//    }
+//
+//    public void clearHandlersLevel() throws IOException {
+//    }
+//
+//    public void setExceptionHandler(Handler handler, Class exception) throws IOException {
+//    }
+//
+//    public Handler unsetExceptionHandler(Class exception) throws IOException {
+//        return null;
+//    }
 }

@@ -30,13 +30,19 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.Handlerizable;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -47,13 +53,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -67,7 +66,7 @@ import java.util.ArrayList;
  * @see java.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
  */
-public interface RemoteBody extends java.rmi.Remote, Handlerizable {
+public interface RemoteBody extends java.rmi.Remote {
 
     /**
      * Receives a request for later processing. The call to this method is non blocking
@@ -218,4 +217,10 @@ public interface RemoteBody extends java.rmi.Remote, Handlerizable {
      * @param newBody the body referenced after the call
      */
     public void changeProxiedBody(Body newBody) throws java.io.IOException;
+    
+    public void addNFEListener(NFEListener listener) throws java.io.IOException;
+
+    public void removeNFEListener(NFEListener listener) throws java.io.IOException;
+
+    public int fireNFE(NonFunctionalException e) throws java.io.IOException;
 }

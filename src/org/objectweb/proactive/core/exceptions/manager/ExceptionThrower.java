@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.exceptions;
+package org.objectweb.proactive.core.exceptions.manager;
 
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.CodeVisitor;

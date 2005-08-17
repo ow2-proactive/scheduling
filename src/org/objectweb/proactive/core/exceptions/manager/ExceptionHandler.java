@@ -1,10 +1,10 @@
-package org.objectweb.proactive.core.exceptions;
+package org.objectweb.proactive.core.exceptions.manager;
+
+import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallMetadata;
-
-import java.lang.reflect.Method;
 
 
 public class ExceptionHandler {
@@ -72,9 +72,8 @@ public class ExceptionHandler {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             boolean runtime = stack.isRuntimeExceptionHandled();
-            boolean nfe = false; /* TODO */
             boolean async = stack.isCaught(m.getExceptionTypes());
-            MethodCallMetadata res = new MethodCallMetadata(runtime, nfe, async);
+            MethodCallMetadata res = new MethodCallMetadata(runtime, async);
 //            System.out.println(m + " => " + res);
             return res;
         }

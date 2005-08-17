@@ -1,4 +1,4 @@
-package org.objectweb.proactive.core.exceptions;
+package org.objectweb.proactive.core.exceptions.manager;
 
 import java.util.Iterator;
 import java.util.LinkedList;

@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.security.cert.X509Certificate;
+
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ft.protocols.cic.HalfFTManagerCIC;
@@ -45,6 +47,9 @@ import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.MessageEventListener;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -54,8 +59,6 @@ import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.crypto.AuthenticationException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.security.cert.X509Certificate;
 
 
 public class HalfBody extends AbstractBody {
@@ -331,4 +334,24 @@ public class HalfBody extends AbstractBody {
     }
 
     // end inner class LocalHalfBody
+    
+    // NFEProducer implementation
+    private NFEListenerList nfeListeners = null;
+    public void addNFEListener(NFEListener listener) {
+        if (nfeListeners == null) {
+            nfeListeners = new NFEListenerList();
+        }
+        nfeListeners.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+        if (nfeListeners != null) {
+            nfeListeners.removeNFEListener(listener);
+        }
+    }
+    public int fireNFE(NonFunctionalException e) {
+    	if (nfeListeners != null) {
+            return nfeListeners.fireNFE(e);
+        }
+        return 0;
+    }
 }

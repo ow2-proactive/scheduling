@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -258,7 +260,16 @@ public class JiniBodyImpl extends java.rmi.server.UnicastRemoteObject
         return this.body.receiveFTMessage(fte);
     }
 	
-	
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+        body.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+    	body.removeNFEListener(listener);
+    }
+    public int fireNFE(NonFunctionalException e) {
+        return body.fireNFE(e);
+    }
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //

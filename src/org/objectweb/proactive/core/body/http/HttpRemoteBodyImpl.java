@@ -35,7 +35,6 @@ import java.io.Serializable;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
@@ -43,6 +42,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
+import org.objectweb.proactive.core.body.http.util.exceptions.HTTPRemoteException;
 import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedException;
 import org.objectweb.proactive.core.body.http.util.messages.BodyRequest;
 import org.objectweb.proactive.core.body.http.util.messages.HttpReply;
@@ -50,7 +50,8 @@ import org.objectweb.proactive.core.body.http.util.messages.HttpRequest;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -566,79 +567,79 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
        
     }
 
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
-     */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        
-        BodyRequest req = new BodyRequest("getHandlersLevel",
-                new ArrayList(), bodyID, this.url);
-        req.send ();    
-       
-        
-                try {
-                    return (HashMap) req.getReturnedObject();
-                } catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-           
-    }
-
- 
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     */
-    public void setExceptionHandler(Class handler, Class exception)
-        throws IOException {
-
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(handler);
-            paramsList.add(exception);
-            new BodyRequest("setExceptionHandler", paramsList,
-                    bodyID, this.url
-                    ).send ();
-            
-            
-            
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws IOException {
-      
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(exception);
-            
-            BodyRequest req = new BodyRequest(
-                    "unsetExceptionHandler", paramsList, bodyID, this.url);
-            req.send ();
-            
-            
-            try {
-                return (Handler) req.getReturnedObject();
-            } catch (Exception e) {               
-                e.printStackTrace();
-            }
-            return null;
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws IOException {
-        
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(handler);
-            paramsList.add(exception);
-
-             new BodyRequest("setExceptionHandler", paramsList,
-                    bodyID, this.url).send ();	
-                    
-    }
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
+//     */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        
+//        BodyRequest req = new BodyRequest("getHandlersLevel",
+//                new ArrayList(), bodyID, this.url);
+//        req.send ();    
+//       
+//        
+//                try {
+//                    return (HashMap) req.getReturnedObject();
+//                } catch (Exception e) {
+//                    throw new HTTPUnexpectedException("Unexpected exception", e);
+//                }
+//           
+//    }
+//
+// 
+//    /** Set a new handler within the table of the Handlerizable Object
+//     * @param handler A handler associated with a class of non functional exception.
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     */
+//    public void setExceptionHandler(Class handler, Class exception)
+//        throws IOException {
+//
+//            ArrayList paramsList = new ArrayList();
+//            paramsList.add(handler);
+//            paramsList.add(exception);
+//            new BodyRequest("setExceptionHandler", paramsList,
+//                    bodyID, this.url
+//                    ).send ();
+//            
+//            
+//            
+//    }
+//
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws IOException {
+//      
+//            ArrayList paramsList = new ArrayList();
+//            paramsList.add(exception);
+//            
+//            BodyRequest req = new BodyRequest(
+//                    "unsetExceptionHandler", paramsList, bodyID, this.url);
+//            req.send ();
+//            
+//            
+//            try {
+//                return (Handler) req.getReturnedObject();
+//            } catch (Exception e) {               
+//                e.printStackTrace();
+//            }
+//            return null;
+//    }
+//
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws IOException {
+//        
+//            ArrayList paramsList = new ArrayList();
+//            paramsList.add(handler);
+//            paramsList.add(exception);
+//
+//             new BodyRequest("setExceptionHandler", paramsList,
+//                    bodyID, this.url).send ();	
+//                    
+//    }
 
     /**
      * @see org.objectweb.proactive.Job#getJobID()
@@ -647,32 +648,32 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         return this.jobID;
     }
 
-    /**
-     * Clear the local map of handlers
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
-     */
-    public void clearHandlersLevel() throws java.io.IOException {
-        
-            new BodyRequest("clearHandlersLevel", new ArrayList(),
-                    bodyID, this.url).send ();
-        
-    }
-
-    /**
-     * Get information about the handlerizable object
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlerizableInfo()
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        BodyRequest req = new BodyRequest(
-                "getHandlerizableInfo", new ArrayList(), bodyID, this.url);
-        req.send ();    
-        try {
-            return (String) req.getReturnedObject();
-        } catch (Exception e) {
-            throw new HTTPUnexpectedException("Unexpected exception", e);
-        }
-    
-    }
+//    /**
+//     * Clear the local map of handlers
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
+//     */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//        
+//            new BodyRequest("clearHandlersLevel", new ArrayList(),
+//                    bodyID, this.url).send ();
+//        
+//    }
+//
+//    /**
+//     * Get information about the handlerizable object
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlerizableInfo()
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        BodyRequest req = new BodyRequest(
+//                "getHandlerizableInfo", new ArrayList(), bodyID, this.url);
+//        req.send ();    
+//        try {
+//            return (String) req.getReturnedObject();
+//        } catch (Exception e) {
+//            throw new HTTPUnexpectedException("Unexpected exception", e);
+//        }
+//    
+//    }
 
     /*
        public boolean equals(Object o) {
@@ -706,5 +707,40 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         if (logger.isDebugEnabled()) { 
             logger.debug("shortcuts are currently not implemented for http communications");
         }
+    }
+    
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+    	ArrayList paramList = new ArrayList();
+    	paramList.add(listener);
+    	try {
+    		new BodyRequest("addNFEListener", paramList, bodyID, url).send();
+		} catch (HTTPRemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public void removeNFEListener(NFEListener listener) {
+    	ArrayList paramList = new ArrayList();
+    	paramList.add(listener);
+    	try {
+			new BodyRequest("removeNFEListener", paramList, bodyID, url).send();
+		} catch (HTTPRemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public int fireNFE(NonFunctionalException e) {
+    	ArrayList paramList = new ArrayList();
+    	paramList.add(e);
+    	try {
+			BodyRequest br = new BodyRequest("fireNFE", paramList, bodyID, url);
+			br.send();
+			return ((Integer) br.getReturnedObject()).intValue();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return 0;
+		}
     }
 }

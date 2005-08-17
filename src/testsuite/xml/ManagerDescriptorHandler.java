@@ -30,20 +30,17 @@
 */
 package testsuite.xml;
 
-import org.apache.log4j.Logger;
+import java.util.Properties;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator;
-import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.SingleValueUnmarshaller;
 import org.objectweb.proactive.core.xml.handler.UnmarshallerHandler;
 import org.objectweb.proactive.core.xml.io.Attributes;
-
 import org.xml.sax.SAXException;
 
 import testsuite.manager.AbstractManager;
 import testsuite.manager.FunctionalTestManager;
-
-import java.util.Properties;
 
 
 /**

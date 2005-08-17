@@ -55,10 +55,10 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.MessageEvent;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.communication.SendReplyCommunicationException;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.exceptions.service.ServiceFailedCalleeNFE;
-import org.objectweb.proactive.core.exceptions.service.ServiceFailedCallerNFE;
+import org.objectweb.proactive.core.exceptions.body.SendReplyCommunicationException;
+import org.objectweb.proactive.core.exceptions.body.ServiceFailedCalleeNFE;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
+import org.objectweb.proactive.core.exceptions.proxy.ServiceFailedCallerNFE;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
@@ -350,13 +350,8 @@ public abstract class BodyImpl extends AbstractBody
                     // Create a non functional exception encapsulating the service exception
                     NonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
                             "Exception occured while serving pending request = " +
-                            request.getMethodName(), e);
-
-                    // Runtime exception are not throwed anymore: node may not be stopped by the service handler
-                    Handler handler = ProActive.searchExceptionHandler(calleeNFE,
-                            this);
-                    handler.handle(calleeNFE,
-                        ProActive.getBodyOnThis().getNodeURL());
+                            request.getMethodName(), e, this, ProActive.getBodyOnThis());
+                    NFEManager.fireNFE(calleeNFE, BodyImpl.this);
 
                     // Create a non functional exception encapsulating the service exception
                     NonFunctionalException callerNFE = new ServiceFailedCallerNFE(
@@ -365,9 +360,8 @@ public abstract class BodyImpl extends AbstractBody
 
                     // Create a new reply that contains this NFE instead of the result
                     Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this,
-                            callerNFE);
-                    //System.out.println("*** Reply contains " + replyAlternate.getResult().getClass());
+                    replyAlternate = request.serveAlternate(BodyImpl.this, callerNFE);
+
                     // Send reply and stop local node if desired
                     if (replyAlternate == null) {
                         if (!isActive()) {
@@ -428,12 +422,10 @@ public abstract class BodyImpl extends AbstractBody
             } catch (java.io.IOException e) {
                 // Create a non functional exception encapsulating the network exception
                 NonFunctionalException nfe = new SendReplyCommunicationException(
-                        "Exception occured in serve while sending reply to future = " +
+                        "Exception occured in while sending reply to request = " +
                         request.getMethodName(), e);
 
-                // Runtime exception are not throwed anymore: node may not be stopped by the service handler
-                Handler handler = ProActive.searchExceptionHandler(nfe, this);
-                handler.handle(nfe, ProActive.getBodyOnThis().getNodeURL());
+                NFEManager.fireNFE(nfe, BodyImpl.this);
             }
         }
 

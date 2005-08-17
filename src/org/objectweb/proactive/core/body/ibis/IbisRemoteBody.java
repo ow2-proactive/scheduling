@@ -30,12 +30,19 @@
  */
 package org.objectweb.proactive.core.body.ibis;
 
+import java.io.IOException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -46,13 +53,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
@@ -215,5 +215,11 @@ public interface IbisRemoteBody extends ibis.rmi.Remote {
      * Change the body referenced by this adapter
      * @param newBody the body referenced after the call
      */
-    public void changeProxiedBody(Body newBody)  throws IOException;
+    public void changeProxiedBody(Body newBody) throws IOException;
+    
+    public void addNFEListener(NFEListener listener) throws IOException;
+
+    public void removeNFEListener(NFEListener listener) throws IOException;
+
+    public int fireNFE(NonFunctionalException e) throws IOException;
 }

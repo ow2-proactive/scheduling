@@ -30,11 +30,11 @@
 */
 package nonregressiontest.stub.stubinterface;
 
-import org.objectweb.proactive.core.exceptions.handler.Handler;
-import org.objectweb.proactive.core.mop.*;
+import java.lang.reflect.InvocationTargetException;
 
-import java.lang.reflect.*;
-import java.util.HashMap;
+import org.objectweb.proactive.core.mop.ConstructorCall;
+import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 
 
 public class ProxyOne implements org.objectweb.proactive.core.mop.Proxy {
@@ -60,45 +60,26 @@ public class ProxyOne implements org.objectweb.proactive.core.mop.Proxy {
         }
     }
     
-	/**
-	 * Get information about the handlerizable object
-	 * @return
-	 */
-	public String getHandlerizableInfo() throws java.io.IOException {
-		return null;
-	}
-
-	/** 
-	 * Give a reference to a local map of handlers
-	 * @return A reference to a map of handlers
-	 */
-	public HashMap getHandlersLevel() throws java.io.IOException {
-		return null;
-	}
-
-	/** 
-	 * Clear the local map of handlers
-	 */
-	public void clearHandlersLevel() throws java.io.IOException {
-	
-	}
-
-	/** Set a new handler within the table of the Handlerizable Object
-		 * @param handler A handler associated with a class of non functional exception.
-		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		 */
-	public void setExceptionHandler(Handler handler, Class exception)
-		throws java.io.IOException {
-			
-		}
-
-	/** Remove a handler from the table of the Handlerizable Object
-		 * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-		 * @return The removed handler or null
-		 */
-	public Handler unsetExceptionHandler(Class exception)
-		throws java.io.IOException {
-		return null;
-	}
-
+//	/**
+//	 * Get information about the handlerizable object
+//	 * @return
+//	 */
+//	public String getHandlerizableInfo() throws java.io.IOException {
+//		return null;
+//	}
+//
+//	/** 
+//	 * Give a reference to a local map of handlers
+//	 * @return A reference to a map of handlers
+//	 */
+//	public HashMap getHandlersLevel() throws java.io.IOException {
+//		return null;
+//	}
+//
+//	/** 
+//	 * Clear the local map of handlers
+//	 */
+//	public void clearHandlersLevel() throws java.io.IOException {
+//	
+//	}
 }

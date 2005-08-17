@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.component.request.Shortcut;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.NFEListenerList;
 
 
 /**
@@ -165,5 +168,25 @@ public abstract class AbstractUniversalBody implements UniversalBody,
             shortcuts = new HashMap();
         }
         shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
+    }
+    
+    // NFEProducer implementation
+    private NFEListenerList nfeListeners = null;
+    public void addNFEListener(NFEListener listener) {
+        if (nfeListeners == null) {
+            nfeListeners = new NFEListenerList();
+        }
+        nfeListeners.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+        if (nfeListeners != null) {
+            nfeListeners.removeNFEListener(listener);
+        }
+    }
+    public int fireNFE(NonFunctionalException e) {
+    	if (nfeListeners != null) {
+            return nfeListeners.fireNFE(e);
+        }
+        return 0;
     }
 }

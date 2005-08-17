@@ -329,6 +329,7 @@ public class NodeExploration implements JobMonitorConstants {
             if (skippedObjects.contains(jobObject)) {
                 continue;
             }
+
             MonitoredAO aoObject = new MonitoredAO(className,
                     rba.getID().toString());
             if (!skippedObjects.contains(aoObject)) {

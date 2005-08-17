@@ -35,15 +35,13 @@ import java.io.Serializable;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -51,7 +49,10 @@ import org.objectweb.proactive.core.body.http.util.exceptions.HTTPUnexpectedExce
 import org.objectweb.proactive.core.body.http.util.messages.HttpLookupMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.exceptions.manager.NFEManager;
 import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Communication;
@@ -432,36 +433,36 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         return remoteBodyStrategy.getProActiveSecurityManager();
     }
 
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
-     */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        return remoteBodyStrategy.getHandlersLevel();
-    }
-
-    /*
-       public void setExceptionHandler(Class handler, Class exception)
-           throws IOException {
-               logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
-               //        remoteBodyStrategy.setExceptionHandler(handler, exception);
-       }
-     */
-    
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws IOException {
-        return remoteBodyStrategy.unsetExceptionHandler(exception);
-    }
-
-    /**
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws IOException {
-        remoteBodyStrategy.setExceptionHandler(handler, exception);
-    }
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
+//     */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        return remoteBodyStrategy.getHandlersLevel();
+//    }
+//
+//    /*
+//       public void setExceptionHandler(Class handler, Class exception)
+//           throws IOException {
+//               logger.info("\n\n---------------------------------------\n-------- Comprend pas\n----------------------\n\n");
+//               //        remoteBodyStrategy.setExceptionHandler(handler, exception);
+//       }
+//     */
+//    
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws IOException {
+//        return remoteBodyStrategy.unsetExceptionHandler(exception);
+//    }
+//
+//    /**
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws IOException {
+//        remoteBodyStrategy.setExceptionHandler(handler, exception);
+//    }
 
     /**
      * @see org.objectweb.proactive.Job#getJobID()
@@ -470,22 +471,22 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
         return jobID;
     }
 
-    /**
-     * Clear the local map of handlers
-     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
-     */
-    public void clearHandlersLevel() throws java.io.IOException {
-        remoteBodyStrategy.clearHandlersLevel();
-    }
-
-    /**
-     * Get information about the handlerizable object
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        return remoteBodyStrategy.getHandlerizableInfo();
-    }
-
-   
+//    /**
+//     * Clear the local map of handlers
+//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
+//     */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//        remoteBodyStrategy.clearHandlersLevel();
+//    }
+//
+//    /**
+//     * Get information about the handlerizable object
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        return remoteBodyStrategy.getHandlerizableInfo();
+//    }
+//
+//   
     private void readObject(java.io.ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
@@ -527,5 +528,16 @@ public class RemoteBodyAdapter implements BodyAdapter, Serializable {
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
         throw new ProActiveRuntimeException("create shortcut method not implemented yet");        
+    }
+    
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+        remoteBodyStrategy.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+        remoteBodyStrategy.removeNFEListener(listener);
+    }
+    public int fireNFE(NonFunctionalException e) {
+        return remoteBodyStrategy.fireNFE(e);
     }
 }

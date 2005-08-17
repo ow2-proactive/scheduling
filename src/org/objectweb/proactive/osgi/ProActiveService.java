@@ -31,7 +31,6 @@
 package org.objectweb.proactive.osgi;
 
 import org.objectweb.fractal.api.Component;
-
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -41,8 +40,6 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.exceptions.NonFunctionalException;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -188,14 +185,14 @@ public interface ProActiveService {
 
     public String getJobId();
 
-    public Handler searchExceptionHandler(NonFunctionalException ex,
-        Object target);
-
-    public void setExceptionHandler(Handler h, Class exception, int levelID,
-        Object target);
-
-    public void setExceptionHandler(Class handler, Class exception,
-        int levelID, Object target);
+//    public Handler searchExceptionHandler(NonFunctionalException ex,
+//        Object target);
+//
+//    public void setExceptionHandler(Handler h, Class exception, int levelID,
+//        Object target);
+//
+//    public void setExceptionHandler(Class handler, Class exception,
+//        int levelID, Object target);
 
     public void exposeAsWebService(Object o, String url, String urn,
         String[] methods);

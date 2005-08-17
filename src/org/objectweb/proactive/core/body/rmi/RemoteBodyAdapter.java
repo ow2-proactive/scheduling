@@ -30,19 +30,25 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.rmi.ConnectException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.exceptions.handler.Handler;
+import org.objectweb.proactive.core.component.request.Shortcut;
+import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.exceptions.manager.NFEListener;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -54,16 +60,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-
-import java.rmi.ConnectException;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
@@ -398,51 +394,51 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
         return proxiedRemoteBody.getEntities();
     }
 
-    //====================
-    // Implements Handlerizable
-    //====================
-
-    /**
-     * Get information about the handlerizable object
-     * @return information about the handlerizable object
-     */
-    public String getHandlerizableInfo() throws java.io.IOException {
-        return proxiedRemoteBody.getHandlerizableInfo();
-    }
-
-    /** Give a reference to a local map of handlers
-     * @return A reference to a map of handlers
-     */
-    public HashMap getHandlersLevel() throws java.io.IOException {
-        HashMap map = proxiedRemoteBody.getHandlersLevel();
-        return map;
-    }
-
-    /**
-     * Clear the local map of handlers
-     */
-    public void clearHandlersLevel() throws java.io.IOException {
-        proxiedRemoteBody.clearHandlersLevel();
-    }
-
-    /** Set a new handler within the table of the Handlerizable Object
-     * @param handler A handler associated with a class of non functional exception.
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     */
-    public void setExceptionHandler(Handler handler, Class exception)
-        throws java.io.IOException {
-        proxiedRemoteBody.setExceptionHandler(handler, exception);
-    }
-
-    /** Remove a handler from the table of the Handlerizable Object
-     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-     * @return The removed handler or null
-     */
-    public Handler unsetExceptionHandler(Class exception)
-        throws java.io.IOException {
-        Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
-        return handler;
-    }
+//    //====================
+//    // Implements Handlerizable
+//    //====================
+//
+//    /**
+//     * Get information about the handlerizable object
+//     * @return information about the handlerizable object
+//     */
+//    public String getHandlerizableInfo() throws java.io.IOException {
+//        return proxiedRemoteBody.getHandlerizableInfo();
+//    }
+//
+//    /** Give a reference to a local map of handlers
+//     * @return A reference to a map of handlers
+//     */
+//    public HashMap getHandlersLevel() throws java.io.IOException {
+//        HashMap map = proxiedRemoteBody.getHandlersLevel();
+//        return map;
+//    }
+//
+//    /**
+//     * Clear the local map of handlers
+//     */
+//    public void clearHandlersLevel() throws java.io.IOException {
+//        proxiedRemoteBody.clearHandlersLevel();
+//    }
+//
+//    /** Set a new handler within the table of the Handlerizable Object
+//     * @param handler A handler associated with a class of non functional exception.
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     */
+//    public void setExceptionHandler(Handler handler, Class exception)
+//        throws java.io.IOException {
+//        proxiedRemoteBody.setExceptionHandler(handler, exception);
+//    }
+//
+//    /** Remove a handler from the table of the Handlerizable Object
+//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+//     * @return The removed handler or null
+//     */
+//    public Handler unsetExceptionHandler(Class exception)
+//        throws java.io.IOException {
+//        Handler handler = proxiedRemoteBody.unsetExceptionHandler(exception);
+//        return handler;
+//    }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveFTEvent(org.objectweb.proactive.core.body.ft.events.FTEvent)
@@ -463,7 +459,36 @@ public class RemoteBodyAdapter implements BodyAdapter, java.io.Serializable {
         // TODO implement
         throw new ProActiveRuntimeException("create shortcut method not implemented yet");
         
-    }    //
+    }
+    
+//  NFEProducer implementation
+    public void addNFEListener(NFEListener listener) {
+    	try {
+			proxiedRemoteBody.addNFEListener(listener);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public void removeNFEListener(NFEListener listener) {
+        try {
+			proxiedRemoteBody.removeNFEListener(listener);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    public int fireNFE(NonFunctionalException e) {
+        try {
+			return proxiedRemoteBody.fireNFE(e);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			return 0;
+		}
+    }
+    
+    //
     // -- PRIVATE METHODS -----------------------------------------------
     //
 }

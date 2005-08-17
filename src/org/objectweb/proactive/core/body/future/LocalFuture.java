@@ -30,10 +30,8 @@
 */ 
 package org.objectweb.proactive.core.body.future;
 
-import org.objectweb.proactive.core.exceptions.Handlerizable;
 
-public interface LocalFuture extends Handlerizable {
+public interface LocalFuture {
 
   public void receiveReply(FutureResult obj) throws java.io.IOException;
-  
 }

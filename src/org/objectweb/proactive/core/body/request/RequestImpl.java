@@ -122,8 +122,6 @@ public class RequestImpl extends MessageImpl implements Request,
         if (loggerNFE.isDebugEnabled()) {
             loggerNFE.debug("*** Serving an alternate version of " +
                 this.getMethodName());
-        }
-        if (loggerNFE.isDebugEnabled()) {
             if (nfe != null) {
                 loggerNFE.debug("*** Result  " + nfe.getClass().getName());
             } else {
