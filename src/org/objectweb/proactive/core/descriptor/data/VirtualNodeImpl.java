@@ -1133,7 +1133,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } catch (NodeException e) {
             e.printStackTrace();
         }
-
+        
         out.defaultWriteObject();
     }
 

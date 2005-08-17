@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.process.ExternalProcess;
-import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 /**
@@ -66,10 +65,10 @@ public class VirtualMachineImpl implements VirtualMachine, java.io.Serializable 
 
     /** indiquates if this machine results from a lookup or not  */
     private boolean hasProcess = true;
-    private ProActiveRuntime remoteRuntime;
+    
 
     /** the process to start in order to create the JVM */
-    private transient ExternalProcess process;
+    private  ExternalProcess process;
 
     /** the service to start in order to acquire the JVM */
     private transient UniversalService service;
