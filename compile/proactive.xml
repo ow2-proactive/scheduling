@@ -142,10 +142,10 @@
 			<include name="${proactive.dir}/rmi/*.java"/>
 			<include name="${proactive.core.dir}/**/*.java"/>
 		</javac>
-		<rmic classname="org.objectweb.proactive.core.body.jini.JiniBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+		<rmic classname="org.objectweb.proactive.core.body.jini.JiniRemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
-		<rmic classname="org.objectweb.proactive.core.body.rmi.RemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
+		<rmic classname="org.objectweb.proactive.core.body.rmi.RmiRemoteBodyImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
 			<classpath refid="project.classpath"/>
 		</rmic>
 		<rmic classname="org.objectweb.proactive.core.runtime.rmi.RmiProActiveRuntimeImpl" base="${classes.dir}" sourcebase="${classes.dir}" stubversion="1.2">
