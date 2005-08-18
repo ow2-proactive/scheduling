@@ -66,7 +66,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive {
         // ComponentEndActive
         if ((activity != null) && activity instanceof ComponentEndActive) {
             componentEndActive = new ComponentEndActiveWrapper((ComponentEndActive) activity);
-        } else if (reifiedObject instanceof EndActive) {
+        } else if (reifiedObject instanceof ComponentEndActive) {
             componentEndActive = new ComponentEndActiveWrapper((ComponentEndActive) reifiedObject);
         } else {
             componentEndActive = null;
