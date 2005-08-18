@@ -30,15 +30,10 @@
  */
 package org.objectweb.proactive.core.body.http;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
-import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
@@ -52,6 +47,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.rmi.ClassServer;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
@@ -64,7 +60,14 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
-  
+import java.io.IOException;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
+
 /**
  *   An adapter for a LocalBody to be able to receive remote calls using HTTP. This helps isolate HTTP-specific
  *   code into a small set of specific classes.
@@ -74,14 +77,14 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @author vlegrand
  *
  */
-public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
-  
-    /*   
-      static initializations
-     A runtime MUST be launched when using this class. Indeed, when one gets a reference on an active objet 
-     (for instance  when performing a lookupActive ), it is necessary to launched the http runtime with its classserver that
-     will receive the reply from the reference 
-     */    
+public class HttpRemoteBodyImpl implements RemoteBody {
+
+    /*
+       static initializations
+       A runtime MUST be launched when using this class. Indeed, when one gets a reference on an active objet
+       (for instance  when performing a lookupActive ), it is necessary to launched the http runtime with its classserver that
+       will receive the reply from the reference
+     */
     static {
         try {
             RuntimeFactory.getDefaultRuntime();
@@ -89,77 +92,94 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
             e.printStackTrace();
         }
     }
-    
-    private static Logger logger = Logger.getLogger("XML_HTTP");
+
+    /**
+     * The encapsulated local body
+     * transient to deal with custom serialization of requests.
+     */
+    protected transient UniversalBody body;
     UniqueID bodyID;
     String jobID;
     String url;
+    private boolean isLocal;
+
     //    int port; // port is no more necessary .. it is also included in the URL ...
+    public HttpRemoteBodyImpl(UniversalBody body) {
+        isLocal = true;
+        this.body = body;
+        this.bodyID = body.getID();
+        this.url = ClassServer.getUrl();
+        this.jobID = body.getJobID();
+    }
 
     /**
-     *  Constructs an HttpRemoteBodyImpl
-     * @param bodyID the uniqueID of the body
-     * @param url The runtime url where the remote body is accessible
-     * @param jobID jobID
-     */
-    public HttpRemoteBodyImpl(UniqueID bodyID, String url, String jobID) {
-        this.bodyID = bodyID;
-        this.url = url;
-        //       this.port = UrlBuilder.getPortFromUrl(url);
-        this.jobID = jobID;
-    }
-    
-
-    /* *
+     * @throws RenegotiateSessionException
+     * @throws IOException
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveRequest(org.objectweb.proactive.core.body.request.Request)
      */
-    public int receiveRequest(Request request)  {              
-            HttpRequest req = new HttpRequest(request, bodyID, this.url);            
+    public int receiveRequest(Request request)
+        throws IOException, RenegotiateSessionException {
+        if (isLocal) {
+            return body.receiveRequest(request);
+        } else {
             try {
-                req.send ();
+                HttpRequest req = new HttpRequest(request, bodyID, this.url);
+                req.send();
                 return req.getReturnedObject();
             } catch (Exception e) {
-                
                 e.printStackTrace();
             }
             return 0;
+        }
     }
 
-    /* *
+    /**
      * @see org.objectweb.proactive.core.body.UniversalBody#receiveReply(org.objectweb.proactive.core.body.reply.Reply)
      */
-    public int receiveReply(Reply reply)  {
-        try {    
-        HttpReply rep = new HttpReply(reply, bodyID,this.url);
-            rep.send();
-            
+    public int receiveReply(Reply reply) throws IOException {
+        if (isLocal) {
+            return body.receiveReply(reply);
+        } else {
+            try {
+                HttpReply rep = new HttpReply(reply, bodyID, this.url);
+                rep.send();
+
                 return rep.getReturnedObject();
             } catch (Exception e) {
-              e.printStackTrace();
+                e.printStackTrace();
             }
             return 0;
+        }
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#terminate()
      */
-    public void terminate() throws java.io.IOException {        
+    public void terminate() throws java.io.IOException {
+        if (isLocal) {
+            body.terminate();
+        } else {
             (new BodyRequest("terminate", new ArrayList(), bodyID, this.url)).send();
+        }
     }
 
     /**
+     * @throws HTTPRemoteException
      * @see org.objectweb.proactive.core.body.UniversalBody#getNodeURL()
      */
-    public String getNodeURL (){        
-            BodyRequest br = new BodyRequest("getNodeURL",
-                    new ArrayList(), bodyID, this.url);
+    public String getNodeURL() throws HTTPRemoteException {
+        if (isLocal) {
+            return body.getNodeURL();
+        } else {
+            BodyRequest br = new BodyRequest("getNodeURL", new ArrayList(),
+                    bodyID, this.url);
+            br.send();
             try {
-                br.send ();          
-                return (String)br.getReturnedObject();
+                return (String) br.getReturnedObject();
             } catch (Exception e) {
-                //throw new HTTPRemoteException("Unexpected exception", e);
-            } 
-            return null;
+                throw new HTTPRemoteException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -174,24 +194,36 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public void updateLocation(UniqueID id, UniversalBody body)
         throws IOException {
+        if (isLocal) {
+            body.updateLocation(id, body);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(id);
             paramsList.add(body);
-            (new BodyRequest("updateLocation", paramsList, bodyID,this.url)).send ();
+            (new BodyRequest("updateLocation", paramsList, bodyID, this.url)).send();
+        }
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#enableAC()
      */
     public void enableAC() throws IOException {
-        (new BodyRequest("enableAC", new ArrayList(), bodyID, this.url)).send ();        
+        if (isLocal) {
+            body.enableAC();
+        } else {
+            (new BodyRequest("enableAC", new ArrayList(), bodyID, this.url)).send();
+        }
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#disableAC()
      */
     public void disableAC() throws IOException {
-        (new BodyRequest("disableAC", new ArrayList(), bodyID, this.url)).send ();        
+        if (isLocal) {
+            body.disableAC();
+        } else {
+            (new BodyRequest("disableAC", new ArrayList(), bodyID, this.url)).send();
+        }
     }
 
     /**
@@ -199,43 +231,39 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public void setImmediateService(String methodName)
         throws IOException {
-        
+        if (isLocal) {
+            body.setImmediateService(methodName);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(methodName);
-            (new BodyRequest("setImmediateService", paramsList,
-                    bodyID, this.url)).send ();
-       
-    }
-    
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
-        try {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(methodName);
-            paramsList.add(parametersTypes);
-            new BodyRequest("setImmediateService", paramsList,
-                    bodyID, this.url).send();
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new HTTPUnexpectedException("Unexpected exception", e);
-        }
-    }
-    
-
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
-        try {
-            ArrayList paramsList = new ArrayList();
-            paramsList.add(methodName);
-            paramsList.add(parametersTypes);
-            new BodyRequest("removeImmediateService", paramsList,
-                    bodyID, this.url).send();
-        } catch (IOException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new HTTPUnexpectedException("Unexpected exception", e);
+            (new BodyRequest("setImmediateService", paramsList, bodyID, this.url)).send();
         }
     }
 
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException {
+        if (isLocal) {
+            body.setImmediateService(methodName, parametersTypes);
+        } else {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(methodName);
+            paramsList.add(parametersTypes);
+            new BodyRequest("setImmediateService", paramsList, bodyID, this.url).send();
+        }
+    }
+
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException {
+        if (isLocal) {
+            body.removeImmediateService(methodName, parametersTypes);
+        } else {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(methodName);
+            paramsList.add(parametersTypes);
+            new BodyRequest("removeImmediateService", paramsList, bodyID,
+                this.url).send();
+        }
+    }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#initiateSession(int, org.objectweb.proactive.core.body.UniversalBody)
@@ -244,12 +272,14 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
         throws IOException, CommunicationForbiddenException, 
             AuthenticationException, RenegotiateSessionException, 
             SecurityNotAvailableException {
-  
+        if (isLocal) {
+            body.initiateSession(type, body);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Integer(type));
             paramsList.add(body);
-            new BodyRequest("initiateSession", paramsList, bodyID, this.url).send ();
-      
+            new BodyRequest("initiateSession", paramsList, bodyID, this.url).send();
+        }
     }
 
     /**
@@ -257,11 +287,13 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public void terminateSession(long sessionID)
         throws IOException, SecurityNotAvailableException {
-     
+        if (isLocal) {
+            body.terminateSession(sessionID);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Long(sessionID));
             new BodyRequest("terminateSession", paramsList, bodyID, this.url).send();
-      
+        }
     }
 
     /**
@@ -269,22 +301,20 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public X509Certificate getCertificate()
         throws SecurityNotAvailableException, IOException {
-        
-            BodyRequest req = new BodyRequest(
-                    "getCertificate", new ArrayList(), bodyID, this.url);
-            
-            req.send ();
-
+        if (isLocal) {
+            return body.getCertificate();
+        } else {
+            BodyRequest req = new BodyRequest("getCertificate",
+                    new ArrayList(), bodyID, this.url);
+            req.send();
             try {
                 return (X509Certificate) req.getReturnedObject();
-            }catch (SecurityNotAvailableException e) {
-
-                throw e;
-            }catch (Exception e) {
-                e.printStackTrace();
-                throw new HTTPUnexpectedException("Unexpected exception", e);
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPRemoteException("Unexpected exception", e);
             }
-            
+        }
     }
 
     /**
@@ -292,25 +322,22 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public Policy getPolicyFrom(X509Certificate certificate)
         throws SecurityNotAvailableException, IOException {
-        
+        if (isLocal) {
+            return body.getPolicyFrom(certificate);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(certificate);
-            
-            BodyRequest req = new BodyRequest("getPolicyFrom",
-                    paramsList, bodyID,this.url);
-            req.send ();
-            
-            
-                try {
-                    return (Policy) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                    
-                }
-   
-        
+            BodyRequest req = new BodyRequest("getPolicyFrom", paramsList,
+                    bodyID, this.url);
+            req.send();
+            try {
+                return (Policy) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -319,21 +346,24 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public long startNewSession(Communication policy)
         throws SecurityNotAvailableException, IOException, 
             RenegotiateSessionException {
-        ArrayList paramsList = new ArrayList();
-        paramsList.add(policy);
-        BodyRequest req = new BodyRequest("startNewSession",
-                 paramsList, bodyID,this.url);
-        req.send ();
-                try {
-                    return ((Long) req.getReturnedObject()).longValue();
-                }catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (RenegotiateSessionException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-
+        if (isLocal) {
+            return body.startNewSession(policy);
+        } else {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(policy);
+            BodyRequest req = new BodyRequest("startNewSession", paramsList,
+                    bodyID, this.url);
+            req.send();
+            try {
+                return ((Long) req.getReturnedObject()).longValue();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (RenegotiateSessionException ex1) {
+                throw ex1;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -342,25 +372,26 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public ConfidentialityTicket negociateKeyReceiverSide(
         ConfidentialityTicket confidentialityTicket, long sessionID)
         throws SecurityNotAvailableException, KeyExchangeException, IOException {
-      
+        if (isLocal) {
+            return body.negociateKeyReceiverSide(confidentialityTicket,
+                sessionID);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(confidentialityTicket);
             paramsList.add(new Long(sessionID));
-
-            BodyRequest req = new BodyRequest(
-                    "negociateKeyReceiverSide", paramsList, bodyID,this.url);
-            req.send ();
-           
-                try {
-                    return (ConfidentialityTicket) req.getReturnedObject();
-                }catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (KeyExchangeException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-           
+            BodyRequest req = new BodyRequest("negociateKeyReceiverSide",
+                    paramsList, bodyID, this.url);
+            req.send();
+            try {
+                return (ConfidentialityTicket) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (KeyExchangeException ex1) {
+                throw ex1;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -368,19 +399,21 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
-     
-        	BodyRequest req = new BodyRequest("getPublicKey",
-                    new ArrayList(), bodyID, this.url);
-        	req.send();
-           
-                try {
-                    return (PublicKey) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-            
+        if (isLocal) {
+            return body.getPublicKey();
+        } else {
+            BodyRequest req = new BodyRequest("getPublicKey", new ArrayList(),
+                    bodyID, this.url);
+            req.send();
+
+            try {
+                return (PublicKey) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -388,16 +421,18 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public byte[] randomValue(long sessionID, byte[] cl_rand)
         throws SecurityNotAvailableException, Exception {
-    
+        if (isLocal) {
+            return body.randomValue(sessionID, cl_rand);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(new Long(sessionID));
             paramsList.add(cl_rand);
-            
-            BodyRequest req = new BodyRequest("randomValue",
-                    paramsList, bodyID, this.url);
-            req.send ();
+
+            BodyRequest req = new BodyRequest("randomValue", paramsList,
+                    bodyID, this.url);
+            req.send();
             return (byte[]) req.getReturnedObject();
-        
+        }
     }
 
     /**
@@ -406,19 +441,23 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public byte[][] publicKeyExchange(long sessionID,
         UniversalBody distantBody, byte[] my_pub, byte[] my_cert,
         byte[] sig_code) throws SecurityNotAvailableException, Exception {
-    
-        ArrayList paramsList = new ArrayList();
-        paramsList.add(new Long(sessionID));
-        paramsList.add(distantBody);
-        paramsList.add(my_pub);
-        paramsList.add(my_cert);
-        paramsList.add(sig_code);
+        if (isLocal) {
+            return body.publicKeyExchange(sessionID, distantBody, my_pub,
+                my_cert, sig_code);
+        } else {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(new Long(sessionID));
+            paramsList.add(distantBody);
+            paramsList.add(my_pub);
+            paramsList.add(my_cert);
+            paramsList.add(sig_code);
 
-        BodyRequest req = new BodyRequest("publicKeyExchange",
-                paramsList, bodyID,this.url);
-        req.send ();
-        
-        return (byte[][]) req.getReturnedObject();
+            BodyRequest req = new BodyRequest("publicKeyExchange", paramsList,
+                    bodyID, this.url);
+            req.send();
+
+            return (byte[][]) req.getReturnedObject();
+        }
     }
 
     /**
@@ -427,19 +466,22 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
     public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
         byte[] tmp2, byte[] tmp3, byte[] tmp4)
         throws SecurityNotAvailableException, Exception {
-        
-        ArrayList paramsList = new ArrayList();
-        paramsList.add(new Long(sessionID));
-        paramsList.add(tmp);
-        paramsList.add(tmp1);
-        paramsList.add(tmp2);
-        paramsList.add(tmp3);
-        paramsList.add(tmp4);
+        if (isLocal) {
+            return body.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
+        } else {
+            ArrayList paramsList = new ArrayList();
+            paramsList.add(new Long(sessionID));
+            paramsList.add(tmp);
+            paramsList.add(tmp1);
+            paramsList.add(tmp2);
+            paramsList.add(tmp3);
+            paramsList.add(tmp4);
 
-        BodyRequest req = new BodyRequest("secretKeyExchange",
-                paramsList, bodyID, this.url);
-        req.send ();        
-        return (byte[][]) req.getReturnedObject();
+            BodyRequest req = new BodyRequest("secretKeyExchange", paramsList,
+                    bodyID, this.url);
+            req.send();
+            return (byte[][]) req.getReturnedObject();
+        }
     }
 
     /**
@@ -447,24 +489,26 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public Communication getPolicyTo(String type, String from, String to)
         throws SecurityNotAvailableException, IOException {
-        
+        if (isLocal) {
+            return body.getPolicyTo(type, from, to);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(type);
             paramsList.add(from);
             paramsList.add(to);
 
-            BodyRequest req = new BodyRequest("getPolicyTo",
-                    paramsList, bodyID, this.url);
-            req.send ();
-           
-                try {
-                    return (Communication)req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-           
+            BodyRequest req = new BodyRequest("getPolicyTo", paramsList,
+                    bodyID, this.url);
+            req.send();
+
+            try {
+                return (Communication) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -472,61 +516,67 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws SecurityNotAvailableException, IOException {
-
+        if (isLocal) {
+            return body.getPolicy(securityContext);
+        } else {
             ArrayList paramsList = new ArrayList();
             paramsList.add(securityContext);
-            
-            BodyRequest req = new BodyRequest("getPolicy",
-                    paramsList, bodyID, this.url);
-            req.send ();
-        
-                try {
-                    return (SecurityContext) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-         
+
+            BodyRequest req = new BodyRequest("getPolicy", paramsList, bodyID,
+                    this.url);
+            req.send();
+
+            try {
+                return (SecurityContext) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getVNName()
      */
     public String getVNName() throws SecurityNotAvailableException, IOException {
-        
-        	BodyRequest req = new BodyRequest("getVNName",
-                    new ArrayList(), bodyID, this.url);
-        	req.send ();
-           
-                try {
-                    return (String) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-           
+        if (isLocal) {
+            return body.getVNName();
+        } else {
+            BodyRequest req = new BodyRequest("getVNName", new ArrayList(),
+                    bodyID, this.url);
+            req.send();
+
+            try {
+                return (String) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
             }
+        }
+    }
 
     /**
      * @see org.objectweb.proactive.core.body.UniversalBody#getCertificateEncoded()
      */
     public byte[] getCertificateEncoded()
         throws SecurityNotAvailableException, IOException {
-        
-        BodyRequest req = new BodyRequest(
-                "getCertificateEncoded", new ArrayList(), bodyID, this.url);
-        req.send ();
-          
-                try {
-                    return (byte[]) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-            
+        if (isLocal) {
+            return body.getCertificateEncoded();
+        } else {
+            BodyRequest req = new BodyRequest("getCertificateEncoded",
+                    new ArrayList(), bodyID, this.url);
+            req.send();
+
+            try {
+                return (byte[]) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -534,18 +584,21 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public ArrayList getEntities()
         throws SecurityNotAvailableException, IOException {
-        BodyRequest req = new BodyRequest("getEntities",
-                new ArrayList(), bodyID, this.url);
-        req.send ();
-     
-                try {
-                    return (ArrayList) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-           
+        if (isLocal) {
+            return body.getEntities();
+        } else {
+            BodyRequest req = new BodyRequest("getEntities", new ArrayList(),
+                    bodyID, this.url);
+            req.send();
+
+            try {
+                return (ArrayList) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
     }
 
     /**
@@ -553,143 +606,28 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      */
     public ProActiveSecurityManager getProActiveSecurityManager()
         throws SecurityNotAvailableException, IOException {
-        	BodyRequest req = new BodyRequest(
-                    "getProActiveSecurityManager", new ArrayList(), bodyID, this.url);
-        	req.send ();
-          
-                try {
-                    return (ProActiveSecurityManager) req.getReturnedObject();
-                } catch (SecurityNotAvailableException e) {
-                    throw e;
-                }catch (Exception e) {
-                    throw new HTTPUnexpectedException("Unexpected exception", e);
-                }
-       
-    }
+        if (isLocal) {
+            return body.getProActiveSecurityManager();
+        } else {
+            BodyRequest req = new BodyRequest("getProActiveSecurityManager",
+                    new ArrayList(), bodyID, this.url);
+            req.send();
 
-//    /**
-//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlersLevel()
-//     */
-//    public HashMap getHandlersLevel() throws java.io.IOException {
-//        
-//        BodyRequest req = new BodyRequest("getHandlersLevel",
-//                new ArrayList(), bodyID, this.url);
-//        req.send ();    
-//       
-//        
-//                try {
-//                    return (HashMap) req.getReturnedObject();
-//                } catch (Exception e) {
-//                    throw new HTTPUnexpectedException("Unexpected exception", e);
-//                }
-//           
-//    }
-//
-// 
-//    /** Set a new handler within the table of the Handlerizable Object
-//     * @param handler A handler associated with a class of non functional exception.
-//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//     */
-//    public void setExceptionHandler(Class handler, Class exception)
-//        throws IOException {
-//
-//            ArrayList paramsList = new ArrayList();
-//            paramsList.add(handler);
-//            paramsList.add(exception);
-//            new BodyRequest("setExceptionHandler", paramsList,
-//                    bodyID, this.url
-//                    ).send ();
-//            
-//            
-//            
-//    }
-//
-//    /**
-//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#unsetExceptionHandler(java.lang.Class)
-//     */
-//    public Handler unsetExceptionHandler(Class exception)
-//        throws IOException {
-//      
-//            ArrayList paramsList = new ArrayList();
-//            paramsList.add(exception);
-//            
-//            BodyRequest req = new BodyRequest(
-//                    "unsetExceptionHandler", paramsList, bodyID, this.url);
-//            req.send ();
-//            
-//            
-//            try {
-//                return (Handler) req.getReturnedObject();
-//            } catch (Exception e) {               
-//                e.printStackTrace();
-//            }
-//            return null;
-//    }
-//
-//    /**
-//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#setExceptionHandler(org.objectweb.proactive.core.exceptions.handler.Handler, java.lang.Class)
-//     */
-//    public void setExceptionHandler(Handler handler, Class exception)
-//        throws IOException {
-//        
-//            ArrayList paramsList = new ArrayList();
-//            paramsList.add(handler);
-//            paramsList.add(exception);
-//
-//             new BodyRequest("setExceptionHandler", paramsList,
-//                    bodyID, this.url).send ();	
-//                    
-//    }
+            try {
+                return (ProActiveSecurityManager) req.getReturnedObject();
+            } catch (SecurityNotAvailableException ex) {
+                throw ex;
+            } catch (Exception e) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
+    }
 
     /**
      * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
         return this.jobID;
-    }
-
-//    /**
-//     * Clear the local map of handlers
-//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#clearHandlersLevel()
-//     */
-//    public void clearHandlersLevel() throws java.io.IOException {
-//        
-//            new BodyRequest("clearHandlersLevel", new ArrayList(),
-//                    bodyID, this.url).send ();
-//        
-//    }
-//
-//    /**
-//     * Get information about the handlerizable object
-//     * @see org.objectweb.proactive.core.exceptions.Handlerizable#getHandlerizableInfo()
-//     */
-//    public String getHandlerizableInfo() throws java.io.IOException {
-//        BodyRequest req = new BodyRequest(
-//                "getHandlerizableInfo", new ArrayList(), bodyID, this.url);
-//        req.send ();    
-//        try {
-//            return (String) req.getReturnedObject();
-//        } catch (Exception e) {
-//            throw new HTTPUnexpectedException("Unexpected exception", e);
-//        }
-//    
-//    }
-
-    /*
-       public boolean equals(Object o) {
-               if (!(o instanceof HttpRemoteBodyImpl)) {
-                       return false;
-               }
-               HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
-               return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
-                   (remoteBodyAdapter.port == rba.getPort());
-       }
-    
-    /**
-     * @see org.objectweb.proactive.core.body.UniversalBody#getRemoteAdapter()
-     */
-    public UniversalBody getRemoteAdapter() {        
-        return this;
     }
 
     /**
@@ -704,43 +642,82 @@ public class HttpRemoteBodyImpl implements UniversalBody, Serializable {
      * @see org.objectweb.proactive.core.body.UniversalBody#createShortcut(org.objectweb.proactive.core.component.request.Shortcut)
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
-        if (logger.isDebugEnabled()) { 
-            logger.debug("shortcuts are currently not implemented for http communications");
+        if (bodyLogger.isDebugEnabled()) {
+            bodyLogger.debug(
+                "shortcuts are currently not implemented for http communications");
         }
     }
-    
-//  NFEProducer implementation
-    public void addNFEListener(NFEListener listener) {
-    	ArrayList paramList = new ArrayList();
-    	paramList.add(listener);
-    	try {
-    		new BodyRequest("addNFEListener", paramList, bodyID, url).send();
-		} catch (HTTPRemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+    //-------------------------------------
+    //  NFEProducer implementation
+    //-------------------------------------
+    public void addNFEListener(NFEListener listener) throws HTTPRemoteException {
+        if (isLocal) {
+            body.addNFEListener(listener);
+        } else {
+            ArrayList paramList = new ArrayList();
+            paramList.add(listener);
+
+            new BodyRequest("addNFEListener", paramList, bodyID, url).send();
+        }
     }
-    public void removeNFEListener(NFEListener listener) {
-    	ArrayList paramList = new ArrayList();
-    	paramList.add(listener);
-    	try {
-			new BodyRequest("removeNFEListener", paramList, bodyID, url).send();
-		} catch (HTTPRemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+    public void removeNFEListener(NFEListener listener)
+        throws HTTPRemoteException {
+        if (isLocal) {
+            body.removeNFEListener(listener);
+        } else {
+            ArrayList paramList = new ArrayList();
+            paramList.add(listener);
+
+            new BodyRequest("removeNFEListener", paramList, bodyID, url).send();
+        }
     }
-    public int fireNFE(NonFunctionalException e) {
-    	ArrayList paramList = new ArrayList();
-    	paramList.add(e);
-    	try {
-			BodyRequest br = new BodyRequest("fireNFE", paramList, bodyID, url);
-			br.send();
-			return ((Integer) br.getReturnedObject()).intValue();
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return 0;
-		}
+
+    public int fireNFE(NonFunctionalException e) throws HTTPRemoteException {
+        if (isLocal) {
+            return body.fireNFE(e);
+        } else {
+            ArrayList paramList = new ArrayList();
+            paramList.add(e);
+            BodyRequest br = new BodyRequest("fireNFE", paramList, bodyID, url);
+            br.send();
+            try {
+                return ((Integer) br.getReturnedObject()).intValue();
+            } catch (Exception e1) {
+                throw new HTTPUnexpectedException("Unexpected exception", e);
+            }
+        }
+    }
+
+    /**
+     * @see org.objectweb.proactive.core.body.RemoteBody#changeProxiedBody(org.objectweb.proactive.Body)
+     */
+    public void changeProxiedBody(Body newBody) throws IOException {
+        if (isLocal) {
+            this.body = newBody;
+        } else {
+            throw new IOException("Cannot change the body remotely");
+        }
+    }
+
+    /*
+       public boolean equals(Object o) {
+               if (!(o instanceof HttpRemoteBodyImpl)) {
+                       return false;
+               }
+               HttpRemoteBodyImpl rba = (HttpRemoteBodyImpl) o;
+               return (remoteBodyAdapter.url.equals(rba.getURL()) && remoteBodyAdapter.bodyID.equals(rba.getBodyID())) &&
+                   (remoteBodyAdapter.port == rba.getPort());
+       }
+     */
+
+    //---------------------------------------------
+    // Private methods
+    //---------------------------------------------
+    private void readObject(java.io.ObjectInputStream in)
+        throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.isLocal = false;
     }
 }

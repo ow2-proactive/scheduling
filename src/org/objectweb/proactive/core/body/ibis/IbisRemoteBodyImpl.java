@@ -37,7 +37,6 @@ import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -61,7 +60,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
 
 public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     implements IbisRemoteBody, java.rmi.server.Unreferenced {
-    protected static Logger logger = Logger.getLogger(IbisRemoteBodyImpl.class.getName());
+    
 
     /**
      * A custom socket Factory
@@ -83,8 +82,8 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
 
     public IbisRemoteBodyImpl(UniversalBody body) throws RemoteException {
         //   super(0, factory, factory);
-        if (logger.isDebugEnabled()) {
-            logger.debug(" IbisRemoteBodyImpl<init> ");
+        if (bodyLogger.isDebugEnabled()) {
+            bodyLogger.debug(" IbisRemoteBodyImpl<init> ");
         }
         this.body = body;
     }
@@ -97,9 +96,9 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     //
     public int receiveRequest(Request r)
         throws java.io.IOException, RenegotiateSessionException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("body  = " + body);
-            logger.debug("request =  " + r.getMethodName());
+        if (bodyLogger.isDebugEnabled()) {
+            bodyLogger.debug("body  = " + body);
+            bodyLogger.debug("request =  " + r.getMethodName());
         }
         return body.receiveRequest(r);
     }
@@ -133,7 +132,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     public void unreferenced() {
-        if (logger.isDebugEnabled()) {
+        if (bodyLogger.isDebugEnabled()) {
             // logger.debug("IbisRemoteBodyImpl: unreferenced()");      
         }
 
@@ -230,14 +229,14 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.body.rmi.RemoteBody#getVNName()
+     * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#getVNName()
      */
     public String getVNName() throws IOException, SecurityNotAvailableException {
         return body.getVNName();
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.body.rmi.RemoteBody#getCertificateEncoded()
+     * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#getCertificateEncoded()
      */
     public byte[] getCertificateEncoded()
         throws IOException, SecurityNotAvailableException {
@@ -245,7 +244,7 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
     }
 
     /* (non-Javadoc)
-     * @see org.objectweb.proactive.core.body.rmi.RemoteBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
+     * @see org.objectweb.proactive.core.body.rmi.RmiRemoteBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
     public SecurityContext getPolicy(SecurityContext securityContext)
         throws IOException, SecurityNotAvailableException {
@@ -262,6 +261,18 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
 
     public void changeProxiedBody(Body newBody) {
         this.body = newBody;
+    }
+    //-------------------------------------
+    //  NFEProducer implementation
+    //-------------------------------------
+    public void addNFEListener(NFEListener listener) {
+        body.addNFEListener(listener);
+    }
+    public void removeNFEListener(NFEListener listener) {
+    	body.removeNFEListener(listener);
+    }
+    public int fireNFE(NonFunctionalException e) {
+        return body.fireNFE(e);
     }
 
     //
@@ -296,14 +307,5 @@ public class IbisRemoteBodyImpl extends ibis.rmi.server.UnicastRemoteObject
        in.defaultReadObject();
        }
      */
-//  NFEProducer implementation
-    public void addNFEListener(NFEListener listener) {
-        body.addNFEListener(listener);
-    }
-    public void removeNFEListener(NFEListener listener) {
-    	body.removeNFEListener(listener);
-    }
-    public int fireNFE(NonFunctionalException e) {
-        return body.fireNFE(e);
-    }
+
 }

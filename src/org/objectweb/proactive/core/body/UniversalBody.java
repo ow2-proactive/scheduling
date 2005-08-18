@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.core.body;
 
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -42,6 +45,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.exceptions.manager.NFEProducer;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -64,10 +69,13 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  * @see org.objectweb.proactive.Body
- * @see org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter
+ * @see org.objectweb.proactive.core.body.rmi.RmiBodyAdapter
  */
-public interface UniversalBody extends NFEProducer, Job {
 
+public interface UniversalBody extends NFEProducer, Job, Serializable {
+
+
+public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     /**
      * Receives a request for later processing. The call to this method is non blocking
      * unless the body cannot temporary receive the request.
@@ -122,7 +130,7 @@ public interface UniversalBody extends NFEProducer, Job {
      * Returns the remote friendly version of this body
      * @return the remote friendly version of this body
      */
-    public UniversalBody getRemoteAdapter();
+    public BodyAdapter getRemoteAdapter();
 
     /**
      * Terminate the body. After this call the body is no more alive and no more active

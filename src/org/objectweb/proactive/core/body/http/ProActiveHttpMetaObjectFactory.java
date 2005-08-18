@@ -59,7 +59,7 @@ protected static Logger logger = Logger.getLogger(ProActiveHttpMetaObjectFactory
   protected static class RemoteHttpBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
     public UniversalBody newRemoteBody(UniversalBody body) {
       try {
-          return new RemoteBodyAdapter(body);
+          return new HttpBodyAdapter(body);
       } catch (ProActiveException e) {
           throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
       }

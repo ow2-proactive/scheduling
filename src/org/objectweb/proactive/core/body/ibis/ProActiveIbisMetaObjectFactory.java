@@ -125,7 +125,7 @@ public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory i
     public UniversalBody newRemoteBody(UniversalBody body) {
       try {
      // 	System.out.println("Creating ibis remote body adapter");
-          return new IbisRemoteBodyAdapter(body);
+          return new IbisBodyAdapter(body);
       } catch (ProActiveException e) {
           throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ", e);
       }

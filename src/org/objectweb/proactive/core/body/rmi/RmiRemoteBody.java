@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.ibis;
+package org.objectweb.proactive.core.body.rmi;
 
 import org.objectweb.proactive.core.body.RemoteBody;
 
@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.body.RemoteBody;
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
- * @see ibis.rmi.Remote
+ * @see java.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
  */
-public interface IbisRemoteBody extends ibis.rmi.Remote, RemoteBody {
+public interface RmiRemoteBody extends java.rmi.Remote, RemoteBody {
 }

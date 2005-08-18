@@ -28,65 +28,81 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.jini;
+package org.objectweb.proactive.core.body.rmi;
 
-
+import java.rmi.ConnectException;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
-import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
-
-/**
- *   An adapter for a JiniBody to be able to receive remote calls. This helps isolate JINI-specific
- *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
- *   to another jini objects library.
- */
-public class JiniBodyAdapter extends BodyAdapter {
+public class RmiBodyAdapter extends BodyAdapter {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public JiniBodyAdapter() {
+    public RmiBodyAdapter() {
     }
 
-    public JiniBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
+    
+
+    protected RmiBodyAdapter(RmiRemoteBody remoteBody) throws ProActiveException {
         construct(remoteBody);
     }
 
-    public JiniBodyAdapter(UniversalBody body) throws ProActiveException {
+    public RmiBodyAdapter(UniversalBody body) throws ProActiveException {
         try {
-            RemoteBody remoteBody = new JiniRemoteBodyImpl(body);
+            RmiRemoteBody remoteBody = new RmiRemoteBodyImpl(body);
             construct(remoteBody);
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
-        
     }
 
     /**
      * Registers an active object into a RMI registry. In fact it is the
-     * jini version of the body of the active object that is registered into the
+     * remote version of the body of the active object that is registered into the
      * RMI Registry under the given URL.
      * @param bodyAdapter the bodyadapter of the active object to register.
-     * @param url the url under which the jini body is registered.
-     * @exception java.io.IOException if the jini body cannot be registered
+     * @param url the url under which the remote body is registered.
+     * @exception java.io.IOException if the remote body cannot be registered
      */
     public void register(String url)
         throws java.io.IOException {
-        java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
+        try {
+            java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
+        } catch (ConnectException e) {
+            //failed to unbind at port 1099 
+            // try at proactive.rmi.port
+            String url2 = UrlBuilder.getProtocol(url) + "//" +
+                UrlBuilder.getHostNameFromUrl(url) + ":" +
+                System.getProperty("proactive.rmi.port") + "/" +
+                UrlBuilder.getNameFromUrl(url);
+
+            java.rmi.Naming.rebind(url2, (RmiRemoteBody) proxiedRemoteBody);
+        }
     }
 
     /**
      * Unregisters an active object previously registered into a RMI registry.
      * @param url the url under which the active object is registered.
-     * @exception java.io.IOException if the jini object cannot be removed from the registry
+     * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
     public void unregister(String url) throws java.io.IOException {
         try {
-            java.rmi.Naming.unbind(url);
+            try {
+                java.rmi.Naming.unbind(url);
+            } catch (ConnectException e) {
+                //failed to unbind at port 1099 
+                // try at proactive.rmi.port
+                String url2 = UrlBuilder.getProtocol(url) + "//" +
+                    UrlBuilder.getHostNameFromUrl(url) + ":" +
+                    System.getProperty("proactive.rmi.port") + "/" +
+                    UrlBuilder.getNameFromUrl(url);
+
+                java.rmi.Naming.unbind(url2);
+            }
         } catch (java.rmi.NotBoundException e) {
             throw new java.io.IOException(
                 "No object is bound to the given url : " + url);
@@ -95,23 +111,35 @@ public class JiniBodyAdapter extends BodyAdapter {
 
     /**
      * Looks-up an active object previously registered in a RMI registry. In fact it is the
-     * jini version of the body of an active object that can be registered into the
+     * remote version of the body of an active object that can be registered into the
      * RMI Registry under a given URL.
-     * @param url the url the jini Body is registered to
+     * @param url the url the remote Body is registered to
      * @return a UniversalBody
-     * @exception java.io.IOException if the jini body cannot be found under the given url
-     *      or if the object found is not of type JiniBody
+     * @exception java.io.IOException if the remote body cannot be found under the given url
+     *      or if the object found is not of type RmiRemoteBody
      */
     public UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
 
-        // Try if URL is the address of a JiniBody
+        // Try if URL is the address of a RmiRemoteBody
         try {
-            o = java.rmi.Naming.lookup(url);
-        } catch (java.rmi.NotBoundException e) {
+            try {
+                o = java.rmi.Naming.lookup(url);
+            } catch (ConnectException e) {
+                // connection failed, try to find a rmiregistry at proactive.rmi.port port
+                String url2 = UrlBuilder.getProtocol(url) + "//" +
+                    UrlBuilder.getHostNameFromUrl(url) + ":" +
+                    System.getProperty("proactive.rmi.port") + "/" +
+                    UrlBuilder.getNameFromUrl(url);
+
+                o = java.rmi.Naming.lookup(url2);
+            }
+        } catch (java.rmi.NotBoundException e) { // there are one rmiregistry on target computer but node isn t bound
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
         }
+
+        //catch (java.rmi.ConnectException e)
         if (o instanceof RmiRemoteBody) {
             try {
                 construct((RmiRemoteBody) o);
@@ -122,9 +150,8 @@ public class JiniBodyAdapter extends BodyAdapter {
             return this;
         } else {
             throw new java.io.IOException(
-                "The given url does exist but doesn't point to a jini body  url=" +
+                "The given url does exist but doesn't point to a remote body  url=" +
                 url + " class found is " + o.getClass().getName());
         }
     }
-
 }

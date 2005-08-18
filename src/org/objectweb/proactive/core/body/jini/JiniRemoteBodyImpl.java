@@ -28,62 +28,43 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.http.util.messages;
+package org.objectweb.proactive.core.body.jini;
 
-import java.io.Serializable;
+import java.rmi.RemoteException;
 
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.http.HttpBodyAdapter;
-import org.objectweb.proactive.core.body.http.util.HttpMessage;
+import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
+import org.objectweb.proactive.core.body.rmi.RmiRemoteBodyImpl;
+import org.objectweb.proactive.core.rmi.RandomPortSocketFactory;
 
 
 /**
- * This classes represents a HTTPMessage. When processed, this message performs a lookup thanks to the urn.
- * @author vlegrand
- * @see HttpMessage
+ *   An adapter for a LocalBody to be able to receive jini calls. This helps isolate JINI-specific
+ *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
+ *   to anothe jini objects library.
  */
-public class HttpLookupMessage extends HttpMessage implements Serializable {
- 
-    private String urn;
+public class JiniRemoteBodyImpl extends RmiRemoteBodyImpl implements RmiRemoteBody,
+    java.rmi.server.Unreferenced {
 
-    
-    //Caller Side
     /**
-     * Constructs an HTTP Message
-     * @param urn The urn of the Object (it can be an active object or a runtime).
+     * A custom socket Factory
      */
-    public HttpLookupMessage(String urn, String url, int port) {
-        super(url);
-        this.urn = urn;
+    protected static RandomPortSocketFactory factory = new RandomPortSocketFactory(37002,
+            5000);
+
+    //
+    // -- CONSTRUCTORS -----------------------------------------------
+    //
+    public JiniRemoteBodyImpl() throws RemoteException {
     }
 
-    /** 
-     * Get the returned object.
-     * @return
-     */
-    public UniversalBody getReturnedObject () {
-       
-        return (UniversalBody)this.returnedObject;
+    public JiniRemoteBodyImpl(UniversalBody body) throws RemoteException {
+        // super(0, factory, factory);
+        this.body = body;
     }
-    
-    
-    
-    //Callee side
-    /**
-     * Performs the lookup
-     * @return The Object associated with the urn
-     */
-    public Object processMessage() {
-        if (this.urn != null) {
-            UniversalBody ub = HttpBodyAdapter.getBodyFromUrn(urn);
-            if (ub != null) {
-                this.returnedObject = ub;
-            }
-        }
-        return this.returnedObject;
+
+    public void unreferenced() {
+        bodyLogger.info("JiniRemoteBodyImpl: unreferenced()");
+        // System.gc();
     }
-    
-    
 }
-
-  

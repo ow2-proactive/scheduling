@@ -119,6 +119,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy
                     constructorCall, node.getNodeInformation().getURL(),
                     activity, factory, jobID
                 };
+            
 
             //added lines--------------------------
             //Object[] args = new Object[] { constructorCall, node.getNodeInformation().getURL(), activity, factory };

@@ -15,19 +15,24 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @author mlacage
  *
  */
-public class SshRemoteBodyAdapter extends RemoteBodyAdapter {
-    public SshRemoteBodyAdapter(UniversalBody body) throws ProActiveException {
+public class SshRmiBodyAdapter extends RmiBodyAdapter {
+    
+    public SshRmiBodyAdapter(){
+        
+    }
+    
+    public SshRmiBodyAdapter(UniversalBody body) throws ProActiveException {
         try {
-            RemoteBody remoteBody = new RemoteBodyImpl(body,
+            RmiRemoteBody remoteBody = new RmiRemoteBodyImpl(body,
                     new SshRMIServerSocketFactory(),
                     new SshRMIClientSocketFactory());
-            super.construct(remoteBody);
+            construct(remoteBody);
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
     }
 
-    public static UniversalBody lookup(String url) throws java.io.IOException {
+    public UniversalBody lookup(String url) throws java.io.IOException {
         String host;
         try {
             host = UrlBuilder.getHostNameFromUrl(url);
@@ -39,14 +44,18 @@ public class SshRemoteBodyAdapter extends RemoteBodyAdapter {
         try {
             Registry registry = LocateRegistry.getRegistry(host, port,
                     new SshRMIClientSocketFactory());
-            RemoteBody bodyStub = (RemoteBody) registry.lookup(UrlBuilder.getNameFromUrl(
+            RmiRemoteBody bodyStub = (RmiRemoteBody) registry.lookup(UrlBuilder.getNameFromUrl(
                         url));
-            return new RemoteBodyAdapter(bodyStub);
+            try {
+                construct(bodyStub);
+            } catch (ProActiveException e1) {
+                throw new java.io.IOException(
+                "The remote object with the given url is not accessible ");
+            };
+            return this;
         } catch (java.rmi.NotBoundException e) {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
-        } catch (ProActiveException e) {
-            throw new IOException(e.getMessage());
         }
     }
 }

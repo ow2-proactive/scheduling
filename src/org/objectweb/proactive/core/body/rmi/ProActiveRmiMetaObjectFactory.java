@@ -67,7 +67,7 @@ protected static Logger logger = Logger.getLogger(ProActiveRmiMetaObjectFactory.
   protected static class RemoteRmiBodyFactoryImpl implements RemoteBodyFactory, java.io.Serializable {
     public UniversalBody newRemoteBody(UniversalBody body) {
       try {
-          return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+          return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
       } catch (ProActiveException e) {
           throw new ProActiveRuntimeException("Cannot create Remote body adapter ", e);
       }

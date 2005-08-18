@@ -338,25 +338,25 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is ibis");
                     }
-                    return new org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter(body);
+                    return new org.objectweb.proactive.core.body.ibis.IbisBodyAdapter(body);
                 } else if ("http".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is http");
                     }
 
-                    return new org.objectweb.proactive.core.body.http.RemoteBodyAdapter(body);
+                    return new org.objectweb.proactive.core.body.http.HttpBodyAdapter(body);
                 } else if ("rmissh".equals(System.getProperty(
                                 "proactive.communication.protocol"))) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmissh");
                     }
-                    return new org.objectweb.proactive.core.body.rmi.SshRemoteBodyAdapter(body);
+                    return new org.objectweb.proactive.core.body.rmi.SshRmiBodyAdapter(body);
                 } else {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Factory is rmi");
                     }
-                    return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+                    return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
                 }
             } catch (ProActiveException e) {
                 throw new ProActiveRuntimeException("Cannot create Remote body adapter ",

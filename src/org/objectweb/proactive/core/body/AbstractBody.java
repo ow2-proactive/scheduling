@@ -51,7 +51,6 @@ import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter;
 import org.objectweb.proactive.core.component.representative.FunctionalInterfaceID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.group.ProActiveGroup;
@@ -1092,7 +1091,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 if (toKill != null) {
                     //this body is still alive
                     toKill.blockCommunication();
-                    BodyAdapter ba = (RemoteBodyAdapter) (toKill.getRemoteAdapter());
+                    BodyAdapter ba = (BodyAdapter) (toKill.getRemoteAdapter());
                     ba.changeProxiedBody(this);
                     this.remoteBody = ba;
                     toKill.terminate();

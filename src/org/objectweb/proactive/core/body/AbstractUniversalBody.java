@@ -122,8 +122,8 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         return nodeURL;
     }
 
-    public UniversalBody getRemoteAdapter() {
-        return remoteBody;
+    public BodyAdapter getRemoteAdapter() {
+        return (BodyAdapter) remoteBody;
     }
 
     public UniqueID getID() {

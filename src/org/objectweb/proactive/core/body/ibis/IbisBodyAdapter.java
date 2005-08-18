@@ -28,66 +28,59 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.jini;
-
-
+package org.objectweb.proactive.core.body.ibis;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
-import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
+import org.objectweb.proactive.core.util.UrlBuilder;
 
 
-
-/**
- *   An adapter for a JiniBody to be able to receive remote calls. This helps isolate JINI-specific
- *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
- *   to another jini objects library.
- */
-public class JiniBodyAdapter extends BodyAdapter {
+public class IbisBodyAdapter extends BodyAdapter {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public JiniBodyAdapter() {
+    public IbisBodyAdapter() {
     }
 
-    public JiniBodyAdapter(RemoteBody remoteBody) throws ProActiveException {
+    public IbisBodyAdapter(IbisRemoteBody remoteBody) throws ProActiveException {
         construct(remoteBody);
     }
 
-    public JiniBodyAdapter(UniversalBody body) throws ProActiveException {
+    public IbisBodyAdapter(UniversalBody body) throws ProActiveException {
         try {
-            RemoteBody remoteBody = new JiniRemoteBodyImpl(body);
+            IbisRemoteBody remoteBody = new IbisRemoteBodyImpl(body);
             construct(remoteBody);
-        } catch (java.rmi.RemoteException e) {
+        } catch (ibis.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
-        
     }
+
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
 
     /**
      * Registers an active object into a RMI registry. In fact it is the
-     * jini version of the body of the active object that is registered into the
+     * remote version of the body of the active object that is registered into the
      * RMI Registry under the given URL.
      * @param bodyAdapter the bodyadapter of the active object to register.
-     * @param url the url under which the jini body is registered.
-     * @exception java.io.IOException if the jini body cannot be registered
+     * @param url the url under which the remote body is registered.
+     * @exception java.io.IOException if the remote body cannot be registered
      */
-    public void register(String url)
-        throws java.io.IOException {
-        java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
+    public void register(String url) throws java.io.IOException {
+        ibis.rmi.Naming.rebind(url, (IbisRemoteBody) proxiedRemoteBody);
     }
 
     /**
      * Unregisters an active object previously registered into a RMI registry.
      * @param url the url under which the active object is registered.
-     * @exception java.io.IOException if the jini object cannot be removed from the registry
+     * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
     public void unregister(String url) throws java.io.IOException {
         try {
-            java.rmi.Naming.unbind(url);
-        } catch (java.rmi.NotBoundException e) {
+            ibis.rmi.Naming.unbind(url);
+        } catch (ibis.rmi.NotBoundException e) {
             throw new java.io.IOException(
                 "No object is bound to the given url : " + url);
         }
@@ -95,36 +88,35 @@ public class JiniBodyAdapter extends BodyAdapter {
 
     /**
      * Looks-up an active object previously registered in a RMI registry. In fact it is the
-     * jini version of the body of an active object that can be registered into the
+     * remote version of the body of an active object that can be registered into the
      * RMI Registry under a given URL.
-     * @param url the url the jini Body is registered to
+     * @param url the url the remote Body is registered to
      * @return a UniversalBody
-     * @exception java.io.IOException if the jini body cannot be found under the given url
-     *      or if the object found is not of type JiniBody
+     * @exception java.io.IOException if the remote body cannot be found under the given url
+     *      or if the object found is not of type IbisRemoteBody
      */
     public UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;
 
-        // Try if URL is the address of a JiniBody
+        // Try if URL is the address of a IbisRemoteBody
         try {
-            o = java.rmi.Naming.lookup(url);
-        } catch (java.rmi.NotBoundException e) {
+            o = ibis.rmi.Naming.lookup(UrlBuilder.removeProtocol(url, "ibis:"));
+        } catch (ibis.rmi.NotBoundException e) {
             throw new java.io.IOException("The url " + url +
                 " is not bound to any known object");
         }
-        if (o instanceof RmiRemoteBody) {
+        if (o instanceof IbisRemoteBody) {
             try {
-                construct((RmiRemoteBody) o);
+                construct((IbisRemoteBody) o);
             } catch (ProActiveException e1) {
                 throw new java.io.IOException(
-                        "The remote object with the given url is not accessible ");
+                    "The remote object with the given url is not accessible ");
             }
             return this;
         } else {
             throw new java.io.IOException(
-                "The given url does exist but doesn't point to a jini body  url=" +
+                "The given url does exist but doesn't point to a remote body  url=" +
                 url + " class found is " + o.getClass().getName());
         }
     }
-
 }

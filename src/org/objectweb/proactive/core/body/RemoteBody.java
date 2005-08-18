@@ -28,21 +28,19 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.rmi;
+package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import org.apache.log4j.Logger;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
 import org.objectweb.proactive.core.exceptions.manager.NFEListener;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.security.Communication;
 import org.objectweb.proactive.ext.security.CommunicationForbiddenException;
 import org.objectweb.proactive.ext.security.Policy;
@@ -54,7 +52,21 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.io.IOException;
+import java.io.Serializable;
 
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
+
+/**
+ * @author ProActiveTeam
+ * @version 1.0, 17 août 2005
+ * @since ProActive 2.2
+ *
+ */
 /**
  * An object implementing this interface provides the minimum service a body offers
  * remotely. This interface is the glue with the RMI Remote interface that allow the
@@ -66,7 +78,8 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @see java.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
  */
-public interface RemoteBody extends java.rmi.Remote {
+public interface RemoteBody extends Serializable {
+    public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
 
     /**
      * Receives a request for later processing. The call to this method is non blocking
@@ -98,7 +111,7 @@ public interface RemoteBody extends java.rmi.Remote {
      * @exception java.rmi.RemoteException if an exception occured during the remote communication
      * @return the url of the node this body is associated to
      */
-    public String getNodeURL() throws java.rmi.RemoteException;
+    public String getNodeURL() throws java.io.IOException;
 
     /**
      * Returns the UniqueID of this body
@@ -106,9 +119,9 @@ public interface RemoteBody extends java.rmi.Remote {
      * @return the UniqueID of this body
      * @exception java.rmi.RemoteException if an exception occured during the remote communication
      */
-    public UniqueID getID() throws java.rmi.RemoteException;
+    public UniqueID getID() throws java.io.IOException;
 
-    public String getJobID() throws java.rmi.RemoteException;
+    public String getJobID() throws java.io.IOException;
 
     /**
      * Signals to this body that the body identified by id is now to a new
@@ -138,10 +151,12 @@ public interface RemoteBody extends java.rmi.Remote {
      */
     public void setImmediateService(String methodName)
         throws java.io.IOException;
-    
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException;
-    
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException;
+
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException;
+
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException;
 
     // SECURITY
     public void initiateSession(int type, UniversalBody body)
@@ -217,10 +232,11 @@ public interface RemoteBody extends java.rmi.Remote {
      * @param newBody the body referenced after the call
      */
     public void changeProxiedBody(Body newBody) throws java.io.IOException;
-    
+
     public void addNFEListener(NFEListener listener) throws java.io.IOException;
 
-    public void removeNFEListener(NFEListener listener) throws java.io.IOException;
+    public void removeNFEListener(NFEListener listener)
+        throws java.io.IOException;
 
     public int fireNFE(NonFunctionalException e) throws java.io.IOException;
 }
