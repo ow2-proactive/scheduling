@@ -61,6 +61,7 @@
 			<unitTest exclude="no" class="nonregressiontest.component.descriptor.arguments.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.controller.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.component.shortcuts.Test"/>
+			<unitTest exclude="no" class="nonregressiontest.component.activity.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.ft.Test"/>
 			<unitTest exclude="no" class="nonregressiontest.runtime.classloader.Test" />
 	</packageGroup>
