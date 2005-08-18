@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
 import org.objectweb.proactive.core.body.reply.Reply;
@@ -117,7 +118,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         this.wrappedBody.updateLocation(id, body);
     }
 
-    public UniversalBody getRemoteAdapter() {
+    public BodyAdapter getRemoteAdapter() {
         return this.wrappedBody.getRemoteAdapter();
     }
 

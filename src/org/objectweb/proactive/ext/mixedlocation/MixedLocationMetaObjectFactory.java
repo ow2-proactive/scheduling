@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.RemoteBodyFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.ibis.IbisRemoteBodyAdapter;
+import org.objectweb.proactive.core.body.ibis.IbisBodyAdapter;
 import org.objectweb.proactive.core.body.migration.MigrationManager;
 import org.objectweb.proactive.core.body.migration.MigrationManagerFactory;
 import org.objectweb.proactive.core.body.request.Request;
@@ -136,7 +136,7 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
                 // 	System.out.println("Creating ibis remote body adapter");
-                return new IbisRemoteBodyAdapter(body);
+                return new IbisBodyAdapter(body);
             } catch (ProActiveException e) {
                 throw new ProActiveRuntimeException("Cannot create Ibis Remote body adapter ",
                     e);
@@ -149,7 +149,7 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
         java.io.Serializable {
         public UniversalBody newRemoteBody(UniversalBody body) {
             try {
-                return new org.objectweb.proactive.core.body.rmi.RemoteBodyAdapter(body);
+                return new org.objectweb.proactive.core.body.rmi.RmiBodyAdapter(body);
             } catch (ProActiveException e) {
                 throw new ProActiveRuntimeException("Cannot create Remote body adapter ",
                     e);
