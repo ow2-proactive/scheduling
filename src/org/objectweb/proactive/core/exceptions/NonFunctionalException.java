@@ -32,29 +32,43 @@ package org.objectweb.proactive.core.exceptions;
 
 import org.objectweb.proactive.ProActive;
 
+import java.io.Serializable;
 
 
 /**
- * An interface for non functional exceptions
- * Should implement Serializable but Exception class do it
+ * The root class of non functional exceptions
  * @author  ProActive Team
- * @version 1.0,  2003/04/01
- * @since   ProActive 1.0.2
- *
  */
-public class NonFunctionalException extends RuntimeException {
-	private String nodeURL;
-	
-	public NonFunctionalException(String message, Throwable cause) {
-		super(message, cause);
-		nodeURL = ProActive.getBodyOnThis().getNodeURL();
-	}
-	
-	public String getNodeURL() {
-		return nodeURL;
-	}
-	
-	public String toString() {
-		return "NFE[" + getNodeURL() + "]: " + super.toString();
-	}
+public class NonFunctionalException extends RuntimeException
+    implements Serializable {
+    private String nodeURL;
+
+    public NonFunctionalException(String message, Throwable cause) {
+        super(message, cause);
+        nodeURL = ProActive.getBodyOnThis().getNodeURL();
+    }
+
+    public String getNodeURL() {
+        return nodeURL;
+    }
+
+    private static String getSmallName(Class c) {
+        String smallName = c.getName();
+        int lastDot = smallName.lastIndexOf('.');
+        if (lastDot > 0) {
+            smallName = smallName.substring(lastDot + 1);
+        }
+
+        return smallName;
+    }
+
+    public String toString() {
+        String str = "NFE[" + getNodeURL() + "]";
+        for (Throwable cause = this; cause != null; cause = cause.getCause()) {
+            str += (": " + getSmallName(cause.getClass()) + ": " +
+            cause.getMessage());
+        }
+
+        return str;
+    }
 }

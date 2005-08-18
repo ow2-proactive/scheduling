@@ -21,7 +21,9 @@ public interface Loggers {
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT+".process";
     
     static final public String FILETRANSFER = "proactive.filetransfer";
-   
+
+    public static final String NFE = "proactive.nfe";
+
     /** Logger for ProActive Examples. **/
     public static final String EXAMPLES = "proactive.examples";
 

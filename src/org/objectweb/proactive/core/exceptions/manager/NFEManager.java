@@ -1,14 +1,19 @@
 package org.objectweb.proactive.core.exceptions.manager;
 
+import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.exceptions.NonFunctionalException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class NFEManager {
     // NFEProducer implementation
     private static NFEListenerList nfeListeners = null;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.NFE);
 
     public static void addNFEListener(NFEListener listener) {
         if (nfeListeners == null) {
@@ -30,8 +35,9 @@ public class NFEManager {
     public static int fireNFE(NonFunctionalException e, UniversalBody body) {
         return fireNFE(e, body, null);
     }
-    
-    public static int fireAndThrowNFE(NonFunctionalException nfe, Exception e, AbstractProxy proxy) throws Exception {
+
+    public static int fireAndThrowNFE(NonFunctionalException nfe, Exception e,
+        AbstractProxy proxy) throws Exception {
         fireNFE(nfe, proxy);
         throw e;
     }
@@ -55,11 +61,11 @@ public class NFEManager {
         if (nfeListeners != null) {
             nbListeners += nfeListeners.fireNFE(e);
         }
-        
+
         if (nbListeners == 0) {
-        	System.err.println(e);
+            logger.warn(e);
         }
-        
+
         return nbListeners;
     }
 }
