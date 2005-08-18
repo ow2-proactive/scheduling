@@ -38,6 +38,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -114,7 +115,12 @@ public class Manager implements Serializable, InitActive {
             logger.fatal("The class for worker was not found", e);
         }
 
-        this.workerGroup.setWorkerGroup(this.workerGroup);
+        try {
+			this.workerGroup.setWorkerGroup(this.workerGroup);
+		} catch (ExceptionListException e) {
+			// TODO find a fix
+			logger.debug("A worker is done", e);
+		}
 
         // Spliting
         logger.info("Compute the lower bound for the root task");
