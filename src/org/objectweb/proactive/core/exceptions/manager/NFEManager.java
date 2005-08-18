@@ -63,9 +63,13 @@ public class NFEManager {
         }
 
         if (nbListeners == 0) {
-            logger.warn(e);
+            defaultNFEHandler(e);
         }
 
         return nbListeners;
+    }
+
+    public static void defaultNFEHandler(NonFunctionalException nfe) {
+        logger.warn(nfe);
     }
 }
