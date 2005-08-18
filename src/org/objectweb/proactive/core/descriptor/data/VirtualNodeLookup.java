@@ -65,6 +65,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     //we use 1099 as default port
     private int portForLookup = 1099;
     private String message = "########## Calling this method on a VirtualNodeLookup has no sense, since such VirtualNode object references a remote VirtualNode ##########";
+    private String notActivatedMessage = "This VirtualNode lookup is not yet activated. Activate it first";
     protected String runtimeHostForLookup = "LOOKUP_HOST";
 
     public VirtualNodeLookup(String name) {
@@ -77,6 +78,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getProperty()
      */
     public String getProperty() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getProperty();
     }
 
@@ -91,6 +95,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getTimeout()
      */
     public long getTimeout() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getTimeout();
     }
 
@@ -105,6 +112,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getVirtualMachine()
      */
     public VirtualMachine getVirtualMachine() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getVirtualMachine();
     }
 
@@ -134,6 +144,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodeCount()
      */
     public int getNodeCount() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getNodeCount();
     }
 
@@ -149,6 +162,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCurrentlyCreatedNodes()
      */
     public int getNumberOfCurrentlyCreatedNodes() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getNumberOfCurrentlyCreatedNodes();
     }
 
@@ -156,6 +172,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode()
      */
     public Node getNode() throws NodeException {
+        if (!isActivated) {
+            throw new NodeException(notActivatedMessage);
+        }
         try {
             checkActivation();
         } catch (ProActiveException pae) {
@@ -169,6 +188,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNumberOfCreatedNodesAfterDeployment()
      */
     public int getNumberOfCreatedNodesAfterDeployment() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getNumberOfCreatedNodesAfterDeployment();
     }
 
@@ -176,6 +198,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode(int)
      */
     public Node getNode(int index) throws NodeException {
+        if (!isActivated) {
+            throw new NodeException(notActivatedMessage);
+        }
         try {
             checkActivation();
         } catch (ProActiveException pae) {
@@ -188,6 +213,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodesURL()
      */
     public String[] getNodesURL() throws NodeException {
+        if (!isActivated) {
+            throw new NodeException(notActivatedMessage);
+        }
         try {
             checkActivation();
         } catch (ProActiveException pae) {
@@ -200,6 +228,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNodes()
      */
     public Node[] getNodes() throws NodeException {
+        if (!isActivated) {
+            throw new NodeException(notActivatedMessage);
+        }
         try {
             checkActivation();
         } catch (ProActiveException pae) {
@@ -212,6 +243,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getNode(String)
      */
     public Node getNode(String url) throws NodeException {
+        if (!isActivated) {
+            throw new NodeException(notActivatedMessage);
+        }
         try {
             checkActivation();
         } catch (ProActiveException pae) {
@@ -232,6 +266,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     }
 
     public Object getUniqueAO() throws ProActiveException {
+        if (!isActivated) {
+            throw new ProActiveException(notActivatedMessage);
+        }
         checkActivation();
         return virtualNode.getUniqueAO();
     }
@@ -255,6 +292,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.Job#getJobID()
      */
     public String getJobID() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getJobID();
     }
 
@@ -295,6 +335,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getMinNumberOfNodes()
      */
     public int getMinNumberOfNodes() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getMinNumberOfNodes();
     }
 
@@ -304,6 +347,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#getPolicyServer()
      */
     public PolicyServer getPolicyServer() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.getPolicyServer();
     }
 
@@ -311,6 +357,9 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#isMultiple()
      */
     public boolean isMultiple() {
+        if (!isActivated) {
+            vnlogger.error(notActivatedMessage);
+        }
         return virtualNode.isMultiple();
     }
 
