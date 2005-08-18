@@ -11,6 +11,7 @@ public interface Loggers {
     static final public String COMPONENTS = "proactive.components";
     static final public String CLASSLOADER = "proactive.classloader";
     static final public String RUNTIME = "proactive.runtime";
+    static final public String BODY = "proactive.body";
     
     static final public String COMPONENTS_REQUEST = COMPONENTS+".request";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS+".activity";
