@@ -30,12 +30,14 @@
  */
 package org.objectweb.proactive.core.body.rmi;
 
-import java.rmi.ConnectException;
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.UrlBuilder;
+
+import java.rmi.ConnectException;
+
+
 /**
  * An RMI adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
  * to a RemoteBody using RMI.
@@ -44,7 +46,6 @@ import org.objectweb.proactive.core.util.UrlBuilder;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-
 public class RmiBodyAdapter extends BodyAdapter {
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -52,9 +53,8 @@ public class RmiBodyAdapter extends BodyAdapter {
     public RmiBodyAdapter() {
     }
 
-    
-
-    protected RmiBodyAdapter(RmiRemoteBody remoteBody) throws ProActiveException {
+    protected RmiBodyAdapter(RmiRemoteBody remoteBody)
+        throws ProActiveException {
         construct(remoteBody);
     }
 
@@ -75,8 +75,7 @@ public class RmiBodyAdapter extends BodyAdapter {
      * @param url the url under which the remote body is registered.
      * @exception java.io.IOException if the remote body cannot be registered
      */
-    public void register(String url)
-        throws java.io.IOException {
+    public void register(String url) throws java.io.IOException {
         try {
             java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
         } catch (ConnectException e) {
@@ -152,7 +151,7 @@ public class RmiBodyAdapter extends BodyAdapter {
                 construct((RmiRemoteBody) o);
             } catch (ProActiveException e1) {
                 throw new java.io.IOException(
-                        "The remote object with the given url is not accessible ");
+                    "The remote object with the given url is not accessible ");
             }
             return this;
         } else {

@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -64,6 +61,9 @@ import org.objectweb.proactive.core.util.profiling.PAProfilerEngine;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.timer.CompositeAverageMicroTimer;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
+
+import java.io.IOException;
+import java.io.Serializable;
 
 
 /**
@@ -156,25 +156,27 @@ public abstract class BodyImpl extends AbstractBody
         String ftstate = ProActiveConfiguration.getFTState();
         if ("enable".equals(ftstate)) {
             // if the targetBody is not serilizable, FT is disabled
-            if (this.localBodyStrategy.getReifiedObject() instanceof Serializable){            
+            if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                 try {
                     // should use a factory ...
                     this.ftmanager = new FTManagerCIC();
                     this.ftmanager.init(this);
                     if (bodyLogger.isDebugEnabled()) {
-                        bodyLogger.debug("Init FTManager on " + this.getNodeURL());
+                        bodyLogger.debug("Init FTManager on " +
+                            this.getNodeURL());
                     }
-                    
+
                     bodyLogger.info("** Fault-Tolerance is enabled **");
                 } catch (ProActiveException e) {
                     bodyLogger.error(
-                            "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-                            e);
+                        "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                        e);
                     this.ftmanager = null;
                 }
-            }else{
+            } else {
                 // target body is not serilizable
-                bodyLogger.error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
+                bodyLogger.error(
+                    "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                 this.ftmanager = null;
             }
         } else {
@@ -260,12 +262,14 @@ public abstract class BodyImpl extends AbstractBody
         throws java.io.IOException {
         this.requestReceiver.setImmediateService(methodName);
     }
-    
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException {
         this.requestReceiver.setImmediateService(methodName, parametersTypes);
     }
-    
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException {
+
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException {
         this.requestReceiver.removeImmediateService(methodName, parametersTypes);
     }
 
@@ -350,7 +354,8 @@ public abstract class BodyImpl extends AbstractBody
                     // Create a non functional exception encapsulating the service exception
                     NonFunctionalException calleeNFE = new ServiceFailedCalleeNFE(
                             "Exception occured while serving pending request = " +
-                            request.getMethodName(), e, this, ProActive.getBodyOnThis());
+                            request.getMethodName(), e, this,
+                            ProActive.getBodyOnThis());
                     NFEManager.fireNFE(calleeNFE, BodyImpl.this);
 
                     // Create a non functional exception encapsulating the service exception
@@ -360,7 +365,8 @@ public abstract class BodyImpl extends AbstractBody
 
                     // Create a new reply that contains this NFE instead of the result
                     Reply replyAlternate = null;
-                    replyAlternate = request.serveAlternate(BodyImpl.this, callerNFE);
+                    replyAlternate = request.serveAlternate(BodyImpl.this,
+                            callerNFE);
 
                     // Send reply and stop local node if desired
                     if (replyAlternate == null) {

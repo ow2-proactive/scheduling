@@ -1,8 +1,7 @@
 package org.objectweb.proactive.core.classloader;
 
-import java.util.Hashtable;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
@@ -12,6 +11,8 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
+
+import java.util.Hashtable;
 
 
 /**

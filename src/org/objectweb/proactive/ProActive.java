@@ -30,16 +30,14 @@
  */
 package org.objectweb.proactive;
 
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
+
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -85,6 +83,12 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.ext.webservices.soap.ProActiveDeployer;
 
+import java.io.IOException;
+
+import java.net.UnknownHostException;
+
+import java.util.HashMap;
+
 
 public class ProActive {
     protected final static Logger logger = Logger.getLogger(ProActive.class.getName());
@@ -121,8 +125,8 @@ public class ProActive {
         Class c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
 
         // Creation of the default level which contains standard exception handlers
-//        ProActive.defaultLevel = new HashMap();
-//        HandlerManager.initialize();
+        //        ProActive.defaultLevel = new HashMap();
+        //        HandlerManager.initialize();
     }
 
     //
@@ -1361,8 +1365,6 @@ public class ProActive {
         return ProActive.getBodyOnThis().getJobID();
     }
 
-
-
     /**
      *  Expose an active object as a web service
      * @param o The object to expose as a web service
@@ -1541,13 +1543,13 @@ public class ProActive {
     public static void waitForPotentialException() {
         ExceptionHandler.waitForPotentialException();
     }
-    
+
     //NFE
     public static void addNFEListener(NFEListener listener) {
-    	NFEManager.addNFEListener(listener);
+        NFEManager.addNFEListener(listener);
     }
-    
+
     public static void removeNFEListener(NFEListener listener) {
-    	NFEManager.removeNFEListener(listener);
+        NFEManager.removeNFEListener(listener);
     }
 }

@@ -42,6 +42,8 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import java.io.IOException;
 
 import java.util.Hashtable;
+
+
 /**
  * An HTTP adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
  * to a RemoteBody using HTTP.
@@ -50,7 +52,6 @@ import java.util.Hashtable;
  * @since ProActive 2.2
  * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
-
 public class HttpBodyAdapter extends BodyAdapter {
 
     /**
@@ -58,7 +59,6 @@ public class HttpBodyAdapter extends BodyAdapter {
      * thanks to the ProActive.lookupActive method
      */
     protected static transient Hashtable urnBodys = new Hashtable();
-    
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -66,12 +66,10 @@ public class HttpBodyAdapter extends BodyAdapter {
     public HttpBodyAdapter() {
     }
 
-    public HttpBodyAdapter(UniversalBody body) throws ProActiveException {     
+    public HttpBodyAdapter(UniversalBody body) throws ProActiveException {
         RemoteBody remoteBody = new HttpRemoteBodyImpl(body);
         construct(remoteBody);
     }
-
-    
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
@@ -83,8 +81,7 @@ public class HttpBodyAdapter extends BodyAdapter {
      * @param urn The urn of the body (in fact his url + his name)
      * @exception java.io.IOException if the remote body cannot be registered
      */
-    public void register(String urn)
-        throws java.io.IOException {
+    public void register(String urn) throws java.io.IOException {
         int port = UrlBuilder.getPortFromUrl(urn);
 
         //        System.out.println("port = " + port);

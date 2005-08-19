@@ -30,14 +30,11 @@
  */
 package org.objectweb.proactive.core.body.jini;
 
-
-
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.RemoteBody;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
-
 
 
 /**
@@ -65,7 +62,6 @@ public class JiniBodyAdapter extends BodyAdapter {
         } catch (java.rmi.RemoteException e) {
             throw new ProActiveException(e);
         }
-        
     }
 
     /**
@@ -76,8 +72,7 @@ public class JiniBodyAdapter extends BodyAdapter {
      * @param url the url under which the jini body is registered.
      * @exception java.io.IOException if the jini body cannot be registered
      */
-    public void register(String url)
-        throws java.io.IOException {
+    public void register(String url) throws java.io.IOException {
         java.rmi.Naming.rebind(url, (RmiRemoteBody) proxiedRemoteBody);
     }
 
@@ -119,7 +114,7 @@ public class JiniBodyAdapter extends BodyAdapter {
                 construct((RmiRemoteBody) o);
             } catch (ProActiveException e1) {
                 throw new java.io.IOException(
-                        "The remote object with the given url is not accessible ");
+                    "The remote object with the given url is not accessible ");
             }
             return this;
         } else {
@@ -128,5 +123,4 @@ public class JiniBodyAdapter extends BodyAdapter {
                 url + " class found is " + o.getClass().getName());
         }
     }
-
 }

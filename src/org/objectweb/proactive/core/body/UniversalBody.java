@@ -30,14 +30,8 @@
  */
 package org.objectweb.proactive.core.body;
 
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -58,6 +52,14 @@ import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+
 
 /**
  * An object implementing this interface provides the minimum service a body offers
@@ -71,11 +73,9 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * @see org.objectweb.proactive.Body
  * @see org.objectweb.proactive.core.body.rmi.RmiBodyAdapter
  */
-
 public interface UniversalBody extends NFEProducer, Job, Serializable {
+    public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
 
-
-public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     /**
      * Receives a request for later processing. The call to this method is non blocking
      * unless the body cannot temporary receive the request.
@@ -125,7 +125,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * it allows direct communication to the target of a functional call, accross membranes of composite components.
      * @param shortcut the shortcut to create
      * @exception java.io.IOException if a pb occurs during this method call
-     */ 
+     */
     public void createShortcut(Shortcut shortcut) throws java.io.IOException;
 
     /**
@@ -160,24 +160,26 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      */
     public void setImmediateService(String methodName)
         throws IOException;
-    
+
     /**
-     * Adds an immediate service for this body 
+     * Adds an immediate service for this body
      * An immediate service is a method that will bw excecuted by the calling thread.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
      * @exception java.io.IOException if a pb occurs during this method call
      */
-    public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException;
-    
+    public void setImmediateService(String methodName, Class[] parametersTypes)
+        throws IOException;
+
     /**
-     * Removes an immediate service for this body 
+     * Removes an immediate service for this body
      * An immediate service is a method that will bw excecuted by the calling thread.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
      * @exception java.io.IOException if a pb occurs during this method call
      */
-    public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException;
+    public void removeImmediateService(String methodName,
+        Class[] parametersTypes) throws IOException;
 
     // SECURITY
     public void initiateSession(int type, UniversalBody body)

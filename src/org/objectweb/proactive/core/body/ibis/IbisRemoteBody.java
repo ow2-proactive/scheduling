@@ -34,8 +34,8 @@ import org.objectweb.proactive.core.body.RemoteBody;
 
 
 /**
- * An object implementing this interface provides the minimum service a body offers 
- * remotely through IBIS. 
+ * An object implementing this interface provides the minimum service a body offers
+ * remotely through IBIS.
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9

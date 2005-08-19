@@ -30,8 +30,13 @@
  */
 package org.objectweb.proactive.core.body;
 
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -51,14 +56,6 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
-
-import java.io.IOException;
-import java.io.Serializable;
-
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-
-import java.util.ArrayList;
 
 
 /**
