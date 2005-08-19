@@ -632,7 +632,7 @@ public class ProActive {
     }
 
     /**
-     * Unregisters an active object previously registered into a RMI registry.
+     * Unregisters an active object previously registered into a registry.
      * @param url the url under which the active object is registered.
      * @exception java.io.IOException if the remote object cannot be removed from the registry
      */
