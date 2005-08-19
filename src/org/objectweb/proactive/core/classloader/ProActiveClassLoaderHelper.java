@@ -1,8 +1,8 @@
 package org.objectweb.proactive.core.classloader;
 
-import org.apache.log4j.Logger;
+import java.util.Hashtable;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.component.asmgen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.asmgen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.mop.ASMBytecodeStubBuilder;
@@ -12,8 +12,6 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.core.util.log.Loggers;
-
-import java.util.Hashtable;
 
 
 /**
@@ -119,12 +117,8 @@ public class ProActiveClassLoaderHelper {
 
     private void debug(String message) {
         if (logger.isDebugEnabled()) {
-            try {
-                logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
-                    " --> " + message);
-            } catch (ProActiveException e) {
-                logger.debug("[unresolved runtime url] -- > " + message);
-            }
+            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
+                " --> " + message);
         }
     }
 }

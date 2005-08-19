@@ -30,9 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.core.ProActiveException;
@@ -49,6 +48,8 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.util.ArrayList;
+
 
 /**
  * <p>
@@ -62,7 +63,7 @@ import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableExcep
  * with that JVM (using typically the RMI Registry) and use the remote interface of the <code>ProActiveRuntime</code>
  * to perform the interaction.
  * </p><p>
- * Aside the getter giving information about the VM, the 3 services offered are :
+ * Aside the getter giving information about the VM, the 2 services offered are :
  * <ul>
  * <li>the creation of local node through the method <code>createLocalNode</code></li>
  * <li>the creation of another VM(local or remote) through the method <code>createVM</code></li>
@@ -90,12 +91,14 @@ public interface ProActiveRuntime extends Job {
 
     /**
      * Kills all Nodes in this ProActiveRuntime
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void killAllNodes() throws ProActiveException;
 
     /**
      * Kills the Node of the given name and all Active Objects deployed on it.
      * @param nodeName the name of the node to kill
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void killNode(String nodeName) throws ProActiveException;
 
@@ -124,11 +127,12 @@ public interface ProActiveRuntime extends Job {
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
-     * Allows this ProactiveRuntime on this VM to register another ProActiveRuntime
+     * Allows this ProActiveRuntime on this VM to register another ProActiveRuntime
      * @param proActiveRuntimeDist the remote ProactiveRuntime to register
      * @param proActiveRuntimeUrl the url of the remote ProActiveRuntime
      * @param creatorID the name of the creator of the remote ProActiveRuntime
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
@@ -142,6 +146,7 @@ public interface ProActiveRuntime extends Job {
      * @param proActiveRuntimeUrl the url of the remote ProActiveRuntime
      * @param creatorID the name of the creator of the remote ProActiveRuntime
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
@@ -173,6 +178,7 @@ public interface ProActiveRuntime extends Job {
     /**
      * Returns all the ProActiveRuntime URL in which this runtime is registered
      * @return all the ProActiveRuntime URL in which this runtime is registered
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public String[] getAcquaintances() throws ProActiveException;
 
@@ -180,8 +186,10 @@ public interface ProActiveRuntime extends Job {
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>.
      * Tell to this runtime that is no more registered in <code>proActiveRuntimeName</code>.
      * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException;
+    public void rmAcquaintance(String proActiveRuntimeName)
+        throws ProActiveException;
 
     /**
      * Kills this ProActiveRuntime and this VM
@@ -189,19 +197,21 @@ public interface ProActiveRuntime extends Job {
      * if true, if that runtime originates the creation of  a rmi registry, it waits until the registry is empty before
      * dying. To be more precise a thread is created to ask periodically the registry if objects are still
      * registered.
+     * @exception Exception if a problem occurs when killing this ProActiveRuntime
      */
     public void killRT(boolean softly) throws Exception;
 
     /**
      * Returns the url of this ProActiveRuntime on the local or remote VM
      */
-    public String getURL() throws ProActiveException;
+    public String getURL();
 
     /**
      * Returns all Active Objects deployed on the node with the given name on
      * this ProActiveRuntime
      * @param nodeName the name of the node
      * @return ArrayList of ArrayList. The latter contains [body, classname].
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public ArrayList getActiveObjects(String nodeName)
         throws ProActiveException;
@@ -212,6 +222,7 @@ public interface ProActiveRuntime extends Job {
      * @param nodeName the name of the node
      * @param className class of the Active Objects to look for
      * @return Active Objects of the specified class name deployed on this ProactiveRuntime
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public ArrayList getActiveObjects(String nodeName, String className)
         throws ProActiveException;
@@ -220,7 +231,8 @@ public interface ProActiveRuntime extends Job {
      * Returns the VirtualNode with the given name
      * @param virtualNodeName the name of the VirtualNode to be acquired
      * @return VirtualNode the virtualnode of the given name or null if such virtualNode
-     * does not exist.
+     * does not exist, or has not been yet activated.
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public VirtualNode getVirtualNode(String virtualNodeName)
         throws ProActiveException;
@@ -228,6 +240,7 @@ public interface ProActiveRuntime extends Job {
     /**
      * Registers the virtualNode of the given name in a registry such RMIRegistry or Jini Service Lookup
      * @param virtualNodeName
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding) throws ProActiveException;
@@ -242,14 +255,14 @@ public interface ProActiveRuntime extends Job {
 
     /**
      * Unregisters all VirtualNodes from the local runtime
-     * @throws ProActiveException
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public void unregisterAllVirtualNodes() throws ProActiveException;
 
     /**
      * @param nodeUrl
      * @return the jobId of the node with the given name
-     * @throws ProActiveException
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public String getJobID(String nodeUrl) throws ProActiveException;
 
@@ -377,6 +390,7 @@ public interface ProActiveRuntime extends Job {
      * get the class bytecode
      * @param className name of the class
      * @return the bytecode corresponding to the given class, or null if not found
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public byte[] getClassDataFromThisRuntime(String className)
         throws ProActiveException;
@@ -386,6 +400,7 @@ public interface ProActiveRuntime extends Job {
      * then in the grand-father etc...
      * @param className name of the class
      * @return the bytecode corresponding to the given class, or null if not found
+     * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException;

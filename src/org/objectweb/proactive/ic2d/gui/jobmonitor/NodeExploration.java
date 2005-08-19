@@ -50,7 +50,6 @@ public class NodeExploration implements JobMonitorConstants {
     private Set visitedVM;
     private Map runtimes;
     private IC2DMessageLogger controller;
-    
 
     public NodeExploration(DataAssociation asso,
         DefaultListModel skippedObjects, IC2DMessageLogger controller) {
@@ -60,7 +59,6 @@ public class NodeExploration implements JobMonitorConstants {
         this.aos = new HashMap();
         this.runtimes = new HashMap();
         this.controller = controller;
-        
     }
 
     public int getMaxDepth() {
@@ -188,12 +186,9 @@ public class NodeExploration implements JobMonitorConstants {
         String vmName = infos.getName();
 
         String url;
-        try {
-            url = pr.getURL();
-        } catch (ProActiveException e) {
-            log(e);
-            return;
-        }
+
+        url = pr.getURL();
+
         MonitoredJVM jvmObject = new MonitoredJVM(url, depth);
 
         if (visitedVM.contains(vmName) || skippedObjects.contains(jvmObject)) {

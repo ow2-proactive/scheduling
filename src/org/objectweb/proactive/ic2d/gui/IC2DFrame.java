@@ -31,11 +31,8 @@
 package org.objectweb.proactive.ic2d.gui;
 
 import org.globus.ogce.gui.gram.gui.SubmitJobPanel;
-
 import org.objectweb.fractal.gui.FractalGUI;
-
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventListener;
 import org.objectweb.proactive.core.node.NodeException;
@@ -166,11 +163,9 @@ public class IC2DFrame extends javax.swing.JFrame implements IC2DObjectListener,
         proActiveRuntimeRegistered = event.getRegisteredRuntime();
         host = UrlBuilder.getHostNameorIP(proActiveRuntimeRegistered.getVMInformation()
                                                                     .getInetAddress());
-        try {
-            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
-        } catch (ProActiveException e) {
-            logger.warn("port unknown: " + port);
-        }
+
+        port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+
         nodeName = "IC2DNode-" +
             Integer.toString(new java.util.Random(System.currentTimeMillis()).nextInt());
         if (port != 0) {

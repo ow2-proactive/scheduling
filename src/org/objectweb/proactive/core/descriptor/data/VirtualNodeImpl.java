@@ -180,7 +180,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             logger.debug("vn " + this.name + " registered on " +
                 proActiveRuntimeImpl.getVMInformation().getVMID().toString());
         }
-        
+
         // SECURITY
         this.creatorCertificate = creatorCertificate;
         this.policyServer = policyServer;
@@ -624,11 +624,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getHostName();
 
-            try {
-                port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
-            } catch (ProActiveException e) {
-                logger.warn("port unknown: " + port);
-            }
+            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
+
             try {
                 //get the node on the registered runtime
                 // nodeNames = proActiveRuntimeRegistered.getLocalNodeNames();
@@ -666,11 +663,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             nodeHost = proActiveRuntimeRegistered.getVMInformation()
                                                  .getHostName();
             protocol = event.getProtocol();
-            try {
-                port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
-            } catch (ProActiveException e) {
-                logger.warn("port unknown: " + port);
-            }
+
+            port = UrlBuilder.getPortFromUrl(proActiveRuntimeRegistered.getURL());
 
             // it is the only way to get accurate value of askedNodes
             VirtualMachine vm = (VirtualMachine) awaitedVirtualNodes.get(event.getCreatorID());
@@ -1133,7 +1127,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        
+
         out.defaultWriteObject();
     }
 
