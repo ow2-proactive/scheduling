@@ -116,11 +116,11 @@ public class Manager implements Serializable, InitActive {
         }
 
         try {
-			this.workerGroup.setWorkerGroup(this.workerGroup);
-		} catch (ExceptionListException e) {
-			// TODO find a fix
-			logger.debug("A worker is done", e);
-		}
+            this.workerGroup.setWorkerGroup(this.workerGroup);
+        } catch (ExceptionListException e) {
+            // TODO find a fix
+            logger.debug("A worker is down", e);
+        }
 
         // Spliting
         logger.info("Compute the lower bound for the root task");
@@ -169,7 +169,7 @@ public class Manager implements Serializable, InitActive {
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
                 this.allResults.add(this.futureTaskList.get(index));
-                this.pendingTaskList.remove(index);
+                // this.pendingTaskList.remove(index);
             } catch (ProActiveException e) {
                 while (service.getRequestCount() > 0) {
                     service.serveOldest();
