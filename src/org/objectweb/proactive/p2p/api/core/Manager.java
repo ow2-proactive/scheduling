@@ -157,7 +157,7 @@ public class Manager implements Serializable, InitActive {
         while (taskIt.hasNext()) {
             // wait for a free worker
             int index = ProActive.waitForAny(this.futureTaskList);
-            this.allResults.add(this.futureTaskList.get(index));
+            this.allResults.add(this.futureTaskList.remove(index));
             this.pendingTaskList.remove(index);
             Worker freeWorker = (Worker) this.workingWorkerList.remove(index);
             this.assignTaskToWorker(freeWorker, (Task) taskIt.next());
@@ -168,8 +168,7 @@ public class Manager implements Serializable, InitActive {
         while (this.allResults.size() != this.tasks.size()) {
             try {
                 int index = ProActive.waitForAny(this.futureTaskList, 1000);
-                this.allResults.add(this.futureTaskList.get(index));
-                // this.pendingTaskList.remove(index);
+                this.allResults.add(this.futureTaskList.remove(index));
             } catch (ProActiveException e) {
                 while (service.getRequestCount() > 0) {
                     service.serveOldest();
@@ -177,7 +176,8 @@ public class Manager implements Serializable, InitActive {
                 continue;
             }
         }
-
+        System.out.println("Total of results = " + this.allResults.size());
+        System.out.println("Total of tasks = " + this.tasks.size());
         // Set the final result
         this.finalResult = this.rootTask.gather((Result[]) this.allResults.toArray(
                     new Result[this.allResults.size()]));
@@ -200,6 +200,7 @@ public class Manager implements Serializable, InitActive {
     }
 
     public Result getFinalResult() {
+        ProActive.waitFor(this.finalResult);
         return this.finalResult;
     }
 }
