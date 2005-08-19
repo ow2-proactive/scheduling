@@ -605,20 +605,7 @@ public class ProActive {
      */
     public static void register(Object obj, String url)
         throws java.io.IOException {
-        // Check if obj is really a reified object
-        if (!(MOP.isReifiedObject(obj))) {
-            throw new java.io.IOException("The given object " + obj +
-                " is not a reified object");
-        }
-
-        // Find the appropriate remoteBody
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-        if (myProxy == null) {
-            throw new java.io.IOException(
-                "Cannot find a Proxy on the stub object: " + obj);
-        }
-        BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        BodyAdapter body = myBodyProxy.getBody().getRemoteAdapter();
+        BodyAdapter body = getRemoteBody(obj);
         try {
             body.register(url);
         } catch (IOException e) {
@@ -711,8 +698,7 @@ public class ProActive {
      * @return the URL of <code>activeObject</code>.
      */
     public static String getActiveObjectNodeUrl(Object activeObject) {
-        BodyProxy proxy = (BodyProxy) ((StubObject) activeObject).getProxy();
-        UniversalBody body = proxy.getBody();
+        UniversalBody body = getRemoteBody(activeObject);
         return body.getNodeURL();
     }
 
@@ -1287,22 +1273,7 @@ public class ProActive {
      * Enable the automatic continuation mechanism for this active object.
      */
     public static void enableAC(Object obj) throws java.io.IOException {
-        // Check if obj is really a reified object
-        if (!(MOP.isReifiedObject(obj))) {
-            throw new ProActiveRuntimeException("The given object " + obj +
-                " is not a reified object");
-        }
-
-        // Find the appropriate remoteBody
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-
-        if (myProxy == null) {
-            throw new ProActiveRuntimeException(
-                "Cannot find a Proxy on the stub object: " + obj);
-        }
-
-        BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+        UniversalBody body = getRemoteBody(obj);
         body.enableAC();
     }
 
@@ -1310,22 +1281,7 @@ public class ProActive {
      * Disable the automatic continuation mechanism for this active object.
      */
     public static void disableAC(Object obj) throws java.io.IOException {
-        // Check if obj is really a reified object
-        if (!(MOP.isReifiedObject(obj))) {
-            throw new ProActiveRuntimeException("The given object " + obj +
-                " is not a reified object");
-        }
-
-        // Find the appropriate remoteBody
-        org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
-
-        if (myProxy == null) {
-            throw new ProActiveRuntimeException(
-                "Cannot find a Proxy on the stub object: " + obj);
-        }
-
-        BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+        UniversalBody body = getRemoteBody(obj);
         body.disableAC();
     }
 
@@ -1378,7 +1334,7 @@ public class ProActive {
      * @param obj
      * @return
      */
-    private static UniversalBody getRemoteBody(Object obj) {
+    private static BodyAdapter getRemoteBody(Object obj) {
         // Check if obj is really a reified object
         if (!(MOP.isReifiedObject(obj))) {
             throw new ProActiveRuntimeException("The given object " + obj +
@@ -1394,7 +1350,7 @@ public class ProActive {
         }
 
         BodyProxy myBodyProxy = (BodyProxy) myProxy;
-        UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
+        BodyAdapter body = myBodyProxy.getBody().getRemoteAdapter();
         return body;
     }
 
