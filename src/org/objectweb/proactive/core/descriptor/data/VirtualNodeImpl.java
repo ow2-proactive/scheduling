@@ -1120,15 +1120,18 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     private void writeObject(java.io.ObjectOutputStream out)
         throws java.io.IOException {
-        try {
+        
             if (isActivated) {
-                waitForAllNodesCreation();
+                try {
+                    waitForAllNodesCreation();
+                } catch (NodeException e) {
+                    out.defaultWriteObject();
+                    return;
+                }
             }
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
+            out.defaultWriteObject();
 
-        out.defaultWriteObject();
+        
     }
 
     private void readObject(java.io.ObjectInputStream in)

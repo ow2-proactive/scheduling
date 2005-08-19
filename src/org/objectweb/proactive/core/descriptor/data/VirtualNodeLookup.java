@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -133,6 +134,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 isActivated = true;
             } catch (ProActiveException e) {
                 e.printStackTrace();
+                throw new ProActiveRuntimeException(e);
             }
         } else {
             vnlogger.info("VirtualNode " + this.name +
