@@ -34,15 +34,14 @@ import org.objectweb.proactive.core.body.RemoteBody;
 
 
 /**
- * An object implementing this interface provides the minimum service a body offers
- * remotely. This interface is the glue with the RMI Remote interface that allow the
- * body to be accessed remotely.
- *
+ * An object implementing this interface provides the minimum service a body offers 
+ * remotely through IBIS. 
  * @author  ProActive Team
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  * @see ibis.rmi.Remote
  * @see org.objectweb.proactive.core.body.UniversalBody
+ * * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
 public interface IbisRemoteBody extends ibis.rmi.Remote, RemoteBody {
 }

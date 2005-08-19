@@ -60,9 +60,12 @@ import java.util.ArrayList;
 
 
 /**
- * Local view of an adapter, i.e. a generlized reference to an active object.
- * @author cdelbe
+ * An adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
  * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
 public abstract class BodyAdapter implements UniversalBody {
 
@@ -88,15 +91,37 @@ public abstract class BodyAdapter implements UniversalBody {
     /**
      * Change the body referenced by this adapter.
      * @param newBody the body referenced after the call
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void changeProxiedBody(Body newBody) throws IOException {
         this.proxiedRemoteBody.changeProxiedBody(newBody);
     }
 
+    /**
+     * Looks-up an active object previously registered in a registry. In fact it is the
+     * remote version of the body of an active object that can be registered into the
+     * Registry under a given URL.
+     * @param url the url the remote Body is registered to
+     * @return a UniversalBody
+     * @exception java.io.IOException if the remote body cannot be found under the given url
+     *      or if the object found is not of type RemoteBody
+     */
     public abstract UniversalBody lookup(String url) throws java.io.IOException;
 
+    /**
+     * Registers an active object into protocol-specific registry. In fact it is the
+     * remote version of the body of the active object that is registered into the
+     * Registry under the given URL.
+     * @param url the url under which the remote body is registered.
+     * @exception java.io.IOException if the remote body cannot be registered
+     */
     public abstract void register(String url) throws java.io.IOException;
 
+    /**
+     * Unregisters an active object previously registered into a registry.
+     * @param url the url under which the active object is registered.
+     * @exception java.io.IOException if the remote object cannot be removed from the registry
+     */
     public abstract void unregister(String url) throws java.io.IOException;
 
     public boolean equals(Object o) {

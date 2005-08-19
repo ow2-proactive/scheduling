@@ -161,20 +161,20 @@ public abstract class BodyImpl extends AbstractBody
                     // should use a factory ...
                     this.ftmanager = new FTManagerCIC();
                     this.ftmanager.init(this);
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Init FTManager on " + this.getNodeURL());
+                    if (bodyLogger.isDebugEnabled()) {
+                        bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                     }
                     
-                    logger.info("** Fault-Tolerance is enabled **");
+                    bodyLogger.info("** Fault-Tolerance is enabled **");
                 } catch (ProActiveException e) {
-                    logger.error(
+                    bodyLogger.error(
                             "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
                             e);
                     this.ftmanager = null;
                 }
             }else{
                 // target body is not serilizable
-                logger.error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
+                bodyLogger.error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                 this.ftmanager = null;
             }
         } else {

@@ -62,21 +62,14 @@ import java.util.ArrayList;
 
 
 /**
- * @author ProActiveTeam
- * @version 1.0, 17 août 2005
- * @since ProActive 2.2
- *
- */
-/**
  * An object implementing this interface provides the minimum service a body offers
- * remotely. This interface is the glue with the RMI Remote interface that allow the
- * body to be accessed remotely.
- *
- * @author  ProActive Team
- * @version 1.0,  2001/10/23
- * @since   ProActive 0.9
- * @see java.rmi.Remote
+ * remotely. This interface is extended by protocol-specific(RMI, RMI/SSH, IBIS, HTTP, JINI)
+ * remote interfaces to allow the body to be accessed remotely.
+ * @author ProActiveTeam
+ * @version 1.0, 5 août 2005
+ * @since ProActive 2.2
  * @see org.objectweb.proactive.core.body.UniversalBody
+ * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
 public interface RemoteBody extends Serializable {
     public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
@@ -102,14 +95,15 @@ public interface RemoteBody extends Serializable {
     /**
      * Terminate the body. After this call the body is no more alive and no more active
      * although the active thread is not interrupted. The body is unuseable after this call.
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public void terminate() throws java.io.IOException;
 
     /**
      * Returns the url of the node this body is associated to
      * The url of the node can change if the active object migrates
-     * @exception java.rmi.RemoteException if an exception occured during the remote communication
      * @return the url of the node this body is associated to
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public String getNodeURL() throws java.io.IOException;
 
@@ -117,10 +111,14 @@ public interface RemoteBody extends Serializable {
      * Returns the UniqueID of this body
      * This identifier is unique accross all JVMs
      * @return the UniqueID of this body
-     * @exception java.rmi.RemoteException if an exception occured during the remote communication
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public UniqueID getID() throws java.io.IOException;
 
+    /**
+     * @return the JobID of the remote body
+     * @exception java.io.IOException if an exception occured during the remote communication
+     */
     public String getJobID() throws java.io.IOException;
 
     /**
@@ -137,17 +135,20 @@ public interface RemoteBody extends Serializable {
 
     /**
      * Enables automatic continuation mechanism for this body
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public void enableAC() throws java.io.IOException;
 
     /**
      * Disables automatic continuation mechanism for this body
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public void disableAC() throws java.io.IOException;
 
     /**
      * For setting an immediate service for this body.
      * An immediate service is a method that will bw excecuted by the calling thread.
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public void setImmediateService(String methodName)
         throws java.io.IOException;
@@ -224,12 +225,14 @@ public interface RemoteBody extends Serializable {
      * For sending a message to the FTManager linked to this object
      * @param fte the message
      * @return still not used
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public int receiveFTMessage(FTMessage fte) throws IOException;
 
     /**
      * Change the body referenced by this adapter
      * @param newBody the body referenced after the call
+     * @exception java.io.IOException if an exception occured during the remote communication
      */
     public void changeProxiedBody(Body newBody) throws java.io.IOException;
 

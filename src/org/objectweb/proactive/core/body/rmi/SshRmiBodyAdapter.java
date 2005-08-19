@@ -12,8 +12,12 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 
 
 /**
- * @author mlacage
- *
+ * An RMISSH adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using RMISSH.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
+ * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
 public class SshRmiBodyAdapter extends RmiBodyAdapter {
     

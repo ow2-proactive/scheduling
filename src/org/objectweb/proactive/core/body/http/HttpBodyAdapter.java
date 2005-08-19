@@ -42,7 +42,14 @@ import org.objectweb.proactive.core.util.UrlBuilder;
 import java.io.IOException;
 
 import java.util.Hashtable;
-
+/**
+ * An HTTP adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using HTTP.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
+ * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
+ */
 
 public class HttpBodyAdapter extends BodyAdapter {
 

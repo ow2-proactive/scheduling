@@ -36,7 +36,14 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.BodyAdapter;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.util.UrlBuilder;
-
+/**
+ * An RMI adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using RMI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
+ * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
+ */
 
 public class RmiBodyAdapter extends BodyAdapter {
     //

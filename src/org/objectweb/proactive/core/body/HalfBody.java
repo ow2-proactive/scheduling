@@ -94,7 +94,7 @@ public class HalfBody extends AbstractBody {
         if (psm != null) {
             //  startDefaultProActiveSecurityManager();
             isSecurityOn = (psm != null);
-            logger.debug("HalfBody Security is " + isSecurityOn);
+            bodyLogger.debug("HalfBody Security is " + isSecurityOn);
             psm.setBody(this);
             internalBodySecurity = new InternalBodySecurity(null);
         }
@@ -113,12 +113,12 @@ public class HalfBody extends AbstractBody {
                 // should use a factory ...
                 this.ftmanager = new HalfFTManagerCIC();
                 this.ftmanager.init(this);
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Init FTManager on " + this.getNodeURL());
+                if (bodyLogger.isDebugEnabled()) {
+                    bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                 }
-                logger.info("** Fault-Tolerance is enabled **");
+                bodyLogger.info("** Fault-Tolerance is enabled **");
             } catch (ProActiveException e) {
-                logger.error(
+                bodyLogger.error(
                     "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
                     e);
                 this.ftmanager = null;
@@ -280,7 +280,7 @@ public class HalfBody extends AbstractBody {
             try {
                 try {
                     if (!isSecurityOn) {
-                        logger.debug("security is off");
+                        bodyLogger.debug("security is off");
                         throw new SecurityNotAvailableException();
                     }
                     if (internalBodySecurity.isLocalBody()) {
@@ -295,7 +295,7 @@ public class HalfBody extends AbstractBody {
                     }
                 } catch (SecurityNotAvailableException e) {
                     // do nothing 
-                    logger.debug("communication without security");
+                    bodyLogger.debug("communication without security");
                     //e.printStackTrace();
                 }
 
@@ -310,10 +310,10 @@ public class HalfBody extends AbstractBody {
                 //e.printStackTrace();
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
                 psm.terminateSession(sessionID);
-                logger.debug("renegotiate session");
+                bodyLogger.debug("renegotiate session");
                 sendRequest(methodCall, future, e.getUniversalBody());
             } catch (CommunicationForbiddenException e) {
-                logger.warn(e);
+                bodyLogger.warn(e);
                 //e.printStackTrace();
             } catch (AuthenticationException e) {
                 e.printStackTrace();

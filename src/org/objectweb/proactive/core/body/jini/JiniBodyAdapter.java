@@ -41,9 +41,11 @@ import org.objectweb.proactive.core.body.rmi.RmiRemoteBody;
 
 
 /**
- *   An adapter for a JiniBody to be able to receive remote calls. This helps isolate JINI-specific
- *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
- *   to another jini objects library.
+ * An JINI adapter for a RemoteBody. The Adpater is the generic entry point for remote calls
+ * to a RemoteBody using JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
+ * @author ProActiveTeam
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  */
 public class JiniBodyAdapter extends BodyAdapter {
     //
@@ -100,7 +102,7 @@ public class JiniBodyAdapter extends BodyAdapter {
      * @param url the url the jini Body is registered to
      * @return a UniversalBody
      * @exception java.io.IOException if the jini body cannot be found under the given url
-     *      or if the object found is not of type JiniBody
+     *      or if the object found is not of type RmiRemoteBody
      */
     public UniversalBody lookup(String url) throws java.io.IOException {
         Object o = null;

@@ -30,17 +30,6 @@
  */
 package org.objectweb.proactive.core.body;
 
-import java.io.IOException;
-import java.security.Provider;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Hashtable;
-
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.internalmsg.FTMessage;
@@ -72,6 +61,18 @@ import org.objectweb.proactive.ext.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.ext.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.ext.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.IOException;
+
+import java.security.Provider;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 
 /**
@@ -119,7 +120,6 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     protected boolean isSecurityOn = false;
     protected transient InternalBodySecurity internalBodySecurity;
     protected Hashtable openedSessions;
-    protected static Logger logger = Logger.getLogger(AbstractBody.class.getName());
     protected boolean isInterfaceSecureImplemented = false;
 
     // SPMD GROUP
@@ -802,10 +802,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     /*
-     * 
+     *
      * @see org.objectweb.proactive.Body#getShortcutTargetBody(org.objectweb.proactive.core.component.representative.FunctionalInterfaceID)
      */
-    public UniversalBody getShortcutTargetBody(FunctionalInterfaceID functionalItfID) {
+    public UniversalBody getShortcutTargetBody(
+        FunctionalInterfaceID functionalItfID) {
         if (shortcuts == null) {
             return null;
         } else {
@@ -875,7 +876,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         try {
             try {
                 if (!isSecurityOn) {
-                    logger.debug("security is off");
+                    bodyLogger.debug("security is off");
                 } else {
                     if (internalBodySecurity.isLocalBody()) {
                         byte[] certE = destinationBody.getRemoteAdapter()
@@ -894,7 +895,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             } catch (SecurityNotAvailableException e) {
                 // do nothing 
-                logger.debug("communication without security");
+                bodyLogger.debug("communication without security");
                 //e.printStackTrace();
             }
             localBodyStrategy.sendRequest(methodCall, future, destinationBody);
@@ -905,68 +906,67 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             psm.terminateSession(sessionID);
             sendRequest(methodCall, future, e.getUniversalBody());
         } catch (CommunicationForbiddenException e) {
-            logger.warn(e);
+            bodyLogger.warn(e);
             //e.printStackTrace();
         } catch (AuthenticationException e) {
             e.printStackTrace();
         }
     }
 
-//    /**
-//     * Get information about the handlerizable object
-//     * @return information about the handlerizable object
-//     */
-//    public String getHandlerizableInfo() throws java.io.IOException {
-//        return "BODY (URL=" + this.nodeURL + ") of CLASS [" + this.getClass() +
-//        "]";
-//    }
-//
-//    /** Give a reference to a local map of handlers
-//     * @return A reference to a map of handlers
-//     */
-//    public HashMap getHandlersLevel() throws java.io.IOException {
-//        return bodyLevel;
-//    }
-//
-//    /**
-//     * Clear the local map of handlers
-//     */
-//    public void clearHandlersLevel() throws java.io.IOException {
-//        bodyLevel.clear();
-//    }
-//
-//    /** Set a new handler within the table of the Handlerizable Object
-//     * @param handler A handler associated with a class of non functional exception.
-//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//     */
-//    public void setExceptionHandler(Handler handler, Class exception)
-//        throws java.io.IOException {
-//        // add handler to body level
-//        if (bodyLevel == null) {
-//            bodyLevel = new HashMap();
-//        }
-//        bodyLevel.put(exception, handler);
-//    }
-//
-//    /** Remove a handler from the table of the Handlerizable Object
-//     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
-//     * @return The removed handler or null
-//     */
-//    public Handler unsetExceptionHandler(Class exception)
-//        throws java.io.IOException {
-//        // remove handler from body level
-//        if (bodyLevel != null) {
-//            Handler handler = (Handler) bodyLevel.remove(exception);
-//            return handler;
-//        } else {
-//            if (logger.isDebugEnabled()) {
-//                logger.debug("[NFE_WARNING] No handler for [" +
-//                    exception.getName() + "] can be removed from BODY level");
-//            }
-//            return null;
-//        }
-//    }
-
+    //    /**
+    //     * Get information about the handlerizable object
+    //     * @return information about the handlerizable object
+    //     */
+    //    public String getHandlerizableInfo() throws java.io.IOException {
+    //        return "BODY (URL=" + this.nodeURL + ") of CLASS [" + this.getClass() +
+    //        "]";
+    //    }
+    //
+    //    /** Give a reference to a local map of handlers
+    //     * @return A reference to a map of handlers
+    //     */
+    //    public HashMap getHandlersLevel() throws java.io.IOException {
+    //        return bodyLevel;
+    //    }
+    //
+    //    /**
+    //     * Clear the local map of handlers
+    //     */
+    //    public void clearHandlersLevel() throws java.io.IOException {
+    //        bodyLevel.clear();
+    //    }
+    //
+    //    /** Set a new handler within the table of the Handlerizable Object
+    //     * @param handler A handler associated with a class of non functional exception.
+    //     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //     */
+    //    public void setExceptionHandler(Handler handler, Class exception)
+    //        throws java.io.IOException {
+    //        // add handler to body level
+    //        if (bodyLevel == null) {
+    //            bodyLevel = new HashMap();
+    //        }
+    //        bodyLevel.put(exception, handler);
+    //    }
+    //
+    //    /** Remove a handler from the table of the Handlerizable Object
+    //     * @param exception A class of non functional exception. It is a subclass of <code>NonFunctionalException</code>.
+    //     * @return The removed handler or null
+    //     */
+    //    public Handler unsetExceptionHandler(Class exception)
+    //        throws java.io.IOException {
+    //        // remove handler from body level
+    //        if (bodyLevel != null) {
+    //            Handler handler = (Handler) bodyLevel.remove(exception);
+    //            return handler;
+    //        } else {
+    //            if (logger.isDebugEnabled()) {
+    //                logger.debug("[NFE_WARNING] No handler for [" +
+    //                    exception.getName() + "] can be removed from BODY level");
+    //            }
+    //            return null;
+    //        }
+    //    }
     public int receiveFTMessage(FTMessage fte) {
         // delegate to the FTManger
         int res = 0;
@@ -1099,6 +1099,5 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
         }
-        logger = Logger.getLogger("AbstractBody");
     }
 }

@@ -115,6 +115,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * peer that it has migrated to a new location
      * @param id the id of the body
      * @param body the stub to the new location
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void updateLocation(UniqueID id, UniversalBody body)
         throws java.io.IOException;
@@ -123,6 +124,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * similar to the {@link UniversalBody#updateLocation(org.objectweb.proactive.core.UniqueID, UniversalBody)} method,
      * it allows direct communication to the target of a functional call, accross membranes of composite components.
      * @param shortcut the shortcut to create
+     * @exception java.io.IOException if a pb occurs during this method call
      */ 
     public void createShortcut(Shortcut shortcut) throws java.io.IOException;
 
@@ -135,22 +137,26 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     /**
      * Terminate the body. After this call the body is no more alive and no more active
      * although the active thread is not interrupted. The body is unuseable after this call.
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void terminate() throws java.io.IOException;
 
     /**
      * Enables automatic continuation mechanism for this body
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void enableAC() throws java.io.IOException;
 
     /**
      * Disables automatic continuation mechanism for this body
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void disableAC() throws java.io.IOException;
 
     /**
      * For setting an immediate service for this body.
      * An immediate service is a method that will bw excecuted by the calling thread.
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void setImmediateService(String methodName)
         throws IOException;
@@ -160,7 +166,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * An immediate service is a method that will bw excecuted by the calling thread.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
-     * @throws IOException
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void setImmediateService(String methodName, Class[] parametersTypes) throws IOException;
     
@@ -169,7 +175,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * An immediate service is a method that will bw excecuted by the calling thread.
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
-     * @throws IOException
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public void removeImmediateService(String methodName, Class[] parametersTypes) throws IOException;
 
@@ -244,6 +250,7 @@ public static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
      * For sending a non fonctional message to the FTManager linked to this object.
      * @param ev the message to send
      * @return still not used
+     * @exception java.io.IOException if a pb occurs during this method call
      */
     public int receiveFTMessage(FTMessage ev) throws IOException;
 }
