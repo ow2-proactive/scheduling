@@ -54,9 +54,13 @@ import java.util.ArrayList;
 
 
 /**
+ * An adapter for a RemoteProActiveRuntime. The Adpater is the generic entry point for remote calls
+ * to a RemoteProActiveRuntime using different protocols such as RMI, RMISSH, IBIS, HTTP, JINI.
+ * This also allows to cache informations, and so to avoid crossing the network when calling some methods.
  * @author ProActiveTeam
  * @version 1.0, 5 août 2005
  * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-11-2000/jw-1110-smartproxy.html">smartProxy Pattern.</a>
  *
  */
 public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
@@ -81,9 +85,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
             this.vmInformation = proActiveRuntime.getVMInformation();
             this.proActiveRuntimeURL = proActiveRuntime.getURL();
         } catch (IOException e) {
-           throw new ProActiveException(e);
+            throw new ProActiveException(e);
         }
-        
     }
 
     //
@@ -181,8 +184,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException {
         try {
-            proActiveRuntime.register(proActiveRuntimeDist, proActiveRuntimeUrl,
-                creatorID, creationProtocol, vmName);
+            proActiveRuntime.register(proActiveRuntimeDist,
+                proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
         } catch (IOException e) {
             throw new ProActiveException(e);
         }
@@ -219,7 +222,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getProActiveRuntime(java.lang.String)
      */
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) throws ProActiveException {
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
+        throws ProActiveException {
         try {
             return proActiveRuntime.getProActiveRuntime(proActiveRuntimeName);
         } catch (IOException e) {
@@ -231,7 +235,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#addAcquaintance(java.lang.String)
      */
-    public void addAcquaintance(String proActiveRuntimeName) throws ProActiveException {
+    public void addAcquaintance(String proActiveRuntimeName)
+        throws ProActiveException {
         try {
             proActiveRuntime.addAcquaintance(proActiveRuntimeName);
         } catch (IOException e) {
@@ -255,7 +260,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#rmAcquaintance(java.lang.String)
      */
-    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException {
+    public void rmAcquaintance(String proActiveRuntimeName)
+        throws ProActiveException {
         try {
             proActiveRuntime.rmAcquaintance(proActiveRuntimeName);
         } catch (IOException e) {
@@ -290,7 +296,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getActiveObjects(java.lang.String)
      */
-    public ArrayList getActiveObjects(String nodeName) throws ProActiveException {
+    public ArrayList getActiveObjects(String nodeName)
+        throws ProActiveException {
         try {
             return proActiveRuntime.getActiveObjects(nodeName);
         } catch (IOException e) {
@@ -302,7 +309,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getActiveObjects(java.lang.String, java.lang.String)
      */
-    public ArrayList getActiveObjects(String nodeName, String className) throws ProActiveException {
+    public ArrayList getActiveObjects(String nodeName, String className)
+        throws ProActiveException {
         try {
             return proActiveRuntime.getActiveObjects(nodeName, className);
         } catch (IOException e) {
@@ -314,7 +322,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getVirtualNode(java.lang.String)
      */
-    public VirtualNode getVirtualNode(String virtualNodeName) throws ProActiveException {
+    public VirtualNode getVirtualNode(String virtualNodeName)
+        throws ProActiveException {
         try {
             return proActiveRuntime.getVirtualNode(virtualNodeName);
         } catch (IOException e) {
@@ -340,7 +349,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#unregisterVirtualNode(java.lang.String)
      */
-    public void unregisterVirtualNode(String virtualNodeName) throws ProActiveException {
+    public void unregisterVirtualNode(String virtualNodeName)
+        throws ProActiveException {
         try {
             proActiveRuntime.unregisterVirtualNode(virtualNodeName);
         } catch (IOException e) {
@@ -383,16 +393,17 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
         try {
             return proActiveRuntime.createBody(nodeName, bodyConstructorCall,
                 isNodeLocal);
-        }  catch (IOException e) {
+        } catch (IOException e) {
             throw new ProActiveException(e);
-        } 
+        }
     }
 
     /**
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveBody(java.lang.String, org.objectweb.proactive.Body)
      */
-    public UniversalBody receiveBody(String nodeName, Body body) throws ProActiveException {
+    public UniversalBody receiveBody(String nodeName, Body body)
+        throws ProActiveException {
         try {
             return proActiveRuntime.receiveBody(nodeName, body);
         } catch (IOException e) {
@@ -451,9 +462,9 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
             return proActiveRuntime.getPolicy(sc);
         } catch (IOException e) {
             throw new ProActiveException(e);
-        } 
+        }
     }
-    
+
     /**
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getVNName(java.lang.String)
@@ -470,7 +481,8 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
      * @throws ProActiveException
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getClassDataFromThisRuntime(java.lang.String)
      */
-    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
+    public byte[] getClassDataFromThisRuntime(String className)
+        throws ProActiveException {
         try {
             return proActiveRuntime.getClassDataFromThisRuntime(className);
         } catch (IOException e) {
@@ -501,6 +513,4 @@ public class ProActiveRuntimeAdapter implements ProActiveRuntime, Serializable {
     public String getJobID() {
         return vmInformation.getJobID();
     }
-
-    
 }

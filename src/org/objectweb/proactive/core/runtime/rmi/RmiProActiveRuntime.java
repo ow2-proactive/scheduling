@@ -33,13 +33,14 @@ package org.objectweb.proactive.core.runtime.rmi;
 import org.objectweb.proactive.core.runtime.RemoteProActiveRuntime;
 
 
-
 /**
- *   An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate RMI-specific
- *   code into a small set of specific classes, thus enabling reuse if we one day decide to switch
- *   to anothe remote objects library.
- *          @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
+ * An RMI/JINI adapter for a ProActiveRuntime to be able to receive remote calls with RMI. This helps isolate
+ * RMI/JINI specific code into a small set of specific classes.
+ * @author ProActiveTeam
+ * @version 1.0, 9 août 2005
+ * @since ProActive 2.2
+ * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
-public interface RmiProActiveRuntime extends java.rmi.Remote, RemoteProActiveRuntime {
-    
+public interface RmiProActiveRuntime extends java.rmi.Remote,
+    RemoteProActiveRuntime {
 }

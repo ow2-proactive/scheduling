@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -50,12 +47,21 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
 
+import java.io.IOException;
+import java.io.Serializable;
+
+import java.util.ArrayList;
+
 
 /**
+ * An adapter for a ProActiveRuntime to be able to receive remote calls. This helps isolate
+ * protocol-specific code into a small set of specific classes, thus enabling reuse when
+ * using another remote objects library.
+ * Implemented protocols are RMI, RMISSH, IBIS, JINI, HTTP
  * @author ProActiveTeam
  * @version 1.0, 9 août 2005
  * @since ProActive 2.2
- *
+ * @see <a href="http://www.javaworld.com/javaworld/jw-05-1999/jw-05-networked_p.html">Adapter Pattern</a>
  */
 public interface RemoteProActiveRuntime extends Serializable {
     static Logger runtimeLogger = ProActiveLogger.getLogger(Loggers.RUNTIME);

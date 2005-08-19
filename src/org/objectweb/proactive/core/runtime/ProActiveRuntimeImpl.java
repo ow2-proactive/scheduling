@@ -30,17 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.Provider;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Random;
-
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -73,6 +62,19 @@ import org.objectweb.proactive.ext.security.PolicyServer;
 import org.objectweb.proactive.ext.security.ProActiveSecurityManager;
 import org.objectweb.proactive.ext.security.SecurityContext;
 import org.objectweb.proactive.ext.security.exceptions.SecurityNotAvailableException;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Random;
 
 
 /**
@@ -410,7 +412,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     /**
-     *@see org.objectweb.proactive.core.runtime.ProActiveRuntime#setParent(String)
+     * This method adds a reference to the runtime that created this runtime.
+     * It is called when a new runtime is created from another one.
+     * @param parentRuntimeName the name of the creator of this runtime
      */
     public void setParent(String parentRuntimeName) {
         if (parentRuntimeURL == null) {

@@ -108,7 +108,8 @@ public abstract class RuntimeFactory {
     public static synchronized void setFactory(String protocol,
         String factoryClassName) {
         if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("protocol =  " + protocol + " " + factoryClassName);
+            runtimeLogger.debug("protocol =  " + protocol + " " +
+                factoryClassName);
         }
         protocolFactoryMapping.put(protocol, factoryClassName);
     }
@@ -148,7 +149,8 @@ public abstract class RuntimeFactory {
             defaultRuntime = getProtocolSpecificRuntime(System.getProperty(
                         "proactive.communication.protocol") + ":");
             if (runtimeLogger.isDebugEnabled()) {
-                runtimeLogger.debug("default runtime = " + defaultRuntime.getURL());
+                runtimeLogger.debug("default runtime = " +
+                    defaultRuntime.getURL());
             }
         } catch (ProActiveException e) {
             //e.printStackTrace();
@@ -207,6 +209,13 @@ public abstract class RuntimeFactory {
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
+
+    /**
+     * Creates an Adapter for the given RemoteProActiveRuntime
+     * @param remoteProActiveRuntime object we will create an Adapter for
+     * @return the newly created Adpater for the given RemoteProActiveRuntime
+     * @throws ProActiveException if a pb occurs during the creation
+     */
     protected ProActiveRuntimeAdapter createRuntimeAdapter(
         RemoteProActiveRuntime remoteProActiveRuntime)
         throws ProActiveException {
@@ -229,6 +238,11 @@ public abstract class RuntimeFactory {
     protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s)
         throws ProActiveException;
 
+    /**
+     * Creates a new Adapter
+     * @return the newly created Adapter
+     * @throws ProActiveException if a pb occurs during the creation
+     */
     protected abstract ProActiveRuntimeAdapter createRuntimeAdapter()
         throws ProActiveException;
 
@@ -240,7 +254,8 @@ public abstract class RuntimeFactory {
             new ClassServerHelper().initializeClassServer();
         } catch (Exception e) {
             if (runtimeLogger.isInfoEnabled()) {
-                runtimeLogger.info("Error with the ClassServer : " + e.getMessage());
+                runtimeLogger.info("Error with the ClassServer : " +
+                    e.getMessage());
             }
         }
     }
