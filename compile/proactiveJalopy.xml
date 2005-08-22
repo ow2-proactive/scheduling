@@ -228,8 +228,8 @@
         </history>
         <imports>
             <grouping>
-                <defaultDepth>3</defaultDepth>
-                <packages>*:0|gnu:2|java:2|javax:2</packages>
+                <defaultDepth>1</defaultDepth>
+                <packages>java:1|javax:1|org:1|com:1|*:0</packages>
             </grouping>
             <policy>disabled</policy>
             <sort>true</sort>
